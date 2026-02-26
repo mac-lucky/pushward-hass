@@ -69,6 +69,16 @@ def mock_session():
         yield
 
 
+@pytest.fixture(autouse=True)
+def mock_setup_entry():
+    """Prevent actual setup when config entry is created during tests."""
+    with patch(
+        "custom_components.pushward.async_setup_entry",
+        return_value=True,
+    ):
+        yield
+
+
 async def test_user_step_success(
     hass: HomeAssistant,
     mock_api_client,
