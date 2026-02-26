@@ -1,0 +1,9 @@
+name: Dependabot Auto Merge
+
+on:
+  pull_request:
+
+jobs:
+  auto-merge:
+    uses: mac-lucky/actions-shared-workflows/.github/workflows/dependabot-auto-merge-reusable.yml@master
+    secrets: inherit

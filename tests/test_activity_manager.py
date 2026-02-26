@@ -1,0 +1,252 @@
+"""Tests for the PushWard activity manager."""
+from __future__ import annotations
+
+import asyncio
+from datetime import timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+from homeassistant.core import HomeAssistant, State
+
+from custom_components.pushward.activity_manager import ActivityManager
+from custom_components.pushward.const import (
+    CONF_ACCENT_COLOR,
+    CONF_ACTIVITY_NAME,
+    CONF_END_STATES,
+    CONF_ENTITY_ID,
+    CONF_ICON,
+    CONF_PRIORITY,
+    CONF_PROGRESS_ATTRIBUTE,
+    CONF_REMAINING_TIME_ATTR,
+    CONF_SLUG,
+    CONF_START_STATES,
+    CONF_TEMPLATE,
+    CONF_UPDATE_INTERVAL,
+)
+
+
+def _entity_config(**overrides) -> dict:
+    """Build a test entity configuration."""
+    config = {
+        CONF_ENTITY_ID: "binary_sensor.washer",
+        CONF_SLUG: "ha-washer",
+        CONF_ACTIVITY_NAME: "Washer",
+        CONF_ICON: "washer",
+        CONF_PRIORITY: 1,
+        CONF_TEMPLATE: "generic",
+        CONF_START_STATES: ["on"],
+        CONF_END_STATES: ["off"],
+        CONF_UPDATE_INTERVAL: 5,
+        CONF_PROGRESS_ATTRIBUTE: "",
+        CONF_REMAINING_TIME_ATTR: "",
+        CONF_ACCENT_COLOR: "",
+    }
+    config.update(overrides)
+    return config
+
+
+def _mock_state(entity_id: str, state: str, attributes: dict | None = None) -> State:
+    """Create a mock HA State."""
+    mock = MagicMock(spec=State)
+    mock.entity_id = entity_id
+    mock.state = state
+    mock.attributes = attributes or {"friendly_name": entity_id}
+    return mock
+
+
+def _mock_api() -> AsyncMock:
+    """Create a mock PushWard API client."""
+    api = AsyncMock()
+    api.create_activity = AsyncMock()
+    api.update_activity = AsyncMock()
+    api.delete_activity = AsyncMock()
+    return api
+
+
+async def test_start_activity_on_state_change(hass: HomeAssistant) -> None:
+    """Entity going from off→on triggers activity creation and ONGOING update."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config])
+
+    # Set initial state to "off"
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    # Verify no activity started yet
+    api.create_activity.assert_not_called()
+
+    # Simulate state change to "on"
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_awaited_once()
+    api.update_activity.assert_awaited_once()
+    call_args = api.update_activity.call_args
+    assert call_args[0][0] == "ha-washer"
+    assert call_args[0][1] == "ONGOING"
+
+    await manager.async_stop()
+
+
+async def test_end_activity_two_phase(hass: HomeAssistant) -> None:
+    """Entity going on→off triggers two-phase end (ONGOING+Complete, then ENDED)."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    # Start activity
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    api.reset_mock()
+
+    # End activity
+    with patch(
+        "custom_components.pushward.activity_manager.asyncio.sleep",
+        new_callable=AsyncMock,
+    ):
+        hass.states.async_set("binary_sensor.washer", "off")
+        await hass.async_block_till_done()
+        # Allow the end task to complete
+        await asyncio.sleep(0)
+        await hass.async_block_till_done()
+
+    # Should have: ONGOING (completion) + ENDED
+    assert api.update_activity.await_count >= 2
+    calls = api.update_activity.call_args_list
+    # First call: completion content with ONGOING
+    assert calls[0][0][1] == "ONGOING"
+    # Last call: ENDED
+    assert calls[-1][0][1] == "ENDED"
+
+    await manager.async_stop()
+
+
+async def test_periodic_update_dedup(hass: HomeAssistant) -> None:
+    """Periodic update skips if content hasn't changed."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    # Start activity
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+
+    initial_count = api.update_activity.await_count
+
+    # Manually trigger periodic update with same state
+    await manager._async_periodic_update("binary_sensor.washer")
+
+    # Should not have sent another update (same content)
+    assert api.update_activity.await_count == initial_count
+
+    await manager.async_stop()
+
+
+async def test_resume_on_start(hass: HomeAssistant) -> None:
+    """If entity is already in start state when manager starts, resume activity."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config])
+
+    # Entity already "on" before manager starts
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_awaited_once()
+    api.update_activity.assert_awaited_once()
+
+    await manager.async_stop()
+
+
+async def test_stop_ends_all_active(hass: HomeAssistant) -> None:
+    """async_stop sends ENDED for all active activities."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+    api.reset_mock()
+
+    await manager.async_stop()
+
+    # Should have sent ENDED
+    api.update_activity.assert_awaited_once()
+    call_args = api.update_activity.call_args
+    assert call_args[0][0] == "ha-washer"
+    assert call_args[0][1] == "ENDED"
+
+
+async def test_rapid_on_off_cancels_end(hass: HomeAssistant) -> None:
+    """Rapid on→off→on cancels the end task and keeps activity active."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    # Start activity
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+
+    # End activity (schedules two-phase end with sleep)
+    with patch(
+        "custom_components.pushward.activity_manager.asyncio.sleep",
+        new_callable=AsyncMock,
+    ) as mock_sleep:
+        # Make sleep block so end task is pending
+        sleep_event = asyncio.Event()
+        mock_sleep.side_effect = lambda _: sleep_event.wait()
+
+        hass.states.async_set("binary_sensor.washer", "off")
+        await hass.async_block_till_done()
+
+        # Quickly turn back on — should cancel end task
+        hass.states.async_set("binary_sensor.washer", "on")
+        await hass.async_block_till_done()
+
+        # Release sleep to avoid dangling tasks
+        sleep_event.set()
+        await hass.async_block_till_done()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+
+    await manager.async_stop()
+
+
+async def test_reload(hass: HomeAssistant) -> None:
+    """async_reload stops old entities and starts new ones."""
+    api = _mock_api()
+    config1 = _entity_config()
+    config2 = _entity_config(
+        entity_id="switch.light",
+        slug="ha-light",
+        activity_name="Light",
+        icon="lightbulb",
+    )
+    manager = ActivityManager(hass, api, [config1])
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    hass.states.async_set("switch.light", "off")
+    await manager.async_start()
+
+    assert "binary_sensor.washer" in manager._tracked
+    assert "switch.light" not in manager._tracked
+
+    await manager.async_reload([config2])
+
+    assert "binary_sensor.washer" not in manager._tracked
+    assert "switch.light" in manager._tracked
+
+    await manager.async_stop()

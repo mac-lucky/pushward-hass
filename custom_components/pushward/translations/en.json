@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to PushWard",
+        "description": "Enter your PushWard server URL and integration key.",
+        "data": {
+          "server_url": "Server URL",
+          "integration_key": "Integration Key"
+        },
+        "data_description": {
+          "integration_key": "Create one at your PushWard server under Settings → Integration Keys with scope 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to PushWard server.",
+      "invalid_auth": "Invalid integration key.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "PushWard is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "menu_options": {
+          "add_entity": "Add entity",
+          "edit_entity": "Edit entity",
+          "remove_entity": "Remove entity"
+        }
+      },
+      "add_entity": {
+        "title": "Add Entity to PushWard",
+        "data": {
+          "entity_id": "Entity",
+          "slug": "Activity Slug",
+          "activity_name": "Activity Name",
+          "icon": "Icon (SF Symbol)",
+          "priority": "Priority (0-10)",
+          "template": "Template",
+          "start_states": "Start States (comma-separated)",
+          "end_states": "End States (comma-separated)",
+          "update_interval": "Update Interval (seconds)",
+          "progress_attribute": "Progress Attribute",
+          "remaining_time_attribute": "Remaining Time Attribute",
+          "accent_color": "Accent Color"
+        }
+      },
+      "edit_entity": {
+        "title": "Edit Tracked Entity",
+        "data": {
+          "entity_id": "Select entity to edit"
+        }
+      },
+      "edit_entity_form": {
+        "title": "Edit Entity Configuration",
+        "data": {
+          "slug": "Activity Slug",
+          "activity_name": "Activity Name",
+          "icon": "Icon (SF Symbol)",
+          "priority": "Priority (0-10)",
+          "template": "Template",
+          "start_states": "Start States (comma-separated)",
+          "end_states": "End States (comma-separated)",
+          "update_interval": "Update Interval (seconds)",
+          "progress_attribute": "Progress Attribute",
+          "remaining_time_attribute": "Remaining Time Attribute",
+          "accent_color": "Accent Color"
+        }
+      },
+      "remove_entity": {
+        "title": "Remove Tracked Entity",
+        "data": {
+          "entity_id": "Select entities to remove"
+        }
+      }
+    }
+  }
+}
