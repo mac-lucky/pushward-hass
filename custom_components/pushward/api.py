@@ -118,8 +118,9 @@ class PushWardApiClient:
                         body = await resp.text()
                         if "already exists" in body.lower():
                             return
+                        snippet = body[:200] + ("…" if len(body) > 200 else "")
                         raise PushWardApiError(
-                            f"Activity limit reached: {body}",
+                            f"Activity limit reached: {snippet}",
                             status_code=resp.status,
                         )
 
@@ -143,8 +144,9 @@ class PushWardApiClient:
                     # Other 4xx — don't retry
                     if 400 <= resp.status < 500:
                         body = await resp.text()
+                        snippet = body[:200] + ("…" if len(body) > 200 else "")
                         raise PushWardApiError(
-                            f"{method} {path} failed ({resp.status}): {body}",
+                            f"{method} {path} failed ({resp.status}): {snippet}",
                             status_code=resp.status,
                         )
 
@@ -154,7 +156,9 @@ class PushWardApiClient:
                         status_code=resp.status,
                     )
             except (aiohttp.ClientError, TimeoutError) as err:
-                last_error = PushWardApiError(f"{method} {path} connection error: {err}")
+                err_msg = str(err)
+                snippet = err_msg[:200] + ("…" if len(err_msg) > 200 else "")
+                last_error = PushWardApiError(f"{method} {path} connection error: {snippet}")
 
             if attempt < MAX_RETRIES - 1:
                 delay = self._backoff_delay(attempt)

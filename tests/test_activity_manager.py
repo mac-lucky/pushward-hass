@@ -222,6 +222,41 @@ async def test_rapid_on_off_cancels_end(hass: HomeAssistant) -> None:
     await manager.async_stop()
 
 
+async def test_stale_end_skips_ended_after_restart(hass: HomeAssistant) -> None:
+    """A stale end task should not send ENDED if the activity was restarted."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    # Start activity
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    api.reset_mock()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+
+    # Mock sleep to simulate a restart happening during the delay:
+    # when sleep is called, bump the generation as if _start_activity ran again.
+    async def bump_generation_during_sleep(_seconds):
+        tracked.generation += 1
+
+    with patch(
+        "custom_components.pushward.activity_manager.asyncio.sleep",
+        side_effect=bump_generation_during_sleep,
+    ):
+        await manager._async_end_activity("binary_sensor.washer")
+
+    # Should have sent phase 1 (ONGOING) but NOT phase 2 (ENDED)
+    calls = api.update_activity.call_args_list
+    assert len(calls) == 1
+    assert calls[0][0][1] == "ONGOING"
+
+    await manager.async_stop()
+
+
 async def test_reload(hass: HomeAssistant) -> None:
     """async_reload stops old entities and starts new ones."""
     api = _mock_api()

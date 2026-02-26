@@ -10,13 +10,14 @@ from datetime import timedelta
 from functools import partial
 from typing import Any
 
+import aiohttp
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
 )
 
-from .api import PushWardApiClient
+from .api import PushWardApiClient, PushWardApiError
 from .const import (
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
@@ -44,6 +45,7 @@ class TrackedEntity:
     unsub_state: Callable | None = None
     unsub_timer: Callable | None = None
     end_task: asyncio.Task | None = field(default=None, repr=False)
+    generation: int = 0
 
 
 class ActivityManager:
@@ -94,8 +96,8 @@ class ActivityManager:
                 slug = tracked.config[CONF_SLUG]
                 try:
                     await self._api.update_activity(slug, "ENDED", {})
-                except Exception:
-                    _LOGGER.warning("Failed to end activity %s during shutdown", slug)
+                except (PushWardApiError, aiohttp.ClientError):
+                    _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
 
         self._tracked.clear()
 
@@ -136,6 +138,8 @@ class ActivityManager:
             tracked.end_task.cancel()
             tracked.end_task = None
 
+        tracked.generation += 1
+
         try:
             await self._api.create_activity(
                 slug,
@@ -161,7 +165,7 @@ class ActivityManager:
                 partial(self._async_periodic_update, entity_id),
                 interval,
             )
-        except Exception:
+        except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to start activity for %s", entity_id, exc_info=True)
 
     async def _async_periodic_update(self, entity_id: str, _now: Any = None) -> None:
@@ -182,7 +186,7 @@ class ActivityManager:
         try:
             await self._api.update_activity(slug, "ONGOING", content)
             tracked.last_content = content
-        except Exception:
+        except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to update activity %s", slug, exc_info=True)
 
     def _schedule_end(self, entity_id: str) -> None:
@@ -197,6 +201,7 @@ class ActivityManager:
         tracked = self._tracked[entity_id]
         config = tracked.config
         slug = config[CONF_SLUG]
+        gen_at_start = tracked.generation
 
         try:
             # Phase 1: show completion content
@@ -206,11 +211,15 @@ class ActivityManager:
             # Wait for user to see the completion state
             await asyncio.sleep(END_DELAY_SECONDS)
 
+            # Abort if a new start happened during the sleep
+            if tracked.generation != gen_at_start:
+                return
+
             # Phase 2: end the activity
             await self._api.update_activity(slug, "ENDED", completion)
         except asyncio.CancelledError:
             raise
-        except Exception:
+        except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to end activity %s", slug, exc_info=True)
         finally:
             tracked.is_active = False

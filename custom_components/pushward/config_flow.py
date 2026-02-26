@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any
+from urllib.parse import urlparse
 
 import voluptuous as vol
 from homeassistant import config_entries
@@ -15,6 +17,9 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    TextSelector,
+    TextSelectorConfig,
+    TextSelectorType,
 )
 
 from .api import PushWardApiClient, PushWardAuthError
@@ -43,6 +48,16 @@ from .const import (
 from .content_mapper import get_domain_defaults, sanitize_slug
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _validate_url(value: str) -> str:
+    """Validate URL uses http or https scheme."""
+    parsed = urlparse(value)
+    if parsed.scheme not in ("http", "https"):
+        raise vol.Invalid("URL must use http:// or https:// scheme")
+    if not parsed.netloc:
+        raise vol.Invalid("URL must include a host")
+    return value
 
 
 class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -85,8 +100,10 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_SERVER_URL, default=DEFAULT_SERVER_URL): str,
-                    vol.Required(CONF_INTEGRATION_KEY): str,
+                    vol.Required(CONF_SERVER_URL, default=DEFAULT_SERVER_URL): vol.All(str, _validate_url),
+                    vol.Required(CONF_INTEGRATION_KEY): TextSelector(
+                        TextSelectorConfig(type=TextSelectorType.PASSWORD)
+                    ),
                 }
             ),
             errors=errors,
@@ -259,8 +276,12 @@ class PushWardOptionsFlow(config_entries.OptionsFlow):
     def _parse_entity_input(user_input: dict) -> dict:
         """Normalize user input into an entity config dict."""
         entity_id = user_input[CONF_ENTITY_ID]
-        slug = user_input.get(CONF_SLUG, "").strip()
-        if not slug:
+        raw_slug = user_input.get(CONF_SLUG, "").strip()
+        if raw_slug:
+            # Sanitize user-provided slug: lowercase, safe chars only
+            slug = re.sub(r"[^a-z0-9-]", "", raw_slug.lower())
+            slug = re.sub(r"-+", "-", slug).strip("-")
+        if not raw_slug or not slug:
             slug = sanitize_slug(entity_id)
 
         domain = entity_id.split(".")[0] if "." in entity_id else ""
