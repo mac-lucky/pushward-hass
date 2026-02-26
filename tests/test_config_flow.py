@@ -8,6 +8,7 @@ import pytest
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.const import (
@@ -142,16 +143,13 @@ async def test_already_configured(
     mock_api_client,
 ) -> None:
     """Test abort when already configured."""
-    entry = config_entries.ConfigEntry(
-        version=1,
-        minor_version=1,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="PushWard",
         data={
             CONF_SERVER_URL: MOCK_SERVER_URL,
             CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
         },
-        source=config_entries.SOURCE_USER,
         unique_id=DOMAIN,
     )
     entry.add_to_hass(hass)
@@ -163,16 +161,13 @@ async def test_already_configured(
 
 async def test_options_menu(hass: HomeAssistant) -> None:
     """Test options flow shows menu with 3 options."""
-    entry = config_entries.ConfigEntry(
-        version=1,
-        minor_version=1,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="PushWard",
         data={
             CONF_SERVER_URL: MOCK_SERVER_URL,
             CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
         },
-        source=config_entries.SOURCE_USER,
         options={CONF_ENTITIES: []},
     )
     entry.add_to_hass(hass)
@@ -184,16 +179,13 @@ async def test_options_menu(hass: HomeAssistant) -> None:
 
 async def test_add_entity(hass: HomeAssistant) -> None:
     """Test adding an entity through options flow."""
-    entry = config_entries.ConfigEntry(
-        version=1,
-        minor_version=1,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="PushWard",
         data={
             CONF_SERVER_URL: MOCK_SERVER_URL,
             CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
         },
-        source=config_entries.SOURCE_USER,
         options={CONF_ENTITIES: []},
     )
     entry.add_to_hass(hass)
@@ -224,7 +216,6 @@ async def test_add_entity(hass: HomeAssistant) -> None:
 
 async def test_remove_entity(hass: HomeAssistant) -> None:
     """Test removing an entity through options flow."""
-    # Pre-populate with a parsed entity (lists, not CSV strings)
     entity_config = {
         CONF_ENTITY_ID: "binary_sensor.washer",
         CONF_SLUG: "ha-washer",
@@ -236,16 +227,13 @@ async def test_remove_entity(hass: HomeAssistant) -> None:
         CONF_END_STATES: ["off"],
         CONF_UPDATE_INTERVAL: 5,
     }
-    entry = config_entries.ConfigEntry(
-        version=1,
-        minor_version=1,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="PushWard",
         data={
             CONF_SERVER_URL: MOCK_SERVER_URL,
             CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
         },
-        source=config_entries.SOURCE_USER,
         options={CONF_ENTITIES: [entity_config]},
     )
     entry.add_to_hass(hass)

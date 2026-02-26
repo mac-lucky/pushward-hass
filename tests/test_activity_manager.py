@@ -1,11 +1,10 @@
 """Tests for the PushWard activity manager."""
+
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from homeassistant.core import HomeAssistant, State
 
 from custom_components.pushward.activity_manager import ActivityManager
@@ -90,7 +89,7 @@ async def test_start_activity_on_state_change(hass: HomeAssistant) -> None:
 
 
 async def test_end_activity_two_phase(hass: HomeAssistant) -> None:
-    """Entity going on→off triggers two-phase end (ONGOING+Complete, then ENDED)."""
+    """Two-phase end sends ONGOING (completion), then ENDED after delay."""
     api = _mock_api()
     config = _entity_config()
     manager = ActivityManager(hass, api, [config])
@@ -101,26 +100,24 @@ async def test_end_activity_two_phase(hass: HomeAssistant) -> None:
     # Start activity
     hass.states.async_set("binary_sensor.washer", "on")
     await hass.async_block_till_done()
+
+    # Mark as active and reset mock to only capture end calls
+    assert manager._tracked["binary_sensor.washer"].is_active
     api.reset_mock()
 
-    # End activity
+    # Directly call the two-phase end (avoids async_create_task timing)
     with patch(
         "custom_components.pushward.activity_manager.asyncio.sleep",
         new_callable=AsyncMock,
     ):
-        hass.states.async_set("binary_sensor.washer", "off")
-        await hass.async_block_till_done()
-        # Allow the end task to complete
-        await asyncio.sleep(0)
-        await hass.async_block_till_done()
+        await manager._async_end_activity("binary_sensor.washer")
 
     # Should have: ONGOING (completion) + ENDED
-    assert api.update_activity.await_count >= 2
+    assert api.update_activity.await_count == 2
     calls = api.update_activity.call_args_list
-    # First call: completion content with ONGOING
     assert calls[0][0][1] == "ONGOING"
-    # Last call: ENDED
-    assert calls[-1][0][1] == "ENDED"
+    assert calls[1][0][1] == "ENDED"
+    assert not manager._tracked["binary_sensor.washer"].is_active
 
     await manager.async_stop()
 

@@ -1,4 +1,5 @@
 """Map Home Assistant state/attributes to PushWard content."""
+
 import re
 
 from homeassistant.core import State

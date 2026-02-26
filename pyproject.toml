@@ -2,7 +2,7 @@
 name = "pushward-hass"
 version = "0.1.0"
 description = "HACS custom integration for Home Assistant — track HA entities as PushWard Live Activities on iPhone"
-readme = "CLAUDE.md"
+readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
 dependencies = []

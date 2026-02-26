@@ -1,12 +1,14 @@
 """Activity lifecycle manager — tracks HA entities as PushWard Live Activities."""
+
 from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import timedelta
 from functools import partial
-from typing import Any, Callable
+from typing import Any
 
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import (
@@ -16,11 +18,11 @@ from homeassistant.helpers.event import (
 
 from .api import PushWardApiClient
 from .const import (
+    CONF_ACTIVITY_NAME,
     CONF_END_STATES,
     CONF_ENTITY_ID,
-    CONF_SLUG,
-    CONF_ACTIVITY_NAME,
     CONF_PRIORITY,
+    CONF_SLUG,
     CONF_START_STATES,
     CONF_UPDATE_INTERVAL,
     DEFAULT_ENDED_TTL,
@@ -73,14 +75,12 @@ class ActivityManager:
 
             # Resume if entity is currently in a start state (HA restart)
             current = self._hass.states.get(entity_id)
-            if current and current.state in entity_cfg.get(
-                CONF_START_STATES, []
-            ):
+            if current and current.state in entity_cfg.get(CONF_START_STATES, []):
                 await self._start_activity(entity_id)
 
     async def async_stop(self) -> None:
         """End all active activities and unsubscribe listeners."""
-        for entity_id, tracked in self._tracked.items():
+        for _entity_id, tracked in self._tracked.items():
             if tracked.end_task and not tracked.end_task.done():
                 tracked.end_task.cancel()
 
@@ -95,9 +95,7 @@ class ActivityManager:
                 try:
                     await self._api.update_activity(slug, "ENDED", {})
                 except Exception:
-                    _LOGGER.warning(
-                        "Failed to end activity %s during shutdown", slug
-                    )
+                    _LOGGER.warning("Failed to end activity %s during shutdown", slug)
 
         self._tracked.clear()
 
@@ -108,9 +106,7 @@ class ActivityManager:
         await self.async_start()
 
     @callback
-    def _async_on_state_change(
-        self, entity_id: str, event: Event
-    ) -> None:
+    def _async_on_state_change(self, entity_id: str, event: Event) -> None:
         """Handle an HA state change event."""
         new_state: State | None = event.data.get("new_state")
         if new_state is None or new_state.state in ("unavailable", "unknown"):
@@ -159,22 +155,16 @@ class ActivityManager:
             tracked.is_active = True
             tracked.last_content = content
 
-            interval = timedelta(
-                seconds=config.get(CONF_UPDATE_INTERVAL, 5)
-            )
+            interval = timedelta(seconds=config.get(CONF_UPDATE_INTERVAL, 5))
             tracked.unsub_timer = async_track_time_interval(
                 self._hass,
                 partial(self._async_periodic_update, entity_id),
                 interval,
             )
         except Exception:
-            _LOGGER.warning(
-                "Failed to start activity for %s", entity_id, exc_info=True
-            )
+            _LOGGER.warning("Failed to start activity for %s", entity_id, exc_info=True)
 
-    async def _async_periodic_update(
-        self, entity_id: str, _now: Any = None
-    ) -> None:
+    async def _async_periodic_update(self, entity_id: str, _now: Any = None) -> None:
         """Send periodic updates while the activity is active."""
         tracked = self._tracked.get(entity_id)
         if tracked is None or not tracked.is_active:
@@ -193,18 +183,14 @@ class ActivityManager:
             await self._api.update_activity(slug, "ONGOING", content)
             tracked.last_content = content
         except Exception:
-            _LOGGER.warning(
-                "Failed to update activity %s", slug, exc_info=True
-            )
+            _LOGGER.warning("Failed to update activity %s", slug, exc_info=True)
 
     def _schedule_end(self, entity_id: str) -> None:
         """Schedule a two-phase activity end."""
         tracked = self._tracked[entity_id]
         if tracked.end_task and not tracked.end_task.done():
             tracked.end_task.cancel()
-        tracked.end_task = self._hass.async_create_task(
-            self._async_end_activity(entity_id)
-        )
+        tracked.end_task = self._hass.async_create_task(self._async_end_activity(entity_id))
 
     async def _async_end_activity(self, entity_id: str) -> None:
         """Two-phase end: show completion, wait, then dismiss."""
@@ -225,9 +211,7 @@ class ActivityManager:
         except asyncio.CancelledError:
             raise
         except Exception:
-            _LOGGER.warning(
-                "Failed to end activity %s", slug, exc_info=True
-            )
+            _LOGGER.warning("Failed to end activity %s", slug, exc_info=True)
         finally:
             tracked.is_active = False
             tracked.last_content = None

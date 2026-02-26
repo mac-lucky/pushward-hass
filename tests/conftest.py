@@ -1,26 +1,31 @@
 """Shared test fixtures for PushWard integration tests."""
-from unittest.mock import AsyncMock, MagicMock, patch
+
+from unittest.mock import AsyncMock, patch
 
 import pytest
+from homeassistant.core import HomeAssistant
+from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
-    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_ICON,
-    CONF_INTEGRATION_KEY,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
-    CONF_SERVER_URL,
     CONF_SLUG,
     CONF_START_STATES,
     CONF_TEMPLATE,
     CONF_UPDATE_INTERVAL,
-    DOMAIN,
 )
+
+
+@pytest.fixture(autouse=True)
+def enable_custom_integrations(hass: HomeAssistant) -> None:
+    """Enable custom integrations defined in the test dir."""
+    hass.data.pop(DATA_CUSTOM_COMPONENTS)
 
 
 @pytest.fixture
