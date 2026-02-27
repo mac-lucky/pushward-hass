@@ -306,14 +306,15 @@ async def test_user_step_rejects_non_http_url(
 ) -> None:
     """Test that the config flow rejects non-http URL schemes."""
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
-    with pytest.raises(vol.Invalid):
-        await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            user_input={
-                CONF_SERVER_URL: "ftp://evil.example.com",
-                CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-            },
-        )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_SERVER_URL: "ftp://evil.example.com",
+            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
+        },
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_SERVER_URL: "invalid_url"}
 
 
 # --- Slug sanitization tests ---

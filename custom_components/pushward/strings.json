@@ -16,6 +16,7 @@
     "error": {
       "cannot_connect": "Failed to connect to PushWard server.",
       "invalid_auth": "Invalid integration key.",
+      "invalid_url": "URL must use http:// or https:// scheme.",
       "unknown": "An unexpected error occurred."
     },
     "abort": {
