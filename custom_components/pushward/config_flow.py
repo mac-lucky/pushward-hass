@@ -1,4 +1,4 @@
-"""Config flow and options flow for PushWard integration."""
+"""Config flow and subentry flow for PushWard integration."""
 
 from __future__ import annotations
 
@@ -28,7 +28,6 @@ from .const import (
     CONF_ACCENT_COLOR,
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
-    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_ICON,
     CONF_INTEGRATION_KEY,
@@ -44,6 +43,7 @@ from .const import (
     DEFAULT_SERVER_URL,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    SUBENTRY_TYPE_ENTITY,
     TEMPLATES,
 )
 from .content_mapper import get_domain_defaults, sanitize_slug
@@ -61,10 +61,104 @@ def _validate_url(value: str) -> str:
     return value
 
 
+def _entity_schema(defaults: dict | None = None) -> vol.Schema:
+    """Build the entity config schema with optional defaults."""
+    d = defaults or {}
+
+    # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
+    accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
+    accent_key = (
+        vol.Optional(CONF_ACCENT_COLOR, default=accent_rgb)
+        if accent_rgb is not None
+        else vol.Optional(CONF_ACCENT_COLOR)
+    )
+
+    return vol.Schema(
+        {
+            vol.Required(
+                CONF_ENTITY_ID,
+                default=d.get(CONF_ENTITY_ID, ""),
+            ): EntitySelector(EntitySelectorConfig()),
+            vol.Required(CONF_SLUG, default=d.get(CONF_SLUG, "")): str,
+            vol.Optional(
+                CONF_ACTIVITY_NAME,
+                default=d.get(CONF_ACTIVITY_NAME, ""),
+            ): str,
+            vol.Optional(CONF_ICON, default=d.get(CONF_ICON, "")): str,
+            vol.Optional(
+                CONF_PRIORITY,
+                default=d.get(CONF_PRIORITY, DEFAULT_PRIORITY),
+            ): vol.All(int, vol.Range(min=0, max=10)),
+            vol.Optional(
+                CONF_TEMPLATE,
+                default=d.get(CONF_TEMPLATE, "generic"),
+            ): SelectSelector(
+                SelectSelectorConfig(
+                    options=TEMPLATES,
+                    mode=SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Optional(
+                CONF_START_STATES,
+                default=d.get(CONF_START_STATES, ""),
+            ): str,
+            vol.Optional(
+                CONF_END_STATES,
+                default=d.get(CONF_END_STATES, ""),
+            ): str,
+            vol.Optional(
+                CONF_UPDATE_INTERVAL,
+                default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+            ): vol.All(int, vol.Range(min=1)),
+            vol.Optional(
+                CONF_PROGRESS_ATTRIBUTE,
+                default=d.get(CONF_PROGRESS_ATTRIBUTE, ""),
+            ): str,
+            vol.Optional(
+                CONF_REMAINING_TIME_ATTR,
+                default=d.get(CONF_REMAINING_TIME_ATTR, ""),
+            ): str,
+            accent_key: ColorRGBSelector(),
+        }
+    )
+
+
+def _parse_entity_input(user_input: dict) -> dict:
+    """Normalize user input into an entity config dict."""
+    entity_id = user_input[CONF_ENTITY_ID]
+    raw_slug = user_input.get(CONF_SLUG, "").strip()
+    if raw_slug:
+        slug = re.sub(r"[^a-z0-9-]", "", raw_slug.lower())
+        slug = re.sub(r"-+", "-", slug).strip("-")
+    if not raw_slug or not slug:
+        slug = sanitize_slug(entity_id)
+
+    domain = entity_id.split(".")[0] if "." in entity_id else ""
+    defaults = get_domain_defaults(domain)
+
+    start_raw = user_input.get(CONF_START_STATES, "")
+    end_raw = user_input.get(CONF_END_STATES, "")
+
+    return {
+        CONF_ENTITY_ID: entity_id,
+        CONF_SLUG: slug,
+        CONF_ACTIVITY_NAME: user_input.get(CONF_ACTIVITY_NAME, "") or entity_id,
+        CONF_ICON: user_input.get(CONF_ICON, "") or defaults.get("icon", "questionmark.circle"),
+        CONF_PRIORITY: user_input.get(CONF_PRIORITY, DEFAULT_PRIORITY),
+        CONF_TEMPLATE: user_input.get(CONF_TEMPLATE, "generic"),
+        CONF_START_STATES: _parse_csv(start_raw) or defaults.get("start_states", []),
+        CONF_END_STATES: _parse_csv(end_raw) or defaults.get("end_states", []),
+        CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+        CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
+        CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
+        CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
+    }
+
+
 class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle initial PushWard configuration."""
 
-    VERSION = 1
+    VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
         """Handle the initial setup step."""
@@ -99,7 +193,6 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             CONF_SERVER_URL: user_input[CONF_SERVER_URL],
                             CONF_INTEGRATION_KEY: user_input[CONF_INTEGRATION_KEY],
                         },
-                        options={CONF_ENTITIES: []},
                     )
 
         return self.async_show_form(
@@ -115,207 +208,60 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    @staticmethod
+    @classmethod
     @callback
-    def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
-    ) -> PushWardOptionsFlow:
-        """Get the options flow handler."""
-        return PushWardOptionsFlow(config_entry)
+    def async_get_supported_subentry_types(
+        cls, config_entry: config_entries.ConfigEntry
+    ) -> dict[str, type[config_entries.ConfigSubentryFlow]]:
+        """Return supported subentry types."""
+        return {SUBENTRY_TYPE_ENTITY: PushWardEntitySubentryFlow}
 
 
-class PushWardOptionsFlow(config_entries.OptionsFlow):
-    """Handle PushWard entity management options."""
+class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
+    """Handle adding and reconfiguring tracked entities."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        self._config_entry = config_entry
-        self._entities: list[dict] = list(config_entry.options.get(CONF_ENTITIES, []))
-        self._edit_index: int | None = None
-
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
-        """Show the options menu."""
-        return self.async_show_menu(
-            step_id="init",
-            menu_options=["add_entity", "edit_entity", "remove_entity"],
-        )
-
-    async def async_step_add_entity(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
-        """Add an entity to track."""
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
+        """Add a new tracked entity."""
         if user_input is not None:
-            entity_cfg = self._parse_entity_input(user_input)
-            self._entities.append(entity_cfg)
-            return self.async_create_entry(title="", data={CONF_ENTITIES: self._entities})
+            entity_cfg = _parse_entity_input(user_input)
+            return self.async_create_entry(
+                title=entity_cfg[CONF_ACTIVITY_NAME],
+                data=entity_cfg,
+                unique_id=entity_cfg[CONF_ENTITY_ID],
+            )
 
         return self.async_show_form(
-            step_id="add_entity",
-            data_schema=self._entity_schema(),
+            step_id="user",
+            data_schema=_entity_schema(),
         )
 
-    async def async_step_edit_entity(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
-        """Select an entity to edit."""
-        if not self._entities:
-            return self.async_abort(reason="no_entities")
-
-        if user_input is not None:
-            selected = user_input[CONF_ENTITY_ID]
-            for i, ent in enumerate(self._entities):
-                if ent[CONF_ENTITY_ID] == selected:
-                    self._edit_index = i
-                    return await self.async_step_edit_entity_form()
-            return self.async_abort(reason="entity_not_found")
-
-        entity_ids = [e[CONF_ENTITY_ID] for e in self._entities]
-        return self.async_show_form(
-            step_id="edit_entity",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_ENTITY_ID): SelectSelector(
-                        SelectSelectorConfig(
-                            options=entity_ids,
-                            mode=SelectSelectorMode.DROPDOWN,
-                        )
-                    ),
-                }
-            ),
-        )
-
-    async def async_step_edit_entity_form(
+    async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Edit a tracked entity's configuration."""
-        if user_input is not None and self._edit_index is not None:
-            entity_cfg = self._parse_entity_input(user_input)
-            entity_cfg[CONF_ENTITY_ID] = self._entities[self._edit_index][CONF_ENTITY_ID]
-            self._entities[self._edit_index] = entity_cfg
-            return self.async_create_entry(title="", data={CONF_ENTITIES: self._entities})
-
-        current = self._entities[self._edit_index]  # type: ignore[index]
-        return self.async_show_form(
-            step_id="edit_entity_form",
-            data_schema=self._entity_schema(defaults=current),
-        )
-
-    async def async_step_remove_entity(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Remove tracked entities."""
-        if not self._entities:
-            return self.async_abort(reason="no_entities")
+    ) -> config_entries.SubentryFlowResult:
+        """Reconfigure an existing tracked entity."""
+        subentry = self._get_reconfigure_subentry()
+        entry = self._get_entry()
 
         if user_input is not None:
-            to_remove = set(user_input.get(CONF_ENTITY_ID, []))
-            self._entities = [e for e in self._entities if e[CONF_ENTITY_ID] not in to_remove]
-            return self.async_create_entry(title="", data={CONF_ENTITIES: self._entities})
+            entity_cfg = _parse_entity_input(user_input)
+            return self.async_update_and_abort(
+                entry,
+                subentry,
+                data=entity_cfg,
+                title=entity_cfg[CONF_ACTIVITY_NAME],
+            )
 
-        entity_ids = [e[CONF_ENTITY_ID] for e in self._entities]
+        # Pre-fill form with current values, convert lists back to CSV for editing
+        current = dict(subentry.data)
+        if isinstance(current.get(CONF_START_STATES), list):
+            current[CONF_START_STATES] = ", ".join(current[CONF_START_STATES])
+        if isinstance(current.get(CONF_END_STATES), list):
+            current[CONF_END_STATES] = ", ".join(current[CONF_END_STATES])
+
         return self.async_show_form(
-            step_id="remove_entity",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_ENTITY_ID): SelectSelector(
-                        SelectSelectorConfig(
-                            options=entity_ids,
-                            mode=SelectSelectorMode.LIST,
-                            multiple=True,
-                        )
-                    ),
-                }
-            ),
+            step_id="reconfigure",
+            data_schema=_entity_schema(defaults=current),
         )
-
-    def _entity_schema(self, defaults: dict | None = None) -> vol.Schema:
-        """Build the entity config schema with optional defaults."""
-        d = defaults or {}
-
-        # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
-        accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
-        accent_key = (
-            vol.Optional(CONF_ACCENT_COLOR, default=accent_rgb)
-            if accent_rgb is not None
-            else vol.Optional(CONF_ACCENT_COLOR)
-        )
-
-        return vol.Schema(
-            {
-                vol.Required(
-                    CONF_ENTITY_ID,
-                    default=d.get(CONF_ENTITY_ID, ""),
-                ): EntitySelector(EntitySelectorConfig()),
-                vol.Required(CONF_SLUG, default=d.get(CONF_SLUG, "")): str,
-                vol.Optional(
-                    CONF_ACTIVITY_NAME,
-                    default=d.get(CONF_ACTIVITY_NAME, ""),
-                ): str,
-                vol.Optional(CONF_ICON, default=d.get(CONF_ICON, "")): str,
-                vol.Optional(
-                    CONF_PRIORITY,
-                    default=d.get(CONF_PRIORITY, DEFAULT_PRIORITY),
-                ): vol.All(int, vol.Range(min=0, max=10)),
-                vol.Optional(
-                    CONF_TEMPLATE,
-                    default=d.get(CONF_TEMPLATE, "generic"),
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=TEMPLATES,
-                        mode=SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                vol.Optional(
-                    CONF_START_STATES,
-                    default=d.get(CONF_START_STATES, ""),
-                ): str,
-                vol.Optional(
-                    CONF_END_STATES,
-                    default=d.get(CONF_END_STATES, ""),
-                ): str,
-                vol.Optional(
-                    CONF_UPDATE_INTERVAL,
-                    default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
-                ): vol.All(int, vol.Range(min=1)),
-                vol.Optional(
-                    CONF_PROGRESS_ATTRIBUTE,
-                    default=d.get(CONF_PROGRESS_ATTRIBUTE, ""),
-                ): str,
-                vol.Optional(
-                    CONF_REMAINING_TIME_ATTR,
-                    default=d.get(CONF_REMAINING_TIME_ATTR, ""),
-                ): str,
-                accent_key: ColorRGBSelector(),
-            }
-        )
-
-    @staticmethod
-    def _parse_entity_input(user_input: dict) -> dict:
-        """Normalize user input into an entity config dict."""
-        entity_id = user_input[CONF_ENTITY_ID]
-        raw_slug = user_input.get(CONF_SLUG, "").strip()
-        if raw_slug:
-            # Sanitize user-provided slug: lowercase, safe chars only
-            slug = re.sub(r"[^a-z0-9-]", "", raw_slug.lower())
-            slug = re.sub(r"-+", "-", slug).strip("-")
-        if not raw_slug or not slug:
-            slug = sanitize_slug(entity_id)
-
-        domain = entity_id.split(".")[0] if "." in entity_id else ""
-        defaults = get_domain_defaults(domain)
-
-        start_raw = user_input.get(CONF_START_STATES, "")
-        end_raw = user_input.get(CONF_END_STATES, "")
-
-        return {
-            CONF_ENTITY_ID: entity_id,
-            CONF_SLUG: slug,
-            CONF_ACTIVITY_NAME: user_input.get(CONF_ACTIVITY_NAME, "") or entity_id,
-            CONF_ICON: user_input.get(CONF_ICON, "") or defaults.get("icon", "questionmark.circle"),
-            CONF_PRIORITY: user_input.get(CONF_PRIORITY, DEFAULT_PRIORITY),
-            CONF_TEMPLATE: user_input.get(CONF_TEMPLATE, "generic"),
-            CONF_START_STATES: _parse_csv(start_raw) or defaults.get("start_states", []),
-            CONF_END_STATES: _parse_csv(end_raw) or defaults.get("end_states", []),
-            CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
-            CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
-            CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
-            CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
-        }
 
 
 def _rgb_to_hex(rgb: list[int] | None) -> str:

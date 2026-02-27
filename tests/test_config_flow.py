@@ -1,4 +1,4 @@
-"""Tests for PushWard config flow."""
+"""Tests for PushWard config flow and subentry flow."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -14,19 +15,22 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import _validate_url
 from custom_components.pushward.const import (
+    CONF_ACCENT_COLOR,
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
-    CONF_ENTITIES,
     CONF_ENTITY_ID,
     CONF_ICON,
     CONF_INTEGRATION_KEY,
     CONF_PRIORITY,
+    CONF_PROGRESS_ATTRIBUTE,
+    CONF_REMAINING_TIME_ATTR,
     CONF_SERVER_URL,
     CONF_SLUG,
     CONF_START_STATES,
     CONF_TEMPLATE,
     CONF_UPDATE_INTERVAL,
     DOMAIN,
+    SUBENTRY_TYPE_ENTITY,
 )
 
 MOCK_SERVER_URL = "https://pushward.example.com"
@@ -45,9 +49,52 @@ def _mock_entity_input(**overrides) -> dict:
         CONF_START_STATES: "on",
         CONF_END_STATES: "off",
         CONF_UPDATE_INTERVAL: 5,
+        CONF_PROGRESS_ATTRIBUTE: "",
+        CONF_REMAINING_TIME_ATTR: "",
     }
     data.update(overrides)
     return data
+
+
+def _entity_subentry_data(**overrides) -> ConfigSubentryData:
+    """Build a ConfigSubentryData for pre-loading subentries."""
+    data = {
+        CONF_ENTITY_ID: "binary_sensor.washer",
+        CONF_SLUG: "ha-washer",
+        CONF_ACTIVITY_NAME: "Washer",
+        CONF_ICON: "circle.fill",
+        CONF_PRIORITY: 1,
+        CONF_TEMPLATE: "generic",
+        CONF_START_STATES: ["on"],
+        CONF_END_STATES: ["off"],
+        CONF_UPDATE_INTERVAL: 5,
+        CONF_PROGRESS_ATTRIBUTE: "",
+        CONF_REMAINING_TIME_ATTR: "",
+        CONF_ACCENT_COLOR: "",
+    }
+    data.update(overrides)
+    return ConfigSubentryData(
+        data=data,
+        subentry_type=SUBENTRY_TYPE_ENTITY,
+        title=data[CONF_ACTIVITY_NAME],
+        unique_id=data[CONF_ENTITY_ID],
+    )
+
+
+def _mock_entry(**kwargs) -> MockConfigEntry:
+    """Build a MockConfigEntry with sensible defaults."""
+    defaults = {
+        "domain": DOMAIN,
+        "title": "PushWard",
+        "data": {
+            CONF_SERVER_URL: MOCK_SERVER_URL,
+            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
+        },
+        "version": 2,
+        "unique_id": DOMAIN,
+    }
+    defaults.update(kwargs)
+    return MockConfigEntry(**defaults)
 
 
 @pytest.fixture
@@ -81,6 +128,9 @@ def mock_setup_entry():
         yield
 
 
+# --- Config flow tests ---
+
+
 async def test_user_step_success(
     hass: HomeAssistant,
     mock_api_client,
@@ -104,7 +154,6 @@ async def test_user_step_success(
         CONF_SERVER_URL: MOCK_SERVER_URL,
         CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
     }
-    assert result["options"] == {CONF_ENTITIES: []}
     mock_api_client.validate_connection.assert_awaited_once()
 
 
@@ -155,117 +204,12 @@ async def test_already_configured(
     mock_api_client,
 ) -> None:
     """Test abort when already configured."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        title="PushWard",
-        data={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
-            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-        },
-        unique_id=DOMAIN,
-    )
+    entry = _mock_entry()
     entry.add_to_hass(hass)
 
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "already_configured"
-
-
-async def test_options_menu(hass: HomeAssistant) -> None:
-    """Test options flow shows menu with 3 options."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        title="PushWard",
-        data={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
-            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-        },
-        options={CONF_ENTITIES: []},
-    )
-    entry.add_to_hass(hass)
-
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    assert result["type"] is FlowResultType.MENU
-    assert result["menu_options"] == ["add_entity", "edit_entity", "remove_entity"]
-
-
-async def test_add_entity(hass: HomeAssistant) -> None:
-    """Test adding an entity through options flow."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        title="PushWard",
-        data={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
-            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-        },
-        options={CONF_ENTITIES: []},
-    )
-    entry.add_to_hass(hass)
-
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    assert result["type"] is FlowResultType.MENU
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={"next_step_id": "add_entity"},
-    )
-    assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "add_entity"
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input=_mock_entity_input(),
-    )
-    assert result["type"] is FlowResultType.CREATE_ENTRY
-    entities = result["data"][CONF_ENTITIES]
-    assert len(entities) == 1
-    assert entities[0][CONF_ENTITY_ID] == "binary_sensor.washer"
-    assert entities[0][CONF_SLUG] == "ha-washer"
-    # _parse_entity_input converts CSV strings to lists
-    assert entities[0][CONF_START_STATES] == ["on"]
-    assert entities[0][CONF_END_STATES] == ["off"]
-
-
-async def test_remove_entity(hass: HomeAssistant) -> None:
-    """Test removing an entity through options flow."""
-    entity_config = {
-        CONF_ENTITY_ID: "binary_sensor.washer",
-        CONF_SLUG: "ha-washer",
-        CONF_ACTIVITY_NAME: "Washer",
-        CONF_ICON: "circle.fill",
-        CONF_PRIORITY: 1,
-        CONF_TEMPLATE: "generic",
-        CONF_START_STATES: ["on"],
-        CONF_END_STATES: ["off"],
-        CONF_UPDATE_INTERVAL: 5,
-    }
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        title="PushWard",
-        data={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
-            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-        },
-        options={CONF_ENTITIES: [entity_config]},
-    )
-    entry.add_to_hass(hass)
-
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    assert result["type"] is FlowResultType.MENU
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={"next_step_id": "remove_entity"},
-    )
-    assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "remove_entity"
-
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={CONF_ENTITY_ID: ["binary_sensor.washer"]},
-    )
-    assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["data"][CONF_ENTITIES] == []
 
 
 # --- URL validation tests ---
@@ -317,63 +261,110 @@ async def test_user_step_rejects_non_http_url(
     assert result["errors"] == {CONF_SERVER_URL: "invalid_url"}
 
 
-# --- Slug sanitization tests ---
+# --- Subentry flow tests (add entity) ---
 
 
-async def test_add_entity_sanitizes_slug(hass: HomeAssistant) -> None:
-    """Test that user-provided slugs are sanitized to safe characters."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        title="PushWard",
-        data={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
-            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-        },
-        options={CONF_ENTITIES: []},
-    )
+async def test_subentry_add_entity(hass: HomeAssistant) -> None:
+    """Test adding an entity through subentry flow."""
+    entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={"next_step_id": "add_entity"},
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
     )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "user"
 
-    # Slug with uppercase and special chars should be sanitized
-    result = await hass.config_entries.options.async_configure(
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["title"] == "Washer"
+
+    subentries = list(entry.subentries.values())
+    assert len(subentries) == 1
+    assert subentries[0].data[CONF_ENTITY_ID] == "binary_sensor.washer"
+    assert subentries[0].data[CONF_SLUG] == "ha-washer"
+    assert subentries[0].data[CONF_START_STATES] == ["on"]
+    assert subentries[0].data[CONF_END_STATES] == ["off"]
+
+
+async def test_subentry_add_entity_sanitizes_slug(hass: HomeAssistant) -> None:
+    """Test that user-provided slugs are sanitized."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
         user_input=_mock_entity_input(**{CONF_SLUG: "My--Slug!@#$%"}),
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    entities = result["data"][CONF_ENTITIES]
-    # Uppercase → lowercase, special chars stripped, double hyphens collapsed
-    assert entities[0][CONF_SLUG] == "my-slug"
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_SLUG] == "my-slug"
 
 
-async def test_add_entity_empty_slug_auto_generates(hass: HomeAssistant) -> None:
+async def test_subentry_add_entity_empty_slug_auto_generates(hass: HomeAssistant) -> None:
     """Test that empty slug falls back to auto-generated slug."""
-    entry = MockConfigEntry(
-        domain=DOMAIN,
-        title="PushWard",
-        data={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
-            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-        },
-        options={CONF_ENTITIES: []},
-    )
+    entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        user_input={"next_step_id": "add_entity"},
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
     )
-
-    result = await hass.config_entries.options.async_configure(
+    result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
         user_input=_mock_entity_input(**{CONF_SLUG: ""}),
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    entities = result["data"][CONF_ENTITIES]
-    # Empty slug → auto-generated from entity_id "binary_sensor.washer"
-    assert entities[0][CONF_SLUG] == "ha-binary-sensor-washer"
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_SLUG] == "ha-binary-sensor-washer"
+
+
+async def test_subentry_duplicate_entity_aborts(hass: HomeAssistant) -> None:
+    """Test that adding the same entity twice is aborted."""
+    entry = _mock_entry(subentries_data=[_entity_subentry_data()])
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+
+
+# --- Subentry reconfigure flow tests ---
+
+
+async def test_subentry_reconfigure(hass: HomeAssistant) -> None:
+    """Test reconfiguring an existing entity subentry."""
+    entry = _mock_entry(subentries_data=[_entity_subentry_data()])
+    entry.add_to_hass(hass)
+
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reconfigure"
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_ACTIVITY_NAME: "My Washer", CONF_PRIORITY: 5}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+
+    subentry = entry.subentries[subentry_id]
+    assert subentry.data[CONF_ACTIVITY_NAME] == "My Washer"
+    assert subentry.data[CONF_PRIORITY] == 5

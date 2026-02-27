@@ -9,7 +9,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .activity_manager import ActivityManager
 from .api import PushWardApiClient
-from .const import CONF_ENTITIES, CONF_INTEGRATION_KEY, CONF_SERVER_URL, DOMAIN
+from .const import CONF_INTEGRATION_KEY, CONF_SERVER_URL, DOMAIN, SUBENTRY_TYPE_ENTITY
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.error("Failed to connect to PushWard: %s", err)
         raise ConfigEntryNotReady(f"Cannot connect to PushWard: {err}") from err
 
-    entities = entry.options.get(CONF_ENTITIES, [])
+    entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
     manager = ActivityManager(hass, api, entities)
     await manager.async_start()
 
@@ -34,16 +34,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "manager": manager,
     }
 
-    entry.async_on_unload(entry.add_update_listener(_async_options_updated))
+    entry.async_on_unload(entry.add_update_listener(_async_entry_updated))
 
     return True
 
 
-async def _async_options_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Handle options update — reload entity tracking."""
+async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Handle config entry or subentry updates — reload entity tracking."""
     manager = hass.data[DOMAIN][entry.entry_id]["manager"]
-    new_entities = entry.options.get(CONF_ENTITIES, [])
-    await manager.async_reload(new_entities)
+    entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
+    await manager.async_reload(entities)
+
+
+async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+    """Migrate old config entry to current version."""
+    _LOGGER.debug("Migrating PushWard from version %s", config_entry.version)
+
+    if config_entry.version == 1:
+        # V1 stored entities in options; V2 uses subentries.
+        # Clear legacy options — users re-add entities as subentries.
+        hass.config_entries.async_update_entry(config_entry, version=2, options={})
+
+    return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

@@ -1,10 +1,10 @@
 """Constants for the PushWard integration."""
 
 DOMAIN = "pushward"
+SUBENTRY_TYPE_ENTITY = "tracked_entity"
 
 CONF_SERVER_URL = "server_url"
 CONF_INTEGRATION_KEY = "integration_key"
-CONF_ENTITIES = "entities"
 
 # Per-entity config keys
 CONF_ENTITY_ID = "entity_id"
