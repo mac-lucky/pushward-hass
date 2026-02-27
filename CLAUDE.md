@@ -83,6 +83,8 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.4.0 | Fix HACS update detection (`hide_default_branch`), bump min HA to 2025.7.0, add integration icons |
+| 0.3.2 | Add integration icons (`icon.png`, `icon@2x.png`) |
 | 0.3.1 | Make slug field optional, add reconfigure flow for server URL/key |
 | 0.3.0 | Replace options flow with config subentries for entity management |
 | 0.2.0 | Event-driven updates with throttling, field descriptions with examples, color picker for accent color, SF Symbols link |
