@@ -44,11 +44,8 @@ def map_content(state: State, entity_config: dict) -> dict:
     if remaining is not None:
         content["remaining_time"] = remaining
 
-    accent = entity_config.get(CONF_ACCENT_COLOR)
-    if accent:
-        content["accent_color"] = accent
-    else:
-        content["accent_color"] = "blue"
+    accent = entity_config.get(CONF_ACCENT_COLOR, "")
+    content["accent_color"] = accent if accent else "blue"
 
     return content
 

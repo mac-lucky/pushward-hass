@@ -47,6 +47,9 @@
           "progress_attribute": "Progress Attribute",
           "remaining_time_attribute": "Remaining Time Attribute",
           "accent_color": "Accent Color"
+        },
+        "data_description": {
+          "icon": "Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols)."
         }
       },
       "edit_entity": {
@@ -69,6 +72,9 @@
           "progress_attribute": "Progress Attribute",
           "remaining_time_attribute": "Remaining Time Attribute",
           "accent_color": "Accent Color"
+        },
+        "data_description": {
+          "icon": "Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols)."
         }
       },
       "remove_entity": {

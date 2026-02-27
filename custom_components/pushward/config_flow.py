@@ -12,6 +12,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
+    ColorRGBSelector,
     EntitySelector,
     EntitySelectorConfig,
     SelectSelector,
@@ -225,6 +226,15 @@ class PushWardOptionsFlow(config_entries.OptionsFlow):
     def _entity_schema(self, defaults: dict | None = None) -> vol.Schema:
         """Build the entity config schema with optional defaults."""
         d = defaults or {}
+
+        # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
+        accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
+        accent_key = (
+            vol.Optional(CONF_ACCENT_COLOR, default=accent_rgb)
+            if accent_rgb is not None
+            else vol.Optional(CONF_ACCENT_COLOR)
+        )
+
         return vol.Schema(
             {
                 vol.Required(
@@ -270,10 +280,7 @@ class PushWardOptionsFlow(config_entries.OptionsFlow):
                     CONF_REMAINING_TIME_ATTR,
                     default=d.get(CONF_REMAINING_TIME_ATTR, ""),
                 ): str,
-                vol.Optional(
-                    CONF_ACCENT_COLOR,
-                    default=d.get(CONF_ACCENT_COLOR, ""),
-                ): str,
+                accent_key: ColorRGBSelector(),
             }
         )
 
@@ -307,8 +314,25 @@ class PushWardOptionsFlow(config_entries.OptionsFlow):
             CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
             CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
             CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
-            CONF_ACCENT_COLOR: user_input.get(CONF_ACCENT_COLOR, ""),
+            CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
         }
+
+
+def _rgb_to_hex(rgb: list[int] | None) -> str:
+    """Convert an [R, G, B] list to a '#rrggbb' hex string."""
+    if not rgb or not isinstance(rgb, list) or len(rgb) != 3:
+        return ""
+    return f"#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}"
+
+
+def _hex_to_rgb(hex_color: str) -> list[int] | None:
+    """Convert a '#rrggbb' hex string back to [R, G, B] for the color picker."""
+    if not hex_color or not hex_color.startswith("#") or len(hex_color) != 7:
+        return None
+    try:
+        return [int(hex_color[i : i + 2], 16) for i in (1, 3, 5)]
+    except ValueError:
+        return None
 
 
 def _parse_csv(value: str) -> list[str]:
