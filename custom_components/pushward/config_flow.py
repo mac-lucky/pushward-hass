@@ -79,7 +79,7 @@ def _entity_schema(defaults: dict | None = None) -> vol.Schema:
                 CONF_ENTITY_ID,
                 default=d.get(CONF_ENTITY_ID, ""),
             ): EntitySelector(EntitySelectorConfig()),
-            vol.Required(CONF_SLUG, default=d.get(CONF_SLUG, "")): str,
+            vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, "")): str,
             vol.Optional(
                 CONF_ACTIVITY_NAME,
                 default=d.get(CONF_ACTIVITY_NAME, ""),
@@ -200,6 +200,52 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_SERVER_URL, default=DEFAULT_SERVER_URL): str,
+                    vol.Required(CONF_INTEGRATION_KEY): TextSelector(
+                        TextSelectorConfig(type=TextSelectorType.PASSWORD)
+                    ),
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
+        """Handle reconfiguration of server URL and integration key."""
+        entry = self._get_reconfigure_entry()
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                _validate_url(user_input[CONF_SERVER_URL])
+            except vol.Invalid:
+                errors[CONF_SERVER_URL] = "invalid_url"
+            else:
+                session = async_get_clientsession(self.hass)
+                client = PushWardApiClient(
+                    session,
+                    user_input[CONF_SERVER_URL],
+                    user_input[CONF_INTEGRATION_KEY],
+                )
+                try:
+                    await client.validate_connection()
+                except PushWardAuthError:
+                    errors["base"] = "invalid_auth"
+                except Exception:
+                    _LOGGER.exception("Unexpected error during PushWard reconfigure")
+                    errors["base"] = "cannot_connect"
+                else:
+                    return self.async_update_reload_and_abort(
+                        entry,
+                        data={
+                            CONF_SERVER_URL: user_input[CONF_SERVER_URL],
+                            CONF_INTEGRATION_KEY: user_input[CONF_INTEGRATION_KEY],
+                        },
+                    )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_SERVER_URL, default=entry.data.get(CONF_SERVER_URL, DEFAULT_SERVER_URL)): str,
                     vol.Required(CONF_INTEGRATION_KEY): TextSelector(
                         TextSelectorConfig(type=TextSelectorType.PASSWORD)
                     ),

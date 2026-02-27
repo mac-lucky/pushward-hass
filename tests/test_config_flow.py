@@ -212,6 +212,60 @@ async def test_already_configured(
     assert result["reason"] == "already_configured"
 
 
+# --- Reconfigure flow tests ---
+
+
+async def test_reconfigure_success(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """Test successful reconfiguration of server URL and key."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await entry.start_reconfigure_flow(hass)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reconfigure"
+
+    new_url = "https://new.pushward.example.com"
+    new_key = "new-key-456"
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_SERVER_URL: new_url,
+            CONF_INTEGRATION_KEY: new_key,
+        },
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.data[CONF_SERVER_URL] == new_url
+    assert entry.data[CONF_INTEGRATION_KEY] == new_key
+
+
+async def test_reconfigure_invalid_auth(hass: HomeAssistant) -> None:
+    """Test reconfigure with invalid auth shows error."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.pushward.config_flow.PushWardApiClient",
+    ) as mock_cls:
+        instance = mock_cls.return_value
+        instance.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key"))
+
+        result = await entry.start_reconfigure_flow(hass)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            user_input={
+                CONF_SERVER_URL: MOCK_SERVER_URL,
+                CONF_INTEGRATION_KEY: "bad-key",
+            },
+        )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": "invalid_auth"}
+
+
 # --- URL validation tests ---
 
 

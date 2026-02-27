@@ -11,6 +11,17 @@
         "data_description": {
           "integration_key": "Create one at your PushWard server under Settings → Integration Keys with scope 'ha-*'."
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigure PushWard",
+        "description": "Update your PushWard server URL or integration key.",
+        "data": {
+          "server_url": "Server URL",
+          "integration_key": "Integration Key"
+        },
+        "data_description": {
+          "integration_key": "Create one at your PushWard server under Settings → Integration Keys with scope 'ha-*'."
+        }
       }
     },
     "error": {
@@ -20,7 +31,8 @@
       "unknown": "An unexpected error occurred."
     },
     "abort": {
-      "already_configured": "PushWard is already configured."
+      "already_configured": "PushWard is already configured.",
+      "reconfigure_successful": "PushWard configuration updated."
     }
   },
   "config_subentries": {
