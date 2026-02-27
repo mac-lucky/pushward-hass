@@ -122,8 +122,8 @@ async def test_end_activity_two_phase(hass: HomeAssistant) -> None:
     await manager.async_stop()
 
 
-async def test_periodic_update_dedup(hass: HomeAssistant) -> None:
-    """Periodic update skips if content hasn't changed."""
+async def test_throttled_update_dedup(hass: HomeAssistant) -> None:
+    """Throttled update skips if content hasn't changed."""
     api = _mock_api()
     config = _entity_config()
     manager = ActivityManager(hass, api, [config])
@@ -137,8 +137,8 @@ async def test_periodic_update_dedup(hass: HomeAssistant) -> None:
 
     initial_count = api.update_activity.await_count
 
-    # Manually trigger periodic update with same state
-    await manager._async_periodic_update("binary_sensor.washer")
+    # Trigger send_update with same state — should be deduped
+    await manager._send_update("binary_sensor.washer")
 
     # Should not have sent another update (same content)
     assert api.update_activity.await_count == initial_count

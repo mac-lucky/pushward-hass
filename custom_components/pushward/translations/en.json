@@ -43,13 +43,23 @@
           "template": "Template",
           "start_states": "Start States (comma-separated)",
           "end_states": "End States (comma-separated)",
-          "update_interval": "Update Interval (seconds)",
+          "update_interval": "Min. Update Interval (seconds)",
           "progress_attribute": "Progress Attribute",
           "remaining_time_attribute": "Remaining Time Attribute",
           "accent_color": "Accent Color"
         },
         "data_description": {
-          "icon": "Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols)."
+          "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
+          "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
+          "icon": "SF Symbol name used as the activity icon. Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols). Example: lamp.desk.fill, lightbulb.fill",
+          "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
+          "template": "Activity layout template. 'generic' works for most entities.",
+          "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
+          "end_states": "Entity states that end the Live Activity. Example: off, idle, docked",
+          "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit — state changes are sent immediately, but rapid changes are throttled. Example: 5",
+          "progress_attribute": "Entity attribute name that holds a 0–100 progress value. Leave empty if not applicable. Example: percentage",
+          "remaining_time_attribute": "Entity attribute name that holds remaining time in seconds. Leave empty if not applicable. Example: remaining",
+          "accent_color": "Accent color for the Live Activity. Leave empty for default blue."
         }
       },
       "edit_entity": {
@@ -68,13 +78,23 @@
           "template": "Template",
           "start_states": "Start States (comma-separated)",
           "end_states": "End States (comma-separated)",
-          "update_interval": "Update Interval (seconds)",
+          "update_interval": "Min. Update Interval (seconds)",
           "progress_attribute": "Progress Attribute",
           "remaining_time_attribute": "Remaining Time Attribute",
           "accent_color": "Accent Color"
         },
         "data_description": {
-          "icon": "Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols)."
+          "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
+          "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
+          "icon": "SF Symbol name used as the activity icon. Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols). Example: lamp.desk.fill, lightbulb.fill",
+          "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
+          "template": "Activity layout template. 'generic' works for most entities.",
+          "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
+          "end_states": "Entity states that end the Live Activity. Example: off, idle, docked",
+          "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit — state changes are sent immediately, but rapid changes are throttled. Example: 5",
+          "progress_attribute": "Entity attribute name that holds a 0–100 progress value. Leave empty if not applicable. Example: percentage",
+          "remaining_time_attribute": "Entity attribute name that holds remaining time in seconds. Leave empty if not applicable. Example: remaining",
+          "accent_color": "Accent color for the Live Activity. Leave empty for default blue."
         }
       },
       "remove_entity": {

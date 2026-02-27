@@ -4,17 +4,17 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import timedelta
 from functools import partial
 from typing import Any
 
 import aiohttp
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import (
+    async_call_later,
     async_track_state_change_event,
-    async_track_time_interval,
 )
 
 from .api import PushWardApiClient, PushWardApiError
@@ -43,9 +43,10 @@ class TrackedEntity:
     is_active: bool = False
     last_content: dict | None = None
     unsub_state: Callable | None = None
-    unsub_timer: Callable | None = None
+    flush_unsub: Callable | None = None
     end_task: asyncio.Task | None = field(default=None, repr=False)
     generation: int = 0
+    last_sent_at: float = 0.0
 
 
 class ActivityManager:
@@ -86,8 +87,8 @@ class ActivityManager:
             if tracked.end_task and not tracked.end_task.done():
                 tracked.end_task.cancel()
 
-            if tracked.unsub_timer:
-                tracked.unsub_timer()
+            if tracked.flush_unsub:
+                tracked.flush_unsub()
 
             if tracked.unsub_state:
                 tracked.unsub_state()
@@ -126,6 +127,8 @@ class ActivityManager:
             self._hass.async_create_task(self._start_activity(entity_id))
         elif new_state.state in end_states and tracked.is_active:
             self._schedule_end(entity_id)
+        elif tracked.is_active:
+            self._schedule_throttled_update(entity_id)
 
     async def _start_activity(self, entity_id: str) -> None:
         """Create and start a PushWard Live Activity."""
@@ -158,18 +161,30 @@ class ActivityManager:
 
             tracked.is_active = True
             tracked.last_content = content
-
-            interval = timedelta(seconds=config.get(CONF_UPDATE_INTERVAL, 5))
-            tracked.unsub_timer = async_track_time_interval(
-                self._hass,
-                partial(self._async_periodic_update, entity_id),
-                interval,
-            )
+            tracked.last_sent_at = time.monotonic()
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to start activity for %s", entity_id, exc_info=True)
 
-    async def _async_periodic_update(self, entity_id: str, _now: Any = None) -> None:
-        """Send periodic updates while the activity is active."""
+    @callback
+    def _schedule_throttled_update(self, entity_id: str) -> None:
+        """Rate-limited update: send immediately if cooldown expired, else schedule."""
+        tracked = self._tracked[entity_id]
+        interval = tracked.config.get(CONF_UPDATE_INTERVAL, 5)
+        now = time.monotonic()
+        elapsed = now - tracked.last_sent_at
+
+        if elapsed >= interval:
+            self._hass.async_create_task(self._send_update(entity_id))
+        elif tracked.flush_unsub is None:
+            delay = interval - elapsed
+            tracked.flush_unsub = async_call_later(
+                self._hass,
+                delay,
+                partial(self._flush_update, entity_id),
+            )
+
+    async def _send_update(self, entity_id: str) -> None:
+        """Send the latest content to PushWard."""
         tracked = self._tracked.get(entity_id)
         if tracked is None or not tracked.is_active:
             return
@@ -186,8 +201,19 @@ class ActivityManager:
         try:
             await self._api.update_activity(slug, "ONGOING", content)
             tracked.last_content = content
+            tracked.last_sent_at = time.monotonic()
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to update activity %s", slug, exc_info=True)
+
+    @callback
+    def _flush_update(self, entity_id: str, _now: Any = None) -> None:
+        """Fire a pending throttled update."""
+        tracked = self._tracked.get(entity_id)
+        if tracked is None:
+            return
+        tracked.flush_unsub = None
+        if tracked.is_active:
+            self._hass.async_create_task(self._send_update(entity_id))
 
     def _schedule_end(self, entity_id: str) -> None:
         """Schedule a two-phase activity end."""
@@ -224,6 +250,6 @@ class ActivityManager:
         finally:
             tracked.is_active = False
             tracked.last_content = None
-            if tracked.unsub_timer:
-                tracked.unsub_timer()
-                tracked.unsub_timer = None
+            if tracked.flush_unsub:
+                tracked.flush_unsub()
+                tracked.flush_unsub = None
