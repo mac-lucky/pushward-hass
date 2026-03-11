@@ -1,4 +1,6 @@
-# CLAUDE.md — pushward-hass
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview
 
@@ -21,13 +23,25 @@ custom_components/pushward/
 
 ## Build Commands
 
+Uses `uv` for dependency management.
+
 ```bash
+# Setup (install dev dependencies into .venv)
+uv sync --frozen
+
 # Lint
 ruff check custom_components/ tests/
 ruff format --check custom_components/ tests/
 
-# Test
-pytest tests/ -v
+# Test (all)
+uv run pytest tests/ -v
+
+# Test (single file or test)
+uv run pytest tests/test_api.py -v
+uv run pytest tests/test_content_mapper.py::test_map_content_basic -v
+
+# Test with coverage (matches CI)
+uv run pytest tests/ -v --cov=custom_components/pushward --cov-report=term-missing
 
 # Install in HA (dev)
 # Symlink or copy custom_components/pushward/ into HA's custom_components/
@@ -43,6 +57,8 @@ pytest tests/ -v
 - **Slug format:** `ha-<sanitized-entity-id>` (e.g., `sensor.washer_status` → `ha-washer-status`). The slug field is optional — leave empty to auto-generate.
 - **Integration key scope:** Recommended `ha-*` slug pattern with `activity:manage` scope.
 - **ColorRGBSelector for accent color:** Stored as hex string (`#rrggbb`) internally, converted to/from `[r, g, b]` list for the HA color picker. Conditional default — only set when a valid color exists.
+- **Progress attribute expects 0-100:** The `progress_attribute` reads a 0-100 value from the HA entity attribute and divides by 100 to produce a 0.0-1.0 float for the API.
+- **strings.json ↔ translations/en.json:** These must stay in sync. `strings.json` is the source of truth; `translations/en.json` is a copy. When editing UI text, update both files.
 
 ## API Endpoints Used
 
@@ -83,6 +99,8 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.4.2 | Preserve last progress/subtitle on activity end instead of forcing 100% |
+| 0.4.1 | Version bump |
 | 0.4.0 | Fix HACS update detection (`hide_default_branch`), bump min HA to 2025.7.0, add integration icons |
 | 0.3.2 | Add integration icons (`icon.png`, `icon@2x.png`) |
 | 0.3.1 | Make slug field optional, add reconfigure flow for server URL/key |

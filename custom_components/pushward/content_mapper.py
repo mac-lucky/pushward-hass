@@ -50,14 +50,19 @@ def map_content(state: State, entity_config: dict) -> dict:
     return content
 
 
-def map_completion_content(entity_config: dict) -> dict:
-    """Build content for the "Complete" phase of two-phase end."""
+def map_completion_content(entity_config: dict, last_content: dict | None = None) -> dict:
+    """Build content for the "Complete" phase of two-phase end.
+
+    Preserves progress and subtitle from the last live update so the end
+    screen reflects the actual value (e.g. lamp brightness) rather than
+    jumping to 100%.
+    """
     return {
         "template": entity_config.get(CONF_TEMPLATE, "generic"),
-        "progress": 1.0,
+        "progress": last_content.get("progress", 1.0) if last_content else 1.0,
         "state": "Complete",
         "icon": "checkmark.circle.fill",
-        "subtitle": "",
+        "subtitle": last_content.get("subtitle", "") if last_content else "",
         "accent_color": "green",
     }
 
