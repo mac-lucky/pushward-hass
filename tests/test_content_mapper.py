@@ -121,7 +121,7 @@ def test_map_content_with_accent_color():
 # --- map_completion_content ---
 
 
-def test_map_completion_content():
+def test_map_completion_content_no_last():
     config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer"}
 
     content = map_completion_content(config)
@@ -131,6 +131,20 @@ def test_map_completion_content():
     assert content["icon"] == "checkmark.circle.fill"
     assert content["accent_color"] == "green"
     assert content["template"] == "generic"
+    assert content["subtitle"] == ""
+
+
+def test_map_completion_content_preserves_last():
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "lightbulb.fill"}
+    last = {"progress": 0.75, "subtitle": "Living Room Lamp", "accent_color": "blue"}
+
+    content = map_completion_content(config, last_content=last)
+
+    assert content["progress"] == 0.75
+    assert content["subtitle"] == "Living Room Lamp"
+    assert content["state"] == "Complete"
+    assert content["icon"] == "checkmark.circle.fill"
+    assert content["accent_color"] == "green"
 
 
 # --- get_domain_defaults ---

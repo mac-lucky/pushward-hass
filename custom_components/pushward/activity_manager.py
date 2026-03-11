@@ -230,8 +230,8 @@ class ActivityManager:
         gen_at_start = tracked.generation
 
         try:
-            # Phase 1: show completion content
-            completion = map_completion_content(config)
+            # Phase 1: show completion content (preserves last progress/subtitle)
+            completion = map_completion_content(config, tracked.last_content)
             await self._api.update_activity(slug, "ONGOING", completion)
 
             # Wait for user to see the completion state
