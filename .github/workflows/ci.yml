@@ -49,3 +49,20 @@ jobs:
           version: "latest"
       - run: uv sync --frozen
       - run: uv run pytest tests/ -v --cov=custom_components/pushward --cov-report=term-missing
+
+  release:
+    name: Release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [hacs-validate, hassfest, lint, test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get version from manifest
+        id: version
+        run: echo "version=$(jq -r .version custom_components/pushward/manifest.json)" >> "$GITHUB_OUTPUT"
+      - name: Create release if tag doesn't exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "v${{ steps.version.outputs.version }}" --title "v${{ steps.version.outputs.version }}" --generate-notes || echo "Release already exists, skipping."
