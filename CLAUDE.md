@@ -72,7 +72,7 @@ Auth: `Authorization: Bearer <integration_key>`
 ## CI/CD
 
 - HACS validation + hassfest + ruff + pytest in `ci.yml`
-- **Auto-release:** On `main` push, after all checks pass, CI reads the version from `manifest.json` and creates a GitHub release (`vX.Y.Z`) if it doesn't already exist. Release notes are auto-generated from commits.
+- **Auto-release:** On `v*` tag push, after all checks pass, CI creates a GitHub release with auto-generated notes.
 - Dependabot auto-merge via shared workflow
 
 ## Releases
@@ -83,7 +83,8 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 1. Bump version in `manifest.json` (semver: `MAJOR.MINOR.PATCH`)
 2. Commit and push to `main`
-3. CI creates the GitHub release automatically after checks pass
+3. Tag and push: `git tag v0.5.0 && git push --tags`
+4. CI creates the GitHub release automatically after checks pass
 
 **Version tag must match `manifest.json` version** (e.g., `"version": "0.3.1"` → tag `v0.3.1`).
 

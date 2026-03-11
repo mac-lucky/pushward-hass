@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - uses: astral-sh/setup-uv@v4
         with:
           version: "latest"
@@ -52,17 +52,14 @@ jobs:
 
   release:
     name: Release
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     needs: [hacs-validate, hassfest, lint, test]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Get version from manifest
-        id: version
-        run: echo "version=$(jq -r .version custom_components/pushward/manifest.json)" >> "$GITHUB_OUTPUT"
-      - name: Create release if tag doesn't exist
+      - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "v${{ steps.version.outputs.version }}" --title "v${{ steps.version.outputs.version }}" --generate-notes || echo "Release already exists, skipping."
+        run: gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --generate-notes
