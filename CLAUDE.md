@@ -92,6 +92,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.4.3 | Fix CI: hassfest URL validation, Python 3.13, brand icons, tag-triggered releases, bump actions |
 | 0.4.2 | Preserve last progress/subtitle on activity end instead of forcing 100% |
 | 0.4.1 | Version bump |
 | 0.4.0 | Fix HACS update detection (`hide_default_branch`), bump min HA to 2025.7.0, add integration icons |
