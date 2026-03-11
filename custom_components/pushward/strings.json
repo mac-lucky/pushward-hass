@@ -61,7 +61,7 @@
           "data_description": {
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
             "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
-            "icon": "SF Symbol name used as the activity icon. Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols). Example: lamp.desk.fill, lightbulb.fill",
+            "icon": "SF Symbol name used as the activity icon. Example: lamp.desk.fill, lightbulb.fill",
             "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
             "template": "Activity layout template. 'generic' works for most entities.",
             "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
@@ -91,7 +91,7 @@
           "data_description": {
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
             "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
-            "icon": "SF Symbol name used as the activity icon. Browse available symbols at [SF Symbols](https://icons8.com/icons/family-sf-symbols). Example: lamp.desk.fill, lightbulb.fill",
+            "icon": "SF Symbol name used as the activity icon. Example: lamp.desk.fill, lightbulb.fill",
             "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
             "template": "Activity layout template. 'generic' works for most entities.",
             "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
