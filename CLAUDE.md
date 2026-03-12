@@ -93,6 +93,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.5.3 | Auto-discovery entity config flow: step 1 reduced to entity + template, step 2 uses AttributeSelector dropdowns for all attribute fields, SelectSelector with multi-select for start/end states pre-populated from domain defaults |
 | 0.5.2 | Two-step entity config flow: step 1 picks template, step 2 shows only relevant fields (hides pipeline/alert/countdown fields when not applicable) |
 | 0.5.1 | Add HA services (create/update/end/delete activity), custom subtitle attribute, state labels, completion message, URL deep links, dynamic icon/color via entity attributes, optional TTLs, fix shutdown sending empty content |
 | 0.4.4 | Update integration icons from shared icon-assets |
