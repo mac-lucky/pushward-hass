@@ -17,6 +17,7 @@ from custom_components.pushward.config_flow import _validate_url
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
     CONF_ACTIVITY_NAME,
+    CONF_CURRENT_STEP_ATTR,
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_ICON,
@@ -25,9 +26,11 @@ from custom_components.pushward.const import (
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
     CONF_SERVER_URL,
+    CONF_SEVERITY,
     CONF_SLUG,
     CONF_START_STATES,
     CONF_TEMPLATE,
+    CONF_TOTAL_STEPS,
     CONF_UPDATE_INTERVAL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
@@ -51,6 +54,9 @@ def _mock_entity_input(**overrides) -> dict:
         CONF_UPDATE_INTERVAL: 5,
         CONF_PROGRESS_ATTRIBUTE: "",
         CONF_REMAINING_TIME_ATTR: "",
+        CONF_TOTAL_STEPS: 1,
+        CONF_CURRENT_STEP_ATTR: "",
+        CONF_SEVERITY: "info",
     }
     data.update(overrides)
     return data
@@ -70,6 +76,9 @@ def _entity_subentry_data(**overrides) -> ConfigSubentryData:
         CONF_UPDATE_INTERVAL: 5,
         CONF_PROGRESS_ATTRIBUTE: "",
         CONF_REMAINING_TIME_ATTR: "",
+        CONF_TOTAL_STEPS: 1,
+        CONF_CURRENT_STEP_ATTR: "",
+        CONF_SEVERITY: "info",
         CONF_ACCENT_COLOR: "",
     }
     data.update(overrides)
@@ -379,6 +388,47 @@ async def test_subentry_add_entity_empty_slug_auto_generates(hass: HomeAssistant
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_SLUG] == "ha-binary-sensor-washer"
+
+
+async def test_subentry_add_pipeline_entity(hass: HomeAssistant) -> None:
+    """Test adding a pipeline entity persists total_steps and current_step_attribute."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(
+            **{CONF_TEMPLATE: "pipeline", CONF_TOTAL_STEPS: 5, CONF_CURRENT_STEP_ATTR: "step"}
+        ),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_TEMPLATE] == "pipeline"
+    assert subentries[0].data[CONF_TOTAL_STEPS] == 5
+    assert subentries[0].data[CONF_CURRENT_STEP_ATTR] == "step"
+
+
+async def test_subentry_add_alert_entity(hass: HomeAssistant) -> None:
+    """Test adding an alert entity persists severity."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_TEMPLATE: "alert", CONF_SEVERITY: "critical"}),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_TEMPLATE] == "alert"
+    assert subentries[0].data[CONF_SEVERITY] == "critical"
 
 
 async def test_subentry_duplicate_entity_aborts(hass: HomeAssistant) -> None:

@@ -27,6 +27,7 @@ from .api import PushWardApiClient, PushWardAuthError
 from .const import (
     CONF_ACCENT_COLOR,
     CONF_ACTIVITY_NAME,
+    CONF_CURRENT_STEP_ATTR,
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_ICON,
@@ -35,14 +36,19 @@ from .const import (
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
     CONF_SERVER_URL,
+    CONF_SEVERITY,
     CONF_SLUG,
     CONF_START_STATES,
     CONF_TEMPLATE,
+    CONF_TOTAL_STEPS,
     CONF_UPDATE_INTERVAL,
     DEFAULT_PRIORITY,
     DEFAULT_SERVER_URL,
+    DEFAULT_SEVERITY,
+    DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    SEVERITIES,
     SUBENTRY_TYPE_ENTITY,
     TEMPLATES,
 )
@@ -118,6 +124,23 @@ def _entity_schema(defaults: dict | None = None) -> vol.Schema:
                 CONF_REMAINING_TIME_ATTR,
                 default=d.get(CONF_REMAINING_TIME_ATTR, ""),
             ): str,
+            vol.Optional(
+                CONF_TOTAL_STEPS,
+                default=d.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
+            ): vol.All(int, vol.Range(min=1, max=20)),
+            vol.Optional(
+                CONF_CURRENT_STEP_ATTR,
+                default=d.get(CONF_CURRENT_STEP_ATTR, ""),
+            ): str,
+            vol.Optional(
+                CONF_SEVERITY,
+                default=d.get(CONF_SEVERITY, DEFAULT_SEVERITY),
+            ): SelectSelector(
+                SelectSelectorConfig(
+                    options=SEVERITIES,
+                    mode=SelectSelectorMode.DROPDOWN,
+                )
+            ),
             accent_key: ColorRGBSelector(),
         }
     )
@@ -151,6 +174,9 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
         CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
+        CONF_TOTAL_STEPS: user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
+        CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
+        CONF_SEVERITY: user_input.get(CONF_SEVERITY, DEFAULT_SEVERITY),
         CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
     }
 
