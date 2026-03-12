@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
     AttributeSelector,
@@ -108,15 +108,53 @@ def _entity_template_schema(defaults: dict | None = None) -> vol.Schema:
     )
 
 
-def _details_schema(entity_id: str, template: str, defaults: dict | None = None) -> vol.Schema:
+def _collect_entity_states(hass: HomeAssistant | None, entity_id: str, domain: str) -> list[str]:
+    """Collect known state options for an entity from HA runtime data."""
+    states: list[str] = []
+    if hass is None:
+        return states
+
+    state_obj = hass.states.get(entity_id)
+    if state_obj is None:
+        return states
+
+    # Current state
+    if state_obj.state not in ("unavailable", "unknown"):
+        states.append(state_obj.state)
+
+    # select / input_select entities expose their options attribute
+    if domain in ("select", "input_select"):
+        options = state_obj.attributes.get("options", [])
+        if isinstance(options, list):
+            for opt in options:
+                if isinstance(opt, str) and opt not in states:
+                    states.append(opt)
+
+    return states
+
+
+def _details_schema(
+    entity_id: str,
+    template: str,
+    defaults: dict | None = None,
+    hass: HomeAssistant | None = None,
+) -> vol.Schema:
     """Build step-2 schema with all config fields and dynamic selectors."""
     d = defaults or {}
     domain = entity_id.split(".")[0] if "." in entity_id else ""
     domain_defs = get_domain_defaults(domain)
 
-    # State options: domain defaults + any previously saved states
+    # State options: domain defaults + entity runtime states + previously saved
     start_opts = list(domain_defs.get("start_states", []))
     end_opts = list(domain_defs.get("end_states", []))
+
+    entity_states = _collect_entity_states(hass, entity_id, domain)
+    for s in entity_states:
+        if s not in start_opts:
+            start_opts.append(s)
+        if s not in end_opts:
+            end_opts.append(s)
+
     saved_start = d.get(CONF_START_STATES, [])
     saved_end = d.get(CONF_END_STATES, [])
     if isinstance(saved_start, list):
@@ -614,7 +652,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         defaults = self._details_defaults if self._is_reconfigure else None
         return self.async_show_form(
             step_id="details",
-            data_schema=_details_schema(entity_id, template, defaults=defaults),
+            data_schema=_details_schema(entity_id, template, defaults=defaults, hass=self.hass),
             errors=errors,
         )
 
