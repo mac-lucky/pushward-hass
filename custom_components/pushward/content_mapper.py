@@ -63,7 +63,8 @@ def map_content(state: State, entity_config: dict) -> dict:
     # Subtitle: subtitle_attribute > friendly_name
     subtitle_attr = entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
     if subtitle_attr:
-        subtitle = state.attributes.get(subtitle_attr) or state.attributes.get("friendly_name", "")
+        raw = state.attributes.get(subtitle_attr)
+        subtitle = str(raw) if raw is not None else state.attributes.get("friendly_name", "")
     else:
         subtitle = state.attributes.get("friendly_name", "")
 
