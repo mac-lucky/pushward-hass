@@ -107,9 +107,7 @@ def _entity_template_schema(defaults: dict | None = None) -> vol.Schema:
     )
 
 
-def _details_schema(
-    entity_id: str, template: str, defaults: dict | None = None
-) -> vol.Schema:
+def _details_schema(entity_id: str, template: str, defaults: dict | None = None) -> vol.Schema:
     """Build step-2 schema with all config fields and dynamic selectors."""
     d = defaults or {}
     domain = entity_id.split(".")[0] if "." in entity_id else ""
@@ -129,20 +127,10 @@ def _details_schema(
             if s not in end_opts:
                 end_opts.append(s)
 
-    start_default = (
-        d.get(CONF_START_STATES)
-        if d.get(CONF_START_STATES)
-        else domain_defs.get("start_states", [])
-    )
-    end_default = (
-        d.get(CONF_END_STATES)
-        if d.get(CONF_END_STATES)
-        else domain_defs.get("end_states", [])
-    )
+    start_default = d.get(CONF_START_STATES) if d.get(CONF_START_STATES) else domain_defs.get("start_states", [])
+    end_default = d.get(CONF_END_STATES) if d.get(CONF_END_STATES) else domain_defs.get("end_states", [])
 
-    attr_selector = AttributeSelector(
-        AttributeSelectorConfig(entity_id=entity_id)
-    )
+    attr_selector = AttributeSelector(AttributeSelectorConfig(entity_id=entity_id))
 
     # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
     accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
@@ -169,9 +157,7 @@ def _details_schema(
     fields: dict = {}
 
     # --- Start/end states (multi-select with custom values) ---
-    fields[
-        vol.Optional(CONF_START_STATES, default=start_default)
-    ] = SelectSelector(
+    fields[vol.Optional(CONF_START_STATES, default=start_default)] = SelectSelector(
         SelectSelectorConfig(
             options=start_opts,
             multiple=True,
@@ -179,9 +165,7 @@ def _details_schema(
             mode=SelectSelectorMode.DROPDOWN,
         )
     )
-    fields[
-        vol.Optional(CONF_END_STATES, default=end_default)
-    ] = SelectSelector(
+    fields[vol.Optional(CONF_END_STATES, default=end_default)] = SelectSelector(
         SelectSelectorConfig(
             options=end_opts,
             multiple=True,
@@ -232,18 +216,14 @@ def _details_schema(
         )
 
     # --- Identity fields ---
-    fields[
-        vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))
-    ] = str
+    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = str
     fields[
         vol.Optional(
             CONF_ACTIVITY_NAME,
             default=d.get(CONF_ACTIVITY_NAME, ""),
         )
     ] = str
-    fields[
-        vol.Optional(CONF_ICON, default=d.get(CONF_ICON, ""))
-    ] = str
+    fields[vol.Optional(CONF_ICON, default=d.get(CONF_ICON, ""))] = str
     fields[
         vol.Optional(
             CONF_ICON_ATTRIBUTE,
@@ -555,9 +535,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             data_schema=_entity_template_schema(defaults=current),
         )
 
-    async def async_step_details(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.SubentryFlowResult:
+    async def async_step_details(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
         """Step 2: All configuration details with dynamic selectors."""
         entity_id = self._step1_input.get(CONF_ENTITY_ID, "")
         template = self._step1_input.get(CONF_TEMPLATE, "generic")
