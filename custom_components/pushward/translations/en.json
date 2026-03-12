@@ -56,6 +56,9 @@
             "update_interval": "Min. Update Interval (seconds)",
             "progress_attribute": "Progress Attribute",
             "remaining_time_attribute": "Remaining Time Attribute",
+            "total_steps": "Total Steps (pipeline)",
+            "current_step_attribute": "Current Step Attribute (pipeline)",
+            "severity": "Severity (alert)",
             "accent_color": "Accent Color"
           },
           "data_description": {
@@ -69,6 +72,9 @@
             "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit — state changes are sent immediately, but rapid changes are throttled. Example: 5",
             "progress_attribute": "Entity attribute name that holds a 0–100 progress value. Leave empty if not applicable. Example: percentage",
             "remaining_time_attribute": "Entity attribute name that holds remaining time in seconds. Leave empty if not applicable. Example: remaining",
+            "total_steps": "Number of steps in the pipeline. Only used when template is 'pipeline'.",
+            "current_step_attribute": "Entity attribute holding the current step as an integer. Only for 'pipeline'.",
+            "severity": "Alert severity level. Only used when template is 'alert'.",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue."
           }
         },
@@ -86,6 +92,9 @@
             "update_interval": "Min. Update Interval (seconds)",
             "progress_attribute": "Progress Attribute",
             "remaining_time_attribute": "Remaining Time Attribute",
+            "total_steps": "Total Steps (pipeline)",
+            "current_step_attribute": "Current Step Attribute (pipeline)",
+            "severity": "Severity (alert)",
             "accent_color": "Accent Color"
           },
           "data_description": {
@@ -99,6 +108,9 @@
             "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit — state changes are sent immediately, but rapid changes are throttled. Example: 5",
             "progress_attribute": "Entity attribute name that holds a 0–100 progress value. Leave empty if not applicable. Example: percentage",
             "remaining_time_attribute": "Entity attribute name that holds remaining time in seconds. Leave empty if not applicable. Example: remaining",
+            "total_steps": "Number of steps in the pipeline. Only used when template is 'pipeline'.",
+            "current_step_attribute": "Entity attribute holding the current step as an integer. Only for 'pipeline'.",
+            "severity": "Alert severity level. Only used when template is 'alert'.",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue."
           }
         }

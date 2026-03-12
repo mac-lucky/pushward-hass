@@ -19,6 +19,9 @@ CONF_UPDATE_INTERVAL = "update_interval"
 CONF_PROGRESS_ATTRIBUTE = "progress_attribute"
 CONF_REMAINING_TIME_ATTR = "remaining_time_attribute"
 CONF_ACCENT_COLOR = "accent_color"
+CONF_TOTAL_STEPS = "total_steps"
+CONF_CURRENT_STEP_ATTR = "current_step_attribute"
+CONF_SEVERITY = "severity"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
@@ -27,6 +30,11 @@ DEFAULT_TEMPLATE = "generic"
 DEFAULT_UPDATE_INTERVAL = 5
 DEFAULT_ENDED_TTL = 300
 DEFAULT_STALE_TTL = 1800
+DEFAULT_TOTAL_STEPS = 1
+DEFAULT_SEVERITY = "info"
+
+# Alert severities
+SEVERITIES = ["critical", "warning", "info"]
 
 # Templates
 TEMPLATES = ["generic", "countdown", "alert", "pipeline"]

@@ -9,15 +9,18 @@ from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
     CONF_ACTIVITY_NAME,
+    CONF_CURRENT_STEP_ATTR,
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_ICON,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SEVERITY,
     CONF_SLUG,
     CONF_START_STATES,
     CONF_TEMPLATE,
+    CONF_TOTAL_STEPS,
     CONF_UPDATE_INTERVAL,
 )
 
@@ -55,5 +58,8 @@ def sample_entity_config():
         CONF_UPDATE_INTERVAL: 5,
         CONF_PROGRESS_ATTRIBUTE: "",
         CONF_REMAINING_TIME_ATTR: "",
+        CONF_TOTAL_STEPS: 1,
+        CONF_CURRENT_STEP_ATTR: "",
+        CONF_SEVERITY: "info",
         CONF_ACCENT_COLOR: "",
     }
