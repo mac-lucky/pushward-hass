@@ -7,13 +7,20 @@ from homeassistant.core import State
 
 from .const import (
     CONF_ACCENT_COLOR,
+    CONF_ACCENT_COLOR_ATTRIBUTE,
+    CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_ICON,
+    CONF_ICON_ATTRIBUTE,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SECONDARY_URL,
     CONF_SEVERITY,
+    CONF_STATE_LABELS,
+    CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
+    CONF_URL,
     DEFAULT_SEVERITY,
     DEFAULT_TOTAL_STEPS,
     DOMAIN_DEFAULTS,
@@ -38,25 +45,66 @@ def sanitize_slug(entity_id: str) -> str:
 
 def map_content(state: State, entity_config: dict) -> dict:
     """Map HA state + attributes to a PushWard content dict."""
+    # State label: use custom label if configured, else default formatting
+    state_labels = entity_config.get(CONF_STATE_LABELS) or {}
+    if state.state in state_labels:
+        state_text = state_labels[state.state]
+    else:
+        state_text = state.state.replace("_", " ").capitalize()
+
+    # Icon resolution: icon_attribute > static icon > domain default
+    icon = entity_config.get(CONF_ICON, "questionmark.circle")
+    icon_attr = entity_config.get(CONF_ICON_ATTRIBUTE)
+    if icon_attr:
+        dynamic_icon = state.attributes.get(icon_attr)
+        if dynamic_icon:
+            icon = str(dynamic_icon)
+
+    # Subtitle: subtitle_attribute > friendly_name
+    subtitle_attr = entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
+    if subtitle_attr:
+        subtitle = state.attributes.get(subtitle_attr) or state.attributes.get("friendly_name", "")
+    else:
+        subtitle = state.attributes.get("friendly_name", "")
+
+    # Accent color resolution: accent_color_attribute > static accent_color > "blue"
+    accent = entity_config.get(CONF_ACCENT_COLOR, "")
+    color_attr = entity_config.get(CONF_ACCENT_COLOR_ATTRIBUTE)
+    if color_attr:
+        dynamic_color = state.attributes.get(color_attr)
+        if dynamic_color:
+            accent = str(dynamic_color)
+    if not accent:
+        accent = "blue"
+
     content: dict = {
         "template": entity_config.get(CONF_TEMPLATE, "generic"),
         "progress": _get_progress(state, entity_config),
-        "state": state.state.replace("_", " ").capitalize(),
-        "icon": entity_config.get(CONF_ICON, "questionmark.circle"),
-        "subtitle": state.attributes.get("friendly_name", ""),
+        "state": state_text,
+        "icon": icon,
+        "subtitle": subtitle,
+        "accent_color": accent,
     }
 
     remaining = _get_remaining_time(state, entity_config)
     if remaining is not None:
         content["remaining_time"] = remaining
 
-    accent = entity_config.get(CONF_ACCENT_COLOR, "")
-    content["accent_color"] = accent if accent else "blue"
+    # URL deep links
+    url = entity_config.get(CONF_URL, "")
+    if url:
+        content["url"] = url
+    secondary_url = entity_config.get(CONF_SECONDARY_URL, "")
+    if secondary_url:
+        content["secondary_url"] = secondary_url
 
     # Template-specific required fields
     template = content["template"]
     if template == "countdown":
         content["end_date"] = int(time.time()) + (remaining if remaining is not None else 0)
+        completion_msg = entity_config.get(CONF_COMPLETION_MESSAGE)
+        if completion_msg:
+            content["completion_message"] = completion_msg
     elif template == "pipeline":
         total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
         current = _get_current_step(state, entity_config)
@@ -78,14 +126,24 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
     screen reflects the actual value (e.g. lamp brightness) rather than
     jumping to 100%.
     """
+    completion_msg = entity_config.get(CONF_COMPLETION_MESSAGE) or "Complete"
+
     content: dict = {
         "template": entity_config.get(CONF_TEMPLATE, "generic"),
         "progress": last_content.get("progress", 1.0) if last_content else 1.0,
-        "state": "Complete",
+        "state": completion_msg,
         "icon": "checkmark.circle.fill",
         "subtitle": last_content.get("subtitle", "") if last_content else "",
         "accent_color": "green",
     }
+
+    # Persist URL deep links through end
+    url = entity_config.get(CONF_URL, "")
+    if url:
+        content["url"] = url
+    secondary_url = entity_config.get(CONF_SECONDARY_URL, "")
+    if secondary_url:
+        content["secondary_url"] = secondary_url
 
     # Template-specific required fields for server validation
     template = content["template"]

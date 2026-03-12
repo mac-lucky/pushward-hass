@@ -21,13 +21,13 @@ from .api import PushWardApiClient, PushWardApiError
 from .const import (
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
+    CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_PRIORITY,
     CONF_SLUG,
+    CONF_STALE_TTL,
     CONF_START_STATES,
     CONF_UPDATE_INTERVAL,
-    DEFAULT_ENDED_TTL,
-    DEFAULT_STALE_TTL,
     END_DELAY_SECONDS,
 )
 from .content_mapper import map_completion_content, map_content
@@ -96,7 +96,8 @@ class ActivityManager:
             if tracked.is_active:
                 slug = tracked.config[CONF_SLUG]
                 try:
-                    await self._api.update_activity(slug, "ENDED", {})
+                    content = map_completion_content(tracked.config, tracked.last_content)
+                    await self._api.update_activity(slug, "ENDED", content)
                 except (PushWardApiError, aiohttp.ClientError):
                     _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
 
@@ -148,8 +149,8 @@ class ActivityManager:
                 slug,
                 config.get(CONF_ACTIVITY_NAME, entity_id),
                 config.get(CONF_PRIORITY, 1),
-                DEFAULT_ENDED_TTL,
-                DEFAULT_STALE_TTL,
+                ended_ttl=config.get(CONF_ENDED_TTL),
+                stale_ttl=config.get(CONF_STALE_TTL),
             )
 
             current_state = self._hass.states.get(entity_id)

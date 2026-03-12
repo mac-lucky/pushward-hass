@@ -2,16 +2,163 @@
 
 import logging
 
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .activity_manager import ActivityManager
 from .api import PushWardApiClient
-from .const import CONF_INTEGRATION_KEY, CONF_SERVER_URL, DOMAIN, SUBENTRY_TYPE_ENTITY
+from .const import (
+    CONF_INTEGRATION_KEY,
+    CONF_SERVER_URL,
+    DEFAULT_PRIORITY,
+    DOMAIN,
+    SUBENTRY_TYPE_ENTITY,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
+# Content fields for update_activity service
+_CONTENT_FIELDS = [
+    "template",
+    "progress",
+    "state_text",
+    "icon",
+    "subtitle",
+    "accent_color",
+    "remaining_time",
+    "url",
+    "secondary_url",
+    "end_date",
+    "total_steps",
+    "current_step",
+    "severity",
+    "completion_message",
+]
+
+SERVICE_UPDATE_ACTIVITY = "update_activity"
+SERVICE_CREATE_ACTIVITY = "create_activity"
+SERVICE_END_ACTIVITY = "end_activity"
+SERVICE_DELETE_ACTIVITY = "delete_activity"
+
+SCHEMA_UPDATE_ACTIVITY = vol.Schema(
+    {
+        vol.Required("slug"): str,
+        vol.Required("state"): vol.In(["ONGOING", "ENDED"]),
+        vol.Optional("template"): str,
+        vol.Optional("progress"): vol.Coerce(float),
+        vol.Optional("state_text"): str,
+        vol.Optional("icon"): str,
+        vol.Optional("subtitle"): str,
+        vol.Optional("accent_color"): str,
+        vol.Optional("remaining_time"): vol.Coerce(int),
+        vol.Optional("url"): str,
+        vol.Optional("secondary_url"): str,
+        vol.Optional("end_date"): vol.Coerce(int),
+        vol.Optional("total_steps"): vol.Coerce(int),
+        vol.Optional("current_step"): vol.Coerce(int),
+        vol.Optional("severity"): vol.In(["critical", "warning", "info"]),
+        vol.Optional("completion_message"): str,
+    }
+)
+
+SCHEMA_CREATE_ACTIVITY = vol.Schema(
+    {
+        vol.Required("slug"): str,
+        vol.Required("name"): str,
+        vol.Optional("priority", default=DEFAULT_PRIORITY): vol.Coerce(int),
+        vol.Optional("ended_ttl"): vol.Coerce(int),
+        vol.Optional("stale_ttl"): vol.Coerce(int),
+    }
+)
+
+SCHEMA_END_ACTIVITY = vol.Schema(
+    {
+        vol.Required("slug"): str,
+        vol.Optional("completion_message"): str,
+    }
+)
+
+SCHEMA_DELETE_ACTIVITY = vol.Schema(
+    {
+        vol.Required("slug"): str,
+    }
+)
+
+
+def _get_api(hass: HomeAssistant) -> PushWardApiClient:
+    """Get the API client from the first available config entry."""
+    entries = hass.data.get(DOMAIN, {})
+    for entry_data in entries.values():
+        return entry_data["api"]
+    raise HomeAssistantError("No PushWard config entry available")
+
+
+async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the update_activity service call."""
+    api = _get_api(hass)
+    slug = call.data["slug"]
+    state = call.data["state"]
+    content = {}
+    for field in _CONTENT_FIELDS:
+        if field in call.data:
+            # Map state_text -> state for the API
+            key = "state" if field == "state_text" else field
+            content[key] = call.data[field]
+    await api.update_activity(slug, state, content)
+
+
+async def _async_handle_create_activity(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the create_activity service call."""
+    api = _get_api(hass)
+    await api.create_activity(
+        slug=call.data["slug"],
+        name=call.data["name"],
+        priority=call.data["priority"],
+        ended_ttl=call.data.get("ended_ttl"),
+        stale_ttl=call.data.get("stale_ttl"),
+    )
+
+
+async def _async_handle_end_activity(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the end_activity service call."""
+    api = _get_api(hass)
+    slug = call.data["slug"]
+    content = {}
+    if "completion_message" in call.data:
+        content["completion_message"] = call.data["completion_message"]
+    await api.update_activity(slug, "ENDED", content)
+
+
+async def _async_handle_delete_activity(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the delete_activity service call."""
+    api = _get_api(hass)
+    await api.delete_activity(call.data["slug"])
+
+
+def _register_services(hass: HomeAssistant) -> None:
+    """Register PushWard services (only once)."""
+    if hass.services.has_service(DOMAIN, SERVICE_UPDATE_ACTIVITY):
+        return
+
+    async def handle_update(call: ServiceCall) -> None:
+        await _async_handle_update_activity(hass, call)
+
+    async def handle_create(call: ServiceCall) -> None:
+        await _async_handle_create_activity(hass, call)
+
+    async def handle_end(call: ServiceCall) -> None:
+        await _async_handle_end_activity(hass, call)
+
+    async def handle_delete(call: ServiceCall) -> None:
+        await _async_handle_delete_activity(hass, call)
+
+    hass.services.async_register(DOMAIN, SERVICE_UPDATE_ACTIVITY, handle_update, SCHEMA_UPDATE_ACTIVITY)
+    hass.services.async_register(DOMAIN, SERVICE_CREATE_ACTIVITY, handle_create, SCHEMA_CREATE_ACTIVITY)
+    hass.services.async_register(DOMAIN, SERVICE_END_ACTIVITY, handle_end, SCHEMA_END_ACTIVITY)
+    hass.services.async_register(DOMAIN, SERVICE_DELETE_ACTIVITY, handle_delete, SCHEMA_DELETE_ACTIVITY)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -33,6 +180,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "api": api,
         "manager": manager,
     }
+
+    _register_services(hass)
 
     entry.async_on_unload(entry.add_update_listener(_async_entry_updated))
 
@@ -63,4 +212,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     data = hass.data[DOMAIN].pop(entry.entry_id, None)
     if data:
         await data["manager"].async_stop()
+
+    # Unregister services when no entries remain
+    if not hass.data.get(DOMAIN):
+        hass.services.async_remove(DOMAIN, SERVICE_UPDATE_ACTIVITY)
+        hass.services.async_remove(DOMAIN, SERVICE_CREATE_ACTIVITY)
+        hass.services.async_remove(DOMAIN, SERVICE_END_ACTIVITY)
+        hass.services.async_remove(DOMAIN, SERVICE_DELETE_ACTIVITY)
+
     return True

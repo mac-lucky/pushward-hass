@@ -13,25 +13,34 @@ from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
-from custom_components.pushward.config_flow import _validate_url
+from custom_components.pushward.config_flow import _parse_state_labels, _validate_url
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
+    CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
+    CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_END_STATES,
+    CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_ICON,
+    CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SECONDARY_URL,
     CONF_SERVER_URL,
     CONF_SEVERITY,
     CONF_SLUG,
+    CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_STATE_LABELS,
+    CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
     CONF_UPDATE_INTERVAL,
+    CONF_URL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
 )
@@ -47,6 +56,7 @@ def _mock_entity_input(**overrides) -> dict:
         CONF_SLUG: "ha-washer",
         CONF_ACTIVITY_NAME: "Washer",
         CONF_ICON: "circle.fill",
+        CONF_ICON_ATTRIBUTE: "",
         CONF_PRIORITY: 1,
         CONF_TEMPLATE: "generic",
         CONF_START_STATES: "on",
@@ -54,9 +64,15 @@ def _mock_entity_input(**overrides) -> dict:
         CONF_UPDATE_INTERVAL: 5,
         CONF_PROGRESS_ATTRIBUTE: "",
         CONF_REMAINING_TIME_ATTR: "",
+        CONF_SUBTITLE_ATTRIBUTE: "",
+        CONF_STATE_LABELS: "",
+        CONF_COMPLETION_MESSAGE: "",
         CONF_TOTAL_STEPS: 1,
         CONF_CURRENT_STEP_ATTR: "",
         CONF_SEVERITY: "info",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "",
+        CONF_URL: "",
+        CONF_SECONDARY_URL: "",
     }
     data.update(overrides)
     return data
@@ -69,6 +85,7 @@ def _entity_subentry_data(**overrides) -> ConfigSubentryData:
         CONF_SLUG: "ha-washer",
         CONF_ACTIVITY_NAME: "Washer",
         CONF_ICON: "circle.fill",
+        CONF_ICON_ATTRIBUTE: "",
         CONF_PRIORITY: 1,
         CONF_TEMPLATE: "generic",
         CONF_START_STATES: ["on"],
@@ -76,10 +93,18 @@ def _entity_subentry_data(**overrides) -> ConfigSubentryData:
         CONF_UPDATE_INTERVAL: 5,
         CONF_PROGRESS_ATTRIBUTE: "",
         CONF_REMAINING_TIME_ATTR: "",
+        CONF_SUBTITLE_ATTRIBUTE: "",
+        CONF_STATE_LABELS: {},
+        CONF_COMPLETION_MESSAGE: "",
         CONF_TOTAL_STEPS: 1,
         CONF_CURRENT_STEP_ATTR: "",
         CONF_SEVERITY: "info",
         CONF_ACCENT_COLOR: "",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "",
+        CONF_URL: "",
+        CONF_SECONDARY_URL: "",
+        CONF_ENDED_TTL: None,
+        CONF_STALE_TTL: None,
     }
     data.update(overrides)
     return ConfigSubentryData(
@@ -472,3 +497,154 @@ async def test_subentry_reconfigure(hass: HomeAssistant) -> None:
     subentry = entry.subentries[subentry_id]
     assert subentry.data[CONF_ACTIVITY_NAME] == "My Washer"
     assert subentry.data[CONF_PRIORITY] == 5
+
+
+# --- State labels parsing ---
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("heating=Warming Up, cooling=Cooling Down", {"heating": "Warming Up", "cooling": "Cooling Down"}),
+        ("on=Active", {"on": "Active"}),
+        ("", {}),
+        ("bad format, no equals", {}),
+        ("a=1, =empty_key, c=3", {"a": "1", "c": "3"}),
+    ],
+)
+def test_parse_state_labels(raw: str, expected: dict) -> None:
+    """Test _parse_state_labels parses various inputs correctly."""
+    assert _parse_state_labels(raw) == expected
+
+
+# --- New field tests ---
+
+
+async def test_subentry_add_entity_with_state_labels(hass: HomeAssistant) -> None:
+    """State labels are parsed from CSV and stored as dict."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_STATE_LABELS: "heating=Warming Up, idle=Standby"}),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_STATE_LABELS] == {"heating": "Warming Up", "idle": "Standby"}
+
+
+async def test_subentry_add_entity_with_subtitle_attribute(hass: HomeAssistant) -> None:
+    """Subtitle attribute is stored in subentry data."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_SUBTITLE_ATTRIBUTE: "media_title"}),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_SUBTITLE_ATTRIBUTE] == "media_title"
+
+
+async def test_subentry_add_entity_with_completion_message(hass: HomeAssistant) -> None:
+    """Completion message is stored in subentry data."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_COMPLETION_MESSAGE: "Wash Done"}),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_COMPLETION_MESSAGE] == "Wash Done"
+
+
+async def test_subentry_add_entity_with_urls(hass: HomeAssistant) -> None:
+    """URLs are validated and stored."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(
+            **{
+                CONF_URL: "https://ha.local/lovelace/laundry",
+                CONF_SECONDARY_URL: "https://ha.local/lovelace/overview",
+            }
+        ),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_URL] == "https://ha.local/lovelace/laundry"
+    assert subentries[0].data[CONF_SECONDARY_URL] == "https://ha.local/lovelace/overview"
+
+
+async def test_subentry_add_entity_with_icon_attribute(hass: HomeAssistant) -> None:
+    """Icon attribute is stored."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_ICON_ATTRIBUTE: "sf_symbol"}),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_ICON_ATTRIBUTE] == "sf_symbol"
+
+
+async def test_subentry_rejects_invalid_url(hass: HomeAssistant) -> None:
+    """Invalid URL scheme shows error."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_URL: "ftp://evil.example.com"}),
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_URL: "invalid_url"}
+
+
+async def test_subentry_rejects_invalid_secondary_url(hass: HomeAssistant) -> None:
+    """Invalid secondary URL scheme shows error on correct field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_entity_input(**{CONF_SECONDARY_URL: "ftp://evil.example.com"}),
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_SECONDARY_URL: "invalid_url"}

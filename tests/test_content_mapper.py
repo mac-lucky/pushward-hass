@@ -6,13 +6,20 @@ import pytest
 
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
+    CONF_ACCENT_COLOR_ATTRIBUTE,
+    CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_ICON,
+    CONF_ICON_ATTRIBUTE,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SECONDARY_URL,
     CONF_SEVERITY,
+    CONF_STATE_LABELS,
+    CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
+    CONF_URL,
 )
 from custom_components.pushward.content_mapper import (
     get_domain_defaults,
@@ -333,3 +340,241 @@ def test_map_completion_content_alert():
 
     assert content["severity"] == "warning"
     assert content["state"] == "Complete"
+
+
+# --- Feature 1: subtitle attribute ---
+
+
+def test_map_content_subtitle_attribute():
+    """subtitle_attribute reads from entity attribute instead of friendly_name."""
+    state = _make_state("playing", {"friendly_name": "Speaker", "media_title": "My Song"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "play.fill", CONF_SUBTITLE_ATTRIBUTE: "media_title"}
+
+    content = map_content(state, config)
+
+    assert content["subtitle"] == "My Song"
+
+
+def test_map_content_subtitle_attribute_fallback():
+    """subtitle_attribute falls back to friendly_name when attribute is missing."""
+    state = _make_state("playing", {"friendly_name": "Speaker"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "play.fill", CONF_SUBTITLE_ATTRIBUTE: "media_title"}
+
+    content = map_content(state, config)
+
+    assert content["subtitle"] == "Speaker"
+
+
+def test_map_content_subtitle_attribute_empty():
+    """No subtitle_attribute configured uses friendly_name."""
+    state = _make_state("on", {"friendly_name": "Lamp"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "lightbulb.fill"}
+
+    content = map_content(state, config)
+
+    assert content["subtitle"] == "Lamp"
+
+
+# --- Feature 2: state labels ---
+
+
+def test_map_content_state_labels():
+    """Custom state labels map state to display text."""
+    state = _make_state("heating", {"friendly_name": "HVAC"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "thermometer",
+        CONF_STATE_LABELS: {"heating": "Warming Up", "cooling": "Cooling Down"},
+    }
+
+    content = map_content(state, config)
+
+    assert content["state"] == "Warming Up"
+
+
+def test_map_content_state_labels_fallback():
+    """Missing state label falls back to default formatting."""
+    state = _make_state("idle", {"friendly_name": "HVAC"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "thermometer",
+        CONF_STATE_LABELS: {"heating": "Warming Up"},
+    }
+
+    content = map_content(state, config)
+
+    assert content["state"] == "Idle"
+
+
+def test_map_content_state_labels_empty_dict():
+    """Empty state_labels dict uses default formatting."""
+    state = _make_state("running", {"friendly_name": "Washer"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_STATE_LABELS: {}}
+
+    content = map_content(state, config)
+
+    assert content["state"] == "Running"
+
+
+# --- Feature 4: completion message ---
+
+
+def test_map_completion_content_custom_message():
+    """Custom completion message replaces 'Complete'."""
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_COMPLETION_MESSAGE: "Wash Done"}
+
+    content = map_completion_content(config)
+
+    assert content["state"] == "Wash Done"
+
+
+def test_map_completion_content_default_message():
+    """No completion message defaults to 'Complete'."""
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer"}
+
+    content = map_completion_content(config)
+
+    assert content["state"] == "Complete"
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_map_content_countdown_completion_message(mock_time):
+    """Countdown template includes completion_message when configured."""
+    mock_time.time.return_value = 1000.0
+    state = _make_state("active", {"friendly_name": "Timer", "remaining": 60})
+    config = {
+        CONF_TEMPLATE: "countdown",
+        CONF_ICON: "timer",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+        CONF_COMPLETION_MESSAGE: "Time's Up!",
+    }
+
+    content = map_content(state, config)
+
+    assert content["completion_message"] == "Time's Up!"
+
+
+# --- Feature 5: URL deep links ---
+
+
+def test_map_content_with_urls():
+    """URLs are included in content when configured."""
+    state = _make_state("on", {"friendly_name": "Washer"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "washer",
+        CONF_URL: "https://ha.local/lovelace/laundry",
+        CONF_SECONDARY_URL: "https://ha.local/lovelace/overview",
+    }
+
+    content = map_content(state, config)
+
+    assert content["url"] == "https://ha.local/lovelace/laundry"
+    assert content["secondary_url"] == "https://ha.local/lovelace/overview"
+
+
+def test_map_content_urls_omitted_when_empty():
+    """Empty URLs are not included in content dict."""
+    state = _make_state("on", {"friendly_name": "Washer"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_URL: "", CONF_SECONDARY_URL: ""}
+
+    content = map_content(state, config)
+
+    assert "url" not in content
+    assert "secondary_url" not in content
+
+
+def test_map_completion_content_preserves_urls():
+    """URLs persist through completion content."""
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "washer",
+        CONF_URL: "https://ha.local/lovelace/laundry",
+        CONF_SECONDARY_URL: "https://ha.local/lovelace/overview",
+    }
+
+    content = map_completion_content(config)
+
+    assert content["url"] == "https://ha.local/lovelace/laundry"
+    assert content["secondary_url"] == "https://ha.local/lovelace/overview"
+
+
+# --- Feature 6: conditional icon/color via attributes ---
+
+
+def test_map_content_icon_attribute():
+    """icon_attribute overrides static icon."""
+    state = _make_state("heating", {"friendly_name": "HVAC", "sf_symbol": "flame.fill"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "thermometer",
+        CONF_ICON_ATTRIBUTE: "sf_symbol",
+    }
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "flame.fill"
+
+
+def test_map_content_icon_attribute_fallback_to_static():
+    """icon_attribute missing from entity falls back to static icon."""
+    state = _make_state("heating", {"friendly_name": "HVAC"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "thermometer",
+        CONF_ICON_ATTRIBUTE: "sf_symbol",
+    }
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "thermometer"
+
+
+def test_map_content_icon_attribute_not_configured():
+    """No icon_attribute uses static icon."""
+    state = _make_state("on", {"friendly_name": "Lamp"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "lightbulb.fill"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "lightbulb.fill"
+
+
+def test_map_content_accent_color_attribute():
+    """accent_color_attribute overrides static accent_color."""
+    state = _make_state("heating", {"friendly_name": "HVAC", "activity_color": "orange"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "thermometer",
+        CONF_ACCENT_COLOR: "red",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "activity_color",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "orange"
+
+
+def test_map_content_accent_color_attribute_fallback_to_static():
+    """accent_color_attribute missing falls back to static accent_color."""
+    state = _make_state("heating", {"friendly_name": "HVAC"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "thermometer",
+        CONF_ACCENT_COLOR: "red",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "activity_color",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "red"
+
+
+def test_map_content_accent_color_attribute_fallback_to_blue():
+    """No static color and no attribute defaults to 'blue'."""
+    state = _make_state("on", {"friendly_name": "Lamp"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "lightbulb.fill"}
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "blue"

@@ -10,20 +10,29 @@ from homeassistant.core import HomeAssistant, State
 from custom_components.pushward.activity_manager import ActivityManager
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
+    CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
+    CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_END_STATES,
+    CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_ICON,
+    CONF_ICON_ATTRIBUTE,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SECONDARY_URL,
     CONF_SEVERITY,
     CONF_SLUG,
+    CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_STATE_LABELS,
+    CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
     CONF_UPDATE_INTERVAL,
+    CONF_URL,
 )
 
 
@@ -34,6 +43,7 @@ def _entity_config(**overrides) -> dict:
         CONF_SLUG: "ha-washer",
         CONF_ACTIVITY_NAME: "Washer",
         CONF_ICON: "washer",
+        CONF_ICON_ATTRIBUTE: "",
         CONF_PRIORITY: 1,
         CONF_TEMPLATE: "generic",
         CONF_START_STATES: ["on"],
@@ -41,10 +51,18 @@ def _entity_config(**overrides) -> dict:
         CONF_UPDATE_INTERVAL: 5,
         CONF_PROGRESS_ATTRIBUTE: "",
         CONF_REMAINING_TIME_ATTR: "",
+        CONF_SUBTITLE_ATTRIBUTE: "",
+        CONF_STATE_LABELS: {},
+        CONF_COMPLETION_MESSAGE: "",
         CONF_TOTAL_STEPS: 1,
         CONF_CURRENT_STEP_ATTR: "",
         CONF_SEVERITY: "info",
         CONF_ACCENT_COLOR: "",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "",
+        CONF_URL: "",
+        CONF_SECONDARY_URL: "",
+        CONF_ENDED_TTL: None,
+        CONF_STALE_TTL: None,
     }
     config.update(overrides)
     return config
@@ -259,6 +277,59 @@ async def test_stale_end_skips_ended_after_restart(hass: HomeAssistant) -> None:
     calls = api.update_activity.call_args_list
     assert len(calls) == 1
     assert calls[0][0][1] == "ONGOING"
+
+    await manager.async_stop()
+
+
+async def test_create_activity_with_custom_ttls(hass: HomeAssistant) -> None:
+    """When TTLs are configured, they are passed to create_activity."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_ENDED_TTL: 60, CONF_STALE_TTL: 120})
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_awaited_once()
+    call_kwargs = api.create_activity.call_args
+    assert call_kwargs[1]["ended_ttl"] == 60
+    assert call_kwargs[1]["stale_ttl"] == 120
+
+    await manager.async_stop()
+
+
+async def test_create_activity_with_no_ttls(hass: HomeAssistant) -> None:
+    """When TTLs are None, they are passed as None (server defaults)."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_ENDED_TTL: None, CONF_STALE_TTL: None})
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_awaited_once()
+    call_kwargs = api.create_activity.call_args
+    assert call_kwargs[1]["ended_ttl"] is None
+    assert call_kwargs[1]["stale_ttl"] is None
+
+    await manager.async_stop()
+
+
+async def test_create_activity_with_one_ttl(hass: HomeAssistant) -> None:
+    """When only one TTL is configured, only that one is set."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_ENDED_TTL: 600, CONF_STALE_TTL: None})
+    manager = ActivityManager(hass, api, [config])
+
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    call_kwargs = api.create_activity.call_args
+    assert call_kwargs[1]["ended_ttl"] == 600
+    assert call_kwargs[1]["stale_ttl"] is None
 
     await manager.async_stop()
 
