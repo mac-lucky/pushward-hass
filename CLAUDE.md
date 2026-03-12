@@ -72,7 +72,7 @@ Auth: `Authorization: Bearer <integration_key>`
 ## CI/CD
 
 - HACS validation + hassfest + ruff + pytest in `ci.yml`
-- **Auto-release:** On `v*` tag push, after all checks pass, CI creates a GitHub release with auto-generated notes.
+- **Auto-release:** On `v*` tag push, after all checks pass, CI creates a GitHub release with an empty body. Release notes must be added manually via `gh release edit`.
 - Dependabot auto-merge via shared workflow
 
 ## Releases
@@ -85,6 +85,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 2. Commit and push to `main`
 3. Tag and push: `git tag vX.Y.Z && git push --tags`
 4. CI creates the GitHub release automatically after checks pass
+5. Add release notes: `gh release edit vX.Y.Z --notes "description"` (HACS shows these to users)
 
 **Version tag must match `manifest.json` version** (e.g., `"version": "0.3.1"` → tag `v0.3.1`).
 
