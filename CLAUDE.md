@@ -92,7 +92,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
-| 0.5.0 | Add HA services (create/update/end/delete activity), custom subtitle attribute, state labels, completion message, URL deep links, dynamic icon/color via entity attributes, optional TTLs, fix shutdown sending empty content |
+| 0.5.1 | Add HA services (create/update/end/delete activity), custom subtitle attribute, state labels, completion message, URL deep links, dynamic icon/color via entity attributes, optional TTLs, fix shutdown sending empty content |
 | 0.4.4 | Update integration icons from shared icon-assets |
 | 0.4.3 | Fix CI: hassfest URL validation, Python 3.13, brand icons, tag-triggered releases, bump actions |
 | 0.4.2 | Preserve last progress/subtitle on activity end instead of forcing 100% |
