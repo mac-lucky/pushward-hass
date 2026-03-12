@@ -168,36 +168,28 @@
           "title": "Add Entity to PushWard",
           "data": {
             "entity_id": "Entity",
-            "slug": "Activity Slug",
-            "activity_name": "Activity Name",
-            "icon": "Icon (SF Symbol)",
-            "icon_attribute": "Icon Attribute",
-            "priority": "Priority (0-10)",
-            "template": "Template",
-            "start_states": "Start States (comma-separated)",
-            "end_states": "End States (comma-separated)",
-            "update_interval": "Min. Update Interval (seconds)"
+            "template": "Template"
           },
           "data_description": {
-            "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
-            "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
-            "icon": "SF Symbol name used as the activity icon. Example: lamp.desk.fill, lightbulb.fill",
-            "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon when set. Leave empty for static icon. Example: sf_symbol",
-            "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
-            "template": "Activity layout template. 'generic' works for most entities.",
-            "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
-            "end_states": "Entity states that end the Live Activity. Example: off, idle, docked",
-            "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit \u2014 state changes are sent immediately, but rapid changes are throttled. Example: 5"
+            "template": "Activity layout template. 'generic' works for most entities."
           }
         },
-        "template_options": {
+        "details": {
           "title": "Activity Options",
           "data": {
+            "start_states": "Start States",
+            "end_states": "End States",
             "progress_attribute": "Progress Attribute",
             "remaining_time_attribute": "Remaining Time Attribute",
             "total_steps": "Total Steps",
             "current_step_attribute": "Current Step Attribute",
             "severity": "Severity",
+            "slug": "Activity Slug",
+            "activity_name": "Activity Name",
+            "icon": "Icon (SF Symbol)",
+            "icon_attribute": "Icon Attribute",
+            "priority": "Priority (0-10)",
+            "update_interval": "Min. Update Interval (seconds)",
             "subtitle_attribute": "Subtitle Attribute",
             "state_labels": "State Labels",
             "completion_message": "Completion Message",
@@ -209,16 +201,24 @@
             "stale_ttl": "Auto-End After Idle (seconds)"
           },
           "data_description": {
-            "progress_attribute": "Entity attribute name that holds a 0\u2013100 progress value. Leave empty if not applicable. Example: percentage",
-            "remaining_time_attribute": "Entity attribute name that holds remaining time in seconds. Leave empty if not applicable. Example: remaining",
+            "start_states": "Entity states that start the Live Activity. Select from the list or type custom values.",
+            "end_states": "Entity states that end the Live Activity. Select from the list or type custom values.",
+            "progress_attribute": "Entity attribute that holds a 0\u2013100 progress value. Example: percentage",
+            "remaining_time_attribute": "Entity attribute that holds remaining time in seconds. Example: remaining",
             "total_steps": "Total number of steps in the pipeline.",
             "current_step_attribute": "Entity attribute holding the current step as an integer.",
             "severity": "Alert severity level.",
-            "subtitle_attribute": "Entity attribute to show as subtitle. Leave empty to use the entity's friendly name. Example: media_title",
+            "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
+            "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
+            "icon": "SF Symbol name used as the activity icon. Example: lamp.desk.fill, lightbulb.fill",
+            "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon when set.",
+            "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
+            "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit \u2014 state changes are sent immediately, but rapid changes are throttled.",
+            "subtitle_attribute": "Entity attribute to show as subtitle. Leave empty to use the entity's friendly name.",
             "state_labels": "Custom display text for states. Format: state=Label, state2=Label 2. Example: heating=Heating Up, idle=Standby",
             "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
-            "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color when set. Accepts named colors (red, blue) or hex (#FF5733). Example: activity_color",
+            "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color when set. Accepts named colors (red, blue) or hex (#FF5733).",
             "url": "Link opened when tapping the Live Activity. Must start with http:// or https://.",
             "secondary_url": "Secondary link for the Live Activity.",
             "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
@@ -229,26 +229,10 @@
           "title": "Edit Entity Configuration",
           "data": {
             "entity_id": "Entity",
-            "slug": "Activity Slug",
-            "activity_name": "Activity Name",
-            "icon": "Icon (SF Symbol)",
-            "icon_attribute": "Icon Attribute",
-            "priority": "Priority (0-10)",
-            "template": "Template",
-            "start_states": "Start States (comma-separated)",
-            "end_states": "End States (comma-separated)",
-            "update_interval": "Min. Update Interval (seconds)"
+            "template": "Template"
           },
           "data_description": {
-            "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
-            "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
-            "icon": "SF Symbol name used as the activity icon. Example: lamp.desk.fill, lightbulb.fill",
-            "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon when set. Leave empty for static icon. Example: sf_symbol",
-            "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
-            "template": "Activity layout template. 'generic' works for most entities.",
-            "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
-            "end_states": "Entity states that end the Live Activity. Example: off, idle, docked",
-            "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit \u2014 state changes are sent immediately, but rapid changes are throttled. Example: 5"
+            "template": "Activity layout template. 'generic' works for most entities."
           }
         }
       },

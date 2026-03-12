@@ -50,26 +50,22 @@ MOCK_INTEGRATION_KEY = "test-key-123"
 
 
 def _mock_core_input(**overrides) -> dict:
-    """Build step-1 (core) form input."""
+    """Build step-1 (entity + template) form input."""
     data = {
         CONF_ENTITY_ID: "binary_sensor.washer",
-        CONF_SLUG: "ha-washer",
-        CONF_ACTIVITY_NAME: "Washer",
-        CONF_ICON: "circle.fill",
-        CONF_ICON_ATTRIBUTE: "",
-        CONF_PRIORITY: 1,
         CONF_TEMPLATE: "generic",
-        CONF_START_STATES: "on",
-        CONF_END_STATES: "off",
-        CONF_UPDATE_INTERVAL: 5,
     }
     data.update(overrides)
     return data
 
 
-def _mock_options_input(template: str = "generic", **overrides) -> dict:
-    """Build step-2 (template options) form input based on template."""
+def _mock_details_input(template: str = "generic", **overrides) -> dict:
+    """Build step-2 (details) form input based on template."""
     data: dict = {}
+
+    # States (list format from SelectSelector)
+    data[CONF_START_STATES] = ["on"]
+    data[CONF_END_STATES] = ["off"]
 
     # Template-specific fields
     if template in ("generic", "pipeline"):
@@ -81,6 +77,14 @@ def _mock_options_input(template: str = "generic", **overrides) -> dict:
         data[CONF_CURRENT_STEP_ATTR] = ""
     if template == "alert":
         data[CONF_SEVERITY] = "info"
+
+    # Identity fields
+    data[CONF_SLUG] = "ha-washer"
+    data[CONF_ACTIVITY_NAME] = "Washer"
+    data[CONF_ICON] = "circle.fill"
+    data[CONF_ICON_ATTRIBUTE] = ""
+    data[CONF_PRIORITY] = 1
+    data[CONF_UPDATE_INTERVAL] = 5
 
     # Common optional fields
     data[CONF_SUBTITLE_ATTRIBUTE] = ""
@@ -151,12 +155,12 @@ async def _add_entity_subentry(
     hass: HomeAssistant,
     entry: MockConfigEntry,
     core_overrides: dict | None = None,
-    options_overrides: dict | None = None,
+    details_overrides: dict | None = None,
     template: str = "generic",
 ) -> dict:
     """Run both steps of the entity subentry add flow."""
     core = _mock_core_input(**{CONF_TEMPLATE: template, **(core_overrides or {})})
-    options = _mock_options_input(template, **(options_overrides or {}))
+    details = _mock_details_input(template, **(details_overrides or {}))
 
     result = await hass.config_entries.subentries.async_init(
         (entry.entry_id, SUBENTRY_TYPE_ENTITY),
@@ -171,12 +175,12 @@ async def _add_entity_subentry(
         user_input=core,
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
     # Step 2 → Create
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=options,
+        user_input=details,
     )
     return result
 
@@ -424,7 +428,7 @@ async def test_subentry_add_entity_sanitizes_slug(hass: HomeAssistant) -> None:
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await _add_entity_subentry(hass, entry, core_overrides={CONF_SLUG: "My--Slug!@#$%"})
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_SLUG: "My--Slug!@#$%"})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_SLUG] == "my-slug"
@@ -435,7 +439,7 @@ async def test_subentry_add_entity_empty_slug_auto_generates(hass: HomeAssistant
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await _add_entity_subentry(hass, entry, core_overrides={CONF_SLUG: ""})
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_SLUG: ""})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_SLUG] == "ha-binary-sensor-washer"
@@ -450,7 +454,7 @@ async def test_subentry_add_pipeline_entity(hass: HomeAssistant) -> None:
         hass,
         entry,
         template="pipeline",
-        options_overrides={CONF_TOTAL_STEPS: 5, CONF_CURRENT_STEP_ATTR: "step"},
+        details_overrides={CONF_TOTAL_STEPS: 5, CONF_CURRENT_STEP_ATTR: "step"},
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
@@ -468,7 +472,7 @@ async def test_subentry_add_alert_entity(hass: HomeAssistant) -> None:
         hass,
         entry,
         template="alert",
-        options_overrides={CONF_SEVERITY: "critical"},
+        details_overrides={CONF_SEVERITY: "critical"},
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
@@ -485,7 +489,7 @@ async def test_subentry_add_countdown_entity(hass: HomeAssistant) -> None:
         hass,
         entry,
         template="countdown",
-        options_overrides={CONF_REMAINING_TIME_ATTR: "remaining"},
+        details_overrides={CONF_REMAINING_TIME_ATTR: "remaining"},
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
@@ -511,7 +515,7 @@ async def test_subentry_generic_hides_pipeline_alert_fields(hass: HomeAssistant)
         user_input=_mock_core_input(**{CONF_TEMPLATE: "generic"}),
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
     # Check which fields are in the schema
     schema_keys = {str(k) for k in result["data_schema"].schema}
@@ -535,7 +539,7 @@ async def test_subentry_pipeline_shows_pipeline_fields(hass: HomeAssistant) -> N
         result["flow_id"],
         user_input=_mock_core_input(**{CONF_TEMPLATE: "pipeline"}),
     )
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
     schema_keys = {str(k) for k in result["data_schema"].schema}
     assert CONF_TOTAL_STEPS in schema_keys
@@ -558,7 +562,7 @@ async def test_subentry_alert_shows_severity(hass: HomeAssistant) -> None:
         result["flow_id"],
         user_input=_mock_core_input(**{CONF_TEMPLATE: "alert"}),
     )
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
     schema_keys = {str(k) for k in result["data_schema"].schema}
     assert CONF_SEVERITY in schema_keys
@@ -581,7 +585,7 @@ async def test_subentry_countdown_shows_remaining_time(hass: HomeAssistant) -> N
         result["flow_id"],
         user_input=_mock_core_input(**{CONF_TEMPLATE: "countdown"}),
     )
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
     schema_keys = {str(k) for k in result["data_schema"].schema}
     assert CONF_REMAINING_TIME_ATTR in schema_keys
@@ -610,22 +614,22 @@ async def test_subentry_reconfigure(hass: HomeAssistant) -> None:
 
     subentry_id = next(iter(entry.subentries))
 
-    # Step 1: core fields
+    # Step 1: entity + template
     result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "reconfigure"
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_core_input(**{CONF_ACTIVITY_NAME: "My Washer", CONF_PRIORITY: 5}),
+        user_input=_mock_core_input(),
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
-    # Step 2: template options
+    # Step 2: all details including name and priority changes
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_options_input("generic"),
+        user_input=_mock_details_input("generic", **{CONF_ACTIVITY_NAME: "My Washer", CONF_PRIORITY: 5}),
     )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
@@ -662,7 +666,7 @@ async def test_subentry_add_entity_with_state_labels(hass: HomeAssistant) -> Non
     entry.add_to_hass(hass)
 
     result = await _add_entity_subentry(
-        hass, entry, options_overrides={CONF_STATE_LABELS: "heating=Warming Up, idle=Standby"}
+        hass, entry, details_overrides={CONF_STATE_LABELS: "heating=Warming Up, idle=Standby"}
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
@@ -674,7 +678,7 @@ async def test_subentry_add_entity_with_subtitle_attribute(hass: HomeAssistant) 
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await _add_entity_subentry(hass, entry, options_overrides={CONF_SUBTITLE_ATTRIBUTE: "media_title"})
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_SUBTITLE_ATTRIBUTE: "media_title"})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_SUBTITLE_ATTRIBUTE] == "media_title"
@@ -685,7 +689,7 @@ async def test_subentry_add_entity_with_completion_message(hass: HomeAssistant) 
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await _add_entity_subentry(hass, entry, options_overrides={CONF_COMPLETION_MESSAGE: "Wash Done"})
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_COMPLETION_MESSAGE: "Wash Done"})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_COMPLETION_MESSAGE] == "Wash Done"
@@ -699,7 +703,7 @@ async def test_subentry_add_entity_with_urls(hass: HomeAssistant) -> None:
     result = await _add_entity_subentry(
         hass,
         entry,
-        options_overrides={
+        details_overrides={
             CONF_URL: "https://ha.local/lovelace/laundry",
             CONF_SECONDARY_URL: "https://ha.local/lovelace/overview",
         },
@@ -715,7 +719,7 @@ async def test_subentry_add_entity_with_icon_attribute(hass: HomeAssistant) -> N
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await _add_entity_subentry(hass, entry, core_overrides={CONF_ICON_ATTRIBUTE: "sf_symbol"})
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_ICON_ATTRIBUTE: "sf_symbol"})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_ICON_ATTRIBUTE] == "sf_symbol"
@@ -735,12 +739,12 @@ async def test_subentry_rejects_invalid_url(hass: HomeAssistant) -> None:
         result["flow_id"],
         user_input=_mock_core_input(),
     )
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
     # Step 2 with invalid URL
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_options_input(**{CONF_URL: "ftp://evil.example.com"}),
+        user_input=_mock_details_input(**{CONF_URL: "ftp://evil.example.com"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_URL: "invalid_url"}
@@ -760,12 +764,12 @@ async def test_subentry_rejects_invalid_secondary_url(hass: HomeAssistant) -> No
         result["flow_id"],
         user_input=_mock_core_input(),
     )
-    assert result["step_id"] == "template_options"
+    assert result["step_id"] == "details"
 
     # Step 2 with invalid secondary URL
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_options_input(**{CONF_SECONDARY_URL: "ftp://evil.example.com"}),
+        user_input=_mock_details_input(**{CONF_SECONDARY_URL: "ftp://evil.example.com"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_SECONDARY_URL: "invalid_url"}

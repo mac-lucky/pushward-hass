@@ -12,6 +12,8 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
+    AttributeSelector,
+    AttributeSelectorConfig,
     ColorRGBSelector,
     EntitySelector,
     EntitySelectorConfig,
@@ -83,8 +85,8 @@ def _validate_url(value: str) -> str:
     return value
 
 
-def _core_schema(defaults: dict | None = None) -> vol.Schema:
-    """Build step-1 schema with core entity settings."""
+def _entity_template_schema(defaults: dict | None = None) -> vol.Schema:
+    """Build step-1 schema: entity picker + template."""
     d = defaults or {}
     return vol.Schema(
         {
@@ -92,20 +94,6 @@ def _core_schema(defaults: dict | None = None) -> vol.Schema:
                 CONF_ENTITY_ID,
                 default=d.get(CONF_ENTITY_ID, ""),
             ): EntitySelector(EntitySelectorConfig()),
-            vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, "")): str,
-            vol.Optional(
-                CONF_ACTIVITY_NAME,
-                default=d.get(CONF_ACTIVITY_NAME, ""),
-            ): str,
-            vol.Optional(CONF_ICON, default=d.get(CONF_ICON, "")): str,
-            vol.Optional(
-                CONF_ICON_ATTRIBUTE,
-                default=d.get(CONF_ICON_ATTRIBUTE, ""),
-            ): str,
-            vol.Optional(
-                CONF_PRIORITY,
-                default=d.get(CONF_PRIORITY, DEFAULT_PRIORITY),
-            ): vol.All(int, vol.Range(min=0, max=10)),
             vol.Optional(
                 CONF_TEMPLATE,
                 default=d.get(CONF_TEMPLATE, "generic"),
@@ -115,25 +103,46 @@ def _core_schema(defaults: dict | None = None) -> vol.Schema:
                     mode=SelectSelectorMode.DROPDOWN,
                 )
             ),
-            vol.Optional(
-                CONF_START_STATES,
-                default=d.get(CONF_START_STATES, ""),
-            ): str,
-            vol.Optional(
-                CONF_END_STATES,
-                default=d.get(CONF_END_STATES, ""),
-            ): str,
-            vol.Optional(
-                CONF_UPDATE_INTERVAL,
-                default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
-            ): vol.All(int, vol.Range(min=1)),
         }
     )
 
 
-def _options_schema(template: str, defaults: dict | None = None) -> vol.Schema:
-    """Build step-2 schema with template-specific and optional fields."""
+def _details_schema(
+    entity_id: str, template: str, defaults: dict | None = None
+) -> vol.Schema:
+    """Build step-2 schema with all config fields and dynamic selectors."""
     d = defaults or {}
+    domain = entity_id.split(".")[0] if "." in entity_id else ""
+    domain_defs = get_domain_defaults(domain)
+
+    # State options: domain defaults + any previously saved states
+    start_opts = list(domain_defs.get("start_states", []))
+    end_opts = list(domain_defs.get("end_states", []))
+    saved_start = d.get(CONF_START_STATES, [])
+    saved_end = d.get(CONF_END_STATES, [])
+    if isinstance(saved_start, list):
+        for s in saved_start:
+            if s not in start_opts:
+                start_opts.append(s)
+    if isinstance(saved_end, list):
+        for s in saved_end:
+            if s not in end_opts:
+                end_opts.append(s)
+
+    start_default = (
+        d.get(CONF_START_STATES)
+        if d.get(CONF_START_STATES)
+        else domain_defs.get("start_states", [])
+    )
+    end_default = (
+        d.get(CONF_END_STATES)
+        if d.get(CONF_END_STATES)
+        else domain_defs.get("end_states", [])
+    )
+
+    attr_selector = AttributeSelector(
+        AttributeSelectorConfig(entity_id=entity_id)
+    )
 
     # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
     accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
@@ -159,21 +168,43 @@ def _options_schema(template: str, defaults: dict | None = None) -> vol.Schema:
 
     fields: dict = {}
 
-    # Template-specific fields first (most relevant at top)
+    # --- Start/end states (multi-select with custom values) ---
+    fields[
+        vol.Optional(CONF_START_STATES, default=start_default)
+    ] = SelectSelector(
+        SelectSelectorConfig(
+            options=start_opts,
+            multiple=True,
+            custom_value=True,
+            mode=SelectSelectorMode.DROPDOWN,
+        )
+    )
+    fields[
+        vol.Optional(CONF_END_STATES, default=end_default)
+    ] = SelectSelector(
+        SelectSelectorConfig(
+            options=end_opts,
+            multiple=True,
+            custom_value=True,
+            mode=SelectSelectorMode.DROPDOWN,
+        )
+    )
+
+    # --- Template-specific fields ---
     if template in ("generic", "pipeline"):
         fields[
             vol.Optional(
                 CONF_PROGRESS_ATTRIBUTE,
                 default=d.get(CONF_PROGRESS_ATTRIBUTE, ""),
             )
-        ] = str
+        ] = attr_selector
     if template in ("generic", "countdown"):
         fields[
             vol.Optional(
                 CONF_REMAINING_TIME_ATTR,
                 default=d.get(CONF_REMAINING_TIME_ATTR, ""),
             )
-        ] = str
+        ] = attr_selector
     if template == "pipeline":
         fields[
             vol.Optional(
@@ -186,7 +217,7 @@ def _options_schema(template: str, defaults: dict | None = None) -> vol.Schema:
                 CONF_CURRENT_STEP_ATTR,
                 default=d.get(CONF_CURRENT_STEP_ATTR, ""),
             )
-        ] = str
+        ] = attr_selector
     if template == "alert":
         fields[
             vol.Optional(
@@ -200,13 +231,45 @@ def _options_schema(template: str, defaults: dict | None = None) -> vol.Schema:
             )
         )
 
-    # Common optional fields
+    # --- Identity fields ---
+    fields[
+        vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))
+    ] = str
+    fields[
+        vol.Optional(
+            CONF_ACTIVITY_NAME,
+            default=d.get(CONF_ACTIVITY_NAME, ""),
+        )
+    ] = str
+    fields[
+        vol.Optional(CONF_ICON, default=d.get(CONF_ICON, ""))
+    ] = str
+    fields[
+        vol.Optional(
+            CONF_ICON_ATTRIBUTE,
+            default=d.get(CONF_ICON_ATTRIBUTE, ""),
+        )
+    ] = attr_selector
+    fields[
+        vol.Optional(
+            CONF_PRIORITY,
+            default=d.get(CONF_PRIORITY, DEFAULT_PRIORITY),
+        )
+    ] = vol.All(int, vol.Range(min=0, max=10))
+    fields[
+        vol.Optional(
+            CONF_UPDATE_INTERVAL,
+            default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+        )
+    ] = vol.All(int, vol.Range(min=1))
+
+    # --- Optional fields ---
     fields[
         vol.Optional(
             CONF_SUBTITLE_ATTRIBUTE,
             default=d.get(CONF_SUBTITLE_ATTRIBUTE, ""),
         )
-    ] = str
+    ] = attr_selector
     fields[
         vol.Optional(
             CONF_STATE_LABELS,
@@ -225,7 +288,7 @@ def _options_schema(template: str, defaults: dict | None = None) -> vol.Schema:
             CONF_ACCENT_COLOR_ATTRIBUTE,
             default=d.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
         )
-    ] = str
+    ] = attr_selector
     fields[
         vol.Optional(
             CONF_URL,
@@ -272,8 +335,23 @@ def _parse_entity_input(user_input: dict) -> dict:
     domain = entity_id.split(".")[0] if "." in entity_id else ""
     defaults = get_domain_defaults(domain)
 
-    start_raw = user_input.get(CONF_START_STATES, "")
-    end_raw = user_input.get(CONF_END_STATES, "")
+    start_raw = user_input.get(CONF_START_STATES, [])
+    end_raw = user_input.get(CONF_END_STATES, [])
+
+    # Handle both list (from SelectSelector) and string (legacy fallback)
+    if isinstance(start_raw, str):
+        start_states = _parse_csv(start_raw)
+    elif isinstance(start_raw, list):
+        start_states = [s.strip() for s in start_raw if isinstance(s, str) and s.strip()]
+    else:
+        start_states = []
+
+    if isinstance(end_raw, str):
+        end_states = _parse_csv(end_raw)
+    elif isinstance(end_raw, list):
+        end_states = [s.strip() for s in end_raw if isinstance(s, str) and s.strip()]
+    else:
+        end_states = []
 
     # Parse TTLs: NumberSelector returns float, convert to int or None
     ended_ttl = user_input.get(CONF_ENDED_TTL)
@@ -304,8 +382,8 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_ICON_ATTRIBUTE: user_input.get(CONF_ICON_ATTRIBUTE, ""),
         CONF_PRIORITY: user_input.get(CONF_PRIORITY, DEFAULT_PRIORITY),
         CONF_TEMPLATE: user_input.get(CONF_TEMPLATE, "generic"),
-        CONF_START_STATES: _parse_csv(start_raw) or defaults.get("start_states", []),
-        CONF_END_STATES: _parse_csv(end_raw) or defaults.get("end_states", []),
+        CONF_START_STATES: start_states or defaults.get("start_states", []),
+        CONF_END_STATES: end_states or defaults.get("end_states", []),
         CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
         CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
@@ -438,60 +516,55 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
     def __init__(self) -> None:
         """Initialize the subentry flow."""
         super().__init__()
-        self._core_input: dict[str, Any] = {}
+        self._step1_input: dict[str, Any] = {}
         self._is_reconfigure: bool = False
-        self._options_defaults: dict[str, Any] = {}
+        self._details_defaults: dict[str, Any] = {}
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
-        """Step 1: Core entity settings."""
+        """Step 1: Entity + template."""
         if user_input is not None:
-            self._core_input = user_input
+            self._step1_input = user_input
             self._is_reconfigure = False
-            return await self.async_step_template_options()
+            return await self.async_step_details()
 
         return self.async_show_form(
             step_id="user",
-            data_schema=_core_schema(),
+            data_schema=_entity_template_schema(),
         )
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.SubentryFlowResult:
-        """Step 1 (reconfigure): Core entity settings with pre-filled values."""
+        """Step 1 (reconfigure): Entity + template with pre-filled values."""
         subentry = self._get_reconfigure_subentry()
 
         if user_input is not None:
-            self._core_input = user_input
+            self._step1_input = user_input
             self._is_reconfigure = True
             # Prepare defaults for step 2 from existing config
             current = dict(subentry.data)
             labels = current.get(CONF_STATE_LABELS)
             if isinstance(labels, dict):
                 current[CONF_STATE_LABELS] = ", ".join(f"{k}={v}" for k, v in labels.items())
-            self._options_defaults = current
-            return await self.async_step_template_options()
+            self._details_defaults = current
+            return await self.async_step_details()
 
-        # Pre-fill form with current values, convert lists back for editing
         current = dict(subentry.data)
-        if isinstance(current.get(CONF_START_STATES), list):
-            current[CONF_START_STATES] = ", ".join(current[CONF_START_STATES])
-        if isinstance(current.get(CONF_END_STATES), list):
-            current[CONF_END_STATES] = ", ".join(current[CONF_END_STATES])
-
         return self.async_show_form(
             step_id="reconfigure",
-            data_schema=_core_schema(defaults=current),
+            data_schema=_entity_template_schema(defaults=current),
         )
 
-    async def async_step_template_options(
+    async def async_step_details(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.SubentryFlowResult:
-        """Step 2: Template-specific and optional fields."""
-        template = self._core_input.get(CONF_TEMPLATE, "generic")
+        """Step 2: All configuration details with dynamic selectors."""
+        entity_id = self._step1_input.get(CONF_ENTITY_ID, "")
+        template = self._step1_input.get(CONF_TEMPLATE, "generic")
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            merged = {**self._core_input, **user_input}
+            merged = {**self._step1_input, **user_input}
             try:
                 entity_cfg = _parse_entity_input(merged)
             except vol.Invalid as exc:
@@ -513,10 +586,10 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
                     unique_id=entity_cfg[CONF_ENTITY_ID],
                 )
 
-        defaults = self._options_defaults if self._is_reconfigure else None
+        defaults = self._details_defaults if self._is_reconfigure else None
         return self.async_show_form(
-            step_id="template_options",
-            data_schema=_options_schema(template, defaults=defaults),
+            step_id="details",
+            data_schema=_details_schema(entity_id, template, defaults=defaults),
             errors=errors,
         )
 
