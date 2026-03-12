@@ -22,14 +22,21 @@ CONF_ACCENT_COLOR = "accent_color"
 CONF_TOTAL_STEPS = "total_steps"
 CONF_CURRENT_STEP_ATTR = "current_step_attribute"
 CONF_SEVERITY = "severity"
+CONF_SUBTITLE_ATTRIBUTE = "subtitle_attribute"
+CONF_STATE_LABELS = "state_labels"
+CONF_ENDED_TTL = "ended_ttl"
+CONF_STALE_TTL = "stale_ttl"
+CONF_COMPLETION_MESSAGE = "completion_message"
+CONF_URL = "url"
+CONF_SECONDARY_URL = "secondary_url"
+CONF_ICON_ATTRIBUTE = "icon_attribute"
+CONF_ACCENT_COLOR_ATTRIBUTE = "accent_color_attribute"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
 DEFAULT_PRIORITY = 1
 DEFAULT_TEMPLATE = "generic"
 DEFAULT_UPDATE_INTERVAL = 5
-DEFAULT_ENDED_TTL = 300
-DEFAULT_STALE_TTL = 1800
 DEFAULT_TOTAL_STEPS = 1
 DEFAULT_SEVERITY = "info"
 

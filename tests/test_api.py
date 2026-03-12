@@ -93,13 +93,12 @@ async def test_create_activity_success():
     call_args = session.request.call_args
     assert call_args[0][0] == "POST"
     assert call_args[0][1].endswith("/activities")
-    assert call_args[1]["json"] == {
-        "slug": "test-slug",
-        "name": "Test",
-        "priority": 1,
-        "ended_ttl": 300,
-        "stale_ttl": 1800,
-    }
+    body = call_args[1]["json"]
+    assert body["slug"] == "test-slug"
+    assert body["name"] == "Test"
+    assert body["priority"] == 1
+    assert body["ended_ttl"] == 300
+    assert body["stale_ttl"] == 1800
 
 
 async def test_create_activity_already_exists():
@@ -118,6 +117,32 @@ async def test_create_activity_limit():
 
     with pytest.raises(PushWardApiError, match="limit"):
         await client.create_activity("test-slug", "Test", priority=1, ended_ttl=300, stale_ttl=1800)
+
+
+async def test_create_activity_optional_ttls():
+    """TTLs are omitted from JSON body when None."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.create_activity("test-slug", "Test", priority=1)
+
+    body = session.request.call_args[1]["json"]
+    assert "ended_ttl" not in body
+    assert "stale_ttl" not in body
+
+
+async def test_create_activity_partial_ttls():
+    """Only non-None TTLs are included in JSON body."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.create_activity("test-slug", "Test", priority=1, ended_ttl=600)
+
+    body = session.request.call_args[1]["json"]
+    assert body["ended_ttl"] == 600
+    assert "stale_ttl" not in body
 
 
 # --- update_activity ---

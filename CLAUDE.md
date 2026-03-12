@@ -83,7 +83,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 1. Bump version in `manifest.json` (semver: `MAJOR.MINOR.PATCH`)
 2. Commit and push to `main`
-3. Tag and push: `git tag v0.5.0 && git push --tags`
+3. Tag and push: `git tag vX.Y.Z && git push --tags`
 4. CI creates the GitHub release automatically after checks pass
 
 **Version tag must match `manifest.json` version** (e.g., `"version": "0.3.1"` → tag `v0.3.1`).
@@ -92,6 +92,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.5.0 | Add HA services (create/update/end/delete activity), custom subtitle attribute, state labels, completion message, URL deep links, dynamic icon/color via entity attributes, optional TTLs, fix shutdown sending empty content |
 | 0.4.4 | Update integration icons from shared icon-assets |
 | 0.4.3 | Fix CI: hassfest URL validation, Python 3.13, brand icons, tag-triggered releases, bump actions |
 | 0.4.2 | Preserve last progress/subtitle on activity end instead of forcing 100% |

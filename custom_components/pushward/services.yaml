@@ -1,0 +1,200 @@
+update_activity:
+  name: Update Activity
+  description: Update a PushWard Live Activity state and content.
+  fields:
+    slug:
+      name: Slug
+      description: Activity slug identifier.
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    state:
+      name: State
+      description: Activity state.
+      required: true
+      selector:
+        select:
+          options:
+            - "ONGOING"
+            - "ENDED"
+    template:
+      name: Template
+      description: Activity layout template.
+      example: "generic"
+      selector:
+        select:
+          options:
+            - "generic"
+            - "countdown"
+            - "pipeline"
+            - "alert"
+    progress:
+      name: Progress
+      description: Progress value between 0.0 and 1.0.
+      example: 0.5
+      selector:
+        number:
+          min: 0.0
+          max: 1.0
+          step: 0.01
+          mode: slider
+    state_text:
+      name: State Text
+      description: Text shown as the activity state.
+      example: "Downloading"
+      selector:
+        text:
+    icon:
+      name: Icon
+      description: SF Symbol name for the activity icon.
+      example: "arrow.down.circle.fill"
+      selector:
+        text:
+    subtitle:
+      name: Subtitle
+      description: Subtitle text shown on the activity.
+      example: "episode-01.mkv"
+      selector:
+        text:
+    accent_color:
+      name: Accent Color
+      description: Accent color name for the activity.
+      example: "blue"
+      selector:
+        text:
+    remaining_time:
+      name: Remaining Time
+      description: Remaining time in seconds.
+      example: 120
+      selector:
+        number:
+          min: 0
+          mode: box
+    url:
+      name: URL
+      description: URL to open when the activity is tapped.
+      example: "https://example.com"
+      selector:
+        text:
+    secondary_url:
+      name: Secondary URL
+      description: Secondary URL for the activity.
+      example: "https://example.com/details"
+      selector:
+        text:
+    end_date:
+      name: End Date
+      description: Unix timestamp for countdown end date.
+      example: 1700000000
+      selector:
+        number:
+          min: 0
+          mode: box
+    total_steps:
+      name: Total Steps
+      description: Total number of pipeline steps.
+      example: 5
+      selector:
+        number:
+          min: 1
+          mode: box
+    current_step:
+      name: Current Step
+      description: Current pipeline step number.
+      example: 2
+      selector:
+        number:
+          min: 0
+          mode: box
+    severity:
+      name: Severity
+      description: Alert severity level.
+      example: "warning"
+      selector:
+        select:
+          options:
+            - "critical"
+            - "warning"
+            - "info"
+    completion_message:
+      name: Completion Message
+      description: Message shown when the activity ends.
+      example: "Download complete!"
+      selector:
+        text:
+
+create_activity:
+  name: Create Activity
+  description: Create a new PushWard Live Activity.
+  fields:
+    slug:
+      name: Slug
+      description: Unique activity slug identifier.
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    name:
+      name: Name
+      description: Display name for the activity.
+      required: true
+      example: "Washing Machine"
+      selector:
+        text:
+    priority:
+      name: Priority
+      description: Activity priority (0 = lowest, 10 = highest).
+      default: 1
+      example: 1
+      selector:
+        number:
+          min: 0
+          max: 10
+          mode: slider
+    ended_ttl:
+      name: Ended TTL
+      description: Seconds to keep the activity after it ends. Leave empty to keep indefinitely.
+      example: 300
+      selector:
+        number:
+          min: 1
+          mode: box
+    stale_ttl:
+      name: Stale TTL
+      description: Seconds before the activity is considered stale. Leave empty to disable.
+      example: 1800
+      selector:
+        number:
+          min: 1
+          mode: box
+
+end_activity:
+  name: End Activity
+  description: End a PushWard Live Activity.
+  fields:
+    slug:
+      name: Slug
+      description: Activity slug identifier to end.
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    completion_message:
+      name: Completion Message
+      description: Optional message shown when the activity ends.
+      example: "Washing complete!"
+      selector:
+        text:
+
+delete_activity:
+  name: Delete Activity
+  description: Delete a PushWard Live Activity.
+  fields:
+    slug:
+      name: Slug
+      description: Activity slug identifier to delete.
+      required: true
+      example: "ha-washer"
+      selector:
+        text:

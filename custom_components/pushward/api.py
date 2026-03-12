@@ -59,20 +59,23 @@ class PushWardApiClient:
         slug: str,
         name: str,
         priority: int,
-        ended_ttl: int,
-        stale_ttl: int,
+        ended_ttl: int | None = None,
+        stale_ttl: int | None = None,
     ) -> None:
         """Create an activity via POST /activities."""
+        body: dict = {
+            "slug": slug,
+            "name": name,
+            "priority": priority,
+        }
+        if ended_ttl is not None:
+            body["ended_ttl"] = ended_ttl
+        if stale_ttl is not None:
+            body["stale_ttl"] = stale_ttl
         await self._request_with_retry(
             "POST",
             "/activities",
-            json={
-                "slug": slug,
-                "name": name,
-                "priority": priority,
-                "ended_ttl": ended_ttl,
-                "stale_ttl": stale_ttl,
-            },
+            json=body,
             handle_409=True,
         )
 
