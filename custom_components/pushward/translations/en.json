@@ -212,8 +212,8 @@
             "severity": "Alert severity level. Only used when template is 'alert'.",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
             "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color when set. Accepts named colors (red, blue) or hex (#FF5733). Example: activity_color",
-            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://. Example: https://homeassistant.local/lovelace/laundry",
-            "secondary_url": "Secondary link for the Live Activity. Example: https://homeassistant.local/lovelace/overview",
+            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://.",
+            "secondary_url": "Secondary link for the Live Activity.",
             "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
             "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800"
           }
@@ -266,8 +266,8 @@
             "severity": "Alert severity level. Only used when template is 'alert'.",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
             "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color when set. Accepts named colors (red, blue) or hex (#FF5733). Example: activity_color",
-            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://. Example: https://homeassistant.local/lovelace/laundry",
-            "secondary_url": "Secondary link for the Live Activity. Example: https://homeassistant.local/lovelace/overview",
+            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://.",
+            "secondary_url": "Secondary link for the Live Activity.",
             "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
             "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800"
           }
