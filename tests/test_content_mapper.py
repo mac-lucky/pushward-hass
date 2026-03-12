@@ -555,6 +555,79 @@ def test_map_content_accent_color_attribute():
     assert content["accent_color"] == "orange"
 
 
+def test_map_content_accent_color_attribute_rgb_tuple():
+    """RGB tuple from HA attribute is converted to hex string."""
+    state = _make_state("on", {"friendly_name": "Lamp", "rgb_color": (255, 167, 88)})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "rgb_color",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "#ffa758"
+
+
+def test_map_content_accent_color_attribute_rgbw_tuple():
+    """RGBW 4-tuple takes first 3 channels as RGB."""
+    state = _make_state("on", {"friendly_name": "Lamp", "rgbw_color": (100, 200, 50, 128)})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "rgbw_color",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "#64c832"
+
+
+def test_map_content_accent_color_attribute_xy_tuple():
+    """XY color (2-tuple, both <= 1.0) is converted via CIE xy → RGB → hex."""
+    state = _make_state("on", {"friendly_name": "Lamp", "xy_color": (0.3, 0.3)})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "xy_color",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"].startswith("#")
+    assert len(content["accent_color"]) == 7
+
+
+def test_map_content_accent_color_attribute_hs_tuple():
+    """HS color (hue 0-360, sat 0-100) is converted via HS → RGB → hex."""
+    state = _make_state("on", {"friendly_name": "Lamp", "hs_color": (240.0, 100.0)})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "hs_color",
+    }
+
+    content = map_content(state, config)
+
+    # Hue 240 = blue, full saturation
+    assert content["accent_color"] == "#0000ff"
+
+
+def test_map_content_accent_color_attribute_kelvin():
+    """color_temp_kelvin (int) is converted to approximate RGB hex."""
+    state = _make_state("on", {"friendly_name": "Lamp", "color_temp_kelvin": 3000})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "color_temp_kelvin",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"].startswith("#")
+    assert len(content["accent_color"]) == 7
+
+
 def test_map_content_accent_color_attribute_fallback_to_static():
     """accent_color_attribute missing falls back to static accent_color."""
     state = _make_state("heating", {"friendly_name": "HVAC"})
