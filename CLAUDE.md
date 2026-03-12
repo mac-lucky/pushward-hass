@@ -93,6 +93,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.5.2 | Two-step entity config flow: step 1 picks template, step 2 shows only relevant fields (hides pipeline/alert/countdown fields when not applicable) |
 | 0.5.1 | Add HA services (create/update/end/delete activity), custom subtitle attribute, state labels, completion message, URL deep links, dynamic icon/color via entity attributes, optional TTLs, fix shutdown sending empty content |
 | 0.4.4 | Update integration icons from shared icon-assets |
 | 0.4.3 | Fix CI: hassfest URL validation, Python 3.13, brand icons, tag-triggered releases, bump actions |

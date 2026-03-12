@@ -131,7 +131,7 @@
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Create one at your PushWard server under Settings → Integration Keys with scope 'ha-*'."
+          "integration_key": "Create one at your PushWard server under Settings \u2192 Integration Keys with scope 'ha-*'."
         }
       },
       "reconfigure": {
@@ -142,7 +142,7 @@
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Create one at your PushWard server under Settings → Integration Keys with scope 'ha-*'."
+          "integration_key": "Create one at your PushWard server under Settings \u2192 Integration Keys with scope 'ha-*'."
         }
       }
     },
@@ -176,21 +176,7 @@
             "template": "Template",
             "start_states": "Start States (comma-separated)",
             "end_states": "End States (comma-separated)",
-            "update_interval": "Min. Update Interval (seconds)",
-            "progress_attribute": "Progress Attribute",
-            "remaining_time_attribute": "Remaining Time Attribute",
-            "subtitle_attribute": "Subtitle Attribute",
-            "state_labels": "State Labels",
-            "completion_message": "Completion Message",
-            "total_steps": "Total Steps (pipeline)",
-            "current_step_attribute": "Current Step Attribute (pipeline)",
-            "severity": "Severity (alert)",
-            "accent_color": "Accent Color",
-            "accent_color_attribute": "Accent Color Attribute",
-            "url": "URL",
-            "secondary_url": "Secondary URL",
-            "ended_ttl": "Auto-Delete After End (seconds)",
-            "stale_ttl": "Auto-End After Idle (seconds)"
+            "update_interval": "Min. Update Interval (seconds)"
           },
           "data_description": {
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
@@ -201,15 +187,36 @@
             "template": "Activity layout template. 'generic' works for most entities.",
             "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
             "end_states": "Entity states that end the Live Activity. Example: off, idle, docked",
-            "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit — state changes are sent immediately, but rapid changes are throttled. Example: 5",
-            "progress_attribute": "Entity attribute name that holds a 0–100 progress value. Leave empty if not applicable. Example: percentage",
+            "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit \u2014 state changes are sent immediately, but rapid changes are throttled. Example: 5"
+          }
+        },
+        "template_options": {
+          "title": "Activity Options",
+          "data": {
+            "progress_attribute": "Progress Attribute",
+            "remaining_time_attribute": "Remaining Time Attribute",
+            "total_steps": "Total Steps",
+            "current_step_attribute": "Current Step Attribute",
+            "severity": "Severity",
+            "subtitle_attribute": "Subtitle Attribute",
+            "state_labels": "State Labels",
+            "completion_message": "Completion Message",
+            "accent_color": "Accent Color",
+            "accent_color_attribute": "Accent Color Attribute",
+            "url": "URL",
+            "secondary_url": "Secondary URL",
+            "ended_ttl": "Auto-Delete After End (seconds)",
+            "stale_ttl": "Auto-End After Idle (seconds)"
+          },
+          "data_description": {
+            "progress_attribute": "Entity attribute name that holds a 0\u2013100 progress value. Leave empty if not applicable. Example: percentage",
             "remaining_time_attribute": "Entity attribute name that holds remaining time in seconds. Leave empty if not applicable. Example: remaining",
+            "total_steps": "Total number of steps in the pipeline.",
+            "current_step_attribute": "Entity attribute holding the current step as an integer.",
+            "severity": "Alert severity level.",
             "subtitle_attribute": "Entity attribute to show as subtitle. Leave empty to use the entity's friendly name. Example: media_title",
             "state_labels": "Custom display text for states. Format: state=Label, state2=Label 2. Example: heating=Heating Up, idle=Standby",
             "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
-            "total_steps": "Number of steps in the pipeline. Only used when template is 'pipeline'.",
-            "current_step_attribute": "Entity attribute holding the current step as an integer. Only for 'pipeline'.",
-            "severity": "Alert severity level. Only used when template is 'alert'.",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
             "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color when set. Accepts named colors (red, blue) or hex (#FF5733). Example: activity_color",
             "url": "Link opened when tapping the Live Activity. Must start with http:// or https://.",
@@ -230,21 +237,7 @@
             "template": "Template",
             "start_states": "Start States (comma-separated)",
             "end_states": "End States (comma-separated)",
-            "update_interval": "Min. Update Interval (seconds)",
-            "progress_attribute": "Progress Attribute",
-            "remaining_time_attribute": "Remaining Time Attribute",
-            "subtitle_attribute": "Subtitle Attribute",
-            "state_labels": "State Labels",
-            "completion_message": "Completion Message",
-            "total_steps": "Total Steps (pipeline)",
-            "current_step_attribute": "Current Step Attribute (pipeline)",
-            "severity": "Severity (alert)",
-            "accent_color": "Accent Color",
-            "accent_color_attribute": "Accent Color Attribute",
-            "url": "URL",
-            "secondary_url": "Secondary URL",
-            "ended_ttl": "Auto-Delete After End (seconds)",
-            "stale_ttl": "Auto-End After Idle (seconds)"
+            "update_interval": "Min. Update Interval (seconds)"
           },
           "data_description": {
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
@@ -255,21 +248,7 @@
             "template": "Activity layout template. 'generic' works for most entities.",
             "start_states": "Entity states that start the Live Activity. Example: on, heating, playing",
             "end_states": "Entity states that end the Live Activity. Example: off, idle, docked",
-            "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit — state changes are sent immediately, but rapid changes are throttled. Example: 5",
-            "progress_attribute": "Entity attribute name that holds a 0–100 progress value. Leave empty if not applicable. Example: percentage",
-            "remaining_time_attribute": "Entity attribute name that holds remaining time in seconds. Leave empty if not applicable. Example: remaining",
-            "subtitle_attribute": "Entity attribute to show as subtitle. Leave empty to use the entity's friendly name. Example: media_title",
-            "state_labels": "Custom display text for states. Format: state=Label, state2=Label 2. Example: heating=Heating Up, idle=Standby",
-            "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
-            "total_steps": "Number of steps in the pipeline. Only used when template is 'pipeline'.",
-            "current_step_attribute": "Entity attribute holding the current step as an integer. Only for 'pipeline'.",
-            "severity": "Alert severity level. Only used when template is 'alert'.",
-            "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
-            "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color when set. Accepts named colors (red, blue) or hex (#FF5733). Example: activity_color",
-            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://.",
-            "secondary_url": "Secondary link for the Live Activity.",
-            "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
-            "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800"
+            "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit \u2014 state changes are sent immediately, but rapid changes are throttled. Example: 5"
           }
         }
       },

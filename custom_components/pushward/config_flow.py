@@ -83,32 +83,9 @@ def _validate_url(value: str) -> str:
     return value
 
 
-def _entity_schema(defaults: dict | None = None) -> vol.Schema:
-    """Build the entity config schema with optional defaults."""
+def _core_schema(defaults: dict | None = None) -> vol.Schema:
+    """Build step-1 schema with core entity settings."""
     d = defaults or {}
-
-    # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
-    accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
-    accent_key = (
-        vol.Optional(CONF_ACCENT_COLOR, default=accent_rgb)
-        if accent_rgb is not None
-        else vol.Optional(CONF_ACCENT_COLOR)
-    )
-
-    # TTL defaults: use conditional key like accent_color — only set default when valid
-    ended_ttl_val = d.get(CONF_ENDED_TTL)
-    ended_ttl_key = (
-        vol.Optional(CONF_ENDED_TTL, default=ended_ttl_val)
-        if ended_ttl_val is not None
-        else vol.Optional(CONF_ENDED_TTL)
-    )
-    stale_ttl_val = d.get(CONF_STALE_TTL)
-    stale_ttl_key = (
-        vol.Optional(CONF_STALE_TTL, default=stale_ttl_val)
-        if stale_ttl_val is not None
-        else vol.Optional(CONF_STALE_TTL)
-    )
-
     return vol.Schema(
         {
             vol.Required(
@@ -150,74 +127,135 @@ def _entity_schema(defaults: dict | None = None) -> vol.Schema:
                 CONF_UPDATE_INTERVAL,
                 default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
             ): vol.All(int, vol.Range(min=1)),
+        }
+    )
+
+
+def _options_schema(template: str, defaults: dict | None = None) -> vol.Schema:
+    """Build step-2 schema with template-specific and optional fields."""
+    d = defaults or {}
+
+    # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
+    accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
+    accent_key = (
+        vol.Optional(CONF_ACCENT_COLOR, default=accent_rgb)
+        if accent_rgb is not None
+        else vol.Optional(CONF_ACCENT_COLOR)
+    )
+
+    # TTL defaults: only set default when valid value exists
+    ended_ttl_val = d.get(CONF_ENDED_TTL)
+    ended_ttl_key = (
+        vol.Optional(CONF_ENDED_TTL, default=ended_ttl_val)
+        if ended_ttl_val is not None
+        else vol.Optional(CONF_ENDED_TTL)
+    )
+    stale_ttl_val = d.get(CONF_STALE_TTL)
+    stale_ttl_key = (
+        vol.Optional(CONF_STALE_TTL, default=stale_ttl_val)
+        if stale_ttl_val is not None
+        else vol.Optional(CONF_STALE_TTL)
+    )
+
+    fields: dict = {}
+
+    # Template-specific fields first (most relevant at top)
+    if template in ("generic", "pipeline"):
+        fields[
             vol.Optional(
                 CONF_PROGRESS_ATTRIBUTE,
                 default=d.get(CONF_PROGRESS_ATTRIBUTE, ""),
-            ): str,
+            )
+        ] = str
+    if template in ("generic", "countdown"):
+        fields[
             vol.Optional(
                 CONF_REMAINING_TIME_ATTR,
                 default=d.get(CONF_REMAINING_TIME_ATTR, ""),
-            ): str,
-            vol.Optional(
-                CONF_SUBTITLE_ATTRIBUTE,
-                default=d.get(CONF_SUBTITLE_ATTRIBUTE, ""),
-            ): str,
-            vol.Optional(
-                CONF_STATE_LABELS,
-                default=d.get(CONF_STATE_LABELS, ""),
-            ): str,
-            vol.Optional(
-                CONF_COMPLETION_MESSAGE,
-                default=d.get(CONF_COMPLETION_MESSAGE, ""),
-            ): str,
+            )
+        ] = str
+    if template == "pipeline":
+        fields[
             vol.Optional(
                 CONF_TOTAL_STEPS,
                 default=d.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
-            ): vol.All(int, vol.Range(min=1, max=20)),
+            )
+        ] = vol.All(int, vol.Range(min=1, max=20))
+        fields[
             vol.Optional(
                 CONF_CURRENT_STEP_ATTR,
                 default=d.get(CONF_CURRENT_STEP_ATTR, ""),
-            ): str,
+            )
+        ] = str
+    if template == "alert":
+        fields[
             vol.Optional(
                 CONF_SEVERITY,
                 default=d.get(CONF_SEVERITY, DEFAULT_SEVERITY),
-            ): SelectSelector(
-                SelectSelectorConfig(
-                    options=SEVERITIES,
-                    mode=SelectSelectorMode.DROPDOWN,
-                )
-            ),
-            accent_key: ColorRGBSelector(),
-            vol.Optional(
-                CONF_ACCENT_COLOR_ATTRIBUTE,
-                default=d.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
-            ): str,
-            vol.Optional(
-                CONF_URL,
-                default=d.get(CONF_URL, ""),
-            ): str,
-            vol.Optional(
-                CONF_SECONDARY_URL,
-                default=d.get(CONF_SECONDARY_URL, ""),
-            ): str,
-            ended_ttl_key: NumberSelector(
-                NumberSelectorConfig(
-                    min=_TTL_MIN,
-                    max=_TTL_MAX,
-                    mode=NumberSelectorMode.BOX,
-                    unit_of_measurement="seconds",
-                )
-            ),
-            stale_ttl_key: NumberSelector(
-                NumberSelectorConfig(
-                    min=_TTL_MIN,
-                    max=_TTL_MAX,
-                    mode=NumberSelectorMode.BOX,
-                    unit_of_measurement="seconds",
-                )
-            ),
-        }
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=SEVERITIES,
+                mode=SelectSelectorMode.DROPDOWN,
+            )
+        )
+
+    # Common optional fields
+    fields[
+        vol.Optional(
+            CONF_SUBTITLE_ATTRIBUTE,
+            default=d.get(CONF_SUBTITLE_ATTRIBUTE, ""),
+        )
+    ] = str
+    fields[
+        vol.Optional(
+            CONF_STATE_LABELS,
+            default=d.get(CONF_STATE_LABELS, ""),
+        )
+    ] = str
+    fields[
+        vol.Optional(
+            CONF_COMPLETION_MESSAGE,
+            default=d.get(CONF_COMPLETION_MESSAGE, ""),
+        )
+    ] = str
+    fields[accent_key] = ColorRGBSelector()
+    fields[
+        vol.Optional(
+            CONF_ACCENT_COLOR_ATTRIBUTE,
+            default=d.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
+        )
+    ] = str
+    fields[
+        vol.Optional(
+            CONF_URL,
+            default=d.get(CONF_URL, ""),
+        )
+    ] = str
+    fields[
+        vol.Optional(
+            CONF_SECONDARY_URL,
+            default=d.get(CONF_SECONDARY_URL, ""),
+        )
+    ] = str
+    fields[ended_ttl_key] = NumberSelector(
+        NumberSelectorConfig(
+            min=_TTL_MIN,
+            max=_TTL_MAX,
+            mode=NumberSelectorMode.BOX,
+            unit_of_measurement="seconds",
+        )
     )
+    fields[stale_ttl_key] = NumberSelector(
+        NumberSelectorConfig(
+            min=_TTL_MIN,
+            max=_TTL_MAX,
+            mode=NumberSelectorMode.BOX,
+            unit_of_measurement="seconds",
+        )
+    )
+
+    return vol.Schema(fields)
 
 
 def _parse_entity_input(user_input: dict) -> dict:
@@ -395,67 +433,90 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
-    """Handle adding and reconfiguring tracked entities."""
+    """Handle adding and reconfiguring tracked entities (two-step flow)."""
+
+    def __init__(self) -> None:
+        """Initialize the subentry flow."""
+        super().__init__()
+        self._core_input: dict[str, Any] = {}
+        self._is_reconfigure: bool = False
+        self._options_defaults: dict[str, Any] = {}
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
-        """Add a new tracked entity."""
+        """Step 1: Core entity settings."""
+        if user_input is not None:
+            self._core_input = user_input
+            self._is_reconfigure = False
+            return await self.async_step_template_options()
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=_core_schema(),
+        )
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.SubentryFlowResult:
+        """Step 1 (reconfigure): Core entity settings with pre-filled values."""
+        subentry = self._get_reconfigure_subentry()
+
+        if user_input is not None:
+            self._core_input = user_input
+            self._is_reconfigure = True
+            # Prepare defaults for step 2 from existing config
+            current = dict(subentry.data)
+            labels = current.get(CONF_STATE_LABELS)
+            if isinstance(labels, dict):
+                current[CONF_STATE_LABELS] = ", ".join(f"{k}={v}" for k, v in labels.items())
+            self._options_defaults = current
+            return await self.async_step_template_options()
+
+        # Pre-fill form with current values, convert lists back for editing
+        current = dict(subentry.data)
+        if isinstance(current.get(CONF_START_STATES), list):
+            current[CONF_START_STATES] = ", ".join(current[CONF_START_STATES])
+        if isinstance(current.get(CONF_END_STATES), list):
+            current[CONF_END_STATES] = ", ".join(current[CONF_END_STATES])
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=_core_schema(defaults=current),
+        )
+
+    async def async_step_template_options(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.SubentryFlowResult:
+        """Step 2: Template-specific and optional fields."""
+        template = self._core_input.get(CONF_TEMPLATE, "generic")
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            merged = {**self._core_input, **user_input}
             try:
-                entity_cfg = _parse_entity_input(user_input)
+                entity_cfg = _parse_entity_input(merged)
             except vol.Invalid as exc:
                 for field in exc.path:
                     errors[field] = "invalid_url"
             else:
+                if self._is_reconfigure:
+                    entry = self._get_entry()
+                    subentry = self._get_reconfigure_subentry()
+                    return self.async_update_and_abort(
+                        entry,
+                        subentry,
+                        data=entity_cfg,
+                        title=entity_cfg[CONF_ACTIVITY_NAME],
+                    )
                 return self.async_create_entry(
                     title=entity_cfg[CONF_ACTIVITY_NAME],
                     data=entity_cfg,
                     unique_id=entity_cfg[CONF_ENTITY_ID],
                 )
 
+        defaults = self._options_defaults if self._is_reconfigure else None
         return self.async_show_form(
-            step_id="user",
-            data_schema=_entity_schema(),
-            errors=errors,
-        )
-
-    async def async_step_reconfigure(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.SubentryFlowResult:
-        """Reconfigure an existing tracked entity."""
-        subentry = self._get_reconfigure_subentry()
-        entry = self._get_entry()
-        errors: dict[str, str] = {}
-
-        if user_input is not None:
-            try:
-                entity_cfg = _parse_entity_input(user_input)
-            except vol.Invalid as exc:
-                for field in exc.path:
-                    errors[field] = "invalid_url"
-            else:
-                return self.async_update_and_abort(
-                    entry,
-                    subentry,
-                    data=entity_cfg,
-                    title=entity_cfg[CONF_ACTIVITY_NAME],
-                )
-
-        # Pre-fill form with current values, convert lists/dicts back for editing
-        current = dict(subentry.data)
-        if isinstance(current.get(CONF_START_STATES), list):
-            current[CONF_START_STATES] = ", ".join(current[CONF_START_STATES])
-        if isinstance(current.get(CONF_END_STATES), list):
-            current[CONF_END_STATES] = ", ".join(current[CONF_END_STATES])
-        # Convert state_labels dict back to comma-separated string
-        labels = current.get(CONF_STATE_LABELS)
-        if isinstance(labels, dict):
-            current[CONF_STATE_LABELS] = ", ".join(f"{k}={v}" for k, v in labels.items())
-
-        return self.async_show_form(
-            step_id="reconfigure",
-            data_schema=_entity_schema(defaults=current),
+            step_id="template_options",
+            data_schema=_options_schema(template, defaults=defaults),
             errors=errors,
         )
 
