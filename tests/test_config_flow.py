@@ -354,6 +354,75 @@ async def test_reconfigure_invalid_auth(hass: HomeAssistant) -> None:
     assert result["errors"] == {"base": "invalid_auth"}
 
 
+# --- Reauth flow tests ---
+
+
+async def test_reauth_success(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """Test successful reauthentication with a new key."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await entry.start_reauth_flow(hass)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reauth_confirm"
+
+    new_key = "new-valid-key-789"
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input={CONF_INTEGRATION_KEY: new_key},
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reauth_successful"
+    assert entry.data[CONF_INTEGRATION_KEY] == new_key
+    # Server URL should remain unchanged
+    assert entry.data[CONF_SERVER_URL] == MOCK_SERVER_URL
+
+
+async def test_reauth_invalid_key(hass: HomeAssistant) -> None:
+    """Test reauth with an invalid key shows error."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.pushward.config_flow.PushWardApiClient",
+    ) as mock_cls:
+        instance = mock_cls.return_value
+        instance.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key"))
+
+        result = await entry.start_reauth_flow(hass)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            user_input={CONF_INTEGRATION_KEY: "still-bad-key"},
+        )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": "invalid_auth"}
+
+
+async def test_reauth_cannot_connect(hass: HomeAssistant) -> None:
+    """Test reauth when server is unreachable shows error."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.pushward.config_flow.PushWardApiClient",
+    ) as mock_cls:
+        instance = mock_cls.return_value
+        instance.validate_connection = AsyncMock(side_effect=OSError("timeout"))
+
+        result = await entry.start_reauth_flow(hass)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            user_input={CONF_INTEGRATION_KEY: "some-key"},
+        )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": "cannot_connect"}
+
+
 # --- URL validation tests ---
 
 

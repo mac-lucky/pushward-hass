@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
 
+from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
@@ -167,3 +169,36 @@ async def test_service_delete_activity(hass: HomeAssistant) -> None:
     )
 
     api.delete_activity.assert_awaited_once_with("ha-washer")
+
+
+# --- Setup health check tests ---
+
+
+async def test_setup_auth_error_triggers_reauth(hass: HomeAssistant) -> None:
+    """Auth error during setup puts entry in SETUP_ERROR and starts reauth."""
+    api = _mock_api()
+    api.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key", status_code=401))
+
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state is ConfigEntryState.SETUP_ERROR
+
+
+async def test_setup_connection_error_retries(hass: HomeAssistant) -> None:
+    """Connection error during setup puts entry in SETUP_RETRY."""
+    api = _mock_api()
+    api.validate_connection = AsyncMock(side_effect=OSError("timeout"))
+
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state is ConfigEntryState.SETUP_RETRY
