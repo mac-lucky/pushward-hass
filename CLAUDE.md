@@ -93,6 +93,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.6.3 | Fix color attribute conversion: support all HA color formats (rgb, rgbw, rgbww, xy, hs, color_temp_kelvin) → hex string |
 | 0.6.2 | Fix subtitle sent as number instead of string (400 error), use entity friendly name for activity name instead of raw entity_id |
 | 0.6.1 | Populate start/end state dropdowns from entity's actual state and options attribute (select/input_select), so dropdowns are never empty |
 | 0.6.0 | Health check with reauth flow: setup distinguishes auth errors (ConfigEntryAuthFailed → reauth UI) from connection errors (ConfigEntryNotReady → auto-retry), runtime auth failure in activity manager triggers reauth, add reauth_confirm config flow step |

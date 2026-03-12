@@ -4,6 +4,11 @@ import re
 import time
 
 from homeassistant.core import State
+from homeassistant.util.color import (
+    color_hs_to_RGB,
+    color_temperature_to_rgb,
+    color_xy_to_RGB,
+)
 
 from .const import (
     CONF_ACCENT_COLOR,
@@ -43,6 +48,34 @@ def sanitize_slug(entity_id: str) -> str:
     return f"ha-{slug}"
 
 
+def _color_to_str(value: object) -> str:
+    """Convert an HA color attribute to a string the API accepts.
+
+    Handles rgb_color (3-tuple), rgbw/rgbww (4/5-tuple, takes RGB),
+    xy_color (2-tuple 0-1), hs_color (2-tuple hue 0-360, sat 0-100),
+    color_temp_kelvin (int), and plain strings/named colors.
+    """
+    if isinstance(value, (list, tuple)):
+        if len(value) >= 3:
+            # rgb_color, rgbw_color, rgbww_color — take first 3 as RGB
+            r, g, b = int(value[0]), int(value[1]), int(value[2])
+            return f"#{r:02x}{g:02x}{b:02x}"
+        if len(value) == 2:
+            a, b_val = float(value[0]), float(value[1])
+            if a <= 1.0 and b_val <= 1.0:
+                # xy_color (CIE 1931, both 0.0-1.0)
+                r, g, b = color_xy_to_RGB(a, b_val)
+            else:
+                # hs_color (hue 0-360, saturation 0-100)
+                r, g, b = color_hs_to_RGB(a, b_val)
+            return f"#{r:02x}{g:02x}{b:02x}"
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        # color_temp_kelvin
+        rf, gf, bf = color_temperature_to_rgb(float(value))
+        return f"#{int(rf):02x}{int(gf):02x}{int(bf):02x}"
+    return str(value)
+
+
 def map_content(state: State, entity_config: dict) -> dict:
     """Map HA state + attributes to a PushWard content dict."""
     # State label: use custom label if configured, else default formatting
@@ -74,7 +107,7 @@ def map_content(state: State, entity_config: dict) -> dict:
     if color_attr:
         dynamic_color = state.attributes.get(color_attr)
         if dynamic_color:
-            accent = str(dynamic_color)
+            accent = _color_to_str(dynamic_color)
     if not accent:
         accent = "blue"
 
