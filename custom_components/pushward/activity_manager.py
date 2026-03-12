@@ -160,11 +160,7 @@ class ActivityManager:
             name = config.get(CONF_ACTIVITY_NAME) or ""
             if not name:
                 current_state = self._hass.states.get(entity_id)
-                name = (
-                    current_state.attributes.get("friendly_name", entity_id)
-                    if current_state
-                    else entity_id
-                )
+                name = current_state.attributes.get("friendly_name", entity_id) if current_state else entity_id
 
             await self._api.create_activity(
                 slug,
