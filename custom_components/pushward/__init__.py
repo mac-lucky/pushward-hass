@@ -5,11 +5,11 @@ import logging
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady, HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .activity_manager import ActivityManager
-from .api import PushWardApiClient
+from .api import PushWardApiClient, PushWardAuthError
 from .const import (
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
@@ -168,12 +168,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     try:
         await api.validate_connection()
+    except PushWardAuthError as err:
+        raise ConfigEntryAuthFailed(f"Invalid integration key: {err}") from err
     except Exception as err:
-        _LOGGER.error("Failed to connect to PushWard: %s", err)
         raise ConfigEntryNotReady(f"Cannot connect to PushWard: {err}") from err
 
     entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
-    manager = ActivityManager(hass, api, entities)
+    manager = ActivityManager(hass, api, entities, entry)
     await manager.async_start()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {

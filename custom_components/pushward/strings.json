@@ -144,6 +144,16 @@
         "data_description": {
           "integration_key": "Create one at your PushWard server under Settings \u2192 Integration Keys with scope 'ha-*'."
         }
+      },
+      "reauth_confirm": {
+        "title": "[%key:common::config_flow::title::reauth%]",
+        "description": "The PushWard integration key is invalid. Please provide a new one.",
+        "data": {
+          "integration_key": "Integration Key"
+        },
+        "data_description": {
+          "integration_key": "Create one at your PushWard server under Settings \u2192 Integration Keys with scope 'ha-*'."
+        }
       }
     },
     "error": {
@@ -154,7 +164,8 @@
     },
     "abort": {
       "already_configured": "PushWard is already configured.",
-      "reconfigure_successful": "PushWard configuration updated."
+      "reconfigure_successful": "PushWard configuration updated.",
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]"
     }
   },
   "config_subentries": {

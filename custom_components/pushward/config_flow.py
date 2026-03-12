@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import Mapping
 from typing import Any
 from urllib.parse import urlparse
 
@@ -473,6 +474,52 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     vol.Required(CONF_SERVER_URL, default=entry.data.get(CONF_SERVER_URL, DEFAULT_SERVER_URL)): str,
+                    vol.Required(CONF_INTEGRATION_KEY): TextSelector(
+                        TextSelectorConfig(type=TextSelectorType.PASSWORD)
+                    ),
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> config_entries.ConfigFlowResult:
+        """Handle reauth when the integration key becomes invalid."""
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Ask user for a new integration key."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            entry = self._get_reauth_entry()
+            server_url = entry.data[CONF_SERVER_URL]
+            session = async_get_clientsession(self.hass)
+            client = PushWardApiClient(
+                session,
+                server_url,
+                user_input[CONF_INTEGRATION_KEY],
+            )
+            try:
+                await client.validate_connection()
+            except PushWardAuthError:
+                errors["base"] = "invalid_auth"
+            except Exception:
+                _LOGGER.exception("Unexpected error during PushWard reauth")
+                errors["base"] = "cannot_connect"
+            else:
+                return self.async_update_reload_and_abort(
+                    entry,
+                    data_updates={
+                        CONF_INTEGRATION_KEY: user_input[CONF_INTEGRATION_KEY],
+                    },
+                )
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=vol.Schema(
+                {
                     vol.Required(CONF_INTEGRATION_KEY): TextSelector(
                         TextSelectorConfig(type=TextSelectorType.PASSWORD)
                     ),

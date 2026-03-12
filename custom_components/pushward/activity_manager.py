@@ -11,13 +11,14 @@ from functools import partial
 from typing import Any
 
 import aiohttp
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
 )
 
-from .api import PushWardApiClient, PushWardApiError
+from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
@@ -57,11 +58,21 @@ class ActivityManager:
         hass: HomeAssistant,
         api: PushWardApiClient,
         entities: list[dict],
+        entry: ConfigEntry,
     ) -> None:
         self._hass = hass
         self._api = api
         self._entities = entities
+        self._entry = entry
         self._tracked: dict[str, TrackedEntity] = {}
+        self._reauth_triggered = False
+
+    def _trigger_reauth(self) -> None:
+        """Trigger reauth flow once on auth failure."""
+        if not self._reauth_triggered:
+            self._reauth_triggered = True
+            _LOGGER.warning("PushWard auth failed — triggering reauthentication")
+            self._entry.async_start_reauth(self._hass)
 
     async def async_start(self) -> None:
         """Subscribe to state changes and resume any active entities."""
@@ -163,6 +174,8 @@ class ActivityManager:
             tracked.is_active = True
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
+        except PushWardAuthError:
+            self._trigger_reauth()
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to start activity for %s", entity_id, exc_info=True)
 
@@ -203,6 +216,8 @@ class ActivityManager:
             await self._api.update_activity(slug, "ONGOING", content)
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
+        except PushWardAuthError:
+            self._trigger_reauth()
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to update activity %s", slug, exc_info=True)
 
@@ -216,6 +231,7 @@ class ActivityManager:
         if tracked.is_active:
             self._hass.async_create_task(self._send_update(entity_id))
 
+    @callback
     def _schedule_end(self, entity_id: str) -> None:
         """Schedule a two-phase activity end."""
         tracked = self._tracked[entity_id]
@@ -246,6 +262,8 @@ class ActivityManager:
             await self._api.update_activity(slug, "ENDED", completion)
         except asyncio.CancelledError:
             raise
+        except PushWardAuthError:
+            self._trigger_reauth()
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to end activity %s", slug, exc_info=True)
         finally:
