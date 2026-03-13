@@ -47,7 +47,7 @@ update_activity:
         text:
     icon:
       name: Icon
-      description: SF Symbol name for the activity icon.
+      description: SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download).
       example: "arrow.down.circle.fill"
       selector:
         text:
