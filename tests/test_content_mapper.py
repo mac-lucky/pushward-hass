@@ -89,8 +89,8 @@ def test_map_content_with_progress():
 
 
 def test_map_content_clamps_progress():
-    # Progress > 100 should clamp to 1.0
-    state = _make_state("running", {"progress": 150})
+    # Progress 255 (max of 0-255 range) should be 1.0
+    state = _make_state("running", {"progress": 255})
     config = {CONF_TEMPLATE: "generic", CONF_ICON: "gauge", CONF_PROGRESS_ATTRIBUTE: "progress"}
 
     content = map_content(state, config)
@@ -100,6 +100,21 @@ def test_map_content_clamps_progress():
     state_neg = _make_state("running", {"progress": -20})
     content_neg = map_content(state_neg, config)
     assert content_neg["progress"] == 0.0
+
+
+def test_map_content_progress_brightness_scale():
+    """Brightness (0-255) is auto-detected and scaled correctly."""
+    # brightness=26 in HA ≈ 10% → should be ~0.102
+    state = _make_state("on", {"friendly_name": "Lamp", "brightness": 26})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_PROGRESS_ATTRIBUTE: "brightness",
+    }
+
+    content = map_content(state, config)
+
+    assert content["progress"] == pytest.approx(26 / 255, abs=0.01)
 
 
 def test_map_content_with_remaining_time():

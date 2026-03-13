@@ -202,14 +202,22 @@ def get_domain_defaults(domain: str) -> dict:
     )
 
 
+_ATTRS_0_255 = frozenset({"brightness"})
+
+
 def _get_progress(state: State, entity_config: dict) -> float:
-    """Extract progress from entity attributes, clamped to 0.0-1.0."""
+    """Extract progress from entity attributes, clamped to 0.0-1.0.
+
+    Attributes in the 0-255 range (e.g. brightness) are divided by 255;
+    all others are treated as 0-100 percentages.
+    """
     attr_name = entity_config.get(CONF_PROGRESS_ATTRIBUTE)
     if not attr_name:
         return 0.0
     try:
         value = float(state.attributes.get(attr_name, 0))
-        return max(0.0, min(1.0, value / 100.0))
+        scale = 255.0 if attr_name in _ATTRS_0_255 else 100.0
+        return max(0.0, min(1.0, value / scale))
     except (ValueError, TypeError):
         return 0.0
 
