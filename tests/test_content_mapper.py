@@ -666,3 +666,49 @@ def test_map_content_accent_color_attribute_fallback_to_blue():
     content = map_content(state, config)
 
     assert content["accent_color"] == "blue"
+
+
+# --- Entity native icon auto-detection ---
+
+
+def test_map_content_entity_icon_used_when_no_static_icon():
+    """Entity's native icon attribute is used when no static icon is configured."""
+    state = _make_state("on", {"friendly_name": "Thermostat", "icon": "mdi:thermometer"})
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "mdi:thermometer"
+
+
+def test_map_content_static_icon_overrides_entity_icon():
+    """Static icon takes priority over entity's native icon."""
+    state = _make_state("on", {"friendly_name": "Thermostat", "icon": "mdi:thermometer"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "flame.fill"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "flame.fill"
+
+
+def test_map_content_icon_attribute_overrides_entity_icon():
+    """icon_attribute takes priority over entity's native icon."""
+    state = _make_state(
+        "on",
+        {"friendly_name": "HVAC", "icon": "mdi:thermometer", "custom_icon": "mdi:fire"},
+    )
+    config = {CONF_TEMPLATE: "generic", CONF_ICON_ATTRIBUTE: "custom_icon"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "mdi:fire"
+
+
+def test_map_content_fallback_icon_when_no_icon_anywhere():
+    """Falls back to questionmark.circle when no icon source is available."""
+    state = _make_state("on", {"friendly_name": "Unknown Sensor"})
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "questionmark.circle"
