@@ -397,7 +397,7 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_ENTITY_ID: entity_id,
         CONF_SLUG: slug,
         CONF_ACTIVITY_NAME: user_input.get(CONF_ACTIVITY_NAME, "") or entity_id,
-        CONF_ICON: user_input.get(CONF_ICON, "") or defaults.get("icon", "questionmark.circle"),
+        CONF_ICON: user_input.get(CONF_ICON, ""),
         CONF_ICON_ATTRIBUTE: user_input.get(CONF_ICON_ATTRIBUTE, ""),
         CONF_PRIORITY: user_input.get(CONF_PRIORITY, DEFAULT_PRIORITY),
         CONF_TEMPLATE: user_input.get(CONF_TEMPLATE, "generic"),

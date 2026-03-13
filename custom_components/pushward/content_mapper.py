@@ -85,13 +85,21 @@ def map_content(state: State, entity_config: dict) -> dict:
     else:
         state_text = state.state.replace("_", " ").capitalize()
 
-    # Icon resolution: icon_attribute > static icon > domain default
-    icon = entity_config.get(CONF_ICON, "questionmark.circle")
+    # Icon resolution: icon_attribute > static icon > entity icon > fallback
+    icon = ""
     icon_attr = entity_config.get(CONF_ICON_ATTRIBUTE)
     if icon_attr:
         dynamic_icon = state.attributes.get(icon_attr)
         if dynamic_icon:
             icon = str(dynamic_icon)
+    if not icon:
+        icon = entity_config.get(CONF_ICON, "")
+    if not icon:
+        entity_icon = state.attributes.get("icon")
+        if entity_icon:
+            icon = str(entity_icon)
+    if not icon:
+        icon = "questionmark.circle"
 
     # Subtitle: subtitle_attribute > friendly_name
     subtitle_attr = entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
