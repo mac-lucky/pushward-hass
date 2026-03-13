@@ -26,7 +26,7 @@
         },
         "icon": {
           "name": "Icon",
-          "description": "SF Symbol name for the activity icon."
+          "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
         },
         "subtitle": {
           "name": "Subtitle",
@@ -197,7 +197,7 @@
             "severity": "Severity",
             "slug": "Activity Slug",
             "activity_name": "Activity Name",
-            "icon": "Icon (SF Symbol)",
+            "icon": "Icon (SF Symbol / MDI)",
             "icon_attribute": "Icon Attribute",
             "priority": "Priority (0-10)",
             "update_interval": "Min. Update Interval (seconds)",
@@ -221,7 +221,7 @@
             "severity": "Alert severity level.",
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
             "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
-            "icon": "SF Symbol name used as the activity icon. Example: lamp.desk.fill, lightbulb.fill",
+            "icon": "SF Symbol or MDI icon name (e.g. lamp.desk.fill, mdi:thermometer). MDI icons use the mdi: prefix.",
             "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon when set.",
             "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
             "update_interval": "Minimum seconds between updates to the server. Acts as a rate limit \u2014 state changes are sent immediately, but rapid changes are throttled.",
