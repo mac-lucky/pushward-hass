@@ -191,9 +191,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle config entry or subentry updates — reload entity tracking."""
-    manager = hass.data[DOMAIN][entry.entry_id]["manager"]
+    data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
+    if data is None:
+        return
     entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
-    await manager.async_reload(entities)
+    await data["manager"].async_reload(entities)
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
