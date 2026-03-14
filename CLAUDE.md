@@ -93,6 +93,7 @@ HACS detects updates by comparing `manifest.json` version against GitHub release
 
 | Version | Changes |
 |---------|---------|
+| 0.7.1 | Fix KeyError crash in `_async_entry_updated` when update listener fires before setup completes or after unload |
 | 0.7.0 | Auto-detect entity native icon: uses HA entity's icon attribute (e.g. mdi:thermometer) when no static icon is configured. Icon resolution: icon_attribute > static icon > entity icon > fallback. Updated UI hints for MDI support |
 | 0.6.3 | Fix color attribute conversion: support all HA color formats (rgb, rgbw, rgbww, xy, hs, color_temp_kelvin) → hex string. Fix brightness progress using 0-255 scale instead of 0-100 |
 | 0.6.2 | Fix subtitle sent as number instead of string (400 error), use entity friendly name for activity name instead of raw entity_id |
