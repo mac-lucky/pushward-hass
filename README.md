@@ -41,5 +41,5 @@ Copy the `custom_components/pushward` directory into your Home Assistant `custom
 ## Requirements
 
 - Home Assistant 2024.1.0 or newer
-- A running [PushWard server](https://github.com/mac-lucky/pushward-server)
-- The [PushWard iOS app](https://github.com/mac-lucky/pushward-ios) installed on your iPhone
+- A running [PushWard server](https://pushward.app)
+- The [PushWard iOS app](https://pushward.app) installed on your iPhone
