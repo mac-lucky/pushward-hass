@@ -41,11 +41,11 @@ from custom_components.pushward.const import (
     CONF_TOTAL_STEPS,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
+    DEFAULT_SERVER_URL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
 )
 
-MOCK_SERVER_URL = "https://pushward.example.com"
 MOCK_INTEGRATION_KEY = "test-key-123"
 
 
@@ -141,7 +141,7 @@ def _mock_entry(**kwargs) -> MockConfigEntry:
         "domain": DOMAIN,
         "title": "PushWard",
         "data": {
-            CONF_SERVER_URL: MOCK_SERVER_URL,
+            CONF_SERVER_URL: DEFAULT_SERVER_URL,
             CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
         },
         "version": 2,
@@ -231,7 +231,6 @@ async def test_user_step_success(
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
             CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
         },
     )
@@ -239,7 +238,7 @@ async def test_user_step_success(
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "PushWard"
     assert result["data"] == {
-        CONF_SERVER_URL: MOCK_SERVER_URL,
+        CONF_SERVER_URL: DEFAULT_SERVER_URL,
         CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
     }
     mock_api_client.validate_connection.assert_awaited_once()
@@ -257,7 +256,6 @@ async def test_user_step_invalid_auth(hass: HomeAssistant) -> None:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={
-                CONF_SERVER_URL: MOCK_SERVER_URL,
                 CONF_INTEGRATION_KEY: "bad-key",
             },
         )
@@ -278,7 +276,6 @@ async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={
-                CONF_SERVER_URL: MOCK_SERVER_URL,
                 CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
             },
         )
@@ -307,7 +304,7 @@ async def test_reconfigure_success(
     hass: HomeAssistant,
     mock_api_client,
 ) -> None:
-    """Test successful reconfiguration of server URL and key."""
+    """Test successful reconfiguration of integration key."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -315,18 +312,16 @@ async def test_reconfigure_success(
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "reconfigure"
 
-    new_url = "https://new.pushward.example.com"
     new_key = "new-key-456"
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         user_input={
-            CONF_SERVER_URL: new_url,
             CONF_INTEGRATION_KEY: new_key,
         },
     )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
-    assert entry.data[CONF_SERVER_URL] == new_url
+    assert entry.data[CONF_SERVER_URL] == DEFAULT_SERVER_URL
     assert entry.data[CONF_INTEGRATION_KEY] == new_key
 
 
@@ -345,7 +340,6 @@ async def test_reconfigure_invalid_auth(hass: HomeAssistant) -> None:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             user_input={
-                CONF_SERVER_URL: MOCK_SERVER_URL,
                 CONF_INTEGRATION_KEY: "bad-key",
             },
         )
@@ -377,8 +371,7 @@ async def test_reauth_success(
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reauth_successful"
     assert entry.data[CONF_INTEGRATION_KEY] == new_key
-    # Server URL should remain unchanged
-    assert entry.data[CONF_SERVER_URL] == MOCK_SERVER_URL
+    assert entry.data[CONF_SERVER_URL] == DEFAULT_SERVER_URL
 
 
 async def test_reauth_invalid_key(hass: HomeAssistant) -> None:
@@ -453,23 +446,6 @@ def test_validate_url_rejects_non_http_schemes(url: str) -> None:
     """Test that _validate_url rejects non-http/https schemes."""
     with pytest.raises(vol.Invalid):
         _validate_url(url)
-
-
-async def test_user_step_rejects_non_http_url(
-    hass: HomeAssistant,
-    mock_api_client,
-) -> None:
-    """Test that the config flow rejects non-http URL schemes."""
-    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        user_input={
-            CONF_SERVER_URL: "ftp://evil.example.com",
-            CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-        },
-    )
-    assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_SERVER_URL: "invalid_url"}
 
 
 # --- Subentry flow tests (add entity — two-step) ---

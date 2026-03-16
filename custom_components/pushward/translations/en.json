@@ -125,24 +125,22 @@
     "step": {
       "user": {
         "title": "Connect to PushWard",
-        "description": "Enter your PushWard server URL and integration key.",
+        "description": "Enter your PushWard integration key to get started.",
         "data": {
-          "server_url": "Server URL",
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Create one at your PushWard server under Settings \u2192 Integration Keys with scope 'ha-*'."
+          "integration_key": "Create one in the PushWard iOS app under Settings \u2192 Integration Keys with scope 'ha-*'."
         }
       },
       "reconfigure": {
         "title": "Reconfigure PushWard",
-        "description": "Update your PushWard server URL or integration key.",
+        "description": "Update your PushWard integration key.",
         "data": {
-          "server_url": "Server URL",
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Create one at your PushWard server under Settings \u2192 Integration Keys with scope 'ha-*'."
+          "integration_key": "Create one in the PushWard iOS app under Settings \u2192 Integration Keys with scope 'ha-*'."
         }
       },
       "reauth_confirm": {

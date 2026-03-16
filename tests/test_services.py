@@ -12,10 +12,10 @@ from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
+    DEFAULT_SERVER_URL,
     DOMAIN,
 )
 
-MOCK_SERVER_URL = "https://pushward.example.com"
 MOCK_INTEGRATION_KEY = "test-key-123"
 
 
@@ -24,7 +24,7 @@ def _mock_entry() -> MockConfigEntry:
         domain=DOMAIN,
         title="PushWard",
         data={
-            CONF_SERVER_URL: MOCK_SERVER_URL,
+            CONF_SERVER_URL: DEFAULT_SERVER_URL,
             CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
         },
         version=2,
