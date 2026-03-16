@@ -1,6 +1,7 @@
 """PushWard integration for Home Assistant."""
 
 import logging
+from functools import partial
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
@@ -143,22 +144,18 @@ def _register_services(hass: HomeAssistant) -> None:
     if hass.services.has_service(DOMAIN, SERVICE_UPDATE_ACTIVITY):
         return
 
-    async def handle_update(call: ServiceCall) -> None:
-        await _async_handle_update_activity(hass, call)
-
-    async def handle_create(call: ServiceCall) -> None:
-        await _async_handle_create_activity(hass, call)
-
-    async def handle_end(call: ServiceCall) -> None:
-        await _async_handle_end_activity(hass, call)
-
-    async def handle_delete(call: ServiceCall) -> None:
-        await _async_handle_delete_activity(hass, call)
-
-    hass.services.async_register(DOMAIN, SERVICE_UPDATE_ACTIVITY, handle_update, SCHEMA_UPDATE_ACTIVITY)
-    hass.services.async_register(DOMAIN, SERVICE_CREATE_ACTIVITY, handle_create, SCHEMA_CREATE_ACTIVITY)
-    hass.services.async_register(DOMAIN, SERVICE_END_ACTIVITY, handle_end, SCHEMA_END_ACTIVITY)
-    hass.services.async_register(DOMAIN, SERVICE_DELETE_ACTIVITY, handle_delete, SCHEMA_DELETE_ACTIVITY)
+    hass.services.async_register(
+        DOMAIN, SERVICE_UPDATE_ACTIVITY, partial(_async_handle_update_activity, hass), SCHEMA_UPDATE_ACTIVITY
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_CREATE_ACTIVITY, partial(_async_handle_create_activity, hass), SCHEMA_CREATE_ACTIVITY
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_END_ACTIVITY, partial(_async_handle_end_activity, hass), SCHEMA_END_ACTIVITY
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_DELETE_ACTIVITY, partial(_async_handle_delete_activity, hass), SCHEMA_DELETE_ACTIVITY
+    )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

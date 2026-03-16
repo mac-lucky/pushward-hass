@@ -71,9 +71,37 @@ from .content_mapper import get_domain_defaults, sanitize_slug
 
 _LOGGER = logging.getLogger(__name__)
 
+_INTEGRATION_KEY_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_INTEGRATION_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
+    }
+)
+
 # TTL constraints
 _TTL_MIN = 1
 _TTL_MAX = 2592000  # 30 days
+
+
+async def _validate_integration_key(
+    hass: HomeAssistant,
+    key: str,
+    context: str,
+    server_url: str = DEFAULT_SERVER_URL,
+) -> dict[str, str]:
+    """Validate an integration key against the PushWard API.
+
+    Returns an error dict (empty on success).
+    """
+    session = async_get_clientsession(hass)
+    client = PushWardApiClient(session, server_url, key)
+    try:
+        await client.validate_connection()
+    except PushWardAuthError:
+        return {"base": "invalid_auth"}
+    except Exception:
+        _LOGGER.exception("Unexpected error during PushWard %s", context)
+        return {"base": "cannot_connect"}
+    return {}
 
 
 def _validate_url(value: str) -> str:
@@ -434,20 +462,8 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            session = async_get_clientsession(self.hass)
-            client = PushWardApiClient(
-                session,
-                DEFAULT_SERVER_URL,
-                user_input[CONF_INTEGRATION_KEY],
-            )
-            try:
-                await client.validate_connection()
-            except PushWardAuthError:
-                errors["base"] = "invalid_auth"
-            except Exception:
-                _LOGGER.exception("Unexpected error during PushWard setup")
-                errors["base"] = "cannot_connect"
-            else:
+            errors = await _validate_integration_key(self.hass, user_input[CONF_INTEGRATION_KEY], "setup")
+            if not errors:
                 return self.async_create_entry(
                     title="PushWard",
                     data={
@@ -458,13 +474,7 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_INTEGRATION_KEY): TextSelector(
-                        TextSelectorConfig(type=TextSelectorType.PASSWORD)
-                    ),
-                }
-            ),
+            data_schema=_INTEGRATION_KEY_SCHEMA,
             errors=errors,
         )
 
@@ -474,20 +484,8 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            session = async_get_clientsession(self.hass)
-            client = PushWardApiClient(
-                session,
-                DEFAULT_SERVER_URL,
-                user_input[CONF_INTEGRATION_KEY],
-            )
-            try:
-                await client.validate_connection()
-            except PushWardAuthError:
-                errors["base"] = "invalid_auth"
-            except Exception:
-                _LOGGER.exception("Unexpected error during PushWard reconfigure")
-                errors["base"] = "cannot_connect"
-            else:
+            errors = await _validate_integration_key(self.hass, user_input[CONF_INTEGRATION_KEY], "reconfigure")
+            if not errors:
                 return self.async_update_reload_and_abort(
                     entry,
                     data={
@@ -498,13 +496,7 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="reconfigure",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_INTEGRATION_KEY): TextSelector(
-                        TextSelectorConfig(type=TextSelectorType.PASSWORD)
-                    ),
-                }
-            ),
+            data_schema=_INTEGRATION_KEY_SCHEMA,
             errors=errors,
         )
 
@@ -521,20 +513,10 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             entry = self._get_reauth_entry()
             server_url = entry.data[CONF_SERVER_URL]
-            session = async_get_clientsession(self.hass)
-            client = PushWardApiClient(
-                session,
-                server_url,
-                user_input[CONF_INTEGRATION_KEY],
+            errors = await _validate_integration_key(
+                self.hass, user_input[CONF_INTEGRATION_KEY], "reauth", server_url=server_url
             )
-            try:
-                await client.validate_connection()
-            except PushWardAuthError:
-                errors["base"] = "invalid_auth"
-            except Exception:
-                _LOGGER.exception("Unexpected error during PushWard reauth")
-                errors["base"] = "cannot_connect"
-            else:
+            if not errors:
                 return self.async_update_reload_and_abort(
                     entry,
                     data_updates={
@@ -544,13 +526,7 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_show_form(
             step_id="reauth_confirm",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_INTEGRATION_KEY): TextSelector(
-                        TextSelectorConfig(type=TextSelectorType.PASSWORD)
-                    ),
-                }
-            ),
+            data_schema=_INTEGRATION_KEY_SCHEMA,
             errors=errors,
         )
 

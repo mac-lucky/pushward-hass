@@ -150,7 +150,7 @@
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Create one at your PushWard server under Settings \u2192 Integration Keys with scope 'ha-*'."
+          "integration_key": "Create one in the PushWard iOS app under Settings \u2192 Integration Keys with scope 'ha-*'."
         }
       }
     },

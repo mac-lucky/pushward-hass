@@ -13,15 +13,17 @@ from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
-from custom_components.pushward.config_flow import _parse_state_labels, _validate_url
+from custom_components.pushward.config_flow import (
+    _parse_state_labels,
+    _validate_integration_key,
+    _validate_url,
+)
 from custom_components.pushward.const import (
-    CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_END_STATES,
-    CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -33,7 +35,6 @@ from custom_components.pushward.const import (
     CONF_SERVER_URL,
     CONF_SEVERITY,
     CONF_SLUG,
-    CONF_STALE_TTL,
     CONF_START_STATES,
     CONF_STATE_LABELS,
     CONF_SUBTITLE_ATTRIBUTE,
@@ -45,6 +46,8 @@ from custom_components.pushward.const import (
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
 )
+
+from .conftest import make_entity_config
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -100,33 +103,7 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
 
 def _entity_subentry_data(**overrides) -> ConfigSubentryData:
     """Build a ConfigSubentryData for pre-loading subentries."""
-    data = {
-        CONF_ENTITY_ID: "binary_sensor.washer",
-        CONF_SLUG: "ha-washer",
-        CONF_ACTIVITY_NAME: "Washer",
-        CONF_ICON: "circle.fill",
-        CONF_ICON_ATTRIBUTE: "",
-        CONF_PRIORITY: 1,
-        CONF_TEMPLATE: "generic",
-        CONF_START_STATES: ["on"],
-        CONF_END_STATES: ["off"],
-        CONF_UPDATE_INTERVAL: 5,
-        CONF_PROGRESS_ATTRIBUTE: "",
-        CONF_REMAINING_TIME_ATTR: "",
-        CONF_SUBTITLE_ATTRIBUTE: "",
-        CONF_STATE_LABELS: {},
-        CONF_COMPLETION_MESSAGE: "",
-        CONF_TOTAL_STEPS: 1,
-        CONF_CURRENT_STEP_ATTR: "",
-        CONF_SEVERITY: "info",
-        CONF_ACCENT_COLOR: "",
-        CONF_ACCENT_COLOR_ATTRIBUTE: "",
-        CONF_URL: "",
-        CONF_SECONDARY_URL: "",
-        CONF_ENDED_TTL: None,
-        CONF_STALE_TTL: None,
-    }
-    data.update(overrides)
+    data = make_entity_config(**{CONF_ICON: "circle.fill", **overrides})
     return ConfigSubentryData(
         data=data,
         subentry_type=SUBENTRY_TYPE_ENTITY,
@@ -446,6 +423,35 @@ def test_validate_url_rejects_non_http_schemes(url: str) -> None:
     """Test that _validate_url rejects non-http/https schemes."""
     with pytest.raises(vol.Invalid):
         _validate_url(url)
+
+
+# --- _validate_integration_key helper tests ---
+
+
+async def test_validate_integration_key_success(hass: HomeAssistant, mock_api_client) -> None:
+    """Successful validation returns empty errors dict."""
+    errors = await _validate_integration_key(hass, "valid-key", "test")
+    assert errors == {}
+
+
+async def test_validate_integration_key_auth_error(hass: HomeAssistant) -> None:
+    """Auth error returns invalid_auth."""
+    with patch(
+        "custom_components.pushward.config_flow.PushWardApiClient",
+    ) as mock_cls:
+        mock_cls.return_value.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key"))
+        errors = await _validate_integration_key(hass, "bad-key", "test")
+    assert errors == {"base": "invalid_auth"}
+
+
+async def test_validate_integration_key_unexpected_error(hass: HomeAssistant) -> None:
+    """Unexpected error returns cannot_connect."""
+    with patch(
+        "custom_components.pushward.config_flow.PushWardApiClient",
+    ) as mock_cls:
+        mock_cls.return_value.validate_connection = AsyncMock(side_effect=OSError("timeout"))
+        errors = await _validate_integration_key(hass, "some-key", "test")
+    assert errors == {"base": "cannot_connect"}
 
 
 # --- Subentry flow tests (add entity — two-step) ---

@@ -1,6 +1,6 @@
 """Shared test fixtures for PushWard integration tests."""
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from homeassistant.core import HomeAssistant
@@ -40,22 +40,9 @@ def enable_custom_integrations(hass: HomeAssistant) -> None:
     hass.data.pop(DATA_CUSTOM_COMPONENTS)
 
 
-@pytest.fixture
-def mock_api():
-    """Create a mock PushWard API client."""
-    with patch("custom_components.pushward.api.PushWardApiClient") as mock_cls:
-        client = mock_cls.return_value
-        client.validate_connection = AsyncMock(return_value=True)
-        client.create_activity = AsyncMock()
-        client.update_activity = AsyncMock()
-        client.delete_activity = AsyncMock()
-        yield client
-
-
-@pytest.fixture
-def sample_entity_config():
-    """Return a sample entity configuration dict."""
-    return {
+def make_entity_config(**overrides) -> dict:
+    """Build a test entity configuration with sensible defaults."""
+    config = {
         CONF_ENTITY_ID: "binary_sensor.washer",
         CONF_SLUG: "ha-washer",
         CONF_ACTIVITY_NAME: "Washer",
@@ -81,3 +68,15 @@ def sample_entity_config():
         CONF_ENDED_TTL: None,
         CONF_STALE_TTL: None,
     }
+    config.update(overrides)
+    return config
+
+
+def make_mock_state(state: str, attributes: dict | None = None, entity_id: str | None = None) -> MagicMock:
+    """Create a mock HA State object."""
+    mock = MagicMock()
+    mock.state = state
+    mock.attributes = attributes or {}
+    if entity_id is not None:
+        mock.entity_id = entity_id
+    return mock

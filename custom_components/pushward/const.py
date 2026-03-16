@@ -35,7 +35,6 @@ CONF_ACCENT_COLOR_ATTRIBUTE = "accent_color_attribute"
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
 DEFAULT_PRIORITY = 1
-DEFAULT_TEMPLATE = "generic"
 DEFAULT_UPDATE_INTERVAL = 5
 DEFAULT_TOTAL_STEPS = 1
 DEFAULT_SEVERITY = "info"

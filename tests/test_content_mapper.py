@@ -1,6 +1,6 @@
 """Tests for the PushWard content mapper."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -22,20 +22,14 @@ from custom_components.pushward.const import (
     CONF_URL,
 )
 from custom_components.pushward.content_mapper import (
+    _add_url_deeplinks,
     get_domain_defaults,
     map_completion_content,
     map_content,
     sanitize_slug,
 )
 
-
-def _make_state(state: str, attributes: dict | None = None) -> MagicMock:
-    """Create a mock HA State object."""
-    mock = MagicMock()
-    mock.state = state
-    mock.attributes = attributes or {}
-    return mock
-
+from .conftest import make_mock_state as _make_state
 
 # --- sanitize_slug ---
 
@@ -712,3 +706,30 @@ def test_map_content_fallback_icon_when_no_icon_anywhere():
     content = map_content(state, config)
 
     assert content["icon"] == "questionmark.circle"
+
+
+# --- _add_url_deeplinks helper ---
+
+
+def test_add_url_deeplinks_both_urls():
+    """Both URLs are added when present."""
+    content: dict = {}
+    _add_url_deeplinks(content, {CONF_URL: "https://a.com", CONF_SECONDARY_URL: "https://b.com"})
+    assert content["url"] == "https://a.com"
+    assert content["secondary_url"] == "https://b.com"
+
+
+def test_add_url_deeplinks_one_empty():
+    """Only non-empty URL is added."""
+    content: dict = {}
+    _add_url_deeplinks(content, {CONF_URL: "https://a.com", CONF_SECONDARY_URL: ""})
+    assert content["url"] == "https://a.com"
+    assert "secondary_url" not in content
+
+
+def test_add_url_deeplinks_both_empty():
+    """No URLs added when both are empty."""
+    content: dict = {}
+    _add_url_deeplinks(content, {CONF_URL: "", CONF_SECONDARY_URL: ""})
+    assert "url" not in content
+    assert "secondary_url" not in content

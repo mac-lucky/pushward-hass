@@ -35,11 +35,11 @@ Copy the `custom_components/pushward` directory into your Home Assistant `custom
 
 1. Go to **Settings > Devices & Services > Add Integration**
 2. Search for "PushWard"
-3. Enter your PushWard server URL and integration key
-4. Add entities to track via the integration's options flow
+3. Enter your PushWard integration key
+4. Add entities to track via the integration's configuration
 
 ## Requirements
 
-- Home Assistant 2024.1.0 or newer
+- Home Assistant 2025.7.0 or newer
 - A running [PushWard server](https://pushward.app)
 - The [PushWard iOS app](https://pushward.app) installed on your iPhone

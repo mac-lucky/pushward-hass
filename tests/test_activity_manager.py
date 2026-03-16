@@ -5,77 +5,18 @@ from __future__ import annotations
 import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from homeassistant.core import HomeAssistant, State
+from homeassistant.core import HomeAssistant
 
 from custom_components.pushward.activity_manager import ActivityManager
 from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.const import (
-    CONF_ACCENT_COLOR,
-    CONF_ACCENT_COLOR_ATTRIBUTE,
-    CONF_ACTIVITY_NAME,
-    CONF_COMPLETION_MESSAGE,
-    CONF_CURRENT_STEP_ATTR,
-    CONF_END_STATES,
     CONF_ENDED_TTL,
-    CONF_ENTITY_ID,
-    CONF_ICON,
-    CONF_ICON_ATTRIBUTE,
-    CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
-    CONF_REMAINING_TIME_ATTR,
-    CONF_SECONDARY_URL,
-    CONF_SEVERITY,
-    CONF_SLUG,
     CONF_STALE_TTL,
-    CONF_START_STATES,
-    CONF_STATE_LABELS,
-    CONF_SUBTITLE_ATTRIBUTE,
-    CONF_TEMPLATE,
-    CONF_TOTAL_STEPS,
     CONF_UPDATE_INTERVAL,
-    CONF_URL,
 )
 
-
-def _entity_config(**overrides) -> dict:
-    """Build a test entity configuration."""
-    config = {
-        CONF_ENTITY_ID: "binary_sensor.washer",
-        CONF_SLUG: "ha-washer",
-        CONF_ACTIVITY_NAME: "Washer",
-        CONF_ICON: "washer",
-        CONF_ICON_ATTRIBUTE: "",
-        CONF_PRIORITY: 1,
-        CONF_TEMPLATE: "generic",
-        CONF_START_STATES: ["on"],
-        CONF_END_STATES: ["off"],
-        CONF_UPDATE_INTERVAL: 5,
-        CONF_PROGRESS_ATTRIBUTE: "",
-        CONF_REMAINING_TIME_ATTR: "",
-        CONF_SUBTITLE_ATTRIBUTE: "",
-        CONF_STATE_LABELS: {},
-        CONF_COMPLETION_MESSAGE: "",
-        CONF_TOTAL_STEPS: 1,
-        CONF_CURRENT_STEP_ATTR: "",
-        CONF_SEVERITY: "info",
-        CONF_ACCENT_COLOR: "",
-        CONF_ACCENT_COLOR_ATTRIBUTE: "",
-        CONF_URL: "",
-        CONF_SECONDARY_URL: "",
-        CONF_ENDED_TTL: None,
-        CONF_STALE_TTL: None,
-    }
-    config.update(overrides)
-    return config
-
-
-def _mock_state(entity_id: str, state: str, attributes: dict | None = None) -> State:
-    """Create a mock HA State."""
-    mock = MagicMock(spec=State)
-    mock.entity_id = entity_id
-    mock.state = state
-    mock.attributes = attributes or {"friendly_name": entity_id}
-    return mock
+from .conftest import make_entity_config as _entity_config
 
 
 def _mock_api() -> AsyncMock:

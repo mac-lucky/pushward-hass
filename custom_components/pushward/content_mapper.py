@@ -76,6 +76,16 @@ def _color_to_str(value: object) -> str:
     return str(value)
 
 
+def _add_url_deeplinks(content: dict, entity_config: dict) -> None:
+    """Add URL deep-link fields to content when configured."""
+    url = entity_config.get(CONF_URL, "")
+    if url:
+        content["url"] = url
+    secondary_url = entity_config.get(CONF_SECONDARY_URL, "")
+    if secondary_url:
+        content["secondary_url"] = secondary_url
+
+
 def map_content(state: State, entity_config: dict) -> dict:
     """Map HA state + attributes to a PushWard content dict."""
     # State label: use custom label if configured, else default formatting
@@ -132,13 +142,7 @@ def map_content(state: State, entity_config: dict) -> dict:
     if remaining is not None:
         content["remaining_time"] = remaining
 
-    # URL deep links
-    url = entity_config.get(CONF_URL, "")
-    if url:
-        content["url"] = url
-    secondary_url = entity_config.get(CONF_SECONDARY_URL, "")
-    if secondary_url:
-        content["secondary_url"] = secondary_url
+    _add_url_deeplinks(content, entity_config)
 
     # Template-specific required fields
     template = content["template"]
@@ -179,13 +183,7 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         "accent_color": "green",
     }
 
-    # Persist URL deep links through end
-    url = entity_config.get(CONF_URL, "")
-    if url:
-        content["url"] = url
-    secondary_url = entity_config.get(CONF_SECONDARY_URL, "")
-    if secondary_url:
-        content["secondary_url"] = secondary_url
+    _add_url_deeplinks(content, entity_config)
 
     # Template-specific required fields for server validation
     template = content["template"]
