@@ -86,9 +86,7 @@ def _add_url_deeplinks(content: dict, entity_config: dict) -> None:
         content["secondary_url"] = secondary_url
 
 
-def map_content(
-    state: State, entity_config: dict, *, registry_icon: str | None = None
-) -> dict:
+def map_content(state: State, entity_config: dict, *, registry_icon: str | None = None) -> dict:
     """Map HA state + attributes to a PushWard content dict."""
     # State label: use custom label if configured, else default formatting
     state_labels = entity_config.get(CONF_STATE_LABELS) or {}
