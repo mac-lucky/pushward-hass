@@ -171,21 +171,21 @@ def test_map_completion_content_preserves_last():
 
 def test_get_domain_defaults_known():
     defaults = get_domain_defaults("binary_sensor")
-    assert defaults["icon"] == "circle.fill"
+    assert defaults["icon"] == "mdi:toggle-switch-variant"
     assert "on" in defaults["start_states"]
     assert "off" in defaults["end_states"]
 
 
 def test_get_domain_defaults_climate():
     defaults = get_domain_defaults("climate")
-    assert defaults["icon"] == "thermometer"
+    assert defaults["icon"] == "mdi:thermostat"
     assert "heating" in defaults["start_states"]
     assert "off" in defaults["end_states"]
 
 
 def test_get_domain_defaults_unknown():
     defaults = get_domain_defaults("nonexistent_domain")
-    assert defaults["icon"] == "questionmark.circle"
+    assert defaults["icon"] == "mdi:eye"
     assert defaults["start_states"] == []
     assert defaults["end_states"] == []
 
@@ -718,24 +718,94 @@ def test_map_content_state_icon_overrides_registry_icon():
     assert content["icon"] == "mdi:fire"
 
 
-def test_map_content_domain_default_icon_when_no_icon():
-    """Falls back to domain default icon when no other icon source is available."""
+def test_map_content_device_class_icon():
+    """Device class icon is resolved from DEVICE_CLASS_ICONS table."""
+    state = _make_state(
+        "on",
+        {"friendly_name": "Temp Sensor", "device_class": "temperature"},
+        entity_id="sensor.temp",
+    )
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "mdi:thermometer"
+
+
+def test_map_content_device_class_icon_binary_sensor():
+    """Binary sensor device class resolves to correct MDI icon."""
+    state = _make_state(
+        "on",
+        {"friendly_name": "Front Door", "device_class": "door"},
+        entity_id="binary_sensor.front_door",
+    )
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "mdi:door-open"
+
+
+def test_map_content_registry_icon_overrides_device_class():
+    """Registry icon takes priority over device class icon."""
+    state = _make_state(
+        "on",
+        {"friendly_name": "Temp", "device_class": "temperature"},
+        entity_id="sensor.temp",
+    )
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config, registry_icon="mdi:home-thermometer")
+
+    assert content["icon"] == "mdi:home-thermometer"
+
+
+def test_map_content_number_domain_falls_back_to_sensor_icons():
+    """Number domain shares sensor device-class icons."""
+    state = _make_state(
+        "on",
+        {"friendly_name": "Target Temp", "device_class": "temperature"},
+        entity_id="number.target_temp",
+    )
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "mdi:thermometer"
+
+
+def test_map_content_unknown_device_class_falls_to_domain():
+    """Unknown device class with known domain falls back to domain default."""
+    state = _make_state(
+        "on",
+        {"friendly_name": "Sensor", "device_class": "nonexistent"},
+        entity_id="sensor.weird",
+    )
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "mdi:eye"
+
+
+def test_map_content_domain_default_icon_when_no_device_class():
+    """Falls back to domain default icon when no device class is set."""
     state = _make_state("on", {"friendly_name": "HVAC"}, entity_id="climate.hvac")
     config = {CONF_TEMPLATE: "generic"}
 
     content = map_content(state, config)
 
-    assert content["icon"] == "thermometer"
+    assert content["icon"] == "mdi:thermostat"
 
 
 def test_map_content_fallback_icon_when_no_icon_anywhere():
-    """Falls back to questionmark.circle for unknown domains with no icon source."""
+    """Falls back to mdi:eye for unknown domains with no icon source."""
     state = _make_state("on", {"friendly_name": "Unknown Thing"}, entity_id="custom.thing")
     config = {CONF_TEMPLATE: "generic"}
 
     content = map_content(state, config)
 
-    assert content["icon"] == "questionmark.circle"
+    assert content["icon"] == "mdi:eye"
 
 
 # --- _add_url_deeplinks helper ---

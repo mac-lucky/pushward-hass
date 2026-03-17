@@ -28,6 +28,7 @@ from .const import (
     CONF_URL,
     DEFAULT_SEVERITY,
     DEFAULT_TOTAL_STEPS,
+    DEVICE_CLASS_ICONS,
     DOMAIN_DEFAULTS,
 )
 
@@ -86,6 +87,22 @@ def _add_url_deeplinks(content: dict, entity_config: dict) -> None:
         content["secondary_url"] = secondary_url
 
 
+def _resolve_device_class_icon(domain: str, device_class: str) -> str:
+    """Resolve MDI icon from entity domain + device_class.
+
+    Modern HA integrations use frontend-only icon translations, so
+    state.attributes["icon"] and entity_registry.original_icon are empty.
+    This mirrors the HA frontend's device-class icon tables.
+    The ``number`` domain shares sensor device-class icons.
+    """
+    if not domain or not device_class:
+        return ""
+    icon = DEVICE_CLASS_ICONS.get(f"{domain}.{device_class}", "")
+    if not icon and domain == "number":
+        icon = DEVICE_CLASS_ICONS.get(f"sensor.{device_class}", "")
+    return icon
+
+
 def map_content(state: State, entity_config: dict, *, registry_icon: str | None = None) -> dict:
     """Map HA state + attributes to a PushWard content dict."""
     # State label: use custom label if configured, else default formatting
@@ -95,7 +112,13 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
     else:
         state_text = state.state.replace("_", " ").capitalize()
 
-    # Icon resolution: icon_attribute > static icon > state attr > registry > domain default > fallback
+    # Icon resolution order:
+    # 1. icon_attribute (dynamic from HA attribute)
+    # 2. static CONF_ICON (user-configured in PushWard)
+    # 3. state.attributes["icon"] (legacy integrations / _attr_icon)
+    # 4. entity registry icon (user-customized or platform-provided)
+    # 5. device_class icon (mirrors HA frontend tables)
+    # 6. domain default
     icon = ""
     icon_attr = entity_config.get(CONF_ICON_ATTRIBUTE)
     if icon_attr:
@@ -111,9 +134,10 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
     if not icon and registry_icon:
         icon = registry_icon
     if not icon:
-        domain = state.entity_id.split(".")[0] if "." in state.entity_id else ""
-        domain_defs = DOMAIN_DEFAULTS.get(domain, {})
-        icon = domain_defs.get("icon", "questionmark.circle")
+        device_class = state.attributes.get("device_class", "")
+        icon = _resolve_device_class_icon(state.domain, device_class)
+    if not icon:
+        icon = get_domain_defaults(state.domain)["icon"]
 
     # Subtitle: subtitle_attribute > friendly_name
     subtitle_attr = entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
@@ -208,7 +232,7 @@ def get_domain_defaults(domain: str) -> dict:
     """Return default icon, start_states, and end_states for an HA domain."""
     return DOMAIN_DEFAULTS.get(
         domain,
-        {"icon": "questionmark.circle", "start_states": [], "end_states": []},
+        {"icon": "mdi:eye", "start_states": [], "end_states": []},
     )
 
 

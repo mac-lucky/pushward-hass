@@ -79,4 +79,7 @@ def make_mock_state(state: str, attributes: dict | None = None, entity_id: str |
     mock.attributes = attributes or {}
     if entity_id is not None:
         mock.entity_id = entity_id
+        mock.domain = entity_id.split(".")[0] if "." in entity_id else ""
+    else:
+        mock.domain = ""
     return mock

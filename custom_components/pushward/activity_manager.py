@@ -44,6 +44,7 @@ class TrackedEntity:
     config: dict
     is_active: bool = False
     last_content: dict | None = None
+    registry_icon: str | None = None
     unsub_state: Callable | None = None
     flush_unsub: Callable | None = None
     end_task: asyncio.Task | None = field(default=None, repr=False)
@@ -183,8 +184,8 @@ class ActivityManager:
             if current_state is None:
                 return
 
-            registry_icon = self._get_registry_icon(entity_id)
-            content = map_content(current_state, config, registry_icon=registry_icon)
+            tracked.registry_icon = self._get_registry_icon(entity_id)
+            content = map_content(current_state, config, registry_icon=tracked.registry_icon)
             await self._api.update_activity(slug, "ONGOING", content)
 
             tracked.is_active = True
@@ -223,8 +224,7 @@ class ActivityManager:
         if current_state is None:
             return
 
-        registry_icon = self._get_registry_icon(entity_id)
-        content = map_content(current_state, tracked.config, registry_icon=registry_icon)
+        content = map_content(current_state, tracked.config, registry_icon=tracked.registry_icon)
         if content == tracked.last_content:
             return
 
