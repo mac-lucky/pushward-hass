@@ -13,6 +13,7 @@ from typing import Any
 import aiohttp
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Event, HomeAssistant, State, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
@@ -66,6 +67,14 @@ class ActivityManager:
         self._entry = entry
         self._tracked: dict[str, TrackedEntity] = {}
         self._reauth_triggered = False
+
+    def _get_registry_icon(self, entity_id: str) -> str | None:
+        """Look up entity icon from the HA entity registry."""
+        registry = er.async_get(self._hass)
+        entry = registry.async_get(entity_id)
+        if entry is None:
+            return None
+        return entry.icon or entry.original_icon or None
 
     def _trigger_reauth(self) -> None:
         """Trigger reauth flow once on auth failure."""
@@ -174,7 +183,8 @@ class ActivityManager:
             if current_state is None:
                 return
 
-            content = map_content(current_state, config)
+            registry_icon = self._get_registry_icon(entity_id)
+            content = map_content(current_state, config, registry_icon=registry_icon)
             await self._api.update_activity(slug, "ONGOING", content)
 
             tracked.is_active = True
@@ -213,7 +223,8 @@ class ActivityManager:
         if current_state is None:
             return
 
-        content = map_content(current_state, tracked.config)
+        registry_icon = self._get_registry_icon(entity_id)
+        content = map_content(current_state, tracked.config, registry_icon=registry_icon)
         if content == tracked.last_content:
             return
 

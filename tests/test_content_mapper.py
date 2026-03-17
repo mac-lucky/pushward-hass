@@ -698,9 +698,39 @@ def test_map_content_icon_attribute_overrides_entity_icon():
     assert content["icon"] == "mdi:fire"
 
 
+def test_map_content_registry_icon_used_when_no_other_icon():
+    """Entity registry icon is used when no static/attribute/state icon exists."""
+    state = _make_state("on", {"friendly_name": "Thermostat"}, entity_id="climate.thermostat")
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config, registry_icon="mdi:thermometer")
+
+    assert content["icon"] == "mdi:thermometer"
+
+
+def test_map_content_state_icon_overrides_registry_icon():
+    """State attribute icon takes priority over entity registry icon."""
+    state = _make_state("on", {"friendly_name": "T", "icon": "mdi:fire"}, entity_id="climate.thermostat")
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config, registry_icon="mdi:thermometer")
+
+    assert content["icon"] == "mdi:fire"
+
+
+def test_map_content_domain_default_icon_when_no_icon():
+    """Falls back to domain default icon when no other icon source is available."""
+    state = _make_state("on", {"friendly_name": "HVAC"}, entity_id="climate.hvac")
+    config = {CONF_TEMPLATE: "generic"}
+
+    content = map_content(state, config)
+
+    assert content["icon"] == "thermometer"
+
+
 def test_map_content_fallback_icon_when_no_icon_anywhere():
-    """Falls back to questionmark.circle when no icon source is available."""
-    state = _make_state("on", {"friendly_name": "Unknown Sensor"})
+    """Falls back to questionmark.circle for unknown domains with no icon source."""
+    state = _make_state("on", {"friendly_name": "Unknown Thing"}, entity_id="custom.thing")
     config = {CONF_TEMPLATE: "generic"}
 
     content = map_content(state, config)

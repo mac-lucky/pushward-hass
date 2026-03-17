@@ -86,7 +86,9 @@ def _add_url_deeplinks(content: dict, entity_config: dict) -> None:
         content["secondary_url"] = secondary_url
 
 
-def map_content(state: State, entity_config: dict) -> dict:
+def map_content(
+    state: State, entity_config: dict, *, registry_icon: str | None = None
+) -> dict:
     """Map HA state + attributes to a PushWard content dict."""
     # State label: use custom label if configured, else default formatting
     state_labels = entity_config.get(CONF_STATE_LABELS) or {}
@@ -95,7 +97,7 @@ def map_content(state: State, entity_config: dict) -> dict:
     else:
         state_text = state.state.replace("_", " ").capitalize()
 
-    # Icon resolution: icon_attribute > static icon > entity icon > fallback
+    # Icon resolution: icon_attribute > static icon > state attr > registry > domain default > fallback
     icon = ""
     icon_attr = entity_config.get(CONF_ICON_ATTRIBUTE)
     if icon_attr:
@@ -108,8 +110,12 @@ def map_content(state: State, entity_config: dict) -> dict:
         entity_icon = state.attributes.get("icon")
         if entity_icon:
             icon = str(entity_icon)
+    if not icon and registry_icon:
+        icon = registry_icon
     if not icon:
-        icon = "questionmark.circle"
+        domain = state.entity_id.split(".")[0] if "." in state.entity_id else ""
+        domain_defs = DOMAIN_DEFAULTS.get(domain, {})
+        icon = domain_defs.get("icon", "questionmark.circle")
 
     # Subtitle: subtitle_attribute > friendly_name
     subtitle_attr = entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
