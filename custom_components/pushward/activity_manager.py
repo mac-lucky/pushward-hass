@@ -186,6 +186,13 @@ class ActivityManager:
 
             tracked.registry_icon = self._get_registry_icon(entity_id)
             content = map_content(current_state, config, registry_icon=tracked.registry_icon)
+            _LOGGER.debug(
+                "Activity %s icon resolution: state_attr=%s, registry=%s, resolved=%s",
+                slug,
+                current_state.attributes.get("icon"),
+                tracked.registry_icon,
+                content.get("icon"),
+            )
             await self._api.update_activity(slug, "ONGOING", content)
 
             tracked.is_active = True
