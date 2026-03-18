@@ -18,6 +18,8 @@ from homeassistant.helpers.selector import (
     ColorRGBSelector,
     EntitySelector,
     EntitySelectorConfig,
+    IconSelector,
+    IconSelectorConfig,
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
@@ -290,7 +292,12 @@ def _details_schema(
             default=d.get(CONF_ACTIVITY_NAME, ""),
         )
     ] = str
-    fields[vol.Optional(CONF_ICON, default=d.get(CONF_ICON, ""))] = str
+    fields[
+        vol.Optional(
+            CONF_ICON,
+            description={"suggested_value": d.get(CONF_ICON, "")},
+        )
+    ] = IconSelector(IconSelectorConfig(placeholder="mdi:bell"))
     fields[
         vol.Optional(
             CONF_ICON_ATTRIBUTE,

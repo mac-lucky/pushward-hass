@@ -195,7 +195,7 @@
             "severity": "Severity",
             "slug": "Activity Slug",
             "activity_name": "Activity Name",
-            "icon": "Icon (SF Symbol / MDI)",
+            "icon": "Icon",
             "icon_attribute": "Icon Attribute",
             "priority": "Priority (0-10)",
             "update_interval": "Min. Update Interval (seconds)",

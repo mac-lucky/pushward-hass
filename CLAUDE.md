@@ -70,6 +70,7 @@ No build step — Python source is used directly by Home Assistant.
 
 | Version | Changes |
 |---------|---------|
+| 0.13.0  | Replace plain text icon field with HA built-in MDI icon picker (`IconSelector`) for better UX |
 | 0.12.0  | Fix attribute selectors not clearable during reconfigure; add icon resolution integration tests |
 | 0.11.0  | Add device class → MDI icon mapping table; all default icons now use MDI for reliable iOS rendering |
 | 0.10.0  | Fix icon resolution: add entity registry lookup and domain default fallback when no icon is configured |
