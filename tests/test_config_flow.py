@@ -776,6 +776,139 @@ async def test_subentry_add_entity_with_icon_attribute(hass: HomeAssistant) -> N
     assert subentries[0].data[CONF_ICON_ATTRIBUTE] == "sf_symbol"
 
 
+async def test_subentry_reconfigure_clearing_attribute_selectors(hass: HomeAssistant) -> None:
+    """Clearing attribute selectors during reconfigure saves empty strings.
+
+    When a user presses X on an AttributeSelector, HA omits the key from
+    the form submission. The old code used vol.Optional(default=old_value)
+    which re-filled the old value. The fix uses suggested_value so clearing
+    actually persists.
+    """
+    # Start with attribute selectors populated
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                icon_attribute="rgb_color",
+                subtitle_attribute="xy_color",
+                progress_attribute="brightness",
+                accent_color_attribute="hs_color",
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+
+    subentry_id = next(iter(entry.subentries))
+
+    # Verify precondition: attributes are set
+    assert entry.subentries[subentry_id].data[CONF_ICON_ATTRIBUTE] == "rgb_color"
+    assert entry.subentries[subentry_id].data[CONF_SUBTITLE_ATTRIBUTE] == "xy_color"
+    assert entry.subentries[subentry_id].data[CONF_PROGRESS_ATTRIBUTE] == "brightness"
+    assert entry.subentries[subentry_id].data[CONF_ACCENT_COLOR_ATTRIBUTE] == "hs_color"
+
+    # Step 1: reconfigure
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(),
+    )
+    assert result["step_id"] == "details"
+
+    # Step 2: submit WITHOUT attribute selector keys (simulates clearing via X)
+    details = _mock_details_input("generic")
+    del details[CONF_ICON_ATTRIBUTE]
+    del details[CONF_SUBTITLE_ATTRIBUTE]
+    del details[CONF_PROGRESS_ATTRIBUTE]
+    del details[CONF_ACCENT_COLOR_ATTRIBUTE]
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=details,
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+
+    # All cleared selectors should be empty strings
+    data = entry.subentries[subentry_id].data
+    assert data[CONF_ICON_ATTRIBUTE] == ""
+    assert data[CONF_SUBTITLE_ATTRIBUTE] == ""
+    assert data[CONF_PROGRESS_ATTRIBUTE] == ""
+    assert data[CONF_ACCENT_COLOR_ATTRIBUTE] == ""
+
+
+async def test_subentry_reconfigure_clearing_remaining_time_attr(hass: HomeAssistant) -> None:
+    """Clearing remaining_time_attribute during reconfigure saves empty string."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="countdown",
+                remaining_time_attribute="remaining",
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+
+    subentry_id = next(iter(entry.subentries))
+    assert entry.subentries[subentry_id].data[CONF_REMAINING_TIME_ATTR] == "remaining"
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "countdown"}),
+    )
+    assert result["step_id"] == "details"
+
+    details = _mock_details_input("countdown")
+    del details[CONF_REMAINING_TIME_ATTR]
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=details,
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_REMAINING_TIME_ATTR] == ""
+
+
+async def test_subentry_reconfigure_clearing_pipeline_attrs(hass: HomeAssistant) -> None:
+    """Clearing pipeline attribute selectors during reconfigure saves empty strings."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="pipeline",
+                progress_attribute="percent",
+                current_step_attribute="step",
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+
+    subentry_id = next(iter(entry.subentries))
+    assert entry.subentries[subentry_id].data[CONF_PROGRESS_ATTRIBUTE] == "percent"
+    assert entry.subentries[subentry_id].data[CONF_CURRENT_STEP_ATTR] == "step"
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "pipeline"}),
+    )
+    assert result["step_id"] == "details"
+
+    details = _mock_details_input("pipeline")
+    del details[CONF_PROGRESS_ATTRIBUTE]
+    del details[CONF_CURRENT_STEP_ATTR]
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=details,
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+
+    data = entry.subentries[subentry_id].data
+    assert data[CONF_PROGRESS_ATTRIBUTE] == ""
+    assert data[CONF_CURRENT_STEP_ATTR] == ""
+
+
 async def test_subentry_rejects_invalid_url(hass: HomeAssistant) -> None:
     """Invalid URL scheme shows error on step 2."""
     entry = _mock_entry()

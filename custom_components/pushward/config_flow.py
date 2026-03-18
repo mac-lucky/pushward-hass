@@ -246,14 +246,14 @@ def _details_schema(
         fields[
             vol.Optional(
                 CONF_PROGRESS_ATTRIBUTE,
-                default=d.get(CONF_PROGRESS_ATTRIBUTE, ""),
+                description={"suggested_value": d.get(CONF_PROGRESS_ATTRIBUTE, "")},
             )
         ] = attr_selector
     if template in ("generic", "countdown"):
         fields[
             vol.Optional(
                 CONF_REMAINING_TIME_ATTR,
-                default=d.get(CONF_REMAINING_TIME_ATTR, ""),
+                description={"suggested_value": d.get(CONF_REMAINING_TIME_ATTR, "")},
             )
         ] = attr_selector
     if template == "pipeline":
@@ -266,7 +266,7 @@ def _details_schema(
         fields[
             vol.Optional(
                 CONF_CURRENT_STEP_ATTR,
-                default=d.get(CONF_CURRENT_STEP_ATTR, ""),
+                description={"suggested_value": d.get(CONF_CURRENT_STEP_ATTR, "")},
             )
         ] = attr_selector
     if template == "alert":
@@ -294,7 +294,7 @@ def _details_schema(
     fields[
         vol.Optional(
             CONF_ICON_ATTRIBUTE,
-            default=d.get(CONF_ICON_ATTRIBUTE, ""),
+            description={"suggested_value": d.get(CONF_ICON_ATTRIBUTE, "")},
         )
     ] = attr_selector
     fields[
@@ -314,7 +314,7 @@ def _details_schema(
     fields[
         vol.Optional(
             CONF_SUBTITLE_ATTRIBUTE,
-            default=d.get(CONF_SUBTITLE_ATTRIBUTE, ""),
+            description={"suggested_value": d.get(CONF_SUBTITLE_ATTRIBUTE, "")},
         )
     ] = attr_selector
     fields[
@@ -333,7 +333,7 @@ def _details_schema(
     fields[
         vol.Optional(
             CONF_ACCENT_COLOR_ATTRIBUTE,
-            default=d.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
+            description={"suggested_value": d.get(CONF_ACCENT_COLOR_ATTRIBUTE, "")},
         )
     ] = attr_selector
     fields[
