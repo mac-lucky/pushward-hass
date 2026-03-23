@@ -97,9 +97,7 @@ def _get_api(hass: HomeAssistant) -> PushWardApiClient:
     """Get the API client from the first available config entry."""
     entries = hass.data.get(DOMAIN)
     if not entries:
-        raise HomeAssistantError(
-            "PushWard is not configured. Add the integration via Settings → Devices & Services."
-        )
+        raise HomeAssistantError("PushWard is not configured. Add the integration via Settings → Devices & Services.")
     return next(iter(entries.values()))["api"]
 
 
