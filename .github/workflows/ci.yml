@@ -27,14 +27,26 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: astral-sh/setup-uv@v7
         with:
           version: "latest"
       - run: uv tool install ruff
       - run: ruff check custom_components/ tests/
-      - run: ruff format --check custom_components/ tests/
+      - run: ruff format custom_components/ tests/
+      - name: Commit formatting fixes
+        run: |
+          git diff --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: auto-format with ruff"
+          git push
 
   test:
     name: Test
