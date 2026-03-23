@@ -291,8 +291,10 @@ class ActivityManager:
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to end activity %s", slug, exc_info=True)
         finally:
-            tracked.is_active = False
-            tracked.last_content = None
-            if tracked.flush_unsub:
-                tracked.flush_unsub()
-                tracked.flush_unsub = None
+            task = asyncio.current_task()
+            if task is None or not task.cancelled():
+                tracked.is_active = False
+                tracked.last_content = None
+                if tracked.flush_unsub:
+                    tracked.flush_unsub()
+                    tracked.flush_unsub = None

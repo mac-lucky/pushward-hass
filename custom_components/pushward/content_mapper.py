@@ -1,5 +1,7 @@
 """Map Home Assistant state/attributes to PushWard content."""
 
+from __future__ import annotations
+
 import re
 import time
 

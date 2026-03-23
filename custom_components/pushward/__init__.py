@@ -1,5 +1,7 @@
 """PushWard integration for Home Assistant."""
 
+from __future__ import annotations
+
 import logging
 from functools import partial
 
@@ -17,9 +19,11 @@ from .const import (
     DEFAULT_PRIORITY,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
+    validate_url,
 )
 
 _LOGGER = logging.getLogger(__name__)
+
 
 # Content fields for update_activity service
 _CONTENT_FIELDS = [
@@ -55,8 +59,8 @@ SCHEMA_UPDATE_ACTIVITY = vol.Schema(
         vol.Optional("subtitle"): str,
         vol.Optional("accent_color"): str,
         vol.Optional("remaining_time"): vol.Coerce(int),
-        vol.Optional("url"): str,
-        vol.Optional("secondary_url"): str,
+        vol.Optional("url"): validate_url,
+        vol.Optional("secondary_url"): validate_url,
         vol.Optional("end_date"): vol.Coerce(int),
         vol.Optional("total_steps"): vol.Coerce(int),
         vol.Optional("current_step"): vol.Coerce(int),
@@ -91,10 +95,12 @@ SCHEMA_DELETE_ACTIVITY = vol.Schema(
 
 def _get_api(hass: HomeAssistant) -> PushWardApiClient:
     """Get the API client from the first available config entry."""
-    entries = hass.data.get(DOMAIN, {})
-    for entry_data in entries.values():
-        return entry_data["api"]
-    raise HomeAssistantError("No PushWard config entry available")
+    entries = hass.data.get(DOMAIN)
+    if not entries:
+        raise HomeAssistantError(
+            "PushWard is not configured. Add the integration via Settings → Devices & Services."
+        )
+    return next(iter(entries.values()))["api"]
 
 
 async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) -> None:

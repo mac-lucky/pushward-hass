@@ -6,7 +6,6 @@ import logging
 import re
 from collections.abc import Mapping
 from typing import Any
-from urllib.parse import urlparse
 
 import voluptuous as vol
 from homeassistant import config_entries
@@ -68,6 +67,7 @@ from .const import (
     SEVERITIES,
     SUBENTRY_TYPE_ENTITY,
     TEMPLATES,
+    validate_url,
 )
 from .content_mapper import get_domain_defaults, sanitize_slug
 
@@ -104,16 +104,6 @@ async def _validate_integration_key(
         _LOGGER.exception("Unexpected error during PushWard %s", context)
         return {"base": "cannot_connect"}
     return {}
-
-
-def _validate_url(value: str) -> str:
-    """Validate URL uses http or https scheme."""
-    parsed = urlparse(value)
-    if parsed.scheme not in ("http", "https"):
-        raise vol.Invalid("URL must use http:// or https:// scheme")
-    if not parsed.netloc:
-        raise vol.Invalid("URL must include a host")
-    return value
 
 
 def _entity_template_schema(defaults: dict | None = None) -> vol.Schema:
@@ -264,7 +254,7 @@ def _details_schema(
                 CONF_TOTAL_STEPS,
                 default=d.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
             )
-        ] = vol.All(int, vol.Range(min=1, max=20))
+        ] = vol.All(vol.Coerce(int), vol.Range(min=1, max=20))
         fields[
             vol.Optional(
                 CONF_CURRENT_STEP_ATTR,
@@ -309,13 +299,13 @@ def _details_schema(
             CONF_PRIORITY,
             default=d.get(CONF_PRIORITY, DEFAULT_PRIORITY),
         )
-    ] = vol.All(int, vol.Range(min=0, max=10))
+    ] = vol.All(vol.Coerce(int), vol.Range(min=0, max=10))
     fields[
         vol.Optional(
             CONF_UPDATE_INTERVAL,
             default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         )
-    ] = vol.All(int, vol.Range(min=1))
+    ] = vol.All(vol.Coerce(int), vol.Range(min=1))
 
     # --- Optional fields ---
     fields[
@@ -381,7 +371,8 @@ def _parse_entity_input(user_input: dict) -> dict:
     raw_slug = user_input.get(CONF_SLUG, "").strip()
     slug = ""
     if raw_slug:
-        slug = re.sub(r"[^a-z0-9-]", "", raw_slug.lower())
+        slug = raw_slug.lower().replace(".", "-").replace("_", "-")
+        slug = re.sub(r"[^a-z0-9-]", "", slug)
         slug = re.sub(r"-+", "-", slug).strip("-")
     if not slug:
         slug = sanitize_slug(entity_id)
@@ -417,12 +408,12 @@ def _parse_entity_input(user_input: dict) -> dict:
     url_errors: dict[str, str] = {}
     if url:
         try:
-            _validate_url(url)
+            validate_url(url)
         except vol.Invalid:
             url_errors[CONF_URL] = "invalid_url"
     if secondary_url:
         try:
-            _validate_url(secondary_url)
+            validate_url(secondary_url)
         except vol.Invalid:
             url_errors[CONF_SECONDARY_URL] = "invalid_url"
     if url_errors:

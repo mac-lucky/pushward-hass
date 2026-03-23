@@ -1,5 +1,9 @@
 """Constants for the PushWard integration."""
 
+from urllib.parse import urlparse
+
+import voluptuous as vol
+
 DOMAIN = "pushward"
 SUBENTRY_TYPE_ENTITY = "tracked_entity"
 
@@ -228,3 +232,13 @@ DEVICE_CLASS_ICONS: dict[str, str] = {
     # update device classes
     "update.firmware": "mdi:chip",
 }
+
+
+def validate_url(value: str) -> str:
+    """Validate URL uses http or https scheme."""
+    parsed = urlparse(value)
+    if parsed.scheme not in ("http", "https"):
+        raise vol.Invalid("URL must use http:// or https:// scheme")
+    if not parsed.netloc:
+        raise vol.Invalid("URL must include a host")
+    return value

@@ -16,7 +16,6 @@ from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import (
     _parse_state_labels,
     _validate_integration_key,
-    _validate_url,
 )
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR_ATTRIBUTE,
@@ -45,6 +44,7 @@ from custom_components.pushward.const import (
     DEFAULT_SERVER_URL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
+    validate_url,
 )
 
 from .conftest import make_entity_config
@@ -405,8 +405,8 @@ async def test_reauth_cannot_connect(hass: HomeAssistant) -> None:
     ],
 )
 def test_validate_url_accepts_http_https(url: str) -> None:
-    """Test that _validate_url accepts http and https URLs."""
-    assert _validate_url(url) == url
+    """Test that validate_url accepts http and https URLs."""
+    assert validate_url(url) == url
 
 
 @pytest.mark.parametrize(
@@ -420,9 +420,9 @@ def test_validate_url_accepts_http_https(url: str) -> None:
     ],
 )
 def test_validate_url_rejects_non_http_schemes(url: str) -> None:
-    """Test that _validate_url rejects non-http/https schemes."""
+    """Test that validate_url rejects non-http/https schemes."""
     with pytest.raises(vol.Invalid):
-        _validate_url(url)
+        validate_url(url)
 
 
 # --- _validate_integration_key helper tests ---
