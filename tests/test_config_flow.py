@@ -71,11 +71,11 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
     data[CONF_END_STATES] = ["off"]
 
     # Template-specific fields
-    if template in ("generic", "pipeline"):
+    if template in ("generic", "steps"):
         data[CONF_PROGRESS_ATTRIBUTE] = ""
     if template in ("generic", "countdown"):
         data[CONF_REMAINING_TIME_ATTR] = ""
-    if template == "pipeline":
+    if template == "steps":
         data[CONF_TOTAL_STEPS] = 1
         data[CONF_CURRENT_STEP_ATTR] = ""
     if template == "alert":
@@ -496,20 +496,20 @@ async def test_subentry_add_entity_empty_slug_auto_generates(hass: HomeAssistant
     assert subentries[0].data[CONF_SLUG] == "ha-binary-sensor-washer"
 
 
-async def test_subentry_add_pipeline_entity(hass: HomeAssistant) -> None:
-    """Test adding a pipeline entity persists total_steps and current_step_attribute."""
+async def test_subentry_add_steps_entity(hass: HomeAssistant) -> None:
+    """Test adding a steps entity persists total_steps and current_step_attribute."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
     result = await _add_entity_subentry(
         hass,
         entry,
-        template="pipeline",
+        template="steps",
         details_overrides={CONF_TOTAL_STEPS: 5, CONF_CURRENT_STEP_ATTR: "step"},
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
-    assert subentries[0].data[CONF_TEMPLATE] == "pipeline"
+    assert subentries[0].data[CONF_TEMPLATE] == "steps"
     assert subentries[0].data[CONF_TOTAL_STEPS] == 5
     assert subentries[0].data[CONF_CURRENT_STEP_ATTR] == "step"
 
@@ -532,7 +532,7 @@ async def test_subentry_add_alert_entity(hass: HomeAssistant) -> None:
 
 
 async def test_subentry_add_countdown_entity(hass: HomeAssistant) -> None:
-    """Test adding a countdown entity — no pipeline/alert fields shown."""
+    """Test adding a countdown entity — no steps/alert fields shown."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -546,13 +546,13 @@ async def test_subentry_add_countdown_entity(hass: HomeAssistant) -> None:
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_TEMPLATE] == "countdown"
     assert subentries[0].data[CONF_REMAINING_TIME_ATTR] == "remaining"
-    # Pipeline/alert fields should get defaults (not in the form)
+    # Steps/alert fields should get defaults (not in the form)
     assert subentries[0].data[CONF_TOTAL_STEPS] == 1
     assert subentries[0].data[CONF_SEVERITY] == "info"
 
 
-async def test_subentry_generic_hides_pipeline_alert_fields(hass: HomeAssistant) -> None:
-    """Test that generic template doesn't include pipeline/alert fields in step 2."""
+async def test_subentry_generic_hides_steps_alert_fields(hass: HomeAssistant) -> None:
+    """Test that generic template doesn't include steps/alert fields in step 2."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -577,8 +577,8 @@ async def test_subentry_generic_hides_pipeline_alert_fields(hass: HomeAssistant)
     assert CONF_SEVERITY not in schema_keys
 
 
-async def test_subentry_pipeline_shows_pipeline_fields(hass: HomeAssistant) -> None:
-    """Test that pipeline template shows total_steps and current_step_attribute."""
+async def test_subentry_steps_shows_steps_fields(hass: HomeAssistant) -> None:
+    """Test that steps template shows total_steps and current_step_attribute."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -588,7 +588,7 @@ async def test_subentry_pipeline_shows_pipeline_fields(hass: HomeAssistant) -> N
     )
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_core_input(**{CONF_TEMPLATE: "pipeline"}),
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "steps"}),
     )
     assert result["step_id"] == "details"
 
@@ -601,7 +601,7 @@ async def test_subentry_pipeline_shows_pipeline_fields(hass: HomeAssistant) -> N
 
 
 async def test_subentry_alert_shows_severity(hass: HomeAssistant) -> None:
-    """Test that alert template shows severity but not pipeline fields."""
+    """Test that alert template shows severity but not steps fields."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -624,7 +624,7 @@ async def test_subentry_alert_shows_severity(hass: HomeAssistant) -> None:
 
 
 async def test_subentry_countdown_shows_remaining_time(hass: HomeAssistant) -> None:
-    """Test that countdown template shows remaining_time but not pipeline/alert fields."""
+    """Test that countdown template shows remaining_time but not steps/alert fields."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -869,12 +869,12 @@ async def test_subentry_reconfigure_clearing_remaining_time_attr(hass: HomeAssis
     assert entry.subentries[subentry_id].data[CONF_REMAINING_TIME_ATTR] == ""
 
 
-async def test_subentry_reconfigure_clearing_pipeline_attrs(hass: HomeAssistant) -> None:
-    """Clearing pipeline attribute selectors during reconfigure saves empty strings."""
+async def test_subentry_reconfigure_clearing_steps_attrs(hass: HomeAssistant) -> None:
+    """Clearing steps attribute selectors during reconfigure saves empty strings."""
     entry = _mock_entry(
         subentries_data=[
             _entity_subentry_data(
-                template="pipeline",
+                template="steps",
                 progress_attribute="percent",
                 current_step_attribute="step",
             )
@@ -889,11 +889,11 @@ async def test_subentry_reconfigure_clearing_pipeline_attrs(hass: HomeAssistant)
     result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_core_input(**{CONF_TEMPLATE: "pipeline"}),
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "steps"}),
     )
     assert result["step_id"] == "details"
 
-    details = _mock_details_input("pipeline")
+    details = _mock_details_input("steps")
     del details[CONF_PROGRESS_ATTRIBUTE]
     del details[CONF_CURRENT_STEP_ATTR]
 

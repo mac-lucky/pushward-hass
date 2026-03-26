@@ -11,7 +11,7 @@ When an entity enters a configured "start" state (e.g., washer turns on), a Live
 ## Features
 
 - **Track any HA entity** as a PushWard Live Activity
-- **4 templates** — generic, countdown, alert, pipeline
+- **4 templates** — generic, countdown, alert, steps
 - **14 domain defaults** — binary_sensor, switch, climate, vacuum, media_player, lock, cover, timer, sensor, light, fan, weather, update, water_heater
 - **Two-phase end** — shows completion state (green checkmark) before dismissing
 - **Throttled updates** with content deduplication
@@ -56,7 +56,7 @@ Each tracked entity uses a two-step flow:
 | `generic` | Flexible — progress bar, subtitle, icon |
 | `countdown` | Timer with remaining time and end date |
 | `alert` | Severity-based notification (critical/warning/info) |
-| `pipeline` | Multi-step process (e.g., build stages) |
+| `steps` | Multi-step process (e.g., build stages) |
 
 **Step 2** — Configure activity details (fields vary by template):
 
@@ -71,7 +71,7 @@ Each tracked entity uses a two-step flow:
 | Update Interval | Min seconds between updates (default: 5) |
 | Progress Attribute | Entity attribute holding 0–100 value |
 | Remaining Time Attribute | Seconds remaining (countdown template) |
-| Total Steps / Current Step Attribute | Pipeline step tracking |
+| Total Steps / Current Step Attribute | Steps tracking |
 | Severity | critical, warning, or info (alert template) |
 | Subtitle Attribute | Entity attribute for subtitle text |
 | State Labels | Custom state→label mapping (e.g., `on=Running, off=Stopped`) |
@@ -106,7 +106,7 @@ Push a content update to an existing activity.
 |-------|----------|-------------|
 | `slug` | Yes | Activity identifier |
 | `state` | Yes | `ONGOING` or `ENDED` |
-| `template` | No | generic, countdown, pipeline, or alert |
+| `template` | No | generic, countdown, steps, or alert |
 | `progress` | No | 0.0–1.0 |
 | `state_text` | No | Display text |
 | `icon` | No | SF Symbol or MDI icon |
@@ -115,7 +115,7 @@ Push a content update to an existing activity.
 | `remaining_time` | No | Seconds remaining |
 | `url` / `secondary_url` | No | Tap-to-open URLs |
 | `end_date` | No | Unix timestamp for countdown |
-| `total_steps` / `current_step` | No | Pipeline progress |
+| `total_steps` / `current_step` | No | Steps progress |
 | `severity` | No | critical, warning, or info |
 | `completion_message` | No | End display message |
 

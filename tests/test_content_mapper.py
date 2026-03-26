@@ -235,13 +235,13 @@ def test_map_completion_content_countdown(mock_time):
     assert content["state"] == "Complete"
 
 
-# --- pipeline template ---
+# --- steps template ---
 
 
-def test_map_content_pipeline_with_step_attribute():
+def test_map_content_steps_with_step_attribute():
     state = _make_state("running", {"friendly_name": "Build", "step": 3})
     config = {
-        CONF_TEMPLATE: "pipeline",
+        CONF_TEMPLATE: "steps",
         CONF_ICON: "hammer",
         CONF_TOTAL_STEPS: 5,
         CONF_CURRENT_STEP_ATTR: "step",
@@ -255,10 +255,10 @@ def test_map_content_pipeline_with_step_attribute():
     assert content["progress"] == pytest.approx(0.6)
 
 
-def test_map_content_pipeline_clamps_current_step():
+def test_map_content_steps_clamps_current_step():
     state = _make_state("running", {"step": 99})
     config = {
-        CONF_TEMPLATE: "pipeline",
+        CONF_TEMPLATE: "steps",
         CONF_ICON: "hammer",
         CONF_TOTAL_STEPS: 4,
         CONF_CURRENT_STEP_ATTR: "step",
@@ -270,10 +270,10 @@ def test_map_content_pipeline_clamps_current_step():
     assert content["progress"] == 1.0
 
 
-def test_map_content_pipeline_no_step_attribute():
+def test_map_content_steps_no_step_attribute():
     state = _make_state("running", {"friendly_name": "Deploy"})
     config = {
-        CONF_TEMPLATE: "pipeline",
+        CONF_TEMPLATE: "steps",
         CONF_ICON: "arrow.triangle.2.circlepath",
         CONF_TOTAL_STEPS: 3,
     }
@@ -285,11 +285,11 @@ def test_map_content_pipeline_no_step_attribute():
     assert content["progress"] == 0.0
 
 
-def test_map_content_pipeline_explicit_progress_attribute():
+def test_map_content_steps_explicit_progress_attribute():
     """When progress_attribute is set, auto-derive is skipped."""
     state = _make_state("running", {"step": 2, "pct": 80})
     config = {
-        CONF_TEMPLATE: "pipeline",
+        CONF_TEMPLATE: "steps",
         CONF_ICON: "hammer",
         CONF_TOTAL_STEPS: 4,
         CONF_CURRENT_STEP_ATTR: "step",
@@ -304,8 +304,8 @@ def test_map_content_pipeline_explicit_progress_attribute():
     assert content["progress"] == 0.8
 
 
-def test_map_completion_content_pipeline():
-    config = {CONF_TEMPLATE: "pipeline", CONF_ICON: "hammer", CONF_TOTAL_STEPS: 5}
+def test_map_completion_content_steps():
+    config = {CONF_TEMPLATE: "steps", CONF_ICON: "hammer", CONF_TOTAL_STEPS: 5}
 
     content = map_completion_content(config)
 

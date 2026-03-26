@@ -27,7 +27,7 @@ update_activity:
           options:
             - "generic"
             - "countdown"
-            - "pipeline"
+            - "steps"
             - "alert"
     progress:
       name: Progress
@@ -93,7 +93,7 @@ update_activity:
           mode: box
     total_steps:
       name: Total Steps
-      description: Total number of pipeline steps.
+      description: Total number of steps.
       example: 5
       selector:
         number:
@@ -101,7 +101,7 @@ update_activity:
           mode: box
     current_step:
       name: Current Step
-      description: Current pipeline step number.
+      description: Current step number.
       example: 2
       selector:
         number:

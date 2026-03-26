@@ -234,7 +234,7 @@ def _details_schema(
     )
 
     # --- Template-specific fields ---
-    if template in ("generic", "pipeline"):
+    if template in ("generic", "steps"):
         fields[
             vol.Optional(
                 CONF_PROGRESS_ATTRIBUTE,
@@ -248,7 +248,7 @@ def _details_schema(
                 description={"suggested_value": d.get(CONF_REMAINING_TIME_ATTR, "")},
             )
         ] = attr_selector
-    if template == "pipeline":
+    if template == "steps":
         fields[
             vol.Optional(
                 CONF_TOTAL_STEPS,

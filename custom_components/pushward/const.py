@@ -47,7 +47,7 @@ DEFAULT_SEVERITY = "info"
 SEVERITIES = ["critical", "warning", "info"]
 
 # Templates
-TEMPLATES = ["generic", "countdown", "alert", "pipeline"]
+TEMPLATES = ["generic", "countdown", "alert", "steps"]
 
 # API retry
 MAX_RETRIES = 5

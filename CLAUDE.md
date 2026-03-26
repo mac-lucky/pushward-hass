@@ -29,7 +29,7 @@ api.py            → HTTP client with retry/backoff to PushWard server
 
 ## Key Patterns
 
-- **Subentry two-step flow**: `config_flow.py` uses a two-step `ConfigSubentryFlow` — step 1 picks entity + template, step 2 dynamically builds schema via `_details_schema()` based on the selected template (generic/countdown/alert/pipeline).
+- **Subentry two-step flow**: `config_flow.py` uses a two-step `ConfigSubentryFlow` — step 1 picks entity + template, step 2 dynamically builds schema via `_details_schema()` based on the selected template (generic/countdown/alert/steps).
 - **Two-phase end**: On end state, manager sends ONGOING with completion content (green checkmark), sleeps `END_DELAY_SECONDS` (5s), then sends ENDED. The `generation` counter prevents stale ends if the activity restarts during the sleep.
 - **Throttled updates with dedup**: Rate-limited per `update_interval` with content dict equality check. `flush_unsub` timer fires after cooldown.
 - **Reauth**: 401/403 triggers `entry.async_start_reauth()` once via `_reauth_triggered` flag.

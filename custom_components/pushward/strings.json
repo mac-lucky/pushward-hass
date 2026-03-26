@@ -54,11 +54,11 @@
         },
         "total_steps": {
           "name": "Total Steps",
-          "description": "Total number of pipeline steps."
+          "description": "Total number of steps."
         },
         "current_step": {
           "name": "Current Step",
-          "description": "Current pipeline step number."
+          "description": "Current step number."
         },
         "severity": {
           "name": "Severity",
@@ -214,7 +214,7 @@
             "end_states": "Entity states that end the Live Activity. Select from the list or type custom values.",
             "progress_attribute": "Entity attribute that holds a 0\u2013100 progress value. Example: percentage",
             "remaining_time_attribute": "Entity attribute that holds remaining time in seconds. Example: remaining",
-            "total_steps": "Total number of steps in the pipeline.",
+            "total_steps": "Total number of steps.",
             "current_step_attribute": "Entity attribute holding the current step as an integer.",
             "severity": "Alert severity level.",
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",

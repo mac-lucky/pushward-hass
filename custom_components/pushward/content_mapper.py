@@ -181,7 +181,7 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
         completion_msg = entity_config.get(CONF_COMPLETION_MESSAGE)
         if completion_msg:
             content["completion_message"] = completion_msg
-    elif template == "pipeline":
+    elif template == "steps":
         total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
         current = _get_current_step(state, entity_config)
         content["total_steps"] = total
@@ -219,7 +219,7 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
     template = content["template"]
     if template == "countdown":
         content["end_date"] = int(time.time())
-    elif template == "pipeline":
+    elif template == "steps":
         total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
         content["total_steps"] = total
         content["current_step"] = total
