@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from functools import partial
 
+import aiohttp
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -12,20 +13,21 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady,
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .activity_manager import ActivityManager
-from .api import PushWardApiClient, PushWardAuthError
+from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     DEFAULT_PRIORITY,
     DOMAIN,
+    SEVERITIES,
     SUBENTRY_TYPE_ENTITY,
+    validate_slug,
     validate_url,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
-# Content fields for update_activity service
 _CONTENT_FIELDS = [
     "template",
     "progress",
@@ -50,7 +52,7 @@ SERVICE_DELETE_ACTIVITY = "delete_activity"
 
 SCHEMA_UPDATE_ACTIVITY = vol.Schema(
     {
-        vol.Required("slug"): str,
+        vol.Required("slug"): validate_slug,
         vol.Required("state"): vol.In(["ONGOING", "ENDED"]),
         vol.Optional("template"): str,
         vol.Optional("progress"): vol.Coerce(float),
@@ -64,14 +66,14 @@ SCHEMA_UPDATE_ACTIVITY = vol.Schema(
         vol.Optional("end_date"): vol.Coerce(int),
         vol.Optional("total_steps"): vol.Coerce(int),
         vol.Optional("current_step"): vol.Coerce(int),
-        vol.Optional("severity"): vol.In(["critical", "warning", "info"]),
+        vol.Optional("severity"): vol.In(SEVERITIES),
         vol.Optional("completion_message"): str,
     }
 )
 
 SCHEMA_CREATE_ACTIVITY = vol.Schema(
     {
-        vol.Required("slug"): str,
+        vol.Required("slug"): validate_slug,
         vol.Required("name"): str,
         vol.Optional("priority", default=DEFAULT_PRIORITY): vol.Coerce(int),
         vol.Optional("ended_ttl"): vol.Coerce(int),
@@ -81,14 +83,14 @@ SCHEMA_CREATE_ACTIVITY = vol.Schema(
 
 SCHEMA_END_ACTIVITY = vol.Schema(
     {
-        vol.Required("slug"): str,
+        vol.Required("slug"): validate_slug,
         vol.Optional("completion_message"): str,
     }
 )
 
 SCHEMA_DELETE_ACTIVITY = vol.Schema(
     {
-        vol.Required("slug"): str,
+        vol.Required("slug"): validate_slug,
     }
 )
 
@@ -171,7 +173,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await api.validate_connection()
     except PushWardAuthError as err:
         raise ConfigEntryAuthFailed(f"Invalid integration key: {err}") from err
-    except Exception as err:
+    except (PushWardApiError, aiohttp.ClientError, TimeoutError, OSError) as err:
         raise ConfigEntryNotReady(f"Cannot connect to PushWard: {err}") from err
 
     entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]

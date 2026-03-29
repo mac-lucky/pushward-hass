@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import logging
-import re
 from collections.abc import Mapping
 from typing import Any
 
+import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
@@ -30,7 +30,7 @@ from homeassistant.helpers.selector import (
     TextSelectorType,
 )
 
-from .api import PushWardApiClient, PushWardAuthError
+from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
@@ -64,9 +64,14 @@ from .const import (
     DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    PRIORITY_MAX,
+    PRIORITY_MIN,
     SEVERITIES,
     SUBENTRY_TYPE_ENTITY,
     TEMPLATES,
+    TOTAL_STEPS_MAX,
+    UPDATE_INTERVAL_MIN,
+    normalize_slug,
     validate_url,
 )
 from .content_mapper import get_domain_defaults, sanitize_slug
@@ -79,7 +84,6 @@ _INTEGRATION_KEY_SCHEMA = vol.Schema(
     }
 )
 
-# TTL constraints
 _TTL_MIN = 1
 _TTL_MAX = 2592000  # 30 days
 
@@ -100,8 +104,8 @@ async def _validate_integration_key(
         await client.validate_connection()
     except PushWardAuthError:
         return {"base": "invalid_auth"}
-    except Exception:
-        _LOGGER.exception("Unexpected error during PushWard %s", context)
+    except (PushWardApiError, aiohttp.ClientError, TimeoutError, OSError) as err:
+        _LOGGER.warning("PushWard %s failed: %s", context, err)
         return {"base": "cannot_connect"}
     return {}
 
@@ -254,7 +258,7 @@ def _details_schema(
                 CONF_TOTAL_STEPS,
                 default=d.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
             )
-        ] = vol.All(vol.Coerce(int), vol.Range(min=1, max=20))
+        ] = vol.All(vol.Coerce(int), vol.Range(min=1, max=TOTAL_STEPS_MAX))
         fields[
             vol.Optional(
                 CONF_CURRENT_STEP_ATTR,
@@ -299,13 +303,13 @@ def _details_schema(
             CONF_PRIORITY,
             default=d.get(CONF_PRIORITY, DEFAULT_PRIORITY),
         )
-    ] = vol.All(vol.Coerce(int), vol.Range(min=0, max=10))
+    ] = vol.All(vol.Coerce(int), vol.Range(min=PRIORITY_MIN, max=PRIORITY_MAX))
     fields[
         vol.Optional(
             CONF_UPDATE_INTERVAL,
             default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         )
-    ] = vol.All(vol.Coerce(int), vol.Range(min=1))
+    ] = vol.All(vol.Coerce(int), vol.Range(min=UPDATE_INTERVAL_MIN))
 
     # --- Optional fields ---
     fields[
@@ -369,13 +373,7 @@ def _parse_entity_input(user_input: dict) -> dict:
     """Normalize user input into an entity config dict."""
     entity_id = user_input[CONF_ENTITY_ID]
     raw_slug = user_input.get(CONF_SLUG, "").strip()
-    slug = ""
-    if raw_slug:
-        slug = raw_slug.lower().replace(".", "-").replace("_", "-")
-        slug = re.sub(r"[^a-z0-9-]", "", slug)
-        slug = re.sub(r"-+", "-", slug).strip("-")
-    if not slug:
-        slug = sanitize_slug(entity_id)
+    slug = (normalize_slug(raw_slug) if raw_slug else "") or sanitize_slug(entity_id)
 
     domain = entity_id.split(".")[0] if "." in entity_id else ""
     defaults = get_domain_defaults(domain)

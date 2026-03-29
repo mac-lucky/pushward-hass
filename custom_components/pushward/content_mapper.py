@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import re
+import logging
 import time
 
 from homeassistant.core import State
@@ -32,23 +32,18 @@ from .const import (
     DEFAULT_TOTAL_STEPS,
     DEVICE_CLASS_ICONS,
     DOMAIN_DEFAULTS,
+    normalize_slug,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def sanitize_slug(entity_id: str) -> str:
     """Convert an HA entity_id to a PushWard slug.
 
-    sensor.washing_machine_status -> ha-washing-machine-status
+    sensor.washing_machine_status -> ha-sensor-washing-machine-status
     """
-    # Remove domain prefix (e.g. "sensor.")
-    slug = entity_id.replace(".", "-", 1) if "." in entity_id else entity_id
-    # Replace underscores with hyphens
-    slug = slug.replace("_", "-")
-    # Remove any non-alphanumeric characters except hyphens
-    slug = re.sub(r"[^a-z0-9-]", "", slug.lower())
-    # Collapse multiple hyphens
-    slug = re.sub(r"-+", "-", slug).strip("-")
-    return f"ha-{slug}"
+    return f"ha-{normalize_slug(entity_id)}"
 
 
 def _color_to_str(value: object) -> str:
@@ -66,7 +61,10 @@ def _color_to_str(value: object) -> str:
         if len(value) == 2:
             a, b_val = float(value[0]), float(value[1])
             if a <= 1.0 and b_val <= 1.0:
-                # xy_color (CIE 1931, both 0.0-1.0)
+                # Heuristic: values in 0.0-1.0 range → CIE XY color.
+                # HS would need hue ≤ 1° and sat ≤ 1% (near-white), which is
+                # unrealistic in practice. Users map to typed HA attributes
+                # (xy_color / hs_color) anyway.
                 r, g, b = color_xy_to_RGB(a, b_val)
             else:
                 # hs_color (hue 0-360, saturation 0-100)
@@ -255,6 +253,7 @@ def _get_progress(state: State, entity_config: dict) -> float:
         scale = 255.0 if attr_name in _ATTRS_0_255 else 100.0
         return max(0.0, min(1.0, value / scale))
     except (ValueError, TypeError):
+        _LOGGER.debug("Could not parse progress attribute %s for %s", attr_name, state.entity_id)
         return 0.0
 
 
@@ -268,6 +267,7 @@ def _get_current_step(state: State, entity_config: dict) -> int:
         value = int(state.attributes.get(attr_name, 0))
         return max(0, min(total, value))
     except (ValueError, TypeError):
+        _LOGGER.debug("Could not parse current_step attribute %s for %s", attr_name, state.entity_id)
         return 0
 
 
@@ -279,4 +279,5 @@ def _get_remaining_time(state: State, entity_config: dict) -> int | None:
     try:
         return int(state.attributes.get(attr_name, 0))
     except (ValueError, TypeError):
+        _LOGGER.debug("Could not parse remaining_time attribute %s for %s", attr_name, state.entity_id)
         return None

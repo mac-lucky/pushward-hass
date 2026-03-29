@@ -1,5 +1,6 @@
 """Constants for the PushWard integration."""
 
+import re
 from urllib.parse import urlparse
 
 import voluptuous as vol
@@ -43,6 +44,12 @@ DEFAULT_UPDATE_INTERVAL = 5
 DEFAULT_TOTAL_STEPS = 1
 DEFAULT_SEVERITY = "info"
 
+# Validation ranges
+PRIORITY_MIN = 0
+PRIORITY_MAX = 10
+TOTAL_STEPS_MAX = 20
+UPDATE_INTERVAL_MIN = 1
+
 # Alert severities
 SEVERITIES = ["critical", "warning", "info"]
 
@@ -54,7 +61,6 @@ MAX_RETRIES = 5
 RETRY_BASE_DELAY = 1  # seconds
 RETRY_MAX_DELAY = 30  # seconds
 
-# End activity delay (two-phase end)
 END_DELAY_SECONDS = 5
 
 # Domain-based defaults for entity configuration
@@ -242,3 +248,20 @@ def validate_url(value: str) -> str:
     if not parsed.netloc:
         raise vol.Invalid("URL must include a host")
     return value
+
+
+_SLUG_RE = re.compile(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$")
+
+
+def validate_slug(value: str) -> str:
+    """Validate slug contains only lowercase alphanumeric and hyphens."""
+    if not isinstance(value, str) or not _SLUG_RE.match(value):
+        raise vol.Invalid("Slug must contain only lowercase letters, numbers, and hyphens")
+    return value
+
+
+def normalize_slug(raw: str) -> str:
+    """Normalize a raw string into a valid slug (lowercase, alphanumeric + hyphens)."""
+    slug = raw.lower().replace(".", "-").replace("_", "-").replace(" ", "-")
+    slug = re.sub(r"[^a-z0-9-]", "", slug)
+    return re.sub(r"-+", "-", slug).strip("-")

@@ -12,6 +12,8 @@ from .const import MAX_RETRIES, RETRY_BASE_DELAY, RETRY_MAX_DELAY
 
 _LOGGER = logging.getLogger(__name__)
 
+_TIMEOUT = aiohttp.ClientTimeout(total=30)
+
 
 class PushWardApiError(Exception):
     """PushWard API error."""
@@ -48,6 +50,7 @@ class PushWardApiClient:
             async with self._session.get(
                 f"{self._base_url}/auth/me",
                 headers=self._headers,
+                timeout=_TIMEOUT,
             ) as resp:
                 if resp.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
                     raise PushWardAuthError("Invalid integration key", status_code=resp.status)
@@ -112,7 +115,9 @@ class PushWardApiClient:
 
         for attempt in range(MAX_RETRIES):
             try:
-                async with self._session.request(method, url, headers=self._headers, json=json) as resp:
+                async with self._session.request(
+                    method, url, headers=self._headers, json=json, timeout=_TIMEOUT
+                ) as resp:
                     if resp.ok:
                         return
 

@@ -3,6 +3,7 @@
 from unittest.mock import patch
 
 import pytest
+import voluptuous as vol
 
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
@@ -20,6 +21,8 @@ from custom_components.pushward.const import (
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
     CONF_URL,
+    normalize_slug,
+    validate_slug,
 )
 from custom_components.pushward.content_mapper import (
     _add_url_deeplinks,
@@ -47,6 +50,63 @@ from .conftest import make_mock_state as _make_state
 )
 def test_sanitize_slug(entity_id: str, expected: str):
     assert sanitize_slug(entity_id) == expected
+
+
+# --- normalize_slug ---
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("my-slug", "my-slug"),
+        ("My Custom Slug", "my-custom-slug"),
+        ("sensor.washer_status", "sensor-washer-status"),
+        ("UPPER_CASE.dots", "upper-case-dots"),
+        ("a--b", "a-b"),
+        ("---leading-trailing---", "leading-trailing"),
+        ("special!@#chars$%^", "specialchars"),
+        ("", ""),
+        ("!!!", ""),
+    ],
+)
+def test_normalize_slug(raw: str, expected: str):
+    assert normalize_slug(raw) == expected
+
+
+# --- validate_slug ---
+
+
+@pytest.mark.parametrize(
+    "slug",
+    [
+        "ha-washer",
+        "my-activity-slug",
+        "a",
+        "abc123",
+        "a1b2c3",
+    ],
+)
+def test_validate_slug_accepts_valid(slug: str):
+    assert validate_slug(slug) == slug
+
+
+@pytest.mark.parametrize(
+    "slug",
+    [
+        "../admin",
+        "../../other-path",
+        "UPPERCASE",
+        "has spaces",
+        "",
+        "-leading-hyphen",
+        "trailing-hyphen-",
+        "special!chars",
+        "a/b",
+    ],
+)
+def test_validate_slug_rejects_invalid(slug: str):
+    with pytest.raises(vol.Invalid):
+        validate_slug(slug)
 
 
 # --- map_content ---

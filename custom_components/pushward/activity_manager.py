@@ -7,8 +7,8 @@ import logging
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import datetime
 from functools import partial
-from typing import Any
 
 import aiohttp
 from homeassistant.config_entries import ConfigEntry
@@ -246,7 +246,7 @@ class ActivityManager:
             _LOGGER.warning("Failed to update activity %s", slug, exc_info=True)
 
     @callback
-    def _flush_update(self, entity_id: str, _now: Any = None) -> None:
+    def _flush_update(self, entity_id: str, _now: datetime | None = None) -> None:
         """Fire a pending throttled update."""
         tracked = self._tracked.get(entity_id)
         if tracked is None:

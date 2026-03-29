@@ -14,7 +14,10 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import (
+    _hex_to_rgb,
+    _parse_csv,
     _parse_state_labels,
+    _rgb_to_hex,
     _validate_integration_key,
 )
 from custom_components.pushward.const import (
@@ -706,6 +709,53 @@ async def test_subentry_reconfigure(hass: HomeAssistant) -> None:
 def test_parse_state_labels(raw: str, expected: dict) -> None:
     """Test _parse_state_labels parses various inputs correctly."""
     assert _parse_state_labels(raw) == expected
+
+
+@pytest.mark.parametrize(
+    ("hex_color", "expected"),
+    [
+        ("#ff8040", [255, 128, 64]),
+        ("#000000", [0, 0, 0]),
+        ("#ffffff", [255, 255, 255]),
+        ("", None),
+        ("#xyz", None),
+        ("ff8040", None),
+        ("#ff80", None),
+    ],
+)
+def test_hex_to_rgb(hex_color: str, expected: list[int] | None) -> None:
+    """Test _hex_to_rgb converts hex strings to RGB lists."""
+    assert _hex_to_rgb(hex_color) == expected
+
+
+@pytest.mark.parametrize(
+    ("rgb", "expected"),
+    [
+        ([255, 128, 64], "#ff8040"),
+        ([0, 0, 0], "#000000"),
+        (None, ""),
+        ([1, 2], ""),
+        ("not a list", ""),
+    ],
+)
+def test_rgb_to_hex(rgb: list[int] | None, expected: str) -> None:
+    """Test _rgb_to_hex converts RGB lists to hex strings."""
+    assert _rgb_to_hex(rgb) == expected
+
+
+@pytest.mark.parametrize(
+    ("csv_str", "expected"),
+    [
+        ("a, b, c", ["a", "b", "c"]),
+        ("", []),
+        ("  one  ,  two  ", ["one", "two"]),
+        (",,,", []),
+        ("single", ["single"]),
+    ],
+)
+def test_parse_csv(csv_str: str, expected: list[str]) -> None:
+    """Test _parse_csv splits and strips comma-separated values."""
+    assert _parse_csv(csv_str) == expected
 
 
 # --- New field tests (two-step) ---
