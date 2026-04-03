@@ -66,7 +66,36 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Build changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          mode: "COMMIT"
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}\n#{{UNCATEGORIZED}}",
+              "categories": [
+                { "title": "### Features",      "labels": ["feat"] },
+                { "title": "### Bug Fixes",     "labels": ["fix"] },
+                { "title": "### Refactoring",   "labels": ["refactor"] },
+                { "title": "### Documentation", "labels": ["docs"] },
+                { "title": "### CI/CD",         "labels": ["ci"] },
+                { "title": "### Chores",        "labels": ["chore", "style", "perf", "test", "build"] }
+              ],
+              "label_extractor": [
+                {
+                  "pattern": "^(feat|fix|refactor|docs|ci|chore|perf|style|test|build)(\\(.+\\))?(!)?: .+",
+                  "on_property": "title",
+                  "target": "$1"
+                }
+              ]
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --notes ""
+          CHANGELOG: ${{ steps.changelog.outputs.changelog }}
+        run: gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --notes "$CHANGELOG"
