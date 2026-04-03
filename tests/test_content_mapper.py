@@ -886,7 +886,9 @@ def test_map_content_fallback_icon_when_no_icon_anywhere():
 def test_add_url_deeplinks_both_urls():
     """Both URLs are added when present."""
     content: dict = {}
-    _add_url_deeplinks(content, {CONF_TEMPLATE: "steps", CONF_URL: "https://a.com", CONF_SECONDARY_URL: "https://b.com"})
+    _add_url_deeplinks(
+        content, {CONF_TEMPLATE: "steps", CONF_URL: "https://a.com", CONF_SECONDARY_URL: "https://b.com"}
+    )
     assert content["url"] == "https://a.com"
     assert content["secondary_url"] == "https://b.com"
 
@@ -911,11 +913,14 @@ def test_add_url_deeplinks_skipped_for_non_link_templates():
     """URLs are not added for gauge, generic, or countdown templates."""
     for template in ("generic", "gauge", "countdown"):
         content: dict = {}
-        _add_url_deeplinks(content, {
-            CONF_TEMPLATE: template,
-            CONF_URL: "https://example.com",
-            CONF_SECONDARY_URL: "https://example.com/secondary",
-        })
+        _add_url_deeplinks(
+            content,
+            {
+                CONF_TEMPLATE: template,
+                CONF_URL: "https://example.com",
+                CONF_SECONDARY_URL: "https://example.com/secondary",
+            },
+        )
         assert "url" not in content
         assert "secondary_url" not in content
 
