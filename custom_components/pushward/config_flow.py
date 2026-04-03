@@ -210,6 +210,8 @@ def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
 
     if domain == "timer":
         return "countdown"
+    if domain == "light":
+        return "gauge"
 
     state_obj = hass.states.get(entity_id)
     if state_obj is None:
@@ -384,7 +386,7 @@ def _details_schema(
             CONF_ICON,
             description={"suggested_value": d.get(CONF_ICON, "")},
         )
-    ] = IconSelector(IconSelectorConfig(placeholder="mdi:bell"))
+    ] = IconSelector(IconSelectorConfig())
     fields[
         vol.Optional(
             CONF_ICON_ATTRIBUTE,

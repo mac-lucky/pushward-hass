@@ -923,6 +923,24 @@ def test_map_content_gauge_with_value_attribute():
     assert content["progress"] == pytest.approx(0.45)
 
 
+def test_map_content_gauge_brightness_rescaled():
+    """Brightness (0-255) is rescaled to 0-100 for gauge."""
+    state = _make_state("on", {"friendly_name": "Lamp", "brightness": 138})
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "lightbulb.fill",
+        CONF_VALUE_ATTRIBUTE: "brightness",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+    }
+
+    content = map_content(state, config)
+
+    # 138/255 * 100 ≈ 54.1
+    assert content["value"] == pytest.approx(54.1, abs=0.1)
+    assert content["progress"] == pytest.approx(0.541, abs=0.001)
+
+
 def test_map_content_gauge_reads_state_when_no_attribute():
     """Gauge template falls back to entity state as float value."""
     state = _make_state("75.0", {"friendly_name": "Battery"})

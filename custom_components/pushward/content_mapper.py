@@ -319,14 +319,18 @@ def _get_gauge_value(state: State, entity_config: dict) -> float:
 
     When value_attribute is configured, reads from that attribute.
     Otherwise falls back to the entity's primary state.
+    Attributes in the 0-255 range (e.g. brightness) are rescaled to 0-100.
     """
     attr_name = entity_config.get(CONF_VALUE_ATTRIBUTE)
     if attr_name:
         try:
-            return float(state.attributes.get(attr_name, 0))
+            value = float(state.attributes.get(attr_name, 0))
         except (ValueError, TypeError):
             _LOGGER.debug("Could not parse gauge value attribute %s for %s", attr_name, state.entity_id)
             return 0.0
+        if attr_name in _ATTRS_0_255:
+            value = value / 255.0 * 100.0
+        return value
     try:
         return float(state.state)
     except (ValueError, TypeError):

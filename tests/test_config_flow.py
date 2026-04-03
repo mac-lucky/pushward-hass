@@ -814,6 +814,24 @@ async def test_subentry_suggests_gauge_for_measurement_sensor(hass: HomeAssistan
     assert result["step_id"] == "details"
 
 
+async def test_subentry_suggests_gauge_for_light(hass: HomeAssistant) -> None:
+    """Light domain auto-suggests gauge template."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set("light.lamp", "on", {"friendly_name": "Lamp", "brightness": 128})
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "light.lamp", CONF_TEMPLATE: "generic"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "user"
+
+
 async def test_subentry_suggests_countdown_for_timer(hass: HomeAssistant) -> None:
     """Timer domain auto-suggests countdown template."""
     entry = _mock_entry()
