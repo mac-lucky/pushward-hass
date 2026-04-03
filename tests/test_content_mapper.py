@@ -12,6 +12,8 @@ from custom_components.pushward.const import (
     CONF_CURRENT_STEP_ATTR,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_MAX_VALUE,
+    CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
     CONF_SECONDARY_URL,
@@ -20,7 +22,9 @@ from custom_components.pushward.const import (
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
+    CONF_UNIT,
     CONF_URL,
+    CONF_VALUE_ATTRIBUTE,
     normalize_slug,
     validate_slug,
 )
@@ -893,3 +897,126 @@ def test_add_url_deeplinks_both_empty():
     _add_url_deeplinks(content, {CONF_URL: "", CONF_SECONDARY_URL: ""})
     assert "url" not in content
     assert "secondary_url" not in content
+
+
+# --- gauge template ---
+
+
+def test_map_content_gauge_with_value_attribute():
+    """Gauge template reads value from entity attribute."""
+    state = _make_state("22.5", {"friendly_name": "Thermometer", "temperature": 22.5})
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "thermometer",
+        CONF_VALUE_ATTRIBUTE: "temperature",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 50.0,
+        CONF_UNIT: "\u00b0C",
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == 22.5
+    assert content["min_value"] == 0.0
+    assert content["max_value"] == 50.0
+    assert content["unit"] == "\u00b0C"
+    assert content["progress"] == pytest.approx(0.45)
+
+
+def test_map_content_gauge_reads_state_when_no_attribute():
+    """Gauge template falls back to entity state as float value."""
+    state = _make_state("75.0", {"friendly_name": "Battery"})
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "battery.50",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == 75.0
+    assert content["progress"] == 0.75
+
+
+def test_map_content_gauge_clamps_value():
+    """Gauge value is clamped to min/max range."""
+    state = _make_state("150", {"friendly_name": "Sensor"})
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "gauge",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == 100.0
+    assert content["progress"] == 1.0
+
+
+def test_map_content_gauge_unit_omitted_when_empty():
+    """Unit field is not included in content when empty."""
+    state = _make_state("50", {"friendly_name": "Sensor"})
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "gauge",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+        CONF_UNIT: "",
+    }
+
+    content = map_content(state, config)
+
+    assert "unit" not in content
+
+
+def test_map_content_gauge_negative_range():
+    """Gauge with range crossing zero works correctly."""
+    state = _make_state("-5", {"friendly_name": "Outdoor Temp"})
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "thermometer",
+        CONF_MIN_VALUE: -20.0,
+        CONF_MAX_VALUE: 40.0,
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == -5.0
+    assert content["progress"] == pytest.approx(0.25)  # (-5 - -20) / (40 - -20) = 15/60
+
+
+def test_map_content_gauge_equal_min_max():
+    """Degenerate gauge (min == max) doesn't crash and sets progress 1.0."""
+    state = _make_state("50", {"friendly_name": "Sensor"})
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "gauge",
+        CONF_MIN_VALUE: 50.0,
+        CONF_MAX_VALUE: 50.0,
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == 50.0
+    assert content["progress"] == 1.0
+
+
+def test_map_completion_content_gauge():
+    """Gauge completion content sets value to max."""
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "gauge",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+        CONF_UNIT: "%",
+    }
+
+    content = map_completion_content(config)
+
+    assert content["value"] == 100.0
+    assert content["min_value"] == 0.0
+    assert content["max_value"] == 100.0
+    assert content["unit"] == "%"
+    assert content["progress"] == 1.0

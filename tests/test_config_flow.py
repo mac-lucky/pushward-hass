@@ -30,6 +30,8 @@ from custom_components.pushward.const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
+    CONF_MAX_VALUE,
+    CONF_MIN_VALUE,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
@@ -42,8 +44,10 @@ from custom_components.pushward.const import (
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
+    CONF_UNIT,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
+    CONF_VALUE_ATTRIBUTE,
     DEFAULT_SERVER_URL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
@@ -83,6 +87,11 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
         data[CONF_CURRENT_STEP_ATTR] = ""
     if template == "alert":
         data[CONF_SEVERITY] = "info"
+    if template == "gauge":
+        data[CONF_VALUE_ATTRIBUTE] = ""
+        data[CONF_MIN_VALUE] = 0.0
+        data[CONF_MAX_VALUE] = 100.0
+        data[CONF_UNIT] = ""
 
     # Identity fields
     data[CONF_SLUG] = "ha-washer"
@@ -648,6 +657,84 @@ async def test_subentry_countdown_shows_remaining_time(hass: HomeAssistant) -> N
     assert CONF_SEVERITY not in schema_keys
 
 
+async def test_subentry_add_gauge_entity(hass: HomeAssistant) -> None:
+    """Test adding a gauge entity persists min/max/unit/value_attribute."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="gauge",
+        details_overrides={
+            CONF_VALUE_ATTRIBUTE: "temperature",
+            CONF_MIN_VALUE: -10.0,
+            CONF_MAX_VALUE: 50.0,
+            CONF_UNIT: "\u00b0C",
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_TEMPLATE] == "gauge"
+    assert subentries[0].data[CONF_MIN_VALUE] == -10.0
+    assert subentries[0].data[CONF_MAX_VALUE] == 50.0
+    assert subentries[0].data[CONF_UNIT] == "\u00b0C"
+    assert subentries[0].data[CONF_VALUE_ATTRIBUTE] == "temperature"
+
+
+async def test_subentry_gauge_rejects_min_gte_max(hass: HomeAssistant) -> None:
+    """Test that gauge rejects min_value >= max_value and re-shows the form."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "gauge"}),
+    )
+    assert result["step_id"] == "details"
+
+    # Submit with min >= max
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("gauge", **{CONF_MIN_VALUE: 100.0, CONF_MAX_VALUE: 50.0}),
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "details"
+    assert CONF_MIN_VALUE in result["errors"]
+
+
+async def test_subentry_gauge_shows_gauge_fields(hass: HomeAssistant) -> None:
+    """Test that gauge template shows value/min/max/unit but not steps/alert fields."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "gauge"}),
+    )
+    assert result["step_id"] == "details"
+
+    schema_keys = {str(k) for k in result["data_schema"].schema}
+    assert CONF_VALUE_ATTRIBUTE in schema_keys
+    assert CONF_MIN_VALUE in schema_keys
+    assert CONF_MAX_VALUE in schema_keys
+    assert CONF_UNIT in schema_keys
+    # Should NOT show other template fields
+    assert CONF_TOTAL_STEPS not in schema_keys
+    assert CONF_CURRENT_STEP_ATTR not in schema_keys
+    assert CONF_SEVERITY not in schema_keys
+    assert CONF_PROGRESS_ATTRIBUTE not in schema_keys
+    assert CONF_REMAINING_TIME_ATTR not in schema_keys
+
+
 async def test_subentry_duplicate_entity_aborts(hass: HomeAssistant) -> None:
     """Test that adding the same entity twice is aborted."""
     entry = _mock_entry(subentries_data=[_entity_subentry_data()])
@@ -691,6 +778,126 @@ async def test_subentry_reconfigure(hass: HomeAssistant) -> None:
     subentry = entry.subentries[subentry_id]
     assert subentry.data[CONF_ACTIVITY_NAME] == "My Washer"
     assert subentry.data[CONF_PRIORITY] == 5
+
+
+# --- Template auto-suggestion tests ---
+
+
+async def test_subentry_suggests_gauge_for_measurement_sensor(hass: HomeAssistant) -> None:
+    """Submitting generic for a measurement sensor re-shows step 1 with gauge suggested."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set(
+        "sensor.temperature",
+        "22.5",
+        {"device_class": "temperature", "state_class": "measurement", "friendly_name": "Temp"},
+    )
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    # Submit step 1 with default generic
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_TEMPLATE: "generic"},
+    )
+    # Should re-show step 1 with gauge suggested
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "user"
+
+    # Accept suggestion
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_TEMPLATE: "gauge"},
+    )
+    assert result["step_id"] == "details"
+
+
+async def test_subentry_suggests_countdown_for_timer(hass: HomeAssistant) -> None:
+    """Timer domain auto-suggests countdown template."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set("timer.tea", "idle", {"friendly_name": "Tea Timer"})
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "timer.tea", CONF_TEMPLATE: "generic"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "user"
+
+
+async def test_subentry_no_suggestion_when_non_generic(hass: HomeAssistant) -> None:
+    """User explicitly picking a non-generic template skips suggestion."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set(
+        "sensor.temperature",
+        "22.5",
+        {"device_class": "temperature", "state_class": "measurement"},
+    )
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    # User explicitly picks alert — should go straight to details
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_TEMPLATE: "alert"},
+    )
+    assert result["step_id"] == "details"
+
+
+async def test_subentry_no_suggestion_for_binary_sensor(hass: HomeAssistant) -> None:
+    """binary_sensor has no better suggestion — goes straight to details."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set("binary_sensor.door", "off", {"friendly_name": "Door"})
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "binary_sensor.door", CONF_TEMPLATE: "generic"},
+    )
+    assert result["step_id"] == "details"
+
+
+async def test_subentry_suggestion_only_offered_once(hass: HomeAssistant) -> None:
+    """User overrides suggestion back to generic — proceeds without loop."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set(
+        "sensor.temp",
+        "22.5",
+        {"device_class": "temperature", "state_class": "measurement"},
+    )
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    # First submit: generic → re-show with gauge
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temp", CONF_TEMPLATE: "generic"},
+    )
+    assert result["step_id"] == "user"
+
+    # Second submit: override back to generic → should proceed (no infinite loop)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temp", CONF_TEMPLATE: "generic"},
+    )
+    assert result["step_id"] == "details"
 
 
 # --- State labels parsing ---

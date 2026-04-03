@@ -43,6 +43,10 @@ _CONTENT_FIELDS = [
     "current_step",
     "severity",
     "completion_message",
+    "value",
+    "min_value",
+    "max_value",
+    "unit",
 ]
 
 SERVICE_UPDATE_ACTIVITY = "update_activity"
@@ -68,6 +72,10 @@ SCHEMA_UPDATE_ACTIVITY = vol.Schema(
         vol.Optional("current_step"): vol.Coerce(int),
         vol.Optional("severity"): vol.In(SEVERITIES),
         vol.Optional("completion_message"): str,
+        vol.Optional("value"): vol.Coerce(float),
+        vol.Optional("min_value"): vol.Coerce(float),
+        vol.Optional("max_value"): vol.Coerce(float),
+        vol.Optional("unit"): str,
     }
 )
 

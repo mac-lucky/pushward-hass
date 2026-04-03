@@ -19,6 +19,8 @@ from .const import (
     CONF_CURRENT_STEP_ATTR,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_MAX_VALUE,
+    CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
     CONF_SECONDARY_URL,
@@ -27,7 +29,11 @@ from .const import (
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
+    CONF_UNIT,
     CONF_URL,
+    CONF_VALUE_ATTRIBUTE,
+    DEFAULT_MAX_VALUE,
+    DEFAULT_MIN_VALUE,
     DEFAULT_SEVERITY,
     DEFAULT_TOTAL_STEPS,
     DEVICE_CLASS_ICONS,
@@ -189,6 +195,15 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
             content["progress"] = max(0.0, min(1.0, current / total))
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
+    elif template == "gauge":
+        min_val, max_val = _gauge_base_fields(content, entity_config)
+        value = _get_gauge_value(state, entity_config)
+        value = max(min_val, min(max_val, value))
+        content["value"] = value
+        if max_val > min_val:
+            content["progress"] = (value - min_val) / (max_val - min_val)
+        else:
+            content["progress"] = 1.0
 
     return content
 
@@ -224,8 +239,24 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         content["progress"] = 1.0
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
+    elif template == "gauge":
+        _, max_val = _gauge_base_fields(content, entity_config)
+        content["value"] = max_val
+        content["progress"] = 1.0
 
     return content
+
+
+def _gauge_base_fields(content: dict, entity_config: dict) -> tuple[float, float]:
+    """Set shared gauge fields (min_value, max_value, unit) on content and return the range."""
+    min_val = entity_config.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE)
+    max_val = entity_config.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE)
+    content["min_value"] = min_val
+    content["max_value"] = max_val
+    unit = entity_config.get(CONF_UNIT, "")
+    if unit:
+        content["unit"] = unit
+    return min_val, max_val
 
 
 def get_domain_defaults(domain: str) -> dict:
@@ -281,3 +312,23 @@ def _get_remaining_time(state: State, entity_config: dict) -> int | None:
     except (ValueError, TypeError):
         _LOGGER.debug("Could not parse remaining_time attribute %s for %s", attr_name, state.entity_id)
         return None
+
+
+def _get_gauge_value(state: State, entity_config: dict) -> float:
+    """Extract gauge value from entity attribute or state.
+
+    When value_attribute is configured, reads from that attribute.
+    Otherwise falls back to the entity's primary state.
+    """
+    attr_name = entity_config.get(CONF_VALUE_ATTRIBUTE)
+    if attr_name:
+        try:
+            return float(state.attributes.get(attr_name, 0))
+        except (ValueError, TypeError):
+            _LOGGER.debug("Could not parse gauge value attribute %s for %s", attr_name, state.entity_id)
+            return 0.0
+    try:
+        return float(state.state)
+    except (ValueError, TypeError):
+        _LOGGER.debug("Could not parse entity state as gauge value for %s", state.entity_id)
+        return 0.0

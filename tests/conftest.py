@@ -17,6 +17,8 @@ from custom_components.pushward.const import (
     CONF_ENTITY_ID,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_MAX_VALUE,
+    CONF_MIN_VALUE,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
@@ -29,8 +31,10 @@ from custom_components.pushward.const import (
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
+    CONF_UNIT,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
+    CONF_VALUE_ATTRIBUTE,
 )
 
 
@@ -61,6 +65,10 @@ def make_entity_config(**overrides) -> dict:
         CONF_TOTAL_STEPS: 1,
         CONF_CURRENT_STEP_ATTR: "",
         CONF_SEVERITY: "info",
+        CONF_VALUE_ATTRIBUTE: "",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+        CONF_UNIT: "",
         CONF_ACCENT_COLOR: "",
         CONF_ACCENT_COLOR_ATTRIBUTE: "",
         CONF_URL: "",

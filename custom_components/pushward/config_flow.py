@@ -43,6 +43,8 @@ from .const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
+    CONF_MAX_VALUE,
+    CONF_MIN_VALUE,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
@@ -56,8 +58,12 @@ from .const import (
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
     CONF_TOTAL_STEPS,
+    CONF_UNIT,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
+    CONF_VALUE_ATTRIBUTE,
+    DEFAULT_MAX_VALUE,
+    DEFAULT_MIN_VALUE,
     DEFAULT_PRIORITY,
     DEFAULT_SERVER_URL,
     DEFAULT_SEVERITY,
@@ -110,6 +116,11 @@ async def _validate_integration_key(
     return {}
 
 
+def _entity_domain(entity_id: str) -> str:
+    """Extract the domain from an entity_id (e.g. 'sensor.temp' -> 'sensor')."""
+    return entity_id.split(".")[0] if "." in entity_id else ""
+
+
 def _entity_template_schema(defaults: dict | None = None) -> vol.Schema:
     """Build step-1 schema: entity picker + template."""
     d = defaults or {}
@@ -157,6 +168,63 @@ def _collect_entity_states(hass: HomeAssistant | None, entity_id: str, domain: s
     return states
 
 
+# Device classes where gauge is the natural template.
+_GAUGE_DEVICE_CLASSES = frozenset(
+    {
+        "temperature",
+        "humidity",
+        "battery",
+        "power",
+        "energy",
+        "voltage",
+        "current",
+        "pressure",
+        "illuminance",
+        "speed",
+        "wind_speed",
+        "signal_strength",
+        "moisture",
+        "pm25",
+        "pm10",
+        "carbon_dioxide",
+        "carbon_monoxide",
+        "distance",
+        "weight",
+        "volume",
+        "data_rate",
+        "data_size",
+        "frequency",
+        "sound_pressure",
+        "irradiance",
+        "precipitation_intensity",
+    }
+)
+
+
+def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
+    """Suggest the best template for an entity based on domain/device_class/state_class."""
+    if not entity_id or hass is None:
+        return "generic"
+
+    domain = _entity_domain(entity_id)
+
+    if domain == "timer":
+        return "countdown"
+
+    state_obj = hass.states.get(entity_id)
+    if state_obj is None:
+        return "generic"
+
+    attrs = state_obj.attributes
+    if domain in ("sensor", "number"):
+        if attrs.get("state_class") in ("measurement", "total"):
+            return "gauge"
+        if attrs.get("device_class", "") in _GAUGE_DEVICE_CLASSES:
+            return "gauge"
+
+    return "generic"
+
+
 def _details_schema(
     entity_id: str,
     template: str,
@@ -165,7 +233,7 @@ def _details_schema(
 ) -> vol.Schema:
     """Build step-2 schema with all config fields and dynamic selectors."""
     d = defaults or {}
-    domain = entity_id.split(".")[0] if "." in entity_id else ""
+    domain = _entity_domain(entity_id)
     domain_defs = get_domain_defaults(domain)
 
     # State options: domain defaults + entity runtime states + previously saved
@@ -277,6 +345,31 @@ def _details_schema(
                 mode=SelectSelectorMode.DROPDOWN,
             )
         )
+    if template == "gauge":
+        fields[
+            vol.Optional(
+                CONF_VALUE_ATTRIBUTE,
+                description={"suggested_value": d.get(CONF_VALUE_ATTRIBUTE, "")},
+            )
+        ] = attr_selector
+        fields[
+            vol.Required(
+                CONF_MIN_VALUE,
+                default=d.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE),
+            )
+        ] = vol.Coerce(float)
+        fields[
+            vol.Required(
+                CONF_MAX_VALUE,
+                default=d.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE),
+            )
+        ] = vol.Coerce(float)
+        fields[
+            vol.Optional(
+                CONF_UNIT,
+                default=d.get(CONF_UNIT, ""),
+            )
+        ] = vol.All(str, vol.Length(max=32))
 
     # --- Identity fields ---
     fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = str
@@ -375,7 +468,7 @@ def _parse_entity_input(user_input: dict) -> dict:
     raw_slug = user_input.get(CONF_SLUG, "").strip()
     slug = (normalize_slug(raw_slug) if raw_slug else "") or sanitize_slug(entity_id)
 
-    domain = entity_id.split(".")[0] if "." in entity_id else ""
+    domain = _entity_domain(entity_id)
     defaults = get_domain_defaults(domain)
 
     start_raw = user_input.get(CONF_START_STATES, [])
@@ -417,6 +510,13 @@ def _parse_entity_input(user_input: dict) -> dict:
     if url_errors:
         raise vol.Invalid("invalid_url", path=list(url_errors.keys()))
 
+    min_v = float(user_input.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE))
+    max_v = float(user_input.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE))
+
+    # Gauge: min must be strictly less than max
+    if user_input.get(CONF_TEMPLATE) == "gauge" and min_v >= max_v:
+        raise vol.Invalid("invalid_gauge_range", path=[CONF_MIN_VALUE])
+
     return {
         CONF_ENTITY_ID: entity_id,
         CONF_SLUG: slug,
@@ -436,6 +536,10 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_TOTAL_STEPS: user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
         CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
         CONF_SEVERITY: user_input.get(CONF_SEVERITY, DEFAULT_SEVERITY),
+        CONF_VALUE_ATTRIBUTE: user_input.get(CONF_VALUE_ATTRIBUTE, ""),
+        CONF_MIN_VALUE: min_v,
+        CONF_MAX_VALUE: max_v,
+        CONF_UNIT: user_input.get(CONF_UNIT, ""),
         CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
         CONF_ACCENT_COLOR_ATTRIBUTE: user_input.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
         CONF_URL: url,
@@ -544,10 +648,26 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         self._step1_input: dict[str, Any] = {}
         self._is_reconfigure: bool = False
         self._details_defaults: dict[str, Any] = {}
+        self._suggestion_offered: bool = False
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
         """Step 1: Entity + template."""
         if user_input is not None:
+            entity_id = user_input[CONF_ENTITY_ID]
+            template = user_input.get(CONF_TEMPLATE, "generic")
+
+            # Suggest a better template if the user left the default
+            if template == "generic" and not self._suggestion_offered:
+                suggested = _suggest_template(self.hass, entity_id)
+                if suggested != "generic":
+                    self._suggestion_offered = True
+                    return self.async_show_form(
+                        step_id="user",
+                        data_schema=_entity_template_schema(
+                            defaults={CONF_ENTITY_ID: entity_id, CONF_TEMPLATE: suggested}
+                        ),
+                    )
+
             self._step1_input = user_input
             self._is_reconfigure = False
             return await self.async_step_details()
@@ -592,7 +712,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
                 entity_cfg = _parse_entity_input(merged)
             except vol.Invalid as exc:
                 for field in exc.path:
-                    errors[field] = "invalid_url"
+                    errors[field] = str(exc.msg)
             else:
                 if self._is_reconfigure:
                     entry = self._get_entry()

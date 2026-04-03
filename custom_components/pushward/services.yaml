@@ -29,6 +29,7 @@ update_activity:
             - "countdown"
             - "steps"
             - "alert"
+            - "gauge"
     progress:
       name: Progress
       description: Progress value between 0.0 and 1.0.
@@ -121,6 +122,36 @@ update_activity:
       name: Completion Message
       description: Message shown when the activity ends.
       example: "Download complete!"
+      selector:
+        text:
+    value:
+      name: Value
+      description: Current gauge value.
+      example: 22.5
+      selector:
+        number:
+          step: 0.1
+          mode: box
+    min_value:
+      name: Min Value
+      description: Minimum gauge value.
+      example: 0
+      selector:
+        number:
+          step: 0.1
+          mode: box
+    max_value:
+      name: Max Value
+      description: Maximum gauge value.
+      example: 100
+      selector:
+        number:
+          step: 0.1
+          mode: box
+    unit:
+      name: Unit
+      description: Display unit for the gauge value.
+      example: "\u00b0C"
       selector:
         text:
 

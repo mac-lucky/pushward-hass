@@ -64,6 +64,22 @@
           "name": "Severity",
           "description": "Alert severity level."
         },
+        "value": {
+          "name": "Value",
+          "description": "Current gauge value."
+        },
+        "min_value": {
+          "name": "Min Value",
+          "description": "Minimum gauge value."
+        },
+        "max_value": {
+          "name": "Max Value",
+          "description": "Maximum gauge value."
+        },
+        "unit": {
+          "name": "Unit",
+          "description": "Display unit for the gauge (e.g. \u00b0C, %)."
+        },
         "completion_message": {
           "name": "Completion Message",
           "description": "Message shown when the activity ends."
@@ -193,6 +209,10 @@
             "total_steps": "Total Steps",
             "current_step_attribute": "Current Step Attribute",
             "severity": "Severity",
+            "value_attribute": "Value Attribute",
+            "min_value": "Minimum Value",
+            "max_value": "Maximum Value",
+            "unit": "Unit",
             "slug": "Activity Slug",
             "activity_name": "Activity Name",
             "icon": "Icon",
@@ -217,6 +237,10 @@
             "total_steps": "Total number of steps.",
             "current_step_attribute": "Entity attribute holding the current step as an integer.",
             "severity": "Alert severity level.",
+            "value_attribute": "Entity attribute holding the current gauge value as a number. Leave empty to use the entity's state.",
+            "min_value": "Minimum value for the gauge range.",
+            "max_value": "Maximum value for the gauge range.",
+            "unit": "Display unit shown next to the value (e.g. \u00b0C, %, kW). Max 32 characters.",
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
             "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
             "icon": "Override icon. Leave empty to use the entity\u2019s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",
@@ -246,7 +270,8 @@
         }
       },
       "error": {
-        "invalid_url": "URL must use http:// or https:// scheme."
+        "invalid_url": "URL must use http:// or https:// scheme.",
+        "invalid_gauge_range": "Minimum value must be less than maximum value."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",

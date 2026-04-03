@@ -36,6 +36,10 @@ CONF_URL = "url"
 CONF_SECONDARY_URL = "secondary_url"
 CONF_ICON_ATTRIBUTE = "icon_attribute"
 CONF_ACCENT_COLOR_ATTRIBUTE = "accent_color_attribute"
+CONF_VALUE_ATTRIBUTE = "value_attribute"
+CONF_MIN_VALUE = "min_value"
+CONF_MAX_VALUE = "max_value"
+CONF_UNIT = "unit"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
@@ -43,6 +47,8 @@ DEFAULT_PRIORITY = 1
 DEFAULT_UPDATE_INTERVAL = 5
 DEFAULT_TOTAL_STEPS = 1
 DEFAULT_SEVERITY = "info"
+DEFAULT_MIN_VALUE = 0.0
+DEFAULT_MAX_VALUE = 100.0
 
 # Validation ranges
 PRIORITY_MIN = 0
@@ -54,7 +60,7 @@ UPDATE_INTERVAL_MIN = 1
 SEVERITIES = ["critical", "warning", "info"]
 
 # Templates
-TEMPLATES = ["generic", "countdown", "alert", "steps"]
+TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge"]
 
 # API retry
 MAX_RETRIES = 5
