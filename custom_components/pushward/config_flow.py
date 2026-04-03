@@ -432,18 +432,19 @@ def _details_schema(
             description={"suggested_value": d.get(CONF_ACCENT_COLOR_ATTRIBUTE, "")},
         )
     ] = attr_selector
-    fields[
-        vol.Optional(
-            CONF_URL,
-            default=d.get(CONF_URL, ""),
-        )
-    ] = str
-    fields[
-        vol.Optional(
-            CONF_SECONDARY_URL,
-            default=d.get(CONF_SECONDARY_URL, ""),
-        )
-    ] = str
+    if template in ("steps", "alert"):
+        fields[
+            vol.Optional(
+                CONF_URL,
+                default=d.get(CONF_URL, ""),
+            )
+        ] = str
+        fields[
+            vol.Optional(
+                CONF_SECONDARY_URL,
+                default=d.get(CONF_SECONDARY_URL, ""),
+            )
+        ] = str
     fields[ended_ttl_key] = NumberSelector(
         NumberSelectorConfig(
             min=_TTL_MIN,

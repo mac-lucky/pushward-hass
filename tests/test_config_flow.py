@@ -106,8 +106,9 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
     data[CONF_STATE_LABELS] = ""
     data[CONF_COMPLETION_MESSAGE] = ""
     data[CONF_ACCENT_COLOR_ATTRIBUTE] = ""
-    data[CONF_URL] = ""
-    data[CONF_SECONDARY_URL] = ""
+    if template in ("steps", "alert"):
+        data[CONF_URL] = ""
+        data[CONF_SECONDARY_URL] = ""
 
     data.update(overrides)
     return data
@@ -1029,6 +1030,7 @@ async def test_subentry_add_entity_with_urls(hass: HomeAssistant) -> None:
     result = await _add_entity_subentry(
         hass,
         entry,
+        template="alert",
         details_overrides={
             CONF_URL: "https://ha.local/lovelace/laundry",
             CONF_SECONDARY_URL: "https://ha.local/lovelace/overview",
@@ -1196,14 +1198,14 @@ async def test_subentry_rejects_invalid_url(hass: HomeAssistant) -> None:
     )
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_core_input(),
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "alert"}),
     )
     assert result["step_id"] == "details"
 
     # Step 2 with invalid URL
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_details_input(**{CONF_URL: "ftp://evil.example.com"}),
+        user_input=_mock_details_input("alert", **{CONF_URL: "ftp://evil.example.com"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_URL: "invalid_url"}
@@ -1221,14 +1223,14 @@ async def test_subentry_rejects_invalid_secondary_url(hass: HomeAssistant) -> No
     )
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_core_input(),
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "alert"}),
     )
     assert result["step_id"] == "details"
 
     # Step 2 with invalid secondary URL
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_details_input(**{CONF_SECONDARY_URL: "ftp://evil.example.com"}),
+        user_input=_mock_details_input("alert", **{CONF_SECONDARY_URL: "ftp://evil.example.com"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_SECONDARY_URL: "invalid_url"}

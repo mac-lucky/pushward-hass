@@ -84,7 +84,9 @@ def _color_to_str(value: object) -> str:
 
 
 def _add_url_deeplinks(content: dict, entity_config: dict) -> None:
-    """Add URL deep-link fields to content when configured."""
+    """Add URL deep-link fields to content when configured (steps/alert only)."""
+    if entity_config.get(CONF_TEMPLATE, "generic") not in ("steps", "alert"):
+        return
     url = entity_config.get(CONF_URL, "")
     if url:
         content["url"] = url

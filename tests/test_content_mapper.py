@@ -531,11 +531,12 @@ def test_map_content_countdown_completion_message(mock_time):
 
 
 def test_map_content_with_urls():
-    """URLs are included in content when configured."""
+    """URLs are included in content when configured (steps template)."""
     state = _make_state("on", {"friendly_name": "Washer"})
     config = {
-        CONF_TEMPLATE: "generic",
+        CONF_TEMPLATE: "steps",
         CONF_ICON: "washer",
+        CONF_TOTAL_STEPS: 3,
         CONF_URL: "https://ha.local/lovelace/laundry",
         CONF_SECONDARY_URL: "https://ha.local/lovelace/overview",
     }
@@ -549,7 +550,13 @@ def test_map_content_with_urls():
 def test_map_content_urls_omitted_when_empty():
     """Empty URLs are not included in content dict."""
     state = _make_state("on", {"friendly_name": "Washer"})
-    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_URL: "", CONF_SECONDARY_URL: ""}
+    config = {
+        CONF_TEMPLATE: "steps",
+        CONF_ICON: "washer",
+        CONF_TOTAL_STEPS: 3,
+        CONF_URL: "",
+        CONF_SECONDARY_URL: "",
+    }
 
     content = map_content(state, config)
 
@@ -560,8 +567,9 @@ def test_map_content_urls_omitted_when_empty():
 def test_map_completion_content_preserves_urls():
     """URLs persist through completion content."""
     config = {
-        CONF_TEMPLATE: "generic",
+        CONF_TEMPLATE: "steps",
         CONF_ICON: "washer",
+        CONF_TOTAL_STEPS: 3,
         CONF_URL: "https://ha.local/lovelace/laundry",
         CONF_SECONDARY_URL: "https://ha.local/lovelace/overview",
     }
@@ -878,7 +886,7 @@ def test_map_content_fallback_icon_when_no_icon_anywhere():
 def test_add_url_deeplinks_both_urls():
     """Both URLs are added when present."""
     content: dict = {}
-    _add_url_deeplinks(content, {CONF_URL: "https://a.com", CONF_SECONDARY_URL: "https://b.com"})
+    _add_url_deeplinks(content, {CONF_TEMPLATE: "steps", CONF_URL: "https://a.com", CONF_SECONDARY_URL: "https://b.com"})
     assert content["url"] == "https://a.com"
     assert content["secondary_url"] == "https://b.com"
 
@@ -886,7 +894,7 @@ def test_add_url_deeplinks_both_urls():
 def test_add_url_deeplinks_one_empty():
     """Only non-empty URL is added."""
     content: dict = {}
-    _add_url_deeplinks(content, {CONF_URL: "https://a.com", CONF_SECONDARY_URL: ""})
+    _add_url_deeplinks(content, {CONF_TEMPLATE: "alert", CONF_URL: "https://a.com", CONF_SECONDARY_URL: ""})
     assert content["url"] == "https://a.com"
     assert "secondary_url" not in content
 
@@ -894,9 +902,22 @@ def test_add_url_deeplinks_one_empty():
 def test_add_url_deeplinks_both_empty():
     """No URLs added when both are empty."""
     content: dict = {}
-    _add_url_deeplinks(content, {CONF_URL: "", CONF_SECONDARY_URL: ""})
+    _add_url_deeplinks(content, {CONF_TEMPLATE: "steps", CONF_URL: "", CONF_SECONDARY_URL: ""})
     assert "url" not in content
     assert "secondary_url" not in content
+
+
+def test_add_url_deeplinks_skipped_for_non_link_templates():
+    """URLs are not added for gauge, generic, or countdown templates."""
+    for template in ("generic", "gauge", "countdown"):
+        content: dict = {}
+        _add_url_deeplinks(content, {
+            CONF_TEMPLATE: template,
+            CONF_URL: "https://example.com",
+            CONF_SECONDARY_URL: "https://example.com/secondary",
+        })
+        assert "url" not in content
+        assert "secondary_url" not in content
 
 
 # --- gauge template ---

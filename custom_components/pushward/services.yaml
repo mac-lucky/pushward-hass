@@ -74,13 +74,13 @@ update_activity:
           mode: box
     url:
       name: URL
-      description: URL to open when the activity is tapped.
+      description: Primary URL displayed as a tappable button. Only supported on steps and alert templates.
       example: "https://example.com"
       selector:
         text:
     secondary_url:
       name: Secondary URL
-      description: Secondary URL for the activity.
+      description: Secondary URL displayed as a second tappable button. Only supported on steps and alert templates.
       example: "https://example.com/details"
       selector:
         text:

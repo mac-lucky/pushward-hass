@@ -42,11 +42,11 @@
         },
         "url": {
           "name": "URL",
-          "description": "URL to open when the activity is tapped."
+          "description": "Primary URL displayed as a tappable button. Only supported on steps and alert templates."
         },
         "secondary_url": {
           "name": "Secondary URL",
-          "description": "Secondary URL for the activity."
+          "description": "Secondary URL displayed as a second tappable button. Only supported on steps and alert templates."
         },
         "end_date": {
           "name": "End Date",
@@ -252,8 +252,8 @@
             "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
             "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
-            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://.",
-            "secondary_url": "Secondary link for the Live Activity.",
+            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://. Steps and alert templates only.",
+            "secondary_url": "Secondary link for the Live Activity. Steps and alert templates only.",
             "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
             "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800"
           }
