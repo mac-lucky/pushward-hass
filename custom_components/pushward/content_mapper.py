@@ -282,7 +282,7 @@ def _get_progress(state: State, entity_config: dict) -> float:
     try:
         value = float(state.attributes.get(attr_name, 0))
         scale = 255.0 if attr_name in _ATTRS_0_255 else 100.0
-        return max(0.0, min(1.0, value / scale))
+        return round(max(0.0, min(1.0, value / scale)), 2)
     except (ValueError, TypeError):
         _LOGGER.debug("Could not parse progress attribute %s for %s", attr_name, state.entity_id)
         return 0.0
@@ -329,7 +329,7 @@ def _get_gauge_value(state: State, entity_config: dict) -> float:
             _LOGGER.debug("Could not parse gauge value attribute %s for %s", attr_name, state.entity_id)
             return 0.0
         if attr_name in _ATTRS_0_255:
-            value = value / 255.0 * 100.0
+            value = round(value / 255.0 * 100.0)
         return value
     try:
         return float(state.state)

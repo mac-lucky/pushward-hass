@@ -172,7 +172,7 @@ def test_map_content_progress_brightness_scale():
 
     content = map_content(state, config)
 
-    assert content["progress"] == pytest.approx(26 / 255, abs=0.01)
+    assert content["progress"] == round(26 / 255, 2)
 
 
 def test_map_content_with_remaining_time():
@@ -936,9 +936,9 @@ def test_map_content_gauge_brightness_rescaled():
 
     content = map_content(state, config)
 
-    # 138/255 * 100 ≈ 54.1
-    assert content["value"] == pytest.approx(54.1, abs=0.1)
-    assert content["progress"] == pytest.approx(0.541, abs=0.001)
+    # round(138/255 * 100) = 54
+    assert content["value"] == 54
+    assert content["progress"] == 0.54
 
 
 def test_map_content_gauge_reads_state_when_no_attribute():
