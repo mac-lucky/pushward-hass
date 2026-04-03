@@ -8,5 +8,5 @@
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/mac-lucky/pushward-hass/issues",
   "requirements": [],
-  "version": "0.15.3"
+  "version": "0.15.4"
 }
