@@ -11,18 +11,20 @@ When an entity enters a configured "start" state (e.g., washer turns on), a Live
 ## Features
 
 - **Track any HA entity** as a PushWard Live Activity
-- **4 templates** — generic, countdown, alert, steps
+- **6 templates** — generic, countdown, alert, steps, gauge, timeline
+- **Template auto-suggestion** — picks the best template based on entity domain and device class
 - **14 domain defaults** — binary_sensor, switch, climate, vacuum, media_player, lock, cover, timer, sensor, light, fan, weather, update, water_heater
 - **Two-phase end** — shows completion state (green checkmark) before dismissing
 - **Throttled updates** with content deduplication
 - **6-level icon fallback** — attribute → config → entity → registry → device class → domain default
 - **Color support** — RGB, HSV, XY, Kelvin, named colors
-- **Deep links** — primary and secondary tap-to-open URLs
+- **Deep links** — primary and secondary tap-to-open URLs (steps/alert templates)
 - **TTL controls** — auto-delete after end, auto-end on stale activity
 - **Priority** — 0–10 range for activity ordering
 - **Rapid on/off handling** — cancels pending end if activity restarts
 - **Automatic resume** on HA restart
-- **4 services** for manual activity management from automations
+- **Push notifications** — send alerts from automations via the `send_notification` service
+- **5 services** for activity management and notifications from automations
 
 ## Installation
 
@@ -57,6 +59,8 @@ Each tracked entity uses a two-step flow:
 | `countdown` | Timer with remaining time and end date |
 | `alert` | Severity-based notification (critical/warning/info) |
 | `steps` | Multi-step process (e.g., build stages) |
+| `gauge` | Numeric value with range (e.g., temperature, battery) |
+| `timeline` | Sparkline chart with labeled value series |
 
 **Step 2** — Configure activity details (fields vary by template):
 
@@ -73,6 +77,15 @@ Each tracked entity uses a two-step flow:
 | Remaining Time Attribute | Seconds remaining (countdown template) |
 | Total Steps / Current Step Attribute | Steps tracking |
 | Severity | critical, warning, or info (alert template) |
+| Value Attribute | Entity attribute holding a numeric value (gauge/timeline) |
+| Min Value / Max Value | Gauge range bounds (default: 0–100) |
+| Unit | Display unit for the value (e.g., °C, %) |
+| Series | Attribute→label mapping for multi-series timeline |
+| Scale | Y-axis scale — linear or logarithmic (timeline) |
+| Decimal Places | Value display precision, 0–10 (timeline) |
+| Smooth Lines | Enable curve interpolation between points (timeline) |
+| Thresholds | Horizontal reference lines on the sparkline (timeline) |
+| History Period | Hours of HA recorder history to seed on start (timeline, 0–168) |
 | Subtitle Attribute | Entity attribute for subtitle text |
 | State Labels | Custom state→label mapping (e.g., `on=Running, off=Stopped`) |
 | Completion Message | Text shown at end (default: "Complete") |
@@ -106,18 +119,25 @@ Push a content update to an existing activity.
 |-------|----------|-------------|
 | `slug` | Yes | Activity identifier |
 | `state` | Yes | `ONGOING` or `ENDED` |
-| `template` | No | generic, countdown, steps, or alert |
+| `template` | No | generic, countdown, steps, alert, gauge, or timeline |
 | `progress` | No | 0.0–1.0 |
 | `state_text` | No | Display text |
 | `icon` | No | SF Symbol or MDI icon |
 | `subtitle` | No | Subtitle text |
 | `accent_color` | No | Color name or hex |
 | `remaining_time` | No | Seconds remaining |
-| `url` / `secondary_url` | No | Tap-to-open URLs |
+| `url` / `secondary_url` | No | Tap-to-open URLs (steps/alert only) |
 | `end_date` | No | Unix timestamp for countdown |
 | `total_steps` / `current_step` | No | Steps progress |
 | `severity` | No | critical, warning, or info |
 | `completion_message` | No | End display message |
+| `value` | No | Numeric value (gauge) or labeled values object (timeline) |
+| `min_value` / `max_value` | No | Gauge range bounds |
+| `unit` | No | Display unit (e.g., °C, %) |
+| `scale` | No | Y-axis scale: linear or logarithmic (timeline) |
+| `decimals` | No | Decimal places 0–10 (timeline) |
+| `smoothing` | No | Curve interpolation between points (timeline) |
+| `thresholds` | No | Horizontal reference lines on sparkline (timeline) |
 
 ### `pushward.end_activity`
 
@@ -136,14 +156,33 @@ Delete an activity immediately (no completion animation).
 |-------|----------|-------------|
 | `slug` | Yes | Activity identifier |
 
+### `pushward.send_notification`
+
+Send a push notification via PushWard.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `title` | Yes | Notification title |
+| `body` | Yes | Notification body text |
+| `subtitle` | No | Subtitle shown below the title |
+| `level` | No | iOS interruption level: passive, active, time-sensitive, critical |
+| `volume` | No | Sound volume 0.0–1.0 (critical level only) |
+| `thread_id` | No | Groups notifications in Notification Center |
+| `collapse_id` | No | APNs dedup key — replaces previous notification with same key (max 64 chars) |
+| `category` | No | Notification category for custom actions |
+| `source` | No | Source identifier for grouping in PushWard inbox |
+| `source_display_name` | No | Human-readable source name in PushWard inbox |
+| `activity_slug` | No | Link notification to an existing Live Activity |
+| `push` | No | Send as APNs push alert (default: true). When false, inbox-only |
+
 ## Domain Defaults
 
 When adding an entity, start and end states are pre-filled based on the entity's domain:
 
 | Domain | Start States | End States | Default Icon |
 |--------|-------------|------------|--------------|
-| binary_sensor | on | off | mdi:toggle-switch |
-| switch | on | off | mdi:toggle-switch |
+| binary_sensor | on | off | mdi:toggle-switch-variant |
+| switch | on | off | mdi:toggle-switch-variant |
 | light | on | off | mdi:lightbulb |
 | fan | on | off | mdi:fan |
 | climate | heating, cooling | off, idle | mdi:thermostat |
