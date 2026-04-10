@@ -66,7 +66,7 @@
         },
         "value": {
           "name": "Value",
-          "description": "Gauge: numeric value. Timeline: labeled values object ({\"Temp\": 22.5})."
+          "description": "Gauge: numeric value. Timeline: labeled values object (e.g. Temp=22.5)."
         },
         "min_value": {
           "name": "Min Value",

@@ -127,7 +127,7 @@ update_activity:
         text:
     value:
       name: Value
-      description: "Gauge: numeric value. Timeline: labeled values object ({\"Temp\": 22.5})."
+      description: "Gauge: numeric value. Timeline: labeled values object (e.g. Temp=22.5)."
       example: 22.5
       selector:
         object:
