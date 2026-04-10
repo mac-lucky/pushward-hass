@@ -19,6 +19,7 @@ from .const import (
     CONF_SERVER_URL,
     DEFAULT_PRIORITY,
     DOMAIN,
+    NOTIFICATION_LEVELS,
     SCALES,
     SEVERITIES,
     SUBENTRY_TYPE_ENTITY,
@@ -58,6 +59,7 @@ SERVICE_UPDATE_ACTIVITY = "update_activity"
 SERVICE_CREATE_ACTIVITY = "create_activity"
 SERVICE_END_ACTIVITY = "end_activity"
 SERVICE_DELETE_ACTIVITY = "delete_activity"
+SERVICE_SEND_NOTIFICATION = "send_notification"
 
 SCHEMA_UPDATE_ACTIVITY = vol.Schema(
     {
@@ -108,6 +110,23 @@ SCHEMA_END_ACTIVITY = vol.Schema(
 SCHEMA_DELETE_ACTIVITY = vol.Schema(
     {
         vol.Required("slug"): validate_slug,
+    }
+)
+
+SCHEMA_SEND_NOTIFICATION = vol.Schema(
+    {
+        vol.Required("title"): str,
+        vol.Required("body"): str,
+        vol.Optional("subtitle"): str,
+        vol.Optional("level"): vol.In(NOTIFICATION_LEVELS),
+        vol.Optional("volume"): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=1.0)),
+        vol.Optional("thread_id"): str,
+        vol.Optional("collapse_id"): vol.All(str, vol.Length(max=64)),
+        vol.Optional("category"): str,
+        vol.Optional("source"): str,
+        vol.Optional("source_display_name"): str,
+        vol.Optional("activity_slug"): validate_slug,
+        vol.Optional("push", default=True): bool,
     }
 )
 
@@ -162,6 +181,34 @@ async def _async_handle_delete_activity(hass: HomeAssistant, call: ServiceCall) 
     await api.delete_activity(call.data["slug"])
 
 
+_NOTIFICATION_FIELDS = [
+    "subtitle",
+    "level",
+    "volume",
+    "thread_id",
+    "collapse_id",
+    "category",
+    "source",
+    "source_display_name",
+    "activity_slug",
+]
+
+
+async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the send_notification service call."""
+    api = _get_api(hass)
+    kwargs: dict = {}
+    for field in _NOTIFICATION_FIELDS:
+        if field in call.data:
+            kwargs[field] = call.data[field]
+    await api.create_notification(
+        title=call.data["title"],
+        body=call.data["body"],
+        push=call.data["push"],
+        **kwargs,
+    )
+
+
 def _register_services(hass: HomeAssistant) -> None:
     """Register PushWard services (only once)."""
     if hass.services.has_service(DOMAIN, SERVICE_UPDATE_ACTIVITY):
@@ -178,6 +225,9 @@ def _register_services(hass: HomeAssistant) -> None:
     )
     hass.services.async_register(
         DOMAIN, SERVICE_DELETE_ACTIVITY, partial(_async_handle_delete_activity, hass), SCHEMA_DELETE_ACTIVITY
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_SEND_NOTIFICATION, partial(_async_handle_send_notification, hass), SCHEMA_SEND_NOTIFICATION
     )
 
 
@@ -242,5 +292,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_CREATE_ACTIVITY)
         hass.services.async_remove(DOMAIN, SERVICE_END_ACTIVITY)
         hass.services.async_remove(DOMAIN, SERVICE_DELETE_ACTIVITY)
+        hass.services.async_remove(DOMAIN, SERVICE_SEND_NOTIFICATION)
 
     return True

@@ -39,6 +39,7 @@ def _mock_api() -> AsyncMock:
     api.create_activity = AsyncMock()
     api.update_activity = AsyncMock()
     api.delete_activity = AsyncMock()
+    api.create_notification = AsyncMock()
     return api
 
 
@@ -66,6 +67,7 @@ async def test_services_registered_on_setup(hass: HomeAssistant) -> None:
     assert hass.services.has_service(DOMAIN, "create_activity")
     assert hass.services.has_service(DOMAIN, "end_activity")
     assert hass.services.has_service(DOMAIN, "delete_activity")
+    assert hass.services.has_service(DOMAIN, "send_notification")
 
     # Unload should remove services
     await hass.config_entries.async_unload(entry.entry_id)
@@ -75,6 +77,7 @@ async def test_services_registered_on_setup(hass: HomeAssistant) -> None:
     assert not hass.services.has_service(DOMAIN, "create_activity")
     assert not hass.services.has_service(DOMAIN, "end_activity")
     assert not hass.services.has_service(DOMAIN, "delete_activity")
+    assert not hass.services.has_service(DOMAIN, "send_notification")
 
 
 async def test_service_update_activity(hass: HomeAssistant) -> None:
@@ -202,3 +205,82 @@ async def test_setup_connection_error_retries(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
     assert entry.state is ConfigEntryState.SETUP_RETRY
+
+
+# --- send_notification service tests ---
+
+
+async def test_service_send_notification(hass: HomeAssistant) -> None:
+    """send_notification service calls api.create_notification with required fields."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Door Opened", "body": "The front door was opened."},
+        blocking=True,
+    )
+
+    api.create_notification.assert_awaited_once()
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["title"] == "Door Opened"
+    assert call_kwargs["body"] == "The front door was opened."
+    assert call_kwargs["push"] is True
+
+
+async def test_service_send_notification_all_fields(hass: HomeAssistant) -> None:
+    """send_notification service passes all optional fields."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "Alert",
+            "body": "Motion detected",
+            "subtitle": "Front Yard",
+            "level": "time-sensitive",
+            "volume": 0.8,
+            "thread_id": "security",
+            "collapse_id": "motion-front",
+            "category": "SECURITY",
+            "source": "home-assistant",
+            "source_display_name": "Home Assistant",
+            "activity_slug": "ha-motion",
+            "push": False,
+        },
+        blocking=True,
+    )
+
+    api.create_notification.assert_awaited_once()
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["title"] == "Alert"
+    assert call_kwargs["body"] == "Motion detected"
+    assert call_kwargs["subtitle"] == "Front Yard"
+    assert call_kwargs["level"] == "time-sensitive"
+    assert call_kwargs["volume"] == 0.8
+    assert call_kwargs["thread_id"] == "security"
+    assert call_kwargs["collapse_id"] == "motion-front"
+    assert call_kwargs["category"] == "SECURITY"
+    assert call_kwargs["source"] == "home-assistant"
+    assert call_kwargs["source_display_name"] == "Home Assistant"
+    assert call_kwargs["activity_slug"] == "ha-motion"
+    assert call_kwargs["push"] is False
+
+
+async def test_service_send_notification_push_defaults_true(hass: HomeAssistant) -> None:
+    """send_notification defaults push to true when not specified."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Test", "body": "Hello"},
+        blocking=True,
+    )
+
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["push"] is True

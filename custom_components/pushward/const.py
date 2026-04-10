@@ -68,6 +68,9 @@ UPDATE_INTERVAL_MIN = 1
 # Alert severities
 SEVERITIES = ["critical", "warning", "info"]
 
+# Notification interruption levels
+NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
+
 # Templates
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline"]
 

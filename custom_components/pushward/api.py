@@ -100,6 +100,39 @@ class PushWardApiClient:
             allow_404=True,
         )
 
+    async def create_notification(
+        self,
+        title: str,
+        body: str,
+        *,
+        subtitle: str | None = None,
+        level: str | None = None,
+        volume: float | None = None,
+        thread_id: str | None = None,
+        collapse_id: str | None = None,
+        category: str | None = None,
+        source: str | None = None,
+        source_display_name: str | None = None,
+        activity_slug: str | None = None,
+        push: bool = True,
+    ) -> None:
+        """Create a notification via POST /notifications."""
+        payload: dict = {"title": title, "body": body, "push": push}
+        for key, val in [
+            ("subtitle", subtitle),
+            ("level", level),
+            ("volume", volume),
+            ("thread_id", thread_id),
+            ("collapse_id", collapse_id),
+            ("category", category),
+            ("source", source),
+            ("source_display_name", source_display_name),
+            ("activity_slug", activity_slug),
+        ]:
+            if val is not None:
+                payload[key] = val
+        await self._request_with_retry("POST", "/notifications", json=payload)
+
     async def _request_with_retry(
         self,
         method: str,

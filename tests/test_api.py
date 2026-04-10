@@ -185,6 +185,75 @@ async def test_delete_activity_not_found():
     await client.delete_activity("test-slug")
 
 
+# --- create_notification ---
+
+
+async def test_create_notification_required_fields():
+    """create_notification sends title, body, and push to POST /notifications."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.create_notification("Door Opened", "The front door was opened.")
+
+    session.request.assert_called_once()
+    call_args = session.request.call_args
+    assert call_args[0][0] == "POST"
+    assert call_args[0][1].endswith("/notifications")
+    body = call_args[1]["json"]
+    assert body["title"] == "Door Opened"
+    assert body["body"] == "The front door was opened."
+    assert body["push"] is True
+
+
+async def test_create_notification_all_fields():
+    """create_notification includes all optional fields in payload."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.create_notification(
+        "Alert",
+        "Motion detected",
+        subtitle="Front Yard",
+        level="time-sensitive",
+        volume=0.8,
+        thread_id="security",
+        collapse_id="motion-front",
+        category="SECURITY",
+        source="home-assistant",
+        source_display_name="Home Assistant",
+        activity_slug="ha-motion",
+        push=False,
+    )
+
+    body = session.request.call_args[1]["json"]
+    assert body["title"] == "Alert"
+    assert body["body"] == "Motion detected"
+    assert body["subtitle"] == "Front Yard"
+    assert body["level"] == "time-sensitive"
+    assert body["volume"] == 0.8
+    assert body["thread_id"] == "security"
+    assert body["collapse_id"] == "motion-front"
+    assert body["category"] == "SECURITY"
+    assert body["source"] == "home-assistant"
+    assert body["source_display_name"] == "Home Assistant"
+    assert body["activity_slug"] == "ha-motion"
+    assert body["push"] is False
+
+
+async def test_create_notification_omits_none_fields():
+    """Optional fields set to None are not included in the JSON payload."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.create_notification("Test", "Hello")
+
+    body = session.request.call_args[1]["json"]
+    assert set(body.keys()) == {"title", "body", "push"}
+
+
 # --- retry ---
 
 

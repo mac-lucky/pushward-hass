@@ -256,3 +256,92 @@ delete_activity:
       example: "ha-washer"
       selector:
         text:
+
+send_notification:
+  name: Send Notification
+  description: Send a push notification via PushWard.
+  fields:
+    title:
+      name: Title
+      description: Notification title.
+      required: true
+      example: "Door Opened"
+      selector:
+        text:
+    body:
+      name: Body
+      description: Notification body text.
+      required: true
+      example: "The front door was opened."
+      selector:
+        text:
+          multiline: true
+    subtitle:
+      name: Subtitle
+      description: Optional subtitle shown below the title.
+      example: "Living Room"
+      selector:
+        text:
+    level:
+      name: Level
+      description: iOS interruption level. Controls how the notification is delivered.
+      example: "active"
+      selector:
+        select:
+          options:
+            - "passive"
+            - "active"
+            - "time-sensitive"
+            - "critical"
+    volume:
+      name: Volume
+      description: Sound volume for critical alerts (0.0-1.0). Only used when level is critical.
+      example: 1.0
+      selector:
+        number:
+          min: 0.0
+          max: 1.0
+          step: 0.1
+          mode: slider
+    thread_id:
+      name: Thread ID
+      description: Groups notifications together in Notification Center.
+      example: "home-security"
+      selector:
+        text:
+    collapse_id:
+      name: Collapse ID
+      description: APNs deduplication key. Replaces previous notification with the same key. Max 64 characters.
+      example: "door-alert"
+      selector:
+        text:
+    category:
+      name: Category
+      description: Notification category for custom actions.
+      example: "SECURITY"
+      selector:
+        text:
+    source:
+      name: Source
+      description: Source identifier for grouping in the PushWard inbox.
+      example: "home-assistant"
+      selector:
+        text:
+    source_display_name:
+      name: Source Display Name
+      description: Human-readable source name shown in the PushWard inbox.
+      example: "Home Assistant"
+      selector:
+        text:
+    activity_slug:
+      name: Activity Slug
+      description: Link this notification to an existing Live Activity.
+      example: "ha-washer"
+      selector:
+        text:
+    push:
+      name: Push
+      description: Send as an APNs push alert to all devices. When false, the notification is stored in the inbox only.
+      default: true
+      selector:
+        boolean:

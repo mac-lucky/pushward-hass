@@ -151,6 +151,60 @@
           "description": "Activity slug identifier to delete."
         }
       }
+    },
+    "send_notification": {
+      "name": "Send Notification",
+      "description": "Send a push notification via PushWard.",
+      "fields": {
+        "title": {
+          "name": "Title",
+          "description": "Notification title."
+        },
+        "body": {
+          "name": "Body",
+          "description": "Notification body text."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Optional subtitle shown below the title."
+        },
+        "level": {
+          "name": "Level",
+          "description": "iOS interruption level. Controls how the notification is delivered."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Sound volume for critical alerts (0.0-1.0). Only used when level is critical."
+        },
+        "thread_id": {
+          "name": "Thread ID",
+          "description": "Groups notifications together in Notification Center."
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "APNs deduplication key. Replaces previous notification with the same key."
+        },
+        "category": {
+          "name": "Category",
+          "description": "Notification category for custom actions."
+        },
+        "source": {
+          "name": "Source",
+          "description": "Source identifier for grouping in the PushWard inbox."
+        },
+        "source_display_name": {
+          "name": "Source Display Name",
+          "description": "Human-readable source name shown in the PushWard inbox."
+        },
+        "activity_slug": {
+          "name": "Activity Slug",
+          "description": "Link this notification to an existing Live Activity."
+        },
+        "push": {
+          "name": "Push",
+          "description": "Send as an APNs push alert to all devices. When false, the notification is stored in the inbox only."
+        }
+      }
     }
   },
   "config": {
