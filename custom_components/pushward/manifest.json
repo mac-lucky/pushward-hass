@@ -1,13 +1,13 @@
 {
   "domain": "pushward",
   "name": "PushWard",
+  "after_dependencies": ["recorder"],
   "codeowners": ["@mac-lucky"],
   "config_flow": true,
   "documentation": "https://github.com/mac-lucky/pushward-hass",
   "integration_type": "service",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/mac-lucky/pushward-hass/issues",
-  "after_dependencies": ["recorder"],
   "requirements": [],
   "version": "0.17.0"
 }
