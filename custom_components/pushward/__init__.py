@@ -19,6 +19,7 @@ from .const import (
     CONF_SERVER_URL,
     DEFAULT_PRIORITY,
     DOMAIN,
+    SCALES,
     SEVERITIES,
     SUBENTRY_TYPE_ENTITY,
     validate_slug,
@@ -47,6 +48,10 @@ _CONTENT_FIELDS = [
     "min_value",
     "max_value",
     "unit",
+    "scale",
+    "decimals",
+    "smoothing",
+    "thresholds",
 ]
 
 SERVICE_UPDATE_ACTIVITY = "update_activity"
@@ -72,10 +77,14 @@ SCHEMA_UPDATE_ACTIVITY = vol.Schema(
         vol.Optional("current_step"): vol.Coerce(int),
         vol.Optional("severity"): vol.In(SEVERITIES),
         vol.Optional("completion_message"): str,
-        vol.Optional("value"): vol.Coerce(float),
+        vol.Optional("value"): vol.Any(vol.Coerce(float), dict),
         vol.Optional("min_value"): vol.Coerce(float),
         vol.Optional("max_value"): vol.Coerce(float),
         vol.Optional("unit"): str,
+        vol.Optional("scale"): vol.In(SCALES),
+        vol.Optional("decimals"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
+        vol.Optional("smoothing"): bool,
+        vol.Optional("thresholds"): list,
     }
 )
 

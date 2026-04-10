@@ -30,6 +30,7 @@ update_activity:
             - "steps"
             - "alert"
             - "gauge"
+            - "timeline"
     progress:
       name: Progress
       description: Progress value between 0.0 and 1.0.
@@ -126,12 +127,10 @@ update_activity:
         text:
     value:
       name: Value
-      description: Current gauge value.
+      description: "Gauge: numeric value. Timeline: labeled values object ({\"Temp\": 22.5})."
       example: 22.5
       selector:
-        number:
-          step: 0.1
-          mode: box
+        object:
     min_value:
       name: Min Value
       description: Minimum gauge value.
@@ -150,10 +149,38 @@ update_activity:
           mode: box
     unit:
       name: Unit
-      description: Display unit for the gauge value.
+      description: Display unit for the value (e.g. °C, %).
       example: "\u00b0C"
       selector:
         text:
+    scale:
+      name: Scale
+      description: Y-axis scale mode (linear or logarithmic). Timeline template only.
+      example: "linear"
+      selector:
+        select:
+          options:
+            - "linear"
+            - "logarithmic"
+    decimals:
+      name: Decimal Places
+      description: Decimal places for value display (0-10). Timeline template only.
+      example: 1
+      selector:
+        number:
+          min: 0
+          max: 10
+          mode: box
+    smoothing:
+      name: Smooth Lines
+      description: Enable curve interpolation between data points. Timeline template only.
+      selector:
+        boolean:
+    thresholds:
+      name: Thresholds
+      description: Horizontal reference lines on the sparkline. Timeline template only.
+      selector:
+        object:
 
 create_activity:
   name: Create Activity

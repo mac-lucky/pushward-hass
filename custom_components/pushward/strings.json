@@ -66,7 +66,7 @@
         },
         "value": {
           "name": "Value",
-          "description": "Current gauge value."
+          "description": "Gauge: numeric value. Timeline: labeled values object ({\"Temp\": 22.5})."
         },
         "min_value": {
           "name": "Min Value",
@@ -78,11 +78,27 @@
         },
         "unit": {
           "name": "Unit",
-          "description": "Display unit for the gauge (e.g. \u00b0C, %)."
+          "description": "Display unit for the value (e.g. \u00b0C, %)."
         },
         "completion_message": {
           "name": "Completion Message",
           "description": "Message shown when the activity ends."
+        },
+        "scale": {
+          "name": "Scale",
+          "description": "Y-axis scale mode (linear or logarithmic). Timeline template only."
+        },
+        "decimals": {
+          "name": "Decimal Places",
+          "description": "Decimal places for value display (0-10). Timeline template only."
+        },
+        "smoothing": {
+          "name": "Smooth Lines",
+          "description": "Enable curve interpolation between data points. Timeline template only."
+        },
+        "thresholds": {
+          "name": "Thresholds",
+          "description": "Horizontal reference lines on the sparkline. Timeline template only."
         }
       }
     },
@@ -213,6 +229,12 @@
             "min_value": "Minimum Value",
             "max_value": "Maximum Value",
             "unit": "Unit",
+            "series": "Series",
+            "scale": "Scale",
+            "decimals": "Decimal Places",
+            "smoothing": "Smooth Lines",
+            "thresholds": "Thresholds",
+            "history_period": "Back-History Period",
             "slug": "Activity Slug",
             "activity_name": "Activity Name",
             "icon": "Icon",
@@ -241,6 +263,12 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "unit": "Display unit shown next to the value (e.g. \u00b0C, %, kW). Max 32 characters.",
+            "series": "Map entity attributes to named series. Format: attribute=Label, attribute2=Label2. Leave empty to use the entity's state as a single series.",
+            "scale": "Y-axis scale mode for the sparkline chart.",
+            "decimals": "Number of decimal places shown for values (0\u201310).",
+            "smoothing": "Enable curve interpolation between data points for a smoother sparkline.",
+            "thresholds": "Horizontal reference lines on the sparkline. Format: value:color:label. Example: 25:red:Hot, 18:blue:Cold. Max 5.",
+            "history_period": "Hours of past data to seed the sparkline from Home Assistant's recorder. Set to 0 to start with no history.",
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
             "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
             "icon": "Override icon. Leave empty to use the entity\u2019s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",

@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 
 import aiohttp
@@ -25,10 +26,13 @@ from .const import (
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
+    CONF_HISTORY_PERIOD,
     CONF_PRIORITY,
+    CONF_SERIES,
     CONF_SLUG,
     CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_TEMPLATE,
     CONF_UPDATE_INTERVAL,
     END_DELAY_SECONDS,
 )
@@ -193,6 +197,13 @@ class ActivityManager:
                 tracked.registry_icon,
                 content.get("icon"),
             )
+
+            # Seed timeline back-history from HA recorder if configured
+            if config.get(CONF_TEMPLATE) == "timeline":
+                history = await self._seed_timeline_history(entity_id, config, content)
+                if history:
+                    content["history"] = history
+
             await self._api.update_activity(slug, "ONGOING", content)
 
             tracked.is_active = True
@@ -202,6 +213,70 @@ class ActivityManager:
             self._trigger_reauth()
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to start activity for %s", entity_id, exc_info=True)
+
+    async def _seed_timeline_history(self, entity_id: str, config: dict, content: dict) -> dict[str, list[dict]] | None:
+        """Query HA recorder for back-history to seed timeline sparkline."""
+        period_hours = config.get(CONF_HISTORY_PERIOD, 0)
+        if not period_hours:
+            return None
+
+        try:
+            from homeassistant.components.recorder.history import get_significant_states
+        except ImportError:
+            _LOGGER.debug("Recorder not available, skipping history seed for %s", entity_id)
+            return None
+
+        from homeassistant.helpers.recorder import get_instance
+        from homeassistant.util import dt as dt_util
+
+        now = dt_util.utcnow()
+        start = now - timedelta(hours=period_hours)
+
+        try:
+            states = await get_instance(self._hass).async_add_executor_job(
+                get_significant_states,
+                self._hass,
+                start,
+                now,
+                [entity_id],
+            )
+        except Exception:
+            _LOGGER.debug("Failed to query recorder for %s", entity_id, exc_info=True)
+            return None
+
+        entity_states = states.get(entity_id, [])
+        if not entity_states:
+            return None
+
+        series_map = config.get(CONF_SERIES) or {}
+        history: dict[str, list[dict]] = {}
+
+        # Derive the single-series label once (only used when series_map is empty)
+        if not series_map:
+            value_map = content.get("value", {})
+            single_label = next(iter(value_map), entity_id) if value_map else entity_id
+
+        for state_obj in entity_states:
+            if state_obj.state in ("unavailable", "unknown"):
+                continue
+            ts = int(state_obj.last_updated.timestamp())
+
+            if series_map:
+                for attr_name, label in series_map.items():
+                    raw = state_obj.attributes.get(attr_name)
+                    if raw is not None:
+                        with contextlib.suppress(ValueError, TypeError):
+                            history.setdefault(label, []).append({"t": ts, "v": float(raw)})
+            else:
+                with contextlib.suppress(ValueError, TypeError):
+                    history.setdefault(single_label, []).append({"t": ts, "v": float(state_obj.state)})
+
+        # Cap at 300 points per series (server storage limit)
+        for key in history:
+            if len(history[key]) > 300:
+                history[key] = history[key][-300:]
+
+        return history if history else None
 
     @callback
     def _schedule_throttled_update(self, entity_id: str) -> None:

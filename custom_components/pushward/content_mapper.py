@@ -17,21 +17,27 @@ from .const import (
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_DECIMALS,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SERIES,
     CONF_SEVERITY,
+    CONF_SMOOTHING,
     CONF_STATE_LABELS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
+    CONF_THRESHOLDS,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_URL,
     CONF_VALUE_ATTRIBUTE,
+    DEFAULT_DECIMALS,
     DEFAULT_MAX_VALUE,
     DEFAULT_MIN_VALUE,
     DEFAULT_SEVERITY,
@@ -42,6 +48,10 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+# Timeline display fields carried forward to completion content.
+# Keep in sync with the fields emitted in map_content's timeline branch.
+_TIMELINE_CARRY_FIELDS = ("unit", "scale", "decimals", "smoothing", "thresholds")
 
 
 def sanitize_slug(entity_id: str) -> str:
@@ -206,6 +216,26 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
             content["progress"] = (value - min_val) / (max_val - min_val)
         else:
             content["progress"] = 1.0
+    elif template == "timeline":
+        values = _get_timeline_values(state, entity_config)
+        if values:
+            content["value"] = values
+        unit = entity_config.get(CONF_UNIT, "")
+        if unit:
+            content["unit"] = unit
+        scale = entity_config.get(CONF_SCALE, "")
+        if scale and scale != "linear":
+            content["scale"] = scale
+        decimals = entity_config.get(CONF_DECIMALS)
+        if decimals is not None and decimals != DEFAULT_DECIMALS:
+            content["decimals"] = decimals
+        smoothing = entity_config.get(CONF_SMOOTHING)
+        if smoothing:
+            content["smoothing"] = smoothing
+        thresholds = entity_config.get(CONF_THRESHOLDS, [])
+        if thresholds:
+            content["thresholds"] = thresholds
+        content["progress"] = 0.0
 
     return content
 
@@ -245,6 +275,12 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         _, max_val = _gauge_base_fields(content, entity_config)
         content["value"] = max_val
         content["progress"] = 1.0
+    elif template == "timeline":
+        if last_content and "value" in last_content:
+            content["value"] = last_content["value"]
+        for key in _TIMELINE_CARRY_FIELDS:
+            if last_content and key in last_content:
+                content[key] = last_content[key]
 
     return content
 
@@ -314,6 +350,51 @@ def _get_remaining_time(state: State, entity_config: dict) -> int | None:
     except (ValueError, TypeError):
         _LOGGER.debug("Could not parse remaining_time attribute %s for %s", attr_name, state.entity_id)
         return None
+
+
+def _get_timeline_values(state: State, entity_config: dict) -> dict[str, float]:
+    """Extract labeled value map for timeline template.
+
+    Multi-series: reads from CONF_SERIES attribute->label mapping.
+    Single-series fallback: CONF_VALUE_ATTRIBUTE or entity state with friendly_name label.
+    """
+    series_map = entity_config.get(CONF_SERIES) or {}
+    if series_map:
+        values: dict[str, float] = {}
+        for attr_name, label in series_map.items():
+            raw = state.attributes.get(attr_name)
+            if raw is not None:
+                try:
+                    values[label] = float(raw)
+                except (ValueError, TypeError):
+                    _LOGGER.debug(
+                        "Could not parse timeline series attribute %s for %s",
+                        attr_name,
+                        state.entity_id,
+                    )
+        return values
+
+    # Single series: value_attribute or entity state
+    label = state.attributes.get("friendly_name", state.entity_id)
+    attr_name = entity_config.get(CONF_VALUE_ATTRIBUTE)
+    if attr_name:
+        raw = state.attributes.get(attr_name)
+        if raw is None:
+            return {}
+        try:
+            return {label: float(raw)}
+        except (ValueError, TypeError):
+            _LOGGER.debug(
+                "Could not parse timeline value attribute %s for %s",
+                attr_name,
+                state.entity_id,
+            )
+            return {}
+    try:
+        return {label: float(state.state)}
+    except (ValueError, TypeError):
+        _LOGGER.debug("Could not parse entity state as timeline value for %s", state.entity_id)
+        return {}
 
 
 def _get_gauge_value(state: State, entity_config: dict) -> float:

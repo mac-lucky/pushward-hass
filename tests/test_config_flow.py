@@ -17,7 +17,9 @@ from custom_components.pushward.config_flow import (
     _hex_to_rgb,
     _parse_csv,
     _parse_state_labels,
+    _parse_thresholds,
     _rgb_to_hex,
+    _serialize_thresholds,
     _validate_integration_key,
 )
 from custom_components.pushward.const import (
@@ -25,8 +27,10 @@ from custom_components.pushward.const import (
     CONF_ACTIVITY_NAME,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_DECIMALS,
     CONF_END_STATES,
     CONF_ENTITY_ID,
+    CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
@@ -35,14 +39,18 @@ from custom_components.pushward.const import (
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SERIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
     CONF_SLUG,
+    CONF_SMOOTHING,
     CONF_START_STATES,
     CONF_STATE_LABELS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
+    CONF_THRESHOLDS,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UPDATE_INTERVAL,
@@ -92,6 +100,15 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
         data[CONF_MIN_VALUE] = 0.0
         data[CONF_MAX_VALUE] = 100.0
         data[CONF_UNIT] = ""
+    if template == "timeline":
+        data[CONF_SERIES] = ""
+        data[CONF_VALUE_ATTRIBUTE] = ""
+        data[CONF_UNIT] = ""
+        data[CONF_SCALE] = "linear"
+        data[CONF_DECIMALS] = 1
+        data[CONF_SMOOTHING] = False
+        data[CONF_THRESHOLDS] = ""
+        data[CONF_HISTORY_PERIOD] = 0
 
     # Identity fields
     data[CONF_SLUG] = "ha-washer"
@@ -1234,3 +1251,114 @@ async def test_subentry_rejects_invalid_secondary_url(hass: HomeAssistant) -> No
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_SECONDARY_URL: "invalid_url"}
+
+
+# --- _parse_thresholds / _serialize_thresholds ---
+
+
+def test_parse_thresholds_full():
+    """Parse threshold entries with value, color, and label."""
+    result = _parse_thresholds("25:red:Hot, 18:blue:Cold")
+    assert result == [
+        {"value": 25.0, "color": "red", "label": "Hot"},
+        {"value": 18.0, "color": "blue", "label": "Cold"},
+    ]
+
+
+def test_parse_thresholds_value_only():
+    """Parse threshold with value only (no color/label)."""
+    result = _parse_thresholds("20")
+    assert result == [{"value": 20.0}]
+
+
+def test_parse_thresholds_value_and_color():
+    """Parse threshold with value and color but no label."""
+    result = _parse_thresholds("25:red")
+    assert result == [{"value": 25.0, "color": "red"}]
+
+
+def test_parse_thresholds_empty():
+    """Empty string returns empty list."""
+    assert _parse_thresholds("") == []
+
+
+def test_parse_thresholds_invalid_value():
+    """Non-numeric value is skipped."""
+    result = _parse_thresholds("abc:red:Hot, 18:blue:Cold")
+    assert result == [{"value": 18.0, "color": "blue", "label": "Cold"}]
+
+
+def test_parse_thresholds_max_five():
+    """More than 5 thresholds are truncated."""
+    result = _parse_thresholds("1, 2, 3, 4, 5, 6, 7")
+    assert len(result) == 5
+
+
+def test_serialize_thresholds_roundtrip():
+    """Serialization produces parseable output."""
+    original = [
+        {"value": 25.0, "color": "red", "label": "Hot"},
+        {"value": 18.0, "color": "blue"},
+        {"value": 20.0},
+    ]
+    serialized = _serialize_thresholds(original)
+    roundtrip = _parse_thresholds(serialized)
+    assert roundtrip == original
+
+
+def test_serialize_thresholds_empty():
+    """Empty list serializes to empty string."""
+    assert _serialize_thresholds([]) == ""
+
+
+# --- timeline subentry flow ---
+
+
+async def test_subentry_timeline_template(hass: HomeAssistant) -> None:
+    """Timeline template subentry completes successfully."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    # Step 1
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_ENTITY_ID: "sensor.temperature", CONF_TEMPLATE: "timeline"}),
+    )
+    assert result["step_id"] == "details"
+
+    # Step 2 with timeline fields
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input(
+            "timeline",
+            **{
+                CONF_SERIES: "current_temperature=Current, target_temperature=Target",
+                CONF_UNIT: "\u00b0C",
+                CONF_SCALE: "logarithmic",
+                CONF_DECIMALS: 2,
+                CONF_SMOOTHING: True,
+                CONF_THRESHOLDS: "25:red:Hot",
+                CONF_HISTORY_PERIOD: 6,
+            },
+        ),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+    subentries = list(entry.subentries.values())
+    assert len(subentries) == 1
+    subentry_data = subentries[0].data
+    assert subentry_data[CONF_TEMPLATE] == "timeline"
+    assert subentry_data[CONF_SERIES] == {
+        "current_temperature": "Current",
+        "target_temperature": "Target",
+    }
+    assert subentry_data[CONF_UNIT] == "\u00b0C"
+    assert subentry_data[CONF_SCALE] == "logarithmic"
+    assert subentry_data[CONF_DECIMALS] == 2
+    assert subentry_data[CONF_SMOOTHING] is True
+    assert subentry_data[CONF_THRESHOLDS] == [{"value": 25.0, "color": "red", "label": "Hot"}]
+    assert subentry_data[CONF_HISTORY_PERIOD] == 6

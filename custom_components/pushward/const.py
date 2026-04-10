@@ -40,6 +40,12 @@ CONF_VALUE_ATTRIBUTE = "value_attribute"
 CONF_MIN_VALUE = "min_value"
 CONF_MAX_VALUE = "max_value"
 CONF_UNIT = "unit"
+CONF_SERIES = "series"
+CONF_SCALE = "scale"
+CONF_DECIMALS = "decimals"
+CONF_SMOOTHING = "smoothing"
+CONF_THRESHOLDS = "thresholds"
+CONF_HISTORY_PERIOD = "history_period"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
@@ -49,6 +55,9 @@ DEFAULT_TOTAL_STEPS = 1
 DEFAULT_SEVERITY = "info"
 DEFAULT_MIN_VALUE = 0.0
 DEFAULT_MAX_VALUE = 100.0
+DEFAULT_SCALE = "linear"
+DEFAULT_DECIMALS = 1
+DEFAULT_HISTORY_PERIOD = 0
 
 # Validation ranges
 PRIORITY_MIN = 0
@@ -60,7 +69,10 @@ UPDATE_INTERVAL_MIN = 1
 SEVERITIES = ["critical", "warning", "info"]
 
 # Templates
-TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge"]
+TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline"]
+
+# Timeline scales
+SCALES = ["linear", "logarithmic"]
 
 # API retry
 MAX_RETRIES = 5

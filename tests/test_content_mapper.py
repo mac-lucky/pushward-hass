@@ -10,17 +10,22 @@ from custom_components.pushward.const import (
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_DECIMALS,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SERIES,
     CONF_SEVERITY,
+    CONF_SMOOTHING,
     CONF_STATE_LABELS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
+    CONF_THRESHOLDS,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_URL,
@@ -1064,3 +1069,203 @@ def test_map_completion_content_gauge():
     assert content["max_value"] == 100.0
     assert content["unit"] == "%"
     assert content["progress"] == 1.0
+
+
+# --- timeline template ---
+
+
+def test_map_content_timeline_single_series_from_state():
+    """Timeline with no series config uses entity state as single series."""
+    state = _make_state("22.5", {"friendly_name": "Living Room Temp"})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermometer",
+        CONF_UNIT: "\u00b0C",
+    }
+
+    content = map_content(state, config)
+
+    assert content["template"] == "timeline"
+    assert content["value"] == {"Living Room Temp": 22.5}
+    assert content["unit"] == "\u00b0C"
+    assert content["progress"] == 0.0
+
+
+def test_map_content_timeline_single_series_from_attribute():
+    """Timeline with value_attribute reads from attribute."""
+    state = _make_state("on", {"friendly_name": "Thermostat", "current_temperature": 21.0})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermostat",
+        CONF_VALUE_ATTRIBUTE: "current_temperature",
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == {"Thermostat": 21.0}
+
+
+def test_map_content_timeline_multi_series():
+    """Timeline with series config maps multiple attributes to labeled series."""
+    state = _make_state(
+        "heating",
+        {
+            "friendly_name": "HVAC",
+            "current_temperature": 20.5,
+            "target_temperature": 22.0,
+        },
+    )
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermostat",
+        CONF_SERIES: {"current_temperature": "Current", "target_temperature": "Target"},
+        CONF_UNIT: "\u00b0C",
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == {"Current": 20.5, "Target": 22.0}
+    assert content["unit"] == "\u00b0C"
+
+
+def test_map_content_timeline_multi_series_partial():
+    """Multi-series skips missing attributes gracefully."""
+    state = _make_state("heating", {"friendly_name": "HVAC", "current_temperature": 20.5})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermostat",
+        CONF_SERIES: {"current_temperature": "Current", "missing_attr": "Missing"},
+    }
+
+    content = map_content(state, config)
+
+    assert content["value"] == {"Current": 20.5}
+
+
+def test_map_content_timeline_non_numeric_state():
+    """Timeline with non-numeric state produces no value."""
+    state = _make_state("heating", {"friendly_name": "HVAC"})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermostat",
+    }
+
+    content = map_content(state, config)
+
+    assert "value" not in content
+    assert content["progress"] == 0.0
+
+
+def test_map_content_timeline_scale_logarithmic():
+    """Logarithmic scale is included in content."""
+    state = _make_state("42.0", {"friendly_name": "Sensor"})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:chart-line",
+        CONF_SCALE: "logarithmic",
+    }
+
+    content = map_content(state, config)
+
+    assert content["scale"] == "logarithmic"
+
+
+def test_map_content_timeline_scale_linear_omitted():
+    """Linear scale (default) is omitted from content to save payload."""
+    state = _make_state("42.0", {"friendly_name": "Sensor"})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:chart-line",
+        CONF_SCALE: "linear",
+    }
+
+    content = map_content(state, config)
+
+    assert "scale" not in content
+
+
+def test_map_content_timeline_defaults_omitted():
+    """Default decimals (1) and smoothing (False) are omitted from payload."""
+    state = _make_state("42.0", {"friendly_name": "Sensor"})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:chart-line",
+        CONF_DECIMALS: 1,
+        CONF_SMOOTHING: False,
+    }
+
+    content = map_content(state, config)
+
+    assert "decimals" not in content
+    assert "smoothing" not in content
+
+
+def test_map_content_timeline_all_options():
+    """Timeline includes all optional fields when configured."""
+    state = _make_state("22.5", {"friendly_name": "Room Temp"})
+    thresholds = [{"value": 25.0, "color": "red", "label": "Hot"}]
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermometer",
+        CONF_UNIT: "\u00b0C",
+        CONF_SCALE: "logarithmic",
+        CONF_DECIMALS: 2,
+        CONF_SMOOTHING: True,
+        CONF_THRESHOLDS: thresholds,
+    }
+
+    content = map_content(state, config)
+
+    assert content["unit"] == "\u00b0C"
+    assert content["scale"] == "logarithmic"
+    assert content["decimals"] == 2
+    assert content["smoothing"] is True
+    assert content["thresholds"] == thresholds
+
+
+def test_map_content_timeline_unit_omitted_when_empty():
+    """Unit field is not included when empty."""
+    state = _make_state("42.0", {"friendly_name": "Sensor"})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:chart-line",
+        CONF_UNIT: "",
+    }
+
+    content = map_content(state, config)
+
+    assert "unit" not in content
+
+
+def test_map_completion_content_timeline():
+    """Timeline completion preserves last values and display settings."""
+    last_content = {
+        "value": {"Temp": 22.5},
+        "unit": "\u00b0C",
+        "scale": "logarithmic",
+        "decimals": 2,
+        "smoothing": True,
+        "thresholds": [{"value": 25.0, "color": "red"}],
+    }
+    config = {CONF_TEMPLATE: "timeline", CONF_ICON: "mdi:thermometer"}
+
+    content = map_completion_content(config, last_content=last_content)
+
+    assert content["value"] == {"Temp": 22.5}
+    assert content["unit"] == "\u00b0C"
+    assert content["scale"] == "logarithmic"
+    assert content["decimals"] == 2
+    assert content["smoothing"] is True
+    assert content["thresholds"] == [{"value": 25.0, "color": "red"}]
+    assert content["state"] == "Complete"
+    assert content["icon"] == "checkmark.circle.fill"
+
+
+def test_map_completion_content_timeline_no_last_content():
+    """Timeline completion without last content doesn't crash."""
+    config = {CONF_TEMPLATE: "timeline", CONF_ICON: "mdi:thermometer"}
+
+    content = map_completion_content(config)
+
+    assert "value" not in content
+    assert content["state"] == "Complete"

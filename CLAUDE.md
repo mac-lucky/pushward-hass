@@ -1,12 +1,15 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Overview
 
 PushWard for Home Assistant is a custom HACS integration that tracks HA entity state changes and surfaces them as PushWard Live Activities on iPhone (Dynamic Island + Lock Screen). When an entity enters a configured "start" state, a Live Activity is created; when it enters an "end" state, it is dismissed with a two-phase completion animation.
 
 This is a **public repository** — no server internals, private URLs, API keys, or DB schemas should appear in code or commit history.
+
+## Cross-Repository Dependencies
+
+- **pushward-server**: This integration calls server's REST API for activity CRUD (create/update/end) → server sends APNs → pushward-ios shows Live Activities
+- API contract (endpoints, auth with integration keys `hlk_` prefix) is defined by pushward-server
 
 ## Commands
 

@@ -14,6 +14,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
     AttributeSelector,
     AttributeSelectorConfig,
+    BooleanSelector,
     ColorRGBSelector,
     EntitySelector,
     EntitySelectorConfig,
@@ -37,9 +38,11 @@ from .const import (
     CONF_ACTIVITY_NAME,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_DECIMALS,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
+    CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
@@ -48,23 +51,30 @@ from .const import (
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
+    CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SERIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
     CONF_SLUG,
+    CONF_SMOOTHING,
     CONF_STALE_TTL,
     CONF_START_STATES,
     CONF_STATE_LABELS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
+    CONF_THRESHOLDS,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
     CONF_VALUE_ATTRIBUTE,
+    DEFAULT_DECIMALS,
+    DEFAULT_HISTORY_PERIOD,
     DEFAULT_MAX_VALUE,
     DEFAULT_MIN_VALUE,
     DEFAULT_PRIORITY,
+    DEFAULT_SCALE,
     DEFAULT_SERVER_URL,
     DEFAULT_SEVERITY,
     DEFAULT_TOTAL_STEPS,
@@ -72,6 +82,7 @@ from .const import (
     DOMAIN,
     PRIORITY_MAX,
     PRIORITY_MIN,
+    SCALES,
     SEVERITIES,
     SUBENTRY_TYPE_ENTITY,
     TEMPLATES,
@@ -372,6 +383,67 @@ def _details_schema(
                 default=d.get(CONF_UNIT, ""),
             )
         ] = vol.All(str, vol.Length(max=32))
+    if template == "timeline":
+        fields[
+            vol.Optional(
+                CONF_SERIES,
+                default=d.get(CONF_SERIES, ""),
+            )
+        ] = str
+        fields[
+            vol.Optional(
+                CONF_VALUE_ATTRIBUTE,
+                description={"suggested_value": d.get(CONF_VALUE_ATTRIBUTE, "")},
+            )
+        ] = attr_selector
+        fields[
+            vol.Optional(
+                CONF_UNIT,
+                default=d.get(CONF_UNIT, ""),
+            )
+        ] = vol.All(str, vol.Length(max=32))
+        fields[
+            vol.Optional(
+                CONF_SCALE,
+                default=d.get(CONF_SCALE, DEFAULT_SCALE),
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=SCALES,
+                mode=SelectSelectorMode.DROPDOWN,
+            )
+        )
+        fields[
+            vol.Optional(
+                CONF_DECIMALS,
+                default=d.get(CONF_DECIMALS, DEFAULT_DECIMALS),
+            )
+        ] = vol.All(vol.Coerce(int), vol.Range(min=0, max=10))
+        fields[
+            vol.Optional(
+                CONF_SMOOTHING,
+                default=d.get(CONF_SMOOTHING, False),
+            )
+        ] = BooleanSelector()
+        fields[
+            vol.Optional(
+                CONF_THRESHOLDS,
+                default=d.get(CONF_THRESHOLDS, ""),
+            )
+        ] = str
+        fields[
+            vol.Optional(
+                CONF_HISTORY_PERIOD,
+                default=d.get(CONF_HISTORY_PERIOD, DEFAULT_HISTORY_PERIOD),
+            )
+        ] = NumberSelector(
+            NumberSelectorConfig(
+                min=0,
+                max=168,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement="hours",
+            )
+        )
 
     # --- Identity fields ---
     fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = str
@@ -520,6 +592,13 @@ def _parse_entity_input(user_input: dict) -> dict:
     if user_input.get(CONF_TEMPLATE) == "gauge" and min_v >= max_v:
         raise vol.Invalid("invalid_gauge_range", path=[CONF_MIN_VALUE])
 
+    # Parse timeline fields
+    series_raw = user_input.get(CONF_SERIES, "")
+    series = _parse_state_labels(series_raw) if isinstance(series_raw, str) else series_raw or {}
+    thresholds_raw = user_input.get(CONF_THRESHOLDS, "")
+    thresholds = _parse_thresholds(thresholds_raw) if isinstance(thresholds_raw, str) else thresholds_raw or []
+    history_period_raw = user_input.get(CONF_HISTORY_PERIOD, DEFAULT_HISTORY_PERIOD)
+
     return {
         CONF_ENTITY_ID: entity_id,
         CONF_SLUG: slug,
@@ -549,6 +628,12 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_SECONDARY_URL: secondary_url,
         CONF_ENDED_TTL: int(ended_ttl) if ended_ttl is not None else None,
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
+        CONF_SERIES: series,
+        CONF_SCALE: user_input.get(CONF_SCALE, DEFAULT_SCALE),
+        CONF_DECIMALS: user_input.get(CONF_DECIMALS, DEFAULT_DECIMALS),
+        CONF_SMOOTHING: user_input.get(CONF_SMOOTHING, False),
+        CONF_THRESHOLDS: thresholds,
+        CONF_HISTORY_PERIOD: int(history_period_raw) if history_period_raw is not None else DEFAULT_HISTORY_PERIOD,
     }
 
 
@@ -693,7 +778,13 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             current = dict(subentry.data)
             labels = current.get(CONF_STATE_LABELS)
             if isinstance(labels, dict):
-                current[CONF_STATE_LABELS] = ", ".join(f"{k}={v}" for k, v in labels.items())
+                current[CONF_STATE_LABELS] = _serialize_key_value_pairs(labels)
+            series = current.get(CONF_SERIES)
+            if isinstance(series, dict):
+                current[CONF_SERIES] = _serialize_key_value_pairs(series)
+            thresholds = current.get(CONF_THRESHOLDS)
+            if isinstance(thresholds, list):
+                current[CONF_THRESHOLDS] = _serialize_thresholds(thresholds)
             self._details_defaults = current
             return await self.async_step_details()
 
@@ -765,7 +856,7 @@ def _parse_csv(value: str) -> list[str]:
 
 
 def _parse_state_labels(value: str) -> dict[str, str]:
-    """Parse 'state=Label, state2=Label 2' into a dict."""
+    """Parse 'key=value, key2=value2' into a dict."""
     if not value:
         return {}
     result: dict[str, str] = {}
@@ -778,3 +869,52 @@ def _parse_state_labels(value: str) -> dict[str, str]:
             if key and val:
                 result[key] = val
     return result
+
+
+def _serialize_key_value_pairs(pairs: dict[str, str]) -> str:
+    """Serialize a dict to 'key=value, key2=value2' text for UI editing."""
+    if not pairs:
+        return ""
+    return ", ".join(f"{k}={v}" for k, v in pairs.items())
+
+
+def _parse_thresholds(value: str) -> list[dict]:
+    """Parse 'value:color:label, ...' into threshold dicts.
+
+    Format: value[:color[:label]], ...
+    Example: '25:red:Hot, 18:blue:Cold, 20'
+    """
+    if not value:
+        return []
+    result: list[dict] = []
+    for entry in value.split(","):
+        parts = [p.strip() for p in entry.strip().split(":")]
+        if not parts or not parts[0]:
+            continue
+        try:
+            threshold: dict = {"value": float(parts[0])}
+        except ValueError:
+            continue
+        if len(parts) > 1 and parts[1]:
+            threshold["color"] = parts[1]
+        if len(parts) > 2 and parts[2]:
+            threshold["label"] = parts[2]
+        result.append(threshold)
+    return result[:5]
+
+
+def _serialize_thresholds(thresholds: list[dict]) -> str:
+    """Serialize threshold dicts back to 'value:color:label, ...' text for editing."""
+    if not thresholds:
+        return ""
+    parts: list[str] = []
+    for t in thresholds:
+        s = str(t.get("value", ""))
+        color = t.get("color", "")
+        label = t.get("label", "")
+        if color or label:
+            s += f":{color}"
+        if label:
+            s += f":{label}"
+        parts.append(s)
+    return ", ".join(parts)
