@@ -449,9 +449,7 @@ def _details_schema(
         )
 
     # --- Identity fields ---
-    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(
-        str, vol.Length(max=MAX_TEXT_LEN)
-    )
+    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
     fields[
         vol.Optional(
             CONF_ACTIVITY_NAME,
