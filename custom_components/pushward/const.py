@@ -65,6 +65,11 @@ PRIORITY_MAX = 10
 TOTAL_STEPS_MAX = 20
 UPDATE_INTERVAL_MIN = 1
 
+# Free-text input length caps.
+MAX_TEXT_LEN = 255
+MAX_LONG_TEXT_LEN = 1024
+MAX_URL_LEN = 2048
+
 # Alert severities
 SEVERITIES = ["critical", "warning", "info"]
 

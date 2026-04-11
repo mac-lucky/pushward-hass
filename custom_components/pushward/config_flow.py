@@ -80,6 +80,9 @@ from .const import (
     DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    MAX_LONG_TEXT_LEN,
+    MAX_TEXT_LEN,
+    MAX_URL_LEN,
     PRIORITY_MAX,
     PRIORITY_MIN,
     SCALES,
@@ -389,7 +392,7 @@ def _details_schema(
                 CONF_SERIES,
                 default=d.get(CONF_SERIES, ""),
             )
-        ] = str
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
         fields[
             vol.Optional(
                 CONF_VALUE_ATTRIBUTE,
@@ -430,7 +433,7 @@ def _details_schema(
                 CONF_THRESHOLDS,
                 default=d.get(CONF_THRESHOLDS, ""),
             )
-        ] = str
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
         fields[
             vol.Optional(
                 CONF_HISTORY_PERIOD,
@@ -446,13 +449,15 @@ def _details_schema(
         )
 
     # --- Identity fields ---
-    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = str
+    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(
+        str, vol.Length(max=MAX_TEXT_LEN)
+    )
     fields[
         vol.Optional(
             CONF_ACTIVITY_NAME,
             default=d.get(CONF_ACTIVITY_NAME, ""),
         )
-    ] = str
+    ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
     fields[
         vol.Optional(
             CONF_ICON,
@@ -490,13 +495,13 @@ def _details_schema(
             CONF_STATE_LABELS,
             default=d.get(CONF_STATE_LABELS, ""),
         )
-    ] = str
+    ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
     fields[
         vol.Optional(
             CONF_COMPLETION_MESSAGE,
             default=d.get(CONF_COMPLETION_MESSAGE, ""),
         )
-    ] = str
+    ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
     fields[accent_key] = ColorRGBSelector()
     fields[
         vol.Optional(
@@ -510,13 +515,13 @@ def _details_schema(
                 CONF_URL,
                 default=d.get(CONF_URL, ""),
             )
-        ] = str
+        ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
         fields[
             vol.Optional(
                 CONF_SECONDARY_URL,
                 default=d.get(CONF_SECONDARY_URL, ""),
             )
-        ] = str
+        ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
     fields[ended_ttl_key] = NumberSelector(
         NumberSelectorConfig(
             min=_TTL_MIN,
