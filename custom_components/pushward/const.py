@@ -81,6 +81,7 @@ SCALES = ["linear", "logarithmic"]
 MAX_RETRIES = 5
 RETRY_BASE_DELAY = 1  # seconds
 RETRY_MAX_DELAY = 30  # seconds
+MAX_CONCURRENT_REQUESTS = 5  # max simultaneous API request+retry loops
 
 END_DELAY_SECONDS = 5
 

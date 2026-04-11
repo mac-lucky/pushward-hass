@@ -8,7 +8,7 @@ from http import HTTPStatus
 
 import aiohttp
 
-from .const import MAX_RETRIES, RETRY_BASE_DELAY, RETRY_MAX_DELAY
+from .const import MAX_CONCURRENT_REQUESTS, MAX_RETRIES, RETRY_BASE_DELAY, RETRY_MAX_DELAY
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,6 +39,7 @@ class PushWardApiClient:
         self._session = session
         self._base_url = base_url.rstrip("/")
         self._integration_key = integration_key
+        self._request_semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
 
     @property
     def _headers(self) -> dict[str, str]:
@@ -143,80 +144,81 @@ class PushWardApiClient:
         allow_404: bool = False,
     ) -> None:
         """Execute an HTTP request with exponential backoff retry."""
-        url = f"{self._base_url}{path}"
-        last_error: Exception | None = None
+        async with self._request_semaphore:
+            url = f"{self._base_url}{path}"
+            last_error: Exception | None = None
 
-        for attempt in range(MAX_RETRIES):
-            try:
-                async with self._session.request(
-                    method, url, headers=self._headers, json=json, timeout=_TIMEOUT
-                ) as resp:
-                    if resp.ok:
-                        return
-
-                    if allow_404 and resp.status == HTTPStatus.NOT_FOUND:
-                        return
-
-                    if handle_409 and resp.status == HTTPStatus.CONFLICT:
-                        body = await resp.text()
-                        if "already exists" in body.lower():
+            for attempt in range(MAX_RETRIES):
+                try:
+                    async with self._session.request(
+                        method, url, headers=self._headers, json=json, timeout=_TIMEOUT
+                    ) as resp:
+                        if resp.ok:
                             return
-                        snippet = body[:200] + ("…" if len(body) > 200 else "")
-                        raise PushWardApiError(
-                            f"Activity limit reached: {snippet}",
-                            status_code=resp.status,
-                        )
 
-                    if resp.status in (
-                        HTTPStatus.UNAUTHORIZED,
-                        HTTPStatus.FORBIDDEN,
-                    ):
-                        raise PushWardAuthError(
-                            "Invalid integration key",
-                            status_code=resp.status,
-                        )
+                        if allow_404 and resp.status == HTTPStatus.NOT_FOUND:
+                            return
 
-                    if resp.status == HTTPStatus.TOO_MANY_REQUESTS:
-                        delay = self._parse_retry_after(resp.headers.get("Retry-After", ""))
-                        if delay <= 0:
-                            delay = self._backoff_delay(attempt)
-                        _LOGGER.debug("Rate limited, retrying in %.1fs", delay)
-                        await asyncio.sleep(delay)
-                        continue
+                        if handle_409 and resp.status == HTTPStatus.CONFLICT:
+                            body = await resp.text()
+                            if "already exists" in body.lower():
+                                return
+                            snippet = body[:200] + ("…" if len(body) > 200 else "")
+                            raise PushWardApiError(
+                                f"Activity limit reached: {snippet}",
+                                status_code=resp.status,
+                            )
 
-                    # Other 4xx — don't retry
-                    if 400 <= resp.status < 500:
-                        body = await resp.text()
-                        snippet = body[:200] + ("…" if len(body) > 200 else "")
-                        _LOGGER.debug("%s %s returned %d: %s", method, path, resp.status, snippet)
-                        raise PushWardApiError(
+                        if resp.status in (
+                            HTTPStatus.UNAUTHORIZED,
+                            HTTPStatus.FORBIDDEN,
+                        ):
+                            raise PushWardAuthError(
+                                "Invalid integration key",
+                                status_code=resp.status,
+                            )
+
+                        if resp.status == HTTPStatus.TOO_MANY_REQUESTS:
+                            delay = self._parse_retry_after(resp.headers.get("Retry-After", ""))
+                            if delay <= 0:
+                                delay = self._backoff_delay(attempt)
+                            _LOGGER.debug("Rate limited, retrying in %.1fs", delay)
+                            await asyncio.sleep(delay)
+                            continue
+
+                        # Other 4xx — don't retry
+                        if 400 <= resp.status < 500:
+                            body = await resp.text()
+                            snippet = body[:200] + ("…" if len(body) > 200 else "")
+                            _LOGGER.debug("%s %s returned %d: %s", method, path, resp.status, snippet)
+                            raise PushWardApiError(
+                                f"{method} {path} failed ({resp.status})",
+                                status_code=resp.status,
+                            )
+
+                        # 5xx — retry
+                        last_error = PushWardApiError(
                             f"{method} {path} failed ({resp.status})",
                             status_code=resp.status,
                         )
+                except (aiohttp.ClientError, TimeoutError) as err:
+                    err_msg = str(err)
+                    snippet = err_msg[:200] + ("…" if len(err_msg) > 200 else "")
+                    last_error = PushWardApiError(f"{method} {path} connection error: {snippet}")
 
-                    # 5xx — retry
-                    last_error = PushWardApiError(
-                        f"{method} {path} failed ({resp.status})",
-                        status_code=resp.status,
+                if attempt < MAX_RETRIES - 1:
+                    delay = self._backoff_delay(attempt)
+                    _LOGGER.debug(
+                        "Retrying %s %s in %.1fs (attempt %d/%d)",
+                        method,
+                        path,
+                        delay,
+                        attempt + 1,
+                        MAX_RETRIES,
                     )
-            except (aiohttp.ClientError, TimeoutError) as err:
-                err_msg = str(err)
-                snippet = err_msg[:200] + ("…" if len(err_msg) > 200 else "")
-                last_error = PushWardApiError(f"{method} {path} connection error: {snippet}")
+                    await asyncio.sleep(delay)
 
-            if attempt < MAX_RETRIES - 1:
-                delay = self._backoff_delay(attempt)
-                _LOGGER.debug(
-                    "Retrying %s %s in %.1fs (attempt %d/%d)",
-                    method,
-                    path,
-                    delay,
-                    attempt + 1,
-                    MAX_RETRIES,
-                )
-                await asyncio.sleep(delay)
-
-        raise last_error  # type: ignore[misc]
+            raise last_error  # type: ignore[misc]
 
     @staticmethod
     def _backoff_delay(attempt: int) -> float:

@@ -1,5 +1,6 @@
 """Tests for the PushWard API client."""
 
+import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
@@ -10,6 +11,7 @@ from custom_components.pushward.api import (
     PushWardApiError,
     PushWardAuthError,
 )
+from custom_components.pushward.const import MAX_CONCURRENT_REQUESTS
 
 
 def _mock_response(status: int, *, text: str = "", headers: dict | None = None) -> AsyncMock:
@@ -295,3 +297,41 @@ async def test_no_retry_on_client_error(mock_sleep):
 
     assert session.request.call_count == 1
     mock_sleep.assert_not_called()
+
+
+# --- semaphore concurrency cap ---
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_semaphore_caps_concurrency(mock_sleep):
+    """Concurrent API calls are capped at MAX_CONCURRENT_REQUESTS."""
+    lock = asyncio.Lock()
+    current = 0
+    peak = 0
+    resp = _mock_response(200)
+
+    class _SlowContextManager:
+        async def __aenter__(self_cm):
+            nonlocal current, peak
+            async with lock:
+                current += 1
+                if current > peak:
+                    peak = current
+            # Yield control so other tasks can attempt to enter concurrently
+            await asyncio.sleep(0.01)
+            return resp
+
+        async def __aexit__(self_cm, *exc):
+            nonlocal current
+            async with lock:
+                current -= 1
+            return False
+
+    session = AsyncMock(spec=aiohttp.ClientSession)
+    session.request = MagicMock(side_effect=lambda *a, **kw: _SlowContextManager())
+    client = _make_client(session)
+
+    await asyncio.gather(*(client.update_activity(f"slug-{i}", "ONGOING", {"i": i}) for i in range(10)))
+
+    assert peak <= MAX_CONCURRENT_REQUESTS
+    assert session.request.call_count == 10
