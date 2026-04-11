@@ -1142,6 +1142,43 @@ def test_map_content_timeline_multi_series_partial():
     assert content["value"] == {"Current": 20.5}
 
 
+def test_map_content_timeline_brightness_single_series():
+    """Brightness (0-255) is rescaled to 0-100 for single-series timeline."""
+    state = _make_state("on", {"friendly_name": "Lamp", "brightness": 138})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:lightbulb",
+        CONF_VALUE_ATTRIBUTE: "brightness",
+    }
+
+    content = map_content(state, config)
+
+    # round(138/255 * 100) = 54
+    assert content["value"] == {"Lamp": 54}
+
+
+def test_map_content_timeline_brightness_multi_series():
+    """Brightness (0-255) is rescaled to 0-100 in multi-series timeline."""
+    state = _make_state(
+        "on",
+        {
+            "friendly_name": "Lamp",
+            "brightness": 255,
+            "color_temp": 350,
+        },
+    )
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:lightbulb",
+        CONF_SERIES: {"brightness": "Brightness", "color_temp": "Color Temp"},
+    }
+
+    content = map_content(state, config)
+
+    # brightness 255 → 100, color_temp unchanged (not in _ATTRS_0_255)
+    assert content["value"] == {"Brightness": 100, "Color Temp": 350}
+
+
 def test_map_content_timeline_non_numeric_state():
     """Timeline with non-numeric state produces no value."""
     state = _make_state("heating", {"friendly_name": "HVAC"})

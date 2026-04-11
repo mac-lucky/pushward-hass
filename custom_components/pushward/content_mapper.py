@@ -308,6 +308,13 @@ def get_domain_defaults(domain: str) -> dict:
 _ATTRS_0_255 = frozenset({"brightness"})
 
 
+def _rescale_attr(value: float, attr_name: str) -> float:
+    """Rescale 0-255 attributes (e.g. brightness) to 0-100."""
+    if attr_name in _ATTRS_0_255:
+        return round(value / 255.0 * 100.0)
+    return value
+
+
 def _get_progress(state: State, entity_config: dict) -> float:
     """Extract progress from entity attributes, clamped to 0.0-1.0.
 
@@ -365,7 +372,7 @@ def _get_timeline_values(state: State, entity_config: dict) -> dict[str, float]:
             raw = state.attributes.get(attr_name)
             if raw is not None:
                 try:
-                    values[label] = float(raw)
+                    values[label] = _rescale_attr(float(raw), attr_name)
                 except (ValueError, TypeError):
                     _LOGGER.debug(
                         "Could not parse timeline series attribute %s for %s",
@@ -382,7 +389,7 @@ def _get_timeline_values(state: State, entity_config: dict) -> dict[str, float]:
         if raw is None:
             return {}
         try:
-            return {label: float(raw)}
+            return {label: _rescale_attr(float(raw), attr_name)}
         except (ValueError, TypeError):
             _LOGGER.debug(
                 "Could not parse timeline value attribute %s for %s",
@@ -407,13 +414,10 @@ def _get_gauge_value(state: State, entity_config: dict) -> float:
     attr_name = entity_config.get(CONF_VALUE_ATTRIBUTE)
     if attr_name:
         try:
-            value = float(state.attributes.get(attr_name, 0))
+            return _rescale_attr(float(state.attributes.get(attr_name, 0)), attr_name)
         except (ValueError, TypeError):
             _LOGGER.debug("Could not parse gauge value attribute %s for %s", attr_name, state.entity_id)
             return 0.0
-        if attr_name in _ATTRS_0_255:
-            value = round(value / 255.0 * 100.0)
-        return value
     try:
         return float(state.state)
     except (ValueError, TypeError):
