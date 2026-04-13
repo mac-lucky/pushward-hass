@@ -277,18 +277,21 @@ def validate_url(value: str) -> str:
     return value
 
 
-_SLUG_RE = re.compile(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$")
+_SLUG_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$")
 
 
 def validate_slug(value: str) -> str:
-    """Validate slug contains only lowercase alphanumeric and hyphens."""
+    """Validate slug matches server pattern: alphanumeric, hyphens, underscores, max 128 chars."""
     if not isinstance(value, str) or not _SLUG_RE.match(value):
-        raise vol.Invalid("Slug must contain only lowercase letters, numbers, and hyphens")
+        raise vol.Invalid(
+            "Slug must start with a letter or digit, contain only letters, digits, hyphens, "
+            "or underscores, and be at most 128 characters"
+        )
     return value
 
 
 def normalize_slug(raw: str) -> str:
-    """Normalize a raw string into a valid slug (lowercase, alphanumeric + hyphens)."""
-    slug = raw.lower().replace(".", "-").replace("_", "-").replace(" ", "-")
-    slug = re.sub(r"[^a-z0-9-]", "", slug)
+    """Normalize a raw string into a valid slug (lowercase, alphanumeric + hyphens/underscores)."""
+    slug = raw.lower().replace(".", "-").replace(" ", "-")
+    slug = re.sub(r"[^a-z0-9_-]", "", slug)
     return re.sub(r"-+", "-", slug).strip("-")

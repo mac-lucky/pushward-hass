@@ -49,9 +49,9 @@ from .conftest import make_mock_state as _make_state
 @pytest.mark.parametrize(
     ("entity_id", "expected"),
     [
-        ("sensor.washing_machine_status", "ha-sensor-washing-machine-status"),
-        ("binary_sensor.front_door", "ha-binary-sensor-front-door"),
-        ("switch.living_room_light", "ha-switch-living-room-light"),
+        ("sensor.washing_machine_status", "ha-sensor-washing_machine_status"),
+        ("binary_sensor.front_door", "ha-binary_sensor-front_door"),
+        ("switch.living_room_light", "ha-switch-living_room_light"),
         ("climate.hvac", "ha-climate-hvac"),
         ("vacuum.roborock", "ha-vacuum-roborock"),
         ("timer.tea", "ha-timer-tea"),
@@ -69,8 +69,8 @@ def test_sanitize_slug(entity_id: str, expected: str):
     [
         ("my-slug", "my-slug"),
         ("My Custom Slug", "my-custom-slug"),
-        ("sensor.washer_status", "sensor-washer-status"),
-        ("UPPER_CASE.dots", "upper-case-dots"),
+        ("sensor.washer_status", "sensor-washer_status"),
+        ("UPPER_CASE.dots", "upper_case-dots"),
         ("a--b", "a-b"),
         ("---leading-trailing---", "leading-trailing"),
         ("special!@#chars$%^", "specialchars"),
@@ -104,11 +104,9 @@ def test_validate_slug_accepts_valid(slug: str):
     [
         "../admin",
         "../../other-path",
-        "UPPERCASE",
         "has spaces",
         "",
         "-leading-hyphen",
-        "trailing-hyphen-",
         "special!chars",
         "a/b",
     ],

@@ -37,6 +37,8 @@ _CONTENT_FIELDS = [
     "icon",
     "subtitle",
     "accent_color",
+    "text_color",
+    "background_color",
     "remaining_time",
     "url",
     "secondary_url",
@@ -71,6 +73,8 @@ SCHEMA_UPDATE_ACTIVITY = vol.Schema(
         vol.Optional("icon"): str,
         vol.Optional("subtitle"): str,
         vol.Optional("accent_color"): str,
+        vol.Optional("text_color"): str,
+        vol.Optional("background_color"): str,
         vol.Optional("remaining_time"): vol.Coerce(int),
         vol.Optional("url"): validate_url,
         vol.Optional("secondary_url"): validate_url,
@@ -126,6 +130,10 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
         vol.Optional("source"): str,
         vol.Optional("source_display_name"): str,
         vol.Optional("activity_slug"): validate_slug,
+        vol.Optional("url"): validate_url,
+        vol.Optional("image_url"): validate_url,
+        vol.Optional("icon_url"): validate_url,
+        vol.Optional("metadata"): vol.Schema({str: str}),
         vol.Optional("push", default=True): bool,
     }
 )
@@ -191,6 +199,10 @@ _NOTIFICATION_FIELDS = [
     "source",
     "source_display_name",
     "activity_slug",
+    "url",
+    "image_url",
+    "icon_url",
+    "metadata",
 ]
 
 

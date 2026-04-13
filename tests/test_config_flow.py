@@ -523,7 +523,7 @@ async def test_subentry_add_entity_empty_slug_auto_generates(hass: HomeAssistant
     result = await _add_entity_subentry(hass, entry, details_overrides={CONF_SLUG: ""})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
-    assert subentries[0].data[CONF_SLUG] == "ha-binary-sensor-washer"
+    assert subentries[0].data[CONF_SLUG] == "ha-binary_sensor-washer"
 
 
 async def test_subentry_add_steps_entity(hass: HomeAssistant) -> None:
