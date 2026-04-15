@@ -198,9 +198,8 @@ class PushWardApiClient:
                         if 400 <= resp.status < 500:
                             body = await resp.text()
                             snippet = body[:200] + ("…" if len(body) > 200 else "")
-                            _LOGGER.debug("%s %s returned %d: %s", method, path, resp.status, snippet)
                             raise PushWardApiError(
-                                f"{method} {path} failed ({resp.status})",
+                                f"{method} {path} failed ({resp.status}): {snippet}",
                                 status_code=resp.status,
                             )
 

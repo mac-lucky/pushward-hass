@@ -69,6 +69,7 @@ UPDATE_INTERVAL_MIN = 1
 MAX_TEXT_LEN = 255
 MAX_LONG_TEXT_LEN = 1024
 MAX_URL_LEN = 2048
+MAX_SLUG_LEN = 128
 
 # Alert severities
 SEVERITIES = ["critical", "warning", "info"]
@@ -277,21 +278,27 @@ def validate_url(value: str) -> str:
     return value
 
 
-_SLUG_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$")
+_SLUG_RE = re.compile(rf"^[a-zA-Z0-9][a-zA-Z0-9_-]{{0,{MAX_SLUG_LEN - 1}}}$")
 
 
 def validate_slug(value: str) -> str:
-    """Validate slug matches server pattern: alphanumeric, hyphens, underscores, max 128 chars."""
+    """Validate slug matches server pattern: must start with an alphanumeric, contain only
+    alphanumerics, hyphens, or underscores, and be at most MAX_SLUG_LEN chars."""
     if not isinstance(value, str) or not _SLUG_RE.match(value):
         raise vol.Invalid(
             "Slug must start with a letter or digit, contain only letters, digits, hyphens, "
-            "or underscores, and be at most 128 characters"
+            f"or underscores, and be at most {MAX_SLUG_LEN} characters"
         )
     return value
 
 
 def normalize_slug(raw: str) -> str:
-    """Normalize a raw string into a valid slug (lowercase, alphanumeric + hyphens/underscores)."""
+    """Normalize a raw string into a slug that satisfies the server pattern.
+
+    The server requires the slug to start with an alphanumeric, contain only
+    alphanumerics / hyphens / underscores, and be at most MAX_SLUG_LEN chars.
+    """
     slug = raw.lower().replace(".", "-").replace(" ", "-")
     slug = re.sub(r"[^a-z0-9_-]", "", slug)
-    return re.sub(r"-+", "-", slug).strip("-")
+    slug = re.sub(r"-+", "-", slug).strip("-_")
+    return slug[:MAX_SLUG_LEN]

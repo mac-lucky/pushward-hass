@@ -292,11 +292,30 @@ async def test_no_retry_on_client_error(mock_sleep):
     session = _make_session(resp_400)
     client = _make_client(session)
 
-    with pytest.raises(PushWardApiError, match="400"):
+    with pytest.raises(PushWardApiError, match="400") as excinfo:
         await client.update_activity("test-slug", "ONGOING", {"progress": 0.5})
 
+    # Response body must be surfaced on the exception so HA logs show the real reason.
+    assert "Bad Request" in str(excinfo.value)
     assert session.request.call_count == 1
     mock_sleep.assert_not_called()
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_4xx_error_body_truncated_in_exception(mock_sleep):
+    """Large 4xx bodies are truncated to 200 chars + ellipsis in the exception message."""
+    long_body = "x" * 500
+    resp = _mock_response(400, text=long_body)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError) as excinfo:
+        await client.update_activity("test-slug", "ONGOING", {"progress": 0.5})
+
+    msg = str(excinfo.value)
+    assert "…" in msg
+    assert "x" * 200 in msg
+    assert "x" * 201 not in msg
 
 
 # --- semaphore concurrency cap ---

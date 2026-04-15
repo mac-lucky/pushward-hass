@@ -76,10 +76,23 @@ def test_sanitize_slug(entity_id: str, expected: str):
         ("special!@#chars$%^", "specialchars"),
         ("", ""),
         ("!!!", ""),
+        # Leading hyphens/underscores stripped so first char is alphanumeric
+        # (server pattern requires ^[a-zA-Z0-9]).
+        ("_foo", "foo"),
+        ("__bar__", "bar"),
+        ("_-mix-_", "mix"),
     ],
 )
 def test_normalize_slug(raw: str, expected: str):
     assert normalize_slug(raw) == expected
+
+
+def test_normalize_slug_truncates_to_server_max():
+    """Server caps slugs at 128 chars; normalize_slug must not exceed that."""
+    raw = "a" * 200
+    assert len(normalize_slug(raw)) == 128
+    # And the result must still validate against the server pattern.
+    validate_slug(normalize_slug(raw))
 
 
 # --- validate_slug ---
@@ -735,6 +748,62 @@ def test_map_content_accent_color_attribute_fallback_to_blue():
     content = map_content(state, config)
 
     assert content["accent_color"] == "blue"
+
+
+def test_map_content_accent_color_attribute_string_garbage_falls_back():
+    """Non-color string from attribute must not be sent verbatim to the server."""
+    state = _make_state("on", {"friendly_name": "Lamp", "effect": "breathe"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "effect",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "blue"
+
+
+def test_map_content_accent_color_attribute_stringified_tuple_falls_back():
+    """Attribute stored as a string like '(27.0, 19.2)' must fall back, not leak."""
+    state = _make_state("on", {"friendly_name": "Lamp", "raw_color": "(27.001, 19.243)"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "raw_color",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "blue"
+
+
+def test_map_content_accent_color_attribute_dict_falls_back():
+    """Dict-valued attribute falls back instead of emitting str(dict)."""
+    state = _make_state("on", {"friendly_name": "Lamp", "color": {"r": 255, "g": 0, "b": 0}})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "color",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "blue"
+
+
+def test_map_content_accent_color_attribute_hex_string_passthrough():
+    """Hex string attribute is passed through unchanged."""
+    state = _make_state("on", {"friendly_name": "Lamp", "color_hex": "#a1b2c3"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "lightbulb.fill",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "color_hex",
+    }
+
+    content = map_content(state, config)
+
+    assert content["accent_color"] == "#a1b2c3"
 
 
 # --- Entity native icon auto-detection ---

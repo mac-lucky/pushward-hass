@@ -81,6 +81,7 @@ from .const import (
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
     MAX_LONG_TEXT_LEN,
+    MAX_SLUG_LEN,
     MAX_TEXT_LEN,
     MAX_URL_LEN,
     PRIORITY_MAX,
@@ -449,7 +450,7 @@ def _details_schema(
         )
 
     # --- Identity fields ---
-    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(str, vol.Length(max=MAX_SLUG_LEN))
     fields[
         vol.Optional(
             CONF_ACTIVITY_NAME,
@@ -494,12 +495,13 @@ def _details_schema(
             default=d.get(CONF_STATE_LABELS, ""),
         )
     ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
-    fields[
-        vol.Optional(
-            CONF_COMPLETION_MESSAGE,
-            default=d.get(CONF_COMPLETION_MESSAGE, ""),
-        )
-    ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+    if template == "countdown":
+        fields[
+            vol.Optional(
+                CONF_COMPLETION_MESSAGE,
+                default=d.get(CONF_COMPLETION_MESSAGE, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
     fields[accent_key] = ColorRGBSelector()
     fields[
         vol.Optional(

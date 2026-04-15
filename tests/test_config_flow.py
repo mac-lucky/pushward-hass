@@ -121,7 +121,8 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
     # Common optional fields
     data[CONF_SUBTITLE_ATTRIBUTE] = ""
     data[CONF_STATE_LABELS] = ""
-    data[CONF_COMPLETION_MESSAGE] = ""
+    if template == "countdown":
+        data[CONF_COMPLETION_MESSAGE] = ""
     data[CONF_ACCENT_COLOR_ATTRIBUTE] = ""
     if template in ("steps", "alert"):
         data[CONF_URL] = ""
@@ -1029,14 +1030,47 @@ async def test_subentry_add_entity_with_subtitle_attribute(hass: HomeAssistant) 
 
 
 async def test_subentry_add_entity_with_completion_message(hass: HomeAssistant) -> None:
-    """Completion message is stored in subentry data."""
+    """Completion message is stored in subentry data (countdown template only)."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_COMPLETION_MESSAGE: "Wash Done"})
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="countdown",
+        details_overrides={CONF_COMPLETION_MESSAGE: "Wash Done"},
+    )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_COMPLETION_MESSAGE] == "Wash Done"
+
+
+async def test_subentry_completion_message_only_for_countdown(hass: HomeAssistant) -> None:
+    """completion_message field appears in schema only for countdown template."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    for template, expected in [
+        ("generic", False),
+        ("countdown", True),
+        ("steps", False),
+        ("alert", False),
+        ("gauge", False),
+        ("timeline", False),
+    ]:
+        result = await hass.config_entries.subentries.async_init(
+            (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+            context={"source": config_entries.SOURCE_USER},
+        )
+        result = await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input=_mock_core_input(**{CONF_TEMPLATE: template}),
+        )
+        assert result["step_id"] == "details"
+        schema_keys = {str(k) for k in result["data_schema"].schema}
+        assert (CONF_COMPLETION_MESSAGE in schema_keys) is expected, (
+            f"template={template} expected completion_message={expected} but got keys={schema_keys}"
+        )
 
 
 async def test_subentry_add_entity_with_urls(hass: HomeAssistant) -> None:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 
 from homeassistant.core import State
@@ -53,6 +54,27 @@ _LOGGER = logging.getLogger(__name__)
 # Keep in sync with the fields emitted in map_content's timeline branch.
 _TIMELINE_CARRY_FIELDS = ("unit", "scale", "decimals", "smoothing", "thresholds")
 
+# Mirrors server-side ValidateColor: 6- or 8-digit hex with optional '#', or
+# one of the server's allowlisted named colors. Must stay in sync with
+# pushward-server/internal/model/activity.go:validNamedColors.
+_COLOR_HEX_RE = re.compile(r"^#?[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?$")
+_COLOR_NAMED = frozenset(
+    {
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "purple",
+        "pink",
+        "indigo",
+        "teal",
+        "cyan",
+        "mint",
+        "brown",
+    }
+)
+
 
 def sanitize_slug(entity_id: str) -> str:
     """Convert an HA entity_id to a PushWard slug.
@@ -67,30 +89,38 @@ def _color_to_str(value: object) -> str:
 
     Handles rgb_color (3-tuple), rgbw/rgbww (4/5-tuple, takes RGB),
     xy_color (2-tuple 0-1), hs_color (2-tuple hue 0-360, sat 0-100),
-    color_temp_kelvin (int), and plain strings/named colors.
+    color_temp_kelvin (int), and plain named-color / hex strings.
+
+    Returns "" for anything unrecognized so callers fall back to the default
+    accent instead of emitting a garbage color string the server will reject.
     """
     if isinstance(value, (list, tuple)):
-        if len(value) >= 3:
-            # rgb_color, rgbw_color, rgbww_color — take first 3 as RGB
-            r, g, b = int(value[0]), int(value[1]), int(value[2])
-            return f"#{r:02x}{g:02x}{b:02x}"
-        if len(value) == 2:
-            a, b_val = float(value[0]), float(value[1])
-            if a <= 1.0 and b_val <= 1.0:
-                # Heuristic: values in 0.0-1.0 range → CIE XY color.
-                # HS would need hue ≤ 1° and sat ≤ 1% (near-white), which is
-                # unrealistic in practice. Users map to typed HA attributes
-                # (xy_color / hs_color) anyway.
-                r, g, b = color_xy_to_RGB(a, b_val)
-            else:
-                # hs_color (hue 0-360, saturation 0-100)
-                r, g, b = color_hs_to_RGB(a, b_val)
-            return f"#{r:02x}{g:02x}{b:02x}"
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        # color_temp_kelvin
-        rf, gf, bf = color_temperature_to_rgb(float(value))
-        return f"#{int(rf):02x}{int(gf):02x}{int(bf):02x}"
-    return str(value)
+        try:
+            if len(value) >= 3:
+                r, g, b = int(value[0]), int(value[1]), int(value[2])
+                return f"#{r:02x}{g:02x}{b:02x}"
+            if len(value) == 2:
+                a, b_val = float(value[0]), float(value[1])
+                if a <= 1.0 and b_val <= 1.0:
+                    r, g, b = color_xy_to_RGB(a, b_val)
+                else:
+                    r, g, b = color_hs_to_RGB(a, b_val)
+                return f"#{r:02x}{g:02x}{b:02x}"
+        except (TypeError, ValueError):
+            return ""
+    if isinstance(value, bool):
+        return ""
+    if isinstance(value, (int, float)):
+        try:
+            rf, gf, bf = color_temperature_to_rgb(float(value))
+            return f"#{int(rf):02x}{int(gf):02x}{int(bf):02x}"
+        except (TypeError, ValueError):
+            return ""
+    if isinstance(value, str):
+        stripped = value.strip()
+        if _COLOR_HEX_RE.match(stripped) or stripped.lower() in _COLOR_NAMED:
+            return stripped
+    return ""
 
 
 def _add_url_deeplinks(content: dict, entity_config: dict) -> None:
