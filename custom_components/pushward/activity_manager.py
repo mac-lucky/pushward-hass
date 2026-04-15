@@ -6,6 +6,7 @@ import asyncio
 import contextlib
 import logging
 import time
+from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -37,7 +38,9 @@ from .const import (
     CONF_VALUE_ATTRIBUTE,
     END_DELAY_SECONDS,
 )
-from .content_mapper import _rescale_attr, map_completion_content, map_content
+from .content_mapper import _get_timeline_values, map_completion_content, map_content
+
+_HISTORY_BUFFER_MAX = 300
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -55,6 +58,10 @@ class TrackedEntity:
     end_task: asyncio.Task | None = field(default=None, repr=False)
     generation: int = 0
     last_sent_at: float = 0.0
+    # (ts_seconds, {label: value}) — sampled on every state change. HA 2024.8+
+    # strips light attributes from the recorder DB, so recorder queries can't
+    # rebuild brightness history. Keep our own ring buffer instead.
+    history_buffer: deque = field(default_factory=lambda: deque(maxlen=_HISTORY_BUFFER_MAX))
 
 
 class ActivityManager:
@@ -102,8 +109,13 @@ class ActivityManager:
             )
             self._tracked[entity_id] = tracked
 
-            # Resume if entity is currently in a start state (HA restart)
             current = self._hass.states.get(entity_id)
+            # Seed the history buffer with the current value so the first
+            # activity start has at least one point.
+            if current is not None:
+                self._record_history_sample(tracked, current)
+
+            # Resume if entity is currently in a start state (HA restart)
             if current and current.state in entity_cfg.get(CONF_START_STATES, []):
                 await self._start_activity(entity_id)
 
@@ -146,6 +158,10 @@ class ActivityManager:
         if tracked is None:
             return
 
+        # Always sample into the history buffer, even when the activity is not
+        # active — that's exactly how we accumulate backfill material.
+        self._record_history_sample(tracked, new_state)
+
         config = tracked.config
         start_states = config.get(CONF_START_STATES, [])
         end_states = config.get(CONF_END_STATES, [])
@@ -156,6 +172,19 @@ class ActivityManager:
             self._schedule_end(entity_id)
         elif tracked.is_active:
             self._schedule_throttled_update(entity_id)
+
+    def _record_history_sample(self, tracked: TrackedEntity, state: State) -> None:
+        """Append a timeline value sample to the per-entity history buffer."""
+        config = tracked.config
+        if config.get(CONF_TEMPLATE) != "timeline":
+            return
+        if not config.get(CONF_HISTORY_PERIOD, 0):
+            return
+        values = _get_timeline_values(state, config)
+        if not values:
+            return
+        ts = int(state.last_updated.timestamp())
+        tracked.history_buffer.append((ts, values))
 
     async def _start_activity(self, entity_id: str) -> None:
         """Create and start a PushWard Live Activity."""
@@ -215,17 +244,57 @@ class ActivityManager:
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to start activity for %s", entity_id, exc_info=True)
 
-    async def _seed_timeline_history(self, entity_id: str, config: dict, content: dict) -> dict[str, list[dict]] | None:
-        """Query HA recorder for back-history to seed timeline sparkline."""
+    async def _seed_timeline_history(
+        self, entity_id: str, config: dict, _content: dict
+    ) -> dict[str, list[dict]] | None:
+        """Build back-history for the timeline sparkline.
+
+        Primary source is the in-memory ring buffer, populated on every state
+        change. HA 2024.8+ strips attributes like ``brightness`` from the
+        recorder DB, so a recorder query cannot rebuild attribute history —
+        only state history. We fall back to the recorder only for entities
+        whose primary state is the numeric value (no series, no value
+        attribute), e.g. plain numeric sensors.
+        """
         period_minutes = config.get(CONF_HISTORY_PERIOD, 0)
         if not period_minutes:
             return None
 
+        tracked = self._tracked.get(entity_id)
+        cutoff = int(time.time()) - period_minutes * 60
+
+        history: dict[str, list[dict]] = {}
+        if tracked:
+            for ts, values in tracked.history_buffer:
+                if ts < cutoff:
+                    continue
+                for label, v in values.items():
+                    history.setdefault(label, []).append({"t": ts, "v": v})
+
+        if not history and not (config.get(CONF_SERIES) or config.get(CONF_VALUE_ATTRIBUTE)):
+            history = await self._recorder_history_fallback(entity_id, period_minutes)
+
+        for key in history:
+            if len(history[key]) > _HISTORY_BUFFER_MAX:
+                history[key] = history[key][-_HISTORY_BUFFER_MAX:]
+
+        _LOGGER.debug(
+            "History seed %s: period=%dm buffer=%d series=%d points=%d",
+            entity_id,
+            period_minutes,
+            len(tracked.history_buffer) if tracked else 0,
+            len(history),
+            sum(len(v) for v in history.values()),
+        )
+
+        return history if history else None
+
+    async def _recorder_history_fallback(self, entity_id: str, period_minutes: int) -> dict[str, list[dict]]:
+        """Pull numeric primary-state history from the recorder (sensors etc.)."""
         try:
             from homeassistant.components.recorder.history import get_significant_states
         except ImportError:
-            _LOGGER.debug("Recorder not available, skipping history seed for %s", entity_id)
-            return None
+            return {}
 
         from homeassistant.helpers.recorder import get_instance
         from homeassistant.util import dt as dt_util
@@ -246,70 +315,19 @@ class ActivityManager:
             )
         except Exception:
             _LOGGER.debug("Failed to query recorder for %s", entity_id, exc_info=True)
-            return None
+            return {}
 
         entity_states = states.get(entity_id, [])
-        if not entity_states:
-            return None
-
-        series_map = config.get(CONF_SERIES) or {}
-        value_attr = config.get(CONF_VALUE_ATTRIBUTE) or ""
+        label = entity_id
         history: dict[str, list[dict]] = {}
-        state_counts: dict[str, int] = {}
-        attr_present = 0
-
-        # Derive the single-series label once (only used when series_map is empty)
-        if not series_map:
-            value_map = content.get("value", {})
-            single_label = next(iter(value_map), entity_id) if value_map else entity_id
-
         for state_obj in entity_states:
-            state_counts[state_obj.state] = state_counts.get(state_obj.state, 0) + 1
             if state_obj.state in ("unavailable", "unknown"):
                 continue
-            ts = int(state_obj.last_updated.timestamp())
-
-            if series_map:
-                for attr_name, label in series_map.items():
-                    raw = state_obj.attributes.get(attr_name)
-                    if raw is not None:
-                        attr_present += 1
-                        with contextlib.suppress(ValueError, TypeError):
-                            history.setdefault(label, []).append({"t": ts, "v": _rescale_attr(float(raw), attr_name)})
-            elif value_attr:
-                raw = state_obj.attributes.get(value_attr)
-                if raw is not None:
-                    attr_present += 1
-                    with contextlib.suppress(ValueError, TypeError):
-                        history.setdefault(single_label, []).append(
-                            {"t": ts, "v": _rescale_attr(float(raw), value_attr)}
-                        )
-            else:
-                with contextlib.suppress(ValueError, TypeError):
-                    history.setdefault(single_label, []).append({"t": ts, "v": float(state_obj.state)})
-
-        # Cap at 300 points per series (server storage limit)
-        for key in history:
-            if len(history[key]) > 300:
-                history[key] = history[key][-300:]
-
-        sample_attrs: list[str] = []
-        if entity_states:
-            last = entity_states[-1]
-            sample_attrs = sorted(last.attributes.keys())[:12]
-        _LOGGER.debug(
-            "History seed %s: period=%dm states=%d by_state=%s attr_present=%d points=%d value_attr=%r sample_attrs=%s",
-            entity_id,
-            period_minutes,
-            len(entity_states),
-            state_counts,
-            attr_present,
-            sum(len(v) for v in history.values()),
-            value_attr,
-            sample_attrs,
-        )
-
-        return history if history else None
+            with contextlib.suppress(ValueError, TypeError):
+                history.setdefault(label, []).append(
+                    {"t": int(state_obj.last_updated.timestamp()), "v": float(state_obj.state)}
+                )
+        return history
 
     @callback
     def _schedule_throttled_update(self, entity_id: str) -> None:
