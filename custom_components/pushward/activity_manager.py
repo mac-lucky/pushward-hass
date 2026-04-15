@@ -20,6 +20,7 @@ from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
 )
+from homeassistant.helpers.storage import Store
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
@@ -41,6 +42,8 @@ from .const import (
 from .content_mapper import _get_timeline_values, map_completion_content, map_content
 
 _HISTORY_BUFFER_MAX = 300
+_HISTORY_STORAGE_VERSION = 1
+_HISTORY_SAVE_DELAY_S = 30
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -80,6 +83,15 @@ class ActivityManager:
         self._entry = entry
         self._tracked: dict[str, TrackedEntity] = {}
         self._reauth_triggered = False
+        # History ring buffers are persisted so that sparklines survive restarts
+        # (HA 2024.8+ no longer stores light attributes in the recorder DB, so
+        # we cannot reconstruct history from HA itself).
+        self._history_store: Store = Store(
+            hass,
+            _HISTORY_STORAGE_VERSION,
+            f"pushward_history.{entry.entry_id}",
+            atomic_writes=True,
+        )
 
     def _get_registry_icon(self, entity_id: str) -> str | None:
         """Look up entity icon from the HA entity registry."""
@@ -98,9 +110,15 @@ class ActivityManager:
 
     async def async_start(self) -> None:
         """Subscribe to state changes and resume any active entities."""
+        persisted = await self._async_load_history()
+
         for entity_cfg in self._entities:
             entity_id = entity_cfg[CONF_ENTITY_ID]
             tracked = TrackedEntity(config=entity_cfg)
+
+            # Rehydrate the buffer from disk so sparklines survive restarts.
+            for ts, values in persisted.get(entity_id, ()):
+                tracked.history_buffer.append((ts, values))
 
             tracked.unsub_state = async_track_state_change_event(
                 self._hass,
@@ -119,8 +137,57 @@ class ActivityManager:
             if current and current.state in entity_cfg.get(CONF_START_STATES, []):
                 await self._start_activity(entity_id)
 
+    async def _async_load_history(self) -> dict[str, list[tuple[int, dict[str, float]]]]:
+        """Read the persisted ring buffers from .storage."""
+        try:
+            raw = await self._history_store.async_load()
+        except Exception:
+            _LOGGER.debug("Failed to load persisted history, starting fresh", exc_info=True)
+            return {}
+        if not raw:
+            return {}
+        result: dict[str, list[tuple[int, dict[str, float]]]] = {}
+        for entity_id, samples in raw.get("samples", {}).items():
+            rehydrated: list[tuple[int, dict[str, float]]] = []
+            for entry in samples:
+                # Tolerate JSON round-tripping: lists instead of tuples, stringified keys.
+                try:
+                    ts = int(entry[0])
+                    values = {str(k): float(v) for k, v in entry[1].items()}
+                except (KeyError, TypeError, ValueError, IndexError):
+                    continue
+                rehydrated.append((ts, values))
+            if rehydrated:
+                result[entity_id] = rehydrated
+        return result
+
+    @callback
+    def _schedule_history_save(self) -> None:
+        """Debounced write of all ring buffers to .storage."""
+        self._history_store.async_delay_save(self._serialize_history, _HISTORY_SAVE_DELAY_S)
+
+    @callback
+    def _serialize_history(self) -> dict:
+        """Build the JSON payload written by async_delay_save."""
+        return {
+            "samples": {
+                entity_id: [[ts, dict(values)] for ts, values in tracked.history_buffer]
+                for entity_id, tracked in self._tracked.items()
+                if tracked.history_buffer
+            }
+        }
+
     async def async_stop(self) -> None:
         """End all active activities and unsubscribe listeners."""
+        # Flush any pending debounced history write before tearing down. Store
+        # also listens to EVENT_HOMEASSISTANT_FINAL_WRITE for full HA shutdown,
+        # but config-entry reloads don't fire that event.
+        if self._tracked:
+            try:
+                await self._history_store.async_save(self._serialize_history())
+            except Exception:
+                _LOGGER.debug("Failed to flush history buffer on stop", exc_info=True)
+
         for _entity_id, tracked in self._tracked.items():
             if tracked.end_task and not tracked.end_task.done():
                 tracked.end_task.cancel()
@@ -185,6 +252,7 @@ class ActivityManager:
             return
         ts = int(state.last_updated.timestamp())
         tracked.history_buffer.append((ts, values))
+        self._schedule_history_save()
 
     async def _start_activity(self, entity_id: str) -> None:
         """Create and start a PushWard Live Activity."""

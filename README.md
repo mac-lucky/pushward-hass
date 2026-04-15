@@ -85,7 +85,7 @@ Each tracked entity uses a two-step flow:
 | Decimal Places | Value display precision, 0–10 (timeline) |
 | Smooth Lines | Enable curve interpolation between points (timeline) |
 | Thresholds | Horizontal reference lines on the sparkline (timeline) |
-| History Period | Hours of HA recorder history to seed on start (timeline, 0–168) |
+| Back-History Period | Minutes of history to seed the sparkline on activity start (timeline, 0–1440) |
 | Subtitle Attribute | Entity attribute for subtitle text |
 | State Labels | Custom state→label mapping (e.g., `on=Running, off=Stopped`) |
 | Completion Message | Text shown at end (default: "Complete") |
@@ -94,6 +94,17 @@ Each tracked entity uses a two-step flow:
 | URL / Secondary URL | Deep-link URLs (http/https) |
 | Ended TTL | Seconds to keep activity after end |
 | Stale TTL | Seconds of inactivity before auto-end |
+
+### How the timeline sparkline backfill works
+
+Setting **Back-History Period** tells the integration how far back to seed the sparkline when the activity starts. Because Home Assistant 2024.8 [removed light/climate attributes from the recorder database](https://github.com/home-assistant/core/issues/123028), the recorder can no longer be queried to rebuild attribute-based history (e.g. a light's `brightness`). Instead, the integration keeps its own in-memory ring buffer (up to 300 samples per tracked entity), populated from live state changes and persisted to `.storage/pushward_history.<entry_id>` so it survives Home Assistant restarts.
+
+This has a few practical implications:
+
+- **First-time activation is empty.** Right after installing the integration, the buffer has no samples yet — the sparkline only starts filling in once the tracked attribute changes while Home Assistant is running.
+- **Backfill resolution matches state-change frequency.** If a light's brightness changes every 30 seconds, the sparkline shows 30-second resolution. There is no polling.
+- **Fresh-install HA restart is still empty.** The buffer is saved to disk and reloaded on restart, so no data is lost — but if the file doesn't exist yet, the buffer starts empty.
+- **For numeric-state sensors (temperature, humidity, etc.)** the recorder is still used as a fallback, so backfill works immediately on first install.
 
 ## Services
 
