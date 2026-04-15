@@ -34,9 +34,10 @@ from .const import (
     CONF_START_STATES,
     CONF_TEMPLATE,
     CONF_UPDATE_INTERVAL,
+    CONF_VALUE_ATTRIBUTE,
     END_DELAY_SECONDS,
 )
-from .content_mapper import map_completion_content, map_content
+from .content_mapper import _rescale_attr, map_completion_content, map_content
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -252,6 +253,7 @@ class ActivityManager:
             return None
 
         series_map = config.get(CONF_SERIES) or {}
+        value_attr = config.get(CONF_VALUE_ATTRIBUTE) or ""
         history: dict[str, list[dict]] = {}
 
         # Derive the single-series label once (only used when series_map is empty)
@@ -269,7 +271,14 @@ class ActivityManager:
                     raw = state_obj.attributes.get(attr_name)
                     if raw is not None:
                         with contextlib.suppress(ValueError, TypeError):
-                            history.setdefault(label, []).append({"t": ts, "v": float(raw)})
+                            history.setdefault(label, []).append({"t": ts, "v": _rescale_attr(float(raw), attr_name)})
+            elif value_attr:
+                raw = state_obj.attributes.get(value_attr)
+                if raw is not None:
+                    with contextlib.suppress(ValueError, TypeError):
+                        history.setdefault(single_label, []).append(
+                            {"t": ts, "v": _rescale_attr(float(raw), value_attr)}
+                        )
             else:
                 with contextlib.suppress(ValueError, TypeError):
                     history.setdefault(single_label, []).append({"t": ts, "v": float(state_obj.state)})
