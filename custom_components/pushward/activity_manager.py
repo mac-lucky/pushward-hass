@@ -255,6 +255,8 @@ class ActivityManager:
         series_map = config.get(CONF_SERIES) or {}
         value_attr = config.get(CONF_VALUE_ATTRIBUTE) or ""
         history: dict[str, list[dict]] = {}
+        state_counts: dict[str, int] = {}
+        attr_present = 0
 
         # Derive the single-series label once (only used when series_map is empty)
         if not series_map:
@@ -262,6 +264,7 @@ class ActivityManager:
             single_label = next(iter(value_map), entity_id) if value_map else entity_id
 
         for state_obj in entity_states:
+            state_counts[state_obj.state] = state_counts.get(state_obj.state, 0) + 1
             if state_obj.state in ("unavailable", "unknown"):
                 continue
             ts = int(state_obj.last_updated.timestamp())
@@ -270,11 +273,13 @@ class ActivityManager:
                 for attr_name, label in series_map.items():
                     raw = state_obj.attributes.get(attr_name)
                     if raw is not None:
+                        attr_present += 1
                         with contextlib.suppress(ValueError, TypeError):
                             history.setdefault(label, []).append({"t": ts, "v": _rescale_attr(float(raw), attr_name)})
             elif value_attr:
                 raw = state_obj.attributes.get(value_attr)
                 if raw is not None:
+                    attr_present += 1
                     with contextlib.suppress(ValueError, TypeError):
                         history.setdefault(single_label, []).append(
                             {"t": ts, "v": _rescale_attr(float(raw), value_attr)}
@@ -288,14 +293,20 @@ class ActivityManager:
             if len(history[key]) > 300:
                 history[key] = history[key][-300:]
 
+        sample_attrs: list[str] = []
+        if entity_states:
+            last = entity_states[-1]
+            sample_attrs = sorted(last.attributes.keys())[:12]
         _LOGGER.debug(
-            "History seed %s: period=%dm states=%d series=%d points=%d value_attr=%r",
+            "History seed %s: period=%dm states=%d by_state=%s attr_present=%d points=%d value_attr=%r sample_attrs=%s",
             entity_id,
             period_minutes,
             len(entity_states),
-            len(history),
+            state_counts,
+            attr_present,
             sum(len(v) for v in history.values()),
             value_attr,
+            sample_attrs,
         )
 
         return history if history else None
