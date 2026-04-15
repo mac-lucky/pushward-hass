@@ -234,11 +234,14 @@ class ActivityManager:
 
         try:
             states = await get_instance(self._hass).async_add_executor_job(
-                get_significant_states,
-                self._hass,
-                start,
-                now,
-                [entity_id],
+                partial(
+                    get_significant_states,
+                    self._hass,
+                    start,
+                    now,
+                    [entity_id],
+                    significant_changes_only=False,
+                )
             )
         except Exception:
             _LOGGER.debug("Failed to query recorder for %s", entity_id, exc_info=True)
