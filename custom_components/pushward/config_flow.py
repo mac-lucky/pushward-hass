@@ -442,9 +442,9 @@ def _details_schema(
         ] = NumberSelector(
             NumberSelectorConfig(
                 min=0,
-                max=168,
+                max=1440,
                 mode=NumberSelectorMode.BOX,
-                unit_of_measurement="hours",
+                unit_of_measurement="minutes",
             )
         )
 

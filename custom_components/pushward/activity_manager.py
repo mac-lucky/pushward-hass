@@ -216,8 +216,8 @@ class ActivityManager:
 
     async def _seed_timeline_history(self, entity_id: str, config: dict, content: dict) -> dict[str, list[dict]] | None:
         """Query HA recorder for back-history to seed timeline sparkline."""
-        period_hours = config.get(CONF_HISTORY_PERIOD, 0)
-        if not period_hours:
+        period_minutes = config.get(CONF_HISTORY_PERIOD, 0)
+        if not period_minutes:
             return None
 
         try:
@@ -230,7 +230,7 @@ class ActivityManager:
         from homeassistant.util import dt as dt_util
 
         now = dt_util.utcnow()
-        start = now - timedelta(hours=period_hours)
+        start = now - timedelta(minutes=period_minutes)
 
         try:
             states = await get_instance(self._hass).async_add_executor_job(

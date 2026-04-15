@@ -322,7 +322,7 @@
             "decimals": "Number of decimal places shown for values (0\u201310).",
             "smoothing": "Enable curve interpolation between data points for a smoother sparkline.",
             "thresholds": "Horizontal reference lines on the sparkline. Format: value:color:label. Example: 25:red:Hot, 18:blue:Cold. Max 5.",
-            "history_period": "Hours of past data to seed the sparkline from Home Assistant's recorder. Set to 0 to start with no history.",
+            "history_period": "Minutes of past data to seed the sparkline from Home Assistant's recorder. Set to 0 to start with no history.",
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
             "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
             "icon": "Override icon. Leave empty to use the entity\u2019s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",
