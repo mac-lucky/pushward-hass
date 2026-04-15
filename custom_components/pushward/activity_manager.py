@@ -288,6 +288,16 @@ class ActivityManager:
             if len(history[key]) > 300:
                 history[key] = history[key][-300:]
 
+        _LOGGER.debug(
+            "History seed %s: period=%dm states=%d series=%d points=%d value_attr=%r",
+            entity_id,
+            period_minutes,
+            len(entity_states),
+            len(history),
+            sum(len(v) for v in history.values()),
+            value_attr,
+        )
+
         return history if history else None
 
     @callback
