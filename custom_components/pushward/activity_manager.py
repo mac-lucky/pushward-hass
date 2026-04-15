@@ -44,6 +44,18 @@ from .content_mapper import _get_timeline_values, map_completion_content, map_co
 _HISTORY_BUFFER_MAX = 300
 _HISTORY_STORAGE_VERSION = 1
 _HISTORY_SAVE_DELAY_S = 30
+_HISTORY_SAMPLES_KEY = "samples"
+
+
+def history_storage_key(entry_id: str) -> str:
+    """Return the .storage key used for this entry's persisted history buffers."""
+    return f"pushward.history.{entry_id}"
+
+
+def build_history_store(hass: HomeAssistant, entry_id: str) -> Store:
+    """Construct the Store used for persisted history buffers."""
+    return Store(hass, _HISTORY_STORAGE_VERSION, history_storage_key(entry_id), atomic_writes=True)
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,12 +98,7 @@ class ActivityManager:
         # History ring buffers are persisted so that sparklines survive restarts
         # (HA 2024.8+ no longer stores light attributes in the recorder DB, so
         # we cannot reconstruct history from HA itself).
-        self._history_store: Store = Store(
-            hass,
-            _HISTORY_STORAGE_VERSION,
-            f"pushward_history.{entry.entry_id}",
-            atomic_writes=True,
-        )
+        self._history_store: Store = build_history_store(hass, entry.entry_id)
 
     def _get_registry_icon(self, entity_id: str) -> str | None:
         """Look up entity icon from the HA entity registry."""
@@ -147,7 +154,7 @@ class ActivityManager:
         if not raw:
             return {}
         result: dict[str, list[tuple[int, dict[str, float]]]] = {}
-        for entity_id, samples in raw.get("samples", {}).items():
+        for entity_id, samples in raw.get(_HISTORY_SAMPLES_KEY, {}).items():
             rehydrated: list[tuple[int, dict[str, float]]] = []
             for entry in samples:
                 # Tolerate JSON round-tripping: lists instead of tuples, stringified keys.
@@ -170,8 +177,8 @@ class ActivityManager:
     def _serialize_history(self) -> dict:
         """Build the JSON payload written by async_delay_save."""
         return {
-            "samples": {
-                entity_id: [[ts, dict(values)] for ts, values in tracked.history_buffer]
+            _HISTORY_SAMPLES_KEY: {
+                entity_id: [[ts, values] for ts, values in tracked.history_buffer]
                 for entity_id, tracked in self._tracked.items()
                 if tracked.history_buffer
             }
@@ -186,7 +193,7 @@ class ActivityManager:
             try:
                 await self._history_store.async_save(self._serialize_history())
             except Exception:
-                _LOGGER.debug("Failed to flush history buffer on stop", exc_info=True)
+                _LOGGER.warning("Failed to flush history buffer on stop", exc_info=True)
 
         for _entity_id, tracked in self._tracked.items():
             if tracked.end_task and not tracked.end_task.done():

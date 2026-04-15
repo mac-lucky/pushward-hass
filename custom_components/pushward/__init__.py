@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady, HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .activity_manager import ActivityManager
+from .activity_manager import ActivityManager, build_history_store
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     CONF_INTEGRATION_KEY,
@@ -307,3 +307,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_SEND_NOTIFICATION)
 
     return True
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Delete persisted history when the config entry is removed."""
+    await build_history_store(hass, entry.entry_id).async_remove()
