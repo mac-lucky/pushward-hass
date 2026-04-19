@@ -282,6 +282,7 @@ send_notification:
       example: "Living Room"
       selector:
         text:
+    # TODO(critical-alerts): re-add "critical" option and the volume field below once Apple approves entitlement
     level:
       name: Level
       description: iOS interruption level. Controls how the notification is delivered.
@@ -292,17 +293,6 @@ send_notification:
             - "passive"
             - "active"
             - "time-sensitive"
-            - "critical"
-    volume:
-      name: Volume
-      description: Sound volume for critical alerts (0.0-1.0). Only used when level is critical.
-      example: 1.0
-      selector:
-        number:
-          min: 0.0
-          max: 1.0
-          step: 0.1
-          mode: slider
     thread_id:
       name: Thread ID
       description: Groups notifications together in Notification Center.

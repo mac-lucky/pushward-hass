@@ -75,6 +75,7 @@ MAX_SLUG_LEN = 128
 SEVERITIES = ["critical", "warning", "info"]
 
 # Notification interruption levels
+# "critical" is kept for backward compat — UI dropdown hides it until Apple approves entitlement
 NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
 # Templates

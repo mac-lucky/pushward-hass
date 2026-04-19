@@ -176,8 +176,8 @@ Send a push notification via PushWard.
 | `title` | Yes | Notification title |
 | `body` | Yes | Notification body text |
 | `subtitle` | No | Subtitle shown below the title |
-| `level` | No | iOS interruption level: passive, active, time-sensitive, critical |
-| `volume` | No | Sound volume 0.0–1.0 (critical level only) |
+<!-- TODO(critical-alerts): re-add `critical` level and `volume` row once Apple approves entitlement -->
+| `level` | No | iOS interruption level: passive, active, time-sensitive |
 | `thread_id` | No | Groups notifications in Notification Center |
 | `collapse_id` | No | APNs dedup key — replaces previous notification with same key (max 64 chars) |
 | `category` | No | Notification category for custom actions |

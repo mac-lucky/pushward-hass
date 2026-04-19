@@ -172,10 +172,6 @@
           "name": "Level",
           "description": "iOS interruption level. Controls how the notification is delivered."
         },
-        "volume": {
-          "name": "Volume",
-          "description": "Sound volume for critical alerts (0.0-1.0). Only used when level is critical."
-        },
         "thread_id": {
           "name": "Thread ID",
           "description": "Groups notifications together in Notification Center."

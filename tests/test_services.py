@@ -230,7 +230,13 @@ async def test_service_send_notification(hass: HomeAssistant) -> None:
 
 
 async def test_service_send_notification_all_fields(hass: HomeAssistant) -> None:
-    """send_notification service passes all optional fields."""
+    """send_notification service passes all optional fields.
+
+    The `volume` field is asserted here for backward compatibility — the
+    Python service schema accepts it and forwards it to the server so existing
+    automation YAMLs keep working. The UI selector may or may not surface
+    `volume`; the schema is the authoritative contract.
+    """
     api = _mock_api()
     await _setup_entry(hass, api)
 
@@ -284,3 +290,26 @@ async def test_service_send_notification_push_defaults_true(hass: HomeAssistant)
 
     call_kwargs = api.create_notification.call_args[1]
     assert call_kwargs["push"] is True
+
+
+async def test_service_send_notification_level_critical_backward_compat(
+    hass: HomeAssistant,
+) -> None:
+    """Automation YAMLs with level: critical must continue to validate and
+    forward. `critical` is retained in NOTIFICATION_LEVELS for backward
+    compatibility even though the UI selector no longer offers it; the server
+    handles downgrade when required.
+    """
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Alert", "body": "Motion", "level": "critical"},
+        blocking=True,
+    )
+
+    api.create_notification.assert_awaited_once()
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["level"] == "critical"
