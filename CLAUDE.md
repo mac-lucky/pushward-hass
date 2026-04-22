@@ -50,6 +50,6 @@ Resolved in `content_mapper.map_content()` with 6-level fallback (most complex c
 
 ## Gotchas
 
-- `strings.json` and `translations/en.json` must stay in sync — update both when changing UI text.
+- UI text lives in `translations/<lang>.json` only. HA custom integrations do **not** use `strings.json` (that's a HA Core build artifact) — English goes directly in `translations/en.json`. Adding a new locale is zero-code: drop a new `translations/<tag>.json` file.
 - **Release**: tag must match `version` in `manifest.json`. HACS only sees GitHub releases (`hide_default_branch: true`).
 - ConfigEntry `VERSION = 2` — migration from v1 (options-based) to v2 (subentries) exists in `__init__.py`.
