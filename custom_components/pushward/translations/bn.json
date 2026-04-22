@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "অ্যাক্টিভিটি আপডেট করুন",
+      "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "state": {
+          "name": "অবস্থা",
+          "description": "অ্যাক্টিভিটির অবস্থা (ONGOING বা ENDED)।"
+        },
+        "template": {
+          "name": "টেমপ্লেট",
+          "description": "অ্যাক্টিভিটির লেআউট টেমপ্লেট।"
+        },
+        "progress": {
+          "name": "অগ্রগতি",
+          "description": "0.0 থেকে 1.0 এর মধ্যে অগ্রগতির মান।"
+        },
+        "state_text": {
+          "name": "অবস্থার টেক্সট",
+          "description": "অ্যাক্টিভিটির অবস্থা হিসেবে প্রদর্শিত টেক্সট।"
+        },
+        "icon": {
+          "name": "আইকন",
+          "description": "SF Symbol বা MDI আইকনের নাম (যেমন arrow.down.circle.fill, mdi:download)।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "অ্যাক্টিভিটিতে প্রদর্শিত সাবটাইটেল টেক্সট।"
+        },
+        "accent_color": {
+          "name": "অ্যাকসেন্ট রঙ",
+          "description": "অ্যাক্টিভিটির জন্য অ্যাকসেন্ট রঙের নাম।"
+        },
+        "remaining_time": {
+          "name": "অবশিষ্ট সময়",
+          "description": "সেকেন্ডে অবশিষ্ট সময়।"
+        },
+        "url": {
+          "name": "URL",
+          "description": "ট্যাপযোগ্য বোতাম হিসেবে প্রদর্শিত প্রাথমিক URL। শুধুমাত্র steps এবং alert টেমপ্লেটে সমর্থিত।"
+        },
+        "secondary_url": {
+          "name": "সেকেন্ডারি URL",
+          "description": "দ্বিতীয় ট্যাপযোগ্য বোতাম হিসেবে প্রদর্শিত সেকেন্ডারি URL। শুধুমাত্র steps এবং alert টেমপ্লেটে সমর্থিত।"
+        },
+        "end_date": {
+          "name": "শেষ তারিখ",
+          "description": "কাউন্টডাউন শেষ তারিখের Unix টাইমস্ট্যাম্প।"
+        },
+        "total_steps": {
+          "name": "মোট ধাপ",
+          "description": "মোট ধাপের সংখ্যা।"
+        },
+        "current_step": {
+          "name": "বর্তমান ধাপ",
+          "description": "বর্তমান ধাপের নম্বর।"
+        },
+        "severity": {
+          "name": "তীব্রতা",
+          "description": "সতর্কতার তীব্রতার স্তর।"
+        },
+        "value": {
+          "name": "মান",
+          "description": "গেজ: সংখ্যাসূচক মান। Timeline: লেবেলযুক্ত মানের অবজেক্ট (যেমন Temp=22.5)।"
+        },
+        "min_value": {
+          "name": "সর্বনিম্ন মান",
+          "description": "গেজের সর্বনিম্ন মান।"
+        },
+        "max_value": {
+          "name": "সর্বোচ্চ মান",
+          "description": "গেজের সর্বোচ্চ মান।"
+        },
+        "unit": {
+          "name": "একক",
+          "description": "মানের পাশে প্রদর্শিত একক (যেমন °C, %)।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত বার্তা।"
+        },
+        "scale": {
+          "name": "স্কেল",
+          "description": "Y-অক্ষের স্কেল মোড (রৈখিক বা লগারিদমিক)। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        },
+        "decimals": {
+          "name": "দশমিক স্থান",
+          "description": "মান প্রদর্শনের জন্য দশমিক স্থানের সংখ্যা (0-10)। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        },
+        "smoothing": {
+          "name": "মসৃণ রেখা",
+          "description": "ডেটা পয়েন্টের মধ্যে কার্ভ ইন্টারপোলেশন সক্ষম করুন। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        },
+        "thresholds": {
+          "name": "থ্রেশহোল্ড",
+          "description": "স্পার্কলাইনে অনুভূমিক রেফারেন্স লাইন। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        }
+      }
+    },
+    "create_activity": {
+      "name": "অ্যাক্টিভিটি তৈরি করুন",
+      "description": "একটি নতুন PushWard Live Activity তৈরি করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অনন্য অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "name": {
+          "name": "নাম",
+          "description": "অ্যাক্টিভিটির প্রদর্শনের নাম।"
+        },
+        "priority": {
+          "name": "অগ্রাধিকার",
+          "description": "অ্যাক্টিভিটির অগ্রাধিকার (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।"
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "অ্যাক্টিভিটি শেষ হওয়ার পরে রাখার সেকেন্ড।"
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "অ্যাক্টিভিটি পুরনো বলে বিবেচিত হওয়ার আগে সেকেন্ড।"
+        }
+      }
+    },
+    "end_activity": {
+      "name": "অ্যাক্টিভিটি সমাপ্ত করুন",
+      "description": "একটি PushWard Live Activity সমাপ্ত করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "সমাপ্ত করতে অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত ঐচ্ছিক বার্তা।"
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "অ্যাক্টিভিটি মুছুন",
+      "description": "একটি PushWard Live Activity মুছুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "মুছতে অ্যাক্টিভিটির slug পরিচয়কারী।"
+        }
+      }
+    },
+    "send_notification": {
+      "name": "বিজ্ঞপ্তি পাঠান",
+      "description": "PushWard-এর মাধ্যমে একটি পুশ বিজ্ঞপ্তি পাঠান।",
+      "fields": {
+        "title": {
+          "name": "শিরোনাম",
+          "description": "বিজ্ঞপ্তির শিরোনাম।"
+        },
+        "body": {
+          "name": "বডি",
+          "description": "বিজ্ঞপ্তির মূল টেক্সট।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "শিরোনামের নিচে প্রদর্শিত ঐচ্ছিক সাবটাইটেল।"
+        },
+        "level": {
+          "name": "স্তর",
+          "description": "iOS বাধা স্তর। বিজ্ঞপ্তি কীভাবে ডেলিভার হবে তা নিয়ন্ত্রণ করে।"
+        },
+        "thread_id": {
+          "name": "Thread ID",
+          "description": "Notification Center-এ বিজ্ঞপ্তিগুলি একসাথে গ্রুপ করে।"
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "APNs ডিডুপ্লিকেশন কী। একই কী সহ পূর্ববর্তী বিজ্ঞপ্তি প্রতিস্থাপন করে।"
+        },
+        "category": {
+          "name": "ক্যাটাগরি",
+          "description": "কাস্টম অ্যাকশনের জন্য বিজ্ঞপ্তির ক্যাটাগরি।"
+        },
+        "source": {
+          "name": "উৎস",
+          "description": "PushWard ইনবক্সে গ্রুপিংয়ের জন্য উৎস পরিচয়কারী।"
+        },
+        "source_display_name": {
+          "name": "উৎসের প্রদর্শনের নাম",
+          "description": "PushWard ইনবক্সে প্রদর্শিত মানব-পাঠযোগ্য উৎসের নাম।"
+        },
+        "activity_slug": {
+          "name": "Activity Slug",
+          "description": "এই বিজ্ঞপ্তিটি একটি বিদ্যমান Live Activity-র সাথে লিঙ্ক করুন।"
+        },
+        "push": {
+          "name": "পুশ",
+          "description": "সকল ডিভাইসে APNs পুশ অ্যালার্ট হিসেবে পাঠান। মিথ্যা হলে, বিজ্ঞপ্তিটি শুধুমাত্র ইনবক্সে সংরক্ষিত হয়।"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "PushWard-এর সাথে সংযুক্ত হন",
+        "description": "শুরু করতে আপনার PushWard ইন্টিগ্রেশন কী লিখুন।",
+        "data": {
+          "integration_key": "ইন্টিগ্রেশন কী"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS অ্যাপে Settings → Integration Keys-এ 'ha-*' স্কোপ সহ একটি তৈরি করুন।"
+        }
+      },
+      "reconfigure": {
+        "title": "PushWard পুনরায় কনফিগার করুন",
+        "description": "আপনার PushWard ইন্টিগ্রেশন কী আপডেট করুন।",
+        "data": {
+          "integration_key": "ইন্টিগ্রেশন কী"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS অ্যাপে Settings → Integration Keys-এ 'ha-*' স্কোপ সহ একটি তৈরি করুন।"
+        }
+      },
+      "reauth_confirm": {
+        "title": "পুনরায় প্রমাণীকরণ করুন",
+        "description": "PushWard ইন্টিগ্রেশন কী অবৈধ। অনুগ্রহ করে একটি নতুন কী প্রদান করুন।",
+        "data": {
+          "integration_key": "ইন্টিগ্রেশন কী"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS অ্যাপে Settings → Integration Keys-এ 'ha-*' স্কোপ সহ একটি তৈরি করুন।"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "PushWard সার্ভারের সাথে সংযোগ করতে ব্যর্থ হয়েছে।",
+      "invalid_auth": "অবৈধ ইন্টিগ্রেশন কী।",
+      "invalid_url": "URL-এ http:// বা https:// স্কিম ব্যবহার করতে হবে।",
+      "unknown": "একটি অপ্রত্যাশিত ত্রুটি ঘটেছে।"
+    },
+    "abort": {
+      "already_configured": "PushWard ইতিমধ্যে কনফিগার করা আছে।",
+      "reconfigure_successful": "PushWard কনফিগারেশন আপডেট হয়েছে।",
+      "reauth_successful": "পুনরায় প্রমাণীকরণ সফল হয়েছে।"
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "ট্র্যাক করা সত্তা",
+      "initiate_flow": {
+        "user": "ট্র্যাক করা সত্তা যোগ করুন"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard-এ সত্তা যোগ করুন",
+          "data": {
+            "entity_id": "সত্তা",
+            "template": "টেমপ্লেট"
+          },
+          "data_description": {
+            "template": "অ্যাক্টিভিটির লেআউট টেমপ্লেট। বেশিরভাগ সত্তার জন্য 'generic' কাজ করে।"
+          }
+        },
+        "details": {
+          "title": "অ্যাক্টিভিটির বিকল্পসমূহ",
+          "data": {
+            "start_states": "শুরুর অবস্থাসমূহ",
+            "end_states": "শেষের অবস্থাসমূহ",
+            "progress_attribute": "অগ্রগতি অ্যাট্রিবিউট",
+            "remaining_time_attribute": "অবশিষ্ট সময়ের অ্যাট্রিবিউট",
+            "total_steps": "মোট ধাপ",
+            "current_step_attribute": "বর্তমান ধাপের অ্যাট্রিবিউট",
+            "severity": "তীব্রতা",
+            "value_attribute": "মানের অ্যাট্রিবিউট",
+            "min_value": "সর্বনিম্ন মান",
+            "max_value": "সর্বোচ্চ মান",
+            "unit": "একক",
+            "series": "সিরিজ",
+            "scale": "স্কেল",
+            "decimals": "দশমিক স্থান",
+            "smoothing": "মসৃণ রেখা",
+            "thresholds": "থ্রেশহোল্ড",
+            "history_period": "পূর্ববর্তী ইতিহাসের সময়কাল",
+            "slug": "অ্যাক্টিভিটি Slug",
+            "activity_name": "অ্যাক্টিভিটির নাম",
+            "icon": "আইকন",
+            "icon_attribute": "আইকন অ্যাট্রিবিউট",
+            "priority": "অগ্রাধিকার (0-10)",
+            "update_interval": "সর্বনিম্ন আপডেট বিরতি (সেকেন্ড)",
+            "subtitle_attribute": "সাবটাইটেল অ্যাট্রিবিউট",
+            "state_labels": "অবস্থার লেবেলসমূহ",
+            "completion_message": "সমাপ্তি বার্তা",
+            "accent_color": "অ্যাকসেন্ট রঙ",
+            "accent_color_attribute": "অ্যাকসেন্ট রঙের অ্যাট্রিবিউট",
+            "url": "URL",
+            "secondary_url": "সেকেন্ডারি URL",
+            "ended_ttl": "শেষ হওয়ার পরে স্বয়ংক্রিয়-মুছুন (সেকেন্ড)",
+            "stale_ttl": "নিষ্ক্রিয়তার পরে স্বয়ংক্রিয়-সমাপ্ত (সেকেন্ড)"
+          },
+          "data_description": {
+            "start_states": "সত্তার যে অবস্থাগুলি Live Activity শুরু করে। তালিকা থেকে নির্বাচন করুন বা কাস্টম মান টাইপ করুন।",
+            "end_states": "সত্তার যে অবস্থাগুলি Live Activity শেষ করে। তালিকা থেকে নির্বাচন করুন বা কাস্টম মান টাইপ করুন।",
+            "progress_attribute": "0–100 অগ্রগতির মান ধারণকারী সত্তা অ্যাট্রিবিউট। উদাহরণ: percentage",
+            "remaining_time_attribute": "সেকেন্ডে অবশিষ্ট সময় ধারণকারী সত্তা অ্যাট্রিবিউট। উদাহরণ: remaining",
+            "total_steps": "মোট ধাপের সংখ্যা।",
+            "current_step_attribute": "পূর্ণসংখ্যা হিসেবে বর্তমান ধাপ ধারণকারী সত্তা অ্যাট্রিবিউট।",
+            "severity": "সতর্কতার তীব্রতার স্তর।",
+            "value_attribute": "সংখ্যা হিসেবে বর্তমান গেজ মান ধারণকারী সত্তা অ্যাট্রিবিউট। সত্তার অবস্থা ব্যবহার করতে খালি রাখুন।",
+            "min_value": "গেজ পরিসীমার সর্বনিম্ন মান।",
+            "max_value": "গেজ পরিসীমার সর্বোচ্চ মান।",
+            "unit": "মানের পাশে প্রদর্শিত একক (যেমন °C, %, kW)। সর্বোচ্চ 32 অক্ষর।",
+            "series": "সত্তা অ্যাট্রিবিউটগুলিকে নামযুক্ত সিরিজে ম্যাপ করুন। ফরম্যাট: attribute=Label, attribute2=Label2। একটি একক সিরিজ হিসেবে সত্তার অবস্থা ব্যবহার করতে খালি রাখুন।",
+            "scale": "স্পার্কলাইন চার্টের Y-অক্ষের স্কেল মোড।",
+            "decimals": "মানের জন্য দশমিক স্থানের সংখ্যা (0–10)।",
+            "smoothing": "মসৃণ স্পার্কলাইনের জন্য ডেটা পয়েন্টের মধ্যে কার্ভ ইন্টারপোলেশন সক্ষম করুন।",
+            "thresholds": "স্পার্কলাইনে অনুভূমিক রেফারেন্স লাইন। ফরম্যাট: value:color:label। উদাহরণ: 25:red:Hot, 18:blue:Cold। সর্বোচ্চ 5।",
+            "history_period": "Home Assistant-এর রেকর্ডার থেকে স্পার্কলাইন পূরণ করতে অতীত ডেটার মিনিট। কোনো ইতিহাস ছাড়া শুরু করতে 0 সেট করুন।",
+            "slug": "এই অ্যাক্টিভিটির অনন্য পরিচয়কারী। সত্তার ID থেকে স্বয়ংক্রিয়ভাবে তৈরি করতে খালি রাখুন। উদাহরণ: ha-living-room-lamp",
+            "activity_name": "iPhone Live Activity-তে প্রদর্শিত নাম। সত্তার ফ্রেন্ডলি নামে ডিফল্ট।",
+            "icon": "আইকন ওভাররাইড করুন। সত্তার নেটিভ আইকন ব্যবহার করতে খালি রাখুন (যেমন mdi:thermometer)। SF Symbols-ও সমর্থিত (যেমন lamp.desk.fill)।",
+            "icon_attribute": "ডায়নামিক আইকনের জন্য সত্তা অ্যাট্রিবিউট। সেট করলে স্ট্যাটিক আইকন এবং সত্তার আইকন ওভাররাইড করে।",
+            "priority": "ডিভাইস সীমায় পৌঁছালে উচ্চতর অগ্রাধিকারের অ্যাক্টিভিটি বেশিক্ষণ রাখা হয় (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।",
+            "update_interval": "আপডেটের মধ্যে সর্বনিম্ন সেকেন্ড। দ্রুত অবস্থা পরিবর্তন থ্রটল করা হয়।",
+            "subtitle_attribute": "সাবটাইটেল হিসেবে প্রদর্শন করতে সত্তা অ্যাট্রিবিউট। সত্তার ফ্রেন্ডলি নাম ব্যবহার করতে খালি রাখুন।",
+            "state_labels": "অবস্থার জন্য কাস্টম প্রদর্শন টেক্সট। ফরম্যাট: state=Label, state2=Label 2। উদাহরণ: heating=Heating Up, idle=Standby",
+            "completion_message": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত টেক্সট। 'Complete' এর জন্য খালি রাখুন। উদাহরণ: Wash Done",
+            "accent_color": "Live Activity-র জন্য অ্যাকসেন্ট রঙ। ডিফল্ট নীলের জন্য খালি রাখুন।",
+            "accent_color_attribute": "ডায়নামিক অ্যাকসেন্ট রঙের জন্য সত্তা অ্যাট্রিবিউট। স্ট্যাটিক রঙ ওভাররাইড করে। RGB, HS, XY, Kelvin, নামযুক্ত রঙ এবং hex সমর্থন করে।",
+            "url": "Live Activity-তে ট্যাপ করলে খোলা লিঙ্ক। http:// বা https:// দিয়ে শুরু করতে হবে। শুধুমাত্র steps এবং alert টেমপ্লেটের জন্য।",
+            "secondary_url": "Live Activity-র সেকেন্ডারি লিঙ্ক। শুধুমাত্র steps এবং alert টেমপ্লেটের জন্য।",
+            "ended_ttl": "অ্যাক্টিভিটি শেষ হওয়ার পরে সার্ভার থেকে স্বয়ংক্রিয়ভাবে মুছে যাওয়ার আগে সেকেন্ড। অনির্দিষ্টকাল রাখতে খালি রাখুন। উদাহরণ: 300",
+            "stale_ttl": "সার্ভার স্বয়ংক্রিয়ভাবে অ্যাক্টিভিটি সমাপ্ত করার আগে নিষ্ক্রিয়তার সেকেন্ড। নিষ্ক্রিয় করতে খালি রাখুন। উদাহরণ: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "সত্তার কনফিগারেশন সম্পাদনা করুন",
+          "data": {
+            "entity_id": "সত্তা",
+            "template": "টেমপ্লেট"
+          },
+          "data_description": {
+            "template": "অ্যাক্টিভিটির লেআউট টেমপ্লেট। বেশিরভাগ সত্তার জন্য 'generic' কাজ করে।"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL-এ http:// বা https:// স্কিম ব্যবহার করতে হবে।",
+        "invalid_gauge_range": "সর্বনিম্ন মান সর্বোচ্চ মানের চেয়ে কম হতে হবে।"
+      },
+      "abort": {
+        "already_configured": "এই সত্তাটি ইতিমধ্যে ট্র্যাক করা হচ্ছে।",
+        "reconfigure_successful": "সত্তার কনফিগারেশন আপডেট হয়েছে।"
+      }
+    }
+  }
+}

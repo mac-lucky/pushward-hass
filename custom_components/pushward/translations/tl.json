@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "I-update ang Activity",
+      "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado ng activity (ONGOING o ENDED)."
+        },
+        "template": {
+          "name": "Template",
+          "description": "Layout template ng activity."
+        },
+        "progress": {
+          "name": "Progreso",
+          "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Pangalan ng accent color para sa activity."
+        },
+        "remaining_time": {
+          "name": "Natitirang Oras",
+          "description": "Natitirang oras sa mga segundo."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Pangunahing URL na ipinapakita bilang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL na ipinapakita bilang pangalawang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
+        },
+        "end_date": {
+          "name": "Petsa ng Pagtatapos",
+          "description": "Unix timestamp para sa petsa ng pagtatapos ng countdown."
+        },
+        "total_steps": {
+          "name": "Kabuuang Hakbang",
+          "description": "Kabuuang bilang ng mga hakbang."
+        },
+        "current_step": {
+          "name": "Kasalukuyang Hakbang",
+          "description": "Numero ng kasalukuyang hakbang."
+        },
+        "severity": {
+          "name": "Kalubhaan",
+          "description": "Antas ng kalubhaan ng alerto."
+        },
+        "value": {
+          "name": "Halaga",
+          "description": "Gauge: numerikong halaga. Timeline: object ng mga may label na halaga (hal. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Pinakamababang Halaga",
+          "description": "Pinakamababang halaga ng gauge."
+        },
+        "max_value": {
+          "name": "Pinakamataas na Halaga",
+          "description": "Pinakamataas na halaga ng gauge."
+        },
+        "unit": {
+          "name": "Yunit",
+          "description": "Yunit na ipinapakita para sa halaga (hal. °C, %)."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "scale": {
+          "name": "Sukat",
+          "description": "Mode ng sukat ng Y-axis (linear o logarithmic). Para sa timeline template lamang."
+        },
+        "decimals": {
+          "name": "Mga Decimal na Lugar",
+          "description": "Mga decimal na lugar para sa pagpapakita ng halaga (0-10). Para sa timeline template lamang."
+        },
+        "smoothing": {
+          "name": "Maayos na Linya",
+          "description": "Paganahin ang curve interpolation sa pagitan ng mga data point. Para sa timeline template lamang."
+        },
+        "thresholds": {
+          "name": "Mga Threshold",
+          "description": "Mga pahalang na reference line sa sparkline. Para sa timeline template lamang."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Lumikha ng Activity",
+      "description": "Lumikha ng bagong PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Natatanging slug identifier ng activity."
+        },
+        "name": {
+          "name": "Pangalan",
+          "description": "Display na pangalan para sa activity."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Tapusin ang Activity",
+      "description": "Tapusin ang isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity na tatapusin."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Opsyonal na mensaheng ipinapakita kapag natapos ang activity."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Burahin ang Activity",
+      "description": "Burahin ang isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity na buburahin."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Magpadala ng Notification",
+      "description": "Magpadala ng push notification sa pamamagitan ng PushWard.",
+      "fields": {
+        "title": {
+          "name": "Pamagat",
+          "description": "Pamagat ng notification."
+        },
+        "body": {
+          "name": "Katawan",
+          "description": "Katawang teksto ng notification."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Opsyonal na subtitle na ipinapakita sa ilalim ng pamagat."
+        },
+        "level": {
+          "name": "Antas",
+          "description": "Antas ng iOS interruption. Kinokontrol kung paano idine-deliver ang notification."
+        },
+        "thread_id": {
+          "name": "Thread ID",
+          "description": "Nagrugrupo ng mga notification sa Notification Center."
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "APNs deduplication key. Pinapalitan ang nakaraang notification na may parehong key."
+        },
+        "category": {
+          "name": "Kategorya",
+          "description": "Kategorya ng notification para sa mga custom na aksyon."
+        },
+        "source": {
+          "name": "Pinagmulan",
+          "description": "Source identifier para sa paggrupo sa PushWard inbox."
+        },
+        "source_display_name": {
+          "name": "Display na Pangalan ng Pinagmulan",
+          "description": "Nababasang pangalan ng pinagmulan na ipinapakita sa PushWard inbox."
+        },
+        "activity_slug": {
+          "name": "Activity Slug",
+          "description": "I-link ang notification na ito sa isang kasalukuyang Live Activity."
+        },
+        "push": {
+          "name": "Push",
+          "description": "Ipadala bilang APNs push alert sa lahat ng device. Kapag false, ang notification ay iniimbak lamang sa inbox."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Kumonekta sa PushWard",
+        "description": "Ilagay ang iyong PushWard integration key para makapagsimula.",
+        "data": {
+          "integration_key": "Integration Key"
+        },
+        "data_description": {
+          "integration_key": "Lumikha ng isa sa PushWard iOS app sa ilalim ng Settings → Integration Keys na may scope na 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "I-reconfigure ang PushWard",
+        "description": "I-update ang iyong PushWard integration key.",
+        "data": {
+          "integration_key": "Integration Key"
+        },
+        "data_description": {
+          "integration_key": "Lumikha ng isa sa PushWard iOS app sa ilalim ng Settings → Integration Keys na may scope na 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Mag-reauthenticate",
+        "description": "Hindi valid ang PushWard integration key. Mangyaring magbigay ng bago.",
+        "data": {
+          "integration_key": "Integration Key"
+        },
+        "data_description": {
+          "integration_key": "Lumikha ng isa sa PushWard iOS app sa ilalim ng Settings → Integration Keys na may scope na 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Hindi makakonekta sa PushWard server.",
+      "invalid_auth": "Hindi valid ang integration key.",
+      "invalid_url": "Ang URL ay dapat gumamit ng http:// o https:// scheme.",
+      "unknown": "May hindi inaasahang error na naganap."
+    },
+    "abort": {
+      "already_configured": "Naka-configure na ang PushWard.",
+      "reconfigure_successful": "Na-update na ang configuration ng PushWard.",
+      "reauth_successful": "Matagumpay na ang reauthentication."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "Tracked Entity",
+      "initiate_flow": {
+        "user": "Magdagdag ng tracked entity"
+      },
+      "step": {
+        "user": {
+          "title": "Magdagdag ng Entity sa PushWard",
+          "data": {
+            "entity_id": "Entity",
+            "template": "Template"
+          },
+          "data_description": {
+            "template": "Layout template ng activity. Ang 'generic' ay gumagana para sa karamihan ng mga entity."
+          }
+        },
+        "details": {
+          "title": "Mga Opsyon ng Activity",
+          "data": {
+            "start_states": "Mga Start State",
+            "end_states": "Mga End State",
+            "progress_attribute": "Progress Attribute",
+            "remaining_time_attribute": "Remaining Time Attribute",
+            "total_steps": "Kabuuang Hakbang",
+            "current_step_attribute": "Current Step Attribute",
+            "severity": "Kalubhaan",
+            "value_attribute": "Value Attribute",
+            "min_value": "Pinakamababang Halaga",
+            "max_value": "Pinakamataas na Halaga",
+            "unit": "Yunit",
+            "series": "Serye",
+            "scale": "Sukat",
+            "decimals": "Mga Decimal na Lugar",
+            "smoothing": "Maayos na Linya",
+            "thresholds": "Mga Threshold",
+            "history_period": "Panahon ng Kasaysayan",
+            "slug": "Activity Slug",
+            "activity_name": "Pangalan ng Activity",
+            "icon": "Icon",
+            "icon_attribute": "Icon Attribute",
+            "priority": "Priyoridad (0-10)",
+            "update_interval": "Pinakamababang Agwat ng Update (segundo)",
+            "subtitle_attribute": "Subtitle Attribute",
+            "state_labels": "Mga Label ng Estado",
+            "completion_message": "Mensahe ng Pagkumpleto",
+            "accent_color": "Accent Color",
+            "accent_color_attribute": "Accent Color Attribute",
+            "url": "URL",
+            "secondary_url": "Secondary URL",
+            "ended_ttl": "Awtomatikong Burahin Pagkatapos ng Pagtatapos (segundo)",
+            "stale_ttl": "Awtomatikong Tapusin Pagkatapos ng Kawalan ng Aktibidad (segundo)"
+          },
+          "data_description": {
+            "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
+            "end_states": "Mga estado ng entity na nagtatapos ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
+            "progress_attribute": "Attribute ng entity na nagtataglay ng halaga ng progreso mula 0 hanggang 100. Halimbawa: percentage",
+            "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
+            "total_steps": "Kabuuang bilang ng mga hakbang.",
+            "current_step_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang hakbang bilang integer.",
+            "severity": "Antas ng kalubhaan ng alerto.",
+            "value_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang halaga ng gauge bilang numero. Iwanan itong blangko para gamitin ang estado ng entity.",
+            "min_value": "Pinakamababang halaga para sa saklaw ng gauge.",
+            "max_value": "Pinakamataas na halaga para sa saklaw ng gauge.",
+            "unit": "Display na yunit na ipinapakita katabi ng halaga (hal. °C, %, kW). Hanggang 32 karakter.",
+            "series": "I-map ang mga attribute ng entity sa mga pinangalanang serye. Format: attribute=Label, attribute2=Label2. Iwanan itong blangko para gamitin ang estado ng entity bilang isang serye.",
+            "scale": "Mode ng sukat ng Y-axis para sa sparkline chart.",
+            "decimals": "Bilang ng mga decimal na lugar na ipinapakita para sa mga halaga (0–10).",
+            "smoothing": "Paganahin ang curve interpolation sa pagitan ng mga data point para sa mas maayos na sparkline.",
+            "thresholds": "Mga pahalang na reference line sa sparkline. Format: value:color:label. Halimbawa: 25:red:Mainit, 18:blue:Malamig. Hanggang 5.",
+            "history_period": "Mga minuto ng nakaraang data para i-seed ang sparkline mula sa recorder ng Home Assistant. Itakda sa 0 para magsimula nang walang kasaysayan.",
+            "slug": "Natatanging identifier para sa activity na ito. Iwanan itong blangko para awtomatikong buuin mula sa entity ID. Halimbawa: ha-living-room-lamp",
+            "activity_name": "Display na pangalan na ipinapakita sa iPhone Live Activity. Nagde-default sa friendly name ng entity.",
+            "icon": "Override na icon. Iwanan itong blangko para gamitin ang native na icon ng entity (hal. mdi:thermometer). Sinusuportahan din ang SF Symbols (hal. lamp.desk.fill).",
+            "icon_attribute": "Attribute ng entity para sa dynamic na icon. Nino-override ang static icon at entity icon kapag nakatakda.",
+            "priority": "Mas mataas na priyoridad na mga activity ang pinananatili nang mas matagal kapag naabot ang limitasyon ng device (0 = pinakamababa, 10 = pinakamataas).",
+            "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
+            "subtitle_attribute": "Attribute ng entity na ipinapakita bilang subtitle. Iwanan itong blangko para gamitin ang friendly name ng entity.",
+            "state_labels": "Custom na display na teksto para sa mga estado. Format: state=Label, state2=Label 2. Halimbawa: heating=Nagpapainit, idle=Naghihintay",
+            "completion_message": "Tekstong ipinapakita kapag natapos ang activity. Iwanan itong blangko para sa 'Kumpleto'. Halimbawa: Tapos na ang Paglalaba",
+            "accent_color": "Accent color para sa Live Activity. Iwanan itong blangko para sa default na asul.",
+            "accent_color_attribute": "Attribute ng entity para sa dynamic na accent color. Nino-override ang static na kulay. Sinusuportahan ang RGB, HS, XY, Kelvin, mga pinangalanang kulay, at hex.",
+            "url": "Link na bubukas kapag na-tap ang Live Activity. Dapat magsimula sa http:// o https://. Para sa mga steps at alert na template lamang.",
+            "secondary_url": "Secondary link para sa Live Activity. Para sa mga steps at alert na template lamang.",
+            "ended_ttl": "Mga segundo pagkatapos matapos ang activity bago ito awtomatikong mabura mula sa server. Iwanan itong blangko para panatilihing walang hanggan. Halimbawa: 300",
+            "stale_ttl": "Mga segundo ng kawalan ng aktibidad bago awtomatikong tapusin ng server ang activity. Iwanan itong blangko para i-disable. Halimbawa: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "I-edit ang Configuration ng Entity",
+          "data": {
+            "entity_id": "Entity",
+            "template": "Template"
+          },
+          "data_description": {
+            "template": "Layout template ng activity. Ang 'generic' ay gumagana para sa karamihan ng mga entity."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "Ang URL ay dapat gumamit ng http:// o https:// scheme.",
+        "invalid_gauge_range": "Ang pinakamababang halaga ay dapat na mas mababa sa pinakamataas na halaga."
+      },
+      "abort": {
+        "already_configured": "Ang entity na ito ay naka-track na.",
+        "reconfigure_successful": "Na-update na ang configuration ng entity."
+      }
+    }
+  }
+}

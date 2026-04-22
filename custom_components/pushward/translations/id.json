@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Perbarui Aktivitas",
+      "description": "Perbarui status dan konten PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas (ONGOING atau ENDED)."
+        },
+        "template": {
+          "name": "Templat",
+          "description": "Templat tata letak aktivitas."
+        },
+        "progress": {
+          "name": "Kemajuan",
+          "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Nama warna aksen untuk aktivitas."
+        },
+        "remaining_time": {
+          "name": "Waktu Tersisa",
+          "description": "Waktu tersisa dalam detik."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL utama yang ditampilkan sebagai tombol yang dapat ditekan. Hanya didukung pada templat steps dan alert."
+        },
+        "secondary_url": {
+          "name": "URL Sekunder",
+          "description": "URL sekunder yang ditampilkan sebagai tombol kedua yang dapat ditekan. Hanya didukung pada templat steps dan alert."
+        },
+        "end_date": {
+          "name": "Tanggal Akhir",
+          "description": "Stempel waktu Unix untuk tanggal akhir hitung mundur."
+        },
+        "total_steps": {
+          "name": "Total Langkah",
+          "description": "Total jumlah langkah."
+        },
+        "current_step": {
+          "name": "Langkah Saat Ini",
+          "description": "Nomor langkah saat ini."
+        },
+        "severity": {
+          "name": "Tingkat Keparahan",
+          "description": "Tingkat keparahan peringatan."
+        },
+        "value": {
+          "name": "Nilai",
+          "description": "Gauge: nilai numerik. Timeline: objek nilai berlabel (misalnya Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Nilai Minimum",
+          "description": "Nilai minimum gauge."
+        },
+        "max_value": {
+          "name": "Nilai Maksimum",
+          "description": "Nilai maksimum gauge."
+        },
+        "unit": {
+          "name": "Satuan",
+          "description": "Satuan tampilan untuk nilai (misalnya °C, %)."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "scale": {
+          "name": "Skala",
+          "description": "Mode skala sumbu Y (linear atau logaritmik). Hanya untuk templat timeline."
+        },
+        "decimals": {
+          "name": "Angka Desimal",
+          "description": "Jumlah angka desimal untuk tampilan nilai (0-10). Hanya untuk templat timeline."
+        },
+        "smoothing": {
+          "name": "Garis Halus",
+          "description": "Aktifkan interpolasi kurva antar titik data. Hanya untuk templat timeline."
+        },
+        "thresholds": {
+          "name": "Ambang Batas",
+          "description": "Garis referensi horizontal pada sparkline. Hanya untuk templat timeline."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Buat Aktivitas",
+      "description": "Buat PushWard Live Activity baru.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas yang unik."
+        },
+        "name": {
+          "name": "Nama",
+          "description": "Nama tampilan untuk aktivitas."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Akhiri Aktivitas",
+      "description": "Akhiri PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas yang akan diakhiri."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan opsional yang ditampilkan saat aktivitas berakhir."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Hapus Aktivitas",
+      "description": "Hapus PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas yang akan dihapus."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Kirim Notifikasi",
+      "description": "Kirim notifikasi push melalui PushWard.",
+      "fields": {
+        "title": {
+          "name": "Judul",
+          "description": "Judul notifikasi."
+        },
+        "body": {
+          "name": "Isi",
+          "description": "Teks isi notifikasi."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Subjudul opsional yang ditampilkan di bawah judul."
+        },
+        "level": {
+          "name": "Tingkat",
+          "description": "Tingkat interupsi iOS. Mengontrol cara notifikasi dikirimkan."
+        },
+        "thread_id": {
+          "name": "ID Thread",
+          "description": "Mengelompokkan notifikasi bersama di Notification Center."
+        },
+        "collapse_id": {
+          "name": "ID Gabungan",
+          "description": "Kunci deduplikasi APNs. Menggantikan notifikasi sebelumnya dengan kunci yang sama."
+        },
+        "category": {
+          "name": "Kategori",
+          "description": "Kategori notifikasi untuk tindakan kustom."
+        },
+        "source": {
+          "name": "Sumber",
+          "description": "Identifikasi sumber untuk pengelompokan di kotak masuk PushWard."
+        },
+        "source_display_name": {
+          "name": "Nama Tampilan Sumber",
+          "description": "Nama sumber yang mudah dibaca dan ditampilkan di kotak masuk PushWard."
+        },
+        "activity_slug": {
+          "name": "Slug Aktivitas",
+          "description": "Tautkan notifikasi ini ke Live Activity yang sudah ada."
+        },
+        "push": {
+          "name": "Push",
+          "description": "Kirim sebagai peringatan push APNs ke semua perangkat. Jika false, notifikasi hanya disimpan di kotak masuk."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Hubungkan ke PushWard",
+        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai.",
+        "data": {
+          "integration_key": "Kunci Integrasi"
+        },
+        "data_description": {
+          "integration_key": "Buat di aplikasi PushWard iOS di bawah Pengaturan → Integration Keys dengan cakupan 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "Konfigurasi Ulang PushWard",
+        "description": "Perbarui kunci integrasi PushWard Anda.",
+        "data": {
+          "integration_key": "Kunci Integrasi"
+        },
+        "data_description": {
+          "integration_key": "Buat di aplikasi PushWard iOS di bawah Pengaturan → Integration Keys dengan cakupan 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Autentikasi Ulang",
+        "description": "Kunci integrasi PushWard tidak valid. Harap berikan yang baru.",
+        "data": {
+          "integration_key": "Kunci Integrasi"
+        },
+        "data_description": {
+          "integration_key": "Buat di aplikasi PushWard iOS di bawah Pengaturan → Integration Keys dengan cakupan 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Gagal terhubung ke server PushWard.",
+      "invalid_auth": "Kunci integrasi tidak valid.",
+      "invalid_url": "URL harus menggunakan skema http:// atau https://.",
+      "unknown": "Terjadi kesalahan yang tidak terduga."
+    },
+    "abort": {
+      "already_configured": "PushWard sudah dikonfigurasi.",
+      "reconfigure_successful": "Konfigurasi PushWard diperbarui.",
+      "reauth_successful": "Autentikasi ulang berhasil."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "Entitas Terlacak",
+      "initiate_flow": {
+        "user": "Tambah entitas terlacak"
+      },
+      "step": {
+        "user": {
+          "title": "Tambah Entitas ke PushWard",
+          "data": {
+            "entity_id": "Entitas",
+            "template": "Templat"
+          },
+          "data_description": {
+            "template": "Templat tata letak aktivitas. 'generic' cocok untuk sebagian besar entitas."
+          }
+        },
+        "details": {
+          "title": "Opsi Aktivitas",
+          "data": {
+            "start_states": "Status Awal",
+            "end_states": "Status Akhir",
+            "progress_attribute": "Atribut Kemajuan",
+            "remaining_time_attribute": "Atribut Waktu Tersisa",
+            "total_steps": "Total Langkah",
+            "current_step_attribute": "Atribut Langkah Saat Ini",
+            "severity": "Tingkat Keparahan",
+            "value_attribute": "Atribut Nilai",
+            "min_value": "Nilai Minimum",
+            "max_value": "Nilai Maksimum",
+            "unit": "Satuan",
+            "series": "Seri",
+            "scale": "Skala",
+            "decimals": "Angka Desimal",
+            "smoothing": "Garis Halus",
+            "thresholds": "Ambang Batas",
+            "history_period": "Periode Riwayat Mundur",
+            "slug": "Slug Aktivitas",
+            "activity_name": "Nama Aktivitas",
+            "icon": "Ikon",
+            "icon_attribute": "Atribut Ikon",
+            "priority": "Prioritas (0-10)",
+            "update_interval": "Interval Pembaruan Min. (detik)",
+            "subtitle_attribute": "Atribut Subjudul",
+            "state_labels": "Label Status",
+            "completion_message": "Pesan Penyelesaian",
+            "accent_color": "Warna Aksen",
+            "accent_color_attribute": "Atribut Warna Aksen",
+            "url": "URL",
+            "secondary_url": "URL Sekunder",
+            "ended_ttl": "Hapus Otomatis Setelah Berakhir (detik)",
+            "stale_ttl": "Akhiri Otomatis Setelah Tidak Aktif (detik)"
+          },
+          "data_description": {
+            "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
+            "end_states": "Status entitas yang mengakhiri Live Activity. Pilih dari daftar atau ketik nilai kustom.",
+            "progress_attribute": "Atribut entitas yang menyimpan nilai kemajuan 0–100. Contoh: percentage",
+            "remaining_time_attribute": "Atribut entitas yang menyimpan waktu tersisa dalam detik. Contoh: remaining",
+            "total_steps": "Total jumlah langkah.",
+            "current_step_attribute": "Atribut entitas yang menyimpan langkah saat ini sebagai bilangan bulat.",
+            "severity": "Tingkat keparahan peringatan.",
+            "value_attribute": "Atribut entitas yang menyimpan nilai gauge saat ini sebagai angka. Kosongkan untuk menggunakan status entitas.",
+            "min_value": "Nilai minimum untuk rentang gauge.",
+            "max_value": "Nilai maksimum untuk rentang gauge.",
+            "unit": "Satuan tampilan yang ditampilkan di sebelah nilai (misalnya °C, %, kW). Maks 32 karakter.",
+            "series": "Petakan atribut entitas ke seri bernama. Format: attribute=Label, attribute2=Label2. Kosongkan untuk menggunakan status entitas sebagai satu seri.",
+            "scale": "Mode skala sumbu Y untuk grafik sparkline.",
+            "decimals": "Jumlah angka desimal yang ditampilkan untuk nilai (0–10).",
+            "smoothing": "Aktifkan interpolasi kurva antar titik data untuk sparkline yang lebih halus.",
+            "thresholds": "Garis referensi horizontal pada sparkline. Format: value:color:label. Contoh: 25:red:Panas, 18:blue:Dingin. Maks 5.",
+            "history_period": "Menit data masa lalu untuk mengisi sparkline dari recorder Home Assistant. Atur ke 0 untuk memulai tanpa riwayat.",
+            "slug": "Identifikasi unik untuk aktivitas ini. Kosongkan untuk dibuat otomatis dari ID entitas. Contoh: ha-living-room-lamp",
+            "activity_name": "Nama tampilan yang ditampilkan pada iPhone Live Activity. Default ke nama ramah entitas.",
+            "icon": "Ganti ikon. Kosongkan untuk menggunakan ikon asli entitas (misalnya mdi:thermometer). SF Symbols juga didukung (misalnya lamp.desk.fill).",
+            "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis dan ikon entitas saat diatur.",
+            "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
+            "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
+            "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul. Kosongkan untuk menggunakan nama ramah entitas.",
+            "state_labels": "Teks tampilan kustom untuk status. Format: state=Label, state2=Label 2. Contoh: heating=Sedang Memanaskan, idle=Siaga",
+            "completion_message": "Teks yang ditampilkan saat aktivitas berakhir. Kosongkan untuk 'Selesai'. Contoh: Cucian Selesai",
+            "accent_color": "Warna aksen untuk Live Activity. Kosongkan untuk biru default.",
+            "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis. Menggantikan warna statis. Mendukung RGB, HS, XY, Kelvin, nama warna, dan hex.",
+            "url": "Tautan yang dibuka saat menekan Live Activity. Harus dimulai dengan http:// atau https://. Hanya untuk templat steps dan alert.",
+            "secondary_url": "Tautan sekunder untuk Live Activity. Hanya untuk templat steps dan alert.",
+            "ended_ttl": "Detik setelah aktivitas berakhir sebelum dihapus otomatis dari server. Kosongkan untuk menyimpan tanpa batas. Contoh: 300",
+            "stale_ttl": "Detik tidak aktif sebelum server mengakhiri aktivitas secara otomatis. Kosongkan untuk menonaktifkan. Contoh: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "Ubah Konfigurasi Entitas",
+          "data": {
+            "entity_id": "Entitas",
+            "template": "Templat"
+          },
+          "data_description": {
+            "template": "Templat tata letak aktivitas. 'generic' cocok untuk sebagian besar entitas."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL harus menggunakan skema http:// atau https://.",
+        "invalid_gauge_range": "Nilai minimum harus lebih kecil dari nilai maksimum."
+      },
+      "abort": {
+        "already_configured": "Entitas ini sudah dilacak.",
+        "reconfigure_successful": "Konfigurasi entitas diperbarui."
+      }
+    }
+  }
+}

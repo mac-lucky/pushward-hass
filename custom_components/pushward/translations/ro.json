@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Actualizați activitatea",
+      "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea activității (ONGOING sau ENDED)."
+        },
+        "template": {
+          "name": "Șablon",
+          "description": "Șablonul de aspect al activității."
+        },
+        "progress": {
+          "name": "Progres",
+          "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Numele culorii de accent pentru activitate."
+        },
+        "remaining_time": {
+          "name": "Timp rămas",
+          "description": "Timpul rămas în secunde."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL-ul principal afișat ca buton apăsabil. Acceptat doar pe șabloanele steps și alert."
+        },
+        "secondary_url": {
+          "name": "URL secundar",
+          "description": "URL secundar afișat ca al doilea buton apăsabil. Acceptat doar pe șabloanele steps și alert."
+        },
+        "end_date": {
+          "name": "Dată de încheiere",
+          "description": "Marcaj de timp Unix pentru data de încheiere a numărătorii inverse."
+        },
+        "total_steps": {
+          "name": "Total pași",
+          "description": "Numărul total de pași."
+        },
+        "current_step": {
+          "name": "Pas curent",
+          "description": "Numărul pasului curent."
+        },
+        "severity": {
+          "name": "Severitate",
+          "description": "Nivelul de severitate al alertei."
+        },
+        "value": {
+          "name": "Valoare",
+          "description": "gauge: valoare numerică. timeline: obiect cu valori etichetate (ex. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Valoare minimă",
+          "description": "Valoarea minimă a gauge-ului."
+        },
+        "max_value": {
+          "name": "Valoare maximă",
+          "description": "Valoarea maximă a gauge-ului."
+        },
+        "unit": {
+          "name": "Unitate",
+          "description": "Unitatea de afișare pentru valoare (ex. °C, %)."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "scale": {
+          "name": "Scală",
+          "description": "Modul de scală al axei Y (liniară sau logaritmică). Numai pentru șablonul timeline."
+        },
+        "decimals": {
+          "name": "Zecimale",
+          "description": "Numărul de zecimale pentru afișarea valorilor (0-10). Numai pentru șablonul timeline."
+        },
+        "smoothing": {
+          "name": "Linii netezite",
+          "description": "Activați interpolarea curbei între punctele de date. Numai pentru șablonul timeline."
+        },
+        "thresholds": {
+          "name": "Praguri",
+          "description": "Linii de referință orizontale pe sparkline. Numai pentru șablonul timeline."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Creați activitatea",
+      "description": "Creați un nou PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul unic slug al activității."
+        },
+        "name": {
+          "name": "Nume",
+          "description": "Numele de afișare al activității."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = cea mai mică, 10 = cea mai mare)."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Finalizați activitatea",
+      "description": "Finalizați un PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității de finalizat."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesaj opțional afișat la încheierea activității."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Ștergeți activitatea",
+      "description": "Ștergeți un PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității de șters."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Trimiteți notificare",
+      "description": "Trimiteți o notificare push prin PushWard.",
+      "fields": {
+        "title": {
+          "name": "Titlu",
+          "description": "Titlul notificării."
+        },
+        "body": {
+          "name": "Corp",
+          "description": "Textul corpului notificării."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Subtitrare opțională afișată sub titlu."
+        },
+        "level": {
+          "name": "Nivel",
+          "description": "Nivelul de întrerupere iOS. Controlează modul de livrare al notificării."
+        },
+        "thread_id": {
+          "name": "ID fir",
+          "description": "Grupează notificările în Centrul de notificări."
+        },
+        "collapse_id": {
+          "name": "ID de comasare",
+          "description": "Cheie de deduplicare APNs. Înlocuiește notificarea anterioară cu aceeași cheie."
+        },
+        "category": {
+          "name": "Categorie",
+          "description": "Categoria notificării pentru acțiuni personalizate."
+        },
+        "source": {
+          "name": "Sursă",
+          "description": "Identificatorul sursei pentru grupare în inbox-ul PushWard."
+        },
+        "source_display_name": {
+          "name": "Nume afișat al sursei",
+          "description": "Numele sursei lizibil, afișat în inbox-ul PushWard."
+        },
+        "activity_slug": {
+          "name": "Slug activitate",
+          "description": "Asociați această notificare cu un Live Activity existent."
+        },
+        "push": {
+          "name": "Push",
+          "description": "Trimiteți ca alertă push APNs pe toate dispozitivele. Dacă este fals, notificarea este stocată doar în inbox."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectați-vă la PushWard",
+        "description": "Introduceți cheia de integrare PushWard pentru a începe.",
+        "data": {
+          "integration_key": "Cheie de integrare"
+        },
+        "data_description": {
+          "integration_key": "Creați una în aplicația PushWard iOS la Setări → Chei de integrare cu domeniul 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurați PushWard",
+        "description": "Actualizați cheia de integrare PushWard.",
+        "data": {
+          "integration_key": "Cheie de integrare"
+        },
+        "data_description": {
+          "integration_key": "Creați una în aplicația PushWard iOS la Setări → Chei de integrare cu domeniul 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reautentificare",
+        "description": "Cheia de integrare PushWard este invalidă. Furnizați una nouă.",
+        "data": {
+          "integration_key": "Cheie de integrare"
+        },
+        "data_description": {
+          "integration_key": "Creați una în aplicația PushWard iOS la Setări → Chei de integrare cu domeniul 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Conectarea la serverul PushWard a eșuat.",
+      "invalid_auth": "Cheie de integrare invalidă.",
+      "invalid_url": "URL-ul trebuie să folosească schema http:// sau https://.",
+      "unknown": "A apărut o eroare neașteptată."
+    },
+    "abort": {
+      "already_configured": "PushWard este deja configurat.",
+      "reconfigure_successful": "Configurația PushWard a fost actualizată.",
+      "reauth_successful": "Reautentificare reușită."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "Entitate urmărită",
+      "initiate_flow": {
+        "user": "Adăugați o entitate urmărită"
+      },
+      "step": {
+        "user": {
+          "title": "Adăugați o entitate în PushWard",
+          "data": {
+            "entity_id": "Entitate",
+            "template": "Șablon"
+          },
+          "data_description": {
+            "template": "Șablonul de aspect al activității. 'generic' funcționează pentru majoritatea entităților."
+          }
+        },
+        "details": {
+          "title": "Opțiuni activitate",
+          "data": {
+            "start_states": "Stări de pornire",
+            "end_states": "Stări de încheiere",
+            "progress_attribute": "Atribut progres",
+            "remaining_time_attribute": "Atribut timp rămas",
+            "total_steps": "Total pași",
+            "current_step_attribute": "Atribut pas curent",
+            "severity": "Severitate",
+            "value_attribute": "Atribut valoare",
+            "min_value": "Valoare minimă",
+            "max_value": "Valoare maximă",
+            "unit": "Unitate",
+            "series": "Serii",
+            "scale": "Scală",
+            "decimals": "Zecimale",
+            "smoothing": "Linii netezite",
+            "thresholds": "Praguri",
+            "history_period": "Perioadă istoric retroactiv",
+            "slug": "Slug activitate",
+            "activity_name": "Nume activitate",
+            "icon": "Pictogramă",
+            "icon_attribute": "Atribut pictogramă",
+            "priority": "Prioritate (0-10)",
+            "update_interval": "Interval minim de actualizare (secunde)",
+            "subtitle_attribute": "Atribut subtitrare",
+            "state_labels": "Etichete stări",
+            "completion_message": "Mesaj de finalizare",
+            "accent_color": "Culoare accent",
+            "accent_color_attribute": "Atribut culoare accent",
+            "url": "URL",
+            "secondary_url": "URL secundar",
+            "ended_ttl": "Ștergere automată după încheiere (secunde)",
+            "stale_ttl": "Încheiere automată după inactivitate (secunde)"
+          },
+          "data_description": {
+            "start_states": "Stările entității care pornesc Live Activity. Selectați din listă sau introduceți valori personalizate.",
+            "end_states": "Stările entității care încheie Live Activity. Selectați din listă sau introduceți valori personalizate.",
+            "progress_attribute": "Atributul entității care conține o valoare de progres între 0 și 100. Exemplu: percentage",
+            "remaining_time_attribute": "Atributul entității care conține timpul rămas în secunde. Exemplu: remaining",
+            "total_steps": "Numărul total de pași.",
+            "current_step_attribute": "Atributul entității care conține pasul curent ca număr întreg.",
+            "severity": "Nivelul de severitate al alertei.",
+            "value_attribute": "Atributul entității care conține valoarea curentă a gauge-ului ca număr. Lăsați gol pentru a folosi starea entității.",
+            "min_value": "Valoarea minimă a intervalului gauge-ului.",
+            "max_value": "Valoarea maximă a intervalului gauge-ului.",
+            "unit": "Unitatea de afișare lângă valoare (ex. °C, %, kW). Maxim 32 de caractere.",
+            "series": "Asociați atributele entității cu serii denumite. Format: atribut=Etichetă, atribut2=Etichetă2. Lăsați gol pentru a folosi starea entității ca serie unică.",
+            "scale": "Modul de scală al axei Y pentru graficul sparkline.",
+            "decimals": "Numărul de zecimale afișate pentru valori (0–10).",
+            "smoothing": "Activați interpolarea curbei între punctele de date pentru un sparkline mai fluid.",
+            "thresholds": "Linii de referință orizontale pe sparkline. Format: valoare:culoare:etichetă. Exemplu: 25:red:Cald, 18:blue:Rece. Maxim 5.",
+            "history_period": "Minute de date anterioare pentru inițializarea sparkline-ului din înregistrările Home Assistant. Setați 0 pentru a începe fără istoric.",
+            "slug": "Identificator unic pentru această activitate. Lăsați gol pentru a genera automat din ID-ul entității. Exemplu: ha-living-room-lamp",
+            "activity_name": "Numele de afișare pe iPhone Live Activity. Implicit este numele prietenos al entității.",
+            "icon": "Înlocuiți pictograma. Lăsați gol pentru a folosi pictograma nativă a entității (ex. mdi:thermometer). SF Symbols sunt de asemenea acceptate (ex. lamp.desk.fill).",
+            "icon_attribute": "Atributul entității pentru pictogramă dinamică. Suprascrie pictograma statică și cea a entității când este setat.",
+            "priority": "Activitățile cu prioritate mai mare sunt păstrate mai mult timp când se atinge limita dispozitivului (0 = cea mai mică, 10 = cea mai mare).",
+            "update_interval": "Numărul minim de secunde între actualizări. Modificările rapide ale stării sunt limitate ca rată.",
+            "subtitle_attribute": "Atributul entității de afișat ca subtitrare. Lăsați gol pentru a folosi numele prietenos al entității.",
+            "state_labels": "Text de afișare personalizat pentru stări. Format: stare=Etichetă, stare2=Etichetă 2. Exemplu: heating=Se încălzește, idle=Standby",
+            "completion_message": "Textul afișat la încheierea activității. Lăsați gol pentru 'Complet'. Exemplu: Spălare terminată",
+            "accent_color": "Culoarea de accent pentru Live Activity. Lăsați gol pentru albastrul implicit.",
+            "accent_color_attribute": "Atributul entității pentru culoarea de accent dinamică. Suprascrie culoarea statică. Acceptă RGB, HS, XY, Kelvin, culori denumite și hex.",
+            "url": "Linkul deschis la apăsarea Live Activity. Trebuie să înceapă cu http:// sau https://. Numai pentru șabloanele steps și alert.",
+            "secondary_url": "Link secundar pentru Live Activity. Numai pentru șabloanele steps și alert.",
+            "ended_ttl": "Secunde după încheierea activității înainte de a fi ștearsă automat de pe server. Lăsați gol pentru a păstra indefinit. Exemplu: 300",
+            "stale_ttl": "Secunde de inactivitate înainte ca serverul să încheie automat activitatea. Lăsați gol pentru a dezactiva. Exemplu: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "Editați configurația entității",
+          "data": {
+            "entity_id": "Entitate",
+            "template": "Șablon"
+          },
+          "data_description": {
+            "template": "Șablonul de aspect al activității. 'generic' funcționează pentru majoritatea entităților."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL-ul trebuie să folosească schema http:// sau https://.",
+        "invalid_gauge_range": "Valoarea minimă trebuie să fie mai mică decât valoarea maximă."
+      },
+      "abort": {
+        "already_configured": "Această entitate este deja urmărită.",
+        "reconfigure_successful": "Configurația entității a fost actualizată."
+      }
+    }
+  }
+}

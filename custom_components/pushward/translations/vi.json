@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Cập Nhật Hoạt Động",
+      "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Mã định danh slug của hoạt động."
+        },
+        "state": {
+          "name": "Trạng Thái",
+          "description": "Trạng thái hoạt động (ONGOING hoặc ENDED)."
+        },
+        "template": {
+          "name": "Mẫu",
+          "description": "Mẫu bố cục hoạt động."
+        },
+        "progress": {
+          "name": "Tiến Độ",
+          "description": "Giá trị tiến độ từ 0.0 đến 1.0."
+        },
+        "state_text": {
+          "name": "Văn Bản Trạng Thái",
+          "description": "Văn bản hiển thị làm trạng thái hoạt động."
+        },
+        "icon": {
+          "name": "Biểu Tượng",
+          "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Phụ Đề",
+          "description": "Văn bản phụ đề hiển thị trên hoạt động."
+        },
+        "accent_color": {
+          "name": "Màu Nhấn",
+          "description": "Tên màu nhấn cho hoạt động."
+        },
+        "remaining_time": {
+          "name": "Thời Gian Còn Lại",
+          "description": "Thời gian còn lại tính bằng giây."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL chính hiển thị dưới dạng nút có thể nhấn. Chỉ hỗ trợ trên mẫu steps và alert."
+        },
+        "secondary_url": {
+          "name": "URL Phụ",
+          "description": "URL phụ hiển thị dưới dạng nút thứ hai có thể nhấn. Chỉ hỗ trợ trên mẫu steps và alert."
+        },
+        "end_date": {
+          "name": "Ngày Kết Thúc",
+          "description": "Dấu thời gian Unix cho ngày kết thúc đếm ngược."
+        },
+        "total_steps": {
+          "name": "Tổng Số Bước",
+          "description": "Tổng số bước."
+        },
+        "current_step": {
+          "name": "Bước Hiện Tại",
+          "description": "Số thứ tự bước hiện tại."
+        },
+        "severity": {
+          "name": "Mức Độ Nghiêm Trọng",
+          "description": "Mức độ nghiêm trọng của cảnh báo."
+        },
+        "value": {
+          "name": "Giá Trị",
+          "description": "Gauge: giá trị số. Timeline: đối tượng giá trị có nhãn (ví dụ: Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Giá Trị Tối Thiểu",
+          "description": "Giá trị tối thiểu của gauge."
+        },
+        "max_value": {
+          "name": "Giá Trị Tối Đa",
+          "description": "Giá trị tối đa của gauge."
+        },
+        "unit": {
+          "name": "Đơn Vị",
+          "description": "Đơn vị hiển thị cho giá trị (ví dụ: °C, %)."
+        },
+        "completion_message": {
+          "name": "Thông Báo Hoàn Thành",
+          "description": "Thông báo hiển thị khi hoạt động kết thúc."
+        },
+        "scale": {
+          "name": "Tỉ Lệ",
+          "description": "Chế độ tỉ lệ trục Y (linear hoặc logarithmic). Chỉ dành cho mẫu Timeline."
+        },
+        "decimals": {
+          "name": "Số Thập Phân",
+          "description": "Số chữ số thập phân hiển thị cho giá trị (0-10). Chỉ dành cho mẫu Timeline."
+        },
+        "smoothing": {
+          "name": "Làm Mịn Đường",
+          "description": "Bật nội suy đường cong giữa các điểm dữ liệu. Chỉ dành cho mẫu Timeline."
+        },
+        "thresholds": {
+          "name": "Ngưỡng",
+          "description": "Đường tham chiếu ngang trên biểu đồ sparkline. Chỉ dành cho mẫu Timeline."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Tạo Hoạt Động",
+      "description": "Tạo PushWard Live Activity mới.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Mã định danh slug duy nhất cho hoạt động."
+        },
+        "name": {
+          "name": "Tên",
+          "description": "Tên hiển thị của hoạt động."
+        },
+        "priority": {
+          "name": "Ưu Tiên",
+          "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Kết Thúc Hoạt Động",
+      "description": "Kết thúc PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Mã định danh slug của hoạt động cần kết thúc."
+        },
+        "completion_message": {
+          "name": "Thông Báo Hoàn Thành",
+          "description": "Thông báo tùy chọn hiển thị khi hoạt động kết thúc."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Xóa Hoạt Động",
+      "description": "Xóa PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Mã định danh slug của hoạt động cần xóa."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Gửi Thông Báo",
+      "description": "Gửi thông báo đẩy qua PushWard.",
+      "fields": {
+        "title": {
+          "name": "Tiêu Đề",
+          "description": "Tiêu đề thông báo."
+        },
+        "body": {
+          "name": "Nội Dung",
+          "description": "Nội dung văn bản của thông báo."
+        },
+        "subtitle": {
+          "name": "Phụ Đề",
+          "description": "Phụ đề tùy chọn hiển thị bên dưới tiêu đề."
+        },
+        "level": {
+          "name": "Mức Độ",
+          "description": "Mức độ gián đoạn iOS. Kiểm soát cách thông báo được gửi."
+        },
+        "thread_id": {
+          "name": "ID Luồng",
+          "description": "Nhóm các thông báo lại trong Trung tâm Thông báo."
+        },
+        "collapse_id": {
+          "name": "ID Thu Gọn",
+          "description": "Khóa loại trùng lặp APNs. Thay thế thông báo trước có cùng khóa."
+        },
+        "category": {
+          "name": "Danh Mục",
+          "description": "Danh mục thông báo dành cho các hành động tùy chỉnh."
+        },
+        "source": {
+          "name": "Nguồn",
+          "description": "Mã định danh nguồn để nhóm trong hộp thư PushWard."
+        },
+        "source_display_name": {
+          "name": "Tên Hiển Thị Nguồn",
+          "description": "Tên nguồn dễ đọc hiển thị trong hộp thư PushWard."
+        },
+        "activity_slug": {
+          "name": "Slug Hoạt Động",
+          "description": "Liên kết thông báo này với Live Activity hiện có."
+        },
+        "push": {
+          "name": "Đẩy",
+          "description": "Gửi dưới dạng cảnh báo đẩy APNs đến tất cả thiết bị. Khi tắt, thông báo chỉ được lưu trong hộp thư."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Kết Nối với PushWard",
+        "description": "Nhập khóa tích hợp PushWard của bạn để bắt đầu.",
+        "data": {
+          "integration_key": "Khóa Tích Hợp"
+        },
+        "data_description": {
+          "integration_key": "Tạo trong ứng dụng PushWard iOS tại Cài đặt → Khóa Tích Hợp với phạm vi 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "Cấu Hình Lại PushWard",
+        "description": "Cập nhật khóa tích hợp PushWard của bạn.",
+        "data": {
+          "integration_key": "Khóa Tích Hợp"
+        },
+        "data_description": {
+          "integration_key": "Tạo trong ứng dụng PushWard iOS tại Cài đặt → Khóa Tích Hợp với phạm vi 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Xác Thực Lại",
+        "description": "Khóa tích hợp PushWard không hợp lệ. Vui lòng cung cấp khóa mới.",
+        "data": {
+          "integration_key": "Khóa Tích Hợp"
+        },
+        "data_description": {
+          "integration_key": "Tạo trong ứng dụng PushWard iOS tại Cài đặt → Khóa Tích Hợp với phạm vi 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Không thể kết nối với máy chủ PushWard.",
+      "invalid_auth": "Khóa tích hợp không hợp lệ.",
+      "invalid_url": "URL phải sử dụng giao thức http:// hoặc https://.",
+      "unknown": "Đã xảy ra lỗi không mong muốn."
+    },
+    "abort": {
+      "already_configured": "PushWard đã được cấu hình.",
+      "reconfigure_successful": "Đã cập nhật cấu hình PushWard.",
+      "reauth_successful": "Xác thực lại thành công."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "Thực Thể Được Theo Dõi",
+      "initiate_flow": {
+        "user": "Thêm thực thể được theo dõi"
+      },
+      "step": {
+        "user": {
+          "title": "Thêm Thực Thể vào PushWard",
+          "data": {
+            "entity_id": "Thực Thể",
+            "template": "Mẫu"
+          },
+          "data_description": {
+            "template": "Mẫu bố cục hoạt động. 'generic' phù hợp với hầu hết các thực thể."
+          }
+        },
+        "details": {
+          "title": "Tùy Chọn Hoạt Động",
+          "data": {
+            "start_states": "Trạng Thái Bắt Đầu",
+            "end_states": "Trạng Thái Kết Thúc",
+            "progress_attribute": "Thuộc Tính Tiến Độ",
+            "remaining_time_attribute": "Thuộc Tính Thời Gian Còn Lại",
+            "total_steps": "Tổng Số Bước",
+            "current_step_attribute": "Thuộc Tính Bước Hiện Tại",
+            "severity": "Mức Độ Nghiêm Trọng",
+            "value_attribute": "Thuộc Tính Giá Trị",
+            "min_value": "Giá Trị Tối Thiểu",
+            "max_value": "Giá Trị Tối Đa",
+            "unit": "Đơn Vị",
+            "series": "Chuỗi Dữ Liệu",
+            "scale": "Tỉ Lệ",
+            "decimals": "Số Thập Phân",
+            "smoothing": "Làm Mịn Đường",
+            "thresholds": "Ngưỡng",
+            "history_period": "Khoảng Thời Gian Lịch Sử",
+            "slug": "Slug Hoạt Động",
+            "activity_name": "Tên Hoạt Động",
+            "icon": "Biểu Tượng",
+            "icon_attribute": "Thuộc Tính Biểu Tượng",
+            "priority": "Ưu Tiên (0-10)",
+            "update_interval": "Khoảng Cập Nhật Tối Thiểu (giây)",
+            "subtitle_attribute": "Thuộc Tính Phụ Đề",
+            "state_labels": "Nhãn Trạng Thái",
+            "completion_message": "Thông Báo Hoàn Thành",
+            "accent_color": "Màu Nhấn",
+            "accent_color_attribute": "Thuộc Tính Màu Nhấn",
+            "url": "URL",
+            "secondary_url": "URL Phụ",
+            "ended_ttl": "Tự Động Xóa Sau Khi Kết Thúc (giây)",
+            "stale_ttl": "Tự Động Kết Thúc Khi Không Hoạt Động (giây)"
+          },
+          "data_description": {
+            "start_states": "Trạng thái thực thể khởi động Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
+            "end_states": "Trạng thái thực thể kết thúc Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
+            "progress_attribute": "Thuộc tính thực thể chứa giá trị tiến độ 0–100. Ví dụ: percentage",
+            "remaining_time_attribute": "Thuộc tính thực thể chứa thời gian còn lại tính bằng giây. Ví dụ: remaining",
+            "total_steps": "Tổng số bước.",
+            "current_step_attribute": "Thuộc tính thực thể chứa bước hiện tại dưới dạng số nguyên.",
+            "severity": "Mức độ nghiêm trọng của cảnh báo.",
+            "value_attribute": "Thuộc tính thực thể chứa giá trị gauge hiện tại dưới dạng số. Để trống để dùng trạng thái của thực thể.",
+            "min_value": "Giá trị tối thiểu cho dải gauge.",
+            "max_value": "Giá trị tối đa cho dải gauge.",
+            "unit": "Đơn vị hiển thị bên cạnh giá trị (ví dụ: °C, %, kW). Tối đa 32 ký tự.",
+            "series": "Ánh xạ thuộc tính thực thể sang chuỗi có tên. Định dạng: attribute=Label, attribute2=Label2. Để trống để dùng trạng thái của thực thể làm chuỗi duy nhất.",
+            "scale": "Chế độ tỉ lệ trục Y cho biểu đồ sparkline.",
+            "decimals": "Số chữ số thập phân hiển thị cho giá trị (0–10).",
+            "smoothing": "Bật nội suy đường cong giữa các điểm dữ liệu để sparkline mượt hơn.",
+            "thresholds": "Đường tham chiếu ngang trên sparkline. Định dạng: value:color:label. Ví dụ: 25:red:Hot, 18:blue:Cold. Tối đa 5.",
+            "history_period": "Số phút dữ liệu quá khứ để khởi tạo sparkline từ recorder của Home Assistant. Đặt 0 để bắt đầu không có lịch sử.",
+            "slug": "Mã định danh duy nhất cho hoạt động này. Để trống để tự tạo từ ID thực thể. Ví dụ: ha-living-room-lamp",
+            "activity_name": "Tên hiển thị trên iPhone Live Activity. Mặc định là tên thân thiện của thực thể.",
+            "icon": "Ghi đè biểu tượng. Để trống để dùng biểu tượng gốc của thực thể (ví dụ: mdi:thermometer). Cũng hỗ trợ SF Symbols (ví dụ: lamp.desk.fill).",
+            "icon_attribute": "Thuộc tính thực thể cho biểu tượng động. Ghi đè biểu tượng tĩnh và biểu tượng thực thể khi được đặt.",
+            "priority": "Hoạt động có mức ưu tiên cao hơn được giữ lâu hơn khi đạt giới hạn thiết bị (0 = thấp nhất, 10 = cao nhất).",
+            "update_interval": "Số giây tối thiểu giữa các lần cập nhật. Các thay đổi trạng thái nhanh sẽ bị giới hạn tốc độ.",
+            "subtitle_attribute": "Thuộc tính thực thể hiển thị làm phụ đề. Để trống để dùng tên thân thiện của thực thể.",
+            "state_labels": "Văn bản hiển thị tùy chỉnh cho các trạng thái. Định dạng: state=Label, state2=Label 2. Ví dụ: heating=Đang Sưởi, idle=Chờ",
+            "completion_message": "Văn bản hiển thị khi hoạt động kết thúc. Để trống cho 'Hoàn thành'. Ví dụ: Giặt Xong",
+            "accent_color": "Màu nhấn cho Live Activity. Để trống để dùng màu xanh mặc định.",
+            "accent_color_attribute": "Thuộc tính thực thể cho màu nhấn động. Ghi đè màu tĩnh. Hỗ trợ RGB, HS, XY, Kelvin, tên màu và hex.",
+            "url": "Liên kết mở khi nhấn vào Live Activity. Phải bắt đầu bằng http:// hoặc https://. Chỉ dành cho mẫu steps và alert.",
+            "secondary_url": "Liên kết phụ cho Live Activity. Chỉ dành cho mẫu steps và alert.",
+            "ended_ttl": "Số giây sau khi hoạt động kết thúc trước khi tự động xóa khỏi máy chủ. Để trống để giữ vô thời hạn. Ví dụ: 300",
+            "stale_ttl": "Số giây không hoạt động trước khi máy chủ tự động kết thúc hoạt động. Để trống để tắt. Ví dụ: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "Chỉnh Sửa Cấu Hình Thực Thể",
+          "data": {
+            "entity_id": "Thực Thể",
+            "template": "Mẫu"
+          },
+          "data_description": {
+            "template": "Mẫu bố cục hoạt động. 'generic' phù hợp với hầu hết các thực thể."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL phải sử dụng giao thức http:// hoặc https://.",
+        "invalid_gauge_range": "Giá trị tối thiểu phải nhỏ hơn giá trị tối đa."
+      },
+      "abort": {
+        "already_configured": "Thực thể này đã được theo dõi.",
+        "reconfigure_successful": "Đã cập nhật cấu hình thực thể."
+      }
+    }
+  }
+}

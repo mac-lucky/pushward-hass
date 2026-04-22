@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "更新活动",
+      "description": "更新 PushWard Live Activity 的状态和内容。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "活动状态（ONGOING 或 ENDED）。"
+        },
+        "template": {
+          "name": "模板",
+          "description": "活动布局模板。"
+        },
+        "progress": {
+          "name": "进度",
+          "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色名称。"
+        },
+        "remaining_time": {
+          "name": "剩余时间",
+          "description": "剩余时间（秒）。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "作为可点击按钮显示的主要 URL。仅支持 steps 和 alert 模板。"
+        },
+        "secondary_url": {
+          "name": "次要 URL",
+          "description": "作为第二个可点击按钮显示的次要 URL。仅支持 steps 和 alert 模板。"
+        },
+        "end_date": {
+          "name": "结束日期",
+          "description": "倒计时结束日期的 Unix 时间戳。"
+        },
+        "total_steps": {
+          "name": "总步骤数",
+          "description": "步骤总数。"
+        },
+        "current_step": {
+          "name": "当前步骤",
+          "description": "当前步骤编号。"
+        },
+        "severity": {
+          "name": "严重程度",
+          "description": "警报严重程度级别。"
+        },
+        "value": {
+          "name": "值",
+          "description": "gauge：数值。timeline：带标签的值对象（例如 Temp=22.5）。"
+        },
+        "min_value": {
+          "name": "最小值",
+          "description": "gauge 的最小值。"
+        },
+        "max_value": {
+          "name": "最大值",
+          "description": "gauge 的最大值。"
+        },
+        "unit": {
+          "name": "单位",
+          "description": "值的显示单位（例如 °C、%）。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "scale": {
+          "name": "刻度",
+          "description": "Y 轴刻度模式（线性或对数）。仅适用于 timeline 模板。"
+        },
+        "decimals": {
+          "name": "小数位数",
+          "description": "值显示的小数位数（0-10）。仅适用于 timeline 模板。"
+        },
+        "smoothing": {
+          "name": "平滑曲线",
+          "description": "启用数据点之间的曲线插值。仅适用于 timeline 模板。"
+        },
+        "thresholds": {
+          "name": "阈值",
+          "description": "迷你图上的水平参考线。仅适用于 timeline 模板。"
+        }
+      }
+    },
+    "create_activity": {
+      "name": "创建活动",
+      "description": "创建新的 PushWard Live Activity。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "唯一的活动 slug 标识符。"
+        },
+        "name": {
+          "name": "名称",
+          "description": "活动的显示名称。"
+        },
+        "priority": {
+          "name": "优先级",
+          "description": "活动优先级（0 = 最低，10 = 最高）。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        }
+      }
+    },
+    "end_activity": {
+      "name": "结束活动",
+      "description": "结束一个 PushWard Live Activity。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "要结束的活动 slug 标识符。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的可选消息。"
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "删除活动",
+      "description": "删除一个 PushWard Live Activity。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "要删除的活动 slug 标识符。"
+        }
+      }
+    },
+    "send_notification": {
+      "name": "发送通知",
+      "description": "通过 PushWard 发送推送通知。",
+      "fields": {
+        "title": {
+          "name": "标题",
+          "description": "通知标题。"
+        },
+        "body": {
+          "name": "正文",
+          "description": "通知正文文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "标题下方显示的可选副标题。"
+        },
+        "level": {
+          "name": "级别",
+          "description": "iOS 打扰级别，控制通知的发送方式。"
+        },
+        "thread_id": {
+          "name": "线程 ID",
+          "description": "在通知中心将通知分组在一起。"
+        },
+        "collapse_id": {
+          "name": "折叠 ID",
+          "description": "APNs 去重键，用相同键替换之前的通知。"
+        },
+        "category": {
+          "name": "类别",
+          "description": "自定义操作的通知类别。"
+        },
+        "source": {
+          "name": "来源",
+          "description": "用于在 PushWard 收件箱中分组的来源标识符。"
+        },
+        "source_display_name": {
+          "name": "来源显示名称",
+          "description": "在 PushWard 收件箱中显示的可读来源名称。"
+        },
+        "activity_slug": {
+          "name": "活动标识符",
+          "description": "将此通知链接到现有的 Live Activity。"
+        },
+        "push": {
+          "name": "推送",
+          "description": "作为 APNs 推送警报发送到所有设备。为 false 时，通知仅存储在收件箱中。"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "连接到 PushWard",
+        "description": "输入您的 PushWard 集成密钥以开始使用。",
+        "data": {
+          "integration_key": "集成密钥"
+        },
+        "data_description": {
+          "integration_key": "在 PushWard iOS 应用中，前往设置 → 集成密钥，创建范围为 'ha-*' 的密钥。"
+        }
+      },
+      "reconfigure": {
+        "title": "重新配置 PushWard",
+        "description": "更新您的 PushWard 集成密钥。",
+        "data": {
+          "integration_key": "集成密钥"
+        },
+        "data_description": {
+          "integration_key": "在 PushWard iOS 应用中，前往设置 → 集成密钥，创建范围为 'ha-*' 的密钥。"
+        }
+      },
+      "reauth_confirm": {
+        "title": "重新验证",
+        "description": "PushWard 集成密钥无效，请提供新的密钥。",
+        "data": {
+          "integration_key": "集成密钥"
+        },
+        "data_description": {
+          "integration_key": "在 PushWard iOS 应用中，前往设置 → 集成密钥，创建范围为 'ha-*' 的密钥。"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接到 PushWard 服务器。",
+      "invalid_auth": "集成密钥无效。",
+      "invalid_url": "URL 必须使用 http:// 或 https:// 协议。",
+      "unknown": "发生意外错误。"
+    },
+    "abort": {
+      "already_configured": "PushWard 已配置。",
+      "reconfigure_successful": "PushWard 配置已更新。",
+      "reauth_successful": "重新验证成功。"
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "追踪实体",
+      "initiate_flow": {
+        "user": "添加追踪实体"
+      },
+      "step": {
+        "user": {
+          "title": "将实体添加到 PushWard",
+          "data": {
+            "entity_id": "实体",
+            "template": "模板"
+          },
+          "data_description": {
+            "template": "活动布局模板，'generic' 适用于大多数实体。"
+          }
+        },
+        "details": {
+          "title": "活动选项",
+          "data": {
+            "start_states": "开始状态",
+            "end_states": "结束状态",
+            "progress_attribute": "进度属性",
+            "remaining_time_attribute": "剩余时间属性",
+            "total_steps": "总步骤数",
+            "current_step_attribute": "当前步骤属性",
+            "severity": "严重程度",
+            "value_attribute": "值属性",
+            "min_value": "最小值",
+            "max_value": "最大值",
+            "unit": "单位",
+            "series": "系列",
+            "scale": "刻度",
+            "decimals": "小数位数",
+            "smoothing": "平滑曲线",
+            "thresholds": "阈值",
+            "history_period": "历史回溯时长",
+            "slug": "活动标识符",
+            "activity_name": "活动名称",
+            "icon": "图标",
+            "icon_attribute": "图标属性",
+            "priority": "优先级（0-10）",
+            "update_interval": "最小更新间隔（秒）",
+            "subtitle_attribute": "副标题属性",
+            "state_labels": "状态标签",
+            "completion_message": "完成消息",
+            "accent_color": "强调色",
+            "accent_color_attribute": "强调色属性",
+            "url": "URL",
+            "secondary_url": "次要 URL",
+            "ended_ttl": "结束后自动删除（秒）",
+            "stale_ttl": "空闲后自动结束（秒）"
+          },
+          "data_description": {
+            "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
+            "end_states": "结束 Live Activity 的实体状态。从列表中选择或输入自定义值。",
+            "progress_attribute": "持有 0–100 进度值的实体属性。示例：percentage",
+            "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
+            "total_steps": "步骤总数。",
+            "current_step_attribute": "以整数形式持有当前步骤的实体属性。",
+            "severity": "警报严重程度级别。",
+            "value_attribute": "以数字形式持有当前 gauge 值的实体属性。留空则使用实体的状态值。",
+            "min_value": "gauge 范围的最小值。",
+            "max_value": "gauge 范围的最大值。",
+            "unit": "值旁边显示的单位（例如 °C、%、kW）。最多 32 个字符。",
+            "series": "将实体属性映射到命名系列。格式：attribute=标签, attribute2=标签2。留空则将实体状态用作单一系列。",
+            "scale": "迷你图的 Y 轴刻度模式。",
+            "decimals": "值显示的小数位数（0–10）。",
+            "smoothing": "启用数据点之间的曲线插值，使迷你图更平滑。",
+            "thresholds": "迷你图上的水平参考线。格式：值:颜色:标签。示例：25:red:热, 18:blue:冷。最多 5 条。",
+            "history_period": "从 Home Assistant 记录仪中获取的历史数据时长（分钟），用于填充迷你图初始数据。设为 0 则不加载历史。",
+            "slug": "此活动的唯一标识符。留空则自动从实体 ID 生成。示例：ha-living-room-lamp",
+            "activity_name": "在 iPhone Live Activity 上显示的名称。默认使用实体的友好名称。",
+            "icon": "覆盖图标。留空则使用实体的原生图标（例如 mdi:thermometer）。也支持 SF Symbols（例如 lamp.desk.fill）。",
+            "icon_attribute": "动态图标的实体属性。设置后将覆盖静态图标和实体图标。",
+            "priority": "当设备达到上限时，优先级较高的活动会保留更长时间（0 = 最低，10 = 最高）。",
+            "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
+            "subtitle_attribute": "用作副标题的实体属性。留空则使用实体的友好名称。",
+            "state_labels": "状态的自定义显示文本。格式：state=标签, state2=标签2。示例：heating=加热中, idle=待机",
+            "completion_message": "活动结束时显示的文本。留空则显示\"完成\"。示例：洗涤完毕",
+            "accent_color": "Live Activity 的强调色。留空则使用默认蓝色。",
+            "accent_color_attribute": "动态强调色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
+            "url": "点击 Live Activity 时打开的链接。必须以 http:// 或 https:// 开头。仅适用于 steps 和 alert 模板。",
+            "secondary_url": "Live Activity 的次要链接。仅适用于 steps 和 alert 模板。",
+            "ended_ttl": "活动结束后从服务器自动删除前等待的秒数。留空则永久保留。示例：300",
+            "stale_ttl": "服务器自动结束活动前的空闲秒数。留空则禁用。示例：1800"
+          }
+        },
+        "reconfigure": {
+          "title": "编辑实体配置",
+          "data": {
+            "entity_id": "实体",
+            "template": "模板"
+          },
+          "data_description": {
+            "template": "活动布局模板，'generic' 适用于大多数实体。"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL 必须使用 http:// 或 https:// 协议。",
+        "invalid_gauge_range": "最小值必须小于最大值。"
+      },
+      "abort": {
+        "already_configured": "此实体已被追踪。",
+        "reconfigure_successful": "实体配置已更新。"
+      }
+    }
+  }
+}

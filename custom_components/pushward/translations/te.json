@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Activity అప్‌డేట్ చేయి",
+      "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "Activity స్థితి (ONGOING లేదా ENDED)."
+        },
+        "template": {
+          "name": "టెంప్లేట్",
+          "description": "Activity లేఅవుట్ టెంప్లేట్."
+        },
+        "progress": {
+          "name": "పురోగతి",
+          "description": "0.0 మరియు 1.0 మధ్య పురోగతి విలువ."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+        },
+        "remaining_time": {
+          "name": "మిగిలిన సమయం",
+          "description": "సెకన్లలో మిగిలిన సమయం."
+        },
+        "url": {
+          "name": "URL",
+          "description": "నొక్కగలిగే బటన్‌గా చూపబడే ప్రాథమిక URL. steps మరియు alert టెంప్లేట్‌లలో మాత్రమే మద్దతు ఉంది."
+        },
+        "secondary_url": {
+          "name": "ద్వితీయ URL",
+          "description": "రెండవ నొక్కగలిగే బటన్‌గా చూపబడే ద్వితీయ URL. steps మరియు alert టెంప్లేట్‌లలో మాత్రమే మద్దతు ఉంది."
+        },
+        "end_date": {
+          "name": "ముగింపు తేదీ",
+          "description": "కౌంట్‌డౌన్ ముగింపు తేదీ కోసం Unix టైమ్‌స్టాంప్."
+        },
+        "total_steps": {
+          "name": "మొత్తం దశలు",
+          "description": "మొత్తం దశల సంఖ్య."
+        },
+        "current_step": {
+          "name": "ప్రస్తుత దశ",
+          "description": "ప్రస్తుత దశ సంఖ్య."
+        },
+        "severity": {
+          "name": "తీవ్రత",
+          "description": "హెచ్చరిక తీవ్రత స్థాయి."
+        },
+        "value": {
+          "name": "విలువ",
+          "description": "గేజ్: సంఖ్యా విలువ. Timeline: లేబుల్ చేయబడిన విలువల ఆబ్జెక్ట్ (ఉదా. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "కనిష్ట విలువ",
+          "description": "కనిష్ట గేజ్ విలువ."
+        },
+        "max_value": {
+          "name": "గరిష్ట విలువ",
+          "description": "గరిష్ట గేజ్ విలువ."
+        },
+        "unit": {
+          "name": "యూనిట్",
+          "description": "విలువ పక్కన చూపబడే యూనిట్ (ఉదా. °C, %)."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "scale": {
+          "name": "స్కేల్",
+          "description": "Y-అక్షం స్కేల్ మోడ్ (linear లేదా logarithmic). Timeline టెంప్లేట్ మాత్రమే."
+        },
+        "decimals": {
+          "name": "దశాంశ స్థానాలు",
+          "description": "విలువ ప్రదర్శన కోసం దశాంశ స్థానాలు (0-10). Timeline టెంప్లేట్ మాత్రమే."
+        },
+        "smoothing": {
+          "name": "మృదువైన రేఖలు",
+          "description": "డేటా పాయింట్ల మధ్య వక్ర ఇంటర్‌పోలేషన్ ప్రారంభించండి. Timeline టెంప్లేట్ మాత్రమే."
+        },
+        "thresholds": {
+          "name": "థ్రెషోల్డ్‌లు",
+          "description": "స్పార్క్‌లైన్‌పై క్షితిజ సమాంతర సూచన రేఖలు. Timeline టెంప్లేట్ మాత్రమే."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Activity సృష్టించు",
+      "description": "కొత్త PushWard Live Activity సృష్టించండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "ప్రత్యేక activity slug గుర్తింపు."
+        },
+        "name": {
+          "name": "పేరు",
+          "description": "Activity కోసం ప్రదర్శన పేరు."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత",
+          "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Activity ముగించిన తర్వాత ఉంచే సెకన్లు."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Activity పాతదిగా పరిగణించబడే ముందు సెకన్లు."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Activity ముగించు",
+      "description": "PushWard Live Activity ముగించండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "ముగించాల్సిన activity slug గుర్తింపు."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే ఐచ్ఛిక సందేశం."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Activity తొలగించు",
+      "description": "PushWard Live Activity తొలగించండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "తొలగించాల్సిన activity slug గుర్తింపు."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "నోటిఫికేషన్ పంపు",
+      "description": "PushWard ద్వారా పుష్ నోటిఫికేషన్ పంపండి.",
+      "fields": {
+        "title": {
+          "name": "శీర్షిక",
+          "description": "నోటిఫికేషన్ శీర్షిక."
+        },
+        "body": {
+          "name": "విషయం",
+          "description": "నోటిఫికేషన్ విషయం టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "శీర్షిక కింద చూపబడే ఐచ్ఛిక ఉప శీర్షిక."
+        },
+        "level": {
+          "name": "స్థాయి",
+          "description": "iOS అంతరాయ స్థాయి. నోటిఫికేషన్ ఎలా డెలివరీ అవుతుందో నియంత్రిస్తుంది."
+        },
+        "thread_id": {
+          "name": "Thread ID",
+          "description": "నోటిఫికేషన్ సెంటర్‌లో నోటిఫికేషన్‌లను సమూహపరుస్తుంది."
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "APNs డిడుప్లికేషన్ కీ. అదే కీతో మునుపటి నోటిఫికేషన్‌ను భర్తీ చేస్తుంది."
+        },
+        "category": {
+          "name": "వర్గం",
+          "description": "అనుకూల చర్యలకు నోటిఫికేషన్ వర్గం."
+        },
+        "source": {
+          "name": "మూలం",
+          "description": "PushWard ఇన్‌బాక్స్‌లో సమూహపరచడానికి మూల గుర్తింపు."
+        },
+        "source_display_name": {
+          "name": "మూల ప్రదర్శన పేరు",
+          "description": "PushWard ఇన్‌బాక్స్‌లో చూపబడే మానవ-చదవగలిగే మూల పేరు."
+        },
+        "activity_slug": {
+          "name": "Activity Slug",
+          "description": "ఈ నోటిఫికేషన్‌ను ఇప్పటికే ఉన్న Live Activity తో లింక్ చేయండి."
+        },
+        "push": {
+          "name": "పుష్",
+          "description": "అన్ని పరికరాలకు APNs పుష్ హెచ్చరికగా పంపండి. తప్పు అయినప్పుడు, నోటిఫికేషన్ ఇన్‌బాక్స్‌లో మాత్రమే నిల్వ చేయబడుతుంది."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "PushWard కు కనెక్ట్ అవ్వండి",
+        "description": "ప్రారంభించడానికి మీ PushWard ఇంటిగ్రేషన్ కీని నమోదు చేయండి.",
+        "data": {
+          "integration_key": "ఇంటిగ్రేషన్ కీ"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS యాప్‌లో Settings → Integration Keys లో 'ha-*' స్కోప్‌తో ఒకటి సృష్టించండి."
+        }
+      },
+      "reconfigure": {
+        "title": "PushWard పునఃకాన్ఫిగర్ చేయండి",
+        "description": "మీ PushWard ఇంటిగ్రేషన్ కీని అప్‌డేట్ చేయండి.",
+        "data": {
+          "integration_key": "ఇంటిగ్రేషన్ కీ"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS యాప్‌లో Settings → Integration Keys లో 'ha-*' స్కోప్‌తో ఒకటి సృష్టించండి."
+        }
+      },
+      "reauth_confirm": {
+        "title": "మళ్ళీ ప్రమాణీకరించండి",
+        "description": "PushWard ఇంటిగ్రేషన్ కీ చెల్లదు. దయచేసి కొత్తది అందించండి.",
+        "data": {
+          "integration_key": "ఇంటిగ్రేషన్ కీ"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS యాప్‌లో Settings → Integration Keys లో 'ha-*' స్కోప్‌తో ఒకటి సృష్టించండి."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "PushWard సర్వర్‌కు కనెక్ట్ అవడం విఫలమైంది.",
+      "invalid_auth": "చెల్లని ఇంటిగ్రేషన్ కీ.",
+      "invalid_url": "URL http:// లేదా https:// స్కీమ్ ఉపయోగించాలి.",
+      "unknown": "అనూహ్యమైన లోపం సంభవించింది."
+    },
+    "abort": {
+      "already_configured": "PushWard ఇప్పటికే కాన్ఫిగర్ చేయబడింది.",
+      "reconfigure_successful": "PushWard కాన్ఫిగరేషన్ అప్‌డేట్ చేయబడింది.",
+      "reauth_successful": "పునఃప్రమాణీకరణ విజయవంతమైంది."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "ట్రాక్ చేయబడిన ఎంటిటీ",
+      "initiate_flow": {
+        "user": "ట్రాక్ చేయబడిన ఎంటిటీ జోడించు"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard కు ఎంటిటీ జోడించు",
+          "data": {
+            "entity_id": "ఎంటిటీ",
+            "template": "టెంప్లేట్"
+          },
+          "data_description": {
+            "template": "Activity లేఅవుట్ టెంప్లేట్. చాలా ఎంటిటీలకు 'generic' పనిచేస్తుంది."
+          }
+        },
+        "details": {
+          "title": "Activity ఎంపికలు",
+          "data": {
+            "start_states": "ప్రారంభ స్థితులు",
+            "end_states": "ముగింపు స్థితులు",
+            "progress_attribute": "పురోగతి ఆట్రిబ్యూట్",
+            "remaining_time_attribute": "మిగిలిన సమయం ఆట్రిబ్యూట్",
+            "total_steps": "మొత్తం దశలు",
+            "current_step_attribute": "ప్రస్తుత దశ ఆట్రిబ్యూట్",
+            "severity": "తీవ్రత",
+            "value_attribute": "విలువ ఆట్రిబ్యూట్",
+            "min_value": "కనిష్ట విలువ",
+            "max_value": "గరిష్ట విలువ",
+            "unit": "యూనిట్",
+            "series": "శ్రేణి",
+            "scale": "స్కేల్",
+            "decimals": "దశాంశ స్థానాలు",
+            "smoothing": "మృదువైన రేఖలు",
+            "thresholds": "థ్రెషోల్డ్‌లు",
+            "history_period": "గత చరిత్ర వ్యవధి",
+            "slug": "Activity Slug",
+            "activity_name": "Activity పేరు",
+            "icon": "చిహ్నం",
+            "icon_attribute": "చిహ్నం ఆట్రిబ్యూట్",
+            "priority": "ప్రాధాన్యత (0-10)",
+            "update_interval": "కనీస అప్‌డేట్ వ్యవధి (సెకన్లు)",
+            "subtitle_attribute": "ఉప శీర్షిక ఆట్రిబ్యూట్",
+            "state_labels": "స్థితి లేబుళ్ళు",
+            "completion_message": "పూర్తి సందేశం",
+            "accent_color": "యాక్సెంట్ రంగు",
+            "accent_color_attribute": "యాక్సెంట్ రంగు ఆట్రిబ్యూట్",
+            "url": "URL",
+            "secondary_url": "ద్వితీయ URL",
+            "ended_ttl": "ముగింపు తర్వాత స్వయంచాలకంగా తొలగించు (సెకన్లు)",
+            "stale_ttl": "నిష్క్రియంగా ఉన్న తర్వాత స్వయంచాలకంగా ముగించు (సెకన్లు)"
+          },
+          "data_description": {
+            "start_states": "Live Activity ప్రారంభించే ఎంటిటీ స్థితులు. జాబితా నుండి ఎంచుకోండి లేదా అనుకూల విలువలు టైప్ చేయండి.",
+            "end_states": "Live Activity ముగించే ఎంటిటీ స్థితులు. జాబితా నుండి ఎంచుకోండి లేదా అనుకూల విలువలు టైప్ చేయండి.",
+            "progress_attribute": "0–100 పురోగతి విలువను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. ఉదాహరణ: percentage",
+            "remaining_time_attribute": "సెకన్లలో మిగిలిన సమయాన్ని కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. ఉదాహరణ: remaining",
+            "total_steps": "మొత్తం దశల సంఖ్య.",
+            "current_step_attribute": "పూర్ణాంకంగా ప్రస్తుత దశను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్.",
+            "severity": "హెచ్చరిక తీవ్రత స్థాయి.",
+            "value_attribute": "సంఖ్యగా ప్రస్తుత గేజ్ విలువను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. ఎంటిటీ స్థితిని ఉపయోగించడానికి ఖాళీగా వదలండి.",
+            "min_value": "గేజ్ పరిధి కోసం కనిష్ట విలువ.",
+            "max_value": "గేజ్ పరిధి కోసం గరిష్ట విలువ.",
+            "unit": "విలువ పక్కన చూపబడే యూనిట్ (ఉదా. °C, %, kW). గరిష్టంగా 32 అక్షరాలు.",
+            "series": "ఎంటిటీ ఆట్రిబ్యూట్‌లను పేరున్న శ్రేణులకు మ్యాప్ చేయండి. ఆకృతి: attribute=Label, attribute2=Label2. ఒకే శ్రేణిగా ఎంటిటీ స్థితిని ఉపయోగించడానికి ఖాళీగా వదలండి.",
+            "scale": "స్పార్క్‌లైన్ చార్ట్ కోసం Y-అక్షం స్కేల్ మోడ్.",
+            "decimals": "విలువలకు చూపబడే దశాంశ స్థానాల సంఖ్య (0–10).",
+            "smoothing": "మృదువైన స్పార్క్‌లైన్ కోసం డేటా పాయింట్ల మధ్య వక్ర ఇంటర్‌పోలేషన్ ప్రారంభించండి.",
+            "thresholds": "స్పార్క్‌లైన్‌పై క్షితిజ సమాంతర సూచన రేఖలు. ఆకృతి: value:color:label. ఉదాహరణ: 25:red:Hot, 18:blue:Cold. గరిష్టంగా 5.",
+            "history_period": "స్పార్క్‌లైన్‌ను Home Assistant రికార్డర్ నుండి సీడ్ చేయడానికి గత డేటా నిమిషాలు. చరిత్ర లేకుండా ప్రారంభించడానికి 0 సెట్ చేయండి.",
+            "slug": "ఈ activity కోసం ప్రత్యేక గుర్తింపు. ఎంటిటీ ID నుండి స్వయంచాలకంగా రూపొందించడానికి ఖాళీగా వదలండి. ఉదాహరణ: ha-living-room-lamp",
+            "activity_name": "iPhone Live Activity పై చూపబడే ప్రదర్శన పేరు. డిఫాల్ట్‌గా ఎంటిటీ స్నేహపూర్వక పేరుకు.",
+            "icon": "చిహ్నాన్ని భర్తీ చేయండి. ఎంటిటీ స్వంత చిహ్నాన్ని ఉపయోగించడానికి ఖాళీగా వదలండి (ఉదా. mdi:thermometer). SF Symbols కూడా మద్దతు ఇవ్వబడ్డాయి (ఉదా. lamp.desk.fill).",
+            "icon_attribute": "డైనమిక్ చిహ్నం కోసం ఎంటిటీ ఆట్రిబ్యూట్. సెట్ అయినప్పుడు స్థిర చిహ్నం మరియు ఎంటిటీ చిహ్నాన్ని భర్తీ చేస్తుంది.",
+            "priority": "పరికర పరిమితి చేరినప్పుడు అధిక ప్రాధాన్యత activities ఎక్కువ సేపు ఉంచబడతాయి (0 = అత్యల్పం, 10 = అత్యధికం).",
+            "update_interval": "అప్‌డేట్‌ల మధ్య కనీస సెకన్లు. వేగవంతమైన స్థితి మార్పులు థ్రాటిల్ చేయబడతాయి.",
+            "subtitle_attribute": "ఉప శీర్షికగా చూపడానికి ఎంటిటీ ఆట్రిబ్యూట్. ఎంటిటీ స్నేహపూర్వక పేరు ఉపయోగించడానికి ఖాళీగా వదలండి.",
+            "state_labels": "స్థితులకు అనుకూల ప్రదర్శన టెక్స్ట్. ఆకృతి: state=Label, state2=Label 2. ఉదాహరణ: heating=Heating Up, idle=Standby",
+            "completion_message": "Activity ముగించినప్పుడు చూపబడే టెక్స్ట్. 'Complete' కోసం ఖాళీగా వదలండి. ఉదాహరణ: Wash Done",
+            "accent_color": "Live Activity కోసం యాక్సెంట్ రంగు. డిఫాల్ట్ నీలం కోసం ఖాళీగా వదలండి.",
+            "accent_color_attribute": "డైనమిక్ యాక్సెంట్ రంగు కోసం ఎంటిటీ ఆట్రిబ్యూట్. స్థిర రంగును భర్తీ చేస్తుంది. RGB, HS, XY, Kelvin, పేరున్న రంగులు మరియు hex మద్దతు ఉంది.",
+            "url": "Live Activity నొక్కినప్పుడు తెరవబడే లింక్. http:// లేదా https:// తో ప్రారంభించాలి. Steps మరియు alert టెంప్లేట్‌లు మాత్రమే.",
+            "secondary_url": "Live Activity కోసం ద్వితీయ లింక్. Steps మరియు alert టెంప్లేట్‌లు మాత్రమే.",
+            "ended_ttl": "Activity ముగించిన తర్వాత సర్వర్ నుండి స్వయంచాలకంగా తొలగించబడే ముందు సెకన్లు. అనంతంగా ఉంచడానికి ఖాళీగా వదలండి. ఉదాహరణ: 300",
+            "stale_ttl": "సర్వర్ activity ని స్వయంచాలకంగా ముగించే ముందు నిష్క్రియ సెకన్లు. నిలిపివేయడానికి ఖాళీగా వదలండి. ఉదాహరణ: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "ఎంటిటీ కాన్ఫిగరేషన్ సవరించు",
+          "data": {
+            "entity_id": "ఎంటిటీ",
+            "template": "టెంప్లేట్"
+          },
+          "data_description": {
+            "template": "Activity లేఅవుట్ టెంప్లేట్. చాలా ఎంటిటీలకు 'generic' పనిచేస్తుంది."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL http:// లేదా https:// స్కీమ్ ఉపయోగించాలి.",
+        "invalid_gauge_range": "కనిష్ట విలువ గరిష్ట విలువ కంటే తక్కువగా ఉండాలి."
+      },
+      "abort": {
+        "already_configured": "ఈ ఎంటిటీ ఇప్పటికే ట్రాక్ చేయబడుతోంది.",
+        "reconfigure_successful": "ఎంటిటీ కాన్ఫిగరేషన్ అప్‌డేట్ చేయబడింది."
+      }
+    }
+  }
+}

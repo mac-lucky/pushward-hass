@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "アクティビティを更新",
+      "description": "PushWard Live Activityの状態とコンテンツを更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの状態（ONGOING または ENDED）。"
+        },
+        "template": {
+          "name": "テンプレート",
+          "description": "アクティビティのレイアウトテンプレート。"
+        },
+        "progress": {
+          "name": "進捗",
+          "description": "0.0〜1.0の進捗値。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー名。"
+        },
+        "remaining_time": {
+          "name": "残り時間",
+          "description": "残り時間（秒）。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "タップ可能なボタンとして表示されるプライマリURL。steps および alert テンプレートのみ対応。"
+        },
+        "secondary_url": {
+          "name": "セカンダリURL",
+          "description": "2番目のタップ可能なボタンとして表示されるセカンダリURL。steps および alert テンプレートのみ対応。"
+        },
+        "end_date": {
+          "name": "終了日時",
+          "description": "カウントダウン終了日時のUnixタイムスタンプ。"
+        },
+        "total_steps": {
+          "name": "総ステップ数",
+          "description": "ステップの総数。"
+        },
+        "current_step": {
+          "name": "現在のステップ",
+          "description": "現在のステップ番号。"
+        },
+        "severity": {
+          "name": "重大度",
+          "description": "アラートの重大度レベル。"
+        },
+        "value": {
+          "name": "値",
+          "description": "ゲージ: 数値。タイムライン: ラベル付きの値オブジェクト（例: Temp=22.5）。"
+        },
+        "min_value": {
+          "name": "最小値",
+          "description": "ゲージの最小値。"
+        },
+        "max_value": {
+          "name": "最大値",
+          "description": "ゲージの最大値。"
+        },
+        "unit": {
+          "name": "単位",
+          "description": "値の表示単位（例: °C, %）。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "scale": {
+          "name": "スケール",
+          "description": "Y軸のスケールモード（線形または対数）。タイムラインテンプレートのみ。"
+        },
+        "decimals": {
+          "name": "小数点以下の桁数",
+          "description": "値表示の小数点以下の桁数（0〜10）。タイムラインテンプレートのみ。"
+        },
+        "smoothing": {
+          "name": "スムーズな折れ線",
+          "description": "データポイント間のカーブ補間を有効にします。タイムラインテンプレートのみ。"
+        },
+        "thresholds": {
+          "name": "しきい値",
+          "description": "スパークラインの水平参照線。タイムラインテンプレートのみ。"
+        }
+      }
+    },
+    "create_activity": {
+      "name": "アクティビティを作成",
+      "description": "新しいPushWard Live Activityを作成します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "一意のアクティビティスラッグ識別子。"
+        },
+        "name": {
+          "name": "名前",
+          "description": "アクティビティの表示名。"
+        },
+        "priority": {
+          "name": "優先度",
+          "description": "アクティビティの優先度（0 = 最低, 10 = 最高）。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        }
+      }
+    },
+    "end_activity": {
+      "name": "アクティビティを終了",
+      "description": "PushWard Live Activityを終了します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "終了するアクティビティのスラッグ識別子。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるオプションのメッセージ。"
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "アクティビティを削除",
+      "description": "PushWard Live Activityを削除します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "削除するアクティビティのスラッグ識別子。"
+        }
+      }
+    },
+    "send_notification": {
+      "name": "通知を送信",
+      "description": "PushWard経由でプッシュ通知を送信します。",
+      "fields": {
+        "title": {
+          "name": "タイトル",
+          "description": "通知のタイトル。"
+        },
+        "body": {
+          "name": "本文",
+          "description": "通知の本文テキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "タイトルの下に表示されるオプションのサブタイトル。"
+        },
+        "level": {
+          "name": "レベル",
+          "description": "iOSの割り込みレベル。通知の配信方法を制御します。"
+        },
+        "thread_id": {
+          "name": "スレッドID",
+          "description": "通知センターで通知をまとめてグループ化します。"
+        },
+        "collapse_id": {
+          "name": "折りたたみID",
+          "description": "APNsの重複排除キー。同じキーを持つ以前の通知を置き換えます。"
+        },
+        "category": {
+          "name": "カテゴリ",
+          "description": "カスタムアクション用の通知カテゴリ。"
+        },
+        "source": {
+          "name": "ソース",
+          "description": "PushWardインボックスでのグループ化に使用するソース識別子。"
+        },
+        "source_display_name": {
+          "name": "ソース表示名",
+          "description": "PushWardインボックスに表示される人間が読めるソース名。"
+        },
+        "activity_slug": {
+          "name": "アクティビティスラッグ",
+          "description": "この通知を既存のLive Activityにリンクします。"
+        },
+        "push": {
+          "name": "プッシュ",
+          "description": "APNsプッシュアラートとしてすべてのデバイスに送信します。false の場合、通知はインボックスにのみ保存されます。"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "PushWardに接続",
+        "description": "PushWardの統合キーを入力して開始してください。",
+        "data": {
+          "integration_key": "統合キー"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOSアプリの設定 → 統合キーで、スコープ 'ha-*' のキーを作成してください。"
+        }
+      },
+      "reconfigure": {
+        "title": "PushWardを再設定",
+        "description": "PushWardの統合キーを更新します。",
+        "data": {
+          "integration_key": "統合キー"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOSアプリの設定 → 統合キーで、スコープ 'ha-*' のキーを作成してください。"
+        }
+      },
+      "reauth_confirm": {
+        "title": "再認証",
+        "description": "PushWardの統合キーが無効です。新しいキーを入力してください。",
+        "data": {
+          "integration_key": "統合キー"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOSアプリの設定 → 統合キーで、スコープ 'ha-*' のキーを作成してください。"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "PushWardサーバーへの接続に失敗しました。",
+      "invalid_auth": "統合キーが無効です。",
+      "invalid_url": "URLは http:// または https:// で始まる必要があります。",
+      "unknown": "予期しないエラーが発生しました。"
+    },
+    "abort": {
+      "already_configured": "PushWardはすでに設定されています。",
+      "reconfigure_successful": "PushWardの設定を更新しました。",
+      "reauth_successful": "再認証が完了しました。"
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "追跡エンティティ",
+      "initiate_flow": {
+        "user": "追跡エンティティを追加"
+      },
+      "step": {
+        "user": {
+          "title": "エンティティをPushWardに追加",
+          "data": {
+            "entity_id": "エンティティ",
+            "template": "テンプレート"
+          },
+          "data_description": {
+            "template": "アクティビティのレイアウトテンプレート。'generic' はほとんどのエンティティに対応しています。"
+          }
+        },
+        "details": {
+          "title": "アクティビティオプション",
+          "data": {
+            "start_states": "開始状態",
+            "end_states": "終了状態",
+            "progress_attribute": "進捗属性",
+            "remaining_time_attribute": "残り時間属性",
+            "total_steps": "総ステップ数",
+            "current_step_attribute": "現在のステップ属性",
+            "severity": "重大度",
+            "value_attribute": "値属性",
+            "min_value": "最小値",
+            "max_value": "最大値",
+            "unit": "単位",
+            "series": "シリーズ",
+            "scale": "スケール",
+            "decimals": "小数点以下の桁数",
+            "smoothing": "スムーズな折れ線",
+            "thresholds": "しきい値",
+            "history_period": "過去データ期間",
+            "slug": "アクティビティスラッグ",
+            "activity_name": "アクティビティ名",
+            "icon": "アイコン",
+            "icon_attribute": "アイコン属性",
+            "priority": "優先度 (0〜10)",
+            "update_interval": "最小更新間隔（秒）",
+            "subtitle_attribute": "サブタイトル属性",
+            "state_labels": "状態ラベル",
+            "completion_message": "完了メッセージ",
+            "accent_color": "アクセントカラー",
+            "accent_color_attribute": "アクセントカラー属性",
+            "url": "URL",
+            "secondary_url": "セカンダリURL",
+            "ended_ttl": "終了後に自動削除（秒）",
+            "stale_ttl": "アイドル後に自動終了（秒）"
+          },
+          "data_description": {
+            "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
+            "end_states": "Live Activityを終了するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
+            "progress_attribute": "0〜100の進捗値を持つエンティティ属性。例: percentage",
+            "remaining_time_attribute": "残り時間（秒）を持つエンティティ属性。例: remaining",
+            "total_steps": "ステップの総数。",
+            "current_step_attribute": "現在のステップを整数で保持するエンティティ属性。",
+            "severity": "アラートの重大度レベル。",
+            "value_attribute": "現在のゲージ値を数値で保持するエンティティ属性。空白のままにするとエンティティの状態を使用します。",
+            "min_value": "ゲージ範囲の最小値。",
+            "max_value": "ゲージ範囲の最大値。",
+            "unit": "値の隣に表示される単位（例: °C, %, kW）。最大32文字。",
+            "series": "エンティティ属性を名前付きシリーズにマッピングします。形式: attribute=Label, attribute2=Label2。空白のままにするとエンティティの状態を単一シリーズとして使用します。",
+            "scale": "スパークラインチャートのY軸スケールモード。",
+            "decimals": "値の小数点以下の桁数（0〜10）。",
+            "smoothing": "データポイント間のカーブ補間を有効にして、スパークラインを滑らかにします。",
+            "thresholds": "スパークラインの水平参照線。形式: value:color:label。例: 25:red:Hot, 18:blue:Cold。最大5つ。",
+            "history_period": "Home Assistantのレコーダーからスパークラインにシードする過去データの分数。0に設定すると履歴なしで開始します。",
+            "slug": "このアクティビティの一意の識別子。空白のままにするとエンティティIDから自動生成されます。例: ha-living-room-lamp",
+            "activity_name": "iPhone Live Activityに表示される名前。デフォルトはエンティティのフレンドリー名です。",
+            "icon": "アイコンの上書き。空白のままにするとエンティティのネイティブアイコンを使用します（例: mdi:thermometer）。SF Symbolsもサポートされています（例: lamp.desk.fill）。",
+            "icon_attribute": "動的アイコン用のエンティティ属性。設定すると静的アイコンおよびエンティティアイコンより優先されます。",
+            "priority": "デバイスの上限に達した場合、優先度の高いアクティビティが長く保持されます（0 = 最低, 10 = 最高）。",
+            "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
+            "subtitle_attribute": "サブタイトルとして表示するエンティティ属性。空白のままにするとエンティティのフレンドリー名を使用します。",
+            "state_labels": "状態のカスタム表示テキスト。形式: state=Label, state2=Label 2。例: heating=加熱中, idle=待機中",
+            "completion_message": "アクティビティ終了時に表示されるテキスト。空白のままにすると「完了」と表示されます。例: 洗濯完了",
+            "accent_color": "Live Activityのアクセントカラー。空白のままにするとデフォルトの青色を使用します。",
+            "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。静的カラーより優先されます。RGB、HS、XY、ケルビン、カラー名、16進数に対応しています。",
+            "url": "Live Activityをタップしたときに開くリンク。http:// または https:// で始まる必要があります。steps および alert テンプレートのみ。",
+            "secondary_url": "Live Activityのセカンダリリンク。steps および alert テンプレートのみ。",
+            "ended_ttl": "アクティビティ終了後、サーバーから自動削除されるまでの秒数。空白のままにすると無期限に保持されます。例: 300",
+            "stale_ttl": "サーバーがアクティビティを自動終了するまでの非アクティブ秒数。空白のままにすると無効にします。例: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "エンティティ設定を編集",
+          "data": {
+            "entity_id": "エンティティ",
+            "template": "テンプレート"
+          },
+          "data_description": {
+            "template": "アクティビティのレイアウトテンプレート。'generic' はほとんどのエンティティに対応しています。"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URLは http:// または https:// で始まる必要があります。",
+        "invalid_gauge_range": "最小値は最大値より小さくなければなりません。"
+      },
+      "abort": {
+        "already_configured": "このエンティティはすでに追跡されています。",
+        "reconfigure_successful": "エンティティの設定を更新しました。"
+      }
+    }
+  }
+}

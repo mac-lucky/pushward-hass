@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Aktiviteyi Güncelle",
+      "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "Aktivite durumu (ONGOING veya ENDED)."
+        },
+        "template": {
+          "name": "Şablon",
+          "description": "Aktivite düzen şablonu."
+        },
+        "progress": {
+          "name": "İlerleme",
+          "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi adı."
+        },
+        "remaining_time": {
+          "name": "Kalan Süre",
+          "description": "Saniye cinsinden kalan süre."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Dokunulabilir düğme olarak gösterilen birincil URL. Yalnızca steps ve alert şablonlarında desteklenir."
+        },
+        "secondary_url": {
+          "name": "İkincil URL",
+          "description": "İkinci dokunulabilir düğme olarak gösterilen ikincil URL. Yalnızca steps ve alert şablonlarında desteklenir."
+        },
+        "end_date": {
+          "name": "Bitiş Tarihi",
+          "description": "Geri sayım bitiş tarihi için Unix zaman damgası."
+        },
+        "total_steps": {
+          "name": "Toplam Adım",
+          "description": "Toplam adım sayısı."
+        },
+        "current_step": {
+          "name": "Geçerli Adım",
+          "description": "Geçerli adım numarası."
+        },
+        "severity": {
+          "name": "Önem Derecesi",
+          "description": "Uyarı önem düzeyi."
+        },
+        "value": {
+          "name": "Değer",
+          "description": "Gösterge: sayısal değer. Zaman çizelgesi: etiketli değerler nesnesi (örn. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Minimum Değer",
+          "description": "Minimum gösterge değeri."
+        },
+        "max_value": {
+          "name": "Maksimum Değer",
+          "description": "Maksimum gösterge değeri."
+        },
+        "unit": {
+          "name": "Birim",
+          "description": "Değer için görüntü birimi (örn. °C, %)."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "scale": {
+          "name": "Ölçek",
+          "description": "Y ekseni ölçek modu (doğrusal veya logaritmik). Yalnızca zaman çizelgesi şablonu."
+        },
+        "decimals": {
+          "name": "Ondalık Basamak",
+          "description": "Değer görüntüsü için ondalık basamak sayısı (0-10). Yalnızca zaman çizelgesi şablonu."
+        },
+        "smoothing": {
+          "name": "Düzgün Çizgiler",
+          "description": "Veri noktaları arasında eğri aradeğerlemeyi etkinleştir. Yalnızca zaman çizelgesi şablonu."
+        },
+        "thresholds": {
+          "name": "Eşikler",
+          "description": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Yalnızca zaman çizelgesi şablonu."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Aktivite Oluştur",
+      "description": "Yeni bir PushWard Live Activity oluştur.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Benzersiz aktivite slug tanımlayıcısı."
+        },
+        "name": {
+          "name": "Ad",
+          "description": "Aktivite için görüntü adı."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Aktiviteyi Sonlandır",
+      "description": "Bir PushWard Live Activity'yi sonlandır.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Sonlandırılacak aktivite slug tanımlayıcısı."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen isteğe bağlı mesaj."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Aktiviteyi Sil",
+      "description": "Bir PushWard Live Activity'yi sil.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Silinecek aktivite slug tanımlayıcısı."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Bildirim Gönder",
+      "description": "PushWard aracılığıyla anlık bildirim gönder.",
+      "fields": {
+        "title": {
+          "name": "Başlık",
+          "description": "Bildirim başlığı."
+        },
+        "body": {
+          "name": "Gövde",
+          "description": "Bildirim gövde metni."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Başlığın altında gösterilen isteğe bağlı alt başlık."
+        },
+        "level": {
+          "name": "Düzey",
+          "description": "iOS kesme düzeyi. Bildirimin nasıl iletileceğini kontrol eder."
+        },
+        "thread_id": {
+          "name": "Konu Kimliği",
+          "description": "Bildirimleri Bildirim Merkezi'nde gruplandırır."
+        },
+        "collapse_id": {
+          "name": "Daraltma Kimliği",
+          "description": "APNs tekilleştirme anahtarı. Aynı anahtara sahip önceki bildirimin yerini alır."
+        },
+        "category": {
+          "name": "Kategori",
+          "description": "Özel eylemler için bildirim kategorisi."
+        },
+        "source": {
+          "name": "Kaynak",
+          "description": "PushWard gelen kutusunda gruplandırma için kaynak tanımlayıcısı."
+        },
+        "source_display_name": {
+          "name": "Kaynak Görüntü Adı",
+          "description": "PushWard gelen kutusunda gösterilen okunabilir kaynak adı."
+        },
+        "activity_slug": {
+          "name": "Aktivite Slug",
+          "description": "Bu bildirimi mevcut bir Live Activity ile ilişkilendir."
+        },
+        "push": {
+          "name": "Gönder",
+          "description": "Tüm cihazlara APNs anlık uyarısı olarak gönder. False olduğunda bildirim yalnızca gelen kutusunda saklanır."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "PushWard'a Bağlan",
+        "description": "Başlamak için PushWard entegrasyon anahtarınızı girin.",
+        "data": {
+          "integration_key": "Entegrasyon Anahtarı"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS uygulamasında Ayarlar → Entegrasyon Anahtarları bölümünden 'ha-*' kapsamıyla oluşturun."
+        }
+      },
+      "reconfigure": {
+        "title": "PushWard'ı Yeniden Yapılandır",
+        "description": "PushWard entegrasyon anahtarınızı güncelleyin.",
+        "data": {
+          "integration_key": "Entegrasyon Anahtarı"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS uygulamasında Ayarlar → Entegrasyon Anahtarları bölümünden 'ha-*' kapsamıyla oluşturun."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Yeniden Kimlik Doğrulama",
+        "description": "PushWard entegrasyon anahtarı geçersiz. Lütfen yeni bir tane girin.",
+        "data": {
+          "integration_key": "Entegrasyon Anahtarı"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS uygulamasında Ayarlar → Entegrasyon Anahtarları bölümünden 'ha-*' kapsamıyla oluşturun."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "PushWard sunucusuna bağlanılamadı.",
+      "invalid_auth": "Geçersiz entegrasyon anahtarı.",
+      "invalid_url": "URL, http:// veya https:// şeması kullanmalıdır.",
+      "unknown": "Beklenmeyen bir hata oluştu."
+    },
+    "abort": {
+      "already_configured": "PushWard zaten yapılandırılmış.",
+      "reconfigure_successful": "PushWard yapılandırması güncellendi.",
+      "reauth_successful": "Yeniden kimlik doğrulama başarılı."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "İzlenen Varlık",
+      "initiate_flow": {
+        "user": "İzlenen varlık ekle"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard'a Varlık Ekle",
+          "data": {
+            "entity_id": "Varlık",
+            "template": "Şablon"
+          },
+          "data_description": {
+            "template": "Aktivite düzen şablonu. 'generic' çoğu varlık için uygundur."
+          }
+        },
+        "details": {
+          "title": "Aktivite Seçenekleri",
+          "data": {
+            "start_states": "Başlangıç Durumları",
+            "end_states": "Bitiş Durumları",
+            "progress_attribute": "İlerleme Niteliği",
+            "remaining_time_attribute": "Kalan Süre Niteliği",
+            "total_steps": "Toplam Adım",
+            "current_step_attribute": "Geçerli Adım Niteliği",
+            "severity": "Önem Derecesi",
+            "value_attribute": "Değer Niteliği",
+            "min_value": "Minimum Değer",
+            "max_value": "Maksimum Değer",
+            "unit": "Birim",
+            "series": "Seri",
+            "scale": "Ölçek",
+            "decimals": "Ondalık Basamak",
+            "smoothing": "Düzgün Çizgiler",
+            "thresholds": "Eşikler",
+            "history_period": "Geçmiş Dönemi",
+            "slug": "Aktivite Slug",
+            "activity_name": "Aktivite Adı",
+            "icon": "Simge",
+            "icon_attribute": "Simge Niteliği",
+            "priority": "Öncelik (0-10)",
+            "update_interval": "Min. Güncelleme Aralığı (saniye)",
+            "subtitle_attribute": "Alt Başlık Niteliği",
+            "state_labels": "Durum Etiketleri",
+            "completion_message": "Tamamlanma Mesajı",
+            "accent_color": "Vurgu Rengi",
+            "accent_color_attribute": "Vurgu Rengi Niteliği",
+            "url": "URL",
+            "secondary_url": "İkincil URL",
+            "ended_ttl": "Bitişten Sonra Otomatik Sil (saniye)",
+            "stale_ttl": "Hareketsizlikte Otomatik Sonlandır (saniye)"
+          },
+          "data_description": {
+            "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin.",
+            "end_states": "Live Activity'yi sonlandıran varlık durumları. Listeden seçin veya özel değer girin.",
+            "progress_attribute": "0–100 arasında ilerleme değeri tutan varlık niteliği. Örnek: percentage",
+            "remaining_time_attribute": "Saniye cinsinden kalan süreyi tutan varlık niteliği. Örnek: remaining",
+            "total_steps": "Toplam adım sayısı.",
+            "current_step_attribute": "Geçerli adımı tamsayı olarak tutan varlık niteliği.",
+            "severity": "Uyarı önem düzeyi.",
+            "value_attribute": "Geçerli gösterge değerini sayı olarak tutan varlık niteliği. Varlığın durumunu kullanmak için boş bırakın.",
+            "min_value": "Gösterge aralığı için minimum değer.",
+            "max_value": "Gösterge aralığı için maksimum değer.",
+            "unit": "Değerin yanında gösterilen birim (örn. °C, %, kW). En fazla 32 karakter.",
+            "series": "Varlık niteliklerini adlandırılmış serilere eşleyin. Biçim: attribute=Etiket, attribute2=Etiket2. Tek seri olarak varlığın durumunu kullanmak için boş bırakın.",
+            "scale": "Kıvılcım çizelgesi için Y ekseni ölçek modu.",
+            "decimals": "Değerler için gösterilen ondalık basamak sayısı (0–10).",
+            "smoothing": "Daha düzgün bir kıvılcım çizelgesi için veri noktaları arasında eğri aradeğerlemeyi etkinleştir.",
+            "thresholds": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Biçim: değer:renk:etiket. Örnek: 25:red:Sıcak, 18:blue:Soğuk. En fazla 5.",
+            "history_period": "Home Assistant'ın kaydedicisinden kıvılcım çizelgesini başlatmak için geriye dönük veri dakikası. Geçmiş olmadan başlamak için 0 girin.",
+            "slug": "Bu aktivite için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın. Örnek: ha-living-room-lamp",
+            "activity_name": "iPhone Live Activity üzerinde gösterilen görüntü adı. Varsayılan olarak varlığın kolay adını kullanır.",
+            "icon": "Simgeyi geçersiz kıl. Varlığın yerel simgesini kullanmak için boş bırakın (örn. mdi:thermometer). SF Symbols da desteklenir (örn. lamp.desk.fill).",
+            "icon_attribute": "Dinamik simge için varlık niteliği. Ayarlandığında statik simgeyi ve varlık simgesini geçersiz kılar.",
+            "priority": "Cihaz sınırına ulaşıldığında daha yüksek öncelikli aktiviteler daha uzun süre tutulur (0 = en düşük, 10 = en yüksek).",
+            "update_interval": "Güncellemeler arasındaki minimum saniye. Hızlı durum değişiklikleri kısıtlanır.",
+            "subtitle_attribute": "Alt başlık olarak gösterilecek varlık niteliği. Varlığın kolay adını kullanmak için boş bırakın.",
+            "state_labels": "Durumlar için özel görüntü metni. Biçim: durum=Etiket, durum2=Etiket 2. Örnek: heating=Isınıyor, idle=Beklemede",
+            "completion_message": "Aktivite sona erdiğinde gösterilen metin. 'Tamamlandı' için boş bırakın. Örnek: Yıkama Bitti",
+            "accent_color": "Live Activity için vurgu rengi. Varsayılan mavi için boş bırakın.",
+            "accent_color_attribute": "Dinamik vurgu rengi için varlık niteliği. Statik rengi geçersiz kılar. RGB, HS, XY, Kelvin, adlandırılmış renkler ve onaltılık desteklenir.",
+            "url": "Live Activity'ye dokunulduğunda açılan bağlantı. http:// veya https:// ile başlamalıdır. Yalnızca steps ve alert şablonları.",
+            "secondary_url": "Live Activity için ikincil bağlantı. Yalnızca steps ve alert şablonları.",
+            "ended_ttl": "Aktivite sona erdikten kaç saniye sonra sunucudan otomatik silineceği. Süresiz tutmak için boş bırakın. Örnek: 300",
+            "stale_ttl": "Sunucunun aktiviteyi otomatik sonlandırmasından önceki hareketsizlik süresi (saniye). Devre dışı bırakmak için boş bırakın. Örnek: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "Varlık Yapılandırmasını Düzenle",
+          "data": {
+            "entity_id": "Varlık",
+            "template": "Şablon"
+          },
+          "data_description": {
+            "template": "Aktivite düzen şablonu. 'generic' çoğu varlık için uygundur."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL, http:// veya https:// şeması kullanmalıdır.",
+        "invalid_gauge_range": "Minimum değer, maksimum değerden küçük olmalıdır."
+      },
+      "abort": {
+        "already_configured": "Bu varlık zaten izleniyor.",
+        "reconfigure_successful": "Varlık yapılandırması güncellendi."
+      }
+    }
+  }
+}

@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Aktualizuj Live Activity",
+      "description": "Aktualizuj stan i zawartość Live Activity w PushWard.",
+      "fields": {
+        "slug": {
+          "name": "Identyfikator (slug)",
+          "description": "Identyfikator slug Live Activity."
+        },
+        "state": {
+          "name": "Stan",
+          "description": "Stan Live Activity (ONGOING lub ENDED)."
+        },
+        "template": {
+          "name": "Szablon",
+          "description": "Szablon układu Live Activity."
+        },
+        "progress": {
+          "name": "Postęp",
+          "description": "Wartość postępu między 0.0 a 1.0."
+        },
+        "state_text": {
+          "name": "Tekst stanu",
+          "description": "Tekst wyświetlany jako stan Live Activity."
+        },
+        "icon": {
+          "name": "Ikona",
+          "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Podtytuł",
+          "description": "Tekst podtytułu wyświetlany w Live Activity."
+        },
+        "accent_color": {
+          "name": "Kolor akcentu",
+          "description": "Nazwa koloru akcentu dla Live Activity."
+        },
+        "remaining_time": {
+          "name": "Pozostały czas",
+          "description": "Pozostały czas w sekundach."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Główny adres URL wyświetlany jako klikalny przycisk. Obsługiwany tylko w szablonach steps i alert."
+        },
+        "secondary_url": {
+          "name": "Dodatkowy URL",
+          "description": "Dodatkowy adres URL wyświetlany jako drugi klikalny przycisk. Obsługiwany tylko w szablonach steps i alert."
+        },
+        "end_date": {
+          "name": "Data zakończenia",
+          "description": "Znacznik czasu Unix dla daty zakończenia odliczania."
+        },
+        "total_steps": {
+          "name": "Łączna liczba kroków",
+          "description": "Łączna liczba kroków."
+        },
+        "current_step": {
+          "name": "Bieżący krok",
+          "description": "Numer bieżącego kroku."
+        },
+        "severity": {
+          "name": "Poziom istotności",
+          "description": "Poziom istotności alertu."
+        },
+        "value": {
+          "name": "Wartość",
+          "description": "Gauge: wartość liczbowa. Timeline: obiekt wartości z etykietami (np. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Wartość minimalna",
+          "description": "Minimalna wartość wskaźnika."
+        },
+        "max_value": {
+          "name": "Wartość maksymalna",
+          "description": "Maksymalna wartość wskaźnika."
+        },
+        "unit": {
+          "name": "Jednostka",
+          "description": "Jednostka wyświetlana obok wartości (np. °C, %)."
+        },
+        "completion_message": {
+          "name": "Komunikat zakończenia",
+          "description": "Komunikat wyświetlany po zakończeniu Live Activity."
+        },
+        "scale": {
+          "name": "Skala",
+          "description": "Tryb skali osi Y (liniowa lub logarytmiczna). Tylko szablon timeline."
+        },
+        "decimals": {
+          "name": "Miejsca dziesiętne",
+          "description": "Miejsca dziesiętne dla wyświetlanej wartości (0-10). Tylko szablon timeline."
+        },
+        "smoothing": {
+          "name": "Wygładzanie linii",
+          "description": "Włącz interpolację krzywej między punktami danych. Tylko szablon timeline."
+        },
+        "thresholds": {
+          "name": "Progi",
+          "description": "Poziome linie odniesienia na wykresie sparkline. Tylko szablon timeline."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Utwórz Live Activity",
+      "description": "Utwórz nowy PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Identyfikator (slug)",
+          "description": "Unikalny identyfikator slug Live Activity."
+        },
+        "name": {
+          "name": "Nazwa",
+          "description": "Nazwa wyświetlana dla Live Activity."
+        },
+        "priority": {
+          "name": "Priorytet",
+          "description": "Priorytet Live Activity (0 = najniższy, 10 = najwyższy)."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Zakończ Live Activity",
+      "description": "Zakończ PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Identyfikator (slug)",
+          "description": "Identyfikator slug Live Activity do zakończenia."
+        },
+        "completion_message": {
+          "name": "Komunikat zakończenia",
+          "description": "Opcjonalny komunikat wyświetlany po zakończeniu Live Activity."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Usuń Live Activity",
+      "description": "Usuń PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Identyfikator (slug)",
+          "description": "Identyfikator slug Live Activity do usunięcia."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Wyślij powiadomienie",
+      "description": "Wyślij powiadomienie push przez PushWard.",
+      "fields": {
+        "title": {
+          "name": "Tytuł",
+          "description": "Tytuł powiadomienia."
+        },
+        "body": {
+          "name": "Treść",
+          "description": "Treść powiadomienia."
+        },
+        "subtitle": {
+          "name": "Podtytuł",
+          "description": "Opcjonalny podtytuł wyświetlany pod tytułem."
+        },
+        "level": {
+          "name": "Poziom",
+          "description": "Poziom przerywania iOS. Kontroluje sposób dostarczenia powiadomienia."
+        },
+        "thread_id": {
+          "name": "ID wątku",
+          "description": "Grupuje powiadomienia razem w Centrum powiadomień."
+        },
+        "collapse_id": {
+          "name": "ID łączenia",
+          "description": "Klucz deduplikacji APNs. Zastępuje poprzednie powiadomienie z tym samym kluczem."
+        },
+        "category": {
+          "name": "Kategoria",
+          "description": "Kategoria powiadomienia dla akcji niestandardowych."
+        },
+        "source": {
+          "name": "Źródło",
+          "description": "Identyfikator źródła do grupowania w skrzynce PushWard."
+        },
+        "source_display_name": {
+          "name": "Wyświetlana nazwa źródła",
+          "description": "Czytelna nazwa źródła wyświetlana w skrzynce PushWard."
+        },
+        "activity_slug": {
+          "name": "Slug Live Activity",
+          "description": "Powiąż to powiadomienie z istniejącym Live Activity."
+        },
+        "push": {
+          "name": "Push",
+          "description": "Wyślij jako alert push APNs na wszystkie urządzenia. Gdy wyłączone, powiadomienie jest zapisywane tylko w skrzynce."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Połącz z PushWard",
+        "description": "Wprowadź klucz integracji PushWard, aby rozpocząć.",
+        "data": {
+          "integration_key": "Klucz integracji"
+        },
+        "data_description": {
+          "integration_key": "Utwórz go w aplikacji PushWard na iOS w Ustawienia → Klucze integracji z zakresem 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "Ponownie skonfiguruj PushWard",
+        "description": "Zaktualizuj klucz integracji PushWard.",
+        "data": {
+          "integration_key": "Klucz integracji"
+        },
+        "data_description": {
+          "integration_key": "Utwórz go w aplikacji PushWard na iOS w Ustawienia → Klucze integracji z zakresem 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Ponowne uwierzytelnienie",
+        "description": "Klucz integracji PushWard jest nieprawidłowy. Podaj nowy.",
+        "data": {
+          "integration_key": "Klucz integracji"
+        },
+        "data_description": {
+          "integration_key": "Utwórz go w aplikacji PushWard na iOS w Ustawienia → Klucze integracji z zakresem 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nie udało się połączyć z serwerem PushWard.",
+      "invalid_auth": "Nieprawidłowy klucz integracji.",
+      "invalid_url": "Adres URL musi używać schematu http:// lub https://.",
+      "unknown": "Wystąpił nieoczekiwany błąd."
+    },
+    "abort": {
+      "already_configured": "PushWard jest już skonfigurowany.",
+      "reconfigure_successful": "Konfiguracja PushWard została zaktualizowana.",
+      "reauth_successful": "Ponowne uwierzytelnienie powiodło się."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "Śledzona encja",
+      "initiate_flow": {
+        "user": "Dodaj śledzoną encję"
+      },
+      "step": {
+        "user": {
+          "title": "Dodaj encję do PushWard",
+          "data": {
+            "entity_id": "Encja",
+            "template": "Szablon"
+          },
+          "data_description": {
+            "template": "Szablon układu Live Activity. 'generic' pasuje do większości encji."
+          }
+        },
+        "details": {
+          "title": "Opcje Live Activity",
+          "data": {
+            "start_states": "Stany początkowe",
+            "end_states": "Stany końcowe",
+            "progress_attribute": "Atrybut postępu",
+            "remaining_time_attribute": "Atrybut pozostałego czasu",
+            "total_steps": "Łączna liczba kroków",
+            "current_step_attribute": "Atrybut bieżącego kroku",
+            "severity": "Poziom istotności",
+            "value_attribute": "Atrybut wartości",
+            "min_value": "Wartość minimalna",
+            "max_value": "Wartość maksymalna",
+            "unit": "Jednostka",
+            "series": "Serie",
+            "scale": "Skala",
+            "decimals": "Miejsca dziesiętne",
+            "smoothing": "Wygładzanie linii",
+            "thresholds": "Progi",
+            "history_period": "Okres historii wstecznej",
+            "slug": "Slug Live Activity",
+            "activity_name": "Nazwa Live Activity",
+            "icon": "Ikona",
+            "icon_attribute": "Atrybut ikony",
+            "priority": "Priorytet (0-10)",
+            "update_interval": "Min. interwał aktualizacji (sekundy)",
+            "subtitle_attribute": "Atrybut podtytułu",
+            "state_labels": "Etykiety stanów",
+            "completion_message": "Komunikat zakończenia",
+            "accent_color": "Kolor akcentu",
+            "accent_color_attribute": "Atrybut koloru akcentu",
+            "url": "URL",
+            "secondary_url": "Dodatkowy URL",
+            "ended_ttl": "Automatyczne usunięcie po zakończeniu (sekundy)",
+            "stale_ttl": "Automatyczne zakończenie po nieaktywności (sekundy)"
+          },
+          "data_description": {
+            "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości.",
+            "end_states": "Stany encji, które kończą Live Activity. Wybierz z listy lub wpisz własne wartości.",
+            "progress_attribute": "Atrybut encji przechowujący wartość postępu 0–100. Przykład: percentage",
+            "remaining_time_attribute": "Atrybut encji przechowujący pozostały czas w sekundach. Przykład: remaining",
+            "total_steps": "Łączna liczba kroków.",
+            "current_step_attribute": "Atrybut encji przechowujący bieżący krok jako liczbę całkowitą.",
+            "severity": "Poziom istotności alertu.",
+            "value_attribute": "Atrybut encji przechowujący bieżącą wartość wskaźnika jako liczbę. Pozostaw puste, aby użyć stanu encji.",
+            "min_value": "Minimalna wartość zakresu wskaźnika.",
+            "max_value": "Maksymalna wartość zakresu wskaźnika.",
+            "unit": "Jednostka wyświetlana obok wartości (np. °C, %, kW). Maks. 32 znaki.",
+            "series": "Mapuje atrybuty encji na nazwane serie. Format: atrybut=Etykieta, atrybut2=Etykieta2. Pozostaw puste, aby użyć stanu encji jako pojedynczej serii.",
+            "scale": "Tryb skali osi Y dla wykresu sparkline.",
+            "decimals": "Liczba miejsc dziesiętnych wyświetlanych dla wartości (0–10).",
+            "smoothing": "Włącz interpolację krzywej między punktami danych dla gładszego wykresu sparkline.",
+            "thresholds": "Poziome linie odniesienia na wykresie sparkline. Format: wartość:kolor:etykieta. Przykład: 25:red:Gorąco, 18:blue:Zimno. Maks. 5.",
+            "history_period": "Minuty danych historycznych do zasilenia wykresu sparkline z rejestratora Home Assistant. Ustaw 0, aby zacząć bez historii.",
+            "slug": "Unikalny identyfikator dla tego Live Activity. Pozostaw puste, aby wygenerować automatycznie z ID encji. Przykład: ha-living-room-lamp",
+            "activity_name": "Nazwa wyświetlana w Live Activity na iPhonie. Domyślnie przyjazna nazwa encji.",
+            "icon": "Zastąp ikonę. Pozostaw puste, aby użyć natywnej ikony encji (np. mdi:thermometer). Obsługiwane są także SF Symbols (np. lamp.desk.fill).",
+            "icon_attribute": "Atrybut encji dla dynamicznej ikony. Gdy ustawiony, zastępuje ikonę statyczną i ikonę encji.",
+            "priority": "Live Activity o wyższym priorytecie są utrzymywane dłużej, gdy osiągnięto limit urządzenia (0 = najniższy, 10 = najwyższy).",
+            "update_interval": "Minimalna liczba sekund między aktualizacjami. Szybkie zmiany stanu są ograniczane.",
+            "subtitle_attribute": "Atrybut encji wyświetlany jako podtytuł. Pozostaw puste, aby użyć przyjaznej nazwy encji.",
+            "state_labels": "Własny tekst wyświetlany dla stanów. Format: stan=Etykieta, stan2=Etykieta 2. Przykład: heating=Nagrzewanie, idle=Czuwanie",
+            "completion_message": "Tekst wyświetlany po zakończeniu Live Activity. Pozostaw puste dla 'Zakończono'. Przykład: Pranie zakończone",
+            "accent_color": "Kolor akcentu dla Live Activity. Pozostaw puste dla domyślnego niebieskiego.",
+            "accent_color_attribute": "Atrybut encji dla dynamicznego koloru akcentu. Zastępuje kolor statyczny. Obsługuje RGB, HS, XY, Kelvin, kolory nazwane oraz hex.",
+            "url": "Link otwierany po dotknięciu Live Activity. Musi zaczynać się od http:// lub https://. Tylko szablony steps i alert.",
+            "secondary_url": "Dodatkowy link dla Live Activity. Tylko szablony steps i alert.",
+            "ended_ttl": "Liczba sekund po zakończeniu Live Activity, zanim zostanie automatycznie usunięty z serwera. Pozostaw puste, aby zachować bezterminowo. Przykład: 300",
+            "stale_ttl": "Liczba sekund nieaktywności, zanim serwer automatycznie zakończy Live Activity. Pozostaw puste, aby wyłączyć. Przykład: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "Edytuj konfigurację encji",
+          "data": {
+            "entity_id": "Encja",
+            "template": "Szablon"
+          },
+          "data_description": {
+            "template": "Szablon układu Live Activity. 'generic' pasuje do większości encji."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "Adres URL musi używać schematu http:// lub https://.",
+        "invalid_gauge_range": "Wartość minimalna musi być mniejsza od wartości maksymalnej."
+      },
+      "abort": {
+        "already_configured": "Ta encja jest już śledzona.",
+        "reconfigure_successful": "Konfiguracja encji została zaktualizowana."
+      }
+    }
+  }
+}

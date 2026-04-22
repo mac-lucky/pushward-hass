@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "سرگرمی اپڈیٹ کریں",
+      "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی حالت (ONGOING یا ENDED)۔"
+        },
+        "template": {
+          "name": "ٹیمپلیٹ",
+          "description": "سرگرمی کا لے آؤٹ ٹیمپلیٹ۔"
+        },
+        "progress": {
+          "name": "پیش رفت",
+          "description": "0.0 سے 1.0 کے درمیان پیش رفت کی قدر۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً arrow.down.circle.fill، mdi:download)۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کے رنگ کا نام۔"
+        },
+        "remaining_time": {
+          "name": "بقیہ وقت",
+          "description": "سیکنڈوں میں بقیہ وقت۔"
+        },
+        "url": {
+          "name": "URL",
+          "description": "بنیادی URL جو ٹیپ کیے جانے والے بٹن کے طور پر ظاہر ہوتا ہے۔ صرف steps اور alert ٹیمپلیٹس پر سپورٹ ہے۔"
+        },
+        "secondary_url": {
+          "name": "ثانوی URL",
+          "description": "ثانوی URL جو دوسرے ٹیپ کیے جانے والے بٹن کے طور پر ظاہر ہوتا ہے۔ صرف steps اور alert ٹیمپلیٹس پر سپورٹ ہے۔"
+        },
+        "end_date": {
+          "name": "اختتام کی تاریخ",
+          "description": "الٹی گنتی کی اختتامی تاریخ کے لیے Unix ٹائم اسٹیمپ۔"
+        },
+        "total_steps": {
+          "name": "کل مراحل",
+          "description": "مراحل کی کل تعداد۔"
+        },
+        "current_step": {
+          "name": "موجودہ مرحلہ",
+          "description": "موجودہ مرحلے کا نمبر۔"
+        },
+        "severity": {
+          "name": "شدت",
+          "description": "الرٹ کی شدت کی سطح۔"
+        },
+        "value": {
+          "name": "قدر",
+          "description": "Gauge: عددی قدر۔ Timeline: لیبل شدہ قدروں کی آبجیکٹ (مثلاً Temp=22.5)۔"
+        },
+        "min_value": {
+          "name": "کم از کم قدر",
+          "description": "Gauge کی کم از کم قدر۔"
+        },
+        "max_value": {
+          "name": "زیادہ سے زیادہ قدر",
+          "description": "Gauge کی زیادہ سے زیادہ قدر۔"
+        },
+        "unit": {
+          "name": "اکائی",
+          "description": "قدر کے ساتھ ظاہر ہونے والی اکائی (مثلاً °C، %)۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "scale": {
+          "name": "پیمانہ",
+          "description": "Y-محور کا پیمانہ (linear یا logarithmic)۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        },
+        "decimals": {
+          "name": "اعشاریہ مقامات",
+          "description": "قدر ظاہر کرنے کے لیے اعشاریہ مقامات (0-10)۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        },
+        "smoothing": {
+          "name": "ہموار لکیریں",
+          "description": "ڈیٹا پوائنٹس کے درمیان منحنی انٹرپولیشن فعال کریں۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        },
+        "thresholds": {
+          "name": "حدود",
+          "description": "sparkline پر افقی حوالہ لکیریں۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        }
+      }
+    },
+    "create_activity": {
+      "name": "سرگرمی بنائیں",
+      "description": "نئی PushWard Live Activity بنائیں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی منفرد slug شناخت۔"
+        },
+        "name": {
+          "name": "نام",
+          "description": "سرگرمی کا ظاہری نام۔"
+        },
+        "priority": {
+          "name": "ترجیح",
+          "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "سرگرمی ختم ہونے کے بعد اسے برقرار رکھنے کے سیکنڈ۔"
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "سرگرمی کو پرانا سمجھے جانے سے پہلے کے سیکنڈ۔"
+        }
+      }
+    },
+    "end_activity": {
+      "name": "سرگرمی ختم کریں",
+      "description": "PushWard Live Activity ختم کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "ختم کی جانے والی سرگرمی کی slug شناخت۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا اختیاری پیغام۔"
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "سرگرمی حذف کریں",
+      "description": "PushWard Live Activity حذف کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "حذف کی جانے والی سرگرمی کی slug شناخت۔"
+        }
+      }
+    },
+    "send_notification": {
+      "name": "اطلاع بھیجیں",
+      "description": "PushWard کے ذریعے push notification بھیجیں۔",
+      "fields": {
+        "title": {
+          "name": "عنوان",
+          "description": "اطلاع کا عنوان۔"
+        },
+        "body": {
+          "name": "متن",
+          "description": "اطلاع کا بنیادی متن۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "عنوان کے نیچے دکھایا جانے والا اختیاری ذیلی عنوان۔"
+        },
+        "level": {
+          "name": "سطح",
+          "description": "iOS کی مداخلت کی سطح۔ اطلاع کی ترسیل کا طریقہ کنٹرول کرتی ہے۔"
+        },
+        "thread_id": {
+          "name": "Thread ID",
+          "description": "Notification Center میں اطلاعات کو گروپ کرتا ہے۔"
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "APNs ڈی ڈپلیکیشن کلید۔ ایک ہی کلید والی پچھلی اطلاع کو بدل دیتا ہے۔"
+        },
+        "category": {
+          "name": "زمرہ",
+          "description": "اپنی مرضی کی کارروائیوں کے لیے اطلاع کا زمرہ۔"
+        },
+        "source": {
+          "name": "ماخذ",
+          "description": "PushWard inbox میں گروپ بندی کے لیے ماخذ شناخت۔"
+        },
+        "source_display_name": {
+          "name": "ماخذ کا ظاہری نام",
+          "description": "PushWard inbox میں دکھایا جانے والا انسانی پڑھنے کے قابل ماخذ نام۔"
+        },
+        "activity_slug": {
+          "name": "Activity Slug",
+          "description": "اس اطلاع کو کسی موجودہ Live Activity سے منسلک کریں۔"
+        },
+        "push": {
+          "name": "Push",
+          "description": "تمام آلات پر APNs push alert کے طور پر بھیجیں۔ جب غلط ہو تو اطلاع صرف inbox میں محفوظ ہوتی ہے۔"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "PushWard سے جڑیں",
+        "description": "شروع کرنے کے لیے اپنی PushWard انٹیگریشن کی درج کریں۔",
+        "data": {
+          "integration_key": "انٹیگریشن کی"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS ایپ میں Settings → Integration Keys کے تحت 'ha-*' scope کے ساتھ ایک بنائیں۔"
+        }
+      },
+      "reconfigure": {
+        "title": "PushWard دوبارہ ترتیب دیں",
+        "description": "اپنی PushWard انٹیگریشن کی اپڈیٹ کریں۔",
+        "data": {
+          "integration_key": "انٹیگریشن کی"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS ایپ میں Settings → Integration Keys کے تحت 'ha-*' scope کے ساتھ ایک بنائیں۔"
+        }
+      },
+      "reauth_confirm": {
+        "title": "دوبارہ توثیق کریں",
+        "description": "PushWard انٹیگریشن کی غلط ہے۔ براہ کرم نئی کی فراہم کریں۔",
+        "data": {
+          "integration_key": "انٹیگریشن کی"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS ایپ میں Settings → Integration Keys کے تحت 'ha-*' scope کے ساتھ ایک بنائیں۔"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "PushWard سرور سے کنکشن ناکام رہا۔",
+      "invalid_auth": "انٹیگریشن کی غلط ہے۔",
+      "invalid_url": "URL کو http:// یا https:// scheme استعمال کرنی چاہیے۔",
+      "unknown": "ایک غیر متوقع خرابی پیش آئی۔"
+    },
+    "abort": {
+      "already_configured": "PushWard پہلے سے ترتیب شدہ ہے۔",
+      "reconfigure_successful": "PushWard کی ترتیب اپڈیٹ ہو گئی۔",
+      "reauth_successful": "دوبارہ توثیق کامیاب رہی۔"
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "ٹریک شدہ اینٹٹی",
+      "initiate_flow": {
+        "user": "ٹریک شدہ اینٹٹی شامل کریں"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard میں اینٹٹی شامل کریں",
+          "data": {
+            "entity_id": "اینٹٹی",
+            "template": "ٹیمپلیٹ"
+          },
+          "data_description": {
+            "template": "سرگرمی کا لے آؤٹ ٹیمپلیٹ۔ 'generic' زیادہ تر اینٹٹیز کے لیے کام کرتا ہے۔"
+          }
+        },
+        "details": {
+          "title": "سرگرمی کے اختیارات",
+          "data": {
+            "start_states": "شروع کرنے والی حالتیں",
+            "end_states": "ختم کرنے والی حالتیں",
+            "progress_attribute": "پیش رفت کی خصوصیت",
+            "remaining_time_attribute": "بقیہ وقت کی خصوصیت",
+            "total_steps": "کل مراحل",
+            "current_step_attribute": "موجودہ مرحلے کی خصوصیت",
+            "severity": "شدت",
+            "value_attribute": "قدر کی خصوصیت",
+            "min_value": "کم از کم قدر",
+            "max_value": "زیادہ سے زیادہ قدر",
+            "unit": "اکائی",
+            "series": "سیریز",
+            "scale": "پیمانہ",
+            "decimals": "اعشاریہ مقامات",
+            "smoothing": "ہموار لکیریں",
+            "thresholds": "حدود",
+            "history_period": "پچھلی تاریخ کی مدت",
+            "slug": "Activity Slug",
+            "activity_name": "سرگرمی کا نام",
+            "icon": "آئیکن",
+            "icon_attribute": "آئیکن کی خصوصیت",
+            "priority": "ترجیح (0-10)",
+            "update_interval": "کم از کم اپڈیٹ وقفہ (سیکنڈ)",
+            "subtitle_attribute": "ذیلی عنوان کی خصوصیت",
+            "state_labels": "حالت کے لیبل",
+            "completion_message": "تکمیل کا پیغام",
+            "accent_color": "لہجے کا رنگ",
+            "accent_color_attribute": "لہجے کے رنگ کی خصوصیت",
+            "url": "URL",
+            "secondary_url": "ثانوی URL",
+            "ended_ttl": "اختتام کے بعد خودکار حذف (سیکنڈ)",
+            "stale_ttl": "غیر فعال رہنے کے بعد خودکار اختتام (سیکنڈ)"
+          },
+          "data_description": {
+            "start_states": "اینٹٹی کی وہ حالتیں جو Live Activity شروع کرتی ہیں۔ فہرست سے منتخب کریں یا اپنی مرضی کی قدریں ٹائپ کریں۔",
+            "end_states": "اینٹٹی کی وہ حالتیں جو Live Activity ختم کرتی ہیں۔ فہرست سے منتخب کریں یا اپنی مرضی کی قدریں ٹائپ کریں۔",
+            "progress_attribute": "اینٹٹی کی وہ خصوصیت جو 0–100 پیش رفت کی قدر رکھتی ہے۔ مثال: percentage",
+            "remaining_time_attribute": "اینٹٹی کی وہ خصوصیت جو سیکنڈوں میں بقیہ وقت رکھتی ہے۔ مثال: remaining",
+            "total_steps": "مراحل کی کل تعداد۔",
+            "current_step_attribute": "موجودہ مرحلہ integer کے طور پر رکھنے والی اینٹٹی کی خصوصیت۔",
+            "severity": "الرٹ کی شدت کی سطح۔",
+            "value_attribute": "موجودہ gauge قدر بطور نمبر رکھنے والی اینٹٹی کی خصوصیت۔ اینٹٹی کی حالت استعمال کرنے کے لیے خالی چھوڑیں۔",
+            "min_value": "gauge کی حد کے لیے کم از کم قدر۔",
+            "max_value": "gauge کی حد کے لیے زیادہ سے زیادہ قدر۔",
+            "unit": "قدر کے ساتھ ظاہر ہونے والی اکائی (مثلاً °C، %، kW)۔ زیادہ سے زیادہ 32 حروف۔",
+            "series": "اینٹٹی کی خصوصیات کو نامزد سیریز سے منسلک کریں۔ فارمیٹ: attribute=Label, attribute2=Label2۔ ایک سیریز کے طور پر اینٹٹی کی حالت استعمال کرنے کے لیے خالی چھوڑیں۔",
+            "scale": "sparkline چارٹ کے لیے Y-محور کا پیمانہ۔",
+            "decimals": "قدریں ظاہر کرنے کے لیے اعشاریہ مقامات کی تعداد (0–10)۔",
+            "smoothing": "ہموار sparkline کے لیے ڈیٹا پوائنٹس کے درمیان منحنی انٹرپولیشن فعال کریں۔",
+            "thresholds": "sparkline پر افقی حوالہ لکیریں۔ فارمیٹ: value:color:label۔ مثال: 25:red:Hot, 18:blue:Cold۔ زیادہ سے زیادہ 5۔",
+            "history_period": "Home Assistant کے recorder سے sparkline میں ماضی کا ڈیٹا بھرنے کے منٹ۔ بغیر تاریخ کے شروع کرنے کے لیے 0 سیٹ کریں۔",
+            "slug": "اس سرگرمی کی منفرد شناخت۔ entity ID سے خودکار تخلیق کے لیے خالی چھوڑیں۔ مثال: ha-living-room-lamp",
+            "activity_name": "iPhone Live Activity پر دکھایا جانے والا ظاہری نام۔ پہلے سے طے اینٹٹی کا دوستانہ نام ہے۔",
+            "icon": "آئیکن کو اوور رائڈ کریں۔ اینٹٹی کا اصل آئیکن استعمال کرنے کے لیے خالی چھوڑیں (مثلاً mdi:thermometer)۔ SF Symbols بھی سپورٹ ہیں (مثلاً lamp.desk.fill)۔",
+            "icon_attribute": "متحرک آئیکن کے لیے اینٹٹی کی خصوصیت۔ سیٹ ہونے پر static آئیکن اور اینٹٹی آئیکن کو اوور رائڈ کرتی ہے۔",
+            "priority": "زیادہ ترجیح والی سرگرمیاں آلے کی حد پوری ہونے پر زیادہ دیر تک رکھی جاتی ہیں (0 = کم ترین، 10 = سب سے زیادہ)۔",
+            "update_interval": "اپڈیٹس کے درمیان کم از کم سیکنڈ۔ تیز رفتار حالت تبدیلیوں کو محدود کیا جاتا ہے۔",
+            "subtitle_attribute": "ذیلی عنوان کے طور پر دکھانے کے لیے اینٹٹی کی خصوصیت۔ اینٹٹی کا دوستانہ نام استعمال کرنے کے لیے خالی چھوڑیں۔",
+            "state_labels": "حالتوں کے لیے اپنی مرضی کا ظاہری متن۔ فارمیٹ: state=Label, state2=Label 2۔ مثال: heating=Heating Up, idle=Standby",
+            "completion_message": "سرگرمی ختم ہونے پر دکھایا جانے والا متن۔ 'Complete' کے لیے خالی چھوڑیں۔ مثال: Wash Done",
+            "accent_color": "Live Activity کے لیے لہجے کا رنگ۔ پہلے سے طے نیلے رنگ کے لیے خالی چھوڑیں۔",
+            "accent_color_attribute": "متحرک لہجے کے رنگ کے لیے اینٹٹی کی خصوصیت۔ static رنگ کو اوور رائڈ کرتی ہے۔ RGB، HS، XY، Kelvin، نامزد رنگ اور hex سپورٹ کرتا ہے۔",
+            "url": "Live Activity ٹیپ کرنے پر کھلنے والا لنک۔ http:// یا https:// سے شروع ہونا ضروری ہے۔ صرف steps اور alert ٹیمپلیٹس۔",
+            "secondary_url": "Live Activity کے لیے ثانوی لنک۔ صرف steps اور alert ٹیمپلیٹس۔",
+            "ended_ttl": "سرگرمی ختم ہونے کے بعد سرور سے خودکار حذف سے پہلے کے سیکنڈ۔ غیر معینہ مدت تک رکھنے کے لیے خالی چھوڑیں۔ مثال: 300",
+            "stale_ttl": "سرور کے ذریعے سرگرمی خودکار ختم کرنے سے پہلے غیر فعالیت کے سیکنڈ۔ غیر فعال کرنے کے لیے خالی چھوڑیں۔ مثال: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "اینٹٹی کی ترتیب تبدیل کریں",
+          "data": {
+            "entity_id": "اینٹٹی",
+            "template": "ٹیمپلیٹ"
+          },
+          "data_description": {
+            "template": "سرگرمی کا لے آؤٹ ٹیمپلیٹ۔ 'generic' زیادہ تر اینٹٹیز کے لیے کام کرتا ہے۔"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL کو http:// یا https:// scheme استعمال کرنی چاہیے۔",
+        "invalid_gauge_range": "کم از کم قدر زیادہ سے زیادہ قدر سے کم ہونی چاہیے۔"
+      },
+      "abort": {
+        "already_configured": "یہ اینٹٹی پہلے سے ٹریک ہو رہی ہے۔",
+        "reconfigure_successful": "اینٹٹی کی ترتیب اپڈیٹ ہو گئی۔"
+      }
+    }
+  }
+}

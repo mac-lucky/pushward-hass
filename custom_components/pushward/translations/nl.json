@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Activiteit bijwerken",
+      "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Activiteitsstatus (ONGOING of ENDED)."
+        },
+        "template": {
+          "name": "Sjabloon",
+          "description": "Lay-outsjabloon van de activiteit."
+        },
+        "progress": {
+          "name": "Voortgang",
+          "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleurnaam voor de activiteit."
+        },
+        "remaining_time": {
+          "name": "Resterende tijd",
+          "description": "Resterende tijd in seconden."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primaire URL als aanklikbare knop. Alleen ondersteund voor de sjablonen steps en alert."
+        },
+        "secondary_url": {
+          "name": "Secundaire URL",
+          "description": "Secundaire URL als tweede aanklikbare knop. Alleen ondersteund voor de sjablonen steps en alert."
+        },
+        "end_date": {
+          "name": "Einddatum",
+          "description": "Unix-tijdstempel voor de einddatum van de aftelling."
+        },
+        "total_steps": {
+          "name": "Totaal aantal stappen",
+          "description": "Totaal aantal stappen."
+        },
+        "current_step": {
+          "name": "Huidige stap",
+          "description": "Huidig stapnummer."
+        },
+        "severity": {
+          "name": "Ernst",
+          "description": "Ernstniveau van de waarschuwing."
+        },
+        "value": {
+          "name": "Waarde",
+          "description": "Gauge: numerieke waarde. Timeline: object met gelabelde waarden (bijv. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Minimumwaarde",
+          "description": "Minimale gauge-waarde."
+        },
+        "max_value": {
+          "name": "Maximumwaarde",
+          "description": "Maximale gauge-waarde."
+        },
+        "unit": {
+          "name": "Eenheid",
+          "description": "Weergave-eenheid naast de waarde (bijv. °C, %)."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "scale": {
+          "name": "Schaal",
+          "description": "Y-as schaalmodus (lineair of logaritmisch). Alleen voor het sjabloon timeline."
+        },
+        "decimals": {
+          "name": "Decimalen",
+          "description": "Aantal decimalen voor de waardeweergave (0-10). Alleen voor het sjabloon timeline."
+        },
+        "smoothing": {
+          "name": "Vloeiende lijnen",
+          "description": "Schakel curve-interpolatie in tussen gegevenspunten. Alleen voor het sjabloon timeline."
+        },
+        "thresholds": {
+          "name": "Drempelwaarden",
+          "description": "Horizontale referentielijnen op de sparkline. Alleen voor het sjabloon timeline."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Activiteit aanmaken",
+      "description": "Maak een nieuwe PushWard Live Activity aan.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Unieke slug-identificator voor de activiteit."
+        },
+        "name": {
+          "name": "Naam",
+          "description": "Weergavenaam voor de activiteit."
+        },
+        "priority": {
+          "name": "Prioriteit",
+          "description": "Activiteitsprioriteit (0 = laagst, 10 = hoogst)."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Activiteit beëindigen",
+      "description": "Beëindig een PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de te beëindigen activiteit."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Optioneel bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Activiteit verwijderen",
+      "description": "Verwijder een PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de te verwijderen activiteit."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Melding verzenden",
+      "description": "Verstuur een pushmelding via PushWard.",
+      "fields": {
+        "title": {
+          "name": "Titel",
+          "description": "Titel van de melding."
+        },
+        "body": {
+          "name": "Berichttekst",
+          "description": "Berichttekst van de melding."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Optionele ondertitel onder de titel."
+        },
+        "level": {
+          "name": "Niveau",
+          "description": "iOS-onderbrekingsniveau. Bepaalt hoe de melding wordt afgeleverd."
+        },
+        "thread_id": {
+          "name": "Thread-ID",
+          "description": "Groepeert meldingen in het Berichtencentrum."
+        },
+        "collapse_id": {
+          "name": "Samenvouwings-ID",
+          "description": "APNs-deduplicatiesleutel. Vervangt een eerdere melding met dezelfde sleutel."
+        },
+        "category": {
+          "name": "Categorie",
+          "description": "Meldingscategorie voor aangepaste acties."
+        },
+        "source": {
+          "name": "Bron",
+          "description": "Bronidentificator voor groepering in de PushWard-inbox."
+        },
+        "source_display_name": {
+          "name": "Weergavenaam bron",
+          "description": "Leesbare bronnaam in de PushWard-inbox."
+        },
+        "activity_slug": {
+          "name": "Activiteits-slug",
+          "description": "Koppel deze melding aan een bestaande Live Activity."
+        },
+        "push": {
+          "name": "Push",
+          "description": "Verzend als APNs-pushalert naar alle apparaten. Als uitgeschakeld, wordt de melding alleen in de inbox opgeslagen."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Verbinding maken met PushWard",
+        "description": "Voer je PushWard-integratiesleutel in om te beginnen.",
+        "data": {
+          "integration_key": "Integratiesleutel"
+        },
+        "data_description": {
+          "integration_key": "Maak er een aan in de PushWard iOS-app via Instellingen → Integratiesleutels met bereik 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "PushWard opnieuw configureren",
+        "description": "Werk je PushWard-integratiesleutel bij.",
+        "data": {
+          "integration_key": "Integratiesleutel"
+        },
+        "data_description": {
+          "integration_key": "Maak er een aan in de PushWard iOS-app via Instellingen → Integratiesleutels met bereik 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Opnieuw verifiëren",
+        "description": "De PushWard-integratiesleutel is ongeldig. Geef een nieuwe op.",
+        "data": {
+          "integration_key": "Integratiesleutel"
+        },
+        "data_description": {
+          "integration_key": "Maak er een aan in de PushWard iOS-app via Instellingen → Integratiesleutels met bereik 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met de PushWard-server.",
+      "invalid_auth": "Ongeldige integratiesleutel.",
+      "invalid_url": "URL moet het schema http:// of https:// gebruiken.",
+      "unknown": "Er is een onverwachte fout opgetreden."
+    },
+    "abort": {
+      "already_configured": "PushWard is al geconfigureerd.",
+      "reconfigure_successful": "PushWard-configuratie bijgewerkt.",
+      "reauth_successful": "Herverificatie geslaagd."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "Gevolgde entiteit",
+      "initiate_flow": {
+        "user": "Gevolgde entiteit toevoegen"
+      },
+      "step": {
+        "user": {
+          "title": "Entiteit toevoegen aan PushWard",
+          "data": {
+            "entity_id": "Entiteit",
+            "template": "Sjabloon"
+          },
+          "data_description": {
+            "template": "Lay-outsjabloon voor de activiteit. 'generic' werkt voor de meeste entiteiten."
+          }
+        },
+        "details": {
+          "title": "Activiteitsopties",
+          "data": {
+            "start_states": "Startstatussen",
+            "end_states": "Eindstatussen",
+            "progress_attribute": "Voortgangsattribuut",
+            "remaining_time_attribute": "Attribuut resterende tijd",
+            "total_steps": "Totaal aantal stappen",
+            "current_step_attribute": "Attribuut huidige stap",
+            "severity": "Ernst",
+            "value_attribute": "Waardeattribuut",
+            "min_value": "Minimumwaarde",
+            "max_value": "Maximumwaarde",
+            "unit": "Eenheid",
+            "series": "Reeksen",
+            "scale": "Schaal",
+            "decimals": "Decimalen",
+            "smoothing": "Vloeiende lijnen",
+            "thresholds": "Drempelwaarden",
+            "history_period": "Periode terugkijkgeschiedenis",
+            "slug": "Activiteits-slug",
+            "activity_name": "Activiteitsnaam",
+            "icon": "Pictogram",
+            "icon_attribute": "Pictogramattribuut",
+            "priority": "Prioriteit (0-10)",
+            "update_interval": "Min. bijwerkinterval (seconden)",
+            "subtitle_attribute": "Ondertitelattribuut",
+            "state_labels": "Statuslabels",
+            "completion_message": "Voltooiingsbericht",
+            "accent_color": "Accentkleur",
+            "accent_color_attribute": "Accentkleurattribuut",
+            "url": "URL",
+            "secondary_url": "Secundaire URL",
+            "ended_ttl": "Automatisch verwijderen na beëindigen (seconden)",
+            "stale_ttl": "Automatisch beëindigen na inactiviteit (seconden)"
+          },
+          "data_description": {
+            "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
+            "end_states": "Entiteitsstatussen die de Live Activity beëindigen. Selecteer uit de lijst of typ aangepaste waarden.",
+            "progress_attribute": "Entiteitsattribuut met een voortgangswaarde van 0–100. Voorbeeld: percentage",
+            "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
+            "total_steps": "Totaal aantal stappen.",
+            "current_step_attribute": "Entiteitsattribuut met de huidige stap als geheel getal.",
+            "severity": "Ernstniveau van de waarschuwing.",
+            "value_attribute": "Entiteitsattribuut met de huidige gauge-waarde als getal. Laat leeg om de entiteitsstatus te gebruiken.",
+            "min_value": "Minimumwaarde voor het gauge-bereik.",
+            "max_value": "Maximumwaarde voor het gauge-bereik.",
+            "unit": "Weergave-eenheid naast de waarde (bijv. °C, %, kW). Max. 32 tekens.",
+            "series": "Koppel entiteitsattributen aan benoemde reeksen. Indeling: attribuut=Label, attribuut2=Label2. Laat leeg om de entiteitsstatus als enkelvoudige reeks te gebruiken.",
+            "scale": "Y-as schaalmodus voor het sparkline-diagram.",
+            "decimals": "Aantal decimalen voor de waardeweergave (0–10).",
+            "smoothing": "Schakel curve-interpolatie in tussen gegevenspunten voor een vloeiendere sparkline.",
+            "thresholds": "Horizontale referentielijnen op de sparkline. Indeling: waarde:kleur:label. Voorbeeld: 25:red:Heet, 18:blue:Koud. Max. 5.",
+            "history_period": "Minuten aan historische gegevens om de sparkline te vullen vanuit de Home Assistant-recorder. Stel in op 0 om zonder geschiedenis te starten.",
+            "slug": "Unieke identificator voor deze activiteit. Laat leeg om automatisch te genereren vanuit de entiteits-ID. Voorbeeld: ha-living-room-lamp",
+            "activity_name": "Weergavenaam op de iPhone Live Activity. Standaard is de vriendelijke naam van de entiteit.",
+            "icon": "Pictogram overschrijven. Laat leeg om het eigen pictogram van de entiteit te gebruiken (bijv. mdi:thermometer). SF Symbols worden ook ondersteund (bijv. lamp.desk.fill).",
+            "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Heeft voorrang op statisch pictogram en entiteitspictogram wanneer ingesteld.",
+            "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
+            "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
+            "subtitle_attribute": "Entiteitsattribuut als ondertitel. Laat leeg om de vriendelijke naam van de entiteit te gebruiken.",
+            "state_labels": "Aangepaste weergavetekst voor statussen. Indeling: status=Label, status2=Label 2. Voorbeeld: heating=Bezig met opwarmen, idle=Stand-by",
+            "completion_message": "Tekst bij het beëindigen van de activiteit. Laat leeg voor 'Voltooid'. Voorbeeld: Was klaar",
+            "accent_color": "Accentkleur voor de Live Activity. Laat leeg voor standaard blauw.",
+            "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
+            "url": "Link die wordt geopend bij het tikken op de Live Activity. Moet beginnen met http:// of https://. Alleen voor sjablonen steps en alert.",
+            "secondary_url": "Secundaire link voor de Live Activity. Alleen voor sjablonen steps en alert.",
+            "ended_ttl": "Seconden na het beëindigen van de activiteit voordat deze automatisch van de server wordt verwijderd. Laat leeg om onbeperkt te bewaren. Voorbeeld: 300",
+            "stale_ttl": "Seconden inactiviteit voordat de server de activiteit automatisch beëindigt. Laat leeg om uit te schakelen. Voorbeeld: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "Entiteitsconfiguratie bewerken",
+          "data": {
+            "entity_id": "Entiteit",
+            "template": "Sjabloon"
+          },
+          "data_description": {
+            "template": "Lay-outsjabloon voor de activiteit. 'generic' werkt voor de meeste entiteiten."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL moet het schema http:// of https:// gebruiken.",
+        "invalid_gauge_range": "De minimumwaarde moet kleiner zijn dan de maximumwaarde."
+      },
+      "abort": {
+        "already_configured": "Deze entiteit wordt al gevolgd.",
+        "reconfigure_successful": "Entiteitsconfiguratie bijgewerkt."
+      }
+    }
+  }
+}

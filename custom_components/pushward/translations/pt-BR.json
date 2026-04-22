@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Atualizar Atividade",
+      "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado da atividade (ONGOING ou ENDED)."
+        },
+        "template": {
+          "name": "Modelo",
+          "description": "Modelo de layout da atividade."
+        },
+        "progress": {
+          "name": "Progresso",
+          "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Nome da cor de destaque da atividade."
+        },
+        "remaining_time": {
+          "name": "Tempo Restante",
+          "description": "Tempo restante em segundos."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL principal exibida como botão tocável. Suportado apenas nos modelos steps e alert."
+        },
+        "secondary_url": {
+          "name": "URL Secundária",
+          "description": "URL secundária exibida como segundo botão tocável. Suportado apenas nos modelos steps e alert."
+        },
+        "end_date": {
+          "name": "Data de Término",
+          "description": "Timestamp Unix para a data de término da contagem regressiva."
+        },
+        "total_steps": {
+          "name": "Total de Etapas",
+          "description": "Número total de etapas."
+        },
+        "current_step": {
+          "name": "Etapa Atual",
+          "description": "Número da etapa atual."
+        },
+        "severity": {
+          "name": "Severidade",
+          "description": "Nível de severidade do alerta."
+        },
+        "value": {
+          "name": "Valor",
+          "description": "Medidor: valor numérico. Timeline: objeto de valores rotulados (ex.: Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Valor Mínimo",
+          "description": "Valor mínimo do medidor."
+        },
+        "max_value": {
+          "name": "Valor Máximo",
+          "description": "Valor máximo do medidor."
+        },
+        "unit": {
+          "name": "Unidade",
+          "description": "Unidade de exibição para o valor (ex.: °C, %)."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "scale": {
+          "name": "Escala",
+          "description": "Modo de escala do eixo Y (linear ou logarítmico). Apenas para o modelo timeline."
+        },
+        "decimals": {
+          "name": "Casas Decimais",
+          "description": "Casas decimais para exibição de valores (0–10). Apenas para o modelo timeline."
+        },
+        "smoothing": {
+          "name": "Linhas Suavizadas",
+          "description": "Ativar interpolação de curva entre pontos de dados. Apenas para o modelo timeline."
+        },
+        "thresholds": {
+          "name": "Limites",
+          "description": "Linhas de referência horizontais no sparkline. Apenas para o modelo timeline."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Criar Atividade",
+      "description": "Criar uma nova PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug único da atividade."
+        },
+        "name": {
+          "name": "Nome",
+          "description": "Nome de exibição da atividade."
+        },
+        "priority": {
+          "name": "Prioridade",
+          "description": "Prioridade da atividade (0 = menor, 10 = maior)."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Encerrar Atividade",
+      "description": "Encerrar uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade a encerrar."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem opcional exibida quando a atividade é encerrada."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Excluir Atividade",
+      "description": "Excluir uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade a excluir."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "Enviar Notificação",
+      "description": "Enviar uma notificação push via PushWard.",
+      "fields": {
+        "title": {
+          "name": "Título",
+          "description": "Título da notificação."
+        },
+        "body": {
+          "name": "Corpo",
+          "description": "Texto do corpo da notificação."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Subtítulo opcional exibido abaixo do título."
+        },
+        "level": {
+          "name": "Nível",
+          "description": "Nível de interrupção do iOS. Controla como a notificação é entregue."
+        },
+        "thread_id": {
+          "name": "ID de Thread",
+          "description": "Agrupa notificações na Central de Notificações."
+        },
+        "collapse_id": {
+          "name": "ID de Colapso",
+          "description": "Chave de deduplicação APNs. Substitui a notificação anterior com a mesma chave."
+        },
+        "category": {
+          "name": "Categoria",
+          "description": "Categoria da notificação para ações personalizadas."
+        },
+        "source": {
+          "name": "Origem",
+          "description": "Identificador de origem para agrupamento na caixa de entrada do PushWard."
+        },
+        "source_display_name": {
+          "name": "Nome de Exibição da Origem",
+          "description": "Nome legível da origem exibido na caixa de entrada do PushWard."
+        },
+        "activity_slug": {
+          "name": "Slug da Atividade",
+          "description": "Vincular esta notificação a uma Live Activity existente."
+        },
+        "push": {
+          "name": "Push",
+          "description": "Enviar como alerta push APNs para todos os dispositivos. Quando falso, a notificação é armazenada apenas na caixa de entrada."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectar ao PushWard",
+        "description": "Informe sua chave de integração PushWard para começar.",
+        "data": {
+          "integration_key": "Chave de Integração"
+        },
+        "data_description": {
+          "integration_key": "Crie uma no aplicativo PushWard iOS em Configurações → Chaves de Integração com escopo 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigurar PushWard",
+        "description": "Atualizar sua chave de integração PushWard.",
+        "data": {
+          "integration_key": "Chave de Integração"
+        },
+        "data_description": {
+          "integration_key": "Crie uma no aplicativo PushWard iOS em Configurações → Chaves de Integração com escopo 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reautenticar",
+        "description": "A chave de integração PushWard é inválida. Forneça uma nova.",
+        "data": {
+          "integration_key": "Chave de Integração"
+        },
+        "data_description": {
+          "integration_key": "Crie uma no aplicativo PushWard iOS em Configurações → Chaves de Integração com escopo 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Falha ao conectar ao servidor PushWard.",
+      "invalid_auth": "Chave de integração inválida.",
+      "invalid_url": "A URL deve usar o esquema http:// ou https://.",
+      "unknown": "Ocorreu um erro inesperado."
+    },
+    "abort": {
+      "already_configured": "O PushWard já está configurado.",
+      "reconfigure_successful": "Configuração do PushWard atualizada.",
+      "reauth_successful": "Reautenticação bem-sucedida."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "Entidade Monitorada",
+      "initiate_flow": {
+        "user": "Adicionar entidade monitorada"
+      },
+      "step": {
+        "user": {
+          "title": "Adicionar Entidade ao PushWard",
+          "data": {
+            "entity_id": "Entidade",
+            "template": "Modelo"
+          },
+          "data_description": {
+            "template": "Modelo de layout da atividade. 'generic' funciona para a maioria das entidades."
+          }
+        },
+        "details": {
+          "title": "Opções da Atividade",
+          "data": {
+            "start_states": "Estados de Início",
+            "end_states": "Estados de Término",
+            "progress_attribute": "Atributo de Progresso",
+            "remaining_time_attribute": "Atributo de Tempo Restante",
+            "total_steps": "Total de Etapas",
+            "current_step_attribute": "Atributo de Etapa Atual",
+            "severity": "Severidade",
+            "value_attribute": "Atributo de Valor",
+            "min_value": "Valor Mínimo",
+            "max_value": "Valor Máximo",
+            "unit": "Unidade",
+            "series": "Séries",
+            "scale": "Escala",
+            "decimals": "Casas Decimais",
+            "smoothing": "Linhas Suavizadas",
+            "thresholds": "Limites",
+            "history_period": "Período de Histórico Anterior",
+            "slug": "Slug da Atividade",
+            "activity_name": "Nome da Atividade",
+            "icon": "Ícone",
+            "icon_attribute": "Atributo de Ícone",
+            "priority": "Prioridade (0–10)",
+            "update_interval": "Intervalo Mínimo de Atualização (segundos)",
+            "subtitle_attribute": "Atributo de Subtítulo",
+            "state_labels": "Rótulos de Estado",
+            "completion_message": "Mensagem de Conclusão",
+            "accent_color": "Cor de Destaque",
+            "accent_color_attribute": "Atributo de Cor de Destaque",
+            "url": "URL",
+            "secondary_url": "URL Secundária",
+            "ended_ttl": "Exclusão Automática Após Término (segundos)",
+            "stale_ttl": "Encerramento Automático por Inatividade (segundos)"
+          },
+          "data_description": {
+            "start_states": "Estados da entidade que iniciam a Live Activity. Selecione na lista ou digite valores personalizados.",
+            "end_states": "Estados da entidade que encerram a Live Activity. Selecione na lista ou digite valores personalizados.",
+            "progress_attribute": "Atributo da entidade que contém um valor de progresso de 0 a 100. Exemplo: percentage",
+            "remaining_time_attribute": "Atributo da entidade que contém o tempo restante em segundos. Exemplo: remaining",
+            "total_steps": "Número total de etapas.",
+            "current_step_attribute": "Atributo da entidade que contém a etapa atual como número inteiro.",
+            "severity": "Nível de severidade do alerta.",
+            "value_attribute": "Atributo da entidade que contém o valor atual do medidor como número. Deixe vazio para usar o estado da entidade.",
+            "min_value": "Valor mínimo para o intervalo do medidor.",
+            "max_value": "Valor máximo para o intervalo do medidor.",
+            "unit": "Unidade de exibição mostrada ao lado do valor (ex.: °C, %, kW). Máximo de 32 caracteres.",
+            "series": "Mapear atributos da entidade para séries nomeadas. Formato: atributo=Rótulo, atributo2=Rótulo2. Deixe vazio para usar o estado da entidade como série única.",
+            "scale": "Modo de escala do eixo Y para o gráfico sparkline.",
+            "decimals": "Número de casas decimais exibidas para os valores (0–10).",
+            "smoothing": "Ativar interpolação de curva entre pontos de dados para um sparkline mais suave.",
+            "thresholds": "Linhas de referência horizontais no sparkline. Formato: valor:cor:rótulo. Exemplo: 25:red:Quente, 18:blue:Frio. Máximo de 5.",
+            "history_period": "Minutos de dados anteriores para preencher o sparkline a partir do gravador do Home Assistant. Defina 0 para iniciar sem histórico.",
+            "slug": "Identificador único desta atividade. Deixe vazio para gerar automaticamente a partir do ID da entidade. Exemplo: ha-living-room-lamp",
+            "activity_name": "Nome de exibição mostrado na Live Activity do iPhone. Padrão: nome amigável da entidade.",
+            "icon": "Substituir ícone. Deixe vazio para usar o ícone nativo da entidade (ex.: mdi:thermometer). SF Symbols também suportado (ex.: lamp.desk.fill).",
+            "icon_attribute": "Atributo da entidade para ícone dinâmico. Substitui o ícone estático e o ícone da entidade quando definido.",
+            "priority": "Atividades com prioridade mais alta são mantidas por mais tempo quando o limite do dispositivo é atingido (0 = menor, 10 = maior).",
+            "update_interval": "Intervalo mínimo em segundos entre atualizações. Mudanças de estado rápidas são limitadas.",
+            "subtitle_attribute": "Atributo da entidade a exibir como subtítulo. Deixe vazio para usar o nome amigável da entidade.",
+            "state_labels": "Texto de exibição personalizado para estados. Formato: estado=Rótulo, estado2=Rótulo 2. Exemplo: heating=Aquecendo, idle=Em espera",
+            "completion_message": "Texto exibido quando a atividade é encerrada. Deixe vazio para 'Concluído'. Exemplo: Lavagem Concluída",
+            "accent_color": "Cor de destaque para a Live Activity. Deixe vazio para o azul padrão.",
+            "accent_color_attribute": "Atributo da entidade para cor de destaque dinâmica. Substitui a cor estática. Suporta RGB, HS, XY, Kelvin, cores nomeadas e hexadecimal.",
+            "url": "Link aberto ao tocar na Live Activity. Deve começar com http:// ou https://. Apenas para os modelos steps e alert.",
+            "secondary_url": "Link secundário para a Live Activity. Apenas para os modelos steps e alert.",
+            "ended_ttl": "Segundos após o encerramento da atividade antes de ser excluída automaticamente do servidor. Deixe vazio para manter indefinidamente. Exemplo: 300",
+            "stale_ttl": "Segundos de inatividade antes de o servidor encerrar automaticamente a atividade. Deixe vazio para desativar. Exemplo: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "Editar Configuração da Entidade",
+          "data": {
+            "entity_id": "Entidade",
+            "template": "Modelo"
+          },
+          "data_description": {
+            "template": "Modelo de layout da atividade. 'generic' funciona para a maioria das entidades."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "A URL deve usar o esquema http:// ou https://.",
+        "invalid_gauge_range": "O valor mínimo deve ser menor que o valor máximo."
+      },
+      "abort": {
+        "already_configured": "Esta entidade já está sendo monitorada.",
+        "reconfigure_successful": "Configuração da entidade atualizada."
+      }
+    }
+  }
+}

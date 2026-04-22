@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "تحديث النشاط",
+      "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "حالة النشاط (ONGOING أو ENDED)."
+        },
+        "template": {
+          "name": "القالب",
+          "description": "قالب تخطيط النشاط."
+        },
+        "progress": {
+          "name": "التقدم",
+          "description": "قيمة التقدم بين 0.0 و 1.0."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: arrow.down.circle.fill، mdi:download)."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "اسم لون التمييز للنشاط."
+        },
+        "remaining_time": {
+          "name": "الوقت المتبقي",
+          "description": "الوقت المتبقي بالثواني."
+        },
+        "url": {
+          "name": "الرابط",
+          "description": "الرابط الأساسي الظاهر كزر قابل للنقر. مدعوم في قوالب steps و alert فقط."
+        },
+        "secondary_url": {
+          "name": "الرابط الثانوي",
+          "description": "الرابط الثانوي الظاهر كزر ثانٍ قابل للنقر. مدعوم في قوالب steps و alert فقط."
+        },
+        "end_date": {
+          "name": "تاريخ الانتهاء",
+          "description": "الطابع الزمني Unix لتاريخ انتهاء العد التنازلي."
+        },
+        "total_steps": {
+          "name": "إجمالي الخطوات",
+          "description": "العدد الإجمالي للخطوات."
+        },
+        "current_step": {
+          "name": "الخطوة الحالية",
+          "description": "رقم الخطوة الحالية."
+        },
+        "severity": {
+          "name": "مستوى الخطورة",
+          "description": "مستوى خطورة التنبيه."
+        },
+        "value": {
+          "name": "القيمة",
+          "description": "المقياس: قيمة رقمية. Timeline: كائن القيم المسماة (مثال: Temp=22.5)."
+        },
+        "min_value": {
+          "name": "الحد الأدنى للقيمة",
+          "description": "الحد الأدنى لقيمة المقياس."
+        },
+        "max_value": {
+          "name": "الحد الأقصى للقيمة",
+          "description": "الحد الأقصى لقيمة المقياس."
+        },
+        "unit": {
+          "name": "الوحدة",
+          "description": "وحدة عرض القيمة (مثال: °C، %)."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "scale": {
+          "name": "المقياس",
+          "description": "وضع مقياس المحور الصادي (خطي أو لوغاريتمي). قالب timeline فقط."
+        },
+        "decimals": {
+          "name": "المنازل العشرية",
+          "description": "عدد المنازل العشرية لعرض القيمة (0-10). قالب timeline فقط."
+        },
+        "smoothing": {
+          "name": "تنعيم الخطوط",
+          "description": "تفعيل الاستيفاء المنحني بين نقاط البيانات. قالب timeline فقط."
+        },
+        "thresholds": {
+          "name": "العتبات",
+          "description": "خطوط مرجعية أفقية على الرسم البياني المصغّر. قالب timeline فقط."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "إنشاء نشاط",
+      "description": "إنشاء Live Activity جديد في PushWard.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط الفريد."
+        },
+        "name": {
+          "name": "الاسم",
+          "description": "اسم العرض للنشاط."
+        },
+        "priority": {
+          "name": "الأولوية",
+          "description": "أولوية النشاط (0 = أدنى، 10 = أعلى)."
+        },
+        "ended_ttl": {
+          "name": "مدة البقاء بعد الإنهاء",
+          "description": "الثواني للاحتفاظ بالنشاط بعد إنهائه."
+        },
+        "stale_ttl": {
+          "name": "مدة البقاء قبل الإهمال",
+          "description": "الثواني قبل اعتبار النشاط قديماً."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "إنهاء النشاط",
+      "description": "إنهاء Live Activity في PushWard.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط المراد إنهاؤه."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "رسالة اختيارية تظهر عند إنهاء النشاط."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "حذف النشاط",
+      "description": "حذف Live Activity من PushWard.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط المراد حذفه."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "إرسال إشعار",
+      "description": "إرسال إشعار فوري عبر PushWard.",
+      "fields": {
+        "title": {
+          "name": "العنوان",
+          "description": "عنوان الإشعار."
+        },
+        "body": {
+          "name": "نص الرسالة",
+          "description": "نص محتوى الإشعار."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "عنوان فرعي اختياري يظهر أسفل العنوان الرئيسي."
+        },
+        "level": {
+          "name": "المستوى",
+          "description": "مستوى المقاطعة في iOS. يتحكم في كيفية تسليم الإشعار."
+        },
+        "thread_id": {
+          "name": "معرّف الخيط",
+          "description": "يجمع الإشعارات معاً في مركز الإشعارات."
+        },
+        "collapse_id": {
+          "name": "معرّف الدمج",
+          "description": "مفتاح إزالة التكرار في APNs. يحل محل الإشعار السابق بالمفتاح نفسه."
+        },
+        "category": {
+          "name": "الفئة",
+          "description": "فئة الإشعار للإجراءات المخصصة."
+        },
+        "source": {
+          "name": "المصدر",
+          "description": "معرّف المصدر للتجميع في صندوق PushWard."
+        },
+        "source_display_name": {
+          "name": "اسم عرض المصدر",
+          "description": "اسم المصدر القابل للقراءة الظاهر في صندوق PushWard."
+        },
+        "activity_slug": {
+          "name": "معرّف النشاط",
+          "description": "ربط هذا الإشعار بـ Live Activity موجود."
+        },
+        "push": {
+          "name": "إرسال فوري",
+          "description": "إرسال تنبيه APNs فوري إلى جميع الأجهزة. عند تعطيله، يُحفظ الإشعار في الصندوق فقط."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "الاتصال بـ PushWard",
+        "description": "أدخل مفتاح التكامل الخاص بك في PushWard للبدء.",
+        "data": {
+          "integration_key": "مفتاح التكامل"
+        },
+        "data_description": {
+          "integration_key": "أنشئ مفتاحاً في تطبيق PushWard iOS ضمن الإعدادات ← Integration Keys بنطاق 'ha-*'."
+        }
+      },
+      "reconfigure": {
+        "title": "إعادة تهيئة PushWard",
+        "description": "تحديث مفتاح التكامل الخاص بك في PushWard.",
+        "data": {
+          "integration_key": "مفتاح التكامل"
+        },
+        "data_description": {
+          "integration_key": "أنشئ مفتاحاً في تطبيق PushWard iOS ضمن الإعدادات ← Integration Keys بنطاق 'ha-*'."
+        }
+      },
+      "reauth_confirm": {
+        "title": "إعادة المصادقة",
+        "description": "مفتاح التكامل في PushWard غير صالح. يرجى تقديم مفتاح جديد.",
+        "data": {
+          "integration_key": "مفتاح التكامل"
+        },
+        "data_description": {
+          "integration_key": "أنشئ مفتاحاً في تطبيق PushWard iOS ضمن الإعدادات ← Integration Keys بنطاق 'ha-*'."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "فشل الاتصال بخادم PushWard.",
+      "invalid_auth": "مفتاح التكامل غير صالح.",
+      "invalid_url": "يجب أن يستخدم الرابط نظام http:// أو https://.",
+      "unknown": "حدث خطأ غير متوقع."
+    },
+    "abort": {
+      "already_configured": "PushWard مُهيَّأ بالفعل.",
+      "reconfigure_successful": "تم تحديث إعداد PushWard.",
+      "reauth_successful": "تمت إعادة المصادقة بنجاح."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "كيان مُتتبَّع",
+      "initiate_flow": {
+        "user": "إضافة كيان مُتتبَّع"
+      },
+      "step": {
+        "user": {
+          "title": "إضافة كيان إلى PushWard",
+          "data": {
+            "entity_id": "الكيان",
+            "template": "القالب"
+          },
+          "data_description": {
+            "template": "قالب تخطيط النشاط. يناسب 'generic' معظم الكيانات."
+          }
+        },
+        "details": {
+          "title": "خيارات النشاط",
+          "data": {
+            "start_states": "حالات البدء",
+            "end_states": "حالات الإنهاء",
+            "progress_attribute": "سمة التقدم",
+            "remaining_time_attribute": "سمة الوقت المتبقي",
+            "total_steps": "إجمالي الخطوات",
+            "current_step_attribute": "سمة الخطوة الحالية",
+            "severity": "مستوى الخطورة",
+            "value_attribute": "سمة القيمة",
+            "min_value": "الحد الأدنى للقيمة",
+            "max_value": "الحد الأقصى للقيمة",
+            "unit": "الوحدة",
+            "series": "السلاسل",
+            "scale": "المقياس",
+            "decimals": "المنازل العشرية",
+            "smoothing": "تنعيم الخطوط",
+            "thresholds": "العتبات",
+            "history_period": "فترة السجل التاريخي",
+            "slug": "معرّف النشاط",
+            "activity_name": "اسم النشاط",
+            "icon": "الأيقونة",
+            "icon_attribute": "سمة الأيقونة",
+            "priority": "الأولوية (0-10)",
+            "update_interval": "الحد الأدنى لفترة التحديث (ثانية)",
+            "subtitle_attribute": "سمة العنوان الفرعي",
+            "state_labels": "تسميات الحالات",
+            "completion_message": "رسالة الاكتمال",
+            "accent_color": "لون التمييز",
+            "accent_color_attribute": "سمة لون التمييز",
+            "url": "الرابط",
+            "secondary_url": "الرابط الثانوي",
+            "ended_ttl": "حذف تلقائي بعد الإنهاء (ثانية)",
+            "stale_ttl": "إنهاء تلقائي بعد الخمول (ثانية)"
+          },
+          "data_description": {
+            "start_states": "حالات الكيان التي تبدأ Live Activity. اختر من القائمة أو أدخل قيماً مخصصة.",
+            "end_states": "حالات الكيان التي تنهي Live Activity. اختر من القائمة أو أدخل قيماً مخصصة.",
+            "progress_attribute": "سمة الكيان التي تحمل قيمة تقدم من 0 إلى 100. مثال: percentage",
+            "remaining_time_attribute": "سمة الكيان التي تحمل الوقت المتبقي بالثواني. مثال: remaining",
+            "total_steps": "العدد الإجمالي للخطوات.",
+            "current_step_attribute": "سمة الكيان التي تحمل الخطوة الحالية كعدد صحيح.",
+            "severity": "مستوى خطورة التنبيه.",
+            "value_attribute": "سمة الكيان التي تحمل قيمة المقياس الحالية كرقم. اتركها فارغة لاستخدام حالة الكيان.",
+            "min_value": "الحد الأدنى لنطاق المقياس.",
+            "max_value": "الحد الأقصى لنطاق المقياس.",
+            "unit": "وحدة العرض الظاهرة بجانب القيمة (مثال: °C، %، kW). الحد الأقصى 32 حرفاً.",
+            "series": "ربط سمات الكيان بسلاسل مسماة. الصيغة: attribute=Label, attribute2=Label2. اتركها فارغة لاستخدام حالة الكيان كسلسلة واحدة.",
+            "scale": "وضع مقياس المحور الصادي لمخطط sparkline.",
+            "decimals": "عدد المنازل العشرية المعروضة للقيم (0–10).",
+            "smoothing": "تفعيل الاستيفاء المنحني بين نقاط البيانات للحصول على sparkline أكثر سلاسة.",
+            "thresholds": "خطوط مرجعية أفقية على sparkline. الصيغة: value:color:label. مثال: 25:red:Hot, 18:blue:Cold. الحد الأقصى 5.",
+            "history_period": "دقائق البيانات السابقة لتهيئة sparkline من مسجّل Home Assistant. اضبطها على 0 للبدء بلا سجل.",
+            "slug": "معرّف فريد لهذا النشاط. اتركه فارغاً للتوليد التلقائي من معرّف الكيان. مثال: ha-living-room-lamp",
+            "activity_name": "اسم العرض الظاهر في Live Activity على iPhone. يُستخدم الاسم الودي للكيان بشكل افتراضي.",
+            "icon": "تجاوز الأيقونة. اتركه فارغاً لاستخدام أيقونة الكيان الأصلية (مثال: mdi:thermometer). يدعم SF Symbols أيضاً (مثال: lamp.desk.fill).",
+            "icon_attribute": "سمة الكيان للأيقونة الديناميكية. تتجاوز الأيقونة الثابتة وأيقونة الكيان عند تعيينها.",
+            "priority": "الأنشطة ذات الأولوية الأعلى تُحتفظ بها لفترة أطول عند الوصول للحد الأقصى للجهاز (0 = أدنى، 10 = أعلى).",
+            "update_interval": "الحد الأدنى بالثواني بين التحديثات. يتم تقليص التغييرات المتسارعة.",
+            "subtitle_attribute": "سمة الكيان لعرضها كعنوان فرعي. اتركها فارغة لاستخدام الاسم الودي للكيان.",
+            "state_labels": "نص عرض مخصص للحالات. الصيغة: state=Label, state2=Label 2. مثال: heating=Heating Up, idle=Standby",
+            "completion_message": "النص الظاهر عند إنهاء النشاط. اتركه فارغاً لـ 'Complete'. مثال: Wash Done",
+            "accent_color": "لون التمييز لـ Live Activity. اتركه فارغاً للون الأزرق الافتراضي.",
+            "accent_color_attribute": "سمة الكيان للون التمييز الديناميكي. يتجاوز اللون الثابت. يدعم RGB وHS وXY وKelvin والألوان المسماة والـ hex.",
+            "url": "الرابط الذي يُفتح عند النقر على Live Activity. يجب أن يبدأ بـ http:// أو https://. لقوالب steps و alert فقط.",
+            "secondary_url": "الرابط الثانوي لـ Live Activity. لقوالب steps و alert فقط.",
+            "ended_ttl": "الثواني بعد إنهاء النشاط قبل حذفه تلقائياً من الخادم. اتركه فارغاً للاحتفاظ به بصورة دائمة. مثال: 300",
+            "stale_ttl": "ثواني الخمول قبل أن ينهي الخادم النشاط تلقائياً. اتركه فارغاً لتعطيل هذه الميزة. مثال: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "تعديل إعداد الكيان",
+          "data": {
+            "entity_id": "الكيان",
+            "template": "القالب"
+          },
+          "data_description": {
+            "template": "قالب تخطيط النشاط. يناسب 'generic' معظم الكيانات."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "يجب أن يستخدم الرابط نظام http:// أو https://.",
+        "invalid_gauge_range": "يجب أن يكون الحد الأدنى للقيمة أصغر من الحد الأقصى."
+      },
+      "abort": {
+        "already_configured": "هذا الكيان مُتتبَّع بالفعل.",
+        "reconfigure_successful": "تم تحديث إعداد الكيان."
+      }
+    }
+  }
+}

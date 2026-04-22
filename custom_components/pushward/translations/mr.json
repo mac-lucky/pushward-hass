@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Activity अपडेट करा",
+      "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity चा slug ओळखकर्ता."
+        },
+        "state": {
+          "name": "स्थिती",
+          "description": "Activity ची स्थिती (ONGOING किंवा ENDED)."
+        },
+        "template": {
+          "name": "टेम्पलेट",
+          "description": "Activity लेआउट टेम्पलेट."
+        },
+        "progress": {
+          "name": "प्रगती",
+          "description": "0.0 ते 1.0 दरम्यानचे प्रगती मूल्य."
+        },
+        "state_text": {
+          "name": "स्थिती मजकूर",
+          "description": "Activity च्या स्थितीत दाखवला जाणारा मजकूर."
+        },
+        "icon": {
+          "name": "आयकॉन",
+          "description": "SF Symbol किंवा MDI आयकॉनचे नाव (उदा. arrow.down.circle.fill, mdi:download)."
+        },
+        "subtitle": {
+          "name": "उपशीर्षक",
+          "description": "Activity वर दाखवला जाणारा उपशीर्षक मजकूर."
+        },
+        "accent_color": {
+          "name": "Accent रंग",
+          "description": "Activity साठी accent रंगाचे नाव."
+        },
+        "remaining_time": {
+          "name": "उरलेला वेळ",
+          "description": "सेकंदांमध्ये उरलेला वेळ."
+        },
+        "url": {
+          "name": "URL",
+          "description": "टॅप करता येण्याजोगे बटण म्हणून दाखवला जाणारा प्राथमिक URL. फक्त steps आणि alert टेम्पलेटवर समर्थित."
+        },
+        "secondary_url": {
+          "name": "दुय्यम URL",
+          "description": "दुसरे टॅप करता येण्याजोगे बटण म्हणून दाखवला जाणारा दुय्यम URL. फक्त steps आणि alert टेम्पलेटवर समर्थित."
+        },
+        "end_date": {
+          "name": "समाप्ती तारीख",
+          "description": "काउंटडाउन समाप्तीच्या तारखेसाठी Unix timestamp."
+        },
+        "total_steps": {
+          "name": "एकूण चरण",
+          "description": "एकूण चरणांची संख्या."
+        },
+        "current_step": {
+          "name": "सध्याचा चरण",
+          "description": "सध्याचा चरण क्रमांक."
+        },
+        "severity": {
+          "name": "तीव्रता",
+          "description": "Alert तीव्रता पातळी."
+        },
+        "value": {
+          "name": "मूल्य",
+          "description": "Gauge: संख्यात्मक मूल्य. Timeline: लेबल केलेल्या मूल्यांचा ऑब्जेक्ट (उदा. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "किमान मूल्य",
+          "description": "Gauge चे किमान मूल्य."
+        },
+        "max_value": {
+          "name": "कमाल मूल्य",
+          "description": "Gauge चे कमाल मूल्य."
+        },
+        "unit": {
+          "name": "एकक",
+          "description": "मूल्यासाठी प्रदर्शन एकक (उदा. °C, %)."
+        },
+        "completion_message": {
+          "name": "पूर्णता संदेश",
+          "description": "Activity समाप्त झाल्यावर दाखवला जाणारा संदेश."
+        },
+        "scale": {
+          "name": "स्केल",
+          "description": "Y-अक्ष स्केल मोड (linear किंवा logarithmic). फक्त Timeline टेम्पलेटसाठी."
+        },
+        "decimals": {
+          "name": "दशांश स्थाने",
+          "description": "मूल्य प्रदर्शनासाठी दशांश स्थाने (0-10). फक्त Timeline टेम्पलेटसाठी."
+        },
+        "smoothing": {
+          "name": "रेषा गुळगुळीत करा",
+          "description": "डेटा बिंदूंमध्ये वक्र प्रक्षेपण सक्षम करा. फक्त Timeline टेम्पलेटसाठी."
+        },
+        "thresholds": {
+          "name": "थ्रेशोल्ड",
+          "description": "Sparkline वरील क्षैतिज संदर्भ रेषा. फक्त Timeline टेम्पलेटसाठी."
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Activity तयार करा",
+      "description": "नवीन PushWard Live Activity तयार करा.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity साठी अद्वितीय slug ओळखकर्ता."
+        },
+        "name": {
+          "name": "नाव",
+          "description": "Activity साठी प्रदर्शन नाव."
+        },
+        "priority": {
+          "name": "प्राधान्य",
+          "description": "Activity प्राधान्य (0 = सर्वात कमी, 10 = सर्वात जास्त)."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Activity समाप्त झाल्यानंतर ती किती सेकंद ठेवायची."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Activity जुनी मानली जाण्यापूर्वीचे सेकंद."
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Activity समाप्त करा",
+      "description": "PushWard Live Activity समाप्त करा.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "समाप्त करण्यासाठी Activity चा slug ओळखकर्ता."
+        },
+        "completion_message": {
+          "name": "पूर्णता संदेश",
+          "description": "Activity समाप्त झाल्यावर दाखवला जाणारा वैकल्पिक संदेश."
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Activity हटवा",
+      "description": "PushWard Live Activity हटवा.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "हटवण्यासाठी Activity चा slug ओळखकर्ता."
+        }
+      }
+    },
+    "send_notification": {
+      "name": "सूचना पाठवा",
+      "description": "PushWard द्वारे push notification पाठवा.",
+      "fields": {
+        "title": {
+          "name": "शीर्षक",
+          "description": "सूचनेचे शीर्षक."
+        },
+        "body": {
+          "name": "मुख्य मजकूर",
+          "description": "सूचनेचा मुख्य मजकूर."
+        },
+        "subtitle": {
+          "name": "उपशीर्षक",
+          "description": "शीर्षकाखाली दाखवला जाणारा वैकल्पिक उपशीर्षक."
+        },
+        "level": {
+          "name": "पातळी",
+          "description": "iOS व्यत्यय पातळी. सूचना कशी वितरित केली जाते ते नियंत्रित करते."
+        },
+        "thread_id": {
+          "name": "Thread ID",
+          "description": "Notification Center मध्ये सूचना एकत्र गटबद्ध करते."
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "APNs डिडुप्लिकेशन की. समान की असलेल्या मागील सूचनेची जागा घेते."
+        },
+        "category": {
+          "name": "वर्ग",
+          "description": "कस्टम क्रियांसाठी सूचना वर्ग."
+        },
+        "source": {
+          "name": "स्रोत",
+          "description": "PushWard inbox मध्ये गटबद्ध करण्यासाठी स्रोत ओळखकर्ता."
+        },
+        "source_display_name": {
+          "name": "स्रोत प्रदर्शन नाव",
+          "description": "PushWard inbox मध्ये दाखवले जाणारे मानव-वाचनीय स्रोत नाव."
+        },
+        "activity_slug": {
+          "name": "Activity Slug",
+          "description": "ही सूचना विद्यमान Live Activity शी जोडा."
+        },
+        "push": {
+          "name": "Push",
+          "description": "सर्व डिव्हाइसवर APNs push alert म्हणून पाठवा. खोटे असल्यास, सूचना फक्त inbox मध्ये संग्रहित केली जाते."
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "PushWard शी कनेक्ट करा",
+        "description": "प्रारंभ करण्यासाठी आपली PushWard इंटिग्रेशन की प्रविष्ट करा.",
+        "data": {
+          "integration_key": "इंटिग्रेशन की"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS app मध्ये Settings → Integration Keys अंतर्गत 'ha-*' स्कोपसह एक तयार करा."
+        }
+      },
+      "reconfigure": {
+        "title": "PushWard पुन्हा कॉन्फिगर करा",
+        "description": "आपली PushWard इंटिग्रेशन की अपडेट करा.",
+        "data": {
+          "integration_key": "इंटिग्रेशन की"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS app मध्ये Settings → Integration Keys अंतर्गत 'ha-*' स्कोपसह एक तयार करा."
+        }
+      },
+      "reauth_confirm": {
+        "title": "पुन्हा प्रमाणीकरण करा",
+        "description": "PushWard इंटिग्रेशन की अवैध आहे. कृपया नवीन की द्या.",
+        "data": {
+          "integration_key": "इंटिग्रेशन की"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS app मध्ये Settings → Integration Keys अंतर्गत 'ha-*' स्कोपसह एक तयार करा."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "PushWard सर्व्हरशी कनेक्ट होण्यात अयशस्वी.",
+      "invalid_auth": "अवैध इंटिग्रेशन की.",
+      "invalid_url": "URL ने http:// किंवा https:// स्कीम वापरणे आवश्यक आहे.",
+      "unknown": "अनपेक्षित त्रुटी आली."
+    },
+    "abort": {
+      "already_configured": "PushWard आधीच कॉन्फिगर केले आहे.",
+      "reconfigure_successful": "PushWard कॉन्फिगरेशन अपडेट झाले.",
+      "reauth_successful": "पुन्हा प्रमाणीकरण यशस्वी."
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "ट्रॅक केलेली एंटिटी",
+      "initiate_flow": {
+        "user": "ट्रॅक केलेली एंटिटी जोडा"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard मध्ये एंटिटी जोडा",
+          "data": {
+            "entity_id": "एंटिटी",
+            "template": "टेम्पलेट"
+          },
+          "data_description": {
+            "template": "Activity लेआउट टेम्पलेट. बहुतेक एंटिटींसाठी 'generic' काम करते."
+          }
+        },
+        "details": {
+          "title": "Activity पर्याय",
+          "data": {
+            "start_states": "प्रारंभ स्थिती",
+            "end_states": "समाप्ती स्थिती",
+            "progress_attribute": "प्रगती गुणधर्म",
+            "remaining_time_attribute": "उरलेल्या वेळाचा गुणधर्म",
+            "total_steps": "एकूण चरण",
+            "current_step_attribute": "सध्याच्या चरणाचा गुणधर्म",
+            "severity": "तीव्रता",
+            "value_attribute": "मूल्य गुणधर्म",
+            "min_value": "किमान मूल्य",
+            "max_value": "कमाल मूल्य",
+            "unit": "एकक",
+            "series": "मालिका",
+            "scale": "स्केल",
+            "decimals": "दशांश स्थाने",
+            "smoothing": "रेषा गुळगुळीत करा",
+            "thresholds": "थ्रेशोल्ड",
+            "history_period": "मागील इतिहास कालावधी",
+            "slug": "Activity Slug",
+            "activity_name": "Activity नाव",
+            "icon": "आयकॉन",
+            "icon_attribute": "आयकॉन गुणधर्म",
+            "priority": "प्राधान्य (0-10)",
+            "update_interval": "किमान अपडेट मध्यांतर (सेकंद)",
+            "subtitle_attribute": "उपशीर्षक गुणधर्म",
+            "state_labels": "स्थिती लेबले",
+            "completion_message": "पूर्णता संदेश",
+            "accent_color": "Accent रंग",
+            "accent_color_attribute": "Accent रंग गुणधर्म",
+            "url": "URL",
+            "secondary_url": "दुय्यम URL",
+            "ended_ttl": "समाप्तीनंतर स्वयं-हटवा (सेकंद)",
+            "stale_ttl": "निष्क्रियतेनंतर स्वयं-समाप्त (सेकंद)"
+          },
+          "data_description": {
+            "start_states": "Live Activity सुरू करणाऱ्या एंटिटी स्थिती. यादीतून निवडा किंवा कस्टम मूल्ये टाइप करा.",
+            "end_states": "Live Activity समाप्त करणाऱ्या एंटिटी स्थिती. यादीतून निवडा किंवा कस्टम मूल्ये टाइप करा.",
+            "progress_attribute": "0–100 प्रगती मूल्य ठेवणारा एंटिटी गुणधर्म. उदाहरण: percentage",
+            "remaining_time_attribute": "सेकंदांमध्ये उरलेला वेळ ठेवणारा एंटिटी गुणधर्म. उदाहरण: remaining",
+            "total_steps": "एकूण चरणांची संख्या.",
+            "current_step_attribute": "पूर्णांक म्हणून सध्याचा चरण ठेवणारा एंटिटी गुणधर्म.",
+            "severity": "Alert तीव्रता पातळी.",
+            "value_attribute": "संख्या म्हणून सध्याचे gauge मूल्य ठेवणारा एंटिटी गुणधर्म. एंटिटीची स्थिती वापरण्यासाठी रिकामे ठेवा.",
+            "min_value": "Gauge श्रेणीसाठी किमान मूल्य.",
+            "max_value": "Gauge श्रेणीसाठी कमाल मूल्य.",
+            "unit": "मूल्याच्या पुढे दाखवले जाणारे प्रदर्शन एकक (उदा. °C, %, kW). कमाल 32 अक्षरे.",
+            "series": "एंटिटी गुणधर्मांना नावाच्या मालिकांशी मॅप करा. स्वरूप: attribute=Label, attribute2=Label2. एकल मालिका म्हणून एंटिटीची स्थिती वापरण्यासाठी रिकामे ठेवा.",
+            "scale": "Sparkline चार्टसाठी Y-अक्ष स्केल मोड.",
+            "decimals": "मूल्यांसाठी दाखवल्या जाणाऱ्या दशांश स्थानांची संख्या (0–10).",
+            "smoothing": "अधिक गुळगुळीत sparkline साठी डेटा बिंदूंमध्ये वक्र प्रक्षेपण सक्षम करा.",
+            "thresholds": "Sparkline वरील क्षैतिज संदर्भ रेषा. स्वरूप: value:color:label. उदाहरण: 25:red:Hot, 18:blue:Cold. कमाल 5.",
+            "history_period": "Home Assistant च्या recorder मधून sparkline seed करण्यासाठी भूतकाळातील डेटाचे मिनिटे. कोणताही इतिहास न घेण्यासाठी 0 सेट करा.",
+            "slug": "या activity साठी अद्वितीय ओळखकर्ता. entity ID वरून स्वयं-निर्मितीसाठी रिकामे ठेवा. उदाहरण: ha-living-room-lamp",
+            "activity_name": "iPhone Live Activity वर दाखवले जाणारे प्रदर्शन नाव. डीफॉल्टनुसार एंटिटीचे friendly name वापरते.",
+            "icon": "आयकॉन बदला. एंटिटीचा native आयकॉन वापरण्यासाठी रिकामे ठेवा (उदा. mdi:thermometer). SF Symbols देखील समर्थित आहेत (उदा. lamp.desk.fill).",
+            "icon_attribute": "डायनॅमिक आयकॉनसाठी एंटिटी गुणधर्म. सेट केल्यावर static आयकॉन आणि एंटिटी आयकॉन ओव्हररायड करतो.",
+            "priority": "डिव्हाइसची मर्यादा गाठल्यावर उच्च प्राधान्य activities जास्त काळ ठेवल्या जातात (0 = सर्वात कमी, 10 = सर्वात जास्त).",
+            "update_interval": "अपडेटमधील किमान सेकंद. जलद स्थिती बदल throttle केले जातात.",
+            "subtitle_attribute": "उपशीर्षक म्हणून दाखवण्यासाठी एंटिटी गुणधर्म. एंटिटीचे friendly name वापरण्यासाठी रिकामे ठेवा.",
+            "state_labels": "स्थितींसाठी कस्टम प्रदर्शन मजकूर. स्वरूप: state=Label, state2=Label 2. उदाहरण: heating=Heating Up, idle=Standby",
+            "completion_message": "Activity समाप्त झाल्यावर दाखवला जाणारा मजकूर. 'Complete' साठी रिकामे ठेवा. उदाहरण: Wash Done",
+            "accent_color": "Live Activity साठी accent रंग. डीफॉल्ट निळ्यासाठी रिकामे ठेवा.",
+            "accent_color_attribute": "डायनॅमिक accent रंगासाठी एंटिटी गुणधर्म. Static रंग ओव्हररायड करतो. RGB, HS, XY, Kelvin, named colors, आणि hex समर्थित.",
+            "url": "Live Activity टॅप केल्यावर उघडणारी लिंक. http:// किंवा https:// ने सुरू होणे आवश्यक. फक्त steps आणि alert टेम्पलेटसाठी.",
+            "secondary_url": "Live Activity साठी दुय्यम लिंक. फक्त steps आणि alert टेम्पलेटसाठी.",
+            "ended_ttl": "Activity समाप्त झाल्यानंतर सर्व्हरमधून स्वयं-हटवण्यापूर्वीचे सेकंद. अनिश्चित काळासाठी ठेवण्यासाठी रिकामे ठेवा. उदाहरण: 300",
+            "stale_ttl": "सर्व्हर activity स्वयं-समाप्त करण्यापूर्वी निष्क्रियतेचे सेकंद. अक्षम करण्यासाठी रिकामे ठेवा. उदाहरण: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "एंटिटी कॉन्फिगरेशन संपादित करा",
+          "data": {
+            "entity_id": "एंटिटी",
+            "template": "टेम्पलेट"
+          },
+          "data_description": {
+            "template": "Activity लेआउट टेम्पलेट. बहुतेक एंटिटींसाठी 'generic' काम करते."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL ने http:// किंवा https:// स्कीम वापरणे आवश्यक आहे.",
+        "invalid_gauge_range": "किमान मूल्य कमाल मूल्यापेक्षा कमी असणे आवश्यक आहे."
+      },
+      "abort": {
+        "already_configured": "ही एंटिटी आधीच ट्रॅक केली जात आहे.",
+        "reconfigure_successful": "एंटिटी कॉन्फिगरेशन अपडेट झाले."
+      }
+    }
+  }
+}

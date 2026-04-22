@@ -1,0 +1,360 @@
+{
+  "services": {
+    "update_activity": {
+      "name": "Activity अपडेट करें",
+      "description": "PushWard Live Activity की स्थिति और सामग्री अपडेट करें।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity का slug पहचानकर्ता।"
+        },
+        "state": {
+          "name": "स्थिति",
+          "description": "Activity की स्थिति (ONGOING या ENDED)।"
+        },
+        "template": {
+          "name": "टेम्पलेट",
+          "description": "Activity का लेआउट टेम्पलेट।"
+        },
+        "progress": {
+          "name": "प्रगति",
+          "description": "0.0 से 1.0 के बीच प्रगति मान।"
+        },
+        "state_text": {
+          "name": "स्थिति पाठ",
+          "description": "Activity की स्थिति के रूप में दिखाया जाने वाला पाठ।"
+        },
+        "icon": {
+          "name": "आइकन",
+          "description": "SF Symbol या MDI आइकन नाम (जैसे arrow.down.circle.fill, mdi:download)।"
+        },
+        "subtitle": {
+          "name": "उपशीर्षक",
+          "description": "Activity पर दिखाया जाने वाला उपशीर्षक पाठ।"
+        },
+        "accent_color": {
+          "name": "Accent रंग",
+          "description": "Activity के लिए accent रंग का नाम।"
+        },
+        "remaining_time": {
+          "name": "शेष समय",
+          "description": "सेकंड में शेष समय।"
+        },
+        "url": {
+          "name": "URL",
+          "description": "प्राथमिक URL जो टैप करने योग्य बटन के रूप में दिखाया जाता है। केवल steps और alert टेम्पलेट पर समर्थित।"
+        },
+        "secondary_url": {
+          "name": "द्वितीयक URL",
+          "description": "द्वितीयक URL जो दूसरे टैप करने योग्य बटन के रूप में दिखाया जाता है। केवल steps और alert टेम्पलेट पर समर्थित।"
+        },
+        "end_date": {
+          "name": "समाप्ति तिथि",
+          "description": "उलटी गिनती समाप्ति तिथि के लिए Unix timestamp।"
+        },
+        "total_steps": {
+          "name": "कुल चरण",
+          "description": "कुल चरणों की संख्या।"
+        },
+        "current_step": {
+          "name": "वर्तमान चरण",
+          "description": "वर्तमान चरण संख्या।"
+        },
+        "severity": {
+          "name": "गंभीरता",
+          "description": "Alert की गंभीरता का स्तर।"
+        },
+        "value": {
+          "name": "मान",
+          "description": "Gauge: संख्यात्मक मान। Timeline: लेबल किए गए मानों का ऑब्जेक्ट (जैसे Temp=22.5)।"
+        },
+        "min_value": {
+          "name": "न्यूनतम मान",
+          "description": "Gauge का न्यूनतम मान।"
+        },
+        "max_value": {
+          "name": "अधिकतम मान",
+          "description": "Gauge का अधिकतम मान।"
+        },
+        "unit": {
+          "name": "इकाई",
+          "description": "मान के लिए प्रदर्शन इकाई (जैसे °C, %)।"
+        },
+        "completion_message": {
+          "name": "पूर्णता संदेश",
+          "description": "Activity समाप्त होने पर दिखाया जाने वाला संदेश।"
+        },
+        "scale": {
+          "name": "स्केल",
+          "description": "Y-अक्ष स्केल मोड (linear या logarithmic)। केवल timeline टेम्पलेट।"
+        },
+        "decimals": {
+          "name": "दशमलव स्थान",
+          "description": "मान प्रदर्शन के लिए दशमलव स्थान (0-10)। केवल timeline टेम्पलेट।"
+        },
+        "smoothing": {
+          "name": "चिकनी रेखाएं",
+          "description": "डेटा बिंदुओं के बीच curve interpolation सक्षम करें। केवल timeline टेम्पलेट।"
+        },
+        "thresholds": {
+          "name": "सीमाएं",
+          "description": "Sparkline पर क्षैतिज संदर्भ रेखाएं। केवल timeline टेम्पलेट।"
+        }
+      }
+    },
+    "create_activity": {
+      "name": "Activity बनाएं",
+      "description": "नई PushWard Live Activity बनाएं।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "अद्वितीय activity slug पहचानकर्ता।"
+        },
+        "name": {
+          "name": "नाम",
+          "description": "Activity का प्रदर्शन नाम।"
+        },
+        "priority": {
+          "name": "प्राथमिकता",
+          "description": "Activity की प्राथमिकता (0 = सबसे कम, 10 = सबसे अधिक)।"
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        }
+      }
+    },
+    "end_activity": {
+      "name": "Activity समाप्त करें",
+      "description": "PushWard Live Activity समाप्त करें।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "समाप्त करने के लिए activity का slug पहचानकर्ता।"
+        },
+        "completion_message": {
+          "name": "पूर्णता संदेश",
+          "description": "Activity समाप्त होने पर दिखाया जाने वाला वैकल्पिक संदेश।"
+        }
+      }
+    },
+    "delete_activity": {
+      "name": "Activity हटाएं",
+      "description": "PushWard Live Activity हटाएं।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "हटाने के लिए activity का slug पहचानकर्ता।"
+        }
+      }
+    },
+    "send_notification": {
+      "name": "सूचना भेजें",
+      "description": "PushWard के माध्यम से push notification भेजें।",
+      "fields": {
+        "title": {
+          "name": "शीर्षक",
+          "description": "सूचना का शीर्षक।"
+        },
+        "body": {
+          "name": "मुख्य पाठ",
+          "description": "सूचना का मुख्य पाठ।"
+        },
+        "subtitle": {
+          "name": "उपशीर्षक",
+          "description": "शीर्षक के नीचे दिखाया जाने वाला वैकल्पिक उपशीर्षक।"
+        },
+        "level": {
+          "name": "स्तर",
+          "description": "iOS interruption level। सूचना की डिलीवरी नियंत्रित करता है।"
+        },
+        "thread_id": {
+          "name": "Thread ID",
+          "description": "Notification Center में सूचनाओं को एक साथ समूहित करता है।"
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "APNs deduplication key। समान key वाली पिछली सूचना को बदल देता है।"
+        },
+        "category": {
+          "name": "श्रेणी",
+          "description": "कस्टम क्रियाओं के लिए सूचना श्रेणी।"
+        },
+        "source": {
+          "name": "स्रोत",
+          "description": "PushWard inbox में समूहीकरण के लिए स्रोत पहचानकर्ता।"
+        },
+        "source_display_name": {
+          "name": "स्रोत प्रदर्शन नाम",
+          "description": "PushWard inbox में दिखाया जाने वाला मानव-पठनीय स्रोत नाम।"
+        },
+        "activity_slug": {
+          "name": "Activity Slug",
+          "description": "इस सूचना को किसी मौजूदा Live Activity से लिंक करें।"
+        },
+        "push": {
+          "name": "Push",
+          "description": "सभी devices पर APNs push alert के रूप में भेजें। false होने पर, सूचना केवल inbox में संग्रहीत होती है।"
+        }
+      }
+    }
+  },
+  "config": {
+    "step": {
+      "user": {
+        "title": "PushWard से कनेक्ट करें",
+        "description": "शुरू करने के लिए अपनी PushWard इंटीग्रेशन की दर्ज करें।",
+        "data": {
+          "integration_key": "इंटीग्रेशन की"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS ऐप में Settings → Integration Keys के अंतर्गत 'ha-*' scope के साथ एक बनाएं।"
+        }
+      },
+      "reconfigure": {
+        "title": "PushWard पुनः कॉन्फ़िगर करें",
+        "description": "अपनी PushWard इंटीग्रेशन की अपडेट करें।",
+        "data": {
+          "integration_key": "इंटीग्रेशन की"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS ऐप में Settings → Integration Keys के अंतर्गत 'ha-*' scope के साथ एक बनाएं।"
+        }
+      },
+      "reauth_confirm": {
+        "title": "पुनः प्रमाणित करें",
+        "description": "PushWard इंटीग्रेशन की अमान्य है। कृपया एक नई की प्रदान करें।",
+        "data": {
+          "integration_key": "इंटीग्रेशन की"
+        },
+        "data_description": {
+          "integration_key": "PushWard iOS ऐप में Settings → Integration Keys के अंतर्गत 'ha-*' scope के साथ एक बनाएं।"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "PushWard सर्वर से कनेक्ट करने में विफल।",
+      "invalid_auth": "अमान्य इंटीग्रेशन की।",
+      "invalid_url": "URL में http:// या https:// scheme होनी चाहिए।",
+      "unknown": "एक अप्रत्याशित त्रुटि हुई।"
+    },
+    "abort": {
+      "already_configured": "PushWard पहले से कॉन्फ़िगर किया जा चुका है।",
+      "reconfigure_successful": "PushWard कॉन्फ़िगरेशन अपडेट हो गई।",
+      "reauth_successful": "पुनः प्रमाणीकरण सफल रहा।"
+    }
+  },
+  "config_subentries": {
+    "tracked_entity": {
+      "entry_type": "ट्रैक की गई इकाई",
+      "initiate_flow": {
+        "user": "ट्रैक की गई इकाई जोड़ें"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard में इकाई जोड़ें",
+          "data": {
+            "entity_id": "इकाई",
+            "template": "टेम्पलेट"
+          },
+          "data_description": {
+            "template": "Activity का लेआउट टेम्पलेट। अधिकांश इकाइयों के लिए 'generic' काम करता है।"
+          }
+        },
+        "details": {
+          "title": "Activity विकल्प",
+          "data": {
+            "start_states": "प्रारंभ अवस्थाएं",
+            "end_states": "समाप्ति अवस्थाएं",
+            "progress_attribute": "प्रगति Attribute",
+            "remaining_time_attribute": "शेष समय Attribute",
+            "total_steps": "कुल चरण",
+            "current_step_attribute": "वर्तमान चरण Attribute",
+            "severity": "गंभीरता",
+            "value_attribute": "मान Attribute",
+            "min_value": "न्यूनतम मान",
+            "max_value": "अधिकतम मान",
+            "unit": "इकाई",
+            "series": "Series",
+            "scale": "स्केल",
+            "decimals": "दशमलव स्थान",
+            "smoothing": "चिकनी रेखाएं",
+            "thresholds": "सीमाएं",
+            "history_period": "पूर्व इतिहास अवधि",
+            "slug": "Activity Slug",
+            "activity_name": "Activity नाम",
+            "icon": "आइकन",
+            "icon_attribute": "आइकन Attribute",
+            "priority": "प्राथमिकता (0-10)",
+            "update_interval": "न्यूनतम अपडेट अंतराल (सेकंड)",
+            "subtitle_attribute": "उपशीर्षक Attribute",
+            "state_labels": "अवस्था लेबल",
+            "completion_message": "पूर्णता संदेश",
+            "accent_color": "Accent रंग",
+            "accent_color_attribute": "Accent रंग Attribute",
+            "url": "URL",
+            "secondary_url": "द्वितीयक URL",
+            "ended_ttl": "समाप्ति के बाद स्वतः हटाएं (सेकंड)",
+            "stale_ttl": "निष्क्रियता के बाद स्वतः समाप्त करें (सेकंड)"
+          },
+          "data_description": {
+            "start_states": "इकाई की वे अवस्थाएं जो Live Activity प्रारंभ करती हैं। सूची से चुनें या कस्टम मान टाइप करें।",
+            "end_states": "इकाई की वे अवस्थाएं जो Live Activity समाप्त करती हैं। सूची से चुनें या कस्टम मान टाइप करें।",
+            "progress_attribute": "इकाई का वह attribute जो 0–100 प्रगति मान रखता है। उदाहरण: percentage",
+            "remaining_time_attribute": "इकाई का वह attribute जो सेकंड में शेष समय रखता है। उदाहरण: remaining",
+            "total_steps": "कुल चरणों की संख्या।",
+            "current_step_attribute": "इकाई का वह attribute जो वर्तमान चरण को integer के रूप में रखता है।",
+            "severity": "Alert की गंभीरता का स्तर।",
+            "value_attribute": "इकाई का वह attribute जो वर्तमान gauge मान को संख्या के रूप में रखता है। इकाई की अवस्था उपयोग करने के लिए खाली छोड़ें।",
+            "min_value": "Gauge की range का न्यूनतम मान।",
+            "max_value": "Gauge की range का अधिकतम मान।",
+            "unit": "मान के पास दिखाई जाने वाली प्रदर्शन इकाई (जैसे °C, %, kW)। अधिकतम 32 अक्षर।",
+            "series": "इकाई attributes को named series से मैप करें। Format: attribute=Label, attribute2=Label2। एकल series के रूप में इकाई की अवस्था उपयोग करने के लिए खाली छोड़ें।",
+            "scale": "Sparkline chart के लिए Y-अक्ष स्केल मोड।",
+            "decimals": "मानों के लिए दिखाए जाने वाले दशमलव स्थानों की संख्या (0–10)।",
+            "smoothing": "चिकने sparkline के लिए डेटा बिंदुओं के बीच curve interpolation सक्षम करें।",
+            "thresholds": "Sparkline पर क्षैतिज संदर्भ रेखाएं। Format: value:color:label। उदाहरण: 25:red:Hot, 18:blue:Cold। अधिकतम 5।",
+            "history_period": "Home Assistant के recorder से sparkline में भरने के लिए पिछले डेटा के मिनट। बिना इतिहास के शुरू करने के लिए 0 सेट करें।",
+            "slug": "इस activity के लिए अद्वितीय पहचानकर्ता। entity ID से स्वतः बनाने के लिए खाली छोड़ें। उदाहरण: ha-living-room-lamp",
+            "activity_name": "iPhone Live Activity पर दिखाया जाने वाला प्रदर्शन नाम। डिफ़ॉल्ट रूप से इकाई का friendly नाम।",
+            "icon": "आइकन ओवरराइड करें। इकाई का native आइकन उपयोग करने के लिए खाली छोड़ें (जैसे mdi:thermometer)। SF Symbols भी समर्थित हैं (जैसे lamp.desk.fill)।",
+            "icon_attribute": "dynamic आइकन के लिए इकाई attribute। सेट होने पर static आइकन और इकाई आइकन को ओवरराइड करता है।",
+            "priority": "device की सीमा पूरी होने पर उच्च प्राथमिकता वाली activities को अधिक समय तक रखा जाता है (0 = सबसे कम, 10 = सबसे अधिक)।",
+            "update_interval": "अपडेट के बीच न्यूनतम सेकंड। तेज़ अवस्था परिवर्तन throttle किए जाते हैं।",
+            "subtitle_attribute": "उपशीर्षक के रूप में दिखाने के लिए इकाई attribute। इकाई का friendly नाम उपयोग करने के लिए खाली छोड़ें।",
+            "state_labels": "अवस्थाओं के लिए कस्टम प्रदर्शन पाठ। Format: state=Label, state2=Label 2। उदाहरण: heating=Heating Up, idle=Standby",
+            "completion_message": "Activity समाप्त होने पर दिखाया जाने वाला पाठ। 'Complete' के लिए खाली छोड़ें। उदाहरण: Wash Done",
+            "accent_color": "Live Activity के लिए accent रंग। डिफ़ॉल्ट नीले रंग के लिए खाली छोड़ें।",
+            "accent_color_attribute": "dynamic accent रंग के लिए इकाई attribute। static रंग को ओवरराइड करता है। RGB, HS, XY, Kelvin, named colors और hex समर्थित हैं।",
+            "url": "Live Activity टैप करने पर खुलने वाला लिंक। http:// या https:// से शुरू होना चाहिए। केवल steps और alert टेम्पलेट।",
+            "secondary_url": "Live Activity के लिए द्वितीयक लिंक। केवल steps और alert टेम्पलेट।",
+            "ended_ttl": "Activity समाप्त होने के बाद सर्वर से स्वतः हटाए जाने से पहले के सेकंड। अनिश्चित काल तक रखने के लिए खाली छोड़ें। उदाहरण: 300",
+            "stale_ttl": "सर्वर द्वारा activity स्वतः समाप्त करने से पहले निष्क्रियता के सेकंड। अक्षम करने के लिए खाली छोड़ें। उदाहरण: 1800"
+          }
+        },
+        "reconfigure": {
+          "title": "इकाई कॉन्फ़िगरेशन संपादित करें",
+          "data": {
+            "entity_id": "इकाई",
+            "template": "टेम्पलेट"
+          },
+          "data_description": {
+            "template": "Activity का लेआउट टेम्पलेट। अधिकांश इकाइयों के लिए 'generic' काम करता है।"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL में http:// या https:// scheme होनी चाहिए।",
+        "invalid_gauge_range": "न्यूनतम मान, अधिकतम मान से कम होना चाहिए।"
+      },
+      "abort": {
+        "already_configured": "यह इकाई पहले से ट्रैक की जा रही है।",
+        "reconfigure_successful": "इकाई कॉन्फ़िगरेशन अपडेट हो गई।"
+      }
+    }
+  }
+}
