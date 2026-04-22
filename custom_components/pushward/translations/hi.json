@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "समाप्ति तिथि",
-          "description": "उलटी गिनती समाप्ति तिथि के लिए Unix timestamp।"
+          "description": "countdown समाप्ति तिथि के लिए Unix timestamp।"
         },
         "total_steps": {
-          "name": "कुल चरण",
-          "description": "कुल चरणों की संख्या।"
+          "name": "कुल steps",
+          "description": "कुल steps की संख्या।"
         },
         "current_step": {
           "name": "वर्तमान चरण",
@@ -272,7 +272,7 @@
             "end_states": "समाप्ति अवस्थाएं",
             "progress_attribute": "प्रगति Attribute",
             "remaining_time_attribute": "शेष समय Attribute",
-            "total_steps": "कुल चरण",
+            "total_steps": "कुल steps",
             "current_step_attribute": "वर्तमान चरण Attribute",
             "severity": "गंभीरता",
             "value_attribute": "मान Attribute",
@@ -306,7 +306,7 @@
             "end_states": "इकाई की वे अवस्थाएं जो Live Activity समाप्त करती हैं। सूची से चुनें या कस्टम मान टाइप करें।",
             "progress_attribute": "इकाई का वह attribute जो 0–100 प्रगति मान रखता है। उदाहरण: percentage",
             "remaining_time_attribute": "इकाई का वह attribute जो सेकंड में शेष समय रखता है। उदाहरण: remaining",
-            "total_steps": "कुल चरणों की संख्या।",
+            "total_steps": "कुल steps की संख्या।",
             "current_step_attribute": "इकाई का वह attribute जो वर्तमान चरण को integer के रूप में रखता है।",
             "severity": "Alert की गंभीरता का स्तर।",
             "value_attribute": "इकाई का वह attribute जो वर्तमान gauge मान को संख्या के रूप में रखता है। इकाई की अवस्था उपयोग करने के लिए खाली छोड़ें।",

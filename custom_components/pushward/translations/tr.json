@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Bitiş Tarihi",
-          "description": "Geri sayım bitiş tarihi için Unix zaman damgası."
+          "description": "countdown bitiş tarihi için Unix zaman damgası."
         },
         "total_steps": {
-          "name": "Toplam Adım",
-          "description": "Toplam adım sayısı."
+          "name": "Toplam steps",
+          "description": "Toplam steps adedi."
         },
         "current_step": {
           "name": "Geçerli Adım",
@@ -62,19 +62,19 @@
         },
         "severity": {
           "name": "Önem Derecesi",
-          "description": "Uyarı önem düzeyi."
+          "description": "alert önem düzeyi."
         },
         "value": {
           "name": "Değer",
-          "description": "Gösterge: sayısal değer. Zaman çizelgesi: etiketli değerler nesnesi (örn. Temp=22.5)."
+          "description": "gauge: sayısal değer. timeline: etiketli değerler nesnesi (örn. Temp=22.5)."
         },
         "min_value": {
           "name": "Minimum Değer",
-          "description": "Minimum gösterge değeri."
+          "description": "Minimum gauge değeri."
         },
         "max_value": {
           "name": "Maksimum Değer",
-          "description": "Maksimum gösterge değeri."
+          "description": "Maksimum gauge değeri."
         },
         "unit": {
           "name": "Birim",
@@ -86,19 +86,19 @@
         },
         "scale": {
           "name": "Ölçek",
-          "description": "Y ekseni ölçek modu (doğrusal veya logaritmik). Yalnızca zaman çizelgesi şablonu."
+          "description": "Y ekseni ölçek modu (doğrusal veya logaritmik). Yalnızca timeline şablonu."
         },
         "decimals": {
           "name": "Ondalık Basamak",
-          "description": "Değer görüntüsü için ondalık basamak sayısı (0-10). Yalnızca zaman çizelgesi şablonu."
+          "description": "Değer görüntüsü için ondalık basamak sayısı (0-10). Yalnızca timeline şablonu."
         },
         "smoothing": {
           "name": "Düzgün Çizgiler",
-          "description": "Veri noktaları arasında eğri aradeğerlemeyi etkinleştir. Yalnızca zaman çizelgesi şablonu."
+          "description": "Veri noktaları arasında eğri aradeğerlemeyi etkinleştir. Yalnızca timeline şablonu."
         },
         "thresholds": {
           "name": "Eşikler",
-          "description": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Yalnızca zaman çizelgesi şablonu."
+          "description": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Yalnızca timeline şablonu."
         }
       }
     },
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Gönder",
-          "description": "Tüm cihazlara APNs anlık uyarısı olarak gönder. False olduğunda bildirim yalnızca gelen kutusunda saklanır."
+          "description": "Tüm cihazlara APNs push alert olarak gönder. False olduğunda bildirim yalnızca gelen kutusunda saklanır."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Bitiş Durumları",
             "progress_attribute": "İlerleme Niteliği",
             "remaining_time_attribute": "Kalan Süre Niteliği",
-            "total_steps": "Toplam Adım",
+            "total_steps": "Toplam steps",
             "current_step_attribute": "Geçerli Adım Niteliği",
             "severity": "Önem Derecesi",
             "value_attribute": "Değer Niteliği",
@@ -306,12 +306,12 @@
             "end_states": "Live Activity'yi sonlandıran varlık durumları. Listeden seçin veya özel değer girin.",
             "progress_attribute": "0–100 arasında ilerleme değeri tutan varlık niteliği. Örnek: percentage",
             "remaining_time_attribute": "Saniye cinsinden kalan süreyi tutan varlık niteliği. Örnek: remaining",
-            "total_steps": "Toplam adım sayısı.",
+            "total_steps": "Toplam steps adedi.",
             "current_step_attribute": "Geçerli adımı tamsayı olarak tutan varlık niteliği.",
-            "severity": "Uyarı önem düzeyi.",
-            "value_attribute": "Geçerli gösterge değerini sayı olarak tutan varlık niteliği. Varlığın durumunu kullanmak için boş bırakın.",
-            "min_value": "Gösterge aralığı için minimum değer.",
-            "max_value": "Gösterge aralığı için maksimum değer.",
+            "severity": "alert önem düzeyi.",
+            "value_attribute": "Geçerli gauge değerini sayı olarak tutan varlık niteliği. Varlığın durumunu kullanmak için boş bırakın.",
+            "min_value": "gauge aralığı için minimum değer.",
+            "max_value": "gauge aralığı için maksimum değer.",
             "unit": "Değerin yanında gösterilen birim (örn. °C, %, kW). En fazla 32 karakter.",
             "series": "Varlık niteliklerini adlandırılmış serilere eşleyin. Biçim: attribute=Etiket, attribute2=Etiket2. Tek seri olarak varlığın durumunu kullanmak için boş bırakın.",
             "scale": "Kıvılcım çizelgesi için Y ekseni ölçek modu.",

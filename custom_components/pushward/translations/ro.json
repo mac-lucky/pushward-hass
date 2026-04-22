@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Dată de încheiere",
-          "description": "Marcaj de timp Unix pentru data de încheiere a numărătorii inverse."
+          "description": "Marcaj de timp Unix pentru data de încheiere countdown."
         },
         "total_steps": {
-          "name": "Total pași",
-          "description": "Numărul total de pași."
+          "name": "Total steps",
+          "description": "Numărul total de steps."
         },
         "current_step": {
           "name": "Pas curent",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Severitate",
-          "description": "Nivelul de severitate al alertei."
+          "description": "Nivelul de severitate alert."
         },
         "value": {
           "name": "Valoare",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Push",
-          "description": "Trimiteți ca alertă push APNs pe toate dispozitivele. Dacă este fals, notificarea este stocată doar în inbox."
+          "description": "Trimiteți ca APNs push alert pe toate dispozitivele. Dacă este fals, notificarea este stocată doar în inbox."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Stări de încheiere",
             "progress_attribute": "Atribut progres",
             "remaining_time_attribute": "Atribut timp rămas",
-            "total_steps": "Total pași",
+            "total_steps": "Total steps",
             "current_step_attribute": "Atribut pas curent",
             "severity": "Severitate",
             "value_attribute": "Atribut valoare",
@@ -306,9 +306,9 @@
             "end_states": "Stările entității care încheie Live Activity. Selectați din listă sau introduceți valori personalizate.",
             "progress_attribute": "Atributul entității care conține o valoare de progres între 0 și 100. Exemplu: percentage",
             "remaining_time_attribute": "Atributul entității care conține timpul rămas în secunde. Exemplu: remaining",
-            "total_steps": "Numărul total de pași.",
+            "total_steps": "Numărul total de steps.",
             "current_step_attribute": "Atributul entității care conține pasul curent ca număr întreg.",
-            "severity": "Nivelul de severitate al alertei.",
+            "severity": "Nivelul de severitate alert.",
             "value_attribute": "Atributul entității care conține valoarea curentă a gauge-ului ca număr. Lăsați gol pentru a folosi starea entității.",
             "min_value": "Valoarea minimă a intervalului gauge-ului.",
             "max_value": "Valoarea maximă a intervalului gauge-ului.",

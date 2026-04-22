@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Ngày Kết Thúc",
-          "description": "Dấu thời gian Unix cho ngày kết thúc đếm ngược."
+          "description": "Dấu thời gian Unix cho ngày kết thúc countdown."
         },
         "total_steps": {
-          "name": "Tổng Số Bước",
-          "description": "Tổng số bước."
+          "name": "Tổng Số steps",
+          "description": "Tổng số steps hiện có."
         },
         "current_step": {
           "name": "Bước Hiện Tại",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Mức Độ Nghiêm Trọng",
-          "description": "Mức độ nghiêm trọng của cảnh báo."
+          "description": "Mức độ nghiêm trọng của alert."
         },
         "value": {
           "name": "Giá Trị",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Đẩy",
-          "description": "Gửi dưới dạng cảnh báo đẩy APNs đến tất cả thiết bị. Khi tắt, thông báo chỉ được lưu trong hộp thư."
+          "description": "Gửi dưới dạng APNs push alert đến tất cả thiết bị. Khi tắt, thông báo chỉ được lưu trong hộp thư."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Trạng Thái Kết Thúc",
             "progress_attribute": "Thuộc Tính Tiến Độ",
             "remaining_time_attribute": "Thuộc Tính Thời Gian Còn Lại",
-            "total_steps": "Tổng Số Bước",
+            "total_steps": "Tổng Số steps",
             "current_step_attribute": "Thuộc Tính Bước Hiện Tại",
             "severity": "Mức Độ Nghiêm Trọng",
             "value_attribute": "Thuộc Tính Giá Trị",
@@ -306,9 +306,9 @@
             "end_states": "Trạng thái thực thể kết thúc Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
             "progress_attribute": "Thuộc tính thực thể chứa giá trị tiến độ 0–100. Ví dụ: percentage",
             "remaining_time_attribute": "Thuộc tính thực thể chứa thời gian còn lại tính bằng giây. Ví dụ: remaining",
-            "total_steps": "Tổng số bước.",
+            "total_steps": "Tổng số steps hiện có.",
             "current_step_attribute": "Thuộc tính thực thể chứa bước hiện tại dưới dạng số nguyên.",
-            "severity": "Mức độ nghiêm trọng của cảnh báo.",
+            "severity": "Mức độ nghiêm trọng của alert.",
             "value_attribute": "Thuộc tính thực thể chứa giá trị gauge hiện tại dưới dạng số. Để trống để dùng trạng thái của thực thể.",
             "min_value": "Giá trị tối thiểu cho dải gauge.",
             "max_value": "Giá trị tối đa cho dải gauge.",

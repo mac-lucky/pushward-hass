@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "終了日時",
-          "description": "カウントダウン終了日時のUnixタイムスタンプ。"
+          "description": "countdown の終了日時のUnixタイムスタンプ。"
         },
         "total_steps": {
-          "name": "総ステップ数",
-          "description": "ステップの総数。"
+          "name": "総 steps 数",
+          "description": "steps の総数。"
         },
         "current_step": {
           "name": "現在のステップ",
@@ -62,19 +62,19 @@
         },
         "severity": {
           "name": "重大度",
-          "description": "アラートの重大度レベル。"
+          "description": "alert の重大度レベル。"
         },
         "value": {
           "name": "値",
-          "description": "ゲージ: 数値。タイムライン: ラベル付きの値オブジェクト（例: Temp=22.5）。"
+          "description": "gauge: 数値。timeline: ラベル付きの値オブジェクト（例: Temp=22.5）。"
         },
         "min_value": {
           "name": "最小値",
-          "description": "ゲージの最小値。"
+          "description": "gauge の最小値。"
         },
         "max_value": {
           "name": "最大値",
-          "description": "ゲージの最大値。"
+          "description": "gauge の最大値。"
         },
         "unit": {
           "name": "単位",
@@ -86,19 +86,19 @@
         },
         "scale": {
           "name": "スケール",
-          "description": "Y軸のスケールモード（線形または対数）。タイムラインテンプレートのみ。"
+          "description": "Y軸のスケールモード（線形または対数）。timeline テンプレートのみ。"
         },
         "decimals": {
           "name": "小数点以下の桁数",
-          "description": "値表示の小数点以下の桁数（0〜10）。タイムラインテンプレートのみ。"
+          "description": "値表示の小数点以下の桁数（0〜10）。timeline テンプレートのみ。"
         },
         "smoothing": {
           "name": "スムーズな折れ線",
-          "description": "データポイント間のカーブ補間を有効にします。タイムラインテンプレートのみ。"
+          "description": "データポイント間のカーブ補間を有効にします。timeline テンプレートのみ。"
         },
         "thresholds": {
           "name": "しきい値",
-          "description": "スパークラインの水平参照線。タイムラインテンプレートのみ。"
+          "description": "スパークラインの水平参照線。timeline テンプレートのみ。"
         }
       }
     },
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "プッシュ",
-          "description": "APNsプッシュアラートとしてすべてのデバイスに送信します。false の場合、通知はインボックスにのみ保存されます。"
+          "description": "APNs push alert としてすべてのデバイスに送信します。false の場合、通知はインボックスにのみ保存されます。"
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "終了状態",
             "progress_attribute": "進捗属性",
             "remaining_time_attribute": "残り時間属性",
-            "total_steps": "総ステップ数",
+            "total_steps": "総 steps 数",
             "current_step_attribute": "現在のステップ属性",
             "severity": "重大度",
             "value_attribute": "値属性",
@@ -306,12 +306,12 @@
             "end_states": "Live Activityを終了するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
             "progress_attribute": "0〜100の進捗値を持つエンティティ属性。例: percentage",
             "remaining_time_attribute": "残り時間（秒）を持つエンティティ属性。例: remaining",
-            "total_steps": "ステップの総数。",
+            "total_steps": "steps の総数。",
             "current_step_attribute": "現在のステップを整数で保持するエンティティ属性。",
-            "severity": "アラートの重大度レベル。",
-            "value_attribute": "現在のゲージ値を数値で保持するエンティティ属性。空白のままにするとエンティティの状態を使用します。",
-            "min_value": "ゲージ範囲の最小値。",
-            "max_value": "ゲージ範囲の最大値。",
+            "severity": "alert の重大度レベル。",
+            "value_attribute": "現在の gauge 値を数値で保持するエンティティ属性。空白のままにするとエンティティの状態を使用します。",
+            "min_value": "gauge 範囲の最小値。",
+            "max_value": "gauge 範囲の最大値。",
             "unit": "値の隣に表示される単位（例: °C, %, kW）。最大32文字。",
             "series": "エンティティ属性を名前付きシリーズにマッピングします。形式: attribute=Label, attribute2=Label2。空白のままにするとエンティティの状態を単一シリーズとして使用します。",
             "scale": "スパークラインチャートのY軸スケールモード。",

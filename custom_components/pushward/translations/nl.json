@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Einddatum",
-          "description": "Unix-tijdstempel voor de einddatum van de aftelling."
+          "description": "Unix-tijdstempel voor de countdown-einddatum."
         },
         "total_steps": {
-          "name": "Totaal aantal stappen",
-          "description": "Totaal aantal stappen."
+          "name": "Totaal aantal steps",
+          "description": "Totaal aantal steps."
         },
         "current_step": {
           "name": "Huidige stap",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Ernst",
-          "description": "Ernstniveau van de waarschuwing."
+          "description": "alert-ernstniveau."
         },
         "value": {
           "name": "Waarde",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Push",
-          "description": "Verzend als APNs-pushalert naar alle apparaten. Als uitgeschakeld, wordt de melding alleen in de inbox opgeslagen."
+          "description": "Verzend als APNs push alert naar alle apparaten. Als uitgeschakeld, wordt de melding alleen in de inbox opgeslagen."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Eindstatussen",
             "progress_attribute": "Voortgangsattribuut",
             "remaining_time_attribute": "Attribuut resterende tijd",
-            "total_steps": "Totaal aantal stappen",
+            "total_steps": "Totaal aantal steps",
             "current_step_attribute": "Attribuut huidige stap",
             "severity": "Ernst",
             "value_attribute": "Waardeattribuut",
@@ -306,9 +306,9 @@
             "end_states": "Entiteitsstatussen die de Live Activity beëindigen. Selecteer uit de lijst of typ aangepaste waarden.",
             "progress_attribute": "Entiteitsattribuut met een voortgangswaarde van 0–100. Voorbeeld: percentage",
             "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
-            "total_steps": "Totaal aantal stappen.",
+            "total_steps": "Totaal aantal steps.",
             "current_step_attribute": "Entiteitsattribuut met de huidige stap als geheel getal.",
-            "severity": "Ernstniveau van de waarschuwing.",
+            "severity": "alert-ernstniveau.",
             "value_attribute": "Entiteitsattribuut met de huidige gauge-waarde als getal. Laat leeg om de entiteitsstatus te gebruiken.",
             "min_value": "Minimumwaarde voor het gauge-bereik.",
             "max_value": "Maximumwaarde voor het gauge-bereik.",

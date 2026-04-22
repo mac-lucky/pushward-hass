@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Tanggal Akhir",
-          "description": "Stempel waktu Unix untuk tanggal akhir hitung mundur."
+          "description": "Stempel waktu Unix untuk tanggal akhir countdown."
         },
         "total_steps": {
-          "name": "Total Langkah",
-          "description": "Total jumlah langkah."
+          "name": "Total Steps",
+          "description": "Total jumlah steps."
         },
         "current_step": {
           "name": "Langkah Saat Ini",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Tingkat Keparahan",
-          "description": "Tingkat keparahan peringatan."
+          "description": "Tingkat keparahan alert."
         },
         "value": {
           "name": "Nilai",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Push",
-          "description": "Kirim sebagai peringatan push APNs ke semua perangkat. Jika false, notifikasi hanya disimpan di kotak masuk."
+          "description": "Kirim sebagai push alert APNs ke semua perangkat. Jika false, notifikasi hanya disimpan di kotak masuk."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Status Akhir",
             "progress_attribute": "Atribut Kemajuan",
             "remaining_time_attribute": "Atribut Waktu Tersisa",
-            "total_steps": "Total Langkah",
+            "total_steps": "Total Steps",
             "current_step_attribute": "Atribut Langkah Saat Ini",
             "severity": "Tingkat Keparahan",
             "value_attribute": "Atribut Nilai",
@@ -306,9 +306,9 @@
             "end_states": "Status entitas yang mengakhiri Live Activity. Pilih dari daftar atau ketik nilai kustom.",
             "progress_attribute": "Atribut entitas yang menyimpan nilai kemajuan 0–100. Contoh: percentage",
             "remaining_time_attribute": "Atribut entitas yang menyimpan waktu tersisa dalam detik. Contoh: remaining",
-            "total_steps": "Total jumlah langkah.",
+            "total_steps": "Total jumlah steps.",
             "current_step_attribute": "Atribut entitas yang menyimpan langkah saat ini sebagai bilangan bulat.",
-            "severity": "Tingkat keparahan peringatan.",
+            "severity": "Tingkat keparahan alert.",
             "value_attribute": "Atribut entitas yang menyimpan nilai gauge saat ini sebagai angka. Kosongkan untuk menggunakan status entitas.",
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",

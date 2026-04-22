@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Date de fin",
-          "description": "Horodatage Unix pour la date de fin du compte à rebours."
+          "description": "Horodatage Unix pour la date de fin du countdown."
         },
         "total_steps": {
-          "name": "Nombre total d'étapes",
-          "description": "Nombre total d'étapes."
+          "name": "Nombre total de steps",
+          "description": "Nombre total de steps."
         },
         "current_step": {
           "name": "Étape actuelle",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Gravité",
-          "description": "Niveau de gravité de l'alerte."
+          "description": "Niveau de gravité de l'alert."
         },
         "value": {
           "name": "Valeur",
@@ -70,11 +70,11 @@
         },
         "min_value": {
           "name": "Valeur minimale",
-          "description": "Valeur minimale de la jauge."
+          "description": "Valeur minimale du gauge."
         },
         "max_value": {
           "name": "Valeur maximale",
-          "description": "Valeur maximale de la jauge."
+          "description": "Valeur maximale du gauge."
         },
         "unit": {
           "name": "Unité",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Push",
-          "description": "Envoyer en tant qu'alerte push APNs à tous les appareils. Si faux, la notification est stockée uniquement dans la boîte de réception."
+          "description": "Envoyer en tant qu'alert push APNs à tous les appareils. Si faux, la notification est stockée uniquement dans la boîte de réception."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "États de fin",
             "progress_attribute": "Attribut de progression",
             "remaining_time_attribute": "Attribut de temps restant",
-            "total_steps": "Nombre total d'étapes",
+            "total_steps": "Nombre total de steps",
             "current_step_attribute": "Attribut de l'étape actuelle",
             "severity": "Gravité",
             "value_attribute": "Attribut de valeur",
@@ -306,12 +306,12 @@
             "end_states": "États de l'entité qui terminent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées.",
             "progress_attribute": "Attribut de l'entité contenant une valeur de progression de 0 à 100. Exemple : percentage",
             "remaining_time_attribute": "Attribut de l'entité contenant le temps restant en secondes. Exemple : remaining",
-            "total_steps": "Nombre total d'étapes.",
+            "total_steps": "Nombre total de steps.",
             "current_step_attribute": "Attribut de l'entité contenant l'étape actuelle sous forme d'entier.",
-            "severity": "Niveau de gravité de l'alerte.",
-            "value_attribute": "Attribut de l'entité contenant la valeur actuelle de la jauge sous forme numérique. Laisser vide pour utiliser l'état de l'entité.",
-            "min_value": "Valeur minimale de la plage de la jauge.",
-            "max_value": "Valeur maximale de la plage de la jauge.",
+            "severity": "Niveau de gravité de l'alert.",
+            "value_attribute": "Attribut de l'entité contenant la valeur actuelle du gauge sous forme numérique. Laisser vide pour utiliser l'état de l'entité.",
+            "min_value": "Valeur minimale de la plage du gauge.",
+            "max_value": "Valeur maximale de la plage du gauge.",
             "unit": "Unité d'affichage indiquée à côté de la valeur (ex. °C, %, kW). 32 caractères maximum.",
             "series": "Associer les attributs de l'entité à des séries nommées. Format : attribut=Libellé, attribut2=Libellé2. Laisser vide pour utiliser l'état de l'entité comme série unique.",
             "scale": "Mode d'échelle de l'axe Y pour le sparkline.",

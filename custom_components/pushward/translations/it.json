@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Data di fine",
-          "description": "Timestamp Unix per la data di fine del conto alla rovescia."
+          "description": "Timestamp Unix per la data di fine countdown."
         },
         "total_steps": {
-          "name": "Passi totali",
-          "description": "Numero totale di passi."
+          "name": "Total Steps",
+          "description": "Numero totale di steps."
         },
         "current_step": {
           "name": "Passo corrente",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Gravità",
-          "description": "Livello di gravità dell'avviso."
+          "description": "Livello di gravità alert."
         },
         "value": {
           "name": "Valore",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Push",
-          "description": "Inviare come avviso push APNs a tutti i dispositivi. Se falso, la notifica viene salvata solo nella casella."
+          "description": "Inviare come alert push APNs a tutti i dispositivi. Se falso, la notifica viene salvata solo nella casella."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Stati di fine",
             "progress_attribute": "Attributo avanzamento",
             "remaining_time_attribute": "Attributo tempo rimanente",
-            "total_steps": "Passi totali",
+            "total_steps": "Total Steps",
             "current_step_attribute": "Attributo passo corrente",
             "severity": "Gravità",
             "value_attribute": "Attributo valore",
@@ -306,9 +306,9 @@
             "end_states": "Stati dell'entità che terminano la Live Activity. Selezionare dall'elenco o digitare valori personalizzati.",
             "progress_attribute": "Attributo dell'entità che contiene un valore di avanzamento da 0 a 100. Esempio: percentage",
             "remaining_time_attribute": "Attributo dell'entità che contiene il tempo rimanente in secondi. Esempio: remaining",
-            "total_steps": "Numero totale di passi.",
+            "total_steps": "Numero totale di steps.",
             "current_step_attribute": "Attributo dell'entità che contiene il passo corrente come numero intero.",
-            "severity": "Livello di gravità dell'avviso.",
+            "severity": "Livello di gravità alert.",
             "value_attribute": "Attributo dell'entità che contiene il valore corrente del gauge come numero. Lasciare vuoto per utilizzare lo stato dell'entità.",
             "min_value": "Valore minimo per l'intervallo del gauge.",
             "max_value": "Valore massimo per l'intervallo del gauge.",

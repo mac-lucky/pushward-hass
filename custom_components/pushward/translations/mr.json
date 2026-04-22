@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "समाप्ती तारीख",
-          "description": "काउंटडाउन समाप्तीच्या तारखेसाठी Unix timestamp."
+          "description": "countdown समाप्तीच्या तारखेसाठी Unix timestamp."
         },
         "total_steps": {
-          "name": "एकूण चरण",
-          "description": "एकूण चरणांची संख्या."
+          "name": "एकूण steps",
+          "description": "एकूण steps ची संख्या."
         },
         "current_step": {
           "name": "सध्याचा चरण",
@@ -272,7 +272,7 @@
             "end_states": "समाप्ती स्थिती",
             "progress_attribute": "प्रगती गुणधर्म",
             "remaining_time_attribute": "उरलेल्या वेळाचा गुणधर्म",
-            "total_steps": "एकूण चरण",
+            "total_steps": "एकूण steps",
             "current_step_attribute": "सध्याच्या चरणाचा गुणधर्म",
             "severity": "तीव्रता",
             "value_attribute": "मूल्य गुणधर्म",
@@ -306,7 +306,7 @@
             "end_states": "Live Activity समाप्त करणाऱ्या एंटिटी स्थिती. यादीतून निवडा किंवा कस्टम मूल्ये टाइप करा.",
             "progress_attribute": "0–100 प्रगती मूल्य ठेवणारा एंटिटी गुणधर्म. उदाहरण: percentage",
             "remaining_time_attribute": "सेकंदांमध्ये उरलेला वेळ ठेवणारा एंटिटी गुणधर्म. उदाहरण: remaining",
-            "total_steps": "एकूण चरणांची संख्या.",
+            "total_steps": "एकूण steps ची संख्या.",
             "current_step_attribute": "पूर्णांक म्हणून सध्याचा चरण ठेवणारा एंटिटी गुणधर्म.",
             "severity": "Alert तीव्रता पातळी.",
             "value_attribute": "संख्या म्हणून सध्याचे gauge मूल्य ठेवणारा एंटिटी गुणधर्म. एंटिटीची स्थिती वापरण्यासाठी रिकामे ठेवा.",

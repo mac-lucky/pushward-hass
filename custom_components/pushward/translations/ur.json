@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "اختتام کی تاریخ",
-          "description": "الٹی گنتی کی اختتامی تاریخ کے لیے Unix ٹائم اسٹیمپ۔"
+          "description": "countdown اختتامی تاریخ کے لیے Unix ٹائم اسٹیمپ۔"
         },
         "total_steps": {
-          "name": "کل مراحل",
-          "description": "مراحل کی کل تعداد۔"
+          "name": "کل steps",
+          "description": "steps کی کل تعداد۔"
         },
         "current_step": {
           "name": "موجودہ مرحلہ",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "شدت",
-          "description": "الرٹ کی شدت کی سطح۔"
+          "description": "alert کی شدت کی سطح۔"
         },
         "value": {
           "name": "قدر",
@@ -272,7 +272,7 @@
             "end_states": "ختم کرنے والی حالتیں",
             "progress_attribute": "پیش رفت کی خصوصیت",
             "remaining_time_attribute": "بقیہ وقت کی خصوصیت",
-            "total_steps": "کل مراحل",
+            "total_steps": "کل steps",
             "current_step_attribute": "موجودہ مرحلے کی خصوصیت",
             "severity": "شدت",
             "value_attribute": "قدر کی خصوصیت",
@@ -306,9 +306,9 @@
             "end_states": "اینٹٹی کی وہ حالتیں جو Live Activity ختم کرتی ہیں۔ فہرست سے منتخب کریں یا اپنی مرضی کی قدریں ٹائپ کریں۔",
             "progress_attribute": "اینٹٹی کی وہ خصوصیت جو 0–100 پیش رفت کی قدر رکھتی ہے۔ مثال: percentage",
             "remaining_time_attribute": "اینٹٹی کی وہ خصوصیت جو سیکنڈوں میں بقیہ وقت رکھتی ہے۔ مثال: remaining",
-            "total_steps": "مراحل کی کل تعداد۔",
+            "total_steps": "steps کی کل تعداد۔",
             "current_step_attribute": "موجودہ مرحلہ integer کے طور پر رکھنے والی اینٹٹی کی خصوصیت۔",
-            "severity": "الرٹ کی شدت کی سطح۔",
+            "severity": "alert کی شدت کی سطح۔",
             "value_attribute": "موجودہ gauge قدر بطور نمبر رکھنے والی اینٹٹی کی خصوصیت۔ اینٹٹی کی حالت استعمال کرنے کے لیے خالی چھوڑیں۔",
             "min_value": "gauge کی حد کے لیے کم از کم قدر۔",
             "max_value": "gauge کی حد کے لیے زیادہ سے زیادہ قدر۔",

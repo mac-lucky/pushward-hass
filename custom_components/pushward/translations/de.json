@@ -53,8 +53,8 @@
           "description": "Unix-Zeitstempel für das Countdown-Enddatum."
         },
         "total_steps": {
-          "name": "Anzahl Schritte",
-          "description": "Gesamtanzahl der Schritte."
+          "name": "Anzahl Steps",
+          "description": "Gesamtanzahl der steps."
         },
         "current_step": {
           "name": "Aktueller Schritt",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Schweregrad",
-          "description": "Schweregrad der Warnung."
+          "description": "Schweregrad des alert-Templates."
         },
         "value": {
           "name": "Wert",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Push",
-          "description": "Als APNs-Push-Benachrichtigung an alle Geräte senden. Ist diese Option deaktiviert, wird die Benachrichtigung nur im Posteingang gespeichert."
+          "description": "Als APNs-push-alert an alle Geräte senden. Ist diese Option deaktiviert, wird die Benachrichtigung nur im Posteingang gespeichert."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Endzustände",
             "progress_attribute": "Fortschritts-Attribut",
             "remaining_time_attribute": "Attribut für verbleibende Zeit",
-            "total_steps": "Anzahl Schritte",
+            "total_steps": "Anzahl Steps",
             "current_step_attribute": "Attribut für aktuellen Schritt",
             "severity": "Schweregrad",
             "value_attribute": "Wert-Attribut",
@@ -306,9 +306,9 @@
             "end_states": "Entitätszustände, die die Live Activity beenden. Aus der Liste wählen oder eigene Werte eingeben.",
             "progress_attribute": "Entitätsattribut mit einem Fortschrittswert von 0–100. Beispiel: percentage",
             "remaining_time_attribute": "Entitätsattribut mit der verbleibenden Zeit in Sekunden. Beispiel: remaining",
-            "total_steps": "Gesamtanzahl der Schritte.",
+            "total_steps": "Gesamtanzahl der steps.",
             "current_step_attribute": "Entitätsattribut, das den aktuellen Schritt als Ganzzahl enthält.",
-            "severity": "Schweregrad der Warnung.",
+            "severity": "Schweregrad des alert-Templates.",
             "value_attribute": "Entitätsattribut, das den aktuellen Gauge-Wert als Zahl enthält. Leer lassen, um den Zustand der Entität zu verwenden.",
             "min_value": "Minimalwert für den Gauge-Bereich.",
             "max_value": "Maximalwert für den Gauge-Bereich.",

@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "تاريخ الانتهاء",
-          "description": "الطابع الزمني Unix لتاريخ انتهاء العد التنازلي."
+          "description": "الطابع الزمني Unix لتاريخ انتهاء countdown."
         },
         "total_steps": {
-          "name": "إجمالي الخطوات",
-          "description": "العدد الإجمالي للخطوات."
+          "name": "إجمالي Steps",
+          "description": "العدد الإجمالي لـ steps."
         },
         "current_step": {
           "name": "الخطوة الحالية",
@@ -62,19 +62,19 @@
         },
         "severity": {
           "name": "مستوى الخطورة",
-          "description": "مستوى خطورة التنبيه."
+          "description": "مستوى خطورة Alert."
         },
         "value": {
           "name": "القيمة",
-          "description": "المقياس: قيمة رقمية. Timeline: كائن القيم المسماة (مثال: Temp=22.5)."
+          "description": "Gauge: قيمة رقمية. Timeline: كائن القيم المسماة (مثال: Temp=22.5)."
         },
         "min_value": {
           "name": "الحد الأدنى للقيمة",
-          "description": "الحد الأدنى لقيمة المقياس."
+          "description": "الحد الأدنى لقيمة gauge."
         },
         "max_value": {
           "name": "الحد الأقصى للقيمة",
-          "description": "الحد الأقصى لقيمة المقياس."
+          "description": "الحد الأقصى لقيمة gauge."
         },
         "unit": {
           "name": "الوحدة",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "إرسال فوري",
-          "description": "إرسال تنبيه APNs فوري إلى جميع الأجهزة. عند تعطيله، يُحفظ الإشعار في الصندوق فقط."
+          "description": "إرسال alert APNs فوري إلى جميع الأجهزة. عند تعطيله، يُحفظ الإشعار في الصندوق فقط."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "حالات الإنهاء",
             "progress_attribute": "سمة التقدم",
             "remaining_time_attribute": "سمة الوقت المتبقي",
-            "total_steps": "إجمالي الخطوات",
+            "total_steps": "إجمالي Steps",
             "current_step_attribute": "سمة الخطوة الحالية",
             "severity": "مستوى الخطورة",
             "value_attribute": "سمة القيمة",
@@ -306,12 +306,12 @@
             "end_states": "حالات الكيان التي تنهي Live Activity. اختر من القائمة أو أدخل قيماً مخصصة.",
             "progress_attribute": "سمة الكيان التي تحمل قيمة تقدم من 0 إلى 100. مثال: percentage",
             "remaining_time_attribute": "سمة الكيان التي تحمل الوقت المتبقي بالثواني. مثال: remaining",
-            "total_steps": "العدد الإجمالي للخطوات.",
+            "total_steps": "العدد الإجمالي لـ steps.",
             "current_step_attribute": "سمة الكيان التي تحمل الخطوة الحالية كعدد صحيح.",
-            "severity": "مستوى خطورة التنبيه.",
-            "value_attribute": "سمة الكيان التي تحمل قيمة المقياس الحالية كرقم. اتركها فارغة لاستخدام حالة الكيان.",
-            "min_value": "الحد الأدنى لنطاق المقياس.",
-            "max_value": "الحد الأقصى لنطاق المقياس.",
+            "severity": "مستوى خطورة Alert.",
+            "value_attribute": "سمة الكيان التي تحمل قيمة gauge الحالية كرقم. اتركها فارغة لاستخدام حالة الكيان.",
+            "min_value": "الحد الأدنى لنطاق gauge.",
+            "max_value": "الحد الأقصى لنطاق gauge.",
             "unit": "وحدة العرض الظاهرة بجانب القيمة (مثال: °C، %، kW). الحد الأقصى 32 حرفاً.",
             "series": "ربط سمات الكيان بسلاسل مسماة. الصيغة: attribute=Label, attribute2=Label2. اتركها فارغة لاستخدام حالة الكيان كسلسلة واحدة.",
             "scale": "وضع مقياس المحور الصادي لمخطط sparkline.",

@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "结束日期",
-          "description": "倒计时结束日期的 Unix 时间戳。"
+          "description": "countdown 结束日期的 Unix 时间戳。"
         },
         "total_steps": {
-          "name": "总步骤数",
-          "description": "步骤总数。"
+          "name": "总 steps 数",
+          "description": "steps 总数。"
         },
         "current_step": {
           "name": "当前步骤",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "严重程度",
-          "description": "警报严重程度级别。"
+          "description": "alert 严重程度级别。"
         },
         "value": {
           "name": "值",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "推送",
-          "description": "作为 APNs 推送警报发送到所有设备。为 false 时，通知仅存储在收件箱中。"
+          "description": "作为 APNs 推送 alert 发送到所有设备。为 false 时，通知仅存储在收件箱中。"
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "结束状态",
             "progress_attribute": "进度属性",
             "remaining_time_attribute": "剩余时间属性",
-            "total_steps": "总步骤数",
+            "total_steps": "总 steps 数",
             "current_step_attribute": "当前步骤属性",
             "severity": "严重程度",
             "value_attribute": "值属性",
@@ -306,9 +306,9 @@
             "end_states": "结束 Live Activity 的实体状态。从列表中选择或输入自定义值。",
             "progress_attribute": "持有 0–100 进度值的实体属性。示例：percentage",
             "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
-            "total_steps": "步骤总数。",
+            "total_steps": "steps 总数。",
             "current_step_attribute": "以整数形式持有当前步骤的实体属性。",
-            "severity": "警报严重程度级别。",
+            "severity": "alert 严重程度级别。",
             "value_attribute": "以数字形式持有当前 gauge 值的实体属性。留空则使用实体的状态值。",
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",

@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Data zakończenia",
-          "description": "Znacznik czasu Unix dla daty zakończenia odliczania."
+          "description": "Znacznik czasu Unix dla daty zakończenia countdown."
         },
         "total_steps": {
-          "name": "Łączna liczba kroków",
-          "description": "Łączna liczba kroków."
+          "name": "Łączna liczba steps",
+          "description": "Łączna liczba steps."
         },
         "current_step": {
           "name": "Bieżący krok",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Poziom istotności",
-          "description": "Poziom istotności alertu."
+          "description": "Poziom istotności dla szablonu alert."
         },
         "value": {
           "name": "Wartość",
@@ -70,11 +70,11 @@
         },
         "min_value": {
           "name": "Wartość minimalna",
-          "description": "Minimalna wartość wskaźnika."
+          "description": "Minimalna wartość gauge."
         },
         "max_value": {
           "name": "Wartość maksymalna",
-          "description": "Maksymalna wartość wskaźnika."
+          "description": "Maksymalna wartość gauge."
         },
         "unit": {
           "name": "Jednostka",
@@ -272,7 +272,7 @@
             "end_states": "Stany końcowe",
             "progress_attribute": "Atrybut postępu",
             "remaining_time_attribute": "Atrybut pozostałego czasu",
-            "total_steps": "Łączna liczba kroków",
+            "total_steps": "Łączna liczba steps",
             "current_step_attribute": "Atrybut bieżącego kroku",
             "severity": "Poziom istotności",
             "value_attribute": "Atrybut wartości",
@@ -306,12 +306,12 @@
             "end_states": "Stany encji, które kończą Live Activity. Wybierz z listy lub wpisz własne wartości.",
             "progress_attribute": "Atrybut encji przechowujący wartość postępu 0–100. Przykład: percentage",
             "remaining_time_attribute": "Atrybut encji przechowujący pozostały czas w sekundach. Przykład: remaining",
-            "total_steps": "Łączna liczba kroków.",
+            "total_steps": "Łączna liczba steps.",
             "current_step_attribute": "Atrybut encji przechowujący bieżący krok jako liczbę całkowitą.",
-            "severity": "Poziom istotności alertu.",
-            "value_attribute": "Atrybut encji przechowujący bieżącą wartość wskaźnika jako liczbę. Pozostaw puste, aby użyć stanu encji.",
-            "min_value": "Minimalna wartość zakresu wskaźnika.",
-            "max_value": "Maksymalna wartość zakresu wskaźnika.",
+            "severity": "Poziom istotności dla szablonu alert.",
+            "value_attribute": "Atrybut encji przechowujący bieżącą wartość gauge jako liczbę. Pozostaw puste, aby użyć stanu encji.",
+            "min_value": "Minimalna wartość zakresu gauge.",
+            "max_value": "Maksymalna wartość zakresu gauge.",
             "unit": "Jednostka wyświetlana obok wartości (np. °C, %, kW). Maks. 32 znaki.",
             "series": "Mapuje atrybuty encji na nazwane serie. Format: atrybut=Etykieta, atrybut2=Etykieta2. Pozostaw puste, aby użyć stanu encji jako pojedynczej serii.",
             "scale": "Tryb skali osi Y dla wykresu sparkline.",

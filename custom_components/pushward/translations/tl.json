@@ -53,8 +53,8 @@
           "description": "Unix timestamp para sa petsa ng pagtatapos ng countdown."
         },
         "total_steps": {
-          "name": "Kabuuang Hakbang",
-          "description": "Kabuuang bilang ng mga hakbang."
+          "name": "Kabuuang Steps",
+          "description": "Kabuuang bilang ng mga steps."
         },
         "current_step": {
           "name": "Kasalukuyang Hakbang",
@@ -62,7 +62,7 @@
         },
         "severity": {
           "name": "Kalubhaan",
-          "description": "Antas ng kalubhaan ng alerto."
+          "description": "Antas ng kalubhaan ng alert."
         },
         "value": {
           "name": "Halaga",
@@ -272,7 +272,7 @@
             "end_states": "Mga End State",
             "progress_attribute": "Progress Attribute",
             "remaining_time_attribute": "Remaining Time Attribute",
-            "total_steps": "Kabuuang Hakbang",
+            "total_steps": "Kabuuang Steps",
             "current_step_attribute": "Current Step Attribute",
             "severity": "Kalubhaan",
             "value_attribute": "Value Attribute",
@@ -306,9 +306,9 @@
             "end_states": "Mga estado ng entity na nagtatapos ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
             "progress_attribute": "Attribute ng entity na nagtataglay ng halaga ng progreso mula 0 hanggang 100. Halimbawa: percentage",
             "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
-            "total_steps": "Kabuuang bilang ng mga hakbang.",
+            "total_steps": "Kabuuang bilang ng mga steps.",
             "current_step_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang hakbang bilang integer.",
-            "severity": "Antas ng kalubhaan ng alerto.",
+            "severity": "Antas ng kalubhaan ng alert.",
             "value_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang halaga ng gauge bilang numero. Iwanan itong blangko para gamitin ang estado ng entity.",
             "min_value": "Pinakamababang halaga para sa saklaw ng gauge.",
             "max_value": "Pinakamataas na halaga para sa saklaw ng gauge.",

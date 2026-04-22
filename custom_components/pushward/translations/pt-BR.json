@@ -50,11 +50,11 @@
         },
         "end_date": {
           "name": "Data de Término",
-          "description": "Timestamp Unix para a data de término da contagem regressiva."
+          "description": "Timestamp Unix para a data de término do countdown."
         },
         "total_steps": {
-          "name": "Total de Etapas",
-          "description": "Número total de etapas."
+          "name": "Total steps",
+          "description": "Número total de steps."
         },
         "current_step": {
           "name": "Etapa Atual",
@@ -62,19 +62,19 @@
         },
         "severity": {
           "name": "Severidade",
-          "description": "Nível de severidade do alerta."
+          "description": "Nível de severidade do alert."
         },
         "value": {
           "name": "Valor",
-          "description": "Medidor: valor numérico. Timeline: objeto de valores rotulados (ex.: Temp=22.5)."
+          "description": "Gauge: valor numérico. Timeline: objeto de valores rotulados (ex.: Temp=22.5)."
         },
         "min_value": {
           "name": "Valor Mínimo",
-          "description": "Valor mínimo do medidor."
+          "description": "Valor mínimo do gauge."
         },
         "max_value": {
           "name": "Valor Máximo",
-          "description": "Valor máximo do medidor."
+          "description": "Valor máximo do gauge."
         },
         "unit": {
           "name": "Unidade",
@@ -198,7 +198,7 @@
         },
         "push": {
           "name": "Push",
-          "description": "Enviar como alerta push APNs para todos os dispositivos. Quando falso, a notificação é armazenada apenas na caixa de entrada."
+          "description": "Enviar como push alert APNs para todos os dispositivos. Quando falso, a notificação é armazenada apenas na caixa de entrada."
         }
       }
     }
@@ -272,7 +272,7 @@
             "end_states": "Estados de Término",
             "progress_attribute": "Atributo de Progresso",
             "remaining_time_attribute": "Atributo de Tempo Restante",
-            "total_steps": "Total de Etapas",
+            "total_steps": "Total steps",
             "current_step_attribute": "Atributo de Etapa Atual",
             "severity": "Severidade",
             "value_attribute": "Atributo de Valor",
@@ -306,12 +306,12 @@
             "end_states": "Estados da entidade que encerram a Live Activity. Selecione na lista ou digite valores personalizados.",
             "progress_attribute": "Atributo da entidade que contém um valor de progresso de 0 a 100. Exemplo: percentage",
             "remaining_time_attribute": "Atributo da entidade que contém o tempo restante em segundos. Exemplo: remaining",
-            "total_steps": "Número total de etapas.",
+            "total_steps": "Número total de steps.",
             "current_step_attribute": "Atributo da entidade que contém a etapa atual como número inteiro.",
-            "severity": "Nível de severidade do alerta.",
-            "value_attribute": "Atributo da entidade que contém o valor atual do medidor como número. Deixe vazio para usar o estado da entidade.",
-            "min_value": "Valor mínimo para o intervalo do medidor.",
-            "max_value": "Valor máximo para o intervalo do medidor.",
+            "severity": "Nível de severidade do alert.",
+            "value_attribute": "Atributo da entidade que contém o valor atual do gauge como número. Deixe vazio para usar o estado da entidade.",
+            "min_value": "Valor mínimo para o intervalo do gauge.",
+            "max_value": "Valor máximo para o intervalo do gauge.",
             "unit": "Unidade de exibição mostrada ao lado do valor (ex.: °C, %, kW). Máximo de 32 caracteres.",
             "series": "Mapear atributos da entidade para séries nomeadas. Formato: atributo=Rótulo, atributo2=Rótulo2. Deixe vazio para usar o estado da entidade como série única.",
             "scale": "Modo de escala do eixo Y para o gráfico sparkline.",
