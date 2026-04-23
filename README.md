@@ -1,10 +1,15 @@
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://hacs.xyz)
+[![Website](https://img.shields.io/badge/pushward.app-5B4FE5?style=for-the-badge&logo=safari&logoColor=white)](https://pushward.app)
+[![TestFlight](https://img.shields.io/badge/TestFlight-Join_Beta-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://testflight.apple.com/join/T4aT6s3W)
+
 # PushWard for Home Assistant
 
 [![CI](https://github.com/mac-lucky/pushward-hass/actions/workflows/ci.yml/badge.svg)](https://github.com/mac-lucky/pushward-hass/actions/workflows/ci.yml)
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Custom [HACS](https://hacs.xyz) integration that tracks Home Assistant entities as [PushWard](https://pushward.app) Live Activities on iPhone (Dynamic Island + Lock Screen).
+
+> **New to PushWard?** Learn more at **[pushward.app](https://pushward.app)** and join the iOS beta on **[TestFlight](https://testflight.apple.com/join/T4aT6s3W)**.
 
 When an entity enters a configured "start" state (e.g., washer turns on), a Live Activity appears on your iPhone. When it enters an "end" state, the activity dismisses with a two-phase completion animation.
 
@@ -219,7 +224,7 @@ To use the English strings regardless of your Home Assistant language, switch yo
 
 - Home Assistant **2025.7.0** or newer
 - A [PushWard](https://pushward.app) account with an integration key
-- The [PushWard iOS app](https://pushward.app) installed on your iPhone
+- The [PushWard iOS app](https://testflight.apple.com/join/T4aT6s3W) installed on your iPhone (available via TestFlight)
 
 ## Development
 
