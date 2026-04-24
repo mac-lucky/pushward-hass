@@ -46,6 +46,17 @@ CONF_DECIMALS = "decimals"
 CONF_SMOOTHING = "smoothing"
 CONF_THRESHOLDS = "thresholds"
 CONF_HISTORY_PERIOD = "history_period"
+CONF_SOUND = "sound"
+CONF_WARNING_THRESHOLD = "warning_threshold"
+CONF_ALARM = "alarm"
+CONF_STEP_LABELS = "step_labels"
+CONF_STEP_ROWS = "step_rows"
+CONF_FIRED_AT_ATTRIBUTE = "fired_at_attribute"
+CONF_UNITS = "units"
+CONF_BACKGROUND_COLOR = "background_color"
+CONF_BACKGROUND_COLOR_ATTRIBUTE = "background_color_attribute"
+CONF_TEXT_COLOR = "text_color"
+CONF_TEXT_COLOR_ATTRIBUTE = "text_color_attribute"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
@@ -64,6 +75,7 @@ PRIORITY_MIN = 0
 PRIORITY_MAX = 10
 TOTAL_STEPS_MAX = 20
 UPDATE_INTERVAL_MIN = 1
+WARNING_THRESHOLD_MAX = 86400  # 24 h
 
 # Free-text input length caps.
 MAX_TEXT_LEN = 255
@@ -83,6 +95,9 @@ TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline"]
 
 # Timeline scales
 SCALES = ["linear", "logarithmic"]
+
+# Must stay in sync with server UpdateActivityRequest.sound.
+SOUNDS = ("default", "chime", "alert", "success", "warning", "bell", "ding", "buzz", "notification")
 
 # API retry
 MAX_RETRIES = 5

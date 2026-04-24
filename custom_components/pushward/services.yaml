@@ -20,7 +20,8 @@ update_activity:
             - "ENDED"
     template:
       name: Template
-      description: Activity layout template.
+      description: "Required. Activity layout template. For steps: also provide total_steps and current_step. For alert: also provide severity. For gauge: also provide min_value and max_value. For countdown: also provide end_date."
+      required: true
       example: "generic"
       selector:
         select:
@@ -181,6 +182,80 @@ update_activity:
       description: Horizontal reference lines on the sparkline. Timeline template only.
       selector:
         object:
+    sound:
+      name: Sound
+      description: Override the notification sound for this update.
+      example: "chime"
+      selector:
+        select:
+          options:
+            - "default"
+            - "chime"
+            - "alert"
+            - "success"
+            - "warning"
+            - "bell"
+            - "ding"
+            - "buzz"
+            - "notification"
+    priority:
+      name: Priority Override
+      description: Override activity priority for this update (0 = lowest, 10 = highest).
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 10
+          mode: slider
+    background_color:
+      name: Background Color
+      description: Background color as a hex value (e.g. #1a2b3c) or named color (e.g. blue).
+      example: "#1a2b3c"
+      selector:
+        text:
+    text_color:
+      name: Text Color
+      description: Text color as a hex value (e.g. #ffffff) or named color (e.g. white).
+      example: "#ffffff"
+      selector:
+        text:
+    warning_threshold:
+      name: Warning Threshold
+      description: Seconds remaining at which the countdown enters warning state. Countdown template only.
+      example: 30
+      selector:
+        number:
+          min: 0
+          mode: box
+          unit_of_measurement: seconds
+    alarm:
+      name: Alarm
+      description: Trigger a device alarm when the countdown expires. Countdown template only (iOS 26+).
+      selector:
+        boolean:
+    step_labels:
+      name: Step Labels
+      description: Labels for each step as a YAML object keyed by step number (e.g. {"1":"Step 1","2":"Step 2"}). Steps template only.
+      selector:
+        object:
+    step_rows:
+      name: Step Rows
+      description: Row heights for each step as a list of integers (1–10). Steps template only.
+      selector:
+        object:
+    fired_at:
+      name: Fired At
+      description: Unix timestamp when the alert was triggered. Alert template only.
+      example: 1700000000
+      selector:
+        number:
+          min: 0
+          mode: box
+    units:
+      name: Units
+      description: Per-series unit labels as a YAML object (e.g. {"temp":"°C","humidity":"%"}). Timeline template only.
+      selector:
+        object:
 
 create_activity:
   name: Create Activity
@@ -217,6 +292,7 @@ create_activity:
       selector:
         number:
           min: 1
+          max: 2592000
           mode: box
     stale_ttl:
       name: Stale TTL
@@ -225,6 +301,7 @@ create_activity:
       selector:
         number:
           min: 1
+          max: 2592000
           mode: box
 
 end_activity:
@@ -329,6 +406,29 @@ send_notification:
       example: "ha-washer"
       selector:
         text:
+    url:
+      name: URL
+      description: Primary deep-link URL opened when the notification is tapped.
+      example: "https://example.com"
+      selector:
+        text:
+    image_url:
+      name: Image URL
+      description: URL of an image to attach to the notification.
+      example: "https://example.com/image.png"
+      selector:
+        text:
+    icon_url:
+      name: Icon URL
+      description: URL of a custom icon to display with the notification.
+      example: "https://example.com/icon.png"
+      selector:
+        text:
+    metadata:
+      name: Metadata
+      description: Arbitrary key-value pairs attached to the notification for custom app handling.
+      selector:
+        object:
     push:
       name: Push
       description: Send as an APNs push alert to all devices. When false, the notification is stored in the inbox only.

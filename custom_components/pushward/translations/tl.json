@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Mga Threshold",
           "description": "Mga pahalang na reference line sa sparkline. Para sa timeline template lamang."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "warning_threshold": {
+          "name": "Babala na Threshold",
+          "description": "Kapag ang halaga ng gauge o timeline ay umabot o lumampas sa halagang ito, ipinapakita ang kulay ng babala."
+        },
+        "alarm": {
+          "name": "Alarma",
+          "description": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Gumagana lamang sa iOS 26+."
+        },
+        "step_labels": {
+          "name": "Mga Label ng Hakbang",
+          "description": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang."
+        },
+        "step_rows": {
+          "name": "Mga Hilera ng Hakbang",
+          "description": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template."
+        },
+        "fired_at": {
+          "name": "Oras ng Pag-trigger",
+          "description": "Unix timestamp ng pag-trigger ng activity. Ginagamit para ipakita ang kamag-anak na oras."
+        },
+        "units": {
+          "name": "Mga Yunit",
+          "description": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Ipadala bilang APNs push alert sa lahat ng device. Kapag false, ang notification ay iniimbak lamang sa inbox."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL na bubukas kapag na-tap ang notification. Nangangailangan ng HTTPS."
+        },
+        "image_url": {
+          "name": "URL ng Larawan",
+          "description": "URL ng larawang ipinapakita sa notification. Nangangailangan ng HTTPS."
+        },
+        "icon_url": {
+          "name": "URL ng Icon",
+          "description": "URL para sa icon ng notification. Nangangailangan ng HTTPS."
+        },
+        "metadata": {
+          "name": "Metadata",
+          "description": "Karagdagang key-value pair na metadata na ipinapadala kasama ang notification."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "Secondary URL",
             "ended_ttl": "Awtomatikong Burahin Pagkatapos ng Pagtatapos (segundo)",
-            "stale_ttl": "Awtomatikong Tapusin Pagkatapos ng Kawalan ng Aktibidad (segundo)"
+            "stale_ttl": "Awtomatikong Tapusin Pagkatapos ng Kawalan ng Aktibidad (segundo)",
+            "sound": "Tunog",
+            "background_color": "Kulay ng Background",
+            "background_color_attribute": "Attribute ng Kulay ng Background",
+            "text_color": "Kulay ng Teksto",
+            "text_color_attribute": "Attribute ng Kulay ng Teksto",
+            "warning_threshold": "Babala na Threshold",
+            "alarm": "Alarma",
+            "step_labels": "Mga Label ng Hakbang",
+            "step_rows": "Mga Hilera ng Hakbang",
+            "fired_at_attribute": "Attribute ng Oras ng Pag-trigger",
+            "units": "Mga Yunit"
           },
           "data_description": {
             "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
@@ -333,7 +400,18 @@
             "url": "Link na bubukas kapag na-tap ang Live Activity. Dapat magsimula sa http:// o https://. Para sa mga steps at alert na template lamang.",
             "secondary_url": "Secondary link para sa Live Activity. Para sa mga steps at alert na template lamang.",
             "ended_ttl": "Mga segundo pagkatapos matapos ang activity bago ito awtomatikong mabura mula sa server. Iwanan itong blangko para panatilihing walang hanggan. Halimbawa: 300",
-            "stale_ttl": "Mga segundo ng kawalan ng aktibidad bago awtomatikong tapusin ng server ang activity. Iwanan itong blangko para i-disable. Halimbawa: 1800"
+            "stale_ttl": "Mga segundo ng kawalan ng aktibidad bago awtomatikong tapusin ng server ang activity. Iwanan itong blangko para i-disable. Halimbawa: 1800",
+            "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
+            "background_color": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
+            "background_color_attribute": "Attribute ng entity para sa dynamic na kulay ng background. Nino-override ang static na kulay ng background.",
+            "text_color": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
+            "text_color_attribute": "Attribute ng entity para sa dynamic na kulay ng teksto. Nino-override ang static na kulay ng teksto.",
+            "warning_threshold": "Kapag ang halaga ay umabot o lumampas dito, nati-trigger ang kulay ng babala. Mga template na gauge at timeline.",
+            "alarm": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Para sa iOS 26+ lamang.",
+            "step_labels": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang.",
+            "step_rows": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template.",
+            "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
+            "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
           }
         },
         "reconfigure": {

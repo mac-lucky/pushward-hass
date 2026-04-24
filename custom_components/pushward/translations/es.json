@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Umbrales",
           "description": "Líneas de referencia horizontales en el gráfico sparkline. Solo para la plantilla timeline."
+        },
+        "sound": {
+          "name": "Sonido",
+          "description": "Sonido de notificación que se reproduce en el dispositivo con esta actualización."
+        },
+        "priority": {
+          "name": "Prioridad puntual",
+          "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "background_color": {
+          "name": "Color de fondo",
+          "description": "Color de fondo de la Live Activity. Hexadecimal (#RRGGBB) o nombre de color."
+        },
+        "text_color": {
+          "name": "Color del texto",
+          "description": "Color del texto de la Live Activity. Hexadecimal (#RRGGBB) o nombre de color."
+        },
+        "warning_threshold": {
+          "name": "Umbral de advertencia",
+          "description": "Segundos antes de end_date cuando el countdown entra en estado de advertencia. Solo para la plantilla countdown."
+        },
+        "alarm": {
+          "name": "Alarma",
+          "description": "Activar alarma AlarmKit al expirar el countdown (iOS 26+, solo para la plantilla countdown)."
+        },
+        "step_labels": {
+          "name": "Etiquetas de pasos",
+          "description": "Lista ordenada de etiquetas de pasos. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
+        },
+        "step_rows": {
+          "name": "Alturas de fila de pasos",
+          "description": "Lista ordenada de alturas de fila (1-10) por paso. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
+        },
+        "fired_at": {
+          "name": "Activado en",
+          "description": "Marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert."
+        },
+        "units": {
+          "name": "Mapa de unidades",
+          "description": "Etiquetas de unidades por serie. Las claves deben coincidir con las claves del value dict. Solo para la plantilla timeline."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Enviar como push alert APNs a todos los dispositivos. Si es falso, la notificación solo se almacena en la bandeja de entrada."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL que se abre al pulsar la notificación."
+        },
+        "image_url": {
+          "name": "URL de imagen",
+          "description": "URL HTTPS de una imagen para adjuntar a la notificación."
+        },
+        "icon_url": {
+          "name": "URL de icono",
+          "description": "URL HTTPS de un icono personalizado por notificación."
+        },
+        "metadata": {
+          "name": "Metadatos",
+          "description": "Pares clave-valor de metadatos adicionales adjuntos a la notificación."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "URL secundaria",
             "ended_ttl": "Eliminar automáticamente tras finalizar (segundos)",
-            "stale_ttl": "Finalizar automáticamente por inactividad (segundos)"
+            "stale_ttl": "Finalizar automáticamente por inactividad (segundos)",
+            "sound": "Sonido",
+            "background_color": "Color de fondo",
+            "background_color_attribute": "Atributo de color de fondo",
+            "text_color": "Color del texto",
+            "text_color_attribute": "Atributo de color del texto",
+            "warning_threshold": "Umbral de advertencia (segundos)",
+            "alarm": "Alarma (iOS 26+)",
+            "step_labels": "Etiquetas de pasos",
+            "step_rows": "Alturas de fila de pasos",
+            "fired_at_attribute": "Atributo de activación",
+            "units": "Unidades por serie"
           },
           "data_description": {
             "start_states": "Estados de la entidad que inician la Live Activity. Seleccionar de la lista o introducir valores personalizados.",
@@ -333,7 +400,18 @@
             "url": "Enlace que se abre al pulsar la Live Activity. Debe comenzar con http:// o https://. Solo para las plantillas steps y alert.",
             "secondary_url": "Enlace secundario para la Live Activity. Solo para las plantillas steps y alert.",
             "ended_ttl": "Segundos tras la finalización de la actividad antes de eliminarla automáticamente del servidor. Dejar vacío para conservarla indefinidamente. Ejemplo: 300",
-            "stale_ttl": "Segundos de inactividad antes de que el servidor finalice automáticamente la actividad. Dejar vacío para desactivar. Ejemplo: 1800"
+            "stale_ttl": "Segundos de inactividad antes de que el servidor finalice automáticamente la actividad. Dejar vacío para desactivar. Ejemplo: 1800",
+            "sound": "Sonido que se reproduce en cada actualización para esta entidad. Dejar vacío para no forzar ningún sonido.",
+            "background_color": "Color de fondo de la Live Activity. Dejar vacío para el valor predeterminado.",
+            "background_color_attribute": "Atributo de la entidad para el color de fondo dinámico. Anula el color estático. Admite RGB, HS, XY, Kelvin, colores con nombre y hexadecimal.",
+            "text_color": "Color del texto de la Live Activity. Dejar vacío para el valor predeterminado.",
+            "text_color_attribute": "Atributo de la entidad para el color del texto dinámico. Anula el color estático.",
+            "warning_threshold": "Segundos antes del final del countdown cuando el servidor envía un push de advertencia. Dejar vacío para desactivar. Solo para la plantilla countdown.",
+            "alarm": "Activar alarma AlarmKit al expirar el countdown (iOS 26+). Solo para la plantilla countdown.",
+            "step_labels": "Etiquetas para cada paso. Formato: 1=Primer Paso, 2=Segundo Paso. Debe cubrir los pasos 1..total_steps. Solo para la plantilla steps.",
+            "step_rows": "Altura de fila (1–10) para cada paso, separada por comas. Debe tener total_steps entradas. Solo para la plantilla steps.",
+            "fired_at_attribute": "Atributo de la entidad que contiene la marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert.",
+            "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline."
           }
         },
         "reconfigure": {

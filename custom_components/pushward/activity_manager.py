@@ -11,8 +11,10 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from functools import partial
+from typing import Literal
 
 import aiohttp
+from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers import entity_registry as er
@@ -22,7 +24,7 @@ from homeassistant.helpers.event import (
 )
 from homeassistant.helpers.storage import Store
 
-from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
+from .api import PushWardApiClient, PushWardApiError, PushWardAuthError, PushWardForbiddenError
 from .const import (
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
@@ -32,6 +34,7 @@ from .const import (
     CONF_PRIORITY,
     CONF_SERIES,
     CONF_SLUG,
+    CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
     CONF_TEMPLATE,
@@ -45,6 +48,12 @@ _HISTORY_BUFFER_MAX = 300
 _HISTORY_STORAGE_VERSION = 1
 _HISTORY_SAVE_DELAY_S = 30
 _HISTORY_SAMPLES_KEY = "samples"
+
+_ACTIVITY_LIMIT_NOTIFICATION_ID = "pushward_activity_limit"
+
+
+def _forbidden_notification_id(slug: str) -> str:
+    return f"pushward_forbidden_{slug}"
 
 
 def history_storage_key(entry_id: str) -> str:
@@ -114,6 +123,40 @@ class ActivityManager:
             self._reauth_triggered = True
             _LOGGER.warning("PushWard auth failed — triggering reauthentication")
             self._entry.async_start_reauth(self._hass)
+
+    @contextlib.asynccontextmanager
+    async def _api_error_guard(self, slug: str, context: Literal["starting", "updating", "ending"]):
+        """Translate PushWard API/network errors to user-facing notifications or reauth."""
+        try:
+            yield
+        except PushWardAuthError:
+            self._trigger_reauth()
+        except PushWardForbiddenError as err:
+            persistent_notification.async_create(
+                self._hass,
+                f"PushWard: {err}",
+                title=f"PushWard — {slug}",
+                notification_id=_forbidden_notification_id(slug),
+            )
+            _LOGGER.warning("PushWard 403 while %s %s: %s", context, slug, err)
+        except PushWardApiError as err:
+            if err.status_code == 409:
+                persistent_notification.async_create(
+                    self._hass,
+                    "PushWard activity limit reached — delete unused activities or upgrade your subscription.",
+                    title="PushWard — Activity Limit",
+                    notification_id=_ACTIVITY_LIMIT_NOTIFICATION_ID,
+                )
+                _LOGGER.warning("Activity limit reached while %s %s", context, slug)
+            else:
+                _LOGGER.warning("PushWard API error while %s %s: %s", context, slug, err)
+        except aiohttp.ClientError:
+            _LOGGER.warning("PushWard network error while %s %s", context, slug, exc_info=True)
+
+    @callback
+    def _clear_forbidden_notification(self, slug: str) -> None:
+        """Dismiss the forbidden-notification (if any) after a successful call."""
+        persistent_notification.async_dismiss(self._hass, _forbidden_notification_id(slug))
 
     async def async_start(self) -> None:
         """Subscribe to state changes and resume any active entities."""
@@ -274,7 +317,7 @@ class ActivityManager:
 
         tracked.generation += 1
 
-        try:
+        async with self._api_error_guard(slug, "starting"):
             # Resolve activity name: configured name > friendly name > entity_id
             name = config.get(CONF_ACTIVITY_NAME) or ""
             if not name:
@@ -309,15 +352,13 @@ class ActivityManager:
                 if history:
                     content["history"] = history
 
-            await self._api.update_activity(slug, "ONGOING", content)
+            sound = config.get(CONF_SOUND) or None
+            await self._api.update_activity(slug, "ONGOING", content, sound=sound)
+            self._clear_forbidden_notification(slug)
 
             tracked.is_active = True
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
-        except PushWardAuthError:
-            self._trigger_reauth()
-        except (PushWardApiError, aiohttp.ClientError):
-            _LOGGER.warning("Failed to start activity for %s", entity_id, exc_info=True)
 
     async def _seed_timeline_history(
         self, entity_id: str, config: dict, _content: dict
@@ -437,14 +478,12 @@ class ActivityManager:
             return
 
         slug = tracked.config[CONF_SLUG]
-        try:
-            await self._api.update_activity(slug, "ONGOING", content)
+        async with self._api_error_guard(slug, "updating"):
+            sound = tracked.config.get(CONF_SOUND) or None
+            await self._api.update_activity(slug, "ONGOING", content, sound=sound)
+            self._clear_forbidden_notification(slug)
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
-        except PushWardAuthError:
-            self._trigger_reauth()
-        except (PushWardApiError, aiohttp.ClientError):
-            _LOGGER.warning("Failed to update activity %s", slug, exc_info=True)
 
     @callback
     def _flush_update(self, entity_id: str, _now: datetime | None = None) -> None:
@@ -472,25 +511,21 @@ class ActivityManager:
         gen_at_start = tracked.generation
 
         try:
-            # Phase 1: show completion content (preserves last progress/subtitle)
-            completion = map_completion_content(config, tracked.last_content)
-            await self._api.update_activity(slug, "ONGOING", completion)
+            async with self._api_error_guard(slug, "ending"):
+                # Phase 1: show completion content (preserves last progress/subtitle)
+                completion = map_completion_content(config, tracked.last_content)
+                await self._api.update_activity(slug, "ONGOING", completion)
 
-            # Wait for user to see the completion state
-            await asyncio.sleep(END_DELAY_SECONDS)
+                # Wait for user to see the completion state
+                await asyncio.sleep(END_DELAY_SECONDS)
 
-            # Abort if a new start happened during the sleep
-            if tracked.generation != gen_at_start:
-                return
+                # Abort if a new start happened during the sleep
+                if tracked.generation != gen_at_start:
+                    return
 
-            # Phase 2: end the activity
-            await self._api.update_activity(slug, "ENDED", completion)
-        except asyncio.CancelledError:
-            raise
-        except PushWardAuthError:
-            self._trigger_reauth()
-        except (PushWardApiError, aiohttp.ClientError):
-            _LOGGER.warning("Failed to end activity %s", slug, exc_info=True)
+                # Phase 2: end the activity
+                await self._api.update_activity(slug, "ENDED", completion)
+                self._clear_forbidden_notification(slug)
         finally:
             task = asyncio.current_task()
             if task is None or not task.cancelled():

@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "しきい値",
           "description": "スパークラインの水平参照線。timeline テンプレートのみ。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "warning_threshold": {
+          "name": "警告しきい値",
+          "description": "countdown が警告状態に入る end_date までの秒数。countdown テンプレートのみ。"
+        },
+        "alarm": {
+          "name": "アラーム",
+          "description": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+、countdown テンプレートのみ）。"
+        },
+        "step_labels": {
+          "name": "ステップラベル",
+          "description": "ステップラベルの順序付きリスト。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "step_rows": {
+          "name": "ステップ行高",
+          "description": "各ステップの行高（1〜10）の順序付きリスト。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "fired_at": {
+          "name": "発火時刻",
+          "description": "alert が発火したときの Unix タイムスタンプ。alert テンプレートのみ。"
+        },
+        "units": {
+          "name": "単位マップ",
+          "description": "系列ごとの単位ラベル。キーは value dict のキーと一致する必要があります。timeline テンプレートのみ。"
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "プッシュ",
           "description": "APNs push alert としてすべてのデバイスに送信します。false の場合、通知はインボックスにのみ保存されます。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "通知をタップしたときに開く URL。"
+        },
+        "image_url": {
+          "name": "画像 URL",
+          "description": "通知に添付する画像の HTTPS URL。"
+        },
+        "icon_url": {
+          "name": "アイコン URL",
+          "description": "通知ごとのカスタムアイコンの HTTPS URL。"
+        },
+        "metadata": {
+          "name": "メタデータ",
+          "description": "通知に添付される追加メタデータのキーと値のペア。"
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "セカンダリURL",
             "ended_ttl": "終了後に自動削除（秒）",
-            "stale_ttl": "アイドル後に自動終了（秒）"
+            "stale_ttl": "アイドル後に自動終了（秒）",
+            "sound": "サウンド",
+            "background_color": "背景色",
+            "background_color_attribute": "背景色属性",
+            "text_color": "テキスト色",
+            "text_color_attribute": "テキスト色属性",
+            "warning_threshold": "警告しきい値（秒）",
+            "alarm": "アラーム（iOS 26+）",
+            "step_labels": "ステップラベル",
+            "step_rows": "ステップ行高",
+            "fired_at_attribute": "発火時刻属性",
+            "units": "系列ごとの単位"
           },
           "data_description": {
             "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
@@ -333,7 +400,18 @@
             "url": "Live Activityをタップしたときに開くリンク。http:// または https:// で始まる必要があります。steps および alert テンプレートのみ。",
             "secondary_url": "Live Activityのセカンダリリンク。steps および alert テンプレートのみ。",
             "ended_ttl": "アクティビティ終了後、サーバーから自動削除されるまでの秒数。空白のままにすると無期限に保持されます。例: 300",
-            "stale_ttl": "サーバーがアクティビティを自動終了するまでの非アクティブ秒数。空白のままにすると無効にします。例: 1800"
+            "stale_ttl": "サーバーがアクティビティを自動終了するまでの非アクティブ秒数。空白のままにすると無効にします。例: 1800",
+            "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
+            "background_color": "Live Activity の背景色。空白のままにするとデフォルト色を使用します。",
+            "background_color_attribute": "動的背景色のエンティティ属性。静的色より優先されます。RGB、HS、XY、ケルビン、色名、16進数に対応しています。",
+            "text_color": "Live Activity のテキスト色。空白のままにするとデフォルト色を使用します。",
+            "text_color_attribute": "動的テキスト色のエンティティ属性。静的色より優先されます。",
+            "warning_threshold": "countdown 終了前にサーバーが警告プッシュを送信する秒数。空白のままにすると無効にします。countdown テンプレートのみ。",
+            "alarm": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+）。countdown テンプレートのみ。",
+            "step_labels": "各ステップのラベル。形式: 1=最初のステップ, 2=2番目のステップ。ステップ 1..total_steps をカバーする必要があります。steps テンプレートのみ。",
+            "step_rows": "各ステップの行高（1–10）、カンマ区切り。total_steps 個のエントリが必要です。steps テンプレートのみ。",
+            "fired_at_attribute": "alert が発火したときの Unix タイムスタンプを持つエンティティ属性。alert テンプレートのみ。",
+            "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。"
           }
         },
         "reconfigure": {

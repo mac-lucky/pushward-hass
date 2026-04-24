@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Ngưỡng",
           "description": "Đường tham chiếu ngang trên biểu đồ sparkline. Chỉ dành cho mẫu Timeline."
+        },
+        "sound": {
+          "name": "Âm Thanh",
+          "description": "Tên âm thanh thông báo cho bản cập nhật. Để trống để dùng âm thanh hệ thống iOS."
+        },
+        "priority": {
+          "name": "Ưu Tiên",
+          "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "background_color": {
+          "name": "Màu Nền",
+          "description": "Màu nền Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "text_color": {
+          "name": "Màu Chữ",
+          "description": "Màu chữ Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "warning_threshold": {
+          "name": "Ngưỡng Cảnh Báo",
+          "description": "Khi giá trị gauge hoặc timeline đạt hoặc vượt qua ngưỡng này, màu cảnh báo sẽ được hiển thị."
+        },
+        "alarm": {
+          "name": "Chuông Báo",
+          "description": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ hoạt động trên iOS 26+."
+        },
+        "step_labels": {
+          "name": "Nhãn Bước",
+          "description": "Nhãn tùy chỉnh cho các bước trong mẫu steps. Định dạng: 1=Nhãn, 2=Nhãn. Để trống để dùng số bước."
+        },
+        "step_rows": {
+          "name": "Số Hàng Bước",
+          "description": "Số bước hiển thị trong một hàng trong mẫu steps."
+        },
+        "fired_at": {
+          "name": "Thời Điểm Kích Hoạt",
+          "description": "Dấu thời gian Unix khi hoạt động được kích hoạt. Dùng để hiển thị thời gian tương đối."
+        },
+        "units": {
+          "name": "Đơn Vị",
+          "description": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%"
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Đẩy",
           "description": "Gửi dưới dạng APNs push alert đến tất cả thiết bị. Khi tắt, thông báo chỉ được lưu trong hộp thư."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL mở khi nhấn vào thông báo. Yêu cầu HTTPS."
+        },
+        "image_url": {
+          "name": "URL Hình Ảnh",
+          "description": "URL hình ảnh hiển thị trong thông báo. Yêu cầu HTTPS."
+        },
+        "icon_url": {
+          "name": "URL Biểu Tượng",
+          "description": "URL biểu tượng thông báo. Yêu cầu HTTPS."
+        },
+        "metadata": {
+          "name": "Dữ Liệu Phụ",
+          "description": "Dữ liệu meta dạng cặp khóa-giá trị bổ sung gửi kèm thông báo."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "URL Phụ",
             "ended_ttl": "Tự Động Xóa Sau Khi Kết Thúc (giây)",
-            "stale_ttl": "Tự Động Kết Thúc Khi Không Hoạt Động (giây)"
+            "stale_ttl": "Tự Động Kết Thúc Khi Không Hoạt Động (giây)",
+            "sound": "Âm Thanh",
+            "background_color": "Màu Nền",
+            "background_color_attribute": "Thuộc Tính Màu Nền",
+            "text_color": "Màu Chữ",
+            "text_color_attribute": "Thuộc Tính Màu Chữ",
+            "warning_threshold": "Ngưỡng Cảnh Báo",
+            "alarm": "Chuông Báo",
+            "step_labels": "Nhãn Bước",
+            "step_rows": "Số Hàng Bước",
+            "fired_at_attribute": "Thuộc Tính Thời Điểm Kích Hoạt",
+            "units": "Đơn Vị"
           },
           "data_description": {
             "start_states": "Trạng thái thực thể khởi động Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
@@ -333,7 +400,18 @@
             "url": "Liên kết mở khi nhấn vào Live Activity. Phải bắt đầu bằng http:// hoặc https://. Chỉ dành cho mẫu steps và alert.",
             "secondary_url": "Liên kết phụ cho Live Activity. Chỉ dành cho mẫu steps và alert.",
             "ended_ttl": "Số giây sau khi hoạt động kết thúc trước khi tự động xóa khỏi máy chủ. Để trống để giữ vô thời hạn. Ví dụ: 300",
-            "stale_ttl": "Số giây không hoạt động trước khi máy chủ tự động kết thúc hoạt động. Để trống để tắt. Ví dụ: 1800"
+            "stale_ttl": "Số giây không hoạt động trước khi máy chủ tự động kết thúc hoạt động. Để trống để tắt. Ví dụ: 1800",
+            "sound": "Tên âm thanh thông báo cho bản cập nhật này. Để trống để dùng âm thanh hệ thống iOS.",
+            "background_color": "Màu nền Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống.",
+            "background_color_attribute": "Thuộc tính thực thể cho màu nền động. Ghi đè màu nền tĩnh.",
+            "text_color": "Màu chữ Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống.",
+            "text_color_attribute": "Thuộc tính thực thể cho màu chữ động. Ghi đè màu chữ tĩnh.",
+            "warning_threshold": "Khi đạt hoặc vượt giá trị này, màu cảnh báo được kích hoạt. Mẫu gauge và timeline.",
+            "alarm": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ dành cho iOS 26+.",
+            "step_labels": "Nhãn tùy chỉnh cho các bước trong mẫu steps. Định dạng: 1=Nhãn, 2=Nhãn. Để trống để dùng số bước.",
+            "step_rows": "Số bước hiển thị trong một hàng trong mẫu steps.",
+            "fired_at_attribute": "Thuộc tính thực thể chứa dấu thời gian Unix khi kích hoạt. Dùng để hiển thị thời gian tương đối.",
+            "units": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%"
           }
         },
         "reconfigure": {

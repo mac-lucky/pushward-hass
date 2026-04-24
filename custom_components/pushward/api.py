@@ -24,7 +24,12 @@ class PushWardApiError(Exception):
 
 
 class PushWardAuthError(PushWardApiError):
-    """PushWard authentication error."""
+    """PushWard authentication error — 401, bad/expired integration key."""
+
+
+class PushWardForbiddenError(PushWardApiError):
+    """PushWard 403 — server-side policy rejection (subscription lapsed,
+    slug scope, shared-activity, etc.). Not an auth failure — do not reauth."""
 
 
 class PushWardApiClient:
@@ -85,13 +90,22 @@ class PushWardApiClient:
             handle_409=True,
         )
 
-    async def update_activity(self, slug: str, state: str, content: dict) -> None:
-        """Update an activity via PATCH /activity/{slug}."""
-        await self._request_with_retry(
-            "PATCH",
-            f"/activity/{slug}",
-            json={"state": state, "content": content},
-        )
+    async def update_activity(
+        self,
+        slug: str,
+        state: str,
+        content: dict,
+        *,
+        sound: str | None = None,
+        priority: int | None = None,
+    ) -> None:
+        """PATCH /activity/{slug} — sound and priority are top-level, not content fields."""
+        body: dict = {"state": state, "content": content}
+        if sound is not None:
+            body["sound"] = sound
+        if priority is not None:
+            body["priority"] = priority
+        await self._request_with_retry("PATCH", f"/activity/{slug}", json=body)
 
     async def delete_activity(self, slug: str) -> None:
         """Delete an activity via DELETE /activities/{slug}."""
@@ -177,12 +191,17 @@ class PushWardApiClient:
                                 status_code=resp.status,
                             )
 
-                        if resp.status in (
-                            HTTPStatus.UNAUTHORIZED,
-                            HTTPStatus.FORBIDDEN,
-                        ):
+                        if resp.status == HTTPStatus.UNAUTHORIZED:
                             raise PushWardAuthError(
                                 "Invalid integration key",
+                                status_code=resp.status,
+                            )
+
+                        if resp.status == HTTPStatus.FORBIDDEN:
+                            body = await resp.text()
+                            snippet = body[:200] + ("…" if len(body) > 200 else "")
+                            raise PushWardForbiddenError(
+                                snippet or "Forbidden",
                                 status_code=resp.status,
                             )
 

@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Schwellenwerte",
           "description": "Horizontale Referenzlinien in der Sparkline. Nur für die Vorlage 'timeline'."
+        },
+        "sound": {
+          "name": "Ton",
+          "description": "Benachrichtigungston, der bei diesem Update auf dem Gerät abgespielt wird."
+        },
+        "priority": {
+          "name": "Priorität überschreiben",
+          "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "background_color": {
+          "name": "Hintergrundfarbe",
+          "description": "Hintergrundfarbe der Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "text_color": {
+          "name": "Textfarbe",
+          "description": "Textfarbe der Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "warning_threshold": {
+          "name": "Warnschwelle",
+          "description": "Sekunden vor end_date, ab denen der Countdown in den Warnzustand wechselt. Nur für die Vorlage 'countdown'."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "AlarmKit-Alarm beim Ablauf des Countdowns auslösen (iOS 26+, nur für die Vorlage 'countdown')."
+        },
+        "step_labels": {
+          "name": "Schrittbeschriftungen",
+          "description": "Geordnete Liste der Schrittbeschriftungen. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
+        },
+        "step_rows": {
+          "name": "Schrittzeilenhöhen",
+          "description": "Geordnete Liste der Zeilenhöhen (1–10) pro Schritt. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
+        },
+        "fired_at": {
+          "name": "Ausgelöst um",
+          "description": "Unix-Zeitstempel, wann der Alert ausgelöst wurde. Nur für die Vorlage 'alert'."
+        },
+        "units": {
+          "name": "Einheitenzuordnung",
+          "description": "Einheitenbeschriftungen pro Datenreihe. Schlüssel müssen mit den Schlüsseln des value dict übereinstimmen. Nur für die Vorlage 'timeline'."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Als APNs-push-alert an alle Geräte senden. Ist diese Option deaktiviert, wird die Benachrichtigung nur im Posteingang gespeichert."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL, die beim Tippen auf die Benachrichtigung geöffnet wird."
+        },
+        "image_url": {
+          "name": "Bild-URL",
+          "description": "HTTPS-URL eines an die Benachrichtigung anzuhängenden Bilds."
+        },
+        "icon_url": {
+          "name": "Symbol-URL",
+          "description": "HTTPS-URL eines benutzerdefinierten Symbols pro Benachrichtigung."
+        },
+        "metadata": {
+          "name": "Metadaten",
+          "description": "Schlüssel-Wert-Paare mit zusätzlichen Metadaten der Benachrichtigung."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "Sekundäre URL",
             "ended_ttl": "Automatisch löschen nach Beendigung (Sekunden)",
-            "stale_ttl": "Automatisch beenden nach Inaktivität (Sekunden)"
+            "stale_ttl": "Automatisch beenden nach Inaktivität (Sekunden)",
+            "sound": "Ton",
+            "background_color": "Hintergrundfarbe",
+            "background_color_attribute": "Attribut für Hintergrundfarbe",
+            "text_color": "Textfarbe",
+            "text_color_attribute": "Attribut für Textfarbe",
+            "warning_threshold": "Warnschwelle (Sekunden)",
+            "alarm": "Alarm (iOS 26+)",
+            "step_labels": "Schrittbeschriftungen",
+            "step_rows": "Schrittzeilenhöhen",
+            "fired_at_attribute": "Attribut 'Ausgelöst um'",
+            "units": "Einheiten pro Datenreihe"
           },
           "data_description": {
             "start_states": "Entitätszustände, die die Live Activity starten. Aus der Liste wählen oder eigene Werte eingeben.",
@@ -333,7 +400,18 @@
             "url": "Beim Tippen auf die Live Activity geöffneter Link. Muss mit http:// oder https:// beginnen. Nur bei den Vorlagen 'steps' und 'alert'.",
             "secondary_url": "Sekundärer Link für die Live Activity. Nur bei den Vorlagen 'steps' und 'alert'.",
             "ended_ttl": "Sekunden nach dem Beenden der Live Activity, bevor sie automatisch vom Server gelöscht wird. Leer lassen, um unbegrenzt aufzubewahren. Beispiel: 300",
-            "stale_ttl": "Sekunden Inaktivität, bevor der Server die Live Activity automatisch beendet. Leer lassen, um zu deaktivieren. Beispiel: 1800"
+            "stale_ttl": "Sekunden Inaktivität, bevor der Server die Live Activity automatisch beendet. Leer lassen, um zu deaktivieren. Beispiel: 1800",
+            "sound": "Ton, der bei jedem Update für diese Entität abgespielt wird. Leer lassen, um keine Überschreibung zu verwenden.",
+            "background_color": "Hintergrundfarbe der Live Activity. Leer lassen für Standard.",
+            "background_color_attribute": "Entitätsattribut für dynamische Hintergrundfarbe. Überschreibt die statische Farbe. Unterstützt RGB, HS, XY, Kelvin, benannte Farben und Hex.",
+            "text_color": "Textfarbe der Live Activity. Leer lassen für Standard.",
+            "text_color_attribute": "Entitätsattribut für dynamische Textfarbe. Überschreibt die statische Farbe.",
+            "warning_threshold": "Sekunden vor Countdown-Ende, ab denen der Server einen Warn-Push sendet. Leer lassen, um zu deaktivieren. Nur für die Vorlage 'countdown'.",
+            "alarm": "AlarmKit-Alarm beim Ablauf des Countdowns auslösen (iOS 26+). Nur für die Vorlage 'countdown'.",
+            "step_labels": "Beschriftungen für jeden Schritt. Format: 1=Erster Schritt, 2=Zweiter Schritt. Muss Schritte 1..total_steps abdecken. Nur für die Vorlage 'steps'.",
+            "step_rows": "Zeilenhöhe (1–10) für jeden Schritt, kommagetrennt. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'.",
+            "fired_at_attribute": "Entitätsattribut mit dem Unix-Zeitstempel, wann der Alert ausgelöst wurde. Nur für die Vorlage 'alert'.",
+            "units": "Einheitenbeschriftungen pro Datenreihe. Format: Datenreihe=Einheit, Temperatur=°C, Luftfeuchtigkeit=%. Nur für die Vorlage 'timeline'."
           }
         },
         "reconfigure": {

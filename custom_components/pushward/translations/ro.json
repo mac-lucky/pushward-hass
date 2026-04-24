@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Praguri",
           "description": "Linii de referință orizontale pe sparkline. Numai pentru șablonul timeline."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "warning_threshold": {
+          "name": "Prag de avertizare",
+          "description": "Când valoarea gauge sau timeline atinge sau depășește această valoare, se afișează culoarea de avertizare."
+        },
+        "alarm": {
+          "name": "Alarmă",
+          "description": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Funcționează doar pe iOS 26+."
+        },
+        "step_labels": {
+          "name": "Etichete pași",
+          "description": "Etichete personalizate pentru pașii șablonului steps. Format: 1=Etichetă, 2=Etichetă. Gol folosește numerele pașilor."
+        },
+        "step_rows": {
+          "name": "Rânduri pași",
+          "description": "Numărul de pași afișați pe un rând în șablonul steps."
+        },
+        "fired_at": {
+          "name": "Timp declanșare",
+          "description": "Marca temporală Unix când activitatea a fost declanșată. Folosit pentru a afișa timpul relativ."
+        },
+        "units": {
+          "name": "Unități",
+          "description": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%"
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Trimiteți ca APNs push alert pe toate dispozitivele. Dacă este fals, notificarea este stocată doar în inbox."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL deschis la atingerea notificării. Necesită HTTPS."
+        },
+        "image_url": {
+          "name": "URL imagine",
+          "description": "URL-ul imaginii afișate în notificare. Necesită HTTPS."
+        },
+        "icon_url": {
+          "name": "URL pictogramă",
+          "description": "URL pentru pictograma notificării. Necesită HTTPS."
+        },
+        "metadata": {
+          "name": "Metadate",
+          "description": "Metadate suplimentare tip cheie-valoare trimise cu notificarea."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "URL secundar",
             "ended_ttl": "Ștergere automată după încheiere (secunde)",
-            "stale_ttl": "Încheiere automată după inactivitate (secunde)"
+            "stale_ttl": "Încheiere automată după inactivitate (secunde)",
+            "sound": "Sunet",
+            "background_color": "Culoare fundal",
+            "background_color_attribute": "Atribut culoare fundal",
+            "text_color": "Culoare text",
+            "text_color_attribute": "Atribut culoare text",
+            "warning_threshold": "Prag de avertizare",
+            "alarm": "Alarmă",
+            "step_labels": "Etichete pași",
+            "step_rows": "Rânduri pași",
+            "fired_at_attribute": "Atribut timp declanșare",
+            "units": "Unități"
           },
           "data_description": {
             "start_states": "Stările entității care pornesc Live Activity. Selectați din listă sau introduceți valori personalizate.",
@@ -333,7 +400,18 @@
             "url": "Linkul deschis la apăsarea Live Activity. Trebuie să înceapă cu http:// sau https://. Numai pentru șabloanele steps și alert.",
             "secondary_url": "Link secundar pentru Live Activity. Numai pentru șabloanele steps și alert.",
             "ended_ttl": "Secunde după încheierea activității înainte de a fi ștearsă automat de pe server. Lăsați gol pentru a păstra indefinit. Exemplu: 300",
-            "stale_ttl": "Secunde de inactivitate înainte ca serverul să încheie automat activitatea. Lăsați gol pentru a dezactiva. Exemplu: 1800"
+            "stale_ttl": "Secunde de inactivitate înainte ca serverul să încheie automat activitatea. Lăsați gol pentru a dezactiva. Exemplu: 1800",
+            "sound": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS.",
+            "background_color": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului.",
+            "background_color_attribute": "Atribut entitate pentru culoarea de fundal dinamică. Înlocuiește culoarea de fundal statică.",
+            "text_color": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului.",
+            "text_color_attribute": "Atribut entitate pentru culoarea textului dinamic. Înlocuiește culoarea textului static.",
+            "warning_threshold": "Când valoarea atinge sau depășește aceasta, colorarea de avertizare este declanșată. Șabloane gauge și timeline.",
+            "alarm": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Doar pentru iOS 26+.",
+            "step_labels": "Etichete personalizate pentru pașii șablonului steps. Format: 1=Etichetă, 2=Etichetă. Gol folosește numerele pașilor.",
+            "step_rows": "Numărul de pași afișați pe un rând în șablonul steps.",
+            "fired_at_attribute": "Atribut entitate care conține marca temporală Unix a declanșării. Folosit pentru afișarea timpului relativ.",
+            "units": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%"
           }
         },
         "reconfigure": {

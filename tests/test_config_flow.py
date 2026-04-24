@@ -14,8 +14,11 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import (
+    _details_schema,
     _hex_to_rgb,
     _parse_csv,
+    _parse_entity_input,
+    _parse_int_list,
     _parse_state_labels,
     _parse_thresholds,
     _rgb_to_hex,
@@ -25,11 +28,15 @@ from custom_components.pushward.config_flow import (
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
+    CONF_ALARM,
+    CONF_BACKGROUND_COLOR,
+    CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_DECIMALS,
     CONF_END_STATES,
     CONF_ENTITY_ID,
+    CONF_FIRED_AT_ATTRIBUTE,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -46,16 +53,23 @@ from custom_components.pushward.const import (
     CONF_SEVERITY,
     CONF_SLUG,
     CONF_SMOOTHING,
+    CONF_SOUND,
     CONF_START_STATES,
     CONF_STATE_LABELS,
+    CONF_STEP_LABELS,
+    CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
+    CONF_TEXT_COLOR,
+    CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
+    CONF_UNITS,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
     CONF_VALUE_ATTRIBUTE,
+    CONF_WARNING_THRESHOLD,
     DEFAULT_SERVER_URL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
@@ -1396,3 +1410,126 @@ async def test_subentry_timeline_template(hass: HomeAssistant) -> None:
     assert subentry_data[CONF_SMOOTHING] is True
     assert subentry_data[CONF_THRESHOLDS] == [{"value": 25.0, "color": "red", "label": "Hot"}]
     assert subentry_data[CONF_HISTORY_PERIOD] == 6
+
+
+# --- _details_schema new field tests ---
+
+
+def _schema_keys(schema: vol.Schema) -> set[str]:
+    """Extract string key names from a voluptuous schema."""
+    return {m.schema if hasattr(m, "schema") else m for m in schema.schema}
+
+
+def test_details_schema_common_has_sound_background_text_color() -> None:
+    """Common fields sound, background_color*, and text_color* appear in all templates."""
+    schema = _details_schema("binary_sensor.foo", "generic", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_SOUND in keys
+    assert CONF_BACKGROUND_COLOR in keys
+    assert CONF_BACKGROUND_COLOR_ATTRIBUTE in keys
+    assert CONF_TEXT_COLOR in keys
+    assert CONF_TEXT_COLOR_ATTRIBUTE in keys
+
+
+def test_details_schema_countdown_has_warning_threshold_and_alarm() -> None:
+    """Countdown template includes warning_threshold and alarm fields."""
+    schema = _details_schema("binary_sensor.foo", "countdown", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_WARNING_THRESHOLD in keys
+    assert CONF_ALARM in keys
+
+
+def test_details_schema_steps_has_step_labels_and_rows() -> None:
+    """Steps template includes step_labels and step_rows fields."""
+    schema = _details_schema("binary_sensor.foo", "steps", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_STEP_LABELS in keys
+    assert CONF_STEP_ROWS in keys
+
+
+def test_details_schema_alert_has_fired_at_attribute() -> None:
+    """Alert template includes fired_at_attribute field."""
+    schema = _details_schema("binary_sensor.foo", "alert", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_FIRED_AT_ATTRIBUTE in keys
+
+
+def test_details_schema_timeline_has_units() -> None:
+    """Timeline template includes units field."""
+    schema = _details_schema("sensor.temp", "timeline", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_UNITS in keys
+
+
+# --- _parse_int_list tests ---
+
+
+def test_parse_int_list_basic() -> None:
+    """Basic CSV of integers returns list of ints."""
+    assert _parse_int_list("1, 2, 3") == [1, 2, 3]
+
+
+def test_parse_int_list_skips_non_integers() -> None:
+    """Non-integer tokens are silently skipped."""
+    assert _parse_int_list("1, abc, 3") == [1, 3]
+
+
+def test_parse_int_list_empty_string_returns_empty() -> None:
+    """Empty string returns empty list."""
+    assert _parse_int_list("") == []
+
+
+# --- _parse_entity_input new field tests ---
+
+
+def _base_user_input(**overrides) -> dict:
+    """Minimal valid user_input for _parse_entity_input."""
+    data = {
+        CONF_ENTITY_ID: "binary_sensor.foo",
+        CONF_TEMPLATE: "generic",
+        CONF_SLUG: "ha-foo",
+        CONF_ACTIVITY_NAME: "Foo",
+        CONF_START_STATES: ["on"],
+        CONF_END_STATES: ["off"],
+        CONF_PRIORITY: 1,
+        CONF_UPDATE_INTERVAL: 5,
+    }
+    data.update(overrides)
+    return data
+
+
+def test_parse_entity_input_step_labels_parsed_to_dict() -> None:
+    """step_labels CSV is parsed into a dict."""
+    result = _parse_entity_input(_base_user_input(**{CONF_STEP_LABELS: "1=Init, 2=Build"}))
+    assert result[CONF_STEP_LABELS] == {"1": "Init", "2": "Build"}
+
+
+def test_parse_entity_input_step_rows_parsed_to_int_list() -> None:
+    """step_rows CSV is parsed into a list of ints."""
+    result = _parse_entity_input(_base_user_input(**{CONF_STEP_ROWS: "1, 2, 3"}))
+    assert result[CONF_STEP_ROWS] == [1, 2, 3]
+
+
+def test_parse_entity_input_units_parsed_to_dict() -> None:
+    """units CSV is parsed into a dict."""
+    result = _parse_entity_input(_base_user_input(**{CONF_UNITS: "Temp=°C, Humidity=%"}))
+    assert result[CONF_UNITS] == {"Temp": "°C", "Humidity": "%"}
+
+
+def test_parse_entity_input_alarm_stored_as_bool() -> None:
+    """alarm=True is stored as True; omitted defaults to False."""
+    result_true = _parse_entity_input(_base_user_input(**{CONF_ALARM: True}))
+    assert result_true[CONF_ALARM] is True
+
+    result_false = _parse_entity_input(_base_user_input())
+    assert result_false[CONF_ALARM] is False
+
+
+def test_parse_entity_input_warning_threshold_int_or_none() -> None:
+    """warning_threshold is stored as int when provided, None when omitted."""
+    result_with = _parse_entity_input(_base_user_input(**{CONF_WARNING_THRESHOLD: 30}))
+    assert result_with[CONF_WARNING_THRESHOLD] == 30
+    assert isinstance(result_with[CONF_WARNING_THRESHOLD], int)
+
+    result_without = _parse_entity_input(_base_user_input())
+    assert result_without[CONF_WARNING_THRESHOLD] is None

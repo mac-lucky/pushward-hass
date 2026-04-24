@@ -10,6 +10,7 @@ from custom_components.pushward.api import (
     PushWardApiClient,
     PushWardApiError,
     PushWardAuthError,
+    PushWardForbiddenError,
 )
 from custom_components.pushward.const import MAX_CONCURRENT_REQUESTS
 
@@ -354,3 +355,116 @@ async def test_semaphore_caps_concurrency(mock_sleep):
 
     assert peak <= MAX_CONCURRENT_REQUESTS
     assert session.request.call_count == 10
+
+
+# --- 403 demux ---
+
+
+async def test_forbidden_403_subscription_raises_forbidden():
+    resp = _mock_response(403, text="account owner's subscription is not active")
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardForbiddenError) as excinfo:
+        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+
+    assert "subscription" in str(excinfo.value)
+    assert excinfo.value.status_code == 403
+
+
+async def test_forbidden_403_slug_scope_raises_forbidden():
+    resp = _mock_response(403, text="key not allowed for this activity")
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardForbiddenError) as excinfo:
+        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+
+    assert excinfo.value.status_code == 403
+
+
+async def test_forbidden_403_with_empty_body_still_raises_forbidden():
+    resp = _mock_response(403, text="")
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardForbiddenError) as excinfo:
+        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+
+    assert "Forbidden" in str(excinfo.value)
+    assert excinfo.value.status_code == 403
+
+
+async def test_unauthorized_401_still_raises_auth_error():
+    resp = _mock_response(401)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardAuthError):
+        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+
+
+# --- sound / priority top-level fields ---
+
+
+async def test_update_activity_sends_sound_top_level():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("slug", "ONGOING", {"template": "generic"}, sound="chime")
+
+    body = session.request.call_args[1]["json"]
+    assert body == {"state": "ONGOING", "content": {"template": "generic"}, "sound": "chime"}
+
+
+async def test_update_activity_sends_priority_top_level():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("slug", "ONGOING", {"template": "generic"}, priority=7)
+
+    body = session.request.call_args[1]["json"]
+    assert body == {"state": "ONGOING", "content": {"template": "generic"}, "priority": 7}
+
+
+async def test_update_activity_sends_both_sound_and_priority():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("slug", "ONGOING", {"template": "generic"}, sound="chime", priority=7)
+
+    body = session.request.call_args[1]["json"]
+    assert body == {"state": "ONGOING", "content": {"template": "generic"}, "sound": "chime", "priority": 7}
+
+
+async def test_update_activity_omits_sound_when_none():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("slug", "ONGOING", {"template": "generic"})
+
+    body = session.request.call_args[1]["json"]
+    assert "sound" not in body
+
+
+async def test_update_activity_omits_priority_when_none():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("slug", "ONGOING", {"template": "generic"})
+
+    body = session.request.call_args[1]["json"]
+    assert "priority" not in body
+
+
+# --- exception hierarchy ---
+
+
+def test_forbidden_exception_is_subclass_of_api_error():
+    assert issubclass(PushWardForbiddenError, PushWardApiError)
+    assert not issubclass(PushWardForbiddenError, PushWardAuthError)

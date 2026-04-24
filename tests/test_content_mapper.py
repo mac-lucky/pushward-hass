@@ -8,9 +8,13 @@ import voluptuous as vol
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
+    CONF_ALARM,
+    CONF_BACKGROUND_COLOR,
+    CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_DECIMALS,
+    CONF_FIRED_AT_ATTRIBUTE,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_MAX_VALUE,
@@ -23,13 +27,18 @@ from custom_components.pushward.const import (
     CONF_SEVERITY,
     CONF_SMOOTHING,
     CONF_STATE_LABELS,
+    CONF_STEP_LABELS,
+    CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
+    CONF_TEXT_COLOR,
     CONF_THRESHOLDS,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
+    CONF_UNITS,
     CONF_URL,
     CONF_VALUE_ATTRIBUTE,
+    CONF_WARNING_THRESHOLD,
     normalize_slug,
     validate_slug,
 )
@@ -41,6 +50,7 @@ from custom_components.pushward.content_mapper import (
     sanitize_slug,
 )
 
+from .conftest import make_entity_config
 from .conftest import make_mock_state as _make_state
 
 # --- sanitize_slug ---
@@ -1373,3 +1383,374 @@ def test_map_completion_content_timeline_no_last_content():
 
     assert "value" not in content
     assert content["state"] == "Complete"
+
+
+# --- New field tests ---
+
+# Countdown: warning_threshold
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_emits_warning_threshold(mock_time):
+    mock_time.time.return_value = 1000.0
+    state = _make_state("active", {"remaining": 120})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ATTR: "remaining",
+            CONF_WARNING_THRESHOLD: 30,
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["warning_threshold"] == 30
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_omits_warning_threshold_when_not_configured(mock_time):
+    mock_time.time.return_value = 1000.0
+    state = _make_state("active", {"remaining": 120})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ATTR: "remaining",
+            CONF_WARNING_THRESHOLD: None,
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "warning_threshold" not in content
+
+
+# Countdown: alarm
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_emits_alarm_true_when_configured(mock_time):
+    mock_time.time.return_value = 1000.0
+    state = _make_state("active", {"remaining": 60})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ATTR: "remaining",
+            CONF_ALARM: True,
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["alarm"] is True
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_omits_alarm_when_false(mock_time):
+    mock_time.time.return_value = 1000.0
+    state = _make_state("active", {"remaining": 60})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ATTR: "remaining",
+            CONF_ALARM: False,
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "alarm" not in content
+
+
+# Countdown: start_date
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_emits_start_date_when_remaining_present(mock_time):
+    mock_time.time.return_value = 5000.0
+    state = _make_state("active", {"remaining": 120})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ATTR: "remaining",
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["start_date"] == 5000
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_omits_start_date_when_no_remaining_time_attr(mock_time):
+    mock_time.time.return_value = 5000.0
+    state = _make_state("active", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ATTR: "",
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "start_date" not in content
+
+
+# Steps: step_labels
+
+
+def test_steps_emits_step_labels_as_ordered_list():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_LABELS: {"1": "Init", "2": "Build", "3": "Deploy"},
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_labels"] == ["Init", "Build", "Deploy"]
+
+
+def test_steps_step_labels_fills_missing_indices_with_empty_string():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_LABELS: {"1": "Init", "3": "Deploy"},
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_labels"] == ["Init", "", "Deploy"]
+
+
+def test_steps_omits_step_labels_when_all_empty():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_LABELS: {},
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "step_labels" not in content
+
+
+# Steps: step_rows
+
+
+def test_steps_emits_step_rows_matching_total():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_ROWS: [1, 2, 3],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_rows"] == [1, 2, 3]
+
+
+def test_steps_step_rows_clamps_to_one_ten():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_ROWS: [0, 5, 99],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_rows"] == [1, 5, 10]
+
+
+def test_steps_step_rows_omitted_when_length_mismatch():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_ROWS: [1, 2],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "step_rows" not in content
+
+
+# Alert: fired_at
+
+
+def test_alert_emits_fired_at_from_attribute():
+    state = _make_state("firing", {"triggered_at": 1700000000})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "alert",
+            CONF_FIRED_AT_ATTRIBUTE: "triggered_at",
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["fired_at"] == 1700000000
+
+
+def test_alert_omits_fired_at_when_attribute_missing():
+    state = _make_state("firing", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "alert",
+            CONF_FIRED_AT_ATTRIBUTE: "missing_attr",
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "fired_at" not in content
+
+
+def test_alert_omits_fired_at_when_unparseable():
+    state = _make_state("firing", {"triggered_at": "not-a-number"})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "alert",
+            CONF_FIRED_AT_ATTRIBUTE: "triggered_at",
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "fired_at" not in content
+
+
+def test_alert_fired_at_coerces_float_to_int():
+    state = _make_state("firing", {"triggered_at": 1700000000.5})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "alert",
+            CONF_FIRED_AT_ATTRIBUTE: "triggered_at",
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["fired_at"] == 1700000000
+
+
+# Timeline: units
+
+
+def test_timeline_emits_units_dict():
+    state = _make_state(
+        "22.5",
+        {"friendly_name": "Thermostat", "current_temperature": 22.5, "target_temperature": 21.0},
+    )
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "timeline",
+            CONF_SERIES: {"current_temperature": "Current", "target_temperature": "Target"},
+            CONF_UNITS: {"Current": "°C", "Target": "°C"},
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["units"] == {"Current": "°C", "Target": "°C"}
+
+
+def test_timeline_omits_units_when_empty():
+    state = _make_state("22.5", {"friendly_name": "Sensor"})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "timeline",
+            CONF_UNITS: {},
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "units" not in content
+
+
+def test_timeline_completion_carries_units():
+    last_content = {
+        "value": {"Temp": 22.5},
+        "units": {"Temp": "°C"},
+        "template": "timeline",
+    }
+    config = make_entity_config(**{CONF_TEMPLATE: "timeline"})
+
+    content = map_completion_content(config, last_content=last_content)
+
+    assert content["units"] == {"Temp": "°C"}
+
+
+# Common colors: background_color and text_color
+
+
+def test_common_background_color_static():
+    state = _make_state("on", {"friendly_name": "Lamp"})
+    config = make_entity_config(**{CONF_BACKGROUND_COLOR: "#1a2b3c"})
+
+    content = map_content(state, config)
+
+    assert content["background_color"] == "#1a2b3c"
+
+
+def test_common_background_color_from_attribute():
+    state = _make_state("on", {"friendly_name": "Lamp", "bg": "#ff0000"})
+    config = make_entity_config(**{CONF_BACKGROUND_COLOR_ATTRIBUTE: "bg"})
+
+    content = map_content(state, config)
+
+    assert content["background_color"] == "#ff0000"
+
+
+def test_common_text_color_static():
+    state = _make_state("on", {"friendly_name": "Lamp"})
+    config = make_entity_config(**{CONF_TEXT_COLOR: "#ffffff"})
+
+    content = map_content(state, config)
+
+    assert content["text_color"] == "#ffffff"
+
+
+def test_common_omits_colors_when_not_set():
+    state = _make_state("on", {"friendly_name": "Lamp"})
+    config = make_entity_config(**{CONF_BACKGROUND_COLOR: "", CONF_TEXT_COLOR: ""})
+
+    content = map_content(state, config)
+
+    assert "background_color" not in content
+    assert "text_color" not in content
+
+
+@pytest.mark.parametrize("template", ["generic", "countdown"])
+def test_completion_carries_background_and_text_color_all_templates(template):
+    last_content = {
+        "template": template,
+        "background_color": "#fff",
+        "text_color": "red",
+        "progress": 0.5,
+        "subtitle": "test",
+    }
+    config = make_entity_config(**{CONF_TEMPLATE: template})
+
+    content = map_completion_content(config, last_content=last_content)
+
+    assert content["background_color"] == "#fff"
+    assert content["text_color"] == "red"

@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Limites",
           "description": "Linhas de referência horizontais no sparkline. Apenas para o modelo timeline."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "warning_threshold": {
+          "name": "Limite de Aviso",
+          "description": "Segundos antes de end_date quando o countdown entra no estado de aviso. Apenas para o modelo countdown."
+        },
+        "alarm": {
+          "name": "Alarme",
+          "description": "Acionar alarme AlarmKit ao expirar o countdown (iOS 26+, apenas para o modelo countdown)."
+        },
+        "step_labels": {
+          "name": "Rótulos de Etapas",
+          "description": "Lista ordenada de rótulos de etapas. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "step_rows": {
+          "name": "Alturas de Linha das Etapas",
+          "description": "Lista ordenada de alturas de linha (1-10) por etapa. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "fired_at": {
+          "name": "Disparado em",
+          "description": "Timestamp Unix quando o alert foi disparado. Apenas para o modelo alert."
+        },
+        "units": {
+          "name": "Mapa de Unidades",
+          "description": "Rótulos de unidades por série. As chaves devem corresponder às chaves do value dict. Apenas para o modelo timeline."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Enviar como push alert APNs para todos os dispositivos. Quando falso, a notificação é armazenada apenas na caixa de entrada."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL a abrir ao tocar na notificação."
+        },
+        "image_url": {
+          "name": "URL da Imagem",
+          "description": "URL HTTPS de uma imagem para anexar à notificação."
+        },
+        "icon_url": {
+          "name": "URL do Ícone",
+          "description": "URL HTTPS de um ícone personalizado por notificação."
+        },
+        "metadata": {
+          "name": "Metadados",
+          "description": "Pares chave-valor de metadados adicionais anexados à notificação."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "URL Secundária",
             "ended_ttl": "Exclusão Automática Após Término (segundos)",
-            "stale_ttl": "Encerramento Automático por Inatividade (segundos)"
+            "stale_ttl": "Encerramento Automático por Inatividade (segundos)",
+            "sound": "Som",
+            "background_color": "Cor de Fundo",
+            "background_color_attribute": "Atributo de Cor de Fundo",
+            "text_color": "Cor do Texto",
+            "text_color_attribute": "Atributo de Cor do Texto",
+            "warning_threshold": "Limite de Aviso (segundos)",
+            "alarm": "Alarme (iOS 26+)",
+            "step_labels": "Rótulos de Etapas",
+            "step_rows": "Alturas de Linha das Etapas",
+            "fired_at_attribute": "Atributo de Disparo",
+            "units": "Unidades por Série"
           },
           "data_description": {
             "start_states": "Estados da entidade que iniciam a Live Activity. Selecione na lista ou digite valores personalizados.",
@@ -333,7 +400,18 @@
             "url": "Link aberto ao tocar na Live Activity. Deve começar com http:// ou https://. Apenas para os modelos steps e alert.",
             "secondary_url": "Link secundário para a Live Activity. Apenas para os modelos steps e alert.",
             "ended_ttl": "Segundos após o encerramento da atividade antes de ser excluída automaticamente do servidor. Deixe vazio para manter indefinidamente. Exemplo: 300",
-            "stale_ttl": "Segundos de inatividade antes de o servidor encerrar automaticamente a atividade. Deixe vazio para desativar. Exemplo: 1800"
+            "stale_ttl": "Segundos de inatividade antes de o servidor encerrar automaticamente a atividade. Deixe vazio para desativar. Exemplo: 1800",
+            "sound": "Som reproduzido em cada atualização para esta entidade. Deixe vazio para não usar substituição.",
+            "background_color": "Cor de fundo da Live Activity. Deixe vazio para o padrão.",
+            "background_color_attribute": "Atributo da entidade para cor de fundo dinâmica. Substitui a cor estática. Suporta RGB, HS, XY, Kelvin, cores nomeadas e hexadecimal.",
+            "text_color": "Cor do texto da Live Activity. Deixe vazio para o padrão.",
+            "text_color_attribute": "Atributo da entidade para cor do texto dinâmica. Substitui a cor estática.",
+            "warning_threshold": "Segundos antes do fim do countdown quando o servidor envia um push de aviso. Deixe vazio para desativar. Apenas para o modelo countdown.",
+            "alarm": "Acionar alarme AlarmKit ao expirar o countdown (iOS 26+). Apenas para o modelo countdown.",
+            "step_labels": "Rótulos para cada etapa. Formato: 1=Primeira Etapa, 2=Segunda Etapa. Deve cobrir as etapas 1..total_steps. Apenas para o modelo steps.",
+            "step_rows": "Altura de linha (1–10) para cada etapa, separada por vírgulas. Deve ter total_steps entradas. Apenas para o modelo steps.",
+            "fired_at_attribute": "Atributo da entidade com o timestamp Unix de quando o alert foi disparado. Apenas para o modelo alert.",
+            "units": "Rótulos de unidades por série. Formato: RótuloSérie=unidade, Temperatura=°C, Umidade=%. Apenas para o modelo timeline."
           }
         },
         "reconfigure": {

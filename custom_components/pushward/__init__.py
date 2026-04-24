@@ -6,6 +6,7 @@ import logging
 from functools import partial
 
 import aiohttp
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -22,6 +23,7 @@ from .const import (
     NOTIFICATION_LEVELS,
     SCALES,
     SEVERITIES,
+    SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     validate_slug,
     validate_url,
@@ -30,6 +32,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
+# sound and priority are top-level PATCH fields, not content — do not add here.
 _CONTENT_FIELDS = [
     "template",
     "progress",
@@ -43,14 +46,20 @@ _CONTENT_FIELDS = [
     "url",
     "secondary_url",
     "end_date",
+    "warning_threshold",
+    "alarm",
     "total_steps",
     "current_step",
+    "step_labels",
+    "step_rows",
     "severity",
+    "fired_at",
     "completion_message",
     "value",
     "min_value",
     "max_value",
     "unit",
+    "units",
     "scale",
     "decimals",
     "smoothing",
@@ -91,6 +100,14 @@ SCHEMA_UPDATE_ACTIVITY = vol.Schema(
         vol.Optional("decimals"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
         vol.Optional("smoothing"): bool,
         vol.Optional("thresholds"): list,
+        vol.Optional("sound"): vol.In(SOUNDS),
+        vol.Optional("priority"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
+        vol.Optional("warning_threshold"): vol.All(vol.Coerce(int), vol.Range(min=0)),
+        vol.Optional("alarm"): cv.boolean,
+        vol.Optional("step_labels"): list,
+        vol.Optional("step_rows"): list,
+        vol.Optional("fired_at"): vol.Coerce(int),
+        vol.Optional("units"): dict,
     }
 )
 
@@ -158,7 +175,9 @@ async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) 
             # Map state_text -> state for the API
             key = "state" if field == "state_text" else field
             content[key] = call.data[field]
-    await api.update_activity(slug, state, content)
+    sound = call.data.get("sound") or None
+    priority_override = call.data.get("priority")
+    await api.update_activity(slug, state, content, sound=sound, priority=priority_override)
 
 
 async def _async_handle_create_activity(hass: HomeAssistant, call: ServiceCall) -> None:

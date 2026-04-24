@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Eşikler",
           "description": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Yalnızca timeline şablonu."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "warning_threshold": {
+          "name": "Uyarı Eşiği",
+          "description": "Gauge veya timeline değerinin bu değere ulaşması veya aşması durumunda uyarı rengi gösterilir."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "Uyarı eşiği aşıldığında AlarmKit alarmını tetikler. Yalnızca iOS 26+ üzerinde çalışır."
+        },
+        "step_labels": {
+          "name": "Adım Etiketleri",
+          "description": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır."
+        },
+        "step_rows": {
+          "name": "Adım Satırları",
+          "description": "Steps şablonunda bir satırda gösterilecek adım sayısı."
+        },
+        "fired_at": {
+          "name": "Tetiklenme Zamanı",
+          "description": "Aktivitenin tetiklendiği Unix zaman damgası. Gösterilecek göreceli zaman için kullanılır."
+        },
+        "units": {
+          "name": "Birimler",
+          "description": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%"
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Gönder",
           "description": "Tüm cihazlara APNs push alert olarak gönder. False olduğunda bildirim yalnızca gelen kutusunda saklanır."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Bildirime dokunulduğunda açılacak URL. HTTPS gereklidir."
+        },
+        "image_url": {
+          "name": "Görsel URL",
+          "description": "Bildirimde gösterilecek görsel URL'si. HTTPS gereklidir."
+        },
+        "icon_url": {
+          "name": "Simge URL'si",
+          "description": "Bildirim simgesi için URL. HTTPS gereklidir."
+        },
+        "metadata": {
+          "name": "Meta Veri",
+          "description": "Bildirimle gönderilecek ek anahtar-değer çifti meta verisi."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "İkincil URL",
             "ended_ttl": "Bitişten Sonra Otomatik Sil (saniye)",
-            "stale_ttl": "Hareketsizlikte Otomatik Sonlandır (saniye)"
+            "stale_ttl": "Hareketsizlikte Otomatik Sonlandır (saniye)",
+            "sound": "Ses",
+            "background_color": "Arka Plan Rengi",
+            "background_color_attribute": "Arka Plan Rengi Niteliği",
+            "text_color": "Metin Rengi",
+            "text_color_attribute": "Metin Rengi Niteliği",
+            "warning_threshold": "Uyarı Eşiği",
+            "alarm": "Alarm",
+            "step_labels": "Adım Etiketleri",
+            "step_rows": "Adım Satırları",
+            "fired_at_attribute": "Tetiklenme Zamanı Niteliği",
+            "units": "Birimler"
           },
           "data_description": {
             "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin.",
@@ -333,7 +400,18 @@
             "url": "Live Activity'ye dokunulduğunda açılan bağlantı. http:// veya https:// ile başlamalıdır. Yalnızca steps ve alert şablonları.",
             "secondary_url": "Live Activity için ikincil bağlantı. Yalnızca steps ve alert şablonları.",
             "ended_ttl": "Aktivite sona erdikten kaç saniye sonra sunucudan otomatik silineceği. Süresiz tutmak için boş bırakın. Örnek: 300",
-            "stale_ttl": "Sunucunun aktiviteyi otomatik sonlandırmasından önceki hareketsizlik süresi (saniye). Devre dışı bırakmak için boş bırakın. Örnek: 1800"
+            "stale_ttl": "Sunucunun aktiviteyi otomatik sonlandırmasından önceki hareketsizlik süresi (saniye). Devre dışı bırakmak için boş bırakın. Örnek: 1800",
+            "sound": "Bu güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın.",
+            "background_color": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
+            "background_color_attribute": "Dinamik arka plan rengi için varlık niteliği. Statik arka plan rengini geçersiz kılar.",
+            "text_color": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
+            "text_color_attribute": "Dinamik metin rengi için varlık niteliği. Statik metin rengini geçersiz kılar.",
+            "warning_threshold": "Bu değere ulaşıldığında veya aşıldığında uyarı renklendirmesi tetiklenir. Gauge ve timeline şablonları.",
+            "alarm": "Uyarı eşiği aşıldığında AlarmKit alarmını tetikler. Yalnızca iOS 26+.",
+            "step_labels": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır.",
+            "step_rows": "Steps şablonunda bir satırda gösterilecek adım sayısı.",
+            "fired_at_attribute": "Tetiklenme Unix zaman damgasını tutan varlık niteliği. Göreceli zaman görüntüsü için kullanılır.",
+            "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%"
           }
         },
         "reconfigure": {

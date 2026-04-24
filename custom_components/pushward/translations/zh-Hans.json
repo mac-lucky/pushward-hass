@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "阈值",
           "description": "迷你图上的水平参考线。仅适用于 timeline 模板。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "warning_threshold": {
+          "name": "警告阈值",
+          "description": "倒计时进入警告状态前距 end_date 的秒数。仅适用于 countdown 模板。"
+        },
+        "alarm": {
+          "name": "闹钟",
+          "description": "在倒计时到期时触发 AlarmKit 闹钟（iOS 26+，仅适用于 countdown 模板）。"
+        },
+        "step_labels": {
+          "name": "步骤标签",
+          "description": "步骤标签的有序列表。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "step_rows": {
+          "name": "步骤行高",
+          "description": "每个步骤的行高（1-10）有序列表。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "fired_at": {
+          "name": "触发时间",
+          "description": "告警触发时的 Unix 时间戳。仅适用于 alert 模板。"
+        },
+        "units": {
+          "name": "单位映射",
+          "description": "每个系列的单位标签。键必须与 value dict 的键匹配。仅适用于 timeline 模板。"
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "推送",
           "description": "作为 APNs 推送 alert 发送到所有设备。为 false 时，通知仅存储在收件箱中。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "点击通知时打开的 URL。"
+        },
+        "image_url": {
+          "name": "图片 URL",
+          "description": "附加到通知的图片的 HTTPS URL。"
+        },
+        "icon_url": {
+          "name": "图标 URL",
+          "description": "每条通知自定义图标的 HTTPS URL。"
+        },
+        "metadata": {
+          "name": "元数据",
+          "description": "附加到通知的额外元数据键值对。"
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "次要 URL",
             "ended_ttl": "结束后自动删除（秒）",
-            "stale_ttl": "空闲后自动结束（秒）"
+            "stale_ttl": "空闲后自动结束（秒）",
+            "sound": "声音",
+            "background_color": "背景颜色",
+            "background_color_attribute": "背景颜色属性",
+            "text_color": "文字颜色",
+            "text_color_attribute": "文字颜色属性",
+            "warning_threshold": "警告阈值（秒）",
+            "alarm": "闹钟（iOS 26+）",
+            "step_labels": "步骤标签",
+            "step_rows": "步骤行高",
+            "fired_at_attribute": "触发时间属性",
+            "units": "每系列单位"
           },
           "data_description": {
             "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
@@ -333,7 +400,18 @@
             "url": "点击 Live Activity 时打开的链接。必须以 http:// 或 https:// 开头。仅适用于 steps 和 alert 模板。",
             "secondary_url": "Live Activity 的次要链接。仅适用于 steps 和 alert 模板。",
             "ended_ttl": "活动结束后从服务器自动删除前等待的秒数。留空则永久保留。示例：300",
-            "stale_ttl": "服务器自动结束活动前的空闲秒数。留空则禁用。示例：1800"
+            "stale_ttl": "服务器自动结束活动前的空闲秒数。留空则禁用。示例：1800",
+            "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
+            "background_color": "Live Activity 的背景颜色。留空则使用默认颜色。",
+            "background_color_attribute": "动态背景颜色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
+            "text_color": "Live Activity 的文字颜色。留空则使用默认颜色。",
+            "text_color_attribute": "动态文字颜色的实体属性。覆盖静态颜色。",
+            "warning_threshold": "倒计时结束前服务器发送警告推送的秒数。留空则禁用。仅适用于 countdown 模板。",
+            "alarm": "倒计时到期时触发 AlarmKit 闹钟（iOS 26+）。仅适用于 countdown 模板。",
+            "step_labels": "每个步骤的标签。格式：1=第一步, 2=第二步。必须覆盖步骤 1..total_steps。仅适用于 steps 模板。",
+            "step_rows": "每个步骤的行高（1–10），以逗号分隔。必须有 total_steps 个条目。仅适用于 steps 模板。",
+            "fired_at_attribute": "持有告警触发时 Unix 时间戳的实体属性。仅适用于 alert 模板。",
+            "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。"
           }
         },
         "reconfigure": {

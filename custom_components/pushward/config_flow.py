@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from collections.abc import Mapping
 from typing import Any
@@ -36,12 +37,16 @@ from .const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
+    CONF_ALARM,
+    CONF_BACKGROUND_COLOR,
+    CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_DECIMALS,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
+    CONF_FIRED_AT_ATTRIBUTE,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -58,17 +63,24 @@ from .const import (
     CONF_SEVERITY,
     CONF_SLUG,
     CONF_SMOOTHING,
+    CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
     CONF_STATE_LABELS,
+    CONF_STEP_LABELS,
+    CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TEMPLATE,
+    CONF_TEXT_COLOR,
+    CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
+    CONF_UNITS,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
     CONF_VALUE_ATTRIBUTE,
+    CONF_WARNING_THRESHOLD,
     DEFAULT_DECIMALS,
     DEFAULT_HISTORY_PERIOD,
     DEFAULT_MAX_VALUE,
@@ -88,10 +100,12 @@ from .const import (
     PRIORITY_MIN,
     SCALES,
     SEVERITIES,
+    SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     TEMPLATES,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
+    WARNING_THRESHOLD_MAX,
     normalize_slug,
     validate_url,
 )
@@ -281,12 +295,9 @@ def _details_schema(
     attr_selector = AttributeSelector(AttributeSelectorConfig(entity_id=entity_id))
 
     # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
-    accent_rgb = _hex_to_rgb(d.get(CONF_ACCENT_COLOR, ""))
-    accent_key = (
-        vol.Optional(CONF_ACCENT_COLOR, default=accent_rgb)
-        if accent_rgb is not None
-        else vol.Optional(CONF_ACCENT_COLOR)
-    )
+    accent_key = _color_vol_key(CONF_ACCENT_COLOR, d)
+    bg_color_key = _color_vol_key(CONF_BACKGROUND_COLOR, d)
+    text_color_key = _color_vol_key(CONF_TEXT_COLOR, d)
 
     # TTL defaults: only set default when valid value exists
     ended_ttl_val = d.get(CONF_ENDED_TTL)
@@ -350,6 +361,18 @@ def _details_schema(
                 description={"suggested_value": d.get(CONF_CURRENT_STEP_ATTR, "")},
             )
         ] = attr_selector
+        fields[
+            vol.Optional(
+                CONF_STEP_LABELS,
+                default=d.get(CONF_STEP_LABELS, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_STEP_ROWS,
+                default=d.get(CONF_STEP_ROWS, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
     if template == "alert":
         fields[
             vol.Optional(
@@ -362,6 +385,12 @@ def _details_schema(
                 mode=SelectSelectorMode.DROPDOWN,
             )
         )
+        fields[
+            vol.Optional(
+                CONF_FIRED_AT_ATTRIBUTE,
+                description={"suggested_value": d.get(CONF_FIRED_AT_ATTRIBUTE, "")},
+            )
+        ] = attr_selector
     if template == "gauge":
         fields[
             vol.Optional(
@@ -392,6 +421,12 @@ def _details_schema(
             vol.Optional(
                 CONF_SERIES,
                 default=d.get(CONF_SERIES, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_UNITS,
+                default=d.get(CONF_UNITS, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
         fields[
@@ -477,6 +512,17 @@ def _details_schema(
     ] = vol.All(vol.Coerce(int), vol.Range(min=PRIORITY_MIN, max=PRIORITY_MAX))
     fields[
         vol.Optional(
+            CONF_SOUND,
+            default=d.get(CONF_SOUND, ""),
+        )
+    ] = SelectSelector(
+        SelectSelectorConfig(
+            options=["", *list(SOUNDS)],
+            mode=SelectSelectorMode.DROPDOWN,
+        )
+    )
+    fields[
+        vol.Optional(
             CONF_UPDATE_INTERVAL,
             default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         )
@@ -502,11 +548,44 @@ def _details_schema(
                 default=d.get(CONF_COMPLETION_MESSAGE, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_WARNING_THRESHOLD,
+                description={"suggested_value": d.get(CONF_WARNING_THRESHOLD)},
+            )
+        ] = NumberSelector(
+            NumberSelectorConfig(
+                min=0,
+                max=WARNING_THRESHOLD_MAX,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement="seconds",
+            )
+        )
+        fields[
+            vol.Optional(
+                CONF_ALARM,
+                default=d.get(CONF_ALARM, False),
+            )
+        ] = BooleanSelector()
     fields[accent_key] = ColorRGBSelector()
     fields[
         vol.Optional(
             CONF_ACCENT_COLOR_ATTRIBUTE,
             description={"suggested_value": d.get(CONF_ACCENT_COLOR_ATTRIBUTE, "")},
+        )
+    ] = attr_selector
+    fields[bg_color_key] = ColorRGBSelector()
+    fields[
+        vol.Optional(
+            CONF_BACKGROUND_COLOR_ATTRIBUTE,
+            description={"suggested_value": d.get(CONF_BACKGROUND_COLOR_ATTRIBUTE, "")},
+        )
+    ] = attr_selector
+    fields[text_color_key] = ColorRGBSelector()
+    fields[
+        vol.Optional(
+            CONF_TEXT_COLOR_ATTRIBUTE,
+            description={"suggested_value": d.get(CONF_TEXT_COLOR_ATTRIBUTE, "")},
         )
     ] = attr_selector
     if template in ("steps", "alert"):
@@ -639,6 +718,19 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_SMOOTHING: user_input.get(CONF_SMOOTHING, False),
         CONF_THRESHOLDS: thresholds,
         CONF_HISTORY_PERIOD: int(history_period_raw) if history_period_raw is not None else DEFAULT_HISTORY_PERIOD,
+        CONF_SOUND: user_input.get(CONF_SOUND, ""),
+        CONF_WARNING_THRESHOLD: int(user_input[CONF_WARNING_THRESHOLD])
+        if user_input.get(CONF_WARNING_THRESHOLD) is not None
+        else None,
+        CONF_ALARM: bool(user_input.get(CONF_ALARM, False)),
+        CONF_STEP_LABELS: _parse_state_labels(user_input.get(CONF_STEP_LABELS, "")),
+        CONF_STEP_ROWS: _parse_int_list(user_input.get(CONF_STEP_ROWS, "")),
+        CONF_FIRED_AT_ATTRIBUTE: user_input.get(CONF_FIRED_AT_ATTRIBUTE, ""),
+        CONF_UNITS: _parse_state_labels(user_input.get(CONF_UNITS, "")),
+        CONF_BACKGROUND_COLOR: _rgb_to_hex(user_input.get(CONF_BACKGROUND_COLOR)),
+        CONF_BACKGROUND_COLOR_ATTRIBUTE: user_input.get(CONF_BACKGROUND_COLOR_ATTRIBUTE, ""),
+        CONF_TEXT_COLOR: _rgb_to_hex(user_input.get(CONF_TEXT_COLOR)),
+        CONF_TEXT_COLOR_ATTRIBUTE: user_input.get(CONF_TEXT_COLOR_ATTRIBUTE, ""),
     }
 
 
@@ -790,6 +882,15 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             thresholds = current.get(CONF_THRESHOLDS)
             if isinstance(thresholds, list):
                 current[CONF_THRESHOLDS] = _serialize_thresholds(thresholds)
+            step_labels = current.get(CONF_STEP_LABELS)
+            if isinstance(step_labels, dict):
+                current[CONF_STEP_LABELS] = _serialize_key_value_pairs(step_labels)
+            step_rows = current.get(CONF_STEP_ROWS)
+            if isinstance(step_rows, list):
+                current[CONF_STEP_ROWS] = _serialize_int_list(step_rows)
+            units = current.get(CONF_UNITS)
+            if isinstance(units, dict):
+                current[CONF_UNITS] = _serialize_key_value_pairs(units)
             self._details_defaults = current
             return await self.async_step_details()
 
@@ -853,11 +954,31 @@ def _hex_to_rgb(hex_color: str) -> list[int] | None:
         return None
 
 
+def _color_vol_key(conf_key: str, current: dict) -> vol.Optional:
+    """Build a vol.Optional key for a ColorRGBSelector, omitting the default if no valid hex is stored."""
+    rgb = _hex_to_rgb(current.get(conf_key, ""))
+    return vol.Optional(conf_key, default=rgb) if rgb is not None else vol.Optional(conf_key)
+
+
 def _parse_csv(value: str) -> list[str]:
     """Parse a comma-separated string into a list of stripped, non-empty items."""
     if not value:
         return []
     return [s.strip() for s in value.split(",") if s.strip()]
+
+
+def _parse_int_list(value: str) -> list[int]:
+    """Parse '1,2,3' into [1, 2, 3], silently skipping non-integer tokens."""
+    result: list[int] = []
+    for token in _parse_csv(value):
+        with contextlib.suppress(ValueError):
+            result.append(int(token))
+    return result
+
+
+def _serialize_int_list(values: list[int]) -> str:
+    """Serialize a list of ints to '1, 2, 3' text for UI editing."""
+    return ", ".join(str(v) for v in values) if values else ""
 
 
 def _parse_state_labels(value: str) -> dict[str, str]:

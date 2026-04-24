@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Soglie",
           "description": "Linee di riferimento orizzontali sul grafico sparkline. Solo per il modello timeline."
+        },
+        "sound": {
+          "name": "Suono",
+          "description": "Suono di notifica riprodotto sul dispositivo per questo aggiornamento."
+        },
+        "priority": {
+          "name": "Priorità temporanea",
+          "description": "Priorità per singolo aggiornamento (0-10). Sostituisce la priorità configurata dell'attività solo per questo push."
+        },
+        "background_color": {
+          "name": "Colore sfondo",
+          "description": "Colore di sfondo della Live Activity. Esadecimale (#RRGGBB) o nome del colore."
+        },
+        "text_color": {
+          "name": "Colore testo",
+          "description": "Colore del testo della Live Activity. Esadecimale (#RRGGBB) o nome del colore."
+        },
+        "warning_threshold": {
+          "name": "Soglia di avviso",
+          "description": "Secondi prima di end_date in cui il countdown entra in stato di avviso. Solo per il modello countdown."
+        },
+        "alarm": {
+          "name": "Sveglia",
+          "description": "Attivare la sveglia AlarmKit alla scadenza del countdown (iOS 26+, solo per il modello countdown)."
+        },
+        "step_labels": {
+          "name": "Etichette passi",
+          "description": "Elenco ordinato delle etichette dei passi. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
+        },
+        "step_rows": {
+          "name": "Altezze righe passi",
+          "description": "Elenco ordinato delle altezze di riga (1-10) per passo. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
+        },
+        "fired_at": {
+          "name": "Attivato alle",
+          "description": "Timestamp Unix di quando è stato attivato l'alert. Solo per il modello alert."
+        },
+        "units": {
+          "name": "Mappa unità",
+          "description": "Etichette delle unità per serie. Le chiavi devono corrispondere alle chiavi del value dict. Solo per il modello timeline."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Inviare come alert push APNs a tutti i dispositivi. Se falso, la notifica viene salvata solo nella casella."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL da aprire quando si tocca la notifica."
+        },
+        "image_url": {
+          "name": "URL immagine",
+          "description": "URL HTTPS di un'immagine da allegare alla notifica."
+        },
+        "icon_url": {
+          "name": "URL icona",
+          "description": "URL HTTPS di un'icona personalizzata per notifica."
+        },
+        "metadata": {
+          "name": "Metadati",
+          "description": "Coppie chiave-valore di metadati aggiuntivi allegati alla notifica."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "URL secondario",
             "ended_ttl": "Eliminazione automatica dopo la fine (secondi)",
-            "stale_ttl": "Fine automatica dopo inattività (secondi)"
+            "stale_ttl": "Fine automatica dopo inattività (secondi)",
+            "sound": "Suono",
+            "background_color": "Colore sfondo",
+            "background_color_attribute": "Attributo colore sfondo",
+            "text_color": "Colore testo",
+            "text_color_attribute": "Attributo colore testo",
+            "warning_threshold": "Soglia di avviso (secondi)",
+            "alarm": "Sveglia (iOS 26+)",
+            "step_labels": "Etichette passi",
+            "step_rows": "Altezze righe passi",
+            "fired_at_attribute": "Attributo orario di attivazione",
+            "units": "Unità per serie"
           },
           "data_description": {
             "start_states": "Stati dell'entità che avviano la Live Activity. Selezionare dall'elenco o digitare valori personalizzati.",
@@ -333,7 +400,18 @@
             "url": "Link aperto toccando la Live Activity. Deve iniziare con http:// o https://. Solo per i modelli steps e alert.",
             "secondary_url": "Link secondario per la Live Activity. Solo per i modelli steps e alert.",
             "ended_ttl": "Secondi trascorsi i quali l'attività viene eliminata automaticamente dal server dopo la conclusione. Lasciare vuoto per conservarla indefinitamente. Esempio: 300",
-            "stale_ttl": "Secondi di inattività dopo i quali il server termina automaticamente l'attività. Lasciare vuoto per disabilitare. Esempio: 1800"
+            "stale_ttl": "Secondi di inattività dopo i quali il server termina automaticamente l'attività. Lasciare vuoto per disabilitare. Esempio: 1800",
+            "sound": "Suono riprodotto ad ogni aggiornamento per questa entità. Lasciare vuoto per non forzare alcun suono.",
+            "background_color": "Colore di sfondo della Live Activity. Lasciare vuoto per il valore predefinito.",
+            "background_color_attribute": "Attributo dell'entità per il colore di sfondo dinamico. Sostituisce il colore statico. Supporta RGB, HS, XY, Kelvin, colori con nome ed esadecimale.",
+            "text_color": "Colore del testo della Live Activity. Lasciare vuoto per il valore predefinito.",
+            "text_color_attribute": "Attributo dell'entità per il colore del testo dinamico. Sostituisce il colore statico.",
+            "warning_threshold": "Secondi prima della fine del countdown in cui il server invia un push di avviso. Lasciare vuoto per disabilitare. Solo per il modello countdown.",
+            "alarm": "Attivare la sveglia AlarmKit alla scadenza del countdown (iOS 26+). Solo per il modello countdown.",
+            "step_labels": "Etichette per ogni passo. Formato: 1=Primo Passo, 2=Secondo Passo. Deve coprire i passi 1..total_steps. Solo per il modello steps.",
+            "step_rows": "Altezza di riga (1–10) per ogni passo, separata da virgole. Deve avere total_steps voci. Solo per il modello steps.",
+            "fired_at_attribute": "Attributo dell'entità con il timestamp Unix di quando è stato attivato l'alert. Solo per il modello alert.",
+            "units": "Etichette delle unità per serie. Formato: EtichettaSerie=unità, Temperatura=°C, Umidità=%. Solo per il modello timeline."
           }
         },
         "reconfigure": {

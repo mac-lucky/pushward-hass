@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Drempelwaarden",
           "description": "Horizontale referentielijnen op de sparkline. Alleen voor het sjabloon timeline."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "warning_threshold": {
+          "name": "Waarschuwingsdrempel",
+          "description": "Seconden vóór end_date waarop de countdown in waarschuwingsstatus gaat. Alleen voor het sjabloon countdown."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+, alleen voor het sjabloon countdown)."
+        },
+        "step_labels": {
+          "name": "Staplabels",
+          "description": "Geordende lijst met staplabels. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "step_rows": {
+          "name": "Stap-rijhoogten",
+          "description": "Geordende lijst met rijhoogten (1–10) per stap. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "fired_at": {
+          "name": "Afgevuurd om",
+          "description": "Unix-tijdstempel wanneer de alert werd geactiveerd. Alleen voor het sjabloon alert."
+        },
+        "units": {
+          "name": "Eenhedenkaart",
+          "description": "Eenheidslabels per reeks. Sleutels moeten overeenkomen met de sleutels van het value dict. Alleen voor het sjabloon timeline."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Verzend als APNs push alert naar alle apparaten. Als uitgeschakeld, wordt de melding alleen in de inbox opgeslagen."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL die wordt geopend wanneer op de melding wordt getikt."
+        },
+        "image_url": {
+          "name": "Afbeeldings-URL",
+          "description": "HTTPS-URL van een afbeelding om aan de melding te koppelen."
+        },
+        "icon_url": {
+          "name": "Pictogram-URL",
+          "description": "HTTPS-URL van een aangepast pictogram per melding."
+        },
+        "metadata": {
+          "name": "Metagegevens",
+          "description": "Sleutel-waardeparen van aanvullende metagegevens gekoppeld aan de melding."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "Secundaire URL",
             "ended_ttl": "Automatisch verwijderen na beëindigen (seconden)",
-            "stale_ttl": "Automatisch beëindigen na inactiviteit (seconden)"
+            "stale_ttl": "Automatisch beëindigen na inactiviteit (seconden)",
+            "sound": "Geluid",
+            "background_color": "Achtergrondkleur",
+            "background_color_attribute": "Achtergrondkleurattribuut",
+            "text_color": "Tekstkleur",
+            "text_color_attribute": "Tekstkleurattribuut",
+            "warning_threshold": "Waarschuwingsdrempel (seconden)",
+            "alarm": "Alarm (iOS 26+)",
+            "step_labels": "Staplabels",
+            "step_rows": "Stap-rijhoogten",
+            "fired_at_attribute": "Attribuut activeringstijd",
+            "units": "Eenheden per reeks"
           },
           "data_description": {
             "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
@@ -333,7 +400,18 @@
             "url": "Link die wordt geopend bij het tikken op de Live Activity. Moet beginnen met http:// of https://. Alleen voor sjablonen steps en alert.",
             "secondary_url": "Secundaire link voor de Live Activity. Alleen voor sjablonen steps en alert.",
             "ended_ttl": "Seconden na het beëindigen van de activiteit voordat deze automatisch van de server wordt verwijderd. Laat leeg om onbeperkt te bewaren. Voorbeeld: 300",
-            "stale_ttl": "Seconden inactiviteit voordat de server de activiteit automatisch beëindigt. Laat leeg om uit te schakelen. Voorbeeld: 1800"
+            "stale_ttl": "Seconden inactiviteit voordat de server de activiteit automatisch beëindigt. Laat leeg om uit te schakelen. Voorbeeld: 1800",
+            "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
+            "background_color": "Achtergrondkleur van de Live Activity. Laat leeg voor standaard.",
+            "background_color_attribute": "Entiteitsattribuut voor dynamische achtergrondkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
+            "text_color": "Tekstkleur van de Live Activity. Laat leeg voor standaard.",
+            "text_color_attribute": "Entiteitsattribuut voor dynamische tekstkleur. Heeft voorrang op statische kleur.",
+            "warning_threshold": "Seconden vóór het einde van de countdown waarop de server een waarschuwingspush verzendt. Laat leeg om uit te schakelen. Alleen voor het sjabloon countdown.",
+            "alarm": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+). Alleen voor het sjabloon countdown.",
+            "step_labels": "Labels voor elke stap. Indeling: 1=Eerste Stap, 2=Tweede Stap. Moet stappen 1..total_steps omvatten. Alleen voor het sjabloon steps.",
+            "step_rows": "Rijhoogte (1–10) voor elke stap, kommagescheiden. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
+            "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
+            "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline."
           }
         },
         "reconfigure": {

@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Thresholds",
           "description": "Horizontal reference lines on the sparkline. Timeline template only."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "warning_threshold": {
+          "name": "Warning Threshold",
+          "description": "Seconds before end_date when the countdown enters warning state. Countdown template only."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "Trigger AlarmKit alarm on countdown expiry (iOS 26+, countdown template only)."
+        },
+        "step_labels": {
+          "name": "Step Labels",
+          "description": "Ordered list of step labels. Length must equal total_steps. Steps template only."
+        },
+        "step_rows": {
+          "name": "Step Rows",
+          "description": "Ordered list of row heights (1-10) per step. Length must equal total_steps. Steps template only."
+        },
+        "fired_at": {
+          "name": "Fired At",
+          "description": "Unix timestamp when the alert was triggered. Alert template only."
+        },
+        "units": {
+          "name": "Units Map",
+          "description": "Per-series unit labels. Keys must match value dict keys. Timeline template only."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Send as an APNs push alert to all devices. When false, the notification is stored in the inbox only."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL to open when the notification is tapped."
+        },
+        "image_url": {
+          "name": "Image URL",
+          "description": "HTTPS URL of an image to attach to the notification."
+        },
+        "icon_url": {
+          "name": "Icon URL",
+          "description": "HTTPS URL of a custom per-notification icon."
+        },
+        "metadata": {
+          "name": "Metadata",
+          "description": "Key-value pairs of additional metadata attached to the notification."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "Secondary URL",
             "ended_ttl": "Auto-Delete After End (seconds)",
-            "stale_ttl": "Auto-End After Idle (seconds)"
+            "stale_ttl": "Auto-End After Idle (seconds)",
+            "sound": "Sound",
+            "background_color": "Background Color",
+            "background_color_attribute": "Background Color Attribute",
+            "text_color": "Text Color",
+            "text_color_attribute": "Text Color Attribute",
+            "warning_threshold": "Warning Threshold (seconds)",
+            "alarm": "Alarm (iOS 26+)",
+            "step_labels": "Step Labels",
+            "step_rows": "Step Rows",
+            "fired_at_attribute": "Fired At Attribute",
+            "units": "Per-Series Units"
           },
           "data_description": {
             "start_states": "Entity states that start the Live Activity. Select from the list or type custom values.",
@@ -333,7 +400,18 @@
             "url": "Link opened when tapping the Live Activity. Must start with http:// or https://. Steps and alert templates only.",
             "secondary_url": "Secondary link for the Live Activity. Steps and alert templates only.",
             "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
-            "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800"
+            "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800",
+            "sound": "Sound played on every update for this entity. Leave empty to use no override.",
+            "background_color": "Background color for the Live Activity. Leave empty for default.",
+            "background_color_attribute": "Entity attribute for dynamic background color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
+            "text_color": "Text color for the Live Activity. Leave empty for default.",
+            "text_color_attribute": "Entity attribute for dynamic text color. Overrides static color.",
+            "warning_threshold": "Seconds before the end of a countdown when the server sends a warning push. Leave empty to disable. Countdown template only.",
+            "alarm": "Trigger an AlarmKit alarm when the countdown expires (iOS 26+). Countdown template only.",
+            "step_labels": "Labels for each step. Format: 1=First Step, 2=Second Step. Must cover steps 1..total_steps. Steps template only.",
+            "step_rows": "Row height (1–10) for each step, comma-separated. Must have total_steps entries. Steps template only.",
+            "fired_at_attribute": "Entity attribute holding the unix timestamp when the alert fired. Alert template only.",
+            "units": "Per-series unit labels. Format: SeriesLabel=unit, Temperature=°C, Humidity=%. Timeline template only."
           }
         },
         "reconfigure": {

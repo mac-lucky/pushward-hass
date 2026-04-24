@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Ambang Batas",
           "description": "Garis referensi horizontal pada sparkline. Hanya untuk templat timeline."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "warning_threshold": {
+          "name": "Ambang Peringatan",
+          "description": "Saat nilai gauge atau timeline mencapai atau melebihi nilai ini, warna peringatan ditampilkan."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya berfungsi di iOS 26+."
+        },
+        "step_labels": {
+          "name": "Label Langkah",
+          "description": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah."
+        },
+        "step_rows": {
+          "name": "Baris Langkah",
+          "description": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps."
+        },
+        "fired_at": {
+          "name": "Waktu Dipicu",
+          "description": "Unix timestamp saat aktivitas dipicu. Digunakan untuk menampilkan waktu relatif."
+        },
+        "units": {
+          "name": "Satuan",
+          "description": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Kirim sebagai push alert APNs ke semua perangkat. Jika false, notifikasi hanya disimpan di kotak masuk."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL yang dibuka saat mengetuk notifikasi. Memerlukan HTTPS."
+        },
+        "image_url": {
+          "name": "URL Gambar",
+          "description": "URL gambar yang ditampilkan dalam notifikasi. Memerlukan HTTPS."
+        },
+        "icon_url": {
+          "name": "URL Ikon",
+          "description": "URL ikon notifikasi. Memerlukan HTTPS."
+        },
+        "metadata": {
+          "name": "Metadata",
+          "description": "Metadata pasangan kunci-nilai tambahan yang dikirim bersama notifikasi."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "URL Sekunder",
             "ended_ttl": "Hapus Otomatis Setelah Berakhir (detik)",
-            "stale_ttl": "Akhiri Otomatis Setelah Tidak Aktif (detik)"
+            "stale_ttl": "Akhiri Otomatis Setelah Tidak Aktif (detik)",
+            "sound": "Suara",
+            "background_color": "Warna Latar",
+            "background_color_attribute": "Atribut Warna Latar",
+            "text_color": "Warna Teks",
+            "text_color_attribute": "Atribut Warna Teks",
+            "warning_threshold": "Ambang Peringatan",
+            "alarm": "Alarm",
+            "step_labels": "Label Langkah",
+            "step_rows": "Baris Langkah",
+            "fired_at_attribute": "Atribut Waktu Dipicu",
+            "units": "Satuan"
           },
           "data_description": {
             "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
@@ -333,7 +400,18 @@
             "url": "Tautan yang dibuka saat menekan Live Activity. Harus dimulai dengan http:// atau https://. Hanya untuk templat steps dan alert.",
             "secondary_url": "Tautan sekunder untuk Live Activity. Hanya untuk templat steps dan alert.",
             "ended_ttl": "Detik setelah aktivitas berakhir sebelum dihapus otomatis dari server. Kosongkan untuk menyimpan tanpa batas. Contoh: 300",
-            "stale_ttl": "Detik tidak aktif sebelum server mengakhiri aktivitas secara otomatis. Kosongkan untuk menonaktifkan. Contoh: 1800"
+            "stale_ttl": "Detik tidak aktif sebelum server mengakhiri aktivitas secara otomatis. Kosongkan untuk menonaktifkan. Contoh: 1800",
+            "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
+            "background_color": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
+            "background_color_attribute": "Atribut entitas untuk warna latar dinamis. Menggantikan warna latar statis.",
+            "text_color": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
+            "text_color_attribute": "Atribut entitas untuk warna teks dinamis. Menggantikan warna teks statis.",
+            "warning_threshold": "Saat nilai mencapai atau melebihi ini, pewarnaan peringatan dipicu. Templat gauge dan timeline.",
+            "alarm": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya untuk iOS 26+.",
+            "step_labels": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah.",
+            "step_rows": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps.",
+            "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
+            "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
           }
         },
         "reconfigure": {

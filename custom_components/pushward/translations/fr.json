@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Seuils",
           "description": "Lignes de référence horizontales sur le sparkline. Modèle timeline uniquement."
+        },
+        "sound": {
+          "name": "Son",
+          "description": "Son de notification joué sur l'appareil pour cette mise à jour."
+        },
+        "priority": {
+          "name": "Priorité ponctuelle",
+          "description": "Priorité par mise à jour (0-10). Remplace la priorité configurée de la Live Activity pour ce push uniquement."
+        },
+        "background_color": {
+          "name": "Couleur d'arrière-plan",
+          "description": "Couleur d'arrière-plan de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "text_color": {
+          "name": "Couleur du texte",
+          "description": "Couleur du texte de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "warning_threshold": {
+          "name": "Seuil d'avertissement",
+          "description": "Secondes avant end_date lorsque le countdown passe en état d'avertissement. Modèle countdown uniquement."
+        },
+        "alarm": {
+          "name": "Alarme",
+          "description": "Déclencher une alarme AlarmKit à l'expiration du countdown (iOS 26+, modèle countdown uniquement)."
+        },
+        "step_labels": {
+          "name": "Libellés des étapes",
+          "description": "Liste ordonnée des libellés d'étapes. La longueur doit être égale à total_steps. Modèle steps uniquement."
+        },
+        "step_rows": {
+          "name": "Hauteurs de ligne des étapes",
+          "description": "Liste ordonnée des hauteurs de ligne (1-10) par étape. La longueur doit être égale à total_steps. Modèle steps uniquement."
+        },
+        "fired_at": {
+          "name": "Déclenché le",
+          "description": "Horodatage Unix du déclenchement de l'alert. Modèle alert uniquement."
+        },
+        "units": {
+          "name": "Carte des unités",
+          "description": "Libellés d'unités par série. Les clés doivent correspondre aux clés du value dict. Modèle timeline uniquement."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Envoyer en tant qu'alert push APNs à tous les appareils. Si faux, la notification est stockée uniquement dans la boîte de réception."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL à ouvrir lors d'un appui sur la notification."
+        },
+        "image_url": {
+          "name": "URL de l'image",
+          "description": "URL HTTPS d'une image à joindre à la notification."
+        },
+        "icon_url": {
+          "name": "URL de l'icône",
+          "description": "URL HTTPS d'une icône personnalisée par notification."
+        },
+        "metadata": {
+          "name": "Métadonnées",
+          "description": "Paires clé-valeur de métadonnées supplémentaires attachées à la notification."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "URL secondaire",
             "ended_ttl": "Suppression automatique après la fin (secondes)",
-            "stale_ttl": "Fin automatique après inactivité (secondes)"
+            "stale_ttl": "Fin automatique après inactivité (secondes)",
+            "sound": "Son",
+            "background_color": "Couleur d'arrière-plan",
+            "background_color_attribute": "Attribut de couleur d'arrière-plan",
+            "text_color": "Couleur du texte",
+            "text_color_attribute": "Attribut de couleur du texte",
+            "warning_threshold": "Seuil d'avertissement (secondes)",
+            "alarm": "Alarme (iOS 26+)",
+            "step_labels": "Libellés des étapes",
+            "step_rows": "Hauteurs de ligne des étapes",
+            "fired_at_attribute": "Attribut de déclenchement",
+            "units": "Unités par série"
           },
           "data_description": {
             "start_states": "États de l'entité qui démarrent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées.",
@@ -333,7 +400,18 @@
             "url": "Lien ouvert lors de l'appui sur la Live Activity. Doit commencer par http:// ou https://. Modèles steps et alert uniquement.",
             "secondary_url": "Lien secondaire pour la Live Activity. Modèles steps et alert uniquement.",
             "ended_ttl": "Secondes après la fin de la Live Activity avant sa suppression automatique du serveur. Laisser vide pour la conserver indéfiniment. Exemple : 300",
-            "stale_ttl": "Secondes d'inactivité avant que le serveur ne termine automatiquement la Live Activity. Laisser vide pour désactiver. Exemple : 1800"
+            "stale_ttl": "Secondes d'inactivité avant que le serveur ne termine automatiquement la Live Activity. Laisser vide pour désactiver. Exemple : 1800",
+            "sound": "Son joué à chaque mise à jour pour cette entité. Laisser vide pour ne pas forcer de son.",
+            "background_color": "Couleur d'arrière-plan de la Live Activity. Laisser vide pour la valeur par défaut.",
+            "background_color_attribute": "Attribut de l'entité pour la couleur d'arrière-plan dynamique. Remplace la couleur statique. Prend en charge RGB, HS, XY, Kelvin, les couleurs nommées et l'hexadécimal.",
+            "text_color": "Couleur du texte de la Live Activity. Laisser vide pour la valeur par défaut.",
+            "text_color_attribute": "Attribut de l'entité pour la couleur du texte dynamique. Remplace la couleur statique.",
+            "warning_threshold": "Secondes avant la fin du countdown lorsque le serveur envoie un push d'avertissement. Laisser vide pour désactiver. Modèle countdown uniquement.",
+            "alarm": "Déclencher une alarme AlarmKit à l'expiration du countdown (iOS 26+). Modèle countdown uniquement.",
+            "step_labels": "Libellés pour chaque étape. Format : 1=Première étape, 2=Deuxième étape. Doit couvrir les étapes 1..total_steps. Modèle steps uniquement.",
+            "step_rows": "Hauteur de ligne (1–10) pour chaque étape, séparée par des virgules. Doit avoir total_steps entrées. Modèle steps uniquement.",
+            "fired_at_attribute": "Attribut de l'entité contenant l'horodatage Unix du déclenchement de l'alert. Modèle alert uniquement.",
+            "units": "Libellés d'unités par série. Format : LibelléSérie=unité, Température=°C, Humidité=%. Modèle timeline uniquement."
           }
         },
         "reconfigure": {

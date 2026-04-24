@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
 
+import pytest
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -313,3 +315,197 @@ async def test_service_send_notification_level_critical_backward_compat(
     api.create_notification.assert_awaited_once()
     call_kwargs = api.create_notification.call_args[1]
     assert call_kwargs["level"] == "critical"
+
+
+# --- update_activity new field tests ---
+
+
+async def test_update_activity_service_passes_sound_top_level(hass: HomeAssistant) -> None:
+    """sound is passed as a kwarg to api.update_activity, not in content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "template": "generic", "sound": "chime"},
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    call_kwargs = api.update_activity.call_args.kwargs
+    assert call_kwargs.get("sound") == "chime"
+    content = api.update_activity.call_args[0][2]
+    assert "sound" not in content
+
+
+async def test_update_activity_service_passes_priority_top_level(hass: HomeAssistant) -> None:
+    """priority is passed as a kwarg, not embedded in content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "priority": 7},
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    call_kwargs = api.update_activity.call_args.kwargs
+    assert call_kwargs.get("priority") == 7
+    content = api.update_activity.call_args[0][2]
+    assert "priority" not in content
+
+
+async def test_update_activity_service_rejects_invalid_sound(hass: HomeAssistant) -> None:
+    """Invalid sound value is rejected by the service schema."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises((vol.Invalid, Exception)):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity",
+            {"slug": "x", "state": "ONGOING", "sound": "badvalue"},
+            blocking=True,
+        )
+
+
+async def test_update_activity_service_rejects_priority_out_of_range(hass: HomeAssistant) -> None:
+    """Priority > 10 is rejected by the service schema."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises((vol.Invalid, Exception)):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity",
+            {"slug": "x", "state": "ONGOING", "priority": 11},
+            blocking=True,
+        )
+
+
+async def test_update_activity_service_accepts_background_and_text_color(hass: HomeAssistant) -> None:
+    """background_color and text_color appear in content dict passed to api."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "background_color": "#123456", "text_color": "red"},
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    content = api.update_activity.call_args[0][2]
+    assert content["background_color"] == "#123456"
+    assert content["text_color"] == "red"
+
+
+async def test_update_activity_service_accepts_warning_threshold(hass: HomeAssistant) -> None:
+    """warning_threshold appears in content dict."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "warning_threshold": 60},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["warning_threshold"] == 60
+
+
+async def test_update_activity_service_accepts_step_labels_list(hass: HomeAssistant) -> None:
+    """step_labels list appears in content dict."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "step_labels": ["Init", "Build"]},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["step_labels"] == ["Init", "Build"]
+
+
+async def test_update_activity_service_accepts_alarm_bool(hass: HomeAssistant) -> None:
+    """alarm bool appears in content dict."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "alarm": True},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["alarm"] is True
+
+
+async def test_update_activity_service_accepts_fired_at(hass: HomeAssistant) -> None:
+    """fired_at int appears in content dict."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "fired_at": 1700000000},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["fired_at"] == 1700000000
+
+
+async def test_update_activity_service_accepts_units_dict(hass: HomeAssistant) -> None:
+    """units dict appears in content dict."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ONGOING", "units": {"Temp": "°C"}},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["units"] == {"Temp": "°C"}
+
+
+async def test_send_notification_service_accepts_url_image_icon_metadata(hass: HomeAssistant) -> None:
+    """send_notification forwards url, image_url, icon_url, and metadata."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "Test",
+            "body": "Hello",
+            "url": "https://example.com",
+            "image_url": "https://example.com/image.png",
+            "icon_url": "https://example.com/icon.png",
+            "metadata": {"key": "value"},
+        },
+        blocking=True,
+    )
+
+    api.create_notification.assert_awaited_once()
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["url"] == "https://example.com"
+    assert call_kwargs["image_url"] == "https://example.com/image.png"
+    assert call_kwargs["icon_url"] == "https://example.com/icon.png"
+    assert call_kwargs["metadata"] == {"key": "value"}

@@ -99,6 +99,46 @@
         "thresholds": {
           "name": "Progi",
           "description": "Poziome linie odniesienia na wykresie sparkline. Tylko szablon timeline."
+        },
+        "sound": {
+          "name": "Dźwięk",
+          "description": "Dźwięk powiadomienia odtwarzany na urządzeniu przy tej aktualizacji."
+        },
+        "priority": {
+          "name": "Nadpisanie priorytetu",
+          "description": "Priorytet dla pojedynczej aktualizacji (0–10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "background_color": {
+          "name": "Kolor tła",
+          "description": "Kolor tła Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "text_color": {
+          "name": "Kolor tekstu",
+          "description": "Kolor tekstu Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "warning_threshold": {
+          "name": "Próg ostrzeżenia",
+          "description": "Sekundy przed end_date, po których countdown przechodzi w stan ostrzeżenia. Tylko szablon countdown."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+, tylko szablon countdown)."
+        },
+        "step_labels": {
+          "name": "Etykiety kroków",
+          "description": "Uporządkowana lista etykiet kroków. Długość musi być równa total_steps. Tylko szablon steps."
+        },
+        "step_rows": {
+          "name": "Wysokości wierszy kroków",
+          "description": "Uporządkowana lista wysokości wierszy (1–10) dla każdego kroku. Długość musi być równa total_steps. Tylko szablon steps."
+        },
+        "fired_at": {
+          "name": "Czas wyzwolenia",
+          "description": "Znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert."
+        },
+        "units": {
+          "name": "Mapa jednostek",
+          "description": "Etykiety jednostek dla każdej serii. Klucze muszą odpowiadać kluczom value dict. Tylko szablon timeline."
         }
       }
     },
@@ -199,6 +239,22 @@
         "push": {
           "name": "Push",
           "description": "Wyślij jako alert push APNs na wszystkie urządzenia. Gdy wyłączone, powiadomienie jest zapisywane tylko w skrzynce."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Adres URL otwierany po dotknięciu powiadomienia."
+        },
+        "image_url": {
+          "name": "URL obrazu",
+          "description": "Adres HTTPS obrazu do załączenia do powiadomienia."
+        },
+        "icon_url": {
+          "name": "URL ikony",
+          "description": "Adres HTTPS niestandardowej ikony dla tego powiadomienia."
+        },
+        "metadata": {
+          "name": "Metadane",
+          "description": "Pary klucz-wartość dodatkowych metadanych załączonych do powiadomienia."
         }
       }
     }
@@ -299,7 +355,18 @@
             "url": "URL",
             "secondary_url": "Dodatkowy URL",
             "ended_ttl": "Automatyczne usunięcie po zakończeniu (sekundy)",
-            "stale_ttl": "Automatyczne zakończenie po nieaktywności (sekundy)"
+            "stale_ttl": "Automatyczne zakończenie po nieaktywności (sekundy)",
+            "sound": "Dźwięk",
+            "background_color": "Kolor tła",
+            "background_color_attribute": "Atrybut koloru tła",
+            "text_color": "Kolor tekstu",
+            "text_color_attribute": "Atrybut koloru tekstu",
+            "warning_threshold": "Próg ostrzeżenia (sekundy)",
+            "alarm": "Alarm (iOS 26+)",
+            "step_labels": "Etykiety kroków",
+            "step_rows": "Wysokości wierszy kroków",
+            "fired_at_attribute": "Atrybut czasu wyzwolenia",
+            "units": "Jednostki dla serii"
           },
           "data_description": {
             "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości.",
@@ -333,7 +400,18 @@
             "url": "Link otwierany po dotknięciu Live Activity. Musi zaczynać się od http:// lub https://. Tylko szablony steps i alert.",
             "secondary_url": "Dodatkowy link dla Live Activity. Tylko szablony steps i alert.",
             "ended_ttl": "Liczba sekund po zakończeniu Live Activity, zanim zostanie automatycznie usunięty z serwera. Pozostaw puste, aby zachować bezterminowo. Przykład: 300",
-            "stale_ttl": "Liczba sekund nieaktywności, zanim serwer automatycznie zakończy Live Activity. Pozostaw puste, aby wyłączyć. Przykład: 1800"
+            "stale_ttl": "Liczba sekund nieaktywności, zanim serwer automatycznie zakończy Live Activity. Pozostaw puste, aby wyłączyć. Przykład: 1800",
+            "sound": "Dźwięk odtwarzany przy każdej aktualizacji dla tej encji. Pozostaw puste, aby nie używać żadnego nadpisania.",
+            "background_color": "Kolor tła Live Activity. Pozostaw puste dla wartości domyślnej.",
+            "background_color_attribute": "Atrybut encji dla dynamicznego koloru tła. Zastępuje kolor statyczny. Obsługuje RGB, HS, XY, Kelvin, kolory nazwane oraz hex.",
+            "text_color": "Kolor tekstu Live Activity. Pozostaw puste dla wartości domyślnej.",
+            "text_color_attribute": "Atrybut encji dla dynamicznego koloru tekstu. Zastępuje kolor statyczny.",
+            "warning_threshold": "Sekundy przed końcem countdown, w których serwer wysyła ostrzeżenie push. Pozostaw puste, aby wyłączyć. Tylko szablon countdown.",
+            "alarm": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+). Tylko szablon countdown.",
+            "step_labels": "Etykiety dla każdego kroku. Format: 1=Pierwszy Krok, 2=Drugi Krok. Musi obejmować kroki 1..total_steps. Tylko szablon steps.",
+            "step_rows": "Wysokość wiersza (1–10) dla każdego kroku, oddzielona przecinkami. Musi mieć total_steps wpisów. Tylko szablon steps.",
+            "fired_at_attribute": "Atrybut encji zawierający znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert.",
+            "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline."
           }
         },
         "reconfigure": {
