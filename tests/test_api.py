@@ -1,6 +1,7 @@
 """Tests for the PushWard API client."""
 
 import asyncio
+import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
@@ -105,7 +106,11 @@ async def test_create_activity_success():
 
 
 async def test_create_activity_already_exists():
-    resp = _mock_response(409, text="activity already exists")
+    body = (
+        '{"type":"about:blank","title":"Conflict","status":409,'
+        '"detail":"activity already exists","code":"activity.already_exists"}'
+    )
+    resp = _mock_response(409, text=body)
     session = _make_session(resp)
     client = _make_client(session)
 
@@ -114,7 +119,11 @@ async def test_create_activity_already_exists():
 
 
 async def test_create_activity_limit():
-    resp = _mock_response(409, text="activity limit reached")
+    body = (
+        '{"type":"about:blank","title":"Conflict","status":409,'
+        '"detail":"activity limit reached","code":"activity.limit_exceeded"}'
+    )
+    resp = _mock_response(409, text=body)
     session = _make_session(resp)
     client = _make_client(session)
 
@@ -160,7 +169,7 @@ async def test_update_activity_success():
 
     call_args = session.request.call_args
     assert call_args[0][0] == "PATCH"
-    assert "/activity/test-slug" in call_args[0][1]
+    assert "/activities/test-slug" in call_args[0][1]
     assert call_args[1]["json"] == {"state": "ONGOING", "content": {"progress": 0.5}}
 
 
@@ -289,7 +298,8 @@ async def test_retry_on_429_with_retry_after(mock_sleep):
 
 @patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
 async def test_no_retry_on_client_error(mock_sleep):
-    resp_400 = _mock_response(400, text="Bad Request")
+    body = '{"type":"about:blank","title":"Bad Request","status":400,"detail":"Bad Request","code":"validation.failed"}'
+    resp_400 = _mock_response(400, text=body)
     session = _make_session(resp_400)
     client = _make_client(session)
 
@@ -304,9 +314,18 @@ async def test_no_retry_on_client_error(mock_sleep):
 
 @patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
 async def test_4xx_error_body_truncated_in_exception(mock_sleep):
-    """Large 4xx bodies are truncated to 200 chars + ellipsis in the exception message."""
-    long_body = "x" * 500
-    resp = _mock_response(400, text=long_body)
+    """Large Problem.detail values are truncated to 200 chars + ellipsis in the exception."""
+    long_detail = "x" * 500
+    body = json.dumps(
+        {
+            "type": "about:blank",
+            "title": "Bad Request",
+            "status": 400,
+            "detail": long_detail,
+            "code": "validation.failed",
+        }
+    )
+    resp = _mock_response(400, text=body)
     session = _make_session(resp)
     client = _make_client(session)
 
@@ -317,6 +336,29 @@ async def test_4xx_error_body_truncated_in_exception(mock_sleep):
     assert "…" in msg
     assert "x" * 200 in msg
     assert "x" * 201 not in msg
+
+
+async def test_4xx_problem_detail_surfaced():
+    """Problem.detail is preferred over raw body in the exception message."""
+    body = (
+        '{"type":"about:blank","title":"Bad Request","status":400,"detail":"slug too long","code":"validation.failed"}'
+    )
+    resp = _mock_response(400, text=body)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError, match="slug too long"):
+        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+
+
+async def test_4xx_non_json_body_falls_back_to_raw():
+    """When the body isn't JSON, the raw text is used as the error snippet."""
+    resp = _mock_response(400, text="plain text error")
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError, match="plain text error"):
+        await client.update_activity("slug", "ONGOING", {"template": "generic"})
 
 
 # --- semaphore concurrency cap ---
@@ -361,7 +403,12 @@ async def test_semaphore_caps_concurrency(mock_sleep):
 
 
 async def test_forbidden_403_subscription_raises_forbidden():
-    resp = _mock_response(403, text="account owner's subscription is not active")
+    body = (
+        '{"type":"about:blank","title":"Forbidden","status":403,'
+        '"detail":"account owner\'s subscription is not active",'
+        '"code":"subscription.required"}'
+    )
+    resp = _mock_response(403, text=body)
     session = _make_session(resp)
     client = _make_client(session)
 
@@ -373,7 +420,12 @@ async def test_forbidden_403_subscription_raises_forbidden():
 
 
 async def test_forbidden_403_slug_scope_raises_forbidden():
-    resp = _mock_response(403, text="key not allowed for this activity")
+    body = (
+        '{"type":"about:blank","title":"Forbidden","status":403,'
+        '"detail":"key not allowed for this activity",'
+        '"code":"activity.not_in_scope"}'
+    )
+    resp = _mock_response(403, text=body)
     session = _make_session(resp)
     client = _make_client(session)
 
@@ -381,6 +433,7 @@ async def test_forbidden_403_slug_scope_raises_forbidden():
         await client.update_activity("slug", "ONGOING", {"template": "generic"})
 
     assert excinfo.value.status_code == 403
+    assert "key not allowed" in str(excinfo.value)
 
 
 async def test_forbidden_403_with_empty_body_still_raises_forbidden():

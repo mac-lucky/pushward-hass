@@ -1,6 +1,7 @@
 """Async PushWard API client."""
 
 import asyncio
+import json
 import logging
 import time
 from email.utils import parsedate_to_datetime
@@ -73,7 +74,11 @@ class PushWardApiClient:
         ended_ttl: int | None = None,
         stale_ttl: int | None = None,
     ) -> None:
-        """Create an activity via POST /activities."""
+        """Create an activity via POST /activities.
+
+        Server upserts on duplicate slug and always returns 201, so `handle_409`
+        only covers the `activity.limit_exceeded` path now.
+        """
         body: dict = {
             "slug": slug,
             "name": name,
@@ -99,13 +104,13 @@ class PushWardApiClient:
         sound: str | None = None,
         priority: int | None = None,
     ) -> None:
-        """PATCH /activity/{slug} — sound and priority are top-level, not content fields."""
+        """PATCH /activities/{slug} — sound and priority are top-level, not content fields."""
         body: dict = {"state": state, "content": content}
         if sound is not None:
             body["sound"] = sound
         if priority is not None:
             body["priority"] = priority
-        await self._request_with_retry("PATCH", f"/activity/{slug}", json=body)
+        await self._request_with_retry("PATCH", f"/activities/{slug}", json=body)
 
     async def delete_activity(self, slug: str) -> None:
         """Delete an activity via DELETE /activities/{slug}."""
@@ -156,6 +161,28 @@ class PushWardApiClient:
                 payload[key] = val
         await self._request_with_retry("POST", "/notifications", json=payload)
 
+    @staticmethod
+    def _truncate(message: str, max_len: int = 200) -> str:
+        return message[:max_len] + ("…" if len(message) > max_len else "")
+
+    @staticmethod
+    async def _parse_problem(resp: aiohttp.ClientResponse) -> tuple[str, str, str]:
+        """Parse a RFC 9457 Problem body. Return (code, detail, raw_body).
+
+        Tolerant to non-Problem bodies (plain text, empty) — falls back to an
+        empty code/detail so callers can use the raw body.
+        """
+        raw = await resp.text()
+        if not raw:
+            return "", "", raw
+        try:
+            data = json.loads(raw)
+        except ValueError:
+            return "", "", raw
+        if not isinstance(data, dict):
+            return "", "", raw
+        return str(data.get("code") or ""), str(data.get("detail") or ""), raw
+
     async def _request_with_retry(
         self,
         method: str,
@@ -182,12 +209,11 @@ class PushWardApiClient:
                             return
 
                         if handle_409 and resp.status == HTTPStatus.CONFLICT:
-                            body = await resp.text()
-                            if "already exists" in body.lower():
+                            code, detail, raw = await self._parse_problem(resp)
+                            if code == "activity.already_exists" or "already exists" in (detail or raw).lower():
                                 return
-                            snippet = body[:200] + ("…" if len(body) > 200 else "")
                             raise PushWardApiError(
-                                f"Activity limit reached: {snippet}",
+                                f"Activity limit reached: {self._truncate(detail or raw)}",
                                 status_code=resp.status,
                             )
 
@@ -198,10 +224,9 @@ class PushWardApiClient:
                             )
 
                         if resp.status == HTTPStatus.FORBIDDEN:
-                            body = await resp.text()
-                            snippet = body[:200] + ("…" if len(body) > 200 else "")
+                            _, detail, raw = await self._parse_problem(resp)
                             raise PushWardForbiddenError(
-                                snippet or "Forbidden",
+                                self._truncate(detail or raw) or "Forbidden",
                                 status_code=resp.status,
                             )
 
@@ -215,10 +240,9 @@ class PushWardApiClient:
 
                         # Other 4xx — don't retry
                         if 400 <= resp.status < 500:
-                            body = await resp.text()
-                            snippet = body[:200] + ("…" if len(body) > 200 else "")
+                            _, detail, raw = await self._parse_problem(resp)
                             raise PushWardApiError(
-                                f"{method} {path} failed ({resp.status}): {snippet}",
+                                f"{method} {path} failed ({resp.status}): {self._truncate(detail or raw)}",
                                 status_code=resp.status,
                             )
 
@@ -228,9 +252,7 @@ class PushWardApiClient:
                             status_code=resp.status,
                         )
                 except (aiohttp.ClientError, TimeoutError) as err:
-                    err_msg = str(err)
-                    snippet = err_msg[:200] + ("…" if len(err_msg) > 200 else "")
-                    last_error = PushWardApiError(f"{method} {path} connection error: {snippet}")
+                    last_error = PushWardApiError(f"{method} {path} connection error: {self._truncate(str(err))}")
 
                 if attempt < MAX_RETRIES - 1:
                     delay = self._backoff_delay(attempt)
