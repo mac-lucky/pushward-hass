@@ -36,9 +36,11 @@ jobs:
       - uses: astral-sh/ruff-action@v3
         with:
           args: check custom_components/ tests/
+          version: latest
       - uses: astral-sh/ruff-action@v3
         with:
           args: format custom_components/ tests/
+          version: latest
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: auto-format with ruff"
