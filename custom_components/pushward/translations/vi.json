@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "URL mở khi nhấn vào thông báo. Yêu cầu HTTPS."
         },
-        "media": {
-          "name": "URL Hình Ảnh",
-          "description": "URL hình ảnh hiển thị trong thông báo. Yêu cầu HTTPS."
-        },
         "icon_url": {
           "name": "URL Biểu Tượng",
           "description": "URL biểu tượng thông báo. Yêu cầu HTTPS."

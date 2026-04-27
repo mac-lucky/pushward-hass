@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "Adres URL otwierany po dotknięciu powiadomienia."
         },
-        "media": {
-          "name": "URL obrazu",
-          "description": "Adres HTTPS obrazu do załączenia do powiadomienia."
-        },
         "icon_url": {
           "name": "URL ikony",
           "description": "Adres HTTPS niestandardowej ikony dla tego powiadomienia."

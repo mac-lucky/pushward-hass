@@ -558,3 +558,22 @@ async def test_send_notification_service_rejects_invalid_media_type(hass: HomeAs
             },
             blocking=True,
         )
+
+
+async def test_send_notification_service_rejects_category_with_actions(hass: HomeAssistant) -> None:
+    """category and actions are mutually exclusive — server owns aps.category when actions are set."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises((vol.Invalid, Exception)):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {
+                "title": "Test",
+                "body": "Hello",
+                "category": "MY_STATIC_CATEGORY",
+                "actions": [{"id": "ack", "title": "Ack"}],
+            },
+            blocking=True,
+        )

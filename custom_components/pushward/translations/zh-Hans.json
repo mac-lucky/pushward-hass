@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "点击通知时打开的 URL。"
         },
-        "media": {
-          "name": "图片 URL",
-          "description": "附加到通知的图片的 HTTPS URL。"
-        },
         "icon_url": {
           "name": "图标 URL",
           "description": "每条通知自定义图标的 HTTPS URL。"

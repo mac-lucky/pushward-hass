@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "Bildirime dokunulduğunda açılacak URL. HTTPS gereklidir."
         },
-        "media": {
-          "name": "Görsel URL",
-          "description": "Bildirimde gösterilecek görsel URL'si. HTTPS gereklidir."
-        },
         "icon_url": {
           "name": "Simge URL'si",
           "description": "Bildirim simgesi için URL. HTTPS gereklidir."

@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "URL que se abre al pulsar la notificación."
         },
-        "media": {
-          "name": "URL de imagen",
-          "description": "URL HTTPS de una imagen para adjuntar a la notificación."
-        },
         "icon_url": {
           "name": "URL de icono",
           "description": "URL HTTPS de un icono personalizado por notificación."

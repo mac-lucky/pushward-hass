@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "বিজ্ঞপ্তিতে ট্যাপ করলে খোলা URL। HTTPS প্রয়োজন।"
         },
-        "media": {
-          "name": "ছবির URL",
-          "description": "বিজ্ঞপ্তিতে দেখানো ছবির URL। HTTPS প্রয়োজন।"
-        },
         "icon_url": {
           "name": "আইকন URL",
           "description": "বিজ্ঞপ্তির আইকনের URL। HTTPS প্রয়োজন।"
