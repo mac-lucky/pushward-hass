@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "URL a abrir ao tocar na notificação."
         },
-        "image_url": {
-          "name": "URL da Imagem",
-          "description": "URL HTTPS de uma imagem para anexar à notificação."
-        },
         "icon_url": {
           "name": "URL do Ícone",
           "description": "URL HTTPS de um ícone personalizado por notificação."

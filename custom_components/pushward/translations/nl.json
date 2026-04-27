@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "URL die wordt geopend wanneer op de melding wordt getikt."
         },
-        "image_url": {
-          "name": "Afbeeldings-URL",
-          "description": "HTTPS-URL van een afbeelding om aan de melding te koppelen."
-        },
         "icon_url": {
           "name": "Pictogram-URL",
           "description": "HTTPS-URL van een aangepast pictogram per melding."

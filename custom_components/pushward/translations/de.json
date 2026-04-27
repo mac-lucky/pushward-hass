@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "URL, die beim Tippen auf die Benachrichtigung geöffnet wird."
         },
-        "image_url": {
-          "name": "Bild-URL",
-          "description": "HTTPS-URL eines an die Benachrichtigung anzuhängenden Bilds."
-        },
         "icon_url": {
           "name": "Symbol-URL",
           "description": "HTTPS-URL eines benutzerdefinierten Symbols pro Benachrichtigung."

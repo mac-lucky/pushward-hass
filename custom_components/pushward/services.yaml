@@ -412,12 +412,12 @@ send_notification:
       example: "https://example.com"
       selector:
         text:
-    image_url:
-      name: Image URL
-      description: URL of an image to attach to the notification.
-      example: "https://example.com/image.png"
+    media:
+      name: Media
+      description: Media attachment as an object with `url` (HTTPS) and `type` (image, video, or audio).
+      example: '{"url": "https://example.com/image.png", "type": "image"}'
       selector:
-        text:
+        object:
     icon_url:
       name: Icon URL
       description: URL of a custom icon to display with the notification.
@@ -427,6 +427,12 @@ send_notification:
     metadata:
       name: Metadata
       description: Arbitrary key-value pairs attached to the notification for custom app handling.
+      selector:
+        object:
+    actions:
+      name: Actions
+      description: List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`.
+      example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}]'
       selector:
         object:
     push:

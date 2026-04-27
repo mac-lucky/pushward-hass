@@ -244,9 +244,9 @@
           "name": "URL",
           "description": "URL to open when the notification is tapped."
         },
-        "image_url": {
-          "name": "Image URL",
-          "description": "HTTPS URL of an image to attach to the notification."
+        "media": {
+          "name": "Media",
+          "description": "Media attachment as an object with `url` (HTTPS) and `type` (image, video, or audio)."
         },
         "icon_url": {
           "name": "Icon URL",
@@ -255,6 +255,10 @@
         "metadata": {
           "name": "Metadata",
           "description": "Key-value pairs of additional metadata attached to the notification."
+        },
+        "actions": {
+          "name": "Actions",
+          "description": "List of action button objects with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`."
         }
       }
     }

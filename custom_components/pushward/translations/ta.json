@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "அறிவிப்பை தட்டும்போது திறக்கும் URL. HTTPS தேவை."
         },
-        "image_url": {
-          "name": "படம் URL",
-          "description": "அறிவிப்பில் காட்டப்படும் படத்திற்கான URL. HTTPS தேவை."
-        },
         "icon_url": {
           "name": "படவுரு URL",
           "description": "அறிவிப்பு படவுருவிற்கான URL. HTTPS தேவை."

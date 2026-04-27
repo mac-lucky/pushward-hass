@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "నోటిఫికేషన్ నొక్కినప్పుడు తెరవబడే URL. HTTPS అవసరం."
         },
-        "image_url": {
-          "name": "చిత్రం URL",
-          "description": "నోటిఫికేషన్‌లో చూపబడే చిత్రం URL. HTTPS అవసరం."
-        },
         "icon_url": {
           "name": "చిహ్నం URL",
           "description": "నోటిఫికేషన్ చిహ్నం కోసం URL. HTTPS అవసరం."

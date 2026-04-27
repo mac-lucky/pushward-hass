@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "सूचना पर टैप करने पर खुलने वाला URL। HTTPS आवश्यक है।"
         },
-        "image_url": {
-          "name": "छवि URL",
-          "description": "सूचना में दिखाई जाने वाली छवि का URL। HTTPS आवश्यक है।"
-        },
         "icon_url": {
           "name": "आइकन URL",
           "description": "सूचना आइकन का URL। HTTPS आवश्यक है।"

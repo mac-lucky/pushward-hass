@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "सूचनेवर टॅप केल्यावर उघडणारा URL. HTTPS आवश्यक आहे."
         },
-        "image_url": {
-          "name": "प्रतिमा URL",
-          "description": "सूचनेत दाखवण्यात येणाऱ्या प्रतिमेचा URL. HTTPS आवश्यक आहे."
-        },
         "icon_url": {
           "name": "चिन्ह URL",
           "description": "सूचना चिन्हासाठी URL. HTTPS आवश्यक आहे."

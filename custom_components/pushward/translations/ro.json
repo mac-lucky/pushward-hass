@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "URL deschis la atingerea notificării. Necesită HTTPS."
         },
-        "image_url": {
-          "name": "URL imagine",
-          "description": "URL-ul imaginii afișate în notificare. Necesită HTTPS."
-        },
         "icon_url": {
           "name": "URL pictogramă",
           "description": "URL pentru pictograma notificării. Necesită HTTPS."

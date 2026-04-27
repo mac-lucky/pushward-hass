@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "اطلاع پر ٹیپ کرنے پر کھلنے والا URL۔ HTTPS ضروری ہے۔"
         },
-        "image_url": {
-          "name": "تصویر URL",
-          "description": "اطلاع میں دکھائی جانے والی تصویر کا URL۔ HTTPS ضروری ہے۔"
-        },
         "icon_url": {
           "name": "آئیکن URL",
           "description": "اطلاع کے آئیکن کے لیے URL۔ HTTPS ضروری ہے۔"

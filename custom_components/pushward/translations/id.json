@@ -244,10 +244,6 @@
           "name": "URL",
           "description": "URL yang dibuka saat mengetuk notifikasi. Memerlukan HTTPS."
         },
-        "image_url": {
-          "name": "URL Gambar",
-          "description": "URL gambar yang ditampilkan dalam notifikasi. Memerlukan HTTPS."
-        },
         "icon_url": {
           "name": "URL Ikon",
           "description": "URL ikon notifikasi. Memerlukan HTTPS."
