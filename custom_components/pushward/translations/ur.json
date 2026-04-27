@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "اطلاع پر ٹیپ کرنے پر کھلنے والا URL۔ HTTPS ضروری ہے۔"
         },
-        "image_url": {
+        "media": {
           "name": "تصویر URL",
           "description": "اطلاع میں دکھائی جانے والی تصویر کا URL۔ HTTPS ضروری ہے۔"
         },

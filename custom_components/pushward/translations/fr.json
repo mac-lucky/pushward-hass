@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "URL à ouvrir lors d'un appui sur la notification."
         },
-        "image_url": {
+        "media": {
           "name": "URL de l'image",
           "description": "URL HTTPS d'une image à joindre à la notification."
         },

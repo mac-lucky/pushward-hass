@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "నోటిఫికేషన్ నొక్కినప్పుడు తెరవబడే URL. HTTPS అవసరం."
         },
-        "image_url": {
+        "media": {
           "name": "చిత్రం URL",
           "description": "నోటిఫికేషన్‌లో చూపబడే చిత్రం URL. HTTPS అవసరం."
         },

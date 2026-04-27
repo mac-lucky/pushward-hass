@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "通知をタップしたときに開く URL。"
         },
-        "image_url": {
+        "media": {
           "name": "画像 URL",
           "description": "通知に添付する画像の HTTPS URL。"
         },

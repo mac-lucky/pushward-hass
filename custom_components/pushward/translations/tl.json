@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "URL na bubukas kapag na-tap ang notification. Nangangailangan ng HTTPS."
         },
-        "image_url": {
+        "media": {
           "name": "URL ng Larawan",
           "description": "URL ng larawang ipinapakita sa notification. Nangangailangan ng HTTPS."
         },

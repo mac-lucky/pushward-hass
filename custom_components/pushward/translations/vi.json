@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "URL mở khi nhấn vào thông báo. Yêu cầu HTTPS."
         },
-        "image_url": {
+        "media": {
           "name": "URL Hình Ảnh",
           "description": "URL hình ảnh hiển thị trong thông báo. Yêu cầu HTTPS."
         },

@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "URL die wordt geopend wanneer op de melding wordt getikt."
         },
-        "image_url": {
+        "media": {
           "name": "Afbeeldings-URL",
           "description": "HTTPS-URL van een afbeelding om aan de melding te koppelen."
         },

@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "বিজ্ঞপ্তিতে ট্যাপ করলে খোলা URL। HTTPS প্রয়োজন।"
         },
-        "image_url": {
+        "media": {
           "name": "ছবির URL",
           "description": "বিজ্ঞপ্তিতে দেখানো ছবির URL। HTTPS প্রয়োজন।"
         },

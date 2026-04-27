@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "Adres URL otwierany po dotknięciu powiadomienia."
         },
-        "image_url": {
+        "media": {
           "name": "URL obrazu",
           "description": "Adres HTTPS obrazu do załączenia do powiadomienia."
         },

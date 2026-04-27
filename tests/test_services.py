@@ -484,8 +484,8 @@ async def test_update_activity_service_accepts_units_dict(hass: HomeAssistant) -
     assert content["units"] == {"Temp": "°C"}
 
 
-async def test_send_notification_service_accepts_url_image_icon_metadata(hass: HomeAssistant) -> None:
-    """send_notification forwards url, image_url, icon_url, and metadata."""
+async def test_send_notification_service_accepts_url_media_icon_metadata(hass: HomeAssistant) -> None:
+    """send_notification forwards url, media, icon_url, and metadata."""
     api = _mock_api()
     await _setup_entry(hass, api)
 
@@ -496,7 +496,7 @@ async def test_send_notification_service_accepts_url_image_icon_metadata(hass: H
             "title": "Test",
             "body": "Hello",
             "url": "https://example.com",
-            "image_url": "https://example.com/image.png",
+            "media": {"url": "https://example.com/image.png", "type": "image"},
             "icon_url": "https://example.com/icon.png",
             "metadata": {"key": "value"},
         },
@@ -506,6 +506,55 @@ async def test_send_notification_service_accepts_url_image_icon_metadata(hass: H
     api.create_notification.assert_awaited_once()
     call_kwargs = api.create_notification.call_args[1]
     assert call_kwargs["url"] == "https://example.com"
-    assert call_kwargs["image_url"] == "https://example.com/image.png"
+    assert call_kwargs["media"] == {"url": "https://example.com/image.png", "type": "image"}
     assert call_kwargs["icon_url"] == "https://example.com/icon.png"
     assert call_kwargs["metadata"] == {"key": "value"}
+
+
+async def test_send_notification_service_accepts_actions(hass: HomeAssistant) -> None:
+    """send_notification forwards an `actions` list to the API client."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    actions = [
+        {
+            "id": "open",
+            "title": "Open",
+            "url": "https://example.com",
+            "foreground": True,
+        },
+        {
+            "id": "dismiss",
+            "title": "Dismiss",
+            "destructive": True,
+        },
+    ]
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Test", "body": "Hello", "actions": actions},
+        blocking=True,
+    )
+
+    api.create_notification.assert_awaited_once()
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["actions"] == actions
+
+
+async def test_send_notification_service_rejects_invalid_media_type(hass: HomeAssistant) -> None:
+    """media.type must be one of image/video/audio."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises((vol.Invalid, Exception)):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {
+                "title": "Test",
+                "body": "Hello",
+                "media": {"url": "https://example.com/x.png", "type": "gif"},
+            },
+            blocking=True,
+        )

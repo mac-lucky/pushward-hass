@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "URL, die beim Tippen auf die Benachrichtigung geöffnet wird."
         },
-        "image_url": {
+        "media": {
           "name": "Bild-URL",
           "description": "HTTPS-URL eines an die Benachrichtigung anzuhängenden Bilds."
         },

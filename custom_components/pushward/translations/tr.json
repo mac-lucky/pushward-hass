@@ -244,7 +244,7 @@
           "name": "URL",
           "description": "Bildirime dokunulduğunda açılacak URL. HTTPS gereklidir."
         },
-        "image_url": {
+        "media": {
           "name": "Görsel URL",
           "description": "Bildirimde gösterilecek görsel URL'si. HTTPS gereklidir."
         },

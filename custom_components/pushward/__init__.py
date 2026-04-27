@@ -134,6 +134,27 @@ SCHEMA_DELETE_ACTIVITY = vol.Schema(
     }
 )
 
+_MEDIA_TYPES = ("image", "video", "audio")
+
+SCHEMA_MEDIA = vol.Schema(
+    {
+        vol.Required("url"): validate_url,
+        vol.Required("type"): vol.In(_MEDIA_TYPES),
+    }
+)
+
+SCHEMA_ACTION = vol.Schema(
+    {
+        vol.Required("id"): vol.All(str, vol.Length(min=1)),
+        vol.Required("title"): vol.All(str, vol.Length(min=1)),
+        vol.Optional("url"): validate_url,
+        vol.Optional("foreground"): cv.boolean,
+        vol.Optional("destructive"): cv.boolean,
+        vol.Optional("authentication_required"): cv.boolean,
+        vol.Optional("icon"): str,
+    }
+)
+
 SCHEMA_SEND_NOTIFICATION = vol.Schema(
     {
         vol.Required("title"): str,
@@ -148,9 +169,10 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
         vol.Optional("source_display_name"): str,
         vol.Optional("activity_slug"): validate_slug,
         vol.Optional("url"): validate_url,
-        vol.Optional("image_url"): validate_url,
+        vol.Optional("media"): SCHEMA_MEDIA,
         vol.Optional("icon_url"): validate_url,
         vol.Optional("metadata"): vol.Schema({str: str}),
+        vol.Optional("actions"): vol.All([SCHEMA_ACTION], vol.Length(max=10)),
         vol.Optional("push", default=True): bool,
     }
 )
@@ -219,9 +241,10 @@ _NOTIFICATION_FIELDS = [
     "source_display_name",
     "activity_slug",
     "url",
-    "image_url",
+    "media",
     "icon_url",
     "metadata",
+    "actions",
 ]
 
 

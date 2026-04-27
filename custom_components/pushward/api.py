@@ -135,9 +135,10 @@ class PushWardApiClient:
         source_display_name: str | None = None,
         activity_slug: str | None = None,
         url: str | None = None,
-        image_url: str | None = None,
+        media: dict | None = None,
         icon_url: str | None = None,
         metadata: dict[str, str] | None = None,
+        actions: list[dict] | None = None,
         push: bool = True,
     ) -> None:
         """Create a notification via POST /notifications."""
@@ -153,9 +154,10 @@ class PushWardApiClient:
             ("source_display_name", source_display_name),
             ("activity_slug", activity_slug),
             ("url", url),
-            ("image_url", image_url),
+            ("media", media),
             ("icon_url", icon_url),
             ("metadata", metadata),
+            ("actions", actions),
         ]:
             if val is not None:
                 payload[key] = val
