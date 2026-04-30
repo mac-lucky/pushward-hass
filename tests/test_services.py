@@ -556,5 +556,3 @@ async def test_send_notification_service_rejects_invalid_media_type(hass: HomeAs
             },
             blocking=True,
         )
-
-
