@@ -220,10 +220,6 @@
           "name": "Collapse ID",
           "description": "APNs நகல் நீக்கும் விசை. அதே விசையுள்ள முந்தைய அறிவிப்பை மாற்றுகிறது."
         },
-        "category": {
-          "name": "வகை",
-          "description": "தனிப்பயன் செயல்களுக்கான அறிவிப்பு வகை."
-        },
         "source": {
           "name": "மூலம்",
           "description": "PushWard inbox இல் தொகுப்பதற்கான மூல அடையாளம்."

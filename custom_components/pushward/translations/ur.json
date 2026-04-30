@@ -220,10 +220,6 @@
           "name": "Collapse ID",
           "description": "APNs ڈی ڈپلیکیشن کلید۔ ایک ہی کلید والی پچھلی اطلاع کو بدل دیتا ہے۔"
         },
-        "category": {
-          "name": "زمرہ",
-          "description": "اپنی مرضی کی کارروائیوں کے لیے اطلاع کا زمرہ۔"
-        },
         "source": {
           "name": "ماخذ",
           "description": "PushWard inbox میں گروپ بندی کے لیے ماخذ شناخت۔"

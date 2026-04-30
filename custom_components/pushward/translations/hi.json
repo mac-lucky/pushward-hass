@@ -220,10 +220,6 @@
           "name": "Collapse ID",
           "description": "APNs deduplication key। समान key वाली पिछली सूचना को बदल देता है।"
         },
-        "category": {
-          "name": "श्रेणी",
-          "description": "कस्टम क्रियाओं के लिए सूचना श्रेणी।"
-        },
         "source": {
           "name": "स्रोत",
           "description": "PushWard inbox में समूहीकरण के लिए स्रोत पहचानकर्ता।"

@@ -220,10 +220,6 @@
           "name": "Collapse-ID",
           "description": "APNs-Deduplizierungsschlüssel. Ersetzt eine vorherige Benachrichtigung mit demselben Schlüssel."
         },
-        "category": {
-          "name": "Kategorie",
-          "description": "Benachrichtigungskategorie für benutzerdefinierte Aktionen."
-        },
         "source": {
           "name": "Quelle",
           "description": "Quellkennung zur Gruppierung im PushWard-Posteingang."

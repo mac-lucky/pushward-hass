@@ -220,10 +220,6 @@
           "name": "折りたたみID",
           "description": "APNsの重複排除キー。同じキーを持つ以前の通知を置き換えます。"
         },
-        "category": {
-          "name": "カテゴリ",
-          "description": "カスタムアクション用の通知カテゴリ。"
-        },
         "source": {
           "name": "ソース",
           "description": "PushWardインボックスでのグループ化に使用するソース識別子。"

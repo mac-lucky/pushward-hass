@@ -220,10 +220,6 @@
           "name": "ID de comasare",
           "description": "Cheie de deduplicare APNs. Înlocuiește notificarea anterioară cu aceeași cheie."
         },
-        "category": {
-          "name": "Categorie",
-          "description": "Categoria notificării pentru acțiuni personalizate."
-        },
         "source": {
           "name": "Sursă",
           "description": "Identificatorul sursei pentru grupare în inbox-ul PushWard."

@@ -185,7 +185,6 @@ Send a push notification via PushWard.
 | `level` | No | iOS interruption level: passive, active, time-sensitive |
 | `thread_id` | No | Groups notifications in Notification Center |
 | `collapse_id` | No | APNs dedup key — replaces previous notification with same key (max 64 chars) |
-| `category` | No | Notification category for custom actions |
 | `source` | No | Source identifier for grouping in PushWard inbox |
 | `source_display_name` | No | Human-readable source name in PushWard inbox |
 | `activity_slug` | No | Link notification to an existing Live Activity |

@@ -220,10 +220,6 @@
           "name": "Collapse ID",
           "description": "APNs डिडुप्लिकेशन की. समान की असलेल्या मागील सूचनेची जागा घेते."
         },
-        "category": {
-          "name": "वर्ग",
-          "description": "कस्टम क्रियांसाठी सूचना वर्ग."
-        },
         "source": {
           "name": "स्रोत",
           "description": "PushWard inbox मध्ये गटबद्ध करण्यासाठी स्रोत ओळखकर्ता."

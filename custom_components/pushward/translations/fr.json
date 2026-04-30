@@ -220,10 +220,6 @@
           "name": "ID de regroupement",
           "description": "Clé de déduplication APNs. Remplace la notification précédente portant la même clé."
         },
-        "category": {
-          "name": "Catégorie",
-          "description": "Catégorie de notification pour les actions personnalisées."
-        },
         "source": {
           "name": "Source",
           "description": "Identifiant de source pour le regroupement dans la boîte de réception PushWard."

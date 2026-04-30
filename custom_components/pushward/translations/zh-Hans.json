@@ -220,10 +220,6 @@
           "name": "折叠 ID",
           "description": "APNs 去重键，用相同键替换之前的通知。"
         },
-        "category": {
-          "name": "类别",
-          "description": "自定义操作的通知类别。"
-        },
         "source": {
           "name": "来源",
           "description": "用于在 PushWard 收件箱中分组的来源标识符。"

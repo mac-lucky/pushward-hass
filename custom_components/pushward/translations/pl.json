@@ -220,10 +220,6 @@
           "name": "ID łączenia",
           "description": "Klucz deduplikacji APNs. Zastępuje poprzednie powiadomienie z tym samym kluczem."
         },
-        "category": {
-          "name": "Kategoria",
-          "description": "Kategoria powiadomienia dla akcji niestandardowych."
-        },
         "source": {
           "name": "Źródło",
           "description": "Identyfikator źródła do grupowania w skrzynce PushWard."

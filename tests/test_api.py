@@ -232,7 +232,6 @@ async def test_create_notification_all_fields():
         volume=0.8,
         thread_id="security",
         collapse_id="motion-front",
-        category="SECURITY",
         source="home-assistant",
         source_display_name="Home Assistant",
         activity_slug="ha-motion",
@@ -247,7 +246,6 @@ async def test_create_notification_all_fields():
     assert body["volume"] == 0.8
     assert body["thread_id"] == "security"
     assert body["collapse_id"] == "motion-front"
-    assert body["category"] == "SECURITY"
     assert body["source"] == "home-assistant"
     assert body["source_display_name"] == "Home Assistant"
     assert body["activity_slug"] == "ha-motion"

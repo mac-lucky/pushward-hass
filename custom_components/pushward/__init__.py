@@ -164,7 +164,6 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
         vol.Optional("volume"): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=1.0)),
         vol.Optional("thread_id"): str,
         vol.Optional("collapse_id"): vol.All(str, vol.Length(max=64)),
-        vol.Exclusive("category", "category_or_actions"): str,
         vol.Optional("source"): str,
         vol.Optional("source_display_name"): str,
         vol.Optional("activity_slug"): validate_slug,
@@ -172,7 +171,7 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
         vol.Optional("media"): SCHEMA_MEDIA,
         vol.Optional("icon_url"): validate_url,
         vol.Optional("metadata"): vol.Schema({str: str}),
-        vol.Exclusive("actions", "category_or_actions"): vol.All([SCHEMA_ACTION], vol.Length(max=10)),
+        vol.Optional("actions"): vol.All([SCHEMA_ACTION], vol.Length(max=10)),
         vol.Optional("push", default=True): bool,
     }
 )
@@ -236,7 +235,6 @@ _NOTIFICATION_FIELDS = [
     "volume",
     "thread_id",
     "collapse_id",
-    "category",
     "source",
     "source_display_name",
     "activity_slug",

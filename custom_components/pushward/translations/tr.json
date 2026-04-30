@@ -220,10 +220,6 @@
           "name": "Daraltma Kimliği",
           "description": "APNs tekilleştirme anahtarı. Aynı anahtara sahip önceki bildirimin yerini alır."
         },
-        "category": {
-          "name": "Kategori",
-          "description": "Özel eylemler için bildirim kategorisi."
-        },
         "source": {
           "name": "Kaynak",
           "description": "PushWard gelen kutusunda gruplandırma için kaynak tanımlayıcısı."

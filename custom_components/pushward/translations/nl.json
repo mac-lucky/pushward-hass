@@ -220,10 +220,6 @@
           "name": "Samenvouwings-ID",
           "description": "APNs-deduplicatiesleutel. Vervangt een eerdere melding met dezelfde sleutel."
         },
-        "category": {
-          "name": "Categorie",
-          "description": "Meldingscategorie voor aangepaste acties."
-        },
         "source": {
           "name": "Bron",
           "description": "Bronidentificator voor groepering in de PushWard-inbox."

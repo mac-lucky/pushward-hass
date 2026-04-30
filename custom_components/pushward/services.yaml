@@ -382,12 +382,6 @@ send_notification:
       example: "door-alert"
       selector:
         text:
-    category:
-      name: Category
-      description: Notification category for custom actions.
-      example: "SECURITY"
-      selector:
-        text:
     source:
       name: Source
       description: Source identifier for grouping in the PushWard inbox.

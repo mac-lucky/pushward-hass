@@ -220,10 +220,6 @@
           "name": "ID collasso",
           "description": "Chiave di deduplicazione APNs. Sostituisce la notifica precedente con la stessa chiave."
         },
-        "category": {
-          "name": "Categoria",
-          "description": "Categoria della notifica per azioni personalizzate."
-        },
         "source": {
           "name": "Sorgente",
           "description": "Identificatore sorgente per il raggruppamento nella casella PushWard."

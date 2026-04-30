@@ -220,10 +220,6 @@
           "name": "Collapse ID",
           "description": "APNs deduplication key. Pinapalitan ang nakaraang notification na may parehong key."
         },
-        "category": {
-          "name": "Kategorya",
-          "description": "Kategorya ng notification para sa mga custom na aksyon."
-        },
         "source": {
           "name": "Pinagmulan",
           "description": "Source identifier para sa paggrupo sa PushWard inbox."

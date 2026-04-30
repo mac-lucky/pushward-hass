@@ -220,10 +220,6 @@
           "name": "ID de Colapso",
           "description": "Chave de deduplicação APNs. Substitui a notificação anterior com a mesma chave."
         },
-        "category": {
-          "name": "Categoria",
-          "description": "Categoria da notificação para ações personalizadas."
-        },
         "source": {
           "name": "Origem",
           "description": "Identificador de origem para agrupamento na caixa de entrada do PushWard."

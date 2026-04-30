@@ -253,7 +253,6 @@ async def test_service_send_notification_all_fields(hass: HomeAssistant) -> None
             "volume": 0.8,
             "thread_id": "security",
             "collapse_id": "motion-front",
-            "category": "SECURITY",
             "source": "home-assistant",
             "source_display_name": "Home Assistant",
             "activity_slug": "ha-motion",
@@ -271,7 +270,6 @@ async def test_service_send_notification_all_fields(hass: HomeAssistant) -> None
     assert call_kwargs["volume"] == 0.8
     assert call_kwargs["thread_id"] == "security"
     assert call_kwargs["collapse_id"] == "motion-front"
-    assert call_kwargs["category"] == "SECURITY"
     assert call_kwargs["source"] == "home-assistant"
     assert call_kwargs["source_display_name"] == "Home Assistant"
     assert call_kwargs["activity_slug"] == "ha-motion"
@@ -560,20 +558,3 @@ async def test_send_notification_service_rejects_invalid_media_type(hass: HomeAs
         )
 
 
-async def test_send_notification_service_rejects_category_with_actions(hass: HomeAssistant) -> None:
-    """category and actions are mutually exclusive — server owns aps.category when actions are set."""
-    api = _mock_api()
-    await _setup_entry(hass, api)
-
-    with pytest.raises((vol.Invalid, Exception)):
-        await hass.services.async_call(
-            DOMAIN,
-            "send_notification",
-            {
-                "title": "Test",
-                "body": "Hello",
-                "category": "MY_STATIC_CATEGORY",
-                "actions": [{"id": "ack", "title": "Ack"}],
-            },
-            blocking=True,
-        )

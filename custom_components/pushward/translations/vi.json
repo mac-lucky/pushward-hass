@@ -220,10 +220,6 @@
           "name": "ID Thu Gọn",
           "description": "Khóa loại trùng lặp APNs. Thay thế thông báo trước có cùng khóa."
         },
-        "category": {
-          "name": "Danh Mục",
-          "description": "Danh mục thông báo dành cho các hành động tùy chỉnh."
-        },
         "source": {
           "name": "Nguồn",
           "description": "Mã định danh nguồn để nhóm trong hộp thư PushWard."
