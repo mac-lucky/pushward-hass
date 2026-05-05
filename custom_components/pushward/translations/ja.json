@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "PushWardに接続",
-        "description": "PushWardの統合キーを入力して開始してください。iOSアプリは現在TestFlightでパブリックベータ版です(App Storeにはまだ公開されていません): https://testflight.apple.com/join/T4aT6s3W",
+        "description": "PushWardの統合キーを入力して開始してください。iOSアプリは現在TestFlightでパブリックベータ版です(App Storeにはまだ公開されていません): {testflight_url}",
         "data": {
           "integration_key": "統合キー"
         },
         "data_description": {
-          "integration_key": "PushWard iOSアプリ(TestFlight: https://testflight.apple.com/join/T4aT6s3W)を開き、設定 → 統合キーへ移動します。デフォルトのキーをそのまま貼り付けるか、スコープ 'ha-*' で新しいキーを作成してください。"
+          "integration_key": "PushWard iOSアプリ(TestFlight: {testflight_url})を開き、設定 → 統合キーへ移動します。デフォルトのキーをそのまま貼り付けるか、スコープ 'ha-*' で新しいキーを作成してください。"
         }
       },
       "reconfigure": {

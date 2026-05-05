@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "Conectar ao PushWard",
-        "description": "Informe sua chave de integração PushWard para começar. O aplicativo iOS está atualmente em beta pública no TestFlight (ainda não está na App Store): https://testflight.apple.com/join/T4aT6s3W",
+        "description": "Informe sua chave de integração PushWard para começar. O aplicativo iOS está atualmente em beta pública no TestFlight (ainda não está na App Store): {testflight_url}",
         "data": {
           "integration_key": "Chave de Integração"
         },
         "data_description": {
-          "integration_key": "Abra o aplicativo PushWard iOS (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Configurações → Chaves de Integração. Você pode colar a chave padrão ou criar uma nova com escopo 'ha-*'."
+          "integration_key": "Abra o aplicativo PushWard iOS (TestFlight: {testflight_url}) → Configurações → Chaves de Integração. Você pode colar a chave padrão ou criar uma nova com escopo 'ha-*'."
         }
       },
       "reconfigure": {

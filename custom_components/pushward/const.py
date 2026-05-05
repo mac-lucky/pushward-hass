@@ -60,6 +60,7 @@ CONF_TEXT_COLOR_ATTRIBUTE = "text_color_attribute"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
+TESTFLIGHT_URL = "https://testflight.apple.com/join/T4aT6s3W"
 DEFAULT_PRIORITY = 1
 DEFAULT_UPDATE_INTERVAL = 5
 DEFAULT_TOTAL_STEPS = 1

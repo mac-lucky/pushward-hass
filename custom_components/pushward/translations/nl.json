@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "Verbinding maken met PushWard",
-        "description": "Voer je PushWard-integratiesleutel in om te beginnen. De iOS-app is momenteel in publieke bèta op TestFlight (nog niet in de App Store): https://testflight.apple.com/join/T4aT6s3W",
+        "description": "Voer je PushWard-integratiesleutel in om te beginnen. De iOS-app is momenteel in publieke bèta op TestFlight (nog niet in de App Store): {testflight_url}",
         "data": {
           "integration_key": "Integratiesleutel"
         },
         "data_description": {
-          "integration_key": "Open de PushWard iOS-app (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Instellingen → Integratiesleutels. Je kunt de standaardsleutel plakken of een nieuwe aanmaken met bereik 'ha-*'."
+          "integration_key": "Open de PushWard iOS-app (TestFlight: {testflight_url}) → Instellingen → Integratiesleutels. Je kunt de standaardsleutel plakken of een nieuwe aanmaken met bereik 'ha-*'."
         }
       },
       "reconfigure": {

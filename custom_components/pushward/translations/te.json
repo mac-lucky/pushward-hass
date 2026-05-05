@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "PushWard కు కనెక్ట్ అవ్వండి",
-        "description": "ప్రారంభించడానికి మీ PushWard ఇంటిగ్రేషన్ కీని నమోదు చేయండి. iOS యాప్ ప్రస్తుతం App Store లో లేదు; ఇది TestFlight లో పబ్లిక్ బీటాలో ఉంది: https://testflight.apple.com/join/T4aT6s3W",
+        "description": "ప్రారంభించడానికి మీ PushWard ఇంటిగ్రేషన్ కీని నమోదు చేయండి. iOS యాప్ ప్రస్తుతం App Store లో లేదు; ఇది TestFlight లో పబ్లిక్ బీటాలో ఉంది: {testflight_url}",
         "data": {
           "integration_key": "ఇంటిగ్రేషన్ కీ"
         },
         "data_description": {
-          "integration_key": "PushWard iOS యాప్‌ను తెరవండి (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Settings → Integration Keys. మీరు డిఫాల్ట్ కీని పేస్ట్ చేయవచ్చు లేదా 'ha-*' స్కోప్‌తో కొత్తదాన్ని సృష్టించవచ్చు."
+          "integration_key": "PushWard iOS యాప్‌ను తెరవండి (TestFlight: {testflight_url}) → Settings → Integration Keys. మీరు డిఫాల్ట్ కీని పేస్ట్ చేయవచ్చు లేదా 'ha-*' స్కోప్‌తో కొత్తదాన్ని సృష్టించవచ్చు."
         }
       },
       "reconfigure": {

@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "Kumonekta sa PushWard",
-        "description": "Ilagay ang iyong PushWard integration key para makapagsimula. Ang iOS app ay kasalukuyang nasa public beta sa TestFlight (hindi pa sa App Store): https://testflight.apple.com/join/T4aT6s3W",
+        "description": "Ilagay ang iyong PushWard integration key para makapagsimula. Ang iOS app ay kasalukuyang nasa public beta sa TestFlight (hindi pa sa App Store): {testflight_url}",
         "data": {
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Buksan ang PushWard iOS app (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Settings → Integration Keys. Maaari mong i-paste ang default key, o lumikha ng bago na may scope na 'ha-*'."
+          "integration_key": "Buksan ang PushWard iOS app (TestFlight: {testflight_url}) → Settings → Integration Keys. Maaari mong i-paste ang default key, o lumikha ng bago na may scope na 'ha-*'."
         }
       },
       "reconfigure": {

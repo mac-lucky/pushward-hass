@@ -103,6 +103,7 @@ from .const import (
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     TEMPLATES,
+    TESTFLIGHT_URL,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
     WARNING_THRESHOLD_MAX,
@@ -761,6 +762,7 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=_INTEGRATION_KEY_SCHEMA,
             errors=errors,
+            description_placeholders={"testflight_url": TESTFLIGHT_URL},
         )
 
     async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:

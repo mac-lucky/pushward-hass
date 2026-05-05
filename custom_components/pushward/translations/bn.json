@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "PushWard-এর সাথে সংযুক্ত হন",
-        "description": "শুরু করতে আপনার PushWard ইন্টিগ্রেশন কী লিখুন। iOS অ্যাপটি এখনও App Store-এ নেই; এটি বর্তমানে TestFlight-এ পাবলিক বিটায় রয়েছে: https://testflight.apple.com/join/T4aT6s3W",
+        "description": "শুরু করতে আপনার PushWard ইন্টিগ্রেশন কী লিখুন। iOS অ্যাপটি এখনও App Store-এ নেই; এটি বর্তমানে TestFlight-এ পাবলিক বিটায় রয়েছে: {testflight_url}",
         "data": {
           "integration_key": "ইন্টিগ্রেশন কী"
         },
         "data_description": {
-          "integration_key": "PushWard iOS অ্যাপ খুলুন (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Settings → Integration Keys। আপনি ডিফল্ট কী পেস্ট করতে পারেন, অথবা 'ha-*' স্কোপ সহ একটি নতুন তৈরি করতে পারেন।"
+          "integration_key": "PushWard iOS অ্যাপ খুলুন (TestFlight: {testflight_url}) → Settings → Integration Keys। আপনি ডিফল্ট কী পেস্ট করতে পারেন, অথবা 'ha-*' স্কোপ সহ একটি নতুন তৈরি করতে পারেন।"
         }
       },
       "reconfigure": {

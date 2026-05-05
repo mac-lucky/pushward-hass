@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "Hubungkan ke PushWard",
-        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Aplikasi iOS saat ini tersedia dalam beta publik di TestFlight (belum di App Store): https://testflight.apple.com/join/T4aT6s3W",
+        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Aplikasi iOS saat ini tersedia dalam beta publik di TestFlight (belum di App Store): {testflight_url}",
         "data": {
           "integration_key": "Kunci Integrasi"
         },
         "data_description": {
-          "integration_key": "Buka aplikasi PushWard iOS (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Pengaturan → Integration Keys. Anda bisa menempelkan kunci default, atau membuat yang baru dengan cakupan 'ha-*'."
+          "integration_key": "Buka aplikasi PushWard iOS (TestFlight: {testflight_url}) → Pengaturan → Integration Keys. Anda bisa menempelkan kunci default, atau membuat yang baru dengan cakupan 'ha-*'."
         }
       },
       "reconfigure": {

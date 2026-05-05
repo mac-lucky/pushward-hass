@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "PushWard'a Bağlan",
-        "description": "Başlamak için PushWard entegrasyon anahtarınızı girin. iOS uygulaması şu anda TestFlight'ta herkese açık beta sürümünde (henüz App Store'da değil): https://testflight.apple.com/join/T4aT6s3W",
+        "description": "Başlamak için PushWard entegrasyon anahtarınızı girin. iOS uygulaması şu anda TestFlight'ta herkese açık beta sürümünde (henüz App Store'da değil): {testflight_url}",
         "data": {
           "integration_key": "Entegrasyon Anahtarı"
         },
         "data_description": {
-          "integration_key": "PushWard iOS uygulamasını açın (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Ayarlar → Entegrasyon Anahtarları. Varsayılan anahtarı yapıştırabilir veya 'ha-*' kapsamıyla yeni bir tane oluşturabilirsiniz."
+          "integration_key": "PushWard iOS uygulamasını açın (TestFlight: {testflight_url}) → Ayarlar → Entegrasyon Anahtarları. Varsayılan anahtarı yapıştırabilir veya 'ha-*' kapsamıyla yeni bir tane oluşturabilirsiniz."
         }
       },
       "reconfigure": {
