@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "连接到 PushWard",
-        "description": "输入您的 PushWard 集成密钥以开始使用。",
+        "description": "输入您的 PushWard 集成密钥以开始使用。iOS 应用目前在 TestFlight 公测中(尚未在 App Store 上架):https://testflight.apple.com/join/T4aT6s3W",
         "data": {
           "integration_key": "集成密钥"
         },
         "data_description": {
-          "integration_key": "在 PushWard iOS 应用中，前往设置 → 集成密钥，创建范围为 'ha-*' 的密钥。"
+          "integration_key": "打开 PushWard iOS 应用(TestFlight:https://testflight.apple.com/join/T4aT6s3W)→ 设置 → 集成密钥。您可以直接粘贴默认密钥,或创建一个范围为 'ha-*' 的新密钥。"
         }
       },
       "reconfigure": {

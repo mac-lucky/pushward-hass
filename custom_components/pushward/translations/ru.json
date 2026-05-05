@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "Подключиться к PushWard",
-        "description": "Введите ключ интеграции PushWard для начала работы.",
+        "description": "Введите ключ интеграции PushWard для начала работы. Приложение для iOS сейчас доступно в публичной бета-версии в TestFlight (пока не в App Store): https://testflight.apple.com/join/T4aT6s3W",
         "data": {
           "integration_key": "Ключ интеграции"
         },
         "data_description": {
-          "integration_key": "Создайте его в iOS-приложении PushWard в разделе Настройки → Ключи интеграции с областью 'ha-*'."
+          "integration_key": "Откройте приложение PushWard iOS (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Настройки → Ключи интеграции. Можно вставить ключ по умолчанию или создать новый с областью 'ha-*'."
         }
       },
       "reconfigure": {

@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "PushWard உடன் இணை",
-        "description": "தொடங்க உங்கள் PushWard ஒருங்கிணைப்பு விசையை உள்ளிடவும்.",
+        "description": "தொடங்க உங்கள் PushWard ஒருங்கிணைப்பு விசையை உள்ளிடவும். iOS app தற்போது App Store-இல் இல்லை; இது TestFlight-இல் பொது பீட்டாவில் உள்ளது: https://testflight.apple.com/join/T4aT6s3W",
         "data": {
           "integration_key": "ஒருங்கிணைப்பு விசை"
         },
         "data_description": {
-          "integration_key": "PushWard iOS app இல் Settings → Integration Keys இல் 'ha-*' scope உடன் ஒன்றை உருவாக்கவும்."
+          "integration_key": "PushWard iOS app-ஐ திறக்கவும் (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Settings → Integration Keys. நீங்கள் இயல்புநிலை விசையை ஒட்டலாம், அல்லது 'ha-*' scope உடன் ஒரு புதியதை உருவாக்கலாம்."
         }
       },
       "reconfigure": {

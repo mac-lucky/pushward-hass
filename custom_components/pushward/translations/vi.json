@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "Kết Nối với PushWard",
-        "description": "Nhập khóa tích hợp PushWard của bạn để bắt đầu.",
+        "description": "Nhập khóa tích hợp PushWard của bạn để bắt đầu. Ứng dụng iOS hiện đang trong bản beta công khai trên TestFlight (chưa có trên App Store): https://testflight.apple.com/join/T4aT6s3W",
         "data": {
           "integration_key": "Khóa Tích Hợp"
         },
         "data_description": {
-          "integration_key": "Tạo trong ứng dụng PushWard iOS tại Cài đặt → Khóa Tích Hợp với phạm vi 'ha-*'."
+          "integration_key": "Mở ứng dụng PushWard iOS (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Cài đặt → Khóa Tích Hợp. Bạn có thể dán khóa mặc định hoặc tạo khóa mới với phạm vi 'ha-*'."
         }
       },
       "reconfigure": {

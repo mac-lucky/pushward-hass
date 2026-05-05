@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "الاتصال بـ PushWard",
-        "description": "أدخل مفتاح التكامل الخاص بك في PushWard للبدء.",
+        "description": "أدخل مفتاح التكامل الخاص بك في PushWard للبدء. تطبيق iOS متاح حاليًا في النسخة التجريبية العامة عبر TestFlight (وليس بعد على App Store): https://testflight.apple.com/join/T4aT6s3W",
         "data": {
           "integration_key": "مفتاح التكامل"
         },
         "data_description": {
-          "integration_key": "أنشئ مفتاحاً في تطبيق PushWard iOS ضمن الإعدادات ← Integration Keys بنطاق 'ha-*'."
+          "integration_key": "افتح تطبيق PushWard iOS (TestFlight: https://testflight.apple.com/join/T4aT6s3W) ← الإعدادات ← Integration Keys. يمكنك لصق المفتاح الافتراضي، أو إنشاء مفتاح جديد بنطاق 'ha-*'."
         }
       },
       "reconfigure": {

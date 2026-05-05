@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "PushWard से कनेक्ट करें",
-        "description": "शुरू करने के लिए अपनी PushWard इंटीग्रेशन की दर्ज करें।",
+        "description": "शुरू करने के लिए अपनी PushWard इंटीग्रेशन की दर्ज करें। iOS ऐप अभी App Store पर नहीं है; यह वर्तमान में TestFlight पर पब्लिक बीटा में है: https://testflight.apple.com/join/T4aT6s3W",
         "data": {
           "integration_key": "इंटीग्रेशन की"
         },
         "data_description": {
-          "integration_key": "PushWard iOS ऐप में Settings → Integration Keys के अंतर्गत 'ha-*' scope के साथ एक बनाएं।"
+          "integration_key": "PushWard iOS ऐप खोलें (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Settings → Integration Keys। आप डिफ़ॉल्ट की पेस्ट कर सकते हैं, या 'ha-*' scope के साथ एक नई की बना सकते हैं।"
         }
       },
       "reconfigure": {

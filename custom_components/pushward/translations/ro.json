@@ -255,12 +255,12 @@
     "step": {
       "user": {
         "title": "Conectați-vă la PushWard",
-        "description": "Introduceți cheia de integrare PushWard pentru a începe.",
+        "description": "Introduceți cheia de integrare PushWard pentru a începe. Aplicația iOS este în prezent în beta publică pe TestFlight (încă nu este în App Store): https://testflight.apple.com/join/T4aT6s3W",
         "data": {
           "integration_key": "Cheie de integrare"
         },
         "data_description": {
-          "integration_key": "Creați una în aplicația PushWard iOS la Setări → Chei de integrare cu domeniul 'ha-*'."
+          "integration_key": "Deschideți aplicația PushWard iOS (TestFlight: https://testflight.apple.com/join/T4aT6s3W) → Setări → Chei de integrare. Puteți lipi cheia implicită sau crea una nouă cu domeniul 'ha-*'."
         }
       },
       "reconfigure": {
