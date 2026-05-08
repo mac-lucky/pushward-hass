@@ -356,8 +356,11 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
     elif template == "gauge":
         _, max_val = _gauge_base_fields(content, entity_config)
-        content["value"] = max_val
-        content["progress"] = 1.0
+        if last_content and "value" in last_content:
+            content["value"] = last_content["value"]
+        else:
+            content["value"] = max_val
+            content["progress"] = 1.0
     elif template == "timeline":
         if last_content and "value" in last_content:
             content["value"] = last_content["value"]

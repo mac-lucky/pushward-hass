@@ -1148,6 +1148,26 @@ def test_map_completion_content_gauge():
     assert content["progress"] == 1.0
 
 
+def test_map_completion_content_gauge_preserves_last_value():
+    """Gauge completion preserves the final live value (e.g. blinds at 50%)."""
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_ICON: "gauge",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+        CONF_UNIT: "%",
+    }
+    last = {"value": 50.0, "progress": 0.5, "subtitle": "Half"}
+
+    content = map_completion_content(config, last_content=last)
+
+    assert content["value"] == 50.0
+    assert content["progress"] == 0.5
+    assert content["subtitle"] == "Half"
+    assert content["max_value"] == 100.0
+    assert content["unit"] == "%"
+
+
 # --- timeline template ---
 
 
