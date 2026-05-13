@@ -192,6 +192,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "Refresh Widget",
+      "description": "Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to iOS even when the value hasn't changed.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Widget slug identifier. Either slug or entity_id must be provided."
+        },
+        "entity_id": {
+          "name": "Entity",
+          "description": "HA entity bound to the widget. Either slug or entity_id must be provided."
+        }
+      }
+    },
     "send_notification": {
       "name": "Send Notification",
       "description": "Send a push notification via PushWard.",
@@ -257,6 +271,11 @@
           "description": "List of action button objects with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`."
         }
       }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "No PushWard widget matches slug={slug} entity_id={entity_id}."
     }
   },
   "config": {
@@ -352,8 +371,14 @@
             "completion_message": "Completion Message",
             "accent_color": "Accent Color",
             "accent_color_attribute": "Accent Color Attribute",
-            "url": "URL",
-            "secondary_url": "Secondary URL",
+            "tap_action_url": "Tap Action URL",
+            "tap_action_foreground": "Open Tap Action URL",
+            "url": "Primary Button URL",
+            "url_foreground": "Open Primary Button URL",
+            "url_title": "Primary Button Title",
+            "secondary_url": "Secondary Button URL",
+            "secondary_url_foreground": "Open Secondary Button URL",
+            "secondary_url_title": "Secondary Button Title",
             "ended_ttl": "Auto-Delete After End (seconds)",
             "stale_ttl": "Auto-End After Idle (seconds)",
             "sound": "Sound",
@@ -397,8 +422,14 @@
             "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
             "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
             "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
-            "url": "Link opened when tapping the Live Activity. Must start with http:// or https://. Steps and alert templates only.",
-            "secondary_url": "Secondary link for the Live Activity. Steps and alert templates only.",
+            "tap_action_url": "Optional URL opened when tapping the Live Activity background. Supports http(s) (opens Safari) or custom schemes like homeassistant://navigate/lovelace/0 (opens that app).",
+            "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background without leaving the Lock Screen.",
+            "url": "Primary button URL. Steps and alert templates only. Supports http(s) or custom schemes.",
+            "url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
+            "url_title": "Primary button label (max 64 characters).",
+            "secondary_url": "Secondary button URL. Steps and alert templates only.",
+            "secondary_url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
+            "secondary_url_title": "Secondary button label (max 64 characters).",
             "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
             "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800",
             "sound": "Sound played on every update for this entity. Leave empty to use no override.",
@@ -426,12 +457,102 @@
         }
       },
       "error": {
-        "invalid_url": "URL must use http:// or https:// scheme.",
+        "invalid_url": "URL must include a valid scheme. Use http(s):// or a custom app scheme like homeassistant://.",
+        "silent_requires_http": "Silent webhook (foreground off) requires an http:// or https:// URL.",
         "invalid_gauge_range": "Minimum value must be less than maximum value."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",
         "reconfigure_successful": "Entity configuration updated."
+      }
+    },
+    "tracked_widget": {
+      "entry_type": "Tracked Widget",
+      "initiate_flow": {
+        "user": "Add tracked widget"
+      },
+      "step": {
+        "user": {
+          "title": "Add Widget to PushWard",
+          "data": {
+            "entity_id": "Entity",
+            "widget_template": "Template",
+            "slug": "Widget Slug"
+          },
+          "data_description": {
+            "widget_template": "Widget layout. Use `value` for a single number, `progress` for a 0–1 bar, `gauge` for a value-in-range, `status` for a severity badge, or `stat_list` for up to 4 rows.",
+            "slug": "Unique identifier for this widget. Leave empty to auto-generate from entity ID."
+          }
+        },
+        "reconfigure": {
+          "title": "Edit Widget",
+          "data": {
+            "entity_id": "Entity",
+            "widget_template": "Template",
+            "slug": "Widget Slug"
+          },
+          "data_description": {
+            "widget_template": "Widget layout.",
+            "slug": "Unique identifier for this widget."
+          }
+        },
+        "details": {
+          "title": "Widget Options",
+          "data": {
+            "widget_name": "Widget Name",
+            "value_attribute": "Value Attribute",
+            "unit": "Unit",
+            "min_value": "Minimum Value",
+            "max_value": "Maximum Value",
+            "severity": "Severity",
+            "stat_rows": "Stat Rows",
+            "label": "Label",
+            "label_attribute": "Label Attribute",
+            "subtitle_attribute": "Subtitle Attribute",
+            "icon": "Icon",
+            "icon_attribute": "Icon Attribute",
+            "accent_color": "Accent Color",
+            "accent_color_attribute": "Accent Color Attribute",
+            "background_color": "Background Color",
+            "text_color": "Text Color",
+            "widget_trigger_mode": "Trigger Mode",
+            "widget_poll_interval": "Poll Interval (seconds)",
+            "tap_action_url": "Tap Action URL",
+            "tap_action_foreground": "Open Tap Action URL"
+          },
+          "data_description": {
+            "widget_name": "Display name shown in the iOS widget picker. Defaults to the entity's friendly name.",
+            "value_attribute": "Entity attribute holding the value. Leave empty to use the entity's primary state.",
+            "unit": "Display unit shown next to the value. Max 32 characters.",
+            "min_value": "Minimum value for the gauge range.",
+            "max_value": "Maximum value for the gauge range.",
+            "severity": "Status severity (info, warning, critical, success).",
+            "stat_rows": "Up to 4 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Static label shown on the widget. Leave empty to derive from the entity.",
+            "label_attribute": "Entity attribute used as the label. Overrides the static label.",
+            "subtitle_attribute": "Entity attribute shown as the widget subtitle.",
+            "icon": "Static icon. SF Symbols and MDI names supported.",
+            "icon_attribute": "Entity attribute for a dynamic icon. Overrides the static icon.",
+            "accent_color": "Accent color for the widget. Leave empty for the default.",
+            "accent_color_attribute": "Entity attribute for a dynamic accent color.",
+            "background_color": "Optional background color.",
+            "text_color": "Optional text color.",
+            "widget_trigger_mode": "How updates are triggered. `event` reacts to state changes; `poll` re-evaluates on a fixed interval.",
+            "widget_poll_interval": "Interval between polls (10–3600 seconds). Only used when trigger mode is `poll`.",
+            "tap_action_url": "Optional URL opened when tapping the widget. Supports http(s) (opens Safari) or custom schemes like homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL must include a valid scheme. Use http(s):// or a custom app scheme like homeassistant://.",
+        "silent_requires_http": "Silent webhook (foreground off) requires an http:// or https:// URL.",
+        "invalid_gauge_range": "Minimum value must be less than maximum value.",
+        "stat_rows_required": "At least one stat row is required for the stat_list template."
+      },
+      "abort": {
+        "already_configured": "A widget with this slug already exists.",
+        "reconfigure_successful": "Widget configuration updated."
       }
     }
   }

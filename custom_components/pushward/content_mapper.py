@@ -5,8 +5,10 @@ from __future__ import annotations
 import logging
 import re
 import time
+from urllib.parse import urlparse
 
-from homeassistant.core import State
+from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers import entity_registry as er
 from homeassistant.util.color import (
     color_hs_to_RGB,
     color_temperature_to_rgb,
@@ -31,6 +33,8 @@ from .const import (
     CONF_REMAINING_TIME_ATTR,
     CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SECONDARY_URL_FOREGROUND,
+    CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
     CONF_SEVERITY,
     CONF_SMOOTHING,
@@ -38,6 +42,8 @@ from .const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_TAP_ACTION_FOREGROUND,
+    CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
@@ -46,12 +52,15 @@ from .const import (
     CONF_UNIT,
     CONF_UNITS,
     CONF_URL,
+    CONF_URL_FOREGROUND,
+    CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_WARNING_THRESHOLD,
     DEFAULT_DECIMALS,
     DEFAULT_MAX_VALUE,
     DEFAULT_MIN_VALUE,
     DEFAULT_SEVERITY,
+    DEFAULT_TAP_ACTION_FOREGROUND,
     DEFAULT_TOTAL_STEPS,
     DEVICE_CLASS_ICONS,
     DOMAIN_DEFAULTS,
@@ -97,7 +106,7 @@ def sanitize_slug(entity_id: str) -> str:
     return f"ha-{normalize_slug(entity_id)}"
 
 
-def _color_to_str(value: object) -> str:
+def color_to_str(value: object) -> str:
     """Convert an HA color attribute to a string the API accepts.
 
     Handles rgb_color (3-tuple), rgbw/rgbww (4/5-tuple, takes RGB),
@@ -136,28 +145,80 @@ def _color_to_str(value: object) -> str:
     return ""
 
 
-def _resolve_color(state: State, config: dict, static_key: str, attr_key: str) -> str:
+def resolve_color(state: State, config: dict, static_key: str, attr_key: str) -> str:
     """Resolve a color value: dynamic attribute > static config > empty string."""
     attr_name = config.get(attr_key)
     if attr_name:
         raw = state.attributes.get(attr_name)
         if raw:
-            resolved = _color_to_str(raw)
+            resolved = color_to_str(raw)
             if resolved:
                 return resolved
     return config.get(static_key, "")
 
 
-def _add_url_deeplinks(content: dict, entity_config: dict) -> None:
-    """Add URL deep-link fields to content when configured (steps/alert only)."""
+def build_tap_action(url: str, foreground: bool, title: str = "") -> dict | None:
+    """Build a server-side TapAction dict from URL + foreground + optional button title.
+
+    Returns None when url is empty. For http(s) URLs with foreground=False,
+    auto-injects ``method="POST"`` so iOS treats it as a silent webhook
+    (without an HTTP shape, iOS drops the tap per pushward-server fa4a98f).
+    Custom-scheme URLs (e.g. ``homeassistant://``) ignore foreground.
+    """
+    url = (url or "").strip()
+    if not url:
+        return None
+    action: dict = {"url": url, "foreground": bool(foreground)}
+    if not foreground:
+        scheme = urlparse(url).scheme.lower()
+        if scheme in ("http", "https"):
+            action["method"] = "POST"
+    title = (title or "").strip()
+    if title:
+        action["title"] = title
+    return action
+
+
+def add_tap_action(content: dict, config: dict, *, key: str = "tap_action") -> None:
+    """Attach a structured tap-action to content[key] from CONF_TAP_ACTION_URL/FOREGROUND.
+
+    Shared between activity and widget mappers — the widget-wide tap target has
+    the same wire shape on both surfaces.
+    """
+    action = build_tap_action(
+        config.get(CONF_TAP_ACTION_URL, ""),
+        config.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
+    )
+    if action is not None:
+        content[key] = action
+
+
+# (url_action_slot_key, url_config_key, foreground_config_key, title_config_key)
+_BUTTON_SLOTS: tuple[tuple[str, str, str, str], ...] = (
+    ("url_action", CONF_URL, CONF_URL_FOREGROUND, CONF_URL_TITLE),
+    ("secondary_url_action", CONF_SECONDARY_URL, CONF_SECONDARY_URL_FOREGROUND, CONF_SECONDARY_URL_TITLE),
+)
+
+
+def _add_tap_actions(content: dict, entity_config: dict) -> None:
+    """Add structured tap_action / url_action / secondary_url_action to content.
+
+    tap_action is universal (every template); url_action and secondary_url_action
+    are emitted only for steps/alert templates that render button affordances.
+    """
+    add_tap_action(content, entity_config)
+
     if entity_config.get(CONF_TEMPLATE, "generic") not in ("steps", "alert"):
         return
-    url = entity_config.get(CONF_URL, "")
-    if url:
-        content["url"] = url
-    secondary_url = entity_config.get(CONF_SECONDARY_URL, "")
-    if secondary_url:
-        content["secondary_url"] = secondary_url
+
+    for slot_key, url_key, foreground_key, title_key in _BUTTON_SLOTS:
+        action = build_tap_action(
+            entity_config.get(url_key, ""),
+            entity_config.get(foreground_key, DEFAULT_TAP_ACTION_FOREGROUND),
+            entity_config.get(title_key, ""),
+        )
+        if action is not None:
+            content[slot_key] = action
 
 
 def _resolve_device_class_icon(domain: str, device_class: str) -> str:
@@ -176,30 +237,34 @@ def _resolve_device_class_icon(domain: str, device_class: str) -> str:
     return icon
 
 
-def map_content(state: State, entity_config: dict, *, registry_icon: str | None = None) -> dict:
-    """Map HA state + attributes to a PushWard content dict."""
-    # State label: use custom label if configured, else default formatting
-    state_labels = entity_config.get(CONF_STATE_LABELS) or {}
-    if state.state in state_labels:
-        state_text = state_labels[state.state]
-    else:
-        state_text = state.state.replace("_", " ").capitalize()
+def lookup_registry_icon(hass: HomeAssistant, entity_id: str | None) -> str | None:
+    """Return the entity registry's icon for entity_id, or None."""
+    if not entity_id:
+        return None
+    registry = er.async_get(hass)
+    entry = registry.async_get(entity_id)
+    if entry is None:
+        return None
+    return entry.icon or entry.original_icon or None
 
-    # Icon resolution order:
-    # 1. icon_attribute (dynamic from HA attribute)
-    # 2. static CONF_ICON (user-configured in PushWard)
-    # 3. state.attributes["icon"] (legacy integrations / _attr_icon)
-    # 4. entity registry icon (user-customized or platform-provided)
-    # 5. device_class icon (mirrors HA frontend tables)
-    # 6. domain default
+
+def resolve_icon(state: State, config: dict, registry_icon: str | None = None) -> str:
+    """Resolve an entity's display icon via a 6-level fallback chain.
+
+    Order: icon_attribute (dynamic from HA attribute) → static CONF_ICON
+    (user-configured) → state.attributes["icon"] (legacy / _attr_icon) →
+    entity registry icon → device_class icon (mirrors HA frontend tables)
+    → domain default. Returns "" only when every step yields nothing,
+    which is rare given the domain-default fallback.
+    """
     icon = ""
-    icon_attr = entity_config.get(CONF_ICON_ATTRIBUTE)
+    icon_attr = config.get(CONF_ICON_ATTRIBUTE)
     if icon_attr:
         dynamic_icon = state.attributes.get(icon_attr)
         if dynamic_icon:
             icon = str(dynamic_icon)
     if not icon:
-        icon = entity_config.get(CONF_ICON, "")
+        icon = config.get(CONF_ICON, "") or ""
     if not icon:
         entity_icon = state.attributes.get("icon")
         if entity_icon:
@@ -211,6 +276,19 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
         icon = _resolve_device_class_icon(state.domain, device_class)
     if not icon:
         icon = get_domain_defaults(state.domain)["icon"]
+    return icon
+
+
+def map_content(state: State, entity_config: dict, *, registry_icon: str | None = None) -> dict:
+    """Map HA state + attributes to a PushWard content dict."""
+    # State label: use custom label if configured, else default formatting
+    state_labels = entity_config.get(CONF_STATE_LABELS) or {}
+    if state.state in state_labels:
+        state_text = state_labels[state.state]
+    else:
+        state_text = state.state.replace("_", " ").capitalize()
+
+    icon = resolve_icon(state, entity_config, registry_icon=registry_icon)
 
     # Subtitle: subtitle_attribute > friendly_name
     subtitle_attr = entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
@@ -221,10 +299,10 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
         subtitle = state.attributes.get("friendly_name", "")
 
     # Accent color resolution: accent_color_attribute > static accent_color > "blue"
-    accent = _resolve_color(state, entity_config, CONF_ACCENT_COLOR, CONF_ACCENT_COLOR_ATTRIBUTE) or "blue"
+    accent = resolve_color(state, entity_config, CONF_ACCENT_COLOR, CONF_ACCENT_COLOR_ATTRIBUTE) or "blue"
 
-    background_color = _resolve_color(state, entity_config, CONF_BACKGROUND_COLOR, CONF_BACKGROUND_COLOR_ATTRIBUTE)
-    text_color = _resolve_color(state, entity_config, CONF_TEXT_COLOR, CONF_TEXT_COLOR_ATTRIBUTE)
+    background_color = resolve_color(state, entity_config, CONF_BACKGROUND_COLOR, CONF_BACKGROUND_COLOR_ATTRIBUTE)
+    text_color = resolve_color(state, entity_config, CONF_TEXT_COLOR, CONF_TEXT_COLOR_ATTRIBUTE)
 
     content: dict = {
         "template": entity_config.get(CONF_TEMPLATE, "generic"),
@@ -244,7 +322,7 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
     if remaining is not None:
         content["remaining_time"] = remaining
 
-    _add_url_deeplinks(content, entity_config)
+    _add_tap_actions(content, entity_config)
 
     # Template-specific required fields
     template = content["template"]
@@ -341,7 +419,7 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         "accent_color": "green",
     }
 
-    _add_url_deeplinks(content, entity_config)
+    _add_tap_actions(content, entity_config)
 
     # Template-specific required fields for server validation
     template = content["template"]

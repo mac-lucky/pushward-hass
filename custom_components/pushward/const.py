@@ -7,6 +7,7 @@ import voluptuous as vol
 
 DOMAIN = "pushward"
 SUBENTRY_TYPE_ENTITY = "tracked_entity"
+SUBENTRY_TYPE_WIDGET = "tracked_widget"
 
 CONF_SERVER_URL = "server_url"
 CONF_INTEGRATION_KEY = "integration_key"
@@ -34,6 +35,12 @@ CONF_STALE_TTL = "stale_ttl"
 CONF_COMPLETION_MESSAGE = "completion_message"
 CONF_URL = "url"
 CONF_SECONDARY_URL = "secondary_url"
+CONF_URL_FOREGROUND = "url_foreground"
+CONF_URL_TITLE = "url_title"
+CONF_SECONDARY_URL_FOREGROUND = "secondary_url_foreground"
+CONF_SECONDARY_URL_TITLE = "secondary_url_title"
+CONF_TAP_ACTION_URL = "tap_action_url"
+CONF_TAP_ACTION_FOREGROUND = "tap_action_foreground"
 CONF_ICON_ATTRIBUTE = "icon_attribute"
 CONF_ACCENT_COLOR_ATTRIBUTE = "accent_color_attribute"
 CONF_VALUE_ATTRIBUTE = "value_attribute"
@@ -58,6 +65,15 @@ CONF_BACKGROUND_COLOR_ATTRIBUTE = "background_color_attribute"
 CONF_TEXT_COLOR = "text_color"
 CONF_TEXT_COLOR_ATTRIBUTE = "text_color_attribute"
 
+# Widget-specific config keys
+CONF_WIDGET_TEMPLATE = "widget_template"
+CONF_WIDGET_NAME = "widget_name"
+CONF_WIDGET_TRIGGER_MODE = "widget_trigger_mode"
+CONF_WIDGET_POLL_INTERVAL = "widget_poll_interval"
+CONF_LABEL = "label"
+CONF_LABEL_ATTRIBUTE = "label_attribute"
+CONF_STAT_ROWS = "stat_rows"
+
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
 TESTFLIGHT_URL = "https://testflight.apple.com/join/T4aT6s3W"
@@ -70,6 +86,7 @@ DEFAULT_MAX_VALUE = 100.0
 DEFAULT_SCALE = "linear"
 DEFAULT_DECIMALS = 1
 DEFAULT_HISTORY_PERIOD = 0
+DEFAULT_TAP_ACTION_FOREGROUND = True
 
 # Validation ranges
 PRIORITY_MIN = 0
@@ -83,6 +100,7 @@ MAX_TEXT_LEN = 255
 MAX_LONG_TEXT_LEN = 1024
 MAX_URL_LEN = 2048
 MAX_SLUG_LEN = 128
+MAX_TAP_ACTION_TITLE_LEN = 64
 
 # Alert severities
 SEVERITIES = ["critical", "warning", "info"]
@@ -93,6 +111,48 @@ NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
 # Templates
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline"]
+
+# Widget templates (server: pushward-server/internal/model/widget.go)
+WIDGET_TEMPLATE_VALUE = "value"
+WIDGET_TEMPLATE_PROGRESS = "progress"
+WIDGET_TEMPLATE_GAUGE = "gauge"
+WIDGET_TEMPLATE_STATUS = "status"
+WIDGET_TEMPLATE_STAT_LIST = "stat_list"
+WIDGET_TEMPLATES = [
+    WIDGET_TEMPLATE_VALUE,
+    WIDGET_TEMPLATE_PROGRESS,
+    WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_STATUS,
+    WIDGET_TEMPLATE_STAT_LIST,
+]
+
+# Widget trigger modes
+WIDGET_TRIGGER_EVENT = "event"
+WIDGET_TRIGGER_POLL = "poll"
+WIDGET_TRIGGER_MODES = [WIDGET_TRIGGER_EVENT, WIDGET_TRIGGER_POLL]
+
+# Widget poll interval bounds (seconds)
+WIDGET_POLL_INTERVAL_MIN = 10
+WIDGET_POLL_INTERVAL_MAX = 3600
+DEFAULT_WIDGET_POLL_INTERVAL = 60
+
+# Server caps for widget content fields (mirrors widget.go validation).
+WIDGET_MAX_STAT_ROWS = 4
+WIDGET_STAT_LABEL_MAX = 32
+WIDGET_STAT_VALUE_MAX = 32
+WIDGET_STAT_UNIT_MAX = 16
+WIDGET_UNIT_MAX = 32
+WIDGET_LABEL_MAX = 256
+WIDGET_SUBTITLE_MAX = 256
+WIDGET_NAME_MAX = 256
+
+# Widget severities (mirrors server validWidgetSeverities)
+WIDGET_SEVERITIES = ["", "info", "warning", "critical", "success"]
+
+# Widget trend annotations (mirrors server validWidgetTrends)
+WIDGET_TREND_UP = "up"
+WIDGET_TREND_DOWN = "down"
+WIDGET_TREND_FLAT = "flat"
 
 # Timeline scales
 SCALES = ["linear", "logarithmic"]

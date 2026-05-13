@@ -435,3 +435,20 @@ send_notification:
       default: true
       selector:
         boolean:
+
+widget_refresh:
+  name: Refresh Widget
+  description: Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to iOS even when the value hasn't changed.
+  fields:
+    slug:
+      name: Slug
+      description: Widget slug identifier. Either `slug` or `entity_id` must be provided.
+      example: "ha-sensor-registered-users"
+      selector:
+        text:
+    entity_id:
+      name: Entity
+      description: HA entity bound to the widget. Resolved to the matching widget by config. Either `slug` or `entity_id` must be provided.
+      example: "sensor.registered_users"
+      selector:
+        entity:

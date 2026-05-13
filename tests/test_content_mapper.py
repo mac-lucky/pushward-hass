@@ -23,6 +23,8 @@ from custom_components.pushward.const import (
     CONF_REMAINING_TIME_ATTR,
     CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SECONDARY_URL_FOREGROUND,
+    CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
     CONF_SEVERITY,
     CONF_SMOOTHING,
@@ -30,6 +32,8 @@ from custom_components.pushward.const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_TAP_ACTION_FOREGROUND,
+    CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
     CONF_TEXT_COLOR,
     CONF_THRESHOLDS,
@@ -37,13 +41,14 @@ from custom_components.pushward.const import (
     CONF_UNIT,
     CONF_UNITS,
     CONF_URL,
+    CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_WARNING_THRESHOLD,
     normalize_slug,
     validate_slug,
 )
 from custom_components.pushward.content_mapper import (
-    _add_url_deeplinks,
+    build_tap_action,
     get_domain_defaults,
     map_completion_content,
     map_content,
@@ -557,7 +562,7 @@ def test_map_content_countdown_completion_message(mock_time):
 
 
 def test_map_content_with_urls():
-    """URLs are included in content when configured (steps template)."""
+    """URLs are emitted as structured url_action / secondary_url_action."""
     state = _make_state("on", {"friendly_name": "Washer"})
     config = {
         CONF_TEMPLATE: "steps",
@@ -569,12 +574,15 @@ def test_map_content_with_urls():
 
     content = map_content(state, config)
 
-    assert content["url"] == "https://ha.local/lovelace/laundry"
-    assert content["secondary_url"] == "https://ha.local/lovelace/overview"
+    assert content["url_action"] == {"url": "https://ha.local/lovelace/laundry", "foreground": True}
+    assert content["secondary_url_action"] == {"url": "https://ha.local/lovelace/overview", "foreground": True}
+    # Legacy string fields are no longer emitted.
+    assert "url" not in content
+    assert "secondary_url" not in content
 
 
 def test_map_content_urls_omitted_when_empty():
-    """Empty URLs are not included in content dict."""
+    """Empty URLs do not emit url_action / secondary_url_action."""
     state = _make_state("on", {"friendly_name": "Washer"})
     config = {
         CONF_TEMPLATE: "steps",
@@ -586,12 +594,14 @@ def test_map_content_urls_omitted_when_empty():
 
     content = map_content(state, config)
 
+    assert "url_action" not in content
+    assert "secondary_url_action" not in content
     assert "url" not in content
     assert "secondary_url" not in content
 
 
 def test_map_completion_content_preserves_urls():
-    """URLs persist through completion content."""
+    """URLs persist through completion content as structured actions."""
     config = {
         CONF_TEMPLATE: "steps",
         CONF_ICON: "washer",
@@ -602,8 +612,91 @@ def test_map_completion_content_preserves_urls():
 
     content = map_completion_content(config)
 
-    assert content["url"] == "https://ha.local/lovelace/laundry"
-    assert content["secondary_url"] == "https://ha.local/lovelace/overview"
+    assert content["url_action"] == {"url": "https://ha.local/lovelace/laundry", "foreground": True}
+    assert content["secondary_url_action"] == {"url": "https://ha.local/lovelace/overview", "foreground": True}
+
+
+def test_map_content_tap_action_universal():
+    """tap_action is emitted for every template, not just steps/alert."""
+    state = _make_state("on", {"friendly_name": "Counter"})
+    for template in ("generic", "countdown", "alert", "steps", "gauge", "timeline"):
+        config = {
+            CONF_TEMPLATE: template,
+            CONF_TOTAL_STEPS: 3,
+            CONF_TAP_ACTION_URL: "homeassistant://navigate/lovelace/0",
+            CONF_TAP_ACTION_FOREGROUND: True,
+        }
+        content = map_content(state, config)
+        assert content["tap_action"] == {
+            "url": "homeassistant://navigate/lovelace/0",
+            "foreground": True,
+        }
+
+
+def test_map_content_url_action_with_title():
+    """url_action carries the user-configured title verbatim."""
+    state = _make_state("on", {"friendly_name": "Washer"})
+    config = {
+        CONF_TEMPLATE: "steps",
+        CONF_TOTAL_STEPS: 3,
+        CONF_URL: "https://ha.local/lovelace/laundry",
+        CONF_URL_TITLE: "Open Dashboard",
+    }
+    content = map_content(state, config)
+    assert content["url_action"] == {
+        "url": "https://ha.local/lovelace/laundry",
+        "foreground": True,
+        "title": "Open Dashboard",
+    }
+
+
+def test_map_content_silent_webhook_auto_method():
+    """foreground=False on http(s) URL auto-injects method=POST."""
+    state = _make_state("on", {"friendly_name": "Washer"})
+    config = {
+        CONF_TEMPLATE: "steps",
+        CONF_TOTAL_STEPS: 3,
+        CONF_SECONDARY_URL: "https://ha.local/api/services/script/foo",
+        CONF_SECONDARY_URL_FOREGROUND: False,
+        CONF_SECONDARY_URL_TITLE: "Run",
+    }
+    content = map_content(state, config)
+    assert content["secondary_url_action"] == {
+        "url": "https://ha.local/api/services/script/foo",
+        "foreground": False,
+        "method": "POST",
+        "title": "Run",
+    }
+
+
+def test_map_content_custom_scheme_no_method_injection():
+    """Custom scheme URLs never get method injected, even with foreground=False."""
+    state = _make_state("on", {"friendly_name": "Washer"})
+    config = {
+        CONF_TEMPLATE: "alert",
+        CONF_TAP_ACTION_URL: "homeassistant://navigate/lovelace/0",
+        CONF_TAP_ACTION_FOREGROUND: False,
+    }
+    content = map_content(state, config)
+    assert content["tap_action"] == {
+        "url": "homeassistant://navigate/lovelace/0",
+        "foreground": False,
+    }
+    assert "method" not in content["tap_action"]
+
+
+def test_map_content_url_action_skipped_on_non_steps_alert():
+    """url_action / secondary_url_action are emitted only for steps/alert."""
+    state = _make_state("on", {"friendly_name": "Foo"})
+    for template in ("generic", "countdown", "gauge", "timeline"):
+        config = {
+            CONF_TEMPLATE: template,
+            CONF_URL: "https://ha.local",
+            CONF_SECONDARY_URL: "https://ha.local/secondary",
+        }
+        content = map_content(state, config)
+        assert "url_action" not in content, template
+        assert "secondary_url_action" not in content, template
 
 
 # --- Feature 6: conditional icon/color via attributes ---
@@ -962,49 +1055,53 @@ def test_map_content_fallback_icon_when_no_icon_anywhere():
     assert content["icon"] == "mdi:eye"
 
 
-# --- _add_url_deeplinks helper ---
+# --- build_tap_action helper ---
 
 
-def test_add_url_deeplinks_both_urls():
-    """Both URLs are added when present."""
-    content: dict = {}
-    _add_url_deeplinks(
-        content, {CONF_TEMPLATE: "steps", CONF_URL: "https://a.com", CONF_SECONDARY_URL: "https://b.com"}
-    )
-    assert content["url"] == "https://a.com"
-    assert content["secondary_url"] == "https://b.com"
+def test_build_tap_action_empty_url_returns_none():
+    """Empty URL produces no action — caller skips the key."""
+    assert build_tap_action("", True) is None
+    assert build_tap_action("   ", True) is None
 
 
-def test_add_url_deeplinks_one_empty():
-    """Only non-empty URL is added."""
-    content: dict = {}
-    _add_url_deeplinks(content, {CONF_TEMPLATE: "alert", CONF_URL: "https://a.com", CONF_SECONDARY_URL: ""})
-    assert content["url"] == "https://a.com"
-    assert "secondary_url" not in content
+def test_build_tap_action_http_foreground():
+    """http(s) URL + foreground → bare open action, no method injection."""
+    assert build_tap_action("https://example.com", True) == {
+        "url": "https://example.com",
+        "foreground": True,
+    }
 
 
-def test_add_url_deeplinks_both_empty():
-    """No URLs added when both are empty."""
-    content: dict = {}
-    _add_url_deeplinks(content, {CONF_TEMPLATE: "steps", CONF_URL: "", CONF_SECONDARY_URL: ""})
-    assert "url" not in content
-    assert "secondary_url" not in content
+def test_build_tap_action_http_silent_injects_method_post():
+    """http(s) URL + foreground=False → method=POST so iOS treats it as a webhook."""
+    assert build_tap_action("https://example.com/hook", False) == {
+        "url": "https://example.com/hook",
+        "foreground": False,
+        "method": "POST",
+    }
 
 
-def test_add_url_deeplinks_skipped_for_non_link_templates():
-    """URLs are not added for gauge, generic, or countdown templates."""
-    for template in ("generic", "gauge", "countdown"):
-        content: dict = {}
-        _add_url_deeplinks(
-            content,
-            {
-                CONF_TEMPLATE: template,
-                CONF_URL: "https://example.com",
-                CONF_SECONDARY_URL: "https://example.com/secondary",
-            },
-        )
-        assert "url" not in content
-        assert "secondary_url" not in content
+def test_build_tap_action_custom_scheme_no_method():
+    """Custom scheme + foreground=False → no method injection (iOS just opens the app)."""
+    assert build_tap_action("homeassistant://navigate/lovelace/0", False) == {
+        "url": "homeassistant://navigate/lovelace/0",
+        "foreground": False,
+    }
+
+
+def test_build_tap_action_includes_title_when_set():
+    """Title is included verbatim when non-empty; stripped of surrounding whitespace."""
+    assert build_tap_action("https://example.com", True, "  Open  ") == {
+        "url": "https://example.com",
+        "foreground": True,
+        "title": "Open",
+    }
+
+
+def test_build_tap_action_empty_title_skipped():
+    """Empty title is omitted entirely from the action dict."""
+    action = build_tap_action("https://example.com", True, "")
+    assert "title" not in action
 
 
 # --- gauge template ---

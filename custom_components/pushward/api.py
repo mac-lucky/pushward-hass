@@ -33,6 +33,15 @@ class PushWardForbiddenError(PushWardApiError):
     slug scope, shared-activity, etc.). Not an auth failure — do not reauth."""
 
 
+class PushWardWidgetPermissionError(PushWardForbiddenError):
+    """403 specifically for missing `widgets:true` flag on the integration key.
+
+    Server returns this for any widget endpoint call when the integration key
+    doesn't have widget permission. Treated like PushWardForbiddenError but
+    surfaced with widget-specific guidance.
+    """
+
+
 class PushWardApiClient:
     """Async client for the PushWard REST API."""
 
@@ -119,6 +128,43 @@ class PushWardApiClient:
             f"/activities/{slug}",
             allow_404=True,
         )
+
+    async def create_widget(
+        self,
+        slug: str,
+        name: str,
+        template: str,
+        content: dict,
+        *,
+        push_throttle: int | None = None,
+    ) -> None:
+        """POST /widgets. Server upserts on slug — same slug overwrites in place.
+
+        Template lives inside content (mirrors the activity API shape). Caller's
+        `content` dict is merged with `template` here so callers can keep
+        passing the template separately.
+        """
+        body: dict = {
+            "slug": slug,
+            "name": name,
+            "content": {**content, "template": template},
+        }
+        if push_throttle is not None:
+            body["push_throttle"] = push_throttle
+        await self._request_with_retry("POST", "/widgets", json=body)
+
+    async def patch_widget(self, slug: str, body: dict) -> None:
+        """PATCH /widgets/{slug} — RFC 7396 merge patch.
+
+        Caller builds the patch dict (typically {"content": {...},
+        "push_throttle": ...}). Template lives inside content; change it via
+        `content.template`. Absent fields are preserved server-side.
+        """
+        await self._request_with_retry("PATCH", f"/widgets/{slug}", json=body)
+
+    async def delete_widget(self, slug: str) -> None:
+        """DELETE /widgets/{slug}. Idempotent — 404 swallowed."""
+        await self._request_with_retry("DELETE", f"/widgets/{slug}", allow_404=True)
 
     async def create_notification(
         self,
@@ -225,8 +271,14 @@ class PushWardApiClient:
 
                         if resp.status == HTTPStatus.FORBIDDEN:
                             _, detail, raw = await self._parse_problem(resp)
+                            message = self._truncate(detail or raw) or "Forbidden"
+                            if path.startswith("/widgets"):
+                                raise PushWardWidgetPermissionError(
+                                    message,
+                                    status_code=resp.status,
+                                )
                             raise PushWardForbiddenError(
-                                self._truncate(detail or raw) or "Forbidden",
+                                message,
                                 status_code=resp.status,
                             )
 

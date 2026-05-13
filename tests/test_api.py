@@ -8,46 +8,15 @@ import aiohttp
 import pytest
 
 from custom_components.pushward.api import (
-    PushWardApiClient,
     PushWardApiError,
     PushWardAuthError,
     PushWardForbiddenError,
 )
 from custom_components.pushward.const import MAX_CONCURRENT_REQUESTS
 
-
-def _mock_response(status: int, *, text: str = "", headers: dict | None = None) -> AsyncMock:
-    """Create a mock aiohttp response."""
-    resp = AsyncMock()
-    resp.status = status
-    resp.ok = 200 <= status < 300
-    resp.text = AsyncMock(return_value=text)
-    resp.headers = headers or {}
-    resp.raise_for_status = MagicMock()
-    if status >= 400:
-        resp.raise_for_status.side_effect = aiohttp.ClientResponseError(
-            request_info=MagicMock(), history=(), status=status, message=text
-        )
-    return resp
-
-
-def _make_session(*responses: AsyncMock) -> AsyncMock:
-    """Create a mock aiohttp.ClientSession that returns responses in sequence."""
-    session = AsyncMock(spec=aiohttp.ClientSession)
-    ctx_managers = []
-    for resp in responses:
-        cm = AsyncMock()
-        cm.__aenter__ = AsyncMock(return_value=resp)
-        cm.__aexit__ = AsyncMock(return_value=False)
-        ctx_managers.append(cm)
-    session.request = MagicMock(side_effect=ctx_managers)
-    session.get = MagicMock()
-    return session
-
-
-def _make_client(session: AsyncMock) -> PushWardApiClient:
-    return PushWardApiClient(session, "https://api.example.com", "test-key")
-
+from .conftest import make_api_client as _make_client
+from .conftest import make_mock_response as _mock_response
+from .conftest import make_mock_session as _make_session
 
 # --- validate_connection ---
 

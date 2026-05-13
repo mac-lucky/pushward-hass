@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from functools import partial
 
@@ -10,7 +11,12 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
-from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady, HomeAssistantError
+from homeassistant.exceptions import (
+    ConfigEntryAuthFailed,
+    ConfigEntryNotReady,
+    HomeAssistantError,
+    ServiceValidationError,
+)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .activity_manager import ActivityManager, build_history_store
@@ -25,9 +31,11 @@ from .const import (
     SEVERITIES,
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
+    SUBENTRY_TYPE_WIDGET,
     validate_slug,
     validate_url,
 )
+from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -71,6 +79,7 @@ SERVICE_CREATE_ACTIVITY = "create_activity"
 SERVICE_END_ACTIVITY = "end_activity"
 SERVICE_DELETE_ACTIVITY = "delete_activity"
 SERVICE_SEND_NOTIFICATION = "send_notification"
+SERVICE_WIDGET_REFRESH = "widget_refresh"
 
 SCHEMA_UPDATE_ACTIVITY = vol.Schema(
     {
@@ -176,6 +185,16 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
     }
 )
 
+SCHEMA_WIDGET_REFRESH = vol.All(
+    vol.Schema(
+        {
+            vol.Exclusive("slug", "widget_target"): validate_slug,
+            vol.Exclusive("entity_id", "widget_target"): cv.entity_id,
+        }
+    ),
+    cv.has_at_least_one_key("slug", "entity_id"),
+)
+
 
 def _get_api(hass: HomeAssistant) -> PushWardApiClient:
     """Get the API client from the first available config entry."""
@@ -261,6 +280,36 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
     )
 
 
+async def _async_handle_widget_refresh(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the widget_refresh service call.
+
+    Routes the refresh to every config entry's WidgetManager; the manager
+    that owns the slug / entity_id wins, others raise ValueError (swallowed).
+    """
+    slug = call.data.get("slug")
+    entity_id = call.data.get("entity_id")
+    domain_data = hass.data.get(DOMAIN) or {}
+    if not domain_data:
+        raise HomeAssistantError("PushWard is not configured.")
+
+    found = False
+    for entry_data in domain_data.values():
+        manager: WidgetManager | None = entry_data.get("widget_manager")
+        if manager is None:
+            continue
+        try:
+            await manager.async_refresh(slug=slug, entity_id=entity_id)
+            found = True
+        except ValueError:
+            continue
+    if not found:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="widget_not_found",
+            translation_placeholders={"slug": str(slug), "entity_id": str(entity_id)},
+        )
+
+
 def _register_services(hass: HomeAssistant) -> None:
     """Register PushWard services (only once)."""
     if hass.services.has_service(DOMAIN, SERVICE_UPDATE_ACTIVITY):
@@ -281,6 +330,9 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(
         DOMAIN, SERVICE_SEND_NOTIFICATION, partial(_async_handle_send_notification, hass), SCHEMA_SEND_NOTIFICATION
     )
+    hass.services.async_register(
+        DOMAIN, SERVICE_WIDGET_REFRESH, partial(_async_handle_widget_refresh, hass), SCHEMA_WIDGET_REFRESH
+    )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -296,12 +348,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady(f"Cannot connect to PushWard: {err}") from err
 
     entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
+    widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
     manager = ActivityManager(hass, api, entities, entry)
-    await manager.async_start()
+    widget_manager = WidgetManager(hass, api, widgets, entry)
+    await asyncio.gather(manager.async_start(), widget_manager.async_start())
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "api": api,
         "manager": manager,
+        "widget_manager": widget_manager,
     }
 
     _register_services(hass)
@@ -312,12 +367,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Handle config entry or subentry updates — reload entity tracking."""
+    """Handle config entry or subentry updates — reload entity + widget tracking."""
     data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
     if data is None:
         return
     entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
-    await data["manager"].async_reload(entities)
+    widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
+    widget_manager: WidgetManager | None = data.get("widget_manager")
+    reloads = [data["manager"].async_reload(entities)]
+    if widget_manager is not None:
+        reloads.append(widget_manager.async_reload(widgets))
+    await asyncio.gather(*reloads)
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
@@ -336,7 +396,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload PushWard config entry."""
     data = hass.data[DOMAIN].pop(entry.entry_id, None)
     if data:
-        await data["manager"].async_stop()
+        widget_manager: WidgetManager | None = data.get("widget_manager")
+        stops = [data["manager"].async_stop()]
+        if widget_manager is not None:
+            stops.append(widget_manager.async_stop())
+        await asyncio.gather(*stops)
 
     # Unregister services when no entries remain
     if not hass.data.get(DOMAIN):
@@ -345,10 +409,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_END_ACTIVITY)
         hass.services.async_remove(DOMAIN, SERVICE_DELETE_ACTIVITY)
         hass.services.async_remove(DOMAIN, SERVICE_SEND_NOTIFICATION)
+        hass.services.async_remove(DOMAIN, SERVICE_WIDGET_REFRESH)
 
     return True
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Delete persisted history when the config entry is removed."""
+    """Delete persisted history and widget cache when the config entry is removed."""
     await build_history_store(hass, entry.entry_id).async_remove()
+    await build_widget_store(hass, entry.entry_id).async_remove()

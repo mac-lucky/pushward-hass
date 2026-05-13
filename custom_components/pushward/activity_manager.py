@@ -17,7 +17,6 @@ import aiohttp
 from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import Event, HomeAssistant, State, callback
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
@@ -42,7 +41,7 @@ from .const import (
     CONF_VALUE_ATTRIBUTE,
     END_DELAY_SECONDS,
 )
-from .content_mapper import _get_timeline_values, map_completion_content, map_content
+from .content_mapper import _get_timeline_values, lookup_registry_icon, map_completion_content, map_content
 
 _HISTORY_BUFFER_MAX = 300
 _HISTORY_STORAGE_VERSION = 1
@@ -110,12 +109,7 @@ class ActivityManager:
         self._history_store: Store = build_history_store(hass, entry.entry_id)
 
     def _get_registry_icon(self, entity_id: str) -> str | None:
-        """Look up entity icon from the HA entity registry."""
-        registry = er.async_get(self._hass)
-        entry = registry.async_get(entity_id)
-        if entry is None:
-            return None
-        return entry.icon or entry.original_icon or None
+        return lookup_registry_icon(self._hass, entity_id)
 
     def _trigger_reauth(self) -> None:
         """Trigger reauth flow once on auth failure."""

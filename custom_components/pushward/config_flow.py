@@ -6,6 +6,7 @@ import contextlib
 import logging
 from collections.abc import Mapping
 from typing import Any
+from urllib.parse import urlparse
 
 import aiohttp
 import voluptuous as vol
@@ -51,6 +52,8 @@ from .const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
+    CONF_LABEL,
+    CONF_LABEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
@@ -58,6 +61,8 @@ from .const import (
     CONF_REMAINING_TIME_ATTR,
     CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SECONDARY_URL_FOREGROUND,
+    CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
@@ -66,10 +71,13 @@ from .const import (
     CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_STAT_ROWS,
     CONF_STATE_LABELS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_TAP_ACTION_FOREGROUND,
+    CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
@@ -79,8 +87,14 @@ from .const import (
     CONF_UNITS,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
+    CONF_URL_FOREGROUND,
+    CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_WARNING_THRESHOLD,
+    CONF_WIDGET_NAME,
+    CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_TEMPLATE,
+    CONF_WIDGET_TRIGGER_MODE,
     DEFAULT_DECIMALS,
     DEFAULT_HISTORY_PERIOD,
     DEFAULT_MAX_VALUE,
@@ -89,11 +103,14 @@ from .const import (
     DEFAULT_SCALE,
     DEFAULT_SERVER_URL,
     DEFAULT_SEVERITY,
+    DEFAULT_TAP_ACTION_FOREGROUND,
     DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
+    DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
     MAX_LONG_TEXT_LEN,
     MAX_SLUG_LEN,
+    MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_LEN,
     MAX_URL_LEN,
     PRIORITY_MAX,
@@ -102,13 +119,28 @@ from .const import (
     SEVERITIES,
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
+    SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
     TESTFLIGHT_URL,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
     WARNING_THRESHOLD_MAX,
+    WIDGET_LABEL_MAX,
+    WIDGET_MAX_STAT_ROWS,
+    WIDGET_NAME_MAX,
+    WIDGET_POLL_INTERVAL_MAX,
+    WIDGET_POLL_INTERVAL_MIN,
+    WIDGET_SEVERITIES,
+    WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_PROGRESS,
+    WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_STATUS,
+    WIDGET_TEMPLATE_VALUE,
+    WIDGET_TEMPLATES,
+    WIDGET_TRIGGER_EVENT,
+    WIDGET_TRIGGER_MODES,
+    WIDGET_UNIT_MAX,
     normalize_slug,
-    validate_url,
 )
 from .content_mapper import get_domain_defaults, sanitize_slug
 
@@ -589,6 +621,18 @@ def _details_schema(
             description={"suggested_value": d.get(CONF_TEXT_COLOR_ATTRIBUTE, "")},
         )
     ] = attr_selector
+    fields[
+        vol.Optional(
+            CONF_TAP_ACTION_URL,
+            default=d.get(CONF_TAP_ACTION_URL, ""),
+        )
+    ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
+    fields[
+        vol.Optional(
+            CONF_TAP_ACTION_FOREGROUND,
+            default=d.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
+        )
+    ] = BooleanSelector()
     if template in ("steps", "alert"):
         fields[
             vol.Optional(
@@ -598,10 +642,34 @@ def _details_schema(
         ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
         fields[
             vol.Optional(
+                CONF_URL_FOREGROUND,
+                default=d.get(CONF_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
+            )
+        ] = BooleanSelector()
+        fields[
+            vol.Optional(
+                CONF_URL_TITLE,
+                default=d.get(CONF_URL_TITLE, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN))
+        fields[
+            vol.Optional(
                 CONF_SECONDARY_URL,
                 default=d.get(CONF_SECONDARY_URL, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
+        fields[
+            vol.Optional(
+                CONF_SECONDARY_URL_FOREGROUND,
+                default=d.get(CONF_SECONDARY_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
+            )
+        ] = BooleanSelector()
+        fields[
+            vol.Optional(
+                CONF_SECONDARY_URL_TITLE,
+                default=d.get(CONF_SECONDARY_URL_TITLE, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN))
     fields[ended_ttl_key] = NumberSelector(
         NumberSelectorConfig(
             min=_TTL_MIN,
@@ -620,6 +688,64 @@ def _details_schema(
     )
 
     return vol.Schema(fields)
+
+
+_BLOCKED_URL_SCHEMES = frozenset({"javascript", "data", "file", "vbscript"})
+
+
+def _tap_action_url_error(url: str, foreground: bool) -> str | None:
+    """Return the error code for an invalid tap-action URL, or None when valid.
+
+    Empty URL is valid (optional field). Foreground=True accepts http(s) or any
+    custom scheme not on the security blocklist. Foreground=False (silent webhook)
+    requires http(s) — custom schemes are no-ops on iOS without an HTTP shape
+    (see pushward-server fa4a98f).
+    """
+    if not url:
+        return None
+    parsed = urlparse(url)
+    if not parsed.scheme:
+        return "invalid_url"
+    scheme = parsed.scheme.lower()
+    if scheme in ("http", "https"):
+        return None if parsed.netloc else "invalid_url"
+    if scheme in _BLOCKED_URL_SCHEMES:
+        return "invalid_url"
+    if not foreground:
+        return "silent_requires_http"
+    return None
+
+
+def _raise_url_errors(checks: list[tuple[str, str, bool]]) -> None:
+    """Validate a batch of (field, url, foreground) tuples. Raises `vol.Invalid`
+    with one error code and all matching field paths so the form lights up every
+    bad field at once. Different codes are reported one batch at a time, most
+    specific first.
+    """
+    grouped: dict[str, list[str]] = {}
+    for field, url, foreground in checks:
+        code = _tap_action_url_error(url, foreground)
+        if code is None:
+            continue
+        grouped.setdefault(code, []).append(field)
+    if not grouped:
+        return
+    # silent_requires_http is more specific than invalid_url; surface it first.
+    for preferred in ("silent_requires_http", "invalid_url"):
+        if preferred in grouped:
+            raise vol.Invalid(preferred, path=grouped[preferred])
+    # Fall back to whatever code came in (future-proofing for new codes).
+    code, fields = next(iter(grouped.items()))
+    raise vol.Invalid(code, path=fields)
+
+
+def _coerce_gauge_range(user_input: dict, *, is_gauge: bool) -> tuple[float, float]:
+    """Coerce min/max value pair; raise invalid_gauge_range if min >= max for gauge templates."""
+    min_v = float(user_input.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE))
+    max_v = float(user_input.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE))
+    if is_gauge and min_v >= max_v:
+        raise vol.Invalid("invalid_gauge_range", path=[CONF_MIN_VALUE])
+    return min_v, max_v
 
 
 def _parse_entity_input(user_input: dict) -> dict:
@@ -653,29 +779,25 @@ def _parse_entity_input(user_input: dict) -> dict:
     ended_ttl = user_input.get(CONF_ENDED_TTL)
     stale_ttl = user_input.get(CONF_STALE_TTL)
 
-    # Validate and convert URLs
+    # Validate URLs (allow http/https + custom schemes; silent mode requires http(s))
+    tap_action_url = user_input.get(CONF_TAP_ACTION_URL, "").strip()
+    tap_action_foreground = bool(user_input.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
     url = user_input.get(CONF_URL, "").strip()
+    url_foreground = bool(user_input.get(CONF_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
+    url_title = user_input.get(CONF_URL_TITLE, "").strip()
     secondary_url = user_input.get(CONF_SECONDARY_URL, "").strip()
-    url_errors: dict[str, str] = {}
-    if url:
-        try:
-            validate_url(url)
-        except vol.Invalid:
-            url_errors[CONF_URL] = "invalid_url"
-    if secondary_url:
-        try:
-            validate_url(secondary_url)
-        except vol.Invalid:
-            url_errors[CONF_SECONDARY_URL] = "invalid_url"
-    if url_errors:
-        raise vol.Invalid("invalid_url", path=list(url_errors.keys()))
+    secondary_url_foreground = bool(user_input.get(CONF_SECONDARY_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
+    secondary_url_title = user_input.get(CONF_SECONDARY_URL_TITLE, "").strip()
 
-    min_v = float(user_input.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE))
-    max_v = float(user_input.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE))
+    _raise_url_errors(
+        [
+            (CONF_TAP_ACTION_URL, tap_action_url, tap_action_foreground),
+            (CONF_URL, url, url_foreground),
+            (CONF_SECONDARY_URL, secondary_url, secondary_url_foreground),
+        ]
+    )
 
-    # Gauge: min must be strictly less than max
-    if user_input.get(CONF_TEMPLATE) == "gauge" and min_v >= max_v:
-        raise vol.Invalid("invalid_gauge_range", path=[CONF_MIN_VALUE])
+    min_v, max_v = _coerce_gauge_range(user_input, is_gauge=user_input.get(CONF_TEMPLATE) == "gauge")
 
     # Parse timeline fields
     series_raw = user_input.get(CONF_SERIES, "")
@@ -710,7 +832,13 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
         CONF_ACCENT_COLOR_ATTRIBUTE: user_input.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
         CONF_URL: url,
+        CONF_URL_FOREGROUND: url_foreground,
+        CONF_URL_TITLE: url_title,
         CONF_SECONDARY_URL: secondary_url,
+        CONF_SECONDARY_URL_FOREGROUND: secondary_url_foreground,
+        CONF_SECONDARY_URL_TITLE: secondary_url_title,
+        CONF_TAP_ACTION_URL: tap_action_url,
+        CONF_TAP_ACTION_FOREGROUND: tap_action_foreground,
         CONF_ENDED_TTL: int(ended_ttl) if ended_ttl is not None else None,
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
         CONF_SERIES: series,
@@ -823,7 +951,10 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         cls, config_entry: config_entries.ConfigEntry
     ) -> dict[str, type[config_entries.ConfigSubentryFlow]]:
         """Return supported subentry types."""
-        return {SUBENTRY_TYPE_ENTITY: PushWardEntitySubentryFlow}
+        return {
+            SUBENTRY_TYPE_ENTITY: PushWardEntitySubentryFlow,
+            SUBENTRY_TYPE_WIDGET: PushWardWidgetSubentryFlow,
+        }
 
 
 class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
@@ -935,6 +1066,367 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         return self.async_show_form(
             step_id="details",
             data_schema=_details_schema(entity_id, template, defaults=defaults, hass=self.hass),
+            errors=errors,
+        )
+
+
+# --- Widget subentry flow ---
+
+
+def _widget_step1_schema(defaults: dict | None = None) -> vol.Schema:
+    """Step-1 schema: entity picker + template + (optional) slug override."""
+    d = defaults or {}
+    return vol.Schema(
+        {
+            vol.Required(
+                CONF_ENTITY_ID,
+                default=d.get(CONF_ENTITY_ID, ""),
+            ): EntitySelector(EntitySelectorConfig()),
+            vol.Required(
+                CONF_WIDGET_TEMPLATE,
+                default=d.get(CONF_WIDGET_TEMPLATE, WIDGET_TEMPLATE_VALUE),
+            ): SelectSelector(
+                SelectSelectorConfig(
+                    options=WIDGET_TEMPLATES,
+                    mode=SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Optional(
+                CONF_SLUG,
+                default=d.get(CONF_SLUG, ""),
+            ): vol.All(str, vol.Length(max=MAX_SLUG_LEN)),
+        }
+    )
+
+
+def _widget_details_schema(
+    entity_id: str,
+    template: str,
+    defaults: dict | None = None,
+) -> vol.Schema:
+    """Step-2 schema: template-specific fields + cosmetics + trigger mode."""
+    d = defaults or {}
+
+    attr_selector = AttributeSelector(AttributeSelectorConfig(entity_id=entity_id))
+
+    accent_key = _color_vol_key(CONF_ACCENT_COLOR, d)
+    bg_color_key = _color_vol_key(CONF_BACKGROUND_COLOR, d)
+    text_color_key = _color_vol_key(CONF_TEXT_COLOR, d)
+
+    fields: dict = {}
+
+    fields[
+        vol.Optional(
+            CONF_WIDGET_NAME,
+            default=d.get(CONF_WIDGET_NAME, ""),
+        )
+    ] = vol.All(str, vol.Length(max=WIDGET_NAME_MAX))
+
+    # Template-specific
+    if template in (WIDGET_TEMPLATE_VALUE, WIDGET_TEMPLATE_PROGRESS, WIDGET_TEMPLATE_GAUGE):
+        fields[
+            vol.Optional(
+                CONF_VALUE_ATTRIBUTE,
+                description={"suggested_value": d.get(CONF_VALUE_ATTRIBUTE, "")},
+            )
+        ] = attr_selector
+        fields[
+            vol.Optional(
+                CONF_UNIT,
+                default=d.get(CONF_UNIT, ""),
+            )
+        ] = vol.All(str, vol.Length(max=WIDGET_UNIT_MAX))
+
+    if template == WIDGET_TEMPLATE_GAUGE:
+        fields[
+            vol.Required(
+                CONF_MIN_VALUE,
+                default=d.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE),
+            )
+        ] = vol.Coerce(float)
+        fields[
+            vol.Required(
+                CONF_MAX_VALUE,
+                default=d.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE),
+            )
+        ] = vol.Coerce(float)
+
+    if template == WIDGET_TEMPLATE_STATUS:
+        fields[
+            vol.Optional(
+                CONF_SEVERITY,
+                default=d.get(CONF_SEVERITY, ""),
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=WIDGET_SEVERITIES,
+                mode=SelectSelectorMode.DROPDOWN,
+            )
+        )
+
+    if template == WIDGET_TEMPLATE_STAT_LIST:
+        # stat_rows are configured as a structured string until HA gains a
+        # repeating-row selector. Format: 'label=entity_id[:attribute[:unit]]'
+        # comma-separated. Up to 4 rows.
+        fields[
+            vol.Required(
+                CONF_STAT_ROWS,
+                default=d.get(CONF_STAT_ROWS, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+
+    # Cosmetic fields (all templates)
+    fields[
+        vol.Optional(
+            CONF_LABEL,
+            default=d.get(CONF_LABEL, ""),
+        )
+    ] = vol.All(str, vol.Length(max=WIDGET_LABEL_MAX))
+    fields[
+        vol.Optional(
+            CONF_LABEL_ATTRIBUTE,
+            description={"suggested_value": d.get(CONF_LABEL_ATTRIBUTE, "")},
+        )
+    ] = attr_selector
+    fields[
+        vol.Optional(
+            CONF_SUBTITLE_ATTRIBUTE,
+            description={"suggested_value": d.get(CONF_SUBTITLE_ATTRIBUTE, "")},
+        )
+    ] = attr_selector
+    fields[
+        vol.Optional(
+            CONF_ICON,
+            description={"suggested_value": d.get(CONF_ICON, "")},
+        )
+    ] = IconSelector(IconSelectorConfig())
+    fields[
+        vol.Optional(
+            CONF_ICON_ATTRIBUTE,
+            description={"suggested_value": d.get(CONF_ICON_ATTRIBUTE, "")},
+        )
+    ] = attr_selector
+    fields[accent_key] = ColorRGBSelector()
+    fields[
+        vol.Optional(
+            CONF_ACCENT_COLOR_ATTRIBUTE,
+            description={"suggested_value": d.get(CONF_ACCENT_COLOR_ATTRIBUTE, "")},
+        )
+    ] = attr_selector
+    fields[bg_color_key] = ColorRGBSelector()
+    fields[text_color_key] = ColorRGBSelector()
+
+    # Widget-wide tap action (universal across all templates)
+    fields[
+        vol.Optional(
+            CONF_TAP_ACTION_URL,
+            default=d.get(CONF_TAP_ACTION_URL, ""),
+        )
+    ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
+    fields[
+        vol.Optional(
+            CONF_TAP_ACTION_FOREGROUND,
+            default=d.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
+        )
+    ] = BooleanSelector()
+
+    # Trigger mode + interval
+    fields[
+        vol.Required(
+            CONF_WIDGET_TRIGGER_MODE,
+            default=d.get(CONF_WIDGET_TRIGGER_MODE, WIDGET_TRIGGER_EVENT),
+        )
+    ] = SelectSelector(
+        SelectSelectorConfig(
+            options=WIDGET_TRIGGER_MODES,
+            mode=SelectSelectorMode.DROPDOWN,
+        )
+    )
+    fields[
+        vol.Optional(
+            CONF_WIDGET_POLL_INTERVAL,
+            default=d.get(CONF_WIDGET_POLL_INTERVAL, DEFAULT_WIDGET_POLL_INTERVAL),
+        )
+    ] = NumberSelector(
+        NumberSelectorConfig(
+            min=WIDGET_POLL_INTERVAL_MIN,
+            max=WIDGET_POLL_INTERVAL_MAX,
+            mode=NumberSelectorMode.BOX,
+            unit_of_measurement="seconds",
+        )
+    )
+
+    return vol.Schema(fields)
+
+
+def _parse_widget_stat_rows(raw: object) -> list[dict]:
+    """Parse stat_rows from string ('label=entity_id[:attr[:unit]], ...') or list."""
+    if isinstance(raw, list):
+        rows = [row for row in raw if isinstance(row, dict) and row.get(CONF_ENTITY_ID) and row.get(CONF_LABEL)]
+        return rows[:WIDGET_MAX_STAT_ROWS]
+    if not isinstance(raw, str) or not raw.strip():
+        return []
+    rows: list[dict] = []
+    for entry in raw.split(","):
+        entry = entry.strip()
+        if "=" not in entry:
+            continue
+        label, rest = entry.split("=", 1)
+        label = label.strip()
+        parts = [p.strip() for p in rest.split(":")]
+        if not label or not parts or not parts[0]:
+            continue
+        row: dict = {CONF_LABEL: label, CONF_ENTITY_ID: parts[0]}
+        if len(parts) > 1 and parts[1]:
+            row[CONF_VALUE_ATTRIBUTE] = parts[1]
+        if len(parts) > 2 and parts[2]:
+            row[CONF_UNIT] = parts[2]
+        rows.append(row)
+        if len(rows) >= WIDGET_MAX_STAT_ROWS:
+            break
+    return rows
+
+
+def _serialize_widget_stat_rows(rows: list[dict]) -> str:
+    parts: list[str] = []
+    for row in rows or []:
+        label = row.get(CONF_LABEL, "")
+        entity_id = row.get(CONF_ENTITY_ID, "")
+        if not label or not entity_id:
+            continue
+        s = f"{label}={entity_id}"
+        attr = row.get(CONF_VALUE_ATTRIBUTE) or ""
+        unit = row.get(CONF_UNIT) or ""
+        if attr or unit:
+            s += f":{attr}"
+        if unit:
+            s += f":{unit}"
+        parts.append(s)
+    return ", ".join(parts)
+
+
+def _parse_widget_input(user_input: dict, step1: dict) -> dict:
+    """Build the persisted subentry data from step-1 + step-2 inputs."""
+    entity_id = step1[CONF_ENTITY_ID]
+    template = step1[CONF_WIDGET_TEMPLATE]
+    raw_slug = (step1.get(CONF_SLUG) or "").strip()
+    slug = (normalize_slug(raw_slug) if raw_slug else "") or sanitize_slug(entity_id)
+
+    min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == WIDGET_TEMPLATE_GAUGE)
+
+    stat_rows = _parse_widget_stat_rows(user_input.get(CONF_STAT_ROWS, ""))
+    if template == WIDGET_TEMPLATE_STAT_LIST and not stat_rows:
+        raise vol.Invalid("stat_rows_required", path=[CONF_STAT_ROWS])
+
+    poll_interval = int(user_input.get(CONF_WIDGET_POLL_INTERVAL, DEFAULT_WIDGET_POLL_INTERVAL))
+    poll_interval = max(WIDGET_POLL_INTERVAL_MIN, min(WIDGET_POLL_INTERVAL_MAX, poll_interval))
+
+    trigger = user_input.get(CONF_WIDGET_TRIGGER_MODE) or WIDGET_TRIGGER_EVENT
+    if trigger not in WIDGET_TRIGGER_MODES:
+        trigger = WIDGET_TRIGGER_EVENT
+
+    tap_action_url = (user_input.get(CONF_TAP_ACTION_URL) or "").strip()
+    tap_action_foreground = bool(user_input.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
+    _raise_url_errors([(CONF_TAP_ACTION_URL, tap_action_url, tap_action_foreground)])
+
+    return {
+        CONF_ENTITY_ID: entity_id,
+        CONF_SLUG: slug,
+        CONF_WIDGET_NAME: user_input.get(CONF_WIDGET_NAME, "") or "",
+        CONF_WIDGET_TEMPLATE: template,
+        CONF_WIDGET_TRIGGER_MODE: trigger,
+        CONF_WIDGET_POLL_INTERVAL: poll_interval,
+        CONF_VALUE_ATTRIBUTE: user_input.get(CONF_VALUE_ATTRIBUTE, "") or "",
+        CONF_UNIT: user_input.get(CONF_UNIT, "") or "",
+        CONF_MIN_VALUE: min_v,
+        CONF_MAX_VALUE: max_v,
+        CONF_SEVERITY: user_input.get(CONF_SEVERITY, "") or "",
+        CONF_STAT_ROWS: stat_rows,
+        CONF_LABEL: user_input.get(CONF_LABEL, "") or "",
+        CONF_LABEL_ATTRIBUTE: user_input.get(CONF_LABEL_ATTRIBUTE, "") or "",
+        CONF_SUBTITLE_ATTRIBUTE: user_input.get(CONF_SUBTITLE_ATTRIBUTE, "") or "",
+        CONF_ICON: user_input.get(CONF_ICON, "") or "",
+        CONF_ICON_ATTRIBUTE: user_input.get(CONF_ICON_ATTRIBUTE, "") or "",
+        CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
+        CONF_ACCENT_COLOR_ATTRIBUTE: user_input.get(CONF_ACCENT_COLOR_ATTRIBUTE, "") or "",
+        CONF_BACKGROUND_COLOR: _rgb_to_hex(user_input.get(CONF_BACKGROUND_COLOR)),
+        CONF_TEXT_COLOR: _rgb_to_hex(user_input.get(CONF_TEXT_COLOR)),
+        CONF_TAP_ACTION_URL: tap_action_url,
+        CONF_TAP_ACTION_FOREGROUND: tap_action_foreground,
+    }
+
+
+class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
+    """Two-step flow for adding / reconfiguring a tracked widget."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._step1_input: dict[str, Any] = {}
+        self._is_reconfigure: bool = False
+        self._details_defaults: dict[str, Any] = {}
+
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
+        """Step 1: entity + template + slug."""
+        if user_input is not None:
+            self._step1_input = user_input
+            self._is_reconfigure = False
+            return await self.async_step_details()
+        return self.async_show_form(
+            step_id="user",
+            data_schema=_widget_step1_schema(),
+        )
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.SubentryFlowResult:
+        subentry = self._get_reconfigure_subentry()
+        if user_input is not None:
+            self._step1_input = user_input
+            self._is_reconfigure = True
+            current = dict(subentry.data)
+            stat_rows = current.get(CONF_STAT_ROWS)
+            if isinstance(stat_rows, list):
+                current[CONF_STAT_ROWS] = _serialize_widget_stat_rows(stat_rows)
+            self._details_defaults = current
+            return await self.async_step_details()
+        current = dict(subentry.data)
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=_widget_step1_schema(defaults=current),
+        )
+
+    async def async_step_details(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
+        entity_id = self._step1_input.get(CONF_ENTITY_ID, "")
+        template = self._step1_input.get(CONF_WIDGET_TEMPLATE, WIDGET_TEMPLATE_VALUE)
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                widget_cfg = _parse_widget_input(user_input, self._step1_input)
+            except vol.Invalid as exc:
+                for field in exc.path:
+                    errors[field] = str(exc.msg)
+            else:
+                title = widget_cfg.get(CONF_WIDGET_NAME) or widget_cfg[CONF_SLUG]
+                if self._is_reconfigure:
+                    entry = self._get_entry()
+                    subentry = self._get_reconfigure_subentry()
+                    return self.async_update_and_abort(
+                        entry,
+                        subentry,
+                        data=widget_cfg,
+                        title=title,
+                    )
+                return self.async_create_entry(
+                    title=title,
+                    data=widget_cfg,
+                    unique_id=widget_cfg[CONF_SLUG],
+                )
+
+        defaults = self._details_defaults if self._is_reconfigure else None
+        return self.async_show_form(
+            step_id="details",
+            data_schema=_widget_details_schema(entity_id, template, defaults=defaults),
             errors=errors,
         )
 

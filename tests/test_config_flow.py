@@ -21,8 +21,11 @@ from custom_components.pushward.config_flow import (
     _parse_int_list,
     _parse_state_labels,
     _parse_thresholds,
+    _parse_widget_input,
+    _parse_widget_stat_rows,
     _rgb_to_hex,
     _serialize_thresholds,
+    _serialize_widget_stat_rows,
     _validate_integration_key,
 )
 from custom_components.pushward.const import (
@@ -41,6 +44,7 @@ from custom_components.pushward.const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
+    CONF_LABEL,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
@@ -48,6 +52,8 @@ from custom_components.pushward.const import (
     CONF_REMAINING_TIME_ATTR,
     CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SECONDARY_URL_FOREGROUND,
+    CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
@@ -55,10 +61,13 @@ from custom_components.pushward.const import (
     CONF_SMOOTHING,
     CONF_SOUND,
     CONF_START_STATES,
+    CONF_STAT_ROWS,
     CONF_STATE_LABELS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_TAP_ACTION_FOREGROUND,
+    CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
@@ -68,11 +77,23 @@ from custom_components.pushward.const import (
     CONF_UNITS,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
+    CONF_URL_FOREGROUND,
+    CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_WARNING_THRESHOLD,
+    CONF_WIDGET_NAME,
+    CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_TEMPLATE,
+    CONF_WIDGET_TRIGGER_MODE,
     DEFAULT_SERVER_URL,
+    DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
+    WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_VALUE,
+    WIDGET_TRIGGER_EVENT,
+    WIDGET_TRIGGER_POLL,
     validate_url,
 )
 
@@ -1251,8 +1272,8 @@ async def test_subentry_reconfigure_clearing_steps_attrs(hass: HomeAssistant) ->
     assert data[CONF_CURRENT_STEP_ATTR] == ""
 
 
-async def test_subentry_rejects_invalid_url(hass: HomeAssistant) -> None:
-    """Invalid URL scheme shows error on step 2."""
+async def test_subentry_rejects_dangerous_url_scheme(hass: HomeAssistant) -> None:
+    """javascript: and other dangerous schemes are rejected on step 2."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -1267,17 +1288,17 @@ async def test_subentry_rejects_invalid_url(hass: HomeAssistant) -> None:
     )
     assert result["step_id"] == "details"
 
-    # Step 2 with invalid URL
+    # Step 2 with a security-blocked scheme
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_details_input("alert", **{CONF_URL: "ftp://evil.example.com"}),
+        user_input=_mock_details_input("alert", **{CONF_URL: "javascript:alert(1)"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_URL: "invalid_url"}
 
 
-async def test_subentry_rejects_invalid_secondary_url(hass: HomeAssistant) -> None:
-    """Invalid secondary URL scheme shows error on correct field."""
+async def test_subentry_rejects_dangerous_secondary_url(hass: HomeAssistant) -> None:
+    """Dangerous scheme on secondary URL surfaces error on the right field."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -1292,10 +1313,10 @@ async def test_subentry_rejects_invalid_secondary_url(hass: HomeAssistant) -> No
     )
     assert result["step_id"] == "details"
 
-    # Step 2 with invalid secondary URL
+    # Step 2 with a security-blocked scheme
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_mock_details_input("alert", **{CONF_SECONDARY_URL: "ftp://evil.example.com"}),
+        user_input=_mock_details_input("alert", **{CONF_SECONDARY_URL: "data:text/html,bad"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_SECONDARY_URL: "invalid_url"}
@@ -1533,3 +1554,219 @@ def test_parse_entity_input_warning_threshold_int_or_none() -> None:
 
     result_without = _parse_entity_input(_base_user_input())
     assert result_without[CONF_WARNING_THRESHOLD] is None
+
+
+# ---------------------------------------------------------------------------
+# Widget subentry flow tests
+# ---------------------------------------------------------------------------
+
+
+def _widget_step1(**overrides) -> dict:
+    data = {
+        CONF_ENTITY_ID: "sensor.users",
+        CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE,
+        CONF_SLUG: "",
+    }
+    data.update(overrides)
+    return data
+
+
+def _widget_details(**overrides) -> dict:
+    data = {
+        CONF_WIDGET_NAME: "Users",
+        CONF_VALUE_ATTRIBUTE: "",
+        CONF_UNIT: "",
+        CONF_LABEL: "",
+        CONF_WIDGET_TRIGGER_MODE: WIDGET_TRIGGER_EVENT,
+        CONF_WIDGET_POLL_INTERVAL: DEFAULT_WIDGET_POLL_INTERVAL,
+    }
+    data.update(overrides)
+    return data
+
+
+def test_parse_widget_stat_rows_round_trip() -> None:
+    raw = "Users=sensor.users, Active=sensor.active:count:online, Idle=sensor.idle::widgets"
+    parsed = _parse_widget_stat_rows(raw)
+    assert parsed == [
+        {"label": "Users", "entity_id": "sensor.users"},
+        {"label": "Active", "entity_id": "sensor.active", "value_attribute": "count", "unit": "online"},
+        {"label": "Idle", "entity_id": "sensor.idle", "unit": "widgets"},
+    ]
+    # Round-trip: serialize → parse → equal (modulo unit-only edge case below).
+    serialized = _serialize_widget_stat_rows(parsed)
+    reparsed = _parse_widget_stat_rows(serialized)
+    assert reparsed == parsed
+
+
+def test_parse_widget_stat_rows_caps_at_max() -> None:
+    raw = ",".join(f"Row{i}=sensor.s{i}" for i in range(10))
+    parsed = _parse_widget_stat_rows(raw)
+    assert len(parsed) == 4
+
+
+def test_parse_widget_stat_rows_accepts_list_passthrough() -> None:
+    rows = [
+        {"label": "A", "entity_id": "sensor.a"},
+        {"label": "", "entity_id": "sensor.b"},  # dropped: empty label
+        {"label": "C", "entity_id": ""},  # dropped: empty entity
+    ]
+    parsed = _parse_widget_stat_rows(rows)
+    assert parsed == [{"label": "A", "entity_id": "sensor.a"}]
+
+
+def test_parse_widget_input_invalid_gauge_range_raises() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_GAUGE})
+    details = _widget_details(**{CONF_MIN_VALUE: 100.0, CONF_MAX_VALUE: 50.0})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(details, step1)
+    assert exc.value.path == [CONF_MIN_VALUE]
+
+
+def test_parse_widget_input_stat_list_requires_rows() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST})
+    details = _widget_details(**{CONF_STAT_ROWS: ""})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(details, step1)
+    assert exc.value.path == [CONF_STAT_ROWS]
+
+
+def test_parse_widget_input_auto_generates_slug() -> None:
+    step1 = _widget_step1(**{CONF_ENTITY_ID: "sensor.registered_users", CONF_SLUG: ""})
+    details = _widget_details()
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_SLUG] == "ha-sensor-registered_users"
+
+
+def test_parse_widget_input_clamps_poll_interval() -> None:
+    step1 = _widget_step1()
+    # Below the min — should clamp up to WIDGET_POLL_INTERVAL_MIN (10).
+    details = _widget_details(**{CONF_WIDGET_POLL_INTERVAL: 5})
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_WIDGET_POLL_INTERVAL] == 10
+
+
+def test_parse_widget_input_full_value_template() -> None:
+    """Parser invocation: step1 + step2 → persisted subentry dict."""
+    step1 = _widget_step1()
+    details = _widget_details()
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_SLUG] == "ha-sensor-users"
+    assert result[CONF_WIDGET_TEMPLATE] == WIDGET_TEMPLATE_VALUE
+    assert result[CONF_WIDGET_TRIGGER_MODE] == WIDGET_TRIGGER_EVENT
+    assert result[CONF_WIDGET_POLL_INTERVAL] == DEFAULT_WIDGET_POLL_INTERVAL
+
+
+def test_parse_widget_input_poll_mode_persists_interval() -> None:
+    step1 = _widget_step1()
+    details = _widget_details(**{CONF_WIDGET_TRIGGER_MODE: WIDGET_TRIGGER_POLL, CONF_WIDGET_POLL_INTERVAL: 45})
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_WIDGET_TRIGGER_MODE] == WIDGET_TRIGGER_POLL
+    assert result[CONF_WIDGET_POLL_INTERVAL] == 45
+
+
+def test_parse_widget_input_unknown_trigger_falls_back_to_event() -> None:
+    step1 = _widget_step1()
+    details = _widget_details(**{CONF_WIDGET_TRIGGER_MODE: "garbage"})
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_WIDGET_TRIGGER_MODE] == WIDGET_TRIGGER_EVENT
+
+
+# --- Tap action parsing & validation ---
+
+
+def test_parse_entity_input_tap_action_url_persisted() -> None:
+    """tap_action_url + foreground roundtrip through the entity parser."""
+    result = _parse_entity_input(
+        _base_user_input(
+            **{
+                CONF_TAP_ACTION_URL: "homeassistant://navigate/lovelace/0",
+                CONF_TAP_ACTION_FOREGROUND: True,
+            }
+        )
+    )
+    assert result[CONF_TAP_ACTION_URL] == "homeassistant://navigate/lovelace/0"
+    assert result[CONF_TAP_ACTION_FOREGROUND] is True
+
+
+def test_parse_entity_input_url_title_and_foreground_persisted() -> None:
+    """url_title and url_foreground roundtrip through the entity parser (steps/alert)."""
+    result = _parse_entity_input(
+        _base_user_input(
+            **{
+                CONF_TEMPLATE: "steps",
+                CONF_URL: "https://ha.local/lovelace/laundry",
+                CONF_URL_TITLE: "Open",
+                CONF_URL_FOREGROUND: False,
+                CONF_SECONDARY_URL: "https://ha.local/api/services/script/run",
+                CONF_SECONDARY_URL_TITLE: "Run",
+                CONF_SECONDARY_URL_FOREGROUND: False,
+            }
+        )
+    )
+    assert result[CONF_URL] == "https://ha.local/lovelace/laundry"
+    assert result[CONF_URL_TITLE] == "Open"
+    assert result[CONF_URL_FOREGROUND] is False
+    assert result[CONF_SECONDARY_URL_TITLE] == "Run"
+    assert result[CONF_SECONDARY_URL_FOREGROUND] is False
+
+
+def test_parse_entity_input_silent_requires_http() -> None:
+    """foreground=False with a custom-scheme URL is rejected as silent_requires_http."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_entity_input(
+            _base_user_input(
+                **{
+                    CONF_TAP_ACTION_URL: "homeassistant://navigate/lovelace/0",
+                    CONF_TAP_ACTION_FOREGROUND: False,
+                }
+            )
+        )
+    assert exc.value.path == [CONF_TAP_ACTION_URL]
+    # Voluptuous stringifies the error code into args[0]
+    assert "silent_requires_http" in str(exc.value)
+
+
+def test_parse_entity_input_blocks_dangerous_scheme() -> None:
+    """javascript: in any URL field is rejected as invalid_url."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_entity_input(_base_user_input(**{CONF_TAP_ACTION_URL: "javascript:alert(1)"}))
+    assert exc.value.path == [CONF_TAP_ACTION_URL]
+
+
+def test_parse_widget_input_tap_action_url_persisted() -> None:
+    """tap_action_url + foreground roundtrip through the widget parser."""
+    step1 = _widget_step1()
+    details = _widget_details(
+        **{
+            CONF_TAP_ACTION_URL: "homeassistant://navigate/lovelace/0",
+            CONF_TAP_ACTION_FOREGROUND: True,
+        }
+    )
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_TAP_ACTION_URL] == "homeassistant://navigate/lovelace/0"
+    assert result[CONF_TAP_ACTION_FOREGROUND] is True
+
+
+def test_parse_widget_input_silent_requires_http() -> None:
+    """Widget tap_action with foreground=False + custom scheme is rejected."""
+    step1 = _widget_step1()
+    details = _widget_details(
+        **{
+            CONF_TAP_ACTION_URL: "homeassistant://navigate/lovelace/0",
+            CONF_TAP_ACTION_FOREGROUND: False,
+        }
+    )
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(details, step1)
+    assert exc.value.path == [CONF_TAP_ACTION_URL]
+    assert "silent_requires_http" in str(exc.value)
+
+
+def test_parse_widget_input_empty_tap_action_defaults() -> None:
+    """Empty tap_action_url is stored as '' (no validation triggered)."""
+    step1 = _widget_step1()
+    details = _widget_details()
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_TAP_ACTION_URL] == ""
+    # Default foreground is True.
+    assert result[CONF_TAP_ACTION_FOREGROUND] is True

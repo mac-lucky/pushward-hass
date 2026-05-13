@@ -1,11 +1,13 @@
 """Shared test fixtures for PushWard integration tests."""
 
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
+import aiohttp
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 
+from custom_components.pushward.api import PushWardApiClient
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
@@ -23,6 +25,8 @@ from custom_components.pushward.const import (
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_LABEL,
+    CONF_LABEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
@@ -30,6 +34,8 @@ from custom_components.pushward.const import (
     CONF_REMAINING_TIME_ATTR,
     CONF_SCALE,
     CONF_SECONDARY_URL,
+    CONF_SECONDARY_URL_FOREGROUND,
+    CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
     CONF_SEVERITY,
     CONF_SLUG,
@@ -37,10 +43,13 @@ from custom_components.pushward.const import (
     CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_STAT_ROWS,
     CONF_STATE_LABELS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_TAP_ACTION_FOREGROUND,
+    CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
@@ -50,8 +59,18 @@ from custom_components.pushward.const import (
     CONF_UNITS,
     CONF_UPDATE_INTERVAL,
     CONF_URL,
+    CONF_URL_FOREGROUND,
+    CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_WARNING_THRESHOLD,
+    CONF_WIDGET_NAME,
+    CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_TEMPLATE,
+    CONF_WIDGET_TRIGGER_MODE,
+    DEFAULT_TAP_ACTION_FOREGROUND,
+    DEFAULT_WIDGET_POLL_INTERVAL,
+    WIDGET_TEMPLATE_VALUE,
+    WIDGET_TRIGGER_EVENT,
 )
 
 
@@ -89,7 +108,13 @@ def make_entity_config(**overrides) -> dict:
         CONF_ACCENT_COLOR: "",
         CONF_ACCENT_COLOR_ATTRIBUTE: "",
         CONF_URL: "",
+        CONF_URL_FOREGROUND: DEFAULT_TAP_ACTION_FOREGROUND,
+        CONF_URL_TITLE: "",
         CONF_SECONDARY_URL: "",
+        CONF_SECONDARY_URL_FOREGROUND: DEFAULT_TAP_ACTION_FOREGROUND,
+        CONF_SECONDARY_URL_TITLE: "",
+        CONF_TAP_ACTION_URL: "",
+        CONF_TAP_ACTION_FOREGROUND: DEFAULT_TAP_ACTION_FOREGROUND,
         CONF_ENDED_TTL: None,
         CONF_STALE_TTL: None,
         CONF_SERIES: {},
@@ -112,6 +137,71 @@ def make_entity_config(**overrides) -> dict:
     }
     config.update(overrides)
     return config
+
+
+def make_widget_config(**overrides) -> dict:
+    """Build a test widget configuration with sensible defaults."""
+    config = {
+        CONF_ENTITY_ID: "sensor.users",
+        CONF_SLUG: "ha-users",
+        CONF_WIDGET_NAME: "Users",
+        CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE,
+        CONF_WIDGET_TRIGGER_MODE: WIDGET_TRIGGER_EVENT,
+        CONF_WIDGET_POLL_INTERVAL: DEFAULT_WIDGET_POLL_INTERVAL,
+        CONF_VALUE_ATTRIBUTE: "",
+        CONF_UNIT: "",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+        CONF_SEVERITY: "",
+        CONF_STAT_ROWS: [],
+        CONF_LABEL: "",
+        CONF_LABEL_ATTRIBUTE: "",
+        CONF_SUBTITLE_ATTRIBUTE: "",
+        CONF_ICON: "",
+        CONF_ICON_ATTRIBUTE: "",
+        CONF_ACCENT_COLOR: "",
+        CONF_ACCENT_COLOR_ATTRIBUTE: "",
+        CONF_BACKGROUND_COLOR: "",
+        CONF_TEXT_COLOR: "",
+        CONF_TAP_ACTION_URL: "",
+        CONF_TAP_ACTION_FOREGROUND: DEFAULT_TAP_ACTION_FOREGROUND,
+    }
+    config.update(overrides)
+    return config
+
+
+def make_mock_response(status: int, *, text: str = "", headers: dict | None = None) -> AsyncMock:
+    """Build a mock aiohttp response with the given status + body."""
+    resp = AsyncMock()
+    resp.status = status
+    resp.ok = 200 <= status < 300
+    resp.text = AsyncMock(return_value=text)
+    resp.headers = headers or {}
+    resp.raise_for_status = MagicMock()
+    if status >= 400:
+        resp.raise_for_status.side_effect = aiohttp.ClientResponseError(
+            request_info=MagicMock(), history=(), status=status, message=text
+        )
+    return resp
+
+
+def make_mock_session(*responses: AsyncMock) -> AsyncMock:
+    """Build a mock aiohttp.ClientSession returning `responses` in order."""
+    session = AsyncMock(spec=aiohttp.ClientSession)
+    ctx_managers = []
+    for resp in responses:
+        cm = AsyncMock()
+        cm.__aenter__ = AsyncMock(return_value=resp)
+        cm.__aexit__ = AsyncMock(return_value=False)
+        ctx_managers.append(cm)
+    session.request = MagicMock(side_effect=ctx_managers)
+    session.get = MagicMock()
+    return session
+
+
+def make_api_client(session: AsyncMock) -> PushWardApiClient:
+    """Build a PushWardApiClient backed by the given mock session."""
+    return PushWardApiClient(session, "https://api.example.com", "test-key")
 
 
 def make_mock_state(state: str, attributes: dict | None = None, entity_id: str | None = None) -> MagicMock:
