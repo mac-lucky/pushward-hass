@@ -89,6 +89,7 @@ from custom_components.pushward.const import (
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
+    WIDGET_MAX_STAT_ROWS,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_VALUE,
@@ -1601,7 +1602,7 @@ def test_parse_widget_stat_rows_round_trip() -> None:
 def test_parse_widget_stat_rows_caps_at_max() -> None:
     raw = ",".join(f"Row{i}=sensor.s{i}" for i in range(10))
     parsed = _parse_widget_stat_rows(raw)
-    assert len(parsed) == 4
+    assert len(parsed) == WIDGET_MAX_STAT_ROWS
 
 
 def test_parse_widget_stat_rows_accepts_list_passthrough() -> None:

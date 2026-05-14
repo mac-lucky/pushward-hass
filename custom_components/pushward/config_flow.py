@@ -1167,7 +1167,7 @@ def _widget_details_schema(
     if template == WIDGET_TEMPLATE_STAT_LIST:
         # stat_rows are configured as a structured string until HA gains a
         # repeating-row selector. Format: 'label=entity_id[:attribute[:unit]]'
-        # comma-separated. Up to 4 rows.
+        # comma-separated. Capped by WIDGET_MAX_STAT_ROWS.
         fields[
             vol.Required(
                 CONF_STAT_ROWS,

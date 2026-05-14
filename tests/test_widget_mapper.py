@@ -15,6 +15,7 @@ from custom_components.pushward.const import (
     CONF_UNIT,
     CONF_VALUE_ATTRIBUTE,
     CONF_WIDGET_TEMPLATE,
+    WIDGET_MAX_STAT_ROWS,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -273,15 +274,15 @@ def test_stat_list_skips_unavailable_rows():
     assert content["stat_rows"][0]["label"] == "Online"
 
 
-def test_stat_list_caps_at_4_rows():
-    rows = [{"label": f"Row {i}", "entity_id": f"sensor.s{i}"} for i in range(6)]
+def test_stat_list_caps_at_max_rows():
+    rows = [{"label": f"Row {i}", "entity_id": f"sensor.s{i}"} for i in range(8)]
     config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST, CONF_STAT_ROWS: rows})
-    states = {f"sensor.s{i}": make_mock_state(str(i), entity_id=f"sensor.s{i}") for i in range(6)}
+    states = {f"sensor.s{i}": make_mock_state(str(i), entity_id=f"sensor.s{i}") for i in range(8)}
     hass = _make_hass(states)
 
     content = map_widget_content(hass, config)
     assert content is not None
-    assert len(content["stat_rows"]) == 4
+    assert len(content["stat_rows"]) == WIDGET_MAX_STAT_ROWS
 
 
 def test_widget_name_from_config_falls_back_to_friendly_name():

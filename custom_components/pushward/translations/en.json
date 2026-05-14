@@ -480,7 +480,7 @@
             "slug": "Widget Slug"
           },
           "data_description": {
-            "widget_template": "Widget layout. Use `value` for a single number, `progress` for a 0–1 bar, `gauge` for a value-in-range, `status` for a severity badge, or `stat_list` for up to 4 rows.",
+            "widget_template": "Widget layout. Use `value` for a single number, `progress` for a 0–1 bar, `gauge` for a value-in-range, `status` for a severity badge, or `stat_list` for up to 6 rows.",
             "slug": "Unique identifier for this widget. Leave empty to auto-generate from entity ID."
           }
         },
@@ -527,7 +527,7 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "severity": "Status severity (info, warning, critical, success).",
-            "stat_rows": "Up to 4 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "stat_rows": "Up to 6 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
             "label": "Static label shown on the widget. Leave empty to derive from the entity.",
             "label_attribute": "Entity attribute used as the label. Overrides the static label.",
             "subtitle_attribute": "Entity attribute shown as the widget subtitle.",
