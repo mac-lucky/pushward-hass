@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Durum",
-          "description": "Aktivite durumu (ONGOING veya ENDED)."
+          "description": "\u0130stenen aktivite durumu."
         },
         "template": {
           "name": "Şablon",

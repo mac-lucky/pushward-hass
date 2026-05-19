@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Stare",
-          "description": "Starea activității (ONGOING sau ENDED)."
+          "description": "Starea dorită a activității."
         },
         "template": {
           "name": "Șablon",

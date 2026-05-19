@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "অবস্থা",
-          "description": "অ্যাক্টিভিটির অবস্থা (ONGOING বা ENDED)।"
+          "description": "কাঙ্ক্ষিত অ্যাক্টিভিটির অবস্থা।"
         },
         "template": {
           "name": "টেমপ্লেট",

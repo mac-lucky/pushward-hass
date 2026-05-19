@@ -100,6 +100,6 @@ async def test_activity_403_still_uses_forbidden_error():
     client = _make_client(session)
 
     with pytest.raises(PushWardForbiddenError) as ex:
-        await client.update_activity("slug", "ONGOING", {})
+        await client.update_activity("slug", "ongoing", {})
     # Make sure it's NOT mis-routed to the widget subclass.
     assert not isinstance(ex.value, PushWardWidgetPermissionError)

@@ -61,7 +61,7 @@ async def test_start_activity_on_state_change(hass: HomeAssistant) -> None:
     api.update_activity.assert_awaited_once()
     call_args = api.update_activity.call_args
     assert call_args[0][0] == "ha-washer"
-    assert call_args[0][1] == "ONGOING"
+    assert call_args[0][1] == "ongoing"
 
     await manager.async_stop()
 
@@ -93,8 +93,8 @@ async def test_end_activity_two_phase(hass: HomeAssistant) -> None:
     # Should have: ONGOING (completion) + ENDED
     assert api.update_activity.await_count == 2
     calls = api.update_activity.call_args_list
-    assert calls[0][0][1] == "ONGOING"
-    assert calls[1][0][1] == "ENDED"
+    assert calls[0][0][1] == "ongoing"
+    assert calls[1][0][1] == "ended"
     assert not manager._tracked["binary_sensor.washer"].is_active
 
     await manager.async_stop()
@@ -158,7 +158,7 @@ async def test_stop_ends_all_active(hass: HomeAssistant) -> None:
     api.update_activity.assert_awaited_once()
     call_args = api.update_activity.call_args
     assert call_args[0][0] == "ha-washer"
-    assert call_args[0][1] == "ENDED"
+    assert call_args[0][1] == "ended"
 
 
 async def test_rapid_on_off_cancels_end(hass: HomeAssistant) -> None:
@@ -230,7 +230,7 @@ async def test_stale_end_skips_ended_after_restart(hass: HomeAssistant) -> None:
     # Should have sent phase 1 (ONGOING) but NOT phase 2 (ENDED)
     calls = api.update_activity.call_args_list
     assert len(calls) == 1
-    assert calls[0][0][1] == "ONGOING"
+    assert calls[0][0][1] == "ongoing"
 
     await manager.async_stop()
 

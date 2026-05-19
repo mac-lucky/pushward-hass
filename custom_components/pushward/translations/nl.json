@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Status",
-          "description": "Activiteitsstatus (ONGOING of ENDED)."
+          "description": "Gewenste activiteitsstatus."
         },
         "template": {
           "name": "Sjabloon",

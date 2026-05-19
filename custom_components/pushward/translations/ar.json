@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "الحالة",
-          "description": "حالة النشاط (ONGOING أو ENDED)."
+          "description": "الحالة المطلوبة للنشاط."
         },
         "template": {
           "name": "القالب",

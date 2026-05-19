@@ -90,14 +90,14 @@ async def test_service_update_activity(hass: HomeAssistant) -> None:
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "ha-washer", "state": "ONGOING", "state_text": "Running", "progress": 0.5},
+        {"slug": "ha-washer", "state": "ongoing", "state_text": "Running", "progress": 0.5},
         blocking=True,
     )
 
     api.update_activity.assert_awaited_once()
     call_args = api.update_activity.call_args[0]
     assert call_args[0] == "ha-washer"
-    assert call_args[1] == "ONGOING"
+    assert call_args[1] == "ongoing"
     content = call_args[2]
     assert content["state"] == "Running"  # state_text mapped to "state"
     assert content["progress"] == 0.5
@@ -157,7 +157,7 @@ async def test_service_end_activity(hass: HomeAssistant) -> None:
     api.update_activity.assert_awaited_once()
     call_args = api.update_activity.call_args[0]
     assert call_args[0] == "ha-washer"
-    assert call_args[1] == "ENDED"
+    assert call_args[1] == "ended"
     assert call_args[2]["completion_message"] == "Wash Done"
 
 
@@ -326,7 +326,7 @@ async def test_update_activity_service_passes_sound_top_level(hass: HomeAssistan
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "template": "generic", "sound": "chime"},
+        {"slug": "x", "state": "ongoing", "template": "generic", "sound": "chime"},
         blocking=True,
     )
 
@@ -345,7 +345,7 @@ async def test_update_activity_service_passes_priority_top_level(hass: HomeAssis
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "priority": 7},
+        {"slug": "x", "state": "ongoing", "priority": 7},
         blocking=True,
     )
 
@@ -365,7 +365,7 @@ async def test_update_activity_service_rejects_invalid_sound(hass: HomeAssistant
         await hass.services.async_call(
             DOMAIN,
             "update_activity",
-            {"slug": "x", "state": "ONGOING", "sound": "badvalue"},
+            {"slug": "x", "state": "ongoing", "sound": "badvalue"},
             blocking=True,
         )
 
@@ -379,7 +379,7 @@ async def test_update_activity_service_rejects_priority_out_of_range(hass: HomeA
         await hass.services.async_call(
             DOMAIN,
             "update_activity",
-            {"slug": "x", "state": "ONGOING", "priority": 11},
+            {"slug": "x", "state": "ongoing", "priority": 11},
             blocking=True,
         )
 
@@ -392,7 +392,7 @@ async def test_update_activity_service_accepts_background_and_text_color(hass: H
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "background_color": "#123456", "text_color": "red"},
+        {"slug": "x", "state": "ongoing", "background_color": "#123456", "text_color": "red"},
         blocking=True,
     )
 
@@ -410,7 +410,7 @@ async def test_update_activity_service_accepts_warning_threshold(hass: HomeAssis
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "warning_threshold": 60},
+        {"slug": "x", "state": "ongoing", "warning_threshold": 60},
         blocking=True,
     )
 
@@ -426,7 +426,7 @@ async def test_update_activity_service_accepts_step_labels_list(hass: HomeAssist
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "step_labels": ["Init", "Build"]},
+        {"slug": "x", "state": "ongoing", "step_labels": ["Init", "Build"]},
         blocking=True,
     )
 
@@ -442,7 +442,7 @@ async def test_update_activity_service_accepts_alarm_bool(hass: HomeAssistant) -
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "alarm": True},
+        {"slug": "x", "state": "ongoing", "alarm": True},
         blocking=True,
     )
 
@@ -458,7 +458,7 @@ async def test_update_activity_service_accepts_fired_at(hass: HomeAssistant) -> 
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "fired_at": 1700000000},
+        {"slug": "x", "state": "ongoing", "fired_at": 1700000000},
         blocking=True,
     )
 
@@ -474,7 +474,7 @@ async def test_update_activity_service_accepts_units_dict(hass: HomeAssistant) -
     await hass.services.async_call(
         DOMAIN,
         "update_activity",
-        {"slug": "x", "state": "ONGOING", "units": {"Temp": "°C"}},
+        {"slug": "x", "state": "ongoing", "units": {"Temp": "°C"}},
         blocking=True,
     )
 

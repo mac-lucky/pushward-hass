@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "स्थिति",
-          "description": "Activity की स्थिति (ONGOING या ENDED)।"
+          "description": "Activity की वांछित स्थिति।"
         },
         "template": {
           "name": "टेम्पलेट",

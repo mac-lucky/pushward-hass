@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Estado",
-          "description": "Estado ng activity (ONGOING o ENDED)."
+          "description": "Nais na estado ng activity."
         },
         "template": {
           "name": "Template",

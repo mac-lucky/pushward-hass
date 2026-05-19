@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "நிலை",
-          "description": "செயல்பாட்டு நிலை (ONGOING அல்லது ENDED)."
+          "description": "விரும்பிய செயல்பாட்டு நிலை."
         },
         "template": {
           "name": "வார்ப்புரு",

@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Стан",
-          "description": "Стан активності (ONGOING або ENDED)."
+          "description": "Бажаний стан активності."
         },
         "template": {
           "name": "Шаблон",

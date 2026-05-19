@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "État",
-          "description": "État de la Live Activity (ONGOING ou ENDED)."
+          "description": "État souhaité de la Live Activity."
         },
         "template": {
           "name": "Modèle",

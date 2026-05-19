@@ -25,6 +25,8 @@ from homeassistant.helpers.storage import Store
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError, PushWardForbiddenError
 from .const import (
+    ACTIVITY_STATE_ENDED,
+    ACTIVITY_STATE_ONGOING,
     CONF_ACTIVITY_NAME,
     CONF_END_STATES,
     CONF_ENDED_TTL,
@@ -246,7 +248,7 @@ class ActivityManager:
                 slug = tracked.config[CONF_SLUG]
                 try:
                     content = map_completion_content(tracked.config, tracked.last_content)
-                    await self._api.update_activity(slug, "ENDED", content)
+                    await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
                 except (PushWardApiError, aiohttp.ClientError):
                     _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
 
@@ -347,7 +349,7 @@ class ActivityManager:
                     content["history"] = history
 
             sound = config.get(CONF_SOUND) or None
-            await self._api.update_activity(slug, "ONGOING", content, sound=sound)
+            await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
             self._clear_forbidden_notification(slug)
 
             tracked.is_active = True
@@ -379,7 +381,7 @@ class ActivityManager:
                 if ts < cutoff:
                     continue
                 for label, v in values.items():
-                    history.setdefault(label, []).append({"t": ts, "v": v})
+                    history.setdefault(label, []).append({"timestamp": ts, "value": v})
 
         if not history and not (config.get(CONF_SERIES) or config.get(CONF_VALUE_ATTRIBUTE)):
             history = await self._recorder_history_fallback(entity_id, period_minutes)
@@ -435,7 +437,7 @@ class ActivityManager:
                 continue
             with contextlib.suppress(ValueError, TypeError):
                 history.setdefault(label, []).append(
-                    {"t": int(state_obj.last_updated.timestamp()), "v": float(state_obj.state)}
+                    {"timestamp": int(state_obj.last_updated.timestamp()), "value": float(state_obj.state)}
                 )
         return history
 
@@ -474,7 +476,7 @@ class ActivityManager:
         slug = tracked.config[CONF_SLUG]
         async with self._api_error_guard(slug, "updating"):
             sound = tracked.config.get(CONF_SOUND) or None
-            await self._api.update_activity(slug, "ONGOING", content, sound=sound)
+            await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
             self._clear_forbidden_notification(slug)
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
@@ -508,7 +510,7 @@ class ActivityManager:
             async with self._api_error_guard(slug, "ending"):
                 # Phase 1: show completion content (preserves last progress/subtitle)
                 completion = map_completion_content(config, tracked.last_content)
-                await self._api.update_activity(slug, "ONGOING", completion)
+                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, completion)
 
                 # Wait for user to see the completion state
                 await asyncio.sleep(END_DELAY_SECONDS)
@@ -518,7 +520,7 @@ class ActivityManager:
                     return
 
                 # Phase 2: end the activity
-                await self._api.update_activity(slug, "ENDED", completion)
+                await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, completion)
                 self._clear_forbidden_notification(slug)
         finally:
             task = asyncio.current_task()

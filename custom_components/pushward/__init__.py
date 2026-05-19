@@ -22,6 +22,8 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .activity_manager import ActivityManager, build_history_store
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
+    ACTIVITY_STATE_ENDED,
+    ACTIVITY_STATES,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     DEFAULT_PRIORITY,
@@ -84,7 +86,7 @@ SERVICE_WIDGET_REFRESH = "widget_refresh"
 SCHEMA_UPDATE_ACTIVITY = vol.Schema(
     {
         vol.Required("slug"): validate_slug,
-        vol.Required("state"): vol.In(["ONGOING", "ENDED"]),
+        vol.Required("state"): vol.In(ACTIVITY_STATES),
         vol.Optional("template"): str,
         vol.Optional("progress"): vol.Coerce(float),
         vol.Optional("state_text"): str,
@@ -239,7 +241,7 @@ async def _async_handle_end_activity(hass: HomeAssistant, call: ServiceCall) -> 
     content = {}
     if "completion_message" in call.data:
         content["completion_message"] = call.data["completion_message"]
-    await api.update_activity(slug, "ENDED", content)
+    await api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
 
 
 async def _async_handle_delete_activity(hass: HomeAssistant, call: ServiceCall) -> None:

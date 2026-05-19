@@ -102,6 +102,11 @@ MAX_URL_LEN = 2048
 MAX_SLUG_LEN = 128
 MAX_TAP_ACTION_TITLE_LEN = 64
 
+# Activity wire-format states (must match pushward-server enum).
+ACTIVITY_STATE_ONGOING = "ongoing"
+ACTIVITY_STATE_ENDED = "ended"
+ACTIVITY_STATES = [ACTIVITY_STATE_ONGOING, ACTIVITY_STATE_ENDED]
+
 # Alert severities
 SEVERITIES = ["critical", "warning", "info"]
 

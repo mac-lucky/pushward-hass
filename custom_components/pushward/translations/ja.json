@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "状態",
-          "description": "アクティビティの状態（ONGOING または ENDED）。"
+          "description": "アクティビティの目標状態。"
         },
         "template": {
           "name": "テンプレート",

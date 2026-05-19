@@ -134,12 +134,12 @@ async def test_update_activity_success():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.update_activity("test-slug", "ONGOING", {"progress": 0.5})
+    await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
 
     call_args = session.request.call_args
     assert call_args[0][0] == "PATCH"
     assert "/activities/test-slug" in call_args[0][1]
-    assert call_args[1]["json"] == {"state": "ONGOING", "content": {"progress": 0.5}}
+    assert call_args[1]["json"] == {"state": "ongoing", "content": {"progress": 0.5}}
 
 
 # --- delete_activity ---
@@ -243,7 +243,7 @@ async def test_retry_on_server_error(mock_sleep):
     session = _make_session(resp_500, resp_200)
     client = _make_client(session)
 
-    await client.update_activity("test-slug", "ONGOING", {"progress": 0.5})
+    await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
 
     assert session.request.call_count == 2
     mock_sleep.assert_called_once()
@@ -256,7 +256,7 @@ async def test_retry_on_429_with_retry_after(mock_sleep):
     session = _make_session(resp_429, resp_200)
     client = _make_client(session)
 
-    await client.update_activity("test-slug", "ONGOING", {"progress": 0.5})
+    await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
 
     assert session.request.call_count == 2
     # Should sleep for the Retry-After value (2 seconds)
@@ -271,7 +271,7 @@ async def test_no_retry_on_client_error(mock_sleep):
     client = _make_client(session)
 
     with pytest.raises(PushWardApiError, match="400") as excinfo:
-        await client.update_activity("test-slug", "ONGOING", {"progress": 0.5})
+        await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
 
     # Response body must be surfaced on the exception so HA logs show the real reason.
     assert "Bad Request" in str(excinfo.value)
@@ -297,7 +297,7 @@ async def test_4xx_error_body_truncated_in_exception(mock_sleep):
     client = _make_client(session)
 
     with pytest.raises(PushWardApiError) as excinfo:
-        await client.update_activity("test-slug", "ONGOING", {"progress": 0.5})
+        await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
 
     msg = str(excinfo.value)
     assert "…" in msg
@@ -315,7 +315,7 @@ async def test_4xx_problem_detail_surfaced():
     client = _make_client(session)
 
     with pytest.raises(PushWardApiError, match="slug too long"):
-        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+        await client.update_activity("slug", "ongoing", {"template": "generic"})
 
 
 async def test_4xx_non_json_body_falls_back_to_raw():
@@ -325,7 +325,7 @@ async def test_4xx_non_json_body_falls_back_to_raw():
     client = _make_client(session)
 
     with pytest.raises(PushWardApiError, match="plain text error"):
-        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+        await client.update_activity("slug", "ongoing", {"template": "generic"})
 
 
 # --- semaphore concurrency cap ---
@@ -360,7 +360,7 @@ async def test_semaphore_caps_concurrency(mock_sleep):
     session.request = MagicMock(side_effect=lambda *a, **kw: _SlowContextManager())
     client = _make_client(session)
 
-    await asyncio.gather(*(client.update_activity(f"slug-{i}", "ONGOING", {"i": i}) for i in range(10)))
+    await asyncio.gather(*(client.update_activity(f"slug-{i}", "ongoing", {"i": i}) for i in range(10)))
 
     assert peak <= MAX_CONCURRENT_REQUESTS
     assert session.request.call_count == 10
@@ -380,7 +380,7 @@ async def test_forbidden_403_subscription_raises_forbidden():
     client = _make_client(session)
 
     with pytest.raises(PushWardForbiddenError) as excinfo:
-        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+        await client.update_activity("slug", "ongoing", {"template": "generic"})
 
     assert "subscription" in str(excinfo.value)
     assert excinfo.value.status_code == 403
@@ -397,7 +397,7 @@ async def test_forbidden_403_slug_scope_raises_forbidden():
     client = _make_client(session)
 
     with pytest.raises(PushWardForbiddenError) as excinfo:
-        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+        await client.update_activity("slug", "ongoing", {"template": "generic"})
 
     assert excinfo.value.status_code == 403
     assert "key not allowed" in str(excinfo.value)
@@ -409,7 +409,7 @@ async def test_forbidden_403_with_empty_body_still_raises_forbidden():
     client = _make_client(session)
 
     with pytest.raises(PushWardForbiddenError) as excinfo:
-        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+        await client.update_activity("slug", "ongoing", {"template": "generic"})
 
     assert "Forbidden" in str(excinfo.value)
     assert excinfo.value.status_code == 403
@@ -421,7 +421,7 @@ async def test_unauthorized_401_still_raises_auth_error():
     client = _make_client(session)
 
     with pytest.raises(PushWardAuthError):
-        await client.update_activity("slug", "ONGOING", {"template": "generic"})
+        await client.update_activity("slug", "ongoing", {"template": "generic"})
 
 
 # --- sound / priority top-level fields ---
@@ -432,10 +432,10 @@ async def test_update_activity_sends_sound_top_level():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.update_activity("slug", "ONGOING", {"template": "generic"}, sound="chime")
+    await client.update_activity("slug", "ongoing", {"template": "generic"}, sound="chime")
 
     body = session.request.call_args[1]["json"]
-    assert body == {"state": "ONGOING", "content": {"template": "generic"}, "sound": "chime"}
+    assert body == {"state": "ongoing", "content": {"template": "generic"}, "sound": "chime"}
 
 
 async def test_update_activity_sends_priority_top_level():
@@ -443,10 +443,10 @@ async def test_update_activity_sends_priority_top_level():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.update_activity("slug", "ONGOING", {"template": "generic"}, priority=7)
+    await client.update_activity("slug", "ongoing", {"template": "generic"}, priority=7)
 
     body = session.request.call_args[1]["json"]
-    assert body == {"state": "ONGOING", "content": {"template": "generic"}, "priority": 7}
+    assert body == {"state": "ongoing", "content": {"template": "generic"}, "priority": 7}
 
 
 async def test_update_activity_sends_both_sound_and_priority():
@@ -454,10 +454,10 @@ async def test_update_activity_sends_both_sound_and_priority():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.update_activity("slug", "ONGOING", {"template": "generic"}, sound="chime", priority=7)
+    await client.update_activity("slug", "ongoing", {"template": "generic"}, sound="chime", priority=7)
 
     body = session.request.call_args[1]["json"]
-    assert body == {"state": "ONGOING", "content": {"template": "generic"}, "sound": "chime", "priority": 7}
+    assert body == {"state": "ongoing", "content": {"template": "generic"}, "sound": "chime", "priority": 7}
 
 
 async def test_update_activity_omits_sound_when_none():
@@ -465,7 +465,7 @@ async def test_update_activity_omits_sound_when_none():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.update_activity("slug", "ONGOING", {"template": "generic"})
+    await client.update_activity("slug", "ongoing", {"template": "generic"})
 
     body = session.request.call_args[1]["json"]
     assert "sound" not in body
@@ -476,7 +476,7 @@ async def test_update_activity_omits_priority_when_none():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.update_activity("slug", "ONGOING", {"template": "generic"})
+    await client.update_activity("slug", "ongoing", {"template": "generic"})
 
     body = session.request.call_args[1]["json"]
     assert "priority" not in body

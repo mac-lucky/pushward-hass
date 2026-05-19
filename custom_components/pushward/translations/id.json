@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Status",
-          "description": "Status aktivitas (ONGOING atau ENDED)."
+          "description": "Status aktivitas yang diinginkan."
         },
         "template": {
           "name": "Templat",

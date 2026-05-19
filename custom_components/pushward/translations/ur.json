@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "حالت",
-          "description": "سرگرمی کی حالت (ONGOING یا ENDED)۔"
+          "description": "سرگرمی کی مطلوبہ حالت۔"
         },
         "template": {
           "name": "ٹیمپلیٹ",

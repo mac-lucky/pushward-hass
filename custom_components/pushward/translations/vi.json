@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Trạng Thái",
-          "description": "Trạng thái hoạt động (ONGOING hoặc ENDED)."
+          "description": "Trạng thái hoạt động mong muốn."
         },
         "template": {
           "name": "Mẫu",

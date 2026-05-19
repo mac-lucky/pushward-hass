@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Estado",
-          "description": "Estado da atividade (ONGOING ou ENDED)."
+          "description": "Estado de atividade desejado."
         },
         "template": {
           "name": "Modelo",

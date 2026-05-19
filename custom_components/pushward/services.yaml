@@ -16,8 +16,8 @@ update_activity:
       selector:
         select:
           options:
-            - "ONGOING"
-            - "ENDED"
+            - "ongoing"
+            - "ended"
     template:
       name: Template
       description: "Required. Activity layout template. For steps: also provide total_steps and current_step. For alert: also provide severity. For gauge: also provide min_value and max_value. For countdown: also provide end_date."

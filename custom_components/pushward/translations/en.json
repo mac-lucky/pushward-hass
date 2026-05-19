@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "State",
-          "description": "Activity state (ONGOING or ENDED)."
+          "description": "Desired activity state."
         },
         "template": {
           "name": "Template",

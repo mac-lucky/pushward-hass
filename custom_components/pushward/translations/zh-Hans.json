@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "状态",
-          "description": "活动状态（ONGOING 或 ENDED）。"
+          "description": "所需的活动状态。"
         },
         "template": {
           "name": "模板",
