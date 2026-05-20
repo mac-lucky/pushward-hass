@@ -124,6 +124,10 @@
           "name": "Alarm",
           "description": "Trigger AlarmKit alarm on countdown expiry (iOS 26+, countdown template only)."
         },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Requires alarm (iOS 26+, countdown template only)."
+        },
         "step_labels": {
           "name": "Step Labels",
           "description": "Ordered list of step labels. Length must equal total_steps. Steps template only."
@@ -388,6 +392,7 @@
             "text_color_attribute": "Text Color Attribute",
             "warning_threshold": "Warning Threshold (seconds)",
             "alarm": "Alarm (iOS 26+)",
+            "snooze_seconds": "Snooze Seconds (iOS 26+)",
             "step_labels": "Step Labels",
             "step_rows": "Step Rows",
             "fired_at_attribute": "Fired At Attribute",
@@ -439,6 +444,7 @@
             "text_color_attribute": "Entity attribute for dynamic text color. Overrides static color.",
             "warning_threshold": "Seconds before the end of a countdown when the server sends a warning push. Leave empty to disable. Countdown template only.",
             "alarm": "Trigger an AlarmKit alarm when the countdown expires (iOS 26+). Countdown template only.",
+            "snooze_seconds": "How long the iOS Snooze button extends the countdown (60–3600). Leave empty for the 300s (5 min) default. Requires Alarm. Countdown template only.",
             "step_labels": "Labels for each step. Format: 1=First Step, 2=Second Step. Must cover steps 1..total_steps. Steps template only.",
             "step_rows": "Row height (1–10) for each step, comma-separated. Must have total_steps entries. Steps template only.",
             "fired_at_attribute": "Entity attribute holding the unix timestamp when the alert fired. Alert template only.",

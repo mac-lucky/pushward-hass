@@ -450,6 +450,39 @@ async def test_update_activity_service_accepts_alarm_bool(hass: HomeAssistant) -
     assert content["alarm"] is True
 
 
+async def test_update_activity_service_accepts_snooze_seconds(hass: HomeAssistant) -> None:
+    """snooze_seconds int appears in content dict."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ongoing", "alarm": True, "snooze_seconds": 600},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["snooze_seconds"] == 600
+
+
+async def test_update_activity_service_rejects_out_of_range_snooze_seconds(
+    hass: HomeAssistant,
+) -> None:
+    """snooze_seconds outside 60–3600 is rejected by the service schema."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad in (59, 3601):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "update_activity",
+                {"slug": "x", "state": "ongoing", "alarm": True, "snooze_seconds": bad},
+                blocking=True,
+            )
+
+
 async def test_update_activity_service_accepts_fired_at(hass: HomeAssistant) -> None:
     """fired_at int appears in content dict."""
     api = _mock_api()

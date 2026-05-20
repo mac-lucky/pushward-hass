@@ -19,6 +19,7 @@ from .const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ALARM,
+    CONF_SNOOZE_SECONDS,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
@@ -339,6 +340,9 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
             content["warning_threshold"] = int(warning_threshold)
         if entity_config.get(CONF_ALARM):
             content["alarm"] = True
+            snooze_seconds = entity_config.get(CONF_SNOOZE_SECONDS)
+            if snooze_seconds is not None:
+                content["snooze_seconds"] = int(snooze_seconds)
     elif template == "steps":
         total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
         current = _get_current_step(state, entity_config)

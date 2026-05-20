@@ -233,6 +233,16 @@ update_activity:
       description: Trigger a device alarm when the countdown expires. Countdown template only (iOS 26+).
       selector:
         boolean:
+    snooze_seconds:
+      name: Snooze Seconds
+      description: How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+).
+      example: 600
+      selector:
+        number:
+          min: 60
+          max: 3600
+          mode: box
+          unit_of_measurement: seconds
     step_labels:
       name: Step Labels
       description: Labels for each step as a YAML object keyed by step number (e.g. {"1":"Step 1","2":"Step 2"}). Steps template only.

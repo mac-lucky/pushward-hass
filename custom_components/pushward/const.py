@@ -56,6 +56,7 @@ CONF_HISTORY_PERIOD = "history_period"
 CONF_SOUND = "sound"
 CONF_WARNING_THRESHOLD = "warning_threshold"
 CONF_ALARM = "alarm"
+CONF_SNOOZE_SECONDS = "snooze_seconds"
 CONF_STEP_LABELS = "step_labels"
 CONF_STEP_ROWS = "step_rows"
 CONF_FIRED_AT_ATTRIBUTE = "fired_at_attribute"
@@ -94,6 +95,8 @@ PRIORITY_MAX = 10
 TOTAL_STEPS_MAX = 20
 UPDATE_INTERVAL_MIN = 1
 WARNING_THRESHOLD_MAX = 86400  # 24 h
+SNOOZE_SECONDS_MIN = 60
+SNOOZE_SECONDS_MAX = 3600
 
 # Free-text input length caps.
 MAX_TEXT_LEN = 255

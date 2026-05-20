@@ -39,6 +39,7 @@ from .const import (
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
     CONF_ALARM,
+    CONF_SNOOZE_SECONDS,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
@@ -117,6 +118,8 @@ from .const import (
     PRIORITY_MIN,
     SCALES,
     SEVERITIES,
+    SNOOZE_SECONDS_MAX,
+    SNOOZE_SECONDS_MIN,
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
@@ -600,6 +603,19 @@ def _details_schema(
                 default=d.get(CONF_ALARM, False),
             )
         ] = BooleanSelector()
+        fields[
+            vol.Optional(
+                CONF_SNOOZE_SECONDS,
+                description={"suggested_value": d.get(CONF_SNOOZE_SECONDS)},
+            )
+        ] = NumberSelector(
+            NumberSelectorConfig(
+                min=SNOOZE_SECONDS_MIN,
+                max=SNOOZE_SECONDS_MAX,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement="seconds",
+            )
+        )
     fields[accent_key] = ColorRGBSelector()
     fields[
         vol.Optional(
@@ -852,6 +868,9 @@ def _parse_entity_input(user_input: dict) -> dict:
         if user_input.get(CONF_WARNING_THRESHOLD) is not None
         else None,
         CONF_ALARM: bool(user_input.get(CONF_ALARM, False)),
+        CONF_SNOOZE_SECONDS: int(user_input[CONF_SNOOZE_SECONDS])
+        if user_input.get(CONF_SNOOZE_SECONDS) is not None
+        else None,
         CONF_STEP_LABELS: _parse_state_labels(user_input.get(CONF_STEP_LABELS, "")),
         CONF_STEP_ROWS: _parse_int_list(user_input.get(CONF_STEP_ROWS, "")),
         CONF_FIRED_AT_ATTRIBUTE: user_input.get(CONF_FIRED_AT_ATTRIBUTE, ""),
