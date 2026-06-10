@@ -8,9 +8,10 @@ import pytest
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ServiceValidationError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.pushward.api import PushWardAuthError
+from custom_components.pushward.api import PushWardAuthError, PushWardEmailPermissionError
 from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
@@ -42,6 +43,7 @@ def _mock_api() -> AsyncMock:
     api.update_activity = AsyncMock()
     api.delete_activity = AsyncMock()
     api.create_notification = AsyncMock()
+    api.send_email = AsyncMock()
     return api
 
 
@@ -70,6 +72,7 @@ async def test_services_registered_on_setup(hass: HomeAssistant) -> None:
     assert hass.services.has_service(DOMAIN, "end_activity")
     assert hass.services.has_service(DOMAIN, "delete_activity")
     assert hass.services.has_service(DOMAIN, "send_notification")
+    assert hass.services.has_service(DOMAIN, "send_email")
 
     # Unload should remove services
     await hass.config_entries.async_unload(entry.entry_id)
@@ -80,6 +83,7 @@ async def test_services_registered_on_setup(hass: HomeAssistant) -> None:
     assert not hass.services.has_service(DOMAIN, "end_activity")
     assert not hass.services.has_service(DOMAIN, "delete_activity")
     assert not hass.services.has_service(DOMAIN, "send_notification")
+    assert not hass.services.has_service(DOMAIN, "send_email")
 
 
 async def test_service_update_activity(hass: HomeAssistant) -> None:
@@ -313,6 +317,159 @@ async def test_service_send_notification_level_critical_backward_compat(
     api.create_notification.assert_awaited_once()
     call_kwargs = api.create_notification.call_args[1]
     assert call_kwargs["level"] == "critical"
+
+
+# --- send_email service tests ---
+
+
+async def test_service_send_email(hass: HomeAssistant) -> None:
+    """send_email maps `body` -> text_body and forwards to/subject."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_email",
+        {"to": "alerts@example.com", "subject": "Deploy done", "body": "Deployment succeeded."},
+        blocking=True,
+    )
+
+    api.send_email.assert_awaited_once()
+    call_kwargs = api.send_email.call_args[1]
+    assert call_kwargs["to"] == "alerts@example.com"
+    assert call_kwargs["subject"] == "Deploy done"
+    assert call_kwargs["text_body"] == "Deployment succeeded."
+    assert call_kwargs["html_body"] is None
+
+
+async def test_service_send_email_html_only(hass: HomeAssistant) -> None:
+    """send_email accepts an html_body without a plain-text body."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_email",
+        {"to": "alerts@example.com", "subject": "Report", "html_body": "<p>Hi</p>"},
+        blocking=True,
+    )
+
+    call_kwargs = api.send_email.call_args[1]
+    assert call_kwargs["html_body"] == "<p>Hi</p>"
+    assert call_kwargs["text_body"] is None
+
+
+async def test_service_send_email_both_bodies(hass: HomeAssistant) -> None:
+    """send_email forwards both bodies when given, mapping `body` -> text_body."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_email",
+        {"to": "alerts@example.com", "subject": "Report", "body": "plain", "html_body": "<p>Hi</p>"},
+        blocking=True,
+    )
+
+    call_kwargs = api.send_email.call_args[1]
+    assert call_kwargs["text_body"] == "plain"
+    assert call_kwargs["html_body"] == "<p>Hi</p>"
+
+
+async def test_service_send_email_requires_a_body(hass: HomeAssistant) -> None:
+    """Omitting both body and html_body fails schema validation."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_email",
+            {"to": "alerts@example.com", "subject": "Empty"},
+            blocking=True,
+        )
+    api.send_email.assert_not_awaited()
+
+
+async def test_service_send_email_rejects_empty_bodies(hass: HomeAssistant) -> None:
+    """An empty-string body is treated as absent — sending only `body: ""` fails."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_email",
+            {"to": "alerts@example.com", "subject": "Empty", "body": ""},
+            blocking=True,
+        )
+    api.send_email.assert_not_awaited()
+
+
+async def test_service_send_email_drops_empty_text_body(hass: HomeAssistant) -> None:
+    """An empty `body` alongside a valid html_body is coerced to None, not "" ."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_email",
+        {"to": "alerts@example.com", "subject": "Report", "body": "", "html_body": "<p>Hi</p>"},
+        blocking=True,
+    )
+
+    call_kwargs = api.send_email.call_args[1]
+    assert call_kwargs["text_body"] is None
+    assert call_kwargs["html_body"] == "<p>Hi</p>"
+
+
+async def test_service_send_email_rejects_invalid_to(hass: HomeAssistant) -> None:
+    """A malformed recipient address is rejected client-side."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_email",
+            {"to": "not-an-email", "subject": "Hi", "body": "x"},
+            blocking=True,
+        )
+    api.send_email.assert_not_awaited()
+
+
+async def test_service_send_email_rejects_subject_with_line_breaks(hass: HomeAssistant) -> None:
+    """CR/LF in the subject is rejected (email header-injection guard)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_email",
+            {"to": "alerts@example.com", "subject": "Hi\r\nBcc: evil@example.com", "body": "x"},
+            blocking=True,
+        )
+    api.send_email.assert_not_awaited()
+
+
+async def test_service_send_email_permission_error_becomes_validation_error(hass: HomeAssistant) -> None:
+    """A 403 from the API surfaces as a clean ServiceValidationError, not a raw exception."""
+    api = _mock_api()
+    api.send_email = AsyncMock(
+        side_effect=PushWardEmailPermissionError(
+            "recipient is not a verified address for this account", status_code=403
+        )
+    )
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError, match="verified address"):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_email",
+            {"to": "alerts@example.com", "subject": "Hi", "body": "x"},
+            blocking=True,
+        )
 
 
 # --- update_activity new field tests ---

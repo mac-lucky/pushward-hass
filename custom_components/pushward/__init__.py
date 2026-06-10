@@ -20,7 +20,12 @@ from homeassistant.exceptions import (
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .activity_manager import ActivityManager, build_history_store
-from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
+from .api import (
+    PushWardApiClient,
+    PushWardApiError,
+    PushWardAuthError,
+    PushWardForbiddenError,
+)
 from .const import (
     ACTIVITY_STATE_ENDED,
     ACTIVITY_STATES,
@@ -82,6 +87,7 @@ SERVICE_CREATE_ACTIVITY = "create_activity"
 SERVICE_END_ACTIVITY = "end_activity"
 SERVICE_DELETE_ACTIVITY = "delete_activity"
 SERVICE_SEND_NOTIFICATION = "send_notification"
+SERVICE_SEND_EMAIL = "send_email"
 SERVICE_WIDGET_REFRESH = "widget_refresh"
 
 SCHEMA_UPDATE_ACTIVITY = vol.Schema(
@@ -189,6 +195,38 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
     }
 )
 
+
+def _no_line_breaks(value: str) -> str:
+    """Reject CR/LF — guards against email header injection via to/subject."""
+    if "\r" in value or "\n" in value:
+        raise vol.Invalid("must not contain line breaks")
+    return value
+
+
+def _require_email_body(data: dict) -> dict:
+    """Require a non-empty plain-text or HTML body — empty strings don't count.
+
+    `cv.has_at_least_one_key` only checks key presence, so `body: ""` would slip
+    through and ship an empty payload the server rejects.
+    """
+    if not (data.get("body") or data.get("html_body")):
+        raise vol.Invalid("must provide a non-empty 'body', 'html_body', or both")
+    return data
+
+
+# `body` maps to the API `text_body`; `html_body` passes through.
+SCHEMA_SEND_EMAIL = vol.All(
+    vol.Schema(
+        {
+            vol.Required("to"): vol.All(str, vol.Email(), vol.Length(max=254)),
+            vol.Required("subject"): vol.All(str, _no_line_breaks, vol.Length(min=1, max=256)),
+            vol.Optional("body"): str,
+            vol.Optional("html_body"): str,
+        }
+    ),
+    _require_email_body,
+)
+
 SCHEMA_WIDGET_REFRESH = vol.All(
     vol.Schema(
         {
@@ -284,6 +322,23 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
     )
 
 
+async def _async_handle_send_email(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the send_email service call."""
+    api = _get_api(hass)
+    try:
+        await api.send_email(
+            to=call.data["to"],
+            subject=call.data["subject"],
+            text_body=call.data.get("body") or None,
+            html_body=call.data.get("html_body") or None,
+        )
+    except PushWardForbiddenError as err:
+        # Missing `emails` capability or an unverified recipient — user-fixable.
+        raise ServiceValidationError(str(err)) from err
+    except PushWardApiError as err:
+        raise HomeAssistantError(str(err)) from err
+
+
 async def _async_handle_widget_refresh(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the widget_refresh service call.
 
@@ -334,6 +389,7 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(
         DOMAIN, SERVICE_SEND_NOTIFICATION, partial(_async_handle_send_notification, hass), SCHEMA_SEND_NOTIFICATION
     )
+    hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)
     hass.services.async_register(
         DOMAIN, SERVICE_WIDGET_REFRESH, partial(_async_handle_widget_refresh, hass), SCHEMA_WIDGET_REFRESH
     )
@@ -413,6 +469,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.services.async_remove(DOMAIN, SERVICE_END_ACTIVITY)
         hass.services.async_remove(DOMAIN, SERVICE_DELETE_ACTIVITY)
         hass.services.async_remove(DOMAIN, SERVICE_SEND_NOTIFICATION)
+        hass.services.async_remove(DOMAIN, SERVICE_SEND_EMAIL)
         hass.services.async_remove(DOMAIN, SERVICE_WIDGET_REFRESH)
 
     return True

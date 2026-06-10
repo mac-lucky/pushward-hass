@@ -42,6 +42,16 @@ class PushWardWidgetPermissionError(PushWardForbiddenError):
     """
 
 
+class PushWardEmailPermissionError(PushWardForbiddenError):
+    """403 on POST /emails — missing `emails` capability on the key OR the
+    recipient isn't a verified address for the account.
+
+    An integration key can't verify recipients; that's done in the PushWard iOS
+    app. The server's `detail` distinguishes the two cases and is surfaced to
+    the HA user.
+    """
+
+
 class PushWardApiClient:
     """Async client for the PushWard REST API."""
 
@@ -207,6 +217,28 @@ class PushWardApiClient:
                 payload[key] = val
         await self._request_with_retry("POST", "/notifications", json=payload)
 
+    async def send_email(
+        self,
+        to: str,
+        subject: str,
+        *,
+        text_body: str | None = None,
+        html_body: str | None = None,
+    ) -> None:
+        """Send a transactional email via POST /emails.
+
+        ``to`` must be a verified, non-unsubscribed recipient of the account
+        (registered and confirmed in the PushWard iOS app), and the integration
+        key needs the ``emails`` capability. Provide ``text_body``, ``html_body``,
+        or both.
+        """
+        payload: dict = {"to": to, "subject": subject}
+        if text_body is not None:
+            payload["text_body"] = text_body
+        if html_body is not None:
+            payload["html_body"] = html_body
+        await self._request_with_retry("POST", "/emails", json=payload)
+
     @staticmethod
     def _truncate(message: str, max_len: int = 200) -> str:
         return message[:max_len] + ("…" if len(message) > max_len else "")
@@ -274,6 +306,11 @@ class PushWardApiClient:
                             message = self._truncate(detail or raw) or "Forbidden"
                             if path.startswith("/widgets"):
                                 raise PushWardWidgetPermissionError(
+                                    message,
+                                    status_code=resp.status,
+                                )
+                            if path.startswith("/emails"):
+                                raise PushWardEmailPermissionError(
                                     message,
                                     status_code=resp.status,
                                 )

@@ -446,6 +446,40 @@ send_notification:
       selector:
         boolean:
 
+send_email:
+  name: Send Email
+  description: Send a transactional email via PushWard. Provide a text body, an HTML body, or both. The integration key needs the "emails" capability.
+  fields:
+    to:
+      name: To
+      description: Recipient email address. Must be an address you have already added and confirmed in the PushWard iOS app — unverified addresses are rejected.
+      required: true
+      example: "alerts@example.com"
+      selector:
+        text:
+          type: email
+    subject:
+      name: Subject
+      description: Email subject line.
+      required: true
+      example: "Home Security Alert"
+      selector:
+        text:
+    body:
+      name: Body
+      description: Plain-text email body. Provide this, an HTML body, or both.
+      example: "The front door was opened at 10:30 PM."
+      selector:
+        text:
+          multiline: true
+    html_body:
+      name: HTML Body
+      description: HTML email body. Provide this, a plain-text body, or both.
+      example: "<p>The front door was opened at <b>10:30 PM</b>.</p>"
+      selector:
+        text:
+          multiline: true
+
 widget_refresh:
   name: Refresh Widget
   description: Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to iOS even when the value hasn't changed.

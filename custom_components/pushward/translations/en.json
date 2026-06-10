@@ -275,6 +275,28 @@
           "description": "List of action button objects with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`."
         }
       }
+    },
+    "send_email": {
+      "name": "Send Email",
+      "description": "Send a transactional email via PushWard. Provide a text body, an HTML body, or both. The integration key needs the \"emails\" capability.",
+      "fields": {
+        "to": {
+          "name": "To",
+          "description": "Recipient email address. Must be an address you have already added and confirmed in the PushWard iOS app — unverified addresses are rejected."
+        },
+        "subject": {
+          "name": "Subject",
+          "description": "Email subject line."
+        },
+        "body": {
+          "name": "Body",
+          "description": "Plain-text email body. Provide this, an HTML body, or both."
+        },
+        "html_body": {
+          "name": "HTML Body",
+          "description": "HTML email body. Provide this, a plain-text body, or both."
+        }
+      }
     }
   },
   "exceptions": {

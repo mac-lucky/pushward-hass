@@ -29,7 +29,8 @@ When an entity enters a configured "start" state (e.g., washer turns on), a Live
 - **Rapid on/off handling** — cancels pending end if activity restarts
 - **Automatic resume** on HA restart
 - **Push notifications** — send alerts from automations via the `send_notification` service
-- **5 services** for activity management and notifications from automations
+- **Transactional email** — send emails to verified recipients via the `send_email` service
+- **7 services** for activities, widgets, notifications, and email from automations
 
 ## Installation
 
@@ -189,6 +190,28 @@ Send a push notification via PushWard.
 | `source_display_name` | No | Human-readable source name in PushWard inbox |
 | `activity_slug` | No | Link notification to an existing Live Activity |
 | `push` | No | Send as APNs push alert (default: true). When false, inbox-only |
+
+### `pushward.send_email`
+
+Send a transactional email via PushWard. Requires an integration key with the `emails` capability. The recipient must already be added and confirmed in the PushWard iOS app — unverified addresses are rejected.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `to` | Yes | Recipient email address (must be a verified recipient on your account) |
+| `subject` | Yes | Email subject line |
+| `body` | No | Plain-text body (provide `body`, `html_body`, or both) |
+| `html_body` | No | HTML body (provide `body`, `html_body`, or both) |
+
+### `pushward.widget_refresh`
+
+Force-refresh a tracked widget, bypassing the diff cache so it re-renders even when the value is unchanged. Provide exactly one of `slug` or `entity_id`.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `slug` | No\* | Widget slug identifier |
+| `entity_id` | No\* | HA entity bound to the widget |
+
+\* Exactly one of `slug` or `entity_id` is required.
 
 ## Domain Defaults
 

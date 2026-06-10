@@ -10,6 +10,7 @@ import pytest
 from custom_components.pushward.api import (
     PushWardApiError,
     PushWardAuthError,
+    PushWardEmailPermissionError,
     PushWardForbiddenError,
 )
 from custom_components.pushward.const import MAX_CONCURRENT_REQUESTS
@@ -233,6 +234,50 @@ async def test_create_notification_omits_none_fields():
     assert set(body.keys()) == {"title", "body", "push"}
 
 
+# --- send_email ---
+
+
+async def test_send_email_text_body():
+    """send_email POSTs to /emails with to/subject/text_body."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.send_email("alerts@example.com", "Deploy done", text_body="Succeeded.")
+
+    session.request.assert_called_once()
+    call_args = session.request.call_args
+    assert call_args[0][0] == "POST"
+    assert call_args[0][1].endswith("/emails")
+    body = call_args[1]["json"]
+    assert body == {"to": "alerts@example.com", "subject": "Deploy done", "text_body": "Succeeded."}
+
+
+async def test_send_email_html_and_text():
+    """Both bodies are included in the payload when provided."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.send_email("alerts@example.com", "Report", text_body="plain", html_body="<p>html</p>")
+
+    body = session.request.call_args[1]["json"]
+    assert body["text_body"] == "plain"
+    assert body["html_body"] == "<p>html</p>"
+
+
+async def test_send_email_omits_none_bodies():
+    """Body fields set to None are not included in the payload."""
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.send_email("alerts@example.com", "Subj", html_body="<p>x</p>")
+
+    body = session.request.call_args[1]["json"]
+    assert set(body.keys()) == {"to", "subject", "html_body"}
+
+
 # --- retry ---
 
 
@@ -424,6 +469,25 @@ async def test_unauthorized_401_still_raises_auth_error():
         await client.update_activity("slug", "ongoing", {"template": "generic"})
 
 
+async def test_forbidden_403_emails_raises_email_permission_error():
+    """403 on /emails (unverified recipient or missing capability) raises
+    PushWardEmailPermissionError with the server detail surfaced."""
+    body = (
+        '{"type":"about:blank","title":"Forbidden","status":403,'
+        '"detail":"recipient is not a verified address for this account",'
+        '"code":"email.recipient_not_verified"}'
+    )
+    resp = _mock_response(403, text=body)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardEmailPermissionError) as excinfo:
+        await client.send_email("alerts@example.com", "Subj", text_body="hi")
+
+    assert "verified address" in str(excinfo.value)
+    assert excinfo.value.status_code == 403
+
+
 # --- sound / priority top-level fields ---
 
 
@@ -488,3 +552,7 @@ async def test_update_activity_omits_priority_when_none():
 def test_forbidden_exception_is_subclass_of_api_error():
     assert issubclass(PushWardForbiddenError, PushWardApiError)
     assert not issubclass(PushWardForbiddenError, PushWardAuthError)
+
+
+def test_email_permission_error_is_subclass_of_forbidden():
+    assert issubclass(PushWardEmailPermissionError, PushWardForbiddenError)
