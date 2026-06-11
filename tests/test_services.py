@@ -626,7 +626,7 @@ async def test_update_activity_service_accepts_snooze_seconds(hass: HomeAssistan
 async def test_update_activity_service_rejects_out_of_range_snooze_seconds(
     hass: HomeAssistant,
 ) -> None:
-    """snooze_seconds outside 60–3600 is rejected by the service schema."""
+    """snooze_seconds outside 60-3600 is rejected by the service schema."""
     api = _mock_api()
     await _setup_entry(hass, api)
 
