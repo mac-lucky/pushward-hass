@@ -13,14 +13,18 @@ from custom_components.pushward.const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
     CONF_FIRED_AT_ATTRIBUTE,
+    CONF_FIRED_AT_ENTITY,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
+    CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
+    CONF_REMAINING_TIME_ENTITY,
     CONF_SCALE,
     CONF_SECONDARY_URL,
     CONF_SECONDARY_URL_FOREGROUND,
@@ -32,6 +36,7 @@ from custom_components.pushward.const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
@@ -43,6 +48,7 @@ from custom_components.pushward.const import (
     CONF_URL,
     CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
+    CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
     normalize_slug,
     validate_slug,
@@ -1871,3 +1877,326 @@ def test_completion_carries_background_and_text_color_all_templates(template):
 
     assert content["background_color"] == "#fff"
     assert content["text_color"] == "red"
+
+
+# --- Companion source entities ---------------------------------------------
+
+
+class _FakeStates:
+    def __init__(self, mapping):
+        self._mapping = mapping
+
+    def get(self, entity_id):
+        return self._mapping.get(entity_id)
+
+
+class _FakeHass:
+    """Minimal hass stub exposing only states.get for companion resolution."""
+
+    def __init__(self, mapping):
+        self.states = _FakeStates(mapping)
+
+
+def test_companion_remaining_time_from_state():
+    """A separate sensor's state supplies remaining seconds (LG washer pattern)."""
+    primary = _make_state("on", {"friendly_name": "Pralka"}, "sensor.pralka_stan")
+    time_sensor = _make_state("1500", {}, "sensor.pralka_pozostaly_czas")
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "washer",
+        CONF_REMAINING_TIME_ENTITY: "sensor.pralka_pozostaly_czas",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.pralka_pozostaly_czas": time_sensor}))
+
+    assert content["remaining_time"] == 1500
+
+
+def test_companion_remaining_time_clock_string():
+    """An 'H:MM:SS' duration string is parsed to seconds."""
+    primary = _make_state("on", {}, "sensor.pralka_stan")
+    time_sensor = _make_state("0:25:00", {}, "sensor.pralka_pozostaly_czas")
+    config = {CONF_TEMPLATE: "countdown", CONF_REMAINING_TIME_ENTITY: "sensor.pralka_pozostaly_czas"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.pralka_pozostaly_czas": time_sensor}))
+
+    assert content["remaining_time"] == 25 * 60
+
+
+def test_companion_remaining_time_duration_unit_minutes():
+    """A duration sensor in minutes is converted to seconds."""
+    primary = _make_state("on", {}, "sensor.washer")
+    time_sensor = _make_state("25", {"device_class": "duration", "unit_of_measurement": "min"}, "sensor.washer_time")
+    config = {CONF_TEMPLATE: "generic", CONF_REMAINING_TIME_ENTITY: "sensor.washer_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": time_sensor}))
+
+    assert content["remaining_time"] == 25 * 60
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_companion_remaining_time_timestamp_anchors_end_date(mock_time):
+    """A timestamp finish-time sensor maps end_date to the absolute epoch."""
+    mock_time.time.return_value = 1000.0
+    primary = _make_state("on", {}, "sensor.washer")
+    finish = _make_state(
+        "1970-01-01T00:25:00+00:00",
+        {"device_class": "timestamp"},
+        "sensor.washer_finish",
+    )
+    config = {CONF_TEMPLATE: "countdown", CONF_REMAINING_TIME_ENTITY: "sensor.washer_finish"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_finish": finish}))
+
+    assert content["end_date"] == 1500  # absolute epoch from the timestamp
+    assert content["remaining_time"] == 500  # 1500 - now(1000)
+
+
+def test_companion_attribute_overrides_state():
+    """When both companion entity and attribute are set, read the companion's attribute."""
+    primary = _make_state("on", {}, "sensor.washer")
+    companion = _make_state("ignored", {"remaining": 300}, "sensor.washer_extra")
+    config = {
+        CONF_TEMPLATE: "countdown",
+        CONF_REMAINING_TIME_ENTITY: "sensor.washer_extra",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_extra": companion}))
+
+    assert content["remaining_time"] == 300
+
+
+def test_companion_unavailable_falls_back_to_default():
+    """A configured-but-unavailable companion yields no value, not the primary's."""
+    primary = _make_state("on", {"remaining": 999}, "sensor.washer")
+    companion = _make_state("unavailable", {}, "sensor.washer_time")
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_REMAINING_TIME_ENTITY: "sensor.washer_time",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": companion}))
+
+    assert "remaining_time" not in content
+
+
+def test_companion_subtitle_from_state():
+    """Subtitle can come from a separate entity's state."""
+    primary = _make_state("on", {"friendly_name": "Pralka"}, "sensor.pralka_stan")
+    info = _make_state("Cottons 40°C", {}, "sensor.pralka_program")
+    config = {CONF_TEMPLATE: "generic", CONF_SUBTITLE_ENTITY: "sensor.pralka_program"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.pralka_program": info}))
+
+    assert content["subtitle"] == "Cottons 40°C"
+
+
+def test_companion_gauge_value_from_state():
+    """Gauge value can come from a separate numeric entity's state."""
+    primary = _make_state("on", {}, "climate.living")
+    temp = _make_state("21.5", {}, "sensor.living_temp")
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+        CONF_VALUE_ENTITY: "sensor.living_temp",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.living_temp": temp}))
+
+    assert content["value"] == 21.5
+
+
+def test_companion_progress_from_state():
+    """Progress can come from a separate 0-100 entity's state."""
+    primary = _make_state("on", {}, "vacuum.robot")
+    pct = _make_state("75", {}, "sensor.robot_progress")
+    config = {CONF_TEMPLATE: "generic", CONF_PROGRESS_ENTITY: "sensor.robot_progress"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.robot_progress": pct}))
+
+    assert content["progress"] == 0.75
+
+
+def test_companion_current_step_from_state():
+    """Steps current_step can come from a separate entity's state."""
+    primary = _make_state("on", {}, "sensor.dishwasher")
+    step = _make_state("2", {}, "sensor.dishwasher_phase")
+    config = {
+        CONF_TEMPLATE: "steps",
+        CONF_TOTAL_STEPS: 3,
+        CONF_CURRENT_STEP_ENTITY: "sensor.dishwasher_phase",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.dishwasher_phase": step}))
+
+    assert content["current_step"] == 2
+
+
+def test_companion_fired_at_from_timestamp_entity():
+    """Alert fired_at can come from a separate timestamp entity (ISO state)."""
+    primary = _make_state("on", {}, "binary_sensor.alarm")
+    fired = _make_state("1970-01-01T00:16:40+00:00", {"device_class": "timestamp"}, "sensor.alarm_time")
+    config = {CONF_TEMPLATE: "alert", CONF_FIRED_AT_ENTITY: "sensor.alarm_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.alarm_time": fired}))
+
+    assert content["fired_at"] == 1000
+
+
+def test_no_companion_preserves_legacy_attribute_behavior():
+    """Without a companion entity, values still read from the primary's attributes."""
+    state = _make_state("active", {"friendly_name": "Tea Timer", "remaining": 120})
+    config = {CONF_TEMPLATE: "countdown", CONF_REMAINING_TIME_ATTR: "remaining"}
+
+    # No hass passed at all — legacy path.
+    content = map_content(state, config)
+
+    assert content["remaining_time"] == 120
+
+
+def test_companion_configured_but_no_hass_yields_no_value():
+    """A companion is configured but hass is unavailable → fail safe to default, not the primary."""
+    primary = _make_state("on", {"remaining": 999}, "sensor.washer")
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_REMAINING_TIME_ENTITY: "sensor.washer_time",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+    }
+
+    # hass omitted: must NOT silently read the primary's "remaining" attribute.
+    content = map_content(primary, config)
+
+    assert "remaining_time" not in content
+
+
+def test_companion_remaining_time_clock_mmss():
+    """A 2-part 'MM:SS' string parses as minutes:seconds."""
+    primary = _make_state("on", {}, "sensor.washer")
+    time_sensor = _make_state("25:00", {}, "sensor.washer_time")
+    config = {CONF_TEMPLATE: "countdown", CONF_REMAINING_TIME_ENTITY: "sensor.washer_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": time_sensor}))
+
+    assert content["remaining_time"] == 25 * 60
+
+
+def test_companion_remaining_time_invalid_clock_dropped():
+    """A non-clock string containing ':' yields no remaining_time (no crash)."""
+    primary = _make_state("on", {}, "sensor.washer")
+    time_sensor = _make_state("ab:cd", {}, "sensor.washer_time")
+    config = {CONF_TEMPLATE: "generic", CONF_REMAINING_TIME_ENTITY: "sensor.washer_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": time_sensor}))
+
+    assert "remaining_time" not in content
+
+
+def test_companion_remaining_time_negative_clamped():
+    """A negative duration string clamps to zero rather than going negative."""
+    primary = _make_state("on", {}, "sensor.washer")
+    time_sensor = _make_state("-0:10", {}, "sensor.washer_time")
+    config = {CONF_TEMPLATE: "generic", CONF_REMAINING_TIME_ENTITY: "sensor.washer_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": time_sensor}))
+
+    assert content["remaining_time"] == 0
+
+
+def test_companion_remaining_time_duration_unit_hours():
+    """A duration sensor in hours is converted to seconds."""
+    primary = _make_state("on", {}, "sensor.washer")
+    time_sensor = _make_state("2", {"device_class": "duration", "unit_of_measurement": "h"}, "sensor.washer_time")
+    config = {CONF_TEMPLATE: "generic", CONF_REMAINING_TIME_ENTITY: "sensor.washer_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": time_sensor}))
+
+    assert content["remaining_time"] == 2 * 3600
+
+
+def test_companion_remaining_time_duration_no_unit_is_seconds():
+    """A duration sensor without a unit falls back to raw seconds."""
+    primary = _make_state("on", {}, "sensor.washer")
+    time_sensor = _make_state("90", {"device_class": "duration"}, "sensor.washer_time")
+    config = {CONF_TEMPLATE: "generic", CONF_REMAINING_TIME_ENTITY: "sensor.washer_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": time_sensor}))
+
+    assert content["remaining_time"] == 90
+
+
+def test_companion_remaining_time_unknown_unit_is_raw_seconds():
+    """An unsupported duration unit is treated as raw seconds, not dropped."""
+    primary = _make_state("on", {}, "sensor.washer")
+    time_sensor = _make_state(
+        "10", {"device_class": "duration", "unit_of_measurement": "fortnights"}, "sensor.washer_time"
+    )
+    config = {CONF_TEMPLATE: "generic", CONF_REMAINING_TIME_ENTITY: "sensor.washer_time"}
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_time": time_sensor}))
+
+    assert content["remaining_time"] == 10
+
+
+def test_companion_attribute_missing_falls_back_to_default():
+    """Companion entity present but the requested attribute is absent → no value."""
+    primary = _make_state("on", {"remaining": 999}, "sensor.washer")
+    companion = _make_state("on", {}, "sensor.washer_extra")  # no 'remaining' attr
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_REMAINING_TIME_ENTITY: "sensor.washer_extra",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.washer_extra": companion}))
+
+    assert "remaining_time" not in content
+
+
+def test_companion_timeline_value_from_entity():
+    """Timeline single-series value can come from a separate entity, labeled by the primary."""
+    primary = _make_state("on", {"friendly_name": "Robot"}, "vacuum.robot")
+    metric = _make_state("42", {}, "sensor.robot_metric")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_VALUE_ENTITY: "sensor.robot_metric",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.robot_metric": metric}))
+
+    assert content["value"] == {"Robot": 42.0}
+
+
+def test_companion_gauge_value_attribute_rescaled():
+    """A companion gauge value read from a 0-255 attribute is rescaled to 0-100."""
+    primary = _make_state("on", {}, "light.lamp")
+    companion = _make_state("on", {"brightness": 128}, "light.other")
+    config = {
+        CONF_TEMPLATE: "gauge",
+        CONF_MIN_VALUE: 0.0,
+        CONF_MAX_VALUE: 100.0,
+        CONF_VALUE_ENTITY: "light.other",
+        CONF_VALUE_ATTRIBUTE: "brightness",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"light.other": companion}))
+
+    assert content["value"] == 50  # round(128 / 255 * 100)
+
+
+def test_steps_progress_entity_suppresses_autoderive():
+    """A configured progress source overrides the steps auto-derived progress."""
+    primary = _make_state("on", {"step": 2}, "sensor.dishwasher")
+    pct = _make_state("30", {}, "sensor.dishwasher_progress")
+    config = {
+        CONF_TEMPLATE: "steps",
+        CONF_TOTAL_STEPS: 4,
+        CONF_CURRENT_STEP_ATTR: "step",  # auto-derive would yield 2/4 = 0.5
+        CONF_PROGRESS_ENTITY: "sensor.dishwasher_progress",
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.dishwasher_progress": pct}))
+
+    assert content["progress"] == 0.3  # from the entity, NOT the 0.5 auto-derive

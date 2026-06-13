@@ -2,18 +2,23 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import re
 import time
 from urllib.parse import urlparse
 
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfTime
 from homeassistant.core import HomeAssistant, State
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util import dt as dt_util
 from homeassistant.util.color import (
     color_hs_to_RGB,
     color_temperature_to_rgb,
     color_xy_to_RGB,
 )
+from homeassistant.util.unit_conversion import DurationConverter
 
 from .const import (
     CONF_ACCENT_COLOR,
@@ -23,14 +28,18 @@ from .const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
     CONF_FIRED_AT_ATTRIBUTE,
+    CONF_FIRED_AT_ENTITY,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
+    CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
+    CONF_REMAINING_TIME_ENTITY,
     CONF_SCALE,
     CONF_SECONDARY_URL,
     CONF_SECONDARY_URL_FOREGROUND,
@@ -43,6 +52,7 @@ from .const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
@@ -56,6 +66,7 @@ from .const import (
     CONF_URL_FOREGROUND,
     CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
+    CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
     DEFAULT_DECIMALS,
     DEFAULT_MAX_VALUE,
@@ -280,8 +291,19 @@ def resolve_icon(state: State, config: dict, registry_icon: str | None = None) -
     return icon
 
 
-def map_content(state: State, entity_config: dict, *, registry_icon: str | None = None) -> dict:
-    """Map HA state + attributes to a PushWard content dict."""
+def map_content(
+    state: State,
+    entity_config: dict,
+    *,
+    registry_icon: str | None = None,
+    hass: HomeAssistant | None = None,
+) -> dict:
+    """Map HA state + attributes to a PushWard content dict.
+
+    ``hass`` is required only when a value field is configured to read from a
+    separate companion entity (CONF_*_ENTITY); without it those fields fall back
+    to the tracked entity.
+    """
     # State label: use custom label if configured, else default formatting
     state_labels = entity_config.get(CONF_STATE_LABELS) or {}
     if state.state in state_labels:
@@ -291,13 +313,9 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
 
     icon = resolve_icon(state, entity_config, registry_icon=registry_icon)
 
-    # Subtitle: subtitle_attribute > friendly_name
-    subtitle_attr = entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
-    if subtitle_attr:
-        raw = state.attributes.get(subtitle_attr)
-        subtitle = str(raw) if raw is not None else state.attributes.get("friendly_name", "")
-    else:
-        subtitle = state.attributes.get("friendly_name", "")
+    # Subtitle: subtitle_entity/subtitle_attribute > friendly_name
+    raw_subtitle, _ = _resolve_raw(state, entity_config, CONF_SUBTITLE_ENTITY, CONF_SUBTITLE_ATTRIBUTE, hass)
+    subtitle = str(raw_subtitle) if raw_subtitle is not _NO_VALUE else state.attributes.get("friendly_name", "")
 
     # Accent color resolution: accent_color_attribute > static accent_color > "blue"
     accent = resolve_color(state, entity_config, CONF_ACCENT_COLOR, CONF_ACCENT_COLOR_ATTRIBUTE) or "blue"
@@ -307,7 +325,7 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
 
     content: dict = {
         "template": entity_config.get(CONF_TEMPLATE, "generic"),
-        "progress": _get_progress(state, entity_config),
+        "progress": _get_progress(state, entity_config, hass),
         "state": state_text,
         "icon": icon,
         "subtitle": subtitle,
@@ -319,7 +337,10 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
     if text_color:
         content["text_color"] = text_color
 
-    remaining = _get_remaining_time(state, entity_config)
+    # Single clock read shared by remaining_time and the countdown start/end_date
+    # below, so the emitted fields stay mutually consistent.
+    now = int(time.time())
+    remaining, absolute_end = _get_remaining_seconds(state, entity_config, hass, now=now)
     if remaining is not None:
         content["remaining_time"] = remaining
 
@@ -328,8 +349,13 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
     # Template-specific required fields
     template = content["template"]
     if template == "countdown":
-        now = int(time.time())
-        content["end_date"] = now + (remaining if remaining is not None else 0)
+        # A timestamp (finish-time) source anchors end_date to the absolute finish
+        # time, so it doesn't drift as the clock ticks. Otherwise derive it from
+        # remaining seconds against the shared ``now`` read above.
+        if absolute_end is not None:
+            content["end_date"] = absolute_end
+        else:
+            content["end_date"] = now + (remaining if remaining is not None else 0)
         completion_msg = entity_config.get(CONF_COMPLETION_MESSAGE)
         if completion_msg:
             content["completion_message"] = completion_msg
@@ -345,11 +371,11 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
                 content["snooze_seconds"] = int(snooze_seconds)
     elif template == "steps":
         total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
-        current = _get_current_step(state, entity_config)
+        current = _get_current_step(state, entity_config, hass)
         content["total_steps"] = total
         content["current_step"] = current
-        # Auto-derive progress when no explicit progress_attribute is configured
-        if not entity_config.get(CONF_PROGRESS_ATTRIBUTE) and total > 0:
+        # Auto-derive progress when no explicit progress source is configured
+        if not entity_config.get(CONF_PROGRESS_ATTRIBUTE) and not entity_config.get(CONF_PROGRESS_ENTITY) and total > 0:
             content["progress"] = max(0.0, min(1.0, current / total))
         step_labels = entity_config.get(CONF_STEP_LABELS) or {}
         if step_labels:
@@ -361,17 +387,16 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
             content["step_rows"] = [max(1, min(10, int(r))) for r in step_rows]
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
-        fired_at_attr = entity_config.get(CONF_FIRED_AT_ATTRIBUTE)
-        if fired_at_attr:
-            raw_fired_at = state.attributes.get(fired_at_attr)
-            if raw_fired_at is not None:
-                try:
-                    content["fired_at"] = int(float(raw_fired_at))
-                except (ValueError, TypeError):
-                    _LOGGER.debug("Could not parse fired_at attribute %s for %s", fired_at_attr, state.entity_id)
+        raw_fired_at, _ = _resolve_raw(state, entity_config, CONF_FIRED_AT_ENTITY, CONF_FIRED_AT_ATTRIBUTE, hass)
+        if raw_fired_at is not _NO_VALUE:
+            fired_at = _coerce_epoch(raw_fired_at)
+            if fired_at is not None:
+                content["fired_at"] = fired_at
+            else:
+                _LOGGER.debug("Could not parse fired_at for %s", state.entity_id)
     elif template == "gauge":
         min_val, max_val = _gauge_base_fields(content, entity_config)
-        value = _get_gauge_value(state, entity_config)
+        value = _get_gauge_value(state, entity_config, hass)
         value = max(min_val, min(max_val, value))
         content["value"] = value
         if max_val > min_val:
@@ -379,7 +404,7 @@ def map_content(state: State, entity_config: dict, *, registry_icon: str | None 
         else:
             content["progress"] = 1.0
     elif template == "timeline":
-        values = _get_timeline_values(state, entity_config)
+        values = _get_timeline_values(state, entity_config, hass)
         if values:
             content["value"] = values
         unit = entity_config.get(CONF_UNIT, "")
@@ -488,55 +513,198 @@ def _rescale_attr(value: float, attr_name: str) -> float:
     return value
 
 
-def _get_progress(state: State, entity_config: dict) -> float:
-    """Extract progress from entity attributes, clamped to 0.0-1.0.
+# Sentinel returned when a field has no resolvable value (unconfigured, or a
+# configured companion entity is unavailable). Callers apply the field default.
+_NO_VALUE: object = object()
+
+
+def _resolve_source(
+    primary_state: State,
+    entity_config: dict,
+    entity_key: str,
+    hass: HomeAssistant | None,
+) -> State | object:
+    """Resolve the State a value should be read from for ``entity_key``.
+
+    Returns the tracked (primary) State when no companion entity is configured.
+    When a companion IS configured, returns that entity's State, or _NO_VALUE if
+    it is missing/unavailable/unknown (so callers fall back to the field default
+    rather than silently reading the primary). Also returns _NO_VALUE when a
+    companion is configured but ``hass`` is unavailable, to avoid silently
+    sourcing the value from the wrong (primary) entity.
+    """
+    companion_id = entity_config.get(entity_key)
+    if not companion_id:
+        return primary_state
+    if hass is None:
+        return _NO_VALUE
+    companion = hass.states.get(companion_id)
+    if companion is None or companion.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+        return _NO_VALUE
+    return companion
+
+
+def _resolve_raw(
+    primary_state: State,
+    entity_config: dict,
+    entity_key: str,
+    attr_key: str,
+    hass: HomeAssistant | None,
+    *,
+    state_fallback: bool = False,
+) -> tuple[object, State | None]:
+    """Resolve the raw value for a field, honoring an optional companion entity.
+
+    Returns ``(raw, source_state)``. ``raw`` is _NO_VALUE when nothing is
+    configured/available. Precedence:
+      - companion entity set + attribute set  -> companion.attributes[attr]
+      - companion entity set + attribute empty -> companion.state
+      - companion empty + attribute set        -> primary.attributes[attr]
+      - companion empty + attribute empty      -> primary.state if
+        ``state_fallback`` else _NO_VALUE
+    ``source_state`` exposes the chosen entity (for device_class/unit lookups).
+    """
+    attr = entity_config.get(attr_key)
+    if entity_config.get(entity_key):
+        source = _resolve_source(primary_state, entity_config, entity_key, hass)
+        if source is _NO_VALUE:
+            return _NO_VALUE, None
+        raw = source.attributes.get(attr) if attr else source.state
+        return (raw if raw is not None else _NO_VALUE), source
+    if attr:
+        raw = primary_state.attributes.get(attr)
+        return (raw if raw is not None else _NO_VALUE), primary_state
+    if state_fallback:
+        return primary_state.state, primary_state
+    return _NO_VALUE, primary_state
+
+
+def _parse_clock_string(raw: str) -> int | None:
+    """Parse an 'H:MM:SS' / 'MM:SS' (or any HA duration) string into clamped seconds.
+
+    Delegates to ``dt_util.parse_duration``, which rejects malformed input
+    (returns None) instead of raising, and handles sign/format edge cases.
+    """
+    delta = dt_util.parse_duration(raw.strip())
+    if delta is None:
+        return None
+    return max(0, int(delta.total_seconds()))
+
+
+def _coerce_epoch(raw: object) -> int | None:
+    """Coerce a raw value to a unix epoch int: numeric seconds, or an ISO datetime."""
+    try:
+        return int(float(raw))  # type: ignore[arg-type]
+    except (ValueError, TypeError):
+        parsed = dt_util.parse_datetime(str(raw))
+        return int(parsed.timestamp()) if parsed is not None else None
+
+
+def _coerce_remaining_seconds(
+    raw: object, source: State | None, now: int | None = None
+) -> tuple[int | None, int | None]:
+    """Coerce a raw value into ``(remaining_seconds, absolute_end_epoch)``.
+
+    Smart-parses several appliance time formats:
+      - device_class 'timestamp' (ISO finish time) -> absolute end + derived remaining
+      - device_class 'duration' (with unit_of_measurement) -> seconds
+      - 'H:MM:SS' / 'MM:SS' string -> seconds
+      - plain number -> seconds
+    ``absolute_end_epoch`` is non-None only for a timestamp source. ``now`` lets
+    the caller share a single clock read across the emitted fields.
+    """
+    device_class = source.attributes.get("device_class") if source is not None else None
+
+    if device_class == "timestamp":
+        parsed = dt_util.parse_datetime(str(raw))
+        if parsed is None:
+            return None, None
+        end = int(parsed.timestamp())
+        if now is None:
+            now = int(time.time())
+        return max(0, end - now), end
+
+    if isinstance(raw, str) and ":" in raw:
+        secs = _parse_clock_string(raw)
+        if secs is None and source is not None:
+            _LOGGER.debug("Could not parse remaining time clock string for %s", source.entity_id)
+        return secs, None
+
+    try:
+        value = float(raw)  # type: ignore[arg-type]
+    except (ValueError, TypeError):
+        return None, None
+
+    unit = source.attributes.get("unit_of_measurement") if source is not None else None
+    if device_class == "duration" and unit:
+        # Unknown/unsupported unit → treat the raw number as seconds.
+        with contextlib.suppress(HomeAssistantError):
+            value = DurationConverter.convert(value, str(unit), UnitOfTime.SECONDS)
+    return int(value), None
+
+
+def _get_progress(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> float:
+    """Extract progress (0.0-1.0) from a companion entity or the tracked entity.
 
     Attributes in the 0-255 range (e.g. brightness) are divided by 255;
     all others are treated as 0-100 percentages.
     """
-    attr_name = entity_config.get(CONF_PROGRESS_ATTRIBUTE)
-    if not attr_name:
+    raw, _source = _resolve_raw(state, entity_config, CONF_PROGRESS_ENTITY, CONF_PROGRESS_ATTRIBUTE, hass)
+    if raw is _NO_VALUE:
         return 0.0
+    attr_name = entity_config.get(CONF_PROGRESS_ATTRIBUTE)
     try:
-        value = float(state.attributes.get(attr_name, 0))
+        value = float(raw)  # type: ignore[arg-type]
         scale = 255.0 if attr_name in _ATTRS_0_255 else 100.0
         return round(max(0.0, min(1.0, value / scale)), 2)
     except (ValueError, TypeError):
-        _LOGGER.debug("Could not parse progress attribute %s for %s", attr_name, state.entity_id)
+        _LOGGER.debug("Could not parse progress for %s", state.entity_id)
         return 0.0
 
 
-def _get_current_step(state: State, entity_config: dict) -> int:
-    """Extract current step from entity attributes, clamped to 0..total_steps."""
-    attr_name = entity_config.get(CONF_CURRENT_STEP_ATTR)
+def _get_current_step(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> int:
+    """Extract current step from a companion entity or the tracked entity, clamped to 0..total."""
     total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
-    if not attr_name:
+    raw, _source = _resolve_raw(state, entity_config, CONF_CURRENT_STEP_ENTITY, CONF_CURRENT_STEP_ATTR, hass)
+    if raw is _NO_VALUE:
         return 0
     try:
-        value = int(state.attributes.get(attr_name, 0))
+        value = int(float(raw))  # type: ignore[arg-type]
         return max(0, min(total, value))
     except (ValueError, TypeError):
-        _LOGGER.debug("Could not parse current_step attribute %s for %s", attr_name, state.entity_id)
+        _LOGGER.debug("Could not parse current_step for %s", state.entity_id)
         return 0
 
 
-def _get_remaining_time(state: State, entity_config: dict) -> int | None:
-    """Extract remaining time in seconds from entity attributes."""
-    attr_name = entity_config.get(CONF_REMAINING_TIME_ATTR)
-    if not attr_name:
-        return None
+def _get_remaining_seconds(
+    state: State, entity_config: dict, hass: HomeAssistant | None = None, *, now: int | None = None
+) -> tuple[int | None, int | None]:
+    """Resolve remaining time as ``(remaining_seconds, absolute_end_epoch)``.
+
+    Reads from a companion entity (CONF_REMAINING_TIME_ENTITY) or an attribute of
+    the tracked entity (CONF_REMAINING_TIME_ATTR), with smart format parsing.
+    """
+    raw, source = _resolve_raw(state, entity_config, CONF_REMAINING_TIME_ENTITY, CONF_REMAINING_TIME_ATTR, hass)
+    if raw is _NO_VALUE:
+        return None, None
+    return _coerce_remaining_seconds(raw, source, now)
+
+
+def _coerce_scaled_value(raw: object, attr_name: str | None) -> float | None:
+    """Coerce a raw value to float, rescaling 0-255 attributes to 0-100. None if unparseable."""
     try:
-        return int(state.attributes.get(attr_name, 0))
+        value = float(raw)  # type: ignore[arg-type]
     except (ValueError, TypeError):
-        _LOGGER.debug("Could not parse remaining_time attribute %s for %s", attr_name, state.entity_id)
         return None
+    return _rescale_attr(value, attr_name) if attr_name else value
 
 
-def _get_timeline_values(state: State, entity_config: dict) -> dict[str, float]:
+def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> dict[str, float]:
     """Extract labeled value map for timeline template.
 
-    Multi-series: reads from CONF_SERIES attribute->label mapping.
-    Single-series fallback: CONF_VALUE_ATTRIBUTE or entity state with friendly_name label.
+    Multi-series: reads from CONF_SERIES attribute->label mapping on the tracked
+    entity. Single-series: CONF_VALUE_ENTITY/CONF_VALUE_ATTRIBUTE, or the tracked
+    entity's state, labeled with the tracked entity's friendly_name.
     """
     series_map = entity_config.get(CONF_SERIES) or {}
     if series_map:
@@ -554,45 +722,35 @@ def _get_timeline_values(state: State, entity_config: dict) -> dict[str, float]:
                     )
         return values
 
-    # Single series: value_attribute or entity state
+    # Single series: keep the label anchored to the tracked entity so samples
+    # from a companion value entity land in the same series.
     label = state.attributes.get("friendly_name", state.entity_id)
-    attr_name = entity_config.get(CONF_VALUE_ATTRIBUTE)
-    if attr_name:
-        raw = state.attributes.get(attr_name)
-        if raw is None:
-            return {}
-        try:
-            return {label: _rescale_attr(float(raw), attr_name)}
-        except (ValueError, TypeError):
-            _LOGGER.debug(
-                "Could not parse timeline value attribute %s for %s",
-                attr_name,
-                state.entity_id,
-            )
-            return {}
-    try:
-        return {label: float(state.state)}
-    except (ValueError, TypeError):
-        _LOGGER.debug("Could not parse entity state as timeline value for %s", state.entity_id)
+    raw, _source = _resolve_raw(
+        state, entity_config, CONF_VALUE_ENTITY, CONF_VALUE_ATTRIBUTE, hass, state_fallback=True
+    )
+    if raw is _NO_VALUE:
         return {}
+    value = _coerce_scaled_value(raw, entity_config.get(CONF_VALUE_ATTRIBUTE))
+    if value is None:
+        _LOGGER.debug("Could not parse timeline value for %s", state.entity_id)
+        return {}
+    return {label: value}
 
 
-def _get_gauge_value(state: State, entity_config: dict) -> float:
-    """Extract gauge value from entity attribute or state.
+def _get_gauge_value(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> float:
+    """Extract gauge value from a companion entity or the tracked entity.
 
-    When value_attribute is configured, reads from that attribute.
-    Otherwise falls back to the entity's primary state.
-    Attributes in the 0-255 range (e.g. brightness) are rescaled to 0-100.
+    Reads CONF_VALUE_ENTITY/CONF_VALUE_ATTRIBUTE, falling back to the tracked
+    entity's state. Attributes in the 0-255 range (e.g. brightness) are rescaled
+    to 0-100.
     """
-    attr_name = entity_config.get(CONF_VALUE_ATTRIBUTE)
-    if attr_name:
-        try:
-            return _rescale_attr(float(state.attributes.get(attr_name, 0)), attr_name)
-        except (ValueError, TypeError):
-            _LOGGER.debug("Could not parse gauge value attribute %s for %s", attr_name, state.entity_id)
-            return 0.0
-    try:
-        return float(state.state)
-    except (ValueError, TypeError):
-        _LOGGER.debug("Could not parse entity state as gauge value for %s", state.entity_id)
+    raw, _source = _resolve_raw(
+        state, entity_config, CONF_VALUE_ENTITY, CONF_VALUE_ATTRIBUTE, hass, state_fallback=True
+    )
+    if raw is _NO_VALUE:
         return 0.0
+    value = _coerce_scaled_value(raw, entity_config.get(CONF_VALUE_ATTRIBUTE))
+    if value is None:
+        _LOGGER.debug("Could not parse gauge value for %s", state.entity_id)
+        return 0.0
+    return value

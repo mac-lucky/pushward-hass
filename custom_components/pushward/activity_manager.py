@@ -16,6 +16,7 @@ from typing import Literal
 import aiohttp
 from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.event import (
     async_call_later,
@@ -28,19 +29,25 @@ from .const import (
     ACTIVITY_STATE_ENDED,
     ACTIVITY_STATE_ONGOING,
     CONF_ACTIVITY_NAME,
+    CONF_CURRENT_STEP_ENTITY,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
+    CONF_FIRED_AT_ENTITY,
     CONF_HISTORY_PERIOD,
     CONF_PRIORITY,
+    CONF_PROGRESS_ENTITY,
+    CONF_REMAINING_TIME_ENTITY,
     CONF_SERIES,
     CONF_SLUG,
     CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_SUBTITLE_ENTITY,
     CONF_TEMPLATE,
     CONF_UPDATE_INTERVAL,
     CONF_VALUE_ATTRIBUTE,
+    CONF_VALUE_ENTITY,
     END_DELAY_SECONDS,
 )
 from .content_mapper import _get_timeline_values, lookup_registry_icon, map_completion_content, map_content
@@ -51,6 +58,23 @@ _HISTORY_SAVE_DELAY_S = 30
 _HISTORY_SAMPLES_KEY = "samples"
 
 _ACTIVITY_LIMIT_NOTIFICATION_ID = "pushward_activity_limit"
+
+# Config keys that may point a value at a SEPARATE companion entity. Changes to
+# these entities should refresh the activity even though they don't drive
+# start/end (the tracked entity owns lifecycle).
+_COMPANION_ENTITY_KEYS = (
+    CONF_REMAINING_TIME_ENTITY,
+    CONF_PROGRESS_ENTITY,
+    CONF_VALUE_ENTITY,
+    CONF_CURRENT_STEP_ENTITY,
+    CONF_FIRED_AT_ENTITY,
+    CONF_SUBTITLE_ENTITY,
+)
+
+
+def _companion_entity_ids(config: dict) -> list[str]:
+    """Return the order-preserving, deduped, non-empty companion entity_ids for an activity."""
+    return list(dict.fromkeys(eid for key in _COMPANION_ENTITY_KEYS if (eid := config.get(key))))
 
 
 def _forbidden_notification_id(slug: str) -> str:
@@ -79,6 +103,7 @@ class TrackedEntity:
     last_content: dict | None = None
     registry_icon: str | None = None
     unsub_state: Callable | None = None
+    companion_unsubs: list[Callable] = field(default_factory=list)
     flush_unsub: Callable | None = None
     end_task: asyncio.Task | None = field(default=None, repr=False)
     generation: int = 0
@@ -171,6 +196,20 @@ class ActivityManager:
                 entity_id,
                 partial(self._async_on_state_change, entity_id),
             )
+
+            # Subscribe to companion value entities so their changes refresh the
+            # activity. They never start/end it — the tracked entity owns that.
+            # One batched subscription for all companions of this entity.
+            companion_ids = [cid for cid in _companion_entity_ids(entity_cfg) if cid != entity_id]
+            if companion_ids:
+                tracked.companion_unsubs.append(
+                    async_track_state_change_event(
+                        self._hass,
+                        companion_ids,
+                        partial(self._async_on_companion_change, entity_id),
+                    )
+                )
+
             self._tracked[entity_id] = tracked
 
             current = self._hass.states.get(entity_id)
@@ -244,6 +283,10 @@ class ActivityManager:
             if tracked.unsub_state:
                 tracked.unsub_state()
 
+            for unsub in tracked.companion_unsubs:
+                unsub()
+            tracked.companion_unsubs.clear()
+
             if tracked.is_active:
                 slug = tracked.config[CONF_SLUG]
                 try:
@@ -286,17 +329,47 @@ class ActivityManager:
         elif tracked.is_active:
             self._schedule_throttled_update(entity_id)
 
-    def _record_history_sample(self, tracked: TrackedEntity, state: State) -> None:
-        """Append a timeline value sample to the per-entity history buffer."""
+    @callback
+    def _async_on_companion_change(self, entity_id: str, event: Event) -> None:
+        """Handle a state change on a companion value entity.
+
+        Companions only supply values, so a change refreshes the activity (when
+        active) but never starts or ends it. History is sampled against the
+        tracked entity's current state so the timeline series label stays stable.
+        """
+        new_state: State | None = event.data.get("new_state")
+        if new_state is None or new_state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            return
+
+        tracked = self._tracked.get(entity_id)
+        if tracked is None or not tracked.is_active:
+            return
+
+        primary_state = self._hass.states.get(entity_id)
+        if primary_state is not None:
+            # Stamp with the companion's update time: the tracked entity is
+            # unchanged here, so its last_updated would collide on every tick.
+            self._record_history_sample(tracked, primary_state, ts=int(new_state.last_updated.timestamp()))
+
+        self._schedule_throttled_update(entity_id)
+
+    def _record_history_sample(self, tracked: TrackedEntity, state: State, ts: int | None = None) -> None:
+        """Append a timeline value sample to the per-entity history buffer.
+
+        ``ts`` overrides the sample timestamp; companion-driven samples pass the
+        companion's last_updated so points aren't all stamped with the unchanged
+        tracked entity's time.
+        """
         config = tracked.config
         if config.get(CONF_TEMPLATE) != "timeline":
             return
         if not config.get(CONF_HISTORY_PERIOD, 0):
             return
-        values = _get_timeline_values(state, config)
+        values = _get_timeline_values(state, config, self._hass)
         if not values:
             return
-        ts = int(state.last_updated.timestamp())
+        if ts is None:
+            ts = int(state.last_updated.timestamp())
         tracked.history_buffer.append((ts, values))
         self._schedule_history_save()
 
@@ -333,7 +406,7 @@ class ActivityManager:
                 return
 
             tracked.registry_icon = self._get_registry_icon(entity_id)
-            content = map_content(current_state, config, registry_icon=tracked.registry_icon)
+            content = map_content(current_state, config, registry_icon=tracked.registry_icon, hass=self._hass)
             _LOGGER.debug(
                 "Activity %s icon resolution: state_attr=%s, registry=%s, resolved=%s",
                 slug,
@@ -469,7 +542,7 @@ class ActivityManager:
         if current_state is None:
             return
 
-        content = map_content(current_state, tracked.config, registry_icon=tracked.registry_icon)
+        content = map_content(current_state, tracked.config, registry_icon=tracked.registry_icon, hass=self._hass)
         if content == tracked.last_content:
             return
 

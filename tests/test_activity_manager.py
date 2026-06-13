@@ -3,22 +3,28 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from homeassistant.core import HomeAssistant
+from homeassistant.util import dt as dt_util
 
 from custom_components.pushward.activity_manager import (
     _ACTIVITY_LIMIT_NOTIFICATION_ID,
     ActivityManager,
+    _companion_entity_ids,
     _forbidden_notification_id,
 )
 from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardForbiddenError
 from custom_components.pushward.const import (
     CONF_ENDED_TTL,
     CONF_PROGRESS_ATTRIBUTE,
+    CONF_REMAINING_TIME_ENTITY,
     CONF_SOUND,
     CONF_STALE_TTL,
+    CONF_TEMPLATE,
     CONF_UPDATE_INTERVAL,
+    CONF_VALUE_ENTITY,
 )
 
 from .conftest import make_entity_config as _entity_config
@@ -643,5 +649,191 @@ async def test_sound_not_passed_on_end(hass: HomeAssistant) -> None:
     for call in calls:
         sound_kwarg = call.kwargs.get("sound")
         assert sound_kwarg is None or "sound" not in call.kwargs
+
+    await manager.async_stop()
+
+
+# ---------------------------------------------------------------------------
+# Companion value entity tests
+# ---------------------------------------------------------------------------
+
+
+def _companion_config():
+    """Countdown config whose remaining time comes from a separate entity."""
+    return _entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ENTITY: "sensor.washer_time",
+            CONF_UPDATE_INTERVAL: 0,
+        }
+    )
+
+
+async def test_companion_entity_subscribed(hass: HomeAssistant) -> None:
+    """A configured companion value entity is subscribed alongside the primary."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_companion_config()], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    hass.states.async_set("sensor.washer_time", "1000")
+    await manager.async_start()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert len(tracked.companion_unsubs) == 1
+
+    await manager.async_stop()
+
+
+async def test_companion_change_updates_active_activity(hass: HomeAssistant) -> None:
+    """A companion value change refreshes an active activity."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_companion_config()], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    hass.states.async_set("sensor.washer_time", "1000")
+    await manager.async_start()
+
+    # Start the activity via the primary entity.
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    count_after_start = api.update_activity.await_count
+    assert count_after_start >= 1
+
+    # Change only the companion → activity should refresh with new remaining_time.
+    hass.states.async_set("sensor.washer_time", "500")
+    await hass.async_block_till_done()
+
+    assert api.update_activity.await_count == count_after_start + 1
+    last_content = api.update_activity.call_args[0][2]
+    assert last_content["remaining_time"] == 500
+
+    await manager.async_stop()
+
+
+async def test_companion_change_ignored_when_inactive(hass: HomeAssistant) -> None:
+    """A companion change does not start an activity or send updates when inactive."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_companion_config()], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    hass.states.async_set("sensor.washer_time", "1000")
+    await manager.async_start()
+
+    # Primary never enters a start state; only the companion changes.
+    hass.states.async_set("sensor.washer_time", "500")
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_not_called()
+    api.update_activity.assert_not_called()
+
+    await manager.async_stop()
+
+
+async def test_companion_unsubscribed_on_stop(hass: HomeAssistant) -> None:
+    """async_stop releases the real companion subscriptions set up by async_start."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_companion_config()], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    hass.states.async_set("sensor.washer_time", "1000")
+    await manager.async_start()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    # Don't bypass the wiring: real subscriptions must exist, then wrap each real
+    # unsub in a call-through spy so the assertion exercises subscribe→unsubscribe.
+    assert tracked.companion_unsubs
+    spies = [MagicMock(side_effect=u) for u in tracked.companion_unsubs]
+    tracked.companion_unsubs = spies
+
+    await manager.async_stop()
+
+    for spy in spies:
+        spy.assert_called_once()
+    assert tracked.companion_unsubs == []
+
+
+def test_companion_entity_ids_dedup() -> None:
+    """The same entity in two companion fields yields a single subscription target."""
+    config = _entity_config(
+        **{
+            CONF_REMAINING_TIME_ENTITY: "sensor.shared",
+            CONF_VALUE_ENTITY: "sensor.shared",
+        }
+    )
+    assert _companion_entity_ids(config) == ["sensor.shared"]
+
+
+async def test_companion_equal_primary_not_subscribed(hass: HomeAssistant) -> None:
+    """A companion field pointing at the tracked entity itself is not separately subscribed."""
+    config = _entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ENTITY: "binary_sensor.washer",  # == the primary entity
+            CONF_UPDATE_INTERVAL: 0,
+        }
+    )
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.companion_unsubs == []
+
+    await manager.async_stop()
+
+
+async def test_companion_duration_unit_end_to_end(hass: HomeAssistant) -> None:
+    """Real hass + real State: an LG-style duration companion (minutes) is parsed to seconds."""
+    config = _entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ENTITY: "sensor.washer_time",
+            CONF_UPDATE_INTERVAL: 0,
+        }
+    )
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    # A real duration sensor: numeric state + device_class/unit attributes.
+    hass.states.async_set("sensor.washer_time", "25", {"device_class": "duration", "unit_of_measurement": "min"})
+    await manager.async_start()
+
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+
+    last_content = api.update_activity.call_args[0][2]
+    assert last_content["remaining_time"] == 25 * 60
+
+    await manager.async_stop()
+
+
+async def test_companion_timestamp_anchors_end_date_end_to_end(hass: HomeAssistant) -> None:
+    """Real hass + real State: a timestamp finish-time companion anchors end_date to the absolute epoch."""
+    config = _entity_config(
+        **{
+            CONF_TEMPLATE: "countdown",
+            CONF_REMAINING_TIME_ENTITY: "sensor.washer_finish",
+            CONF_UPDATE_INTERVAL: 0,
+        }
+    )
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    finish = dt_util.utcnow() + timedelta(minutes=30)
+    hass.states.async_set("binary_sensor.washer", "off")
+    # A real timestamp sensor exposes its state as an ISO 8601 string.
+    hass.states.async_set("sensor.washer_finish", finish.isoformat(), {"device_class": "timestamp"})
+    await manager.async_start()
+
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+
+    last_content = api.update_activity.call_args[0][2]
+    # end_date is the absolute finish epoch (drift-free), independent of "now".
+    assert last_content["end_date"] == int(finish.timestamp())
+    assert 0 < last_content["remaining_time"] <= 30 * 60
 
     await manager.async_stop()

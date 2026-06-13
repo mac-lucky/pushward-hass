@@ -36,10 +36,12 @@ from custom_components.pushward.const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_FIRED_AT_ATTRIBUTE,
+    CONF_FIRED_AT_ENTITY,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -49,7 +51,9 @@ from custom_components.pushward.const import (
     CONF_MIN_VALUE,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
+    CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
+    CONF_REMAINING_TIME_ENTITY,
     CONF_SCALE,
     CONF_SECONDARY_URL,
     CONF_SECONDARY_URL_FOREGROUND,
@@ -66,6 +70,7 @@ from custom_components.pushward.const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
@@ -80,6 +85,7 @@ from custom_components.pushward.const import (
     CONF_URL_FOREGROUND,
     CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
+    CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
@@ -1555,6 +1561,81 @@ def test_parse_entity_input_warning_threshold_int_or_none() -> None:
 
     result_without = _parse_entity_input(_base_user_input())
     assert result_without[CONF_WARNING_THRESHOLD] is None
+
+
+# --- Companion source entity tests ---
+
+
+def test_parse_entity_input_companion_entities_persisted() -> None:
+    """Companion source entity keys are persisted from user input."""
+    result = _parse_entity_input(
+        _base_user_input(
+            **{
+                CONF_REMAINING_TIME_ENTITY: "sensor.washer_time",
+                CONF_PROGRESS_ENTITY: "sensor.washer_progress",
+                CONF_VALUE_ENTITY: "sensor.washer_value",
+                CONF_CURRENT_STEP_ENTITY: "sensor.washer_step",
+                CONF_FIRED_AT_ENTITY: "sensor.washer_fired",
+                CONF_SUBTITLE_ENTITY: "sensor.washer_program",
+            }
+        )
+    )
+    assert result[CONF_REMAINING_TIME_ENTITY] == "sensor.washer_time"
+    assert result[CONF_PROGRESS_ENTITY] == "sensor.washer_progress"
+    assert result[CONF_VALUE_ENTITY] == "sensor.washer_value"
+    assert result[CONF_CURRENT_STEP_ENTITY] == "sensor.washer_step"
+    assert result[CONF_FIRED_AT_ENTITY] == "sensor.washer_fired"
+    assert result[CONF_SUBTITLE_ENTITY] == "sensor.washer_program"
+
+
+def test_parse_entity_input_companion_entities_default_empty() -> None:
+    """Companion source entity keys default to empty strings when omitted."""
+    result = _parse_entity_input(_base_user_input())
+    assert result[CONF_REMAINING_TIME_ENTITY] == ""
+    assert result[CONF_PROGRESS_ENTITY] == ""
+    assert result[CONF_VALUE_ENTITY] == ""
+    assert result[CONF_CURRENT_STEP_ENTITY] == ""
+    assert result[CONF_FIRED_AT_ENTITY] == ""
+    assert result[CONF_SUBTITLE_ENTITY] == ""
+
+
+async def test_subentry_countdown_shows_remaining_time_entity(hass: HomeAssistant) -> None:
+    """The countdown details schema includes the remaining-time companion entity field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "countdown"}),
+    )
+    assert result["step_id"] == "details"
+
+    schema_keys = {str(k) for k in result["data_schema"].schema}
+    assert CONF_REMAINING_TIME_ENTITY in schema_keys
+    assert CONF_SUBTITLE_ENTITY in schema_keys  # common field, always present
+
+
+async def test_subentry_gauge_shows_value_entity(hass: HomeAssistant) -> None:
+    """The gauge details schema includes the value companion entity field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "gauge"}),
+    )
+    assert result["step_id"] == "details"
+
+    schema_keys = {str(k) for k in result["data_schema"].schema}
+    assert CONF_VALUE_ENTITY in schema_keys
 
 
 # ---------------------------------------------------------------------------

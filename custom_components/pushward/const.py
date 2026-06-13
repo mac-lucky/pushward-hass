@@ -61,6 +61,17 @@ CONF_STEP_LABELS = "step_labels"
 CONF_STEP_ROWS = "step_rows"
 CONF_FIRED_AT_ATTRIBUTE = "fired_at_attribute"
 CONF_UNITS = "units"
+
+# Companion source entities — read a value from a SEPARATE entity instead of an
+# attribute of the tracked entity. Empty => use the tracked entity. When set,
+# the paired *_attr* key (if any) is read as an attribute of the companion;
+# leave the attribute empty to use the companion's own state.
+CONF_REMAINING_TIME_ENTITY = "remaining_time_entity"
+CONF_PROGRESS_ENTITY = "progress_entity"
+CONF_VALUE_ENTITY = "value_entity"
+CONF_CURRENT_STEP_ENTITY = "current_step_entity"
+CONF_FIRED_AT_ENTITY = "fired_at_entity"
+CONF_SUBTITLE_ENTITY = "subtitle_entity"
 CONF_BACKGROUND_COLOR = "background_color"
 CONF_BACKGROUND_COLOR_ATTRIBUTE = "background_color_attribute"
 CONF_TEXT_COLOR = "text_color"

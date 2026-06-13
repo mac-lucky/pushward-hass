@@ -43,11 +43,13 @@ from .const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
+    CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_FIRED_AT_ATTRIBUTE,
+    CONF_FIRED_AT_ENTITY,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -58,7 +60,9 @@ from .const import (
     CONF_MIN_VALUE,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
+    CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
+    CONF_REMAINING_TIME_ENTITY,
     CONF_SCALE,
     CONF_SECONDARY_URL,
     CONF_SECONDARY_URL_FOREGROUND,
@@ -77,6 +81,7 @@ from .const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
@@ -91,6 +96,7 @@ from .const import (
     CONF_URL_FOREGROUND,
     CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
+    CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
@@ -329,6 +335,7 @@ def _details_schema(
     end_default = d.get(CONF_END_STATES) if d.get(CONF_END_STATES) else domain_defs.get("end_states", [])
 
     attr_selector = AttributeSelector(AttributeSelectorConfig(entity_id=entity_id))
+    entity_selector = EntitySelector(EntitySelectorConfig())
 
     # ColorRGBSelector requires a valid [r,g,b] default — omit if no color saved
     accent_key = _color_vol_key(CONF_ACCENT_COLOR, d)
@@ -371,6 +378,7 @@ def _details_schema(
 
     # --- Template-specific fields ---
     if template in ("generic", "steps"):
+        fields[_entity_source_key(CONF_PROGRESS_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
                 CONF_PROGRESS_ATTRIBUTE,
@@ -378,6 +386,7 @@ def _details_schema(
             )
         ] = attr_selector
     if template in ("generic", "countdown"):
+        fields[_entity_source_key(CONF_REMAINING_TIME_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
                 CONF_REMAINING_TIME_ATTR,
@@ -391,6 +400,7 @@ def _details_schema(
                 default=d.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
             )
         ] = vol.All(vol.Coerce(int), vol.Range(min=1, max=TOTAL_STEPS_MAX))
+        fields[_entity_source_key(CONF_CURRENT_STEP_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
                 CONF_CURRENT_STEP_ATTR,
@@ -421,6 +431,7 @@ def _details_schema(
                 mode=SelectSelectorMode.DROPDOWN,
             )
         )
+        fields[_entity_source_key(CONF_FIRED_AT_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
                 CONF_FIRED_AT_ATTRIBUTE,
@@ -428,6 +439,7 @@ def _details_schema(
             )
         ] = attr_selector
     if template == "gauge":
+        fields[_entity_source_key(CONF_VALUE_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
                 CONF_VALUE_ATTRIBUTE,
@@ -465,6 +477,7 @@ def _details_schema(
                 default=d.get(CONF_UNITS, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        fields[_entity_source_key(CONF_VALUE_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
                 CONF_VALUE_ATTRIBUTE,
@@ -565,6 +578,7 @@ def _details_schema(
     ] = vol.All(vol.Coerce(int), vol.Range(min=UPDATE_INTERVAL_MIN))
 
     # --- Optional fields ---
+    fields[_entity_source_key(CONF_SUBTITLE_ENTITY, d)] = entity_selector
     fields[
         vol.Optional(
             CONF_SUBTITLE_ATTRIBUTE,
@@ -834,14 +848,19 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_END_STATES: end_states or defaults.get("end_states", []),
         CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
+        CONF_PROGRESS_ENTITY: user_input.get(CONF_PROGRESS_ENTITY, ""),
         CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
+        CONF_REMAINING_TIME_ENTITY: user_input.get(CONF_REMAINING_TIME_ENTITY, ""),
         CONF_SUBTITLE_ATTRIBUTE: user_input.get(CONF_SUBTITLE_ATTRIBUTE, ""),
+        CONF_SUBTITLE_ENTITY: user_input.get(CONF_SUBTITLE_ENTITY, ""),
         CONF_STATE_LABELS: _parse_state_labels(user_input.get(CONF_STATE_LABELS, "")),
         CONF_COMPLETION_MESSAGE: user_input.get(CONF_COMPLETION_MESSAGE, ""),
         CONF_TOTAL_STEPS: user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
         CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
+        CONF_CURRENT_STEP_ENTITY: user_input.get(CONF_CURRENT_STEP_ENTITY, ""),
         CONF_SEVERITY: user_input.get(CONF_SEVERITY, DEFAULT_SEVERITY),
         CONF_VALUE_ATTRIBUTE: user_input.get(CONF_VALUE_ATTRIBUTE, ""),
+        CONF_VALUE_ENTITY: user_input.get(CONF_VALUE_ENTITY, ""),
         CONF_MIN_VALUE: min_v,
         CONF_MAX_VALUE: max_v,
         CONF_UNIT: user_input.get(CONF_UNIT, ""),
@@ -874,6 +893,7 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_STEP_LABELS: _parse_state_labels(user_input.get(CONF_STEP_LABELS, "")),
         CONF_STEP_ROWS: _parse_int_list(user_input.get(CONF_STEP_ROWS, "")),
         CONF_FIRED_AT_ATTRIBUTE: user_input.get(CONF_FIRED_AT_ATTRIBUTE, ""),
+        CONF_FIRED_AT_ENTITY: user_input.get(CONF_FIRED_AT_ENTITY, ""),
         CONF_UNITS: _parse_state_labels(user_input.get(CONF_UNITS, "")),
         CONF_BACKGROUND_COLOR: _rgb_to_hex(user_input.get(CONF_BACKGROUND_COLOR)),
         CONF_BACKGROUND_COLOR_ATTRIBUTE: user_input.get(CONF_BACKGROUND_COLOR_ATTRIBUTE, ""),
@@ -1471,6 +1491,18 @@ def _color_vol_key(conf_key: str, current: dict) -> vol.Optional:
     """Build a vol.Optional key for a ColorRGBSelector, omitting the default if no valid hex is stored."""
     rgb = _hex_to_rgb(current.get(conf_key, ""))
     return vol.Optional(conf_key, default=rgb) if rgb is not None else vol.Optional(conf_key)
+
+
+def _entity_source_key(conf_key: str, current: dict) -> vol.Optional:
+    """Build a vol.Optional key for a companion-entity EntitySelector.
+
+    Pre-fills the saved entity_id when present; otherwise leaves the field empty
+    so an unset companion submits as absent rather than an invalid empty entity.
+    """
+    saved = current.get(conf_key)
+    if saved:
+        return vol.Optional(conf_key, description={"suggested_value": saved})
+    return vol.Optional(conf_key)
 
 
 def _parse_csv(value: str) -> list[str]:

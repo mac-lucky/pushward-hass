@@ -79,11 +79,11 @@ Each tracked entity uses a two-step flow:
 | Priority | 0–10 (default: 1) |
 | Start / End States | States that trigger start or end |
 | Update Interval | Min seconds between updates (default: 5) |
-| Progress Attribute | Entity attribute holding 0–100 value |
-| Remaining Time Attribute | Seconds remaining (countdown template) |
-| Total Steps / Current Step Attribute | Steps tracking |
+| Progress Entity / Attribute | 0–100 progress, optionally from a separate entity (see [Separate entities](#reading-values-from-separate-entities)) |
+| Remaining Time Entity / Attribute | Seconds remaining (countdown), optionally from a separate entity with smart time parsing |
+| Total Steps / Current Step Entity / Attribute | Steps tracking, optionally from a separate entity |
 | Severity | critical, warning, or info (alert template) |
-| Value Attribute | Entity attribute holding a numeric value (gauge/timeline) |
+| Value Entity / Attribute | Numeric value (gauge/timeline), optionally from a separate entity |
 | Min Value / Max Value | Gauge range bounds (default: 0–100) |
 | Unit | Display unit for the value (e.g., °C, %) |
 | Series | Attribute→label mapping for multi-series timeline |
@@ -92,7 +92,7 @@ Each tracked entity uses a two-step flow:
 | Smooth Lines | Enable curve interpolation between points (timeline) |
 | Thresholds | Horizontal reference lines on the sparkline (timeline) |
 | Back-History Period | Minutes of history to seed the sparkline on activity start (timeline, 0–1440) |
-| Subtitle Attribute | Entity attribute for subtitle text |
+| Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
 | State Labels | Custom state→label mapping (e.g., `on=Running, off=Stopped`) |
 | Completion Message | Text shown at end (default: "Complete") |
 | Accent Color | Static hex color (#RRGGBB) |
@@ -100,6 +100,23 @@ Each tracked entity uses a two-step flow:
 | URL / Secondary URL | Deep-link URLs (http/https) |
 | Ended TTL | Seconds to keep activity after end |
 | Stale TTL | Seconds of inactivity before auto-end |
+
+### Reading values from separate entities
+
+By default every value (remaining time, progress, subtitle, gauge value, current step, fired-at) is read from the **tracked entity** — either its state or one of its attributes. Many appliances instead expose these as **separate entities** (e.g. an LG washer has one sensor for the program state and another for the remaining time). For each value you can set an optional **source entity**:
+
+- **Source entity empty** → read from the tracked entity (unchanged default behavior).
+- **Source entity set, attribute empty** → read that entity's **state**.
+- **Source entity set, attribute set** → read that **attribute** of the source entity.
+
+So a washer Live Activity can use the program sensor as the tracked entity (driving start/end and the displayed state) and point **Remaining Time Entity** at the separate time sensor — no template helper required.
+
+**Smart time parsing** — the remaining-time source accepts whatever format the sensor exposes:
+
+- a **timestamp / finish-time** sensor (`device_class: timestamp`) → anchors the countdown's end date directly (most accurate, no drift),
+- a **duration** sensor with a unit (`s` / `min` / `h` / `d`),
+- an **`H:MM:SS`** or **`MM:SS`** string,
+- a plain number of **seconds**.
 
 ### How the timeline sparkline backfill works
 
