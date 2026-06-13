@@ -1,12 +1,13 @@
 """Shared test fixtures for PushWard integration tests."""
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 
+from custom_components.pushward.activity_manager import ActivityManager
 from custom_components.pushward.api import PushWardApiClient
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
@@ -227,3 +228,81 @@ def make_mock_state(state: str, attributes: dict | None = None, entity_id: str |
     else:
         mock.domain = ""
     return mock
+
+
+def make_activity_api() -> AsyncMock:
+    """Mock PushWard API client exposing the activity CRUD coroutines."""
+    api = AsyncMock()
+    api.create_activity = AsyncMock()
+    api.update_activity = AsyncMock()
+    api.delete_activity = AsyncMock()
+    return api
+
+
+def make_widget_api() -> AsyncMock:
+    """Mock PushWard API client exposing the widget CRUD coroutines."""
+    api = AsyncMock()
+    api.create_widget = AsyncMock()
+    api.patch_widget = AsyncMock()
+    return api
+
+
+def make_mock_entry(entry_id: str = "test_entry") -> MagicMock:
+    """Mock ConfigEntry with the attributes the managers touch."""
+    entry = MagicMock()
+    entry.entry_id = entry_id
+    entry.async_start_reauth = MagicMock()
+    return entry
+
+
+def activity_updates(api: AsyncMock, wire_state: str) -> list[dict]:
+    """Return the content dicts sent to ``update_activity`` for one wire state.
+
+    ``update_activity(slug, wire_state, content, ...)`` — positional arg 1 is the
+    ONGOING/ENDED wire state, arg 2 the content payload.
+    """
+    return [
+        call.args[2]
+        for call in api.update_activity.call_args_list
+        if len(call.args) >= 3 and call.args[1] == wire_state
+    ]
+
+
+async def bump_state(
+    manager: ActivityManager,
+    hass: HomeAssistant,
+    tracked_entity_id: str,
+    set_entity_id: str,
+    value: str,
+    attrs: dict,
+) -> None:
+    """Force a throttled update through the real subscription path.
+
+    Resetting the tracked entity's ``last_sent_at`` makes the cooldown read as
+    elapsed, so a state change on ``set_entity_id`` (the tracked entity itself or a
+    companion) sends immediately instead of arming a timer.
+    """
+    manager._tracked[tracked_entity_id].last_sent_at = 0.0
+    hass.states.async_set(set_entity_id, value, attrs)
+    await hass.async_block_till_done()
+
+
+async def end_activity_via_state(
+    manager: ActivityManager,
+    hass: HomeAssistant,
+    entity_id: str,
+    end_state: str,
+    attrs: dict,
+) -> None:
+    """Drive an entity into an end state and run the two-phase end deterministically.
+
+    Goes through the real ``_async_on_state_change`` → ``_schedule_end`` path with
+    ``END_DELAY_SECONDS`` collapsed to 0 so the ENDED push lands without a 5 s wait.
+    """
+    with patch("custom_components.pushward.activity_manager.END_DELAY_SECONDS", 0):
+        hass.states.async_set(entity_id, end_state, attrs)
+        await hass.async_block_till_done()
+        end_task = manager._tracked[entity_id].end_task
+        if end_task is not None:
+            await end_task
+        await hass.async_block_till_done()
