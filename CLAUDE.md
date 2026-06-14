@@ -11,6 +11,8 @@ PushWard for Home Assistant is a custom HACS integration that tracks HA entity s
 
 The two surfaces are independent: each is a separate `ConfigSubentry` type (`tracked_entity` vs `tracked_widget`), has its own manager, mapper, `.storage` cache, and config-flow class. They share the API client and the icon/color helpers in `content_mapper`.
 
+A third surface points the other way — **HA-side sensor entities** (not an iPhone surface): the integration's only polling component, `PushWardUsageCoordinator` (`coordinator.py`), fetches the account's usage/quota from `GET /auth/me` every `USAGE_UPDATE_INTERVAL` (15 min), and `sensor.py` exposes one "used" sensor per metered resource (notifications, Live Activity updates, widget updates, emails) plus a subscription-tier sensor. `PLATFORMS = [Platform.SENSOR]` is the only HA entity platform forwarded; fields stay absent (sensor → unavailable) on older servers that don't return usage to integration keys.
+
 Requires Python 3.13.2+ and Home Assistant 2025.7.0+.
 
 This is a **public repository** — no server internals, private URLs, API keys, or DB schemas should appear in code or commit history.
@@ -34,14 +36,17 @@ uv run ruff check . && uv run ruff format .     # Lint + format
 ```
 config_flow.py    → ConfigEntry (integration key) + two ConfigSubentry flows:
                       PushWardEntitySubentryFlow (activities), PushWardWidgetSubentryFlow (widgets)
-__init__.py       → Creates API client, starts ActivityManager + WidgetManager, registers 7 services
+__init__.py       → Creates API client, starts ActivityManager + WidgetManager + usage
+                      coordinator, forwards the sensor platform, registers the services
 activity_manager  → Listens to HA state changes, decides activity start/update/end
 content_mapper    → Translates HA State + entity config → activity content dict
                       (also exports shared helpers: resolve_icon, resolve_color, color_to_str,
                        add_tap_action, lookup_registry_icon — reused by widget_mapper)
 widget_manager    → Listens to HA state changes / poll timer, diffs content, PATCHes widget
 widget_mapper     → Translates HA State + widget config → widget content dict
-api.py            → HTTP client with retry/backoff to PushWard server (activities + widgets)
+coordinator.py    → PushWardUsageCoordinator: polls GET /auth/me (15 min) for usage/quota
+sensor.py         → Usage/quota + subscription-tier sensors (the only HA entity platform)
+api.py            → HTTP client with retry/backoff to PushWard server (activities + widgets + /auth/me)
 ```
 
 ## Key Patterns
@@ -50,8 +55,8 @@ api.py            → HTTP client with retry/backoff to PushWard server (activit
 - **Two-phase end**: On end state, manager sends ONGOING with completion content (green checkmark), sleeps `END_DELAY_SECONDS` (5s), then sends ENDED. The `generation` counter prevents stale ends if the activity restarts during the sleep.
 - **Throttled updates with dedup**: Rate-limited per `update_interval` with content dict equality check. `flush_unsub` timer fires after cooldown.
 - **Reauth**: 401/403 triggers `entry.async_start_reauth()` once via `_reauth_triggered` flag.
-- **Timeline history buffer**: `TrackedEntity.history_buffer` is an in-memory ring buffer (≤300 samples) populated from live state changes and persisted to `.storage/pushward.history.<entry_id>`. Required because HA 2024.8+ strips most attributes from the recorder DB — for attribute-based entities (light brightness, climate temps), the recorder cannot be used to backfill the sparkline. For numeric-state sensors, the recorder is still used as a fallback.
-- **Services**: 7 services registered in `__init__.py`: `create_activity`, `update_activity`, `end_activity`, `delete_activity`, `send_notification`, `send_email`, `widget_refresh`. Schemas in `services.yaml`. `widget_refresh` targets by `slug` xor `entity_id` (mutually exclusive) and fans out to every entry's `WidgetManager`. `send_email` POSTs `/emails` (the service field `body` maps to the API `text_body`); it requires the key's `emails` capability and a verified recipient (registered/confirmed in the iOS app — the integration can't verify recipients itself), surfacing `PushWardEmailPermissionError` on 403.
+- **Timeline history buffer**: `TrackedEntity.history_buffer` is an in-memory ring buffer (≤300 samples) populated from live state changes and persisted to `.storage/pushward.history.<entry_id>`. Required because HA 2024.8+ strips most attributes from the recorder DB — for attribute-based entities (light brightness, climate temps), the recorder cannot be used to backfill the sparkline. For numeric-state sensors, the recorder is still used as a fallback (which is why `manifest.json` lists `after_dependencies: [recorder]` — recorder must load first).
+- **Services** (registered in `__init__.py`, schemas in `services.yaml`): `create_activity`, `end_activity`, `delete_activity`, `send_notification`, `send_email`, `widget_refresh`, plus the activity-update family. `update_activity` was **split into per-template actions** — one `update_activity_<template>` per entry in `TEMPLATES` (`update_activity_generic`, `_countdown`, `_alert`, `_steps`, `_gauge`, `_timeline`), each with a schema accepting only that template's fields (`_UPDATE_TEMPLATE_SCHEMAS`). The original `update_activity` survives as a **deprecated alias** (accepts every template's fields + explicit `template`, raises an HA deprecation repair issue). When adding a template, register its `update_activity_<template>` action too. `widget_refresh` targets by `slug` xor `entity_id` (mutually exclusive) and fans out to every entry's `WidgetManager`. `send_email` POSTs `/emails` (the service field `body` maps to the API `text_body`); it requires the key's `emails` capability and a verified recipient (registered/confirmed in the iOS app — the integration can't verify recipients itself), surfacing `PushWardEmailPermissionError` on 403.
 
 ### Widget-specific patterns
 
@@ -84,7 +89,12 @@ Tests use `pytest-homeassistant-custom-component` (real `HomeAssistant` fixture)
 - `make_mock_state(state, attributes, entity_id)` — builds a mock HA `State`.
 - `make_mock_response` / `make_mock_session` / `make_api_client` — wire a fake aiohttp session into a `PushWardApiClient` for API-layer tests.
 
-Adding a new `CONF_*` constant means updating `make_entity_config` (and `make_widget_config` if it's a widget field) in `conftest.py` so existing tests don't break. Test files are split per module: `test_activity_manager`, `test_content_mapper`, `test_widget_manager`, `test_widget_mapper`, `test_widget_api`, `test_api`, `test_config_flow`, `test_services`, `test_icon_resolution`.
+Adding a new `CONF_*` constant means updating `make_entity_config` (and `make_widget_config` if it's a widget field) in `conftest.py` so existing tests don't break. Test files are split per module: `test_activity_manager`, `test_content_mapper`, `test_widget_manager`, `test_widget_mapper`, `test_widget_api`, `test_api`, `test_config_flow`, `test_services`, `test_icon_resolution`, `test_sensor`.
+
+Two cross-cutting test layers sit alongside the per-module files:
+
+- **API-contract tests** (`tests/server_contract.py` + `test_server_contract.py`): `server_contract.py` re-states the **public** PushWard REST validation contract (template-required fields, length caps, color/slug/tap-action rules) from `const.py` and the public OpenAPI spec — it holds *no* server internals. Its `assert_valid_activity_content` / `assert_valid_widget_content` assert that what the mappers emit would be *accepted* by the server, not merely shaped as expected. The `test_real_world_*` files (`activities`, `widgets`, `lifecycle`) drive realistic scenarios through this contract.
+- **Structural tests** (`test_services_yaml.py`): parse `services.yaml` + `translations/*.json` *without* a HomeAssistant fixture, guarding the collapsible-section regroup against dropped/duplicated fields and section keys drifting out of sync with the translation files (each `sections` key must exist in every locale or the HA UI shows a raw key).
 
 ## Gotchas
 
