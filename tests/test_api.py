@@ -53,6 +53,46 @@ async def test_validate_connection_auth_error():
         await client.validate_connection()
 
 
+# --- get_me ---
+
+
+def _get_session(resp: AsyncMock) -> AsyncMock:
+    session = AsyncMock(spec=aiohttp.ClientSession)
+    cm = AsyncMock()
+    cm.__aenter__ = AsyncMock(return_value=resp)
+    cm.__aexit__ = AsyncMock(return_value=False)
+    session.get = MagicMock(return_value=cm)
+    return session
+
+
+async def test_get_me_returns_usage_dict():
+    payload = {"id": "u1", "subscribed": False, "notifications_used": 7, "notifications_limit": 500}
+    session = _get_session(_mock_response(200, json_body=payload))
+    client = _make_client(session)
+
+    result = await client.get_me()
+
+    assert result == payload
+    assert "/auth/me" in session.get.call_args[0][0]
+    assert session.get.call_args[1]["headers"]["Authorization"] == "Bearer test-key"
+
+
+async def test_get_me_auth_error():
+    session = _get_session(_mock_response(403))
+    client = _make_client(session)
+    with pytest.raises(PushWardAuthError):
+        await client.get_me()
+
+
+async def test_get_me_rejects_non_dict_body():
+    resp = _mock_response(200)
+    resp.json = AsyncMock(return_value=["not", "a", "dict"])
+    session = _get_session(resp)
+    client = _make_client(session)
+    with pytest.raises(PushWardApiError):
+        await client.get_me()
+
+
 # --- create_activity ---
 
 

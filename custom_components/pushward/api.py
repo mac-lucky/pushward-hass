@@ -6,6 +6,7 @@ import logging
 import time
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
+from typing import Any
 
 import aiohttp
 
@@ -72,6 +73,19 @@ class PushWardApiClient:
 
     async def validate_connection(self) -> bool:
         """Validate the connection and integration key via GET /auth/me."""
+        await self.get_me()
+        return True
+
+    async def get_me(self) -> dict[str, Any]:
+        """Fetch the account profile + usage counters via GET /auth/me.
+
+        Returns the parsed JSON body. The server returns the user's own quota
+        counters to integration keys: each `*_used` count plus a `*_limit` for
+        capped resources (free tier caps everything; premium omits the uncapped
+        Live Activity / widget limits and switches notifications to a daily cap).
+        Raises PushWardAuthError on 401/403 (bad/expired key) and PushWardApiError
+        on any other failure, so callers can map auth failures to reauth.
+        """
         try:
             async with self._session.get(
                 f"{self._base_url}/auth/me",
@@ -81,9 +95,12 @@ class PushWardApiClient:
                 if resp.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
                     raise PushWardAuthError("Invalid integration key", status_code=resp.status)
                 resp.raise_for_status()
-                return True
-        except aiohttp.ClientError as err:
+                data = await resp.json()
+        except (aiohttp.ClientError, TimeoutError, OSError) as err:
             raise PushWardApiError(f"Cannot connect to PushWard: {err}") from err
+        if not isinstance(data, dict):
+            raise PushWardApiError("Unexpected /auth/me response shape")
+        return data
 
     async def create_activity(
         self,

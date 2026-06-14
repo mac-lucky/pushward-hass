@@ -11,13 +11,19 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.pushward.api import PushWardAuthError, PushWardEmailPermissionError
+from custom_components.pushward.api import (
+    PushWardApiError,
+    PushWardAuthError,
+    PushWardEmailPermissionError,
+)
 from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
     DOMAIN,
 )
+
+from .conftest import make_usage_payload
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -38,7 +44,8 @@ def _mock_entry() -> MockConfigEntry:
 def _mock_api() -> AsyncMock:
     """Create a mock API client with all methods."""
     api = AsyncMock()
-    api.validate_connection = AsyncMock(return_value=True)
+    # async_setup_entry validates + seeds the usage coordinator via get_me.
+    api.get_me = AsyncMock(return_value=make_usage_payload())
     api.create_activity = AsyncMock()
     api.update_activity = AsyncMock()
     api.delete_activity = AsyncMock()
@@ -184,9 +191,13 @@ async def test_service_delete_activity(hass: HomeAssistant) -> None:
 
 
 async def test_setup_auth_error_triggers_reauth(hass: HomeAssistant) -> None:
-    """Auth error during setup puts entry in SETUP_ERROR and starts reauth."""
+    """Auth error during setup puts entry in SETUP_ERROR and starts reauth.
+
+    Setup validates the key via the usage coordinator's first refresh
+    (GET /auth/me), so the failure is injected through get_me.
+    """
     api = _mock_api()
-    api.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key", status_code=401))
+    api.get_me = AsyncMock(side_effect=PushWardAuthError("bad key", status_code=401))
 
     entry = _mock_entry()
     entry.add_to_hass(hass)
@@ -196,12 +207,15 @@ async def test_setup_auth_error_triggers_reauth(hass: HomeAssistant) -> None:
         await hass.async_block_till_done()
 
     assert entry.state is ConfigEntryState.SETUP_ERROR
+    assert any(
+        flow["context"]["source"] == "reauth" for flow in hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    )
 
 
 async def test_setup_connection_error_retries(hass: HomeAssistant) -> None:
     """Connection error during setup puts entry in SETUP_RETRY."""
     api = _mock_api()
-    api.validate_connection = AsyncMock(side_effect=OSError("timeout"))
+    api.get_me = AsyncMock(side_effect=PushWardApiError("timeout"))
 
     entry = _mock_entry()
     entry.add_to_hass(hass)

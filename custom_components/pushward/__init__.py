@@ -6,14 +6,12 @@ import asyncio
 import logging
 from functools import partial
 
-import aiohttp
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import (
-    ConfigEntryAuthFailed,
-    ConfigEntryNotReady,
     HomeAssistantError,
     ServiceValidationError,
 )
@@ -23,7 +21,6 @@ from .activity_manager import ActivityManager, build_history_store
 from .api import (
     PushWardApiClient,
     PushWardApiError,
-    PushWardAuthError,
     PushWardForbiddenError,
 )
 from .const import (
@@ -42,9 +39,12 @@ from .const import (
     validate_slug,
     validate_url,
 )
+from .coordinator import PushWardUsageCoordinator
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
+
+PLATFORMS = [Platform.SENSOR]
 
 
 # sound and priority are top-level PATCH fields, not content — do not add here.
@@ -400,12 +400,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = async_get_clientsession(hass)
     api = PushWardApiClient(session, entry.data[CONF_SERVER_URL], entry.data[CONF_INTEGRATION_KEY])
 
-    try:
-        await api.validate_connection()
-    except PushWardAuthError as err:
-        raise ConfigEntryAuthFailed(f"Invalid integration key: {err}") from err
-    except (PushWardApiError, aiohttp.ClientError, TimeoutError, OSError) as err:
-        raise ConfigEntryNotReady(f"Cannot connect to PushWard: {err}") from err
+    # The usage coordinator's first refresh doubles as the connection/key check:
+    # a bad key surfaces as ConfigEntryAuthFailed (→ reauth); a transient failure
+    # surfaces as UpdateFailed, which async_config_entry_first_refresh translates
+    # to ConfigEntryNotReady (→ retry).
+    coordinator = PushWardUsageCoordinator(hass, api, entry)
+    await coordinator.async_config_entry_first_refresh()
 
     entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
@@ -417,7 +417,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "api": api,
         "manager": manager,
         "widget_manager": widget_manager,
+        "coordinator": coordinator,
     }
+
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     _register_services(hass)
 
@@ -454,6 +457,9 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload PushWard config entry."""
+    if not await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        return False
+
     data = hass.data[DOMAIN].pop(entry.entry_id, None)
     if data:
         widget_manager: WidgetManager | None = data.get("widget_manager")

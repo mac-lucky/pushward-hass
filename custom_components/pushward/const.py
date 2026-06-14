@@ -179,6 +179,10 @@ SCALES = ["linear", "logarithmic"]
 # Must stay in sync with server UpdateActivityRequest.sound.
 SOUNDS = ("default", "chime", "alert", "success", "warning", "bell", "ding", "buzz", "notification")
 
+# Usage/quota coordinator poll interval (seconds). Usage moves slowly and
+# /auth/me is per-IP rate-limited, so poll conservatively.
+USAGE_UPDATE_INTERVAL = 900  # 15 min
+
 # API retry
 MAX_RETRIES = 5
 RETRY_BASE_DELAY = 1  # seconds

@@ -183,12 +183,15 @@ def make_widget_config(**overrides) -> dict:
     return config
 
 
-def make_mock_response(status: int, *, text: str = "", headers: dict | None = None) -> AsyncMock:
+def make_mock_response(
+    status: int, *, text: str = "", headers: dict | None = None, json_body: dict | None = None
+) -> AsyncMock:
     """Build a mock aiohttp response with the given status + body."""
     resp = AsyncMock()
     resp.status = status
     resp.ok = 200 <= status < 300
     resp.text = AsyncMock(return_value=text)
+    resp.json = AsyncMock(return_value=json_body if json_body is not None else {})
     resp.headers = headers or {}
     resp.raise_for_status = MagicMock()
     if status >= 400:
@@ -196,6 +199,50 @@ def make_mock_response(status: int, *, text: str = "", headers: dict | None = No
             request_info=MagicMock(), history=(), status=status, message=text
         )
     return resp
+
+
+def make_usage_payload(**overrides) -> dict:
+    """Build a representative free-tier ``GET /auth/me`` usage payload.
+
+    For a premium-shaped payload use ``make_premium_usage_payload``.
+    """
+    payload = {
+        "id": "user-123",
+        "nickname": "Test",
+        "activity_count": 2,
+        "subscribed": False,
+        "quota_period_month": 202606,
+        "notifications_used": 137,
+        "notifications_limit": 500,
+        "live_activity_updates_used": 40,
+        "live_activity_updates_limit": 250,
+        "widget_updates_used": 8,
+        "widget_updates_limit": 50,
+        "emails_used": 3,
+        "emails_limit": 500,
+        "quota_resets_at": "2026-07-01T00:00:00Z",
+    }
+    payload.update(overrides)
+    return payload
+
+
+def make_premium_usage_payload(**overrides) -> dict:
+    """Build a representative premium ``GET /auth/me`` usage payload.
+
+    Premium drops the uncapped Live Activity / widget limits and adds the
+    daily-notification fields; the notifications counter is the daily cap.
+    """
+    payload = make_usage_payload(
+        subscribed=True,
+        notifications_used=12,
+        notifications_limit=5000,
+        notifications_used_month=420,
+        quota_resets_day_at="2026-06-15T00:00:00Z",
+    )
+    payload.pop("live_activity_updates_limit", None)
+    payload.pop("widget_updates_limit", None)
+    payload.update(overrides)
+    return payload
 
 
 def make_mock_session(*responses: AsyncMock) -> AsyncMock:

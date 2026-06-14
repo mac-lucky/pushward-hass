@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Notifications used"
+      },
+      "live_activity_updates_used": {
+        "name": "Live Activity updates used"
+      },
+      "widget_updates_used": {
+        "name": "Widget updates used"
+      },
+      "emails_used": {
+        "name": "Emails used"
+      },
+      "subscription_tier": {
+        "name": "Subscription tier",
+        "state": {
+          "free": "Free",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "Update Activity",
