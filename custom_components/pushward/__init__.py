@@ -16,7 +16,9 @@ from homeassistant.exceptions import (
     HomeAssistantError,
     ServiceValidationError,
 )
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.typing import ConfigType
 
 from .activity_manager import ActivityManager, build_history_store
 from .api import (
@@ -37,6 +39,7 @@ from .const import (
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
+    TEMPLATES,
     validate_slug,
     validate_url,
 )
@@ -48,42 +51,10 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
 
-# sound and priority are top-level PATCH fields, not content — do not add here.
-_CONTENT_FIELDS = [
-    "template",
-    "progress",
-    "state_text",
-    "icon",
-    "subtitle",
-    "accent_color",
-    "text_color",
-    "background_color",
-    "remaining_time",
-    "url",
-    "secondary_url",
-    "end_date",
-    "warning_threshold",
-    "alarm",
-    "snooze_seconds",
-    "total_steps",
-    "current_step",
-    "step_labels",
-    "step_rows",
-    "severity",
-    "fired_at",
-    "completion_message",
-    "value",
-    "min_value",
-    "max_value",
-    "unit",
-    "units",
-    "scale",
-    "decimals",
-    "smoothing",
-    "thresholds",
-]
-
 SERVICE_UPDATE_ACTIVITY = "update_activity"
+# Per-template update services (one per const.TEMPLATES) — the template is implied by the
+# service name, so the UI shows only that template's fields (HA can't hide fields by value).
+SERVICE_UPDATE_TEMPLATE_PREFIX = "update_activity_"
 SERVICE_CREATE_ACTIVITY = "create_activity"
 SERVICE_END_ACTIVITY = "end_activity"
 SERVICE_DELETE_ACTIVITY = "delete_activity"
@@ -91,44 +62,93 @@ SERVICE_SEND_NOTIFICATION = "send_notification"
 SERVICE_SEND_EMAIL = "send_email"
 SERVICE_WIDGET_REFRESH = "widget_refresh"
 
-SCHEMA_UPDATE_ACTIVITY = vol.Schema(
-    {
-        vol.Required("slug"): validate_slug,
-        vol.Required("state"): vol.In(ACTIVITY_STATES),
-        vol.Optional("template"): str,
-        vol.Optional("progress"): vol.Coerce(float),
-        vol.Optional("state_text"): str,
-        vol.Optional("icon"): str,
-        vol.Optional("subtitle"): str,
-        vol.Optional("accent_color"): str,
-        vol.Optional("text_color"): str,
-        vol.Optional("background_color"): str,
-        vol.Optional("remaining_time"): vol.Coerce(int),
-        vol.Optional("url"): validate_url,
-        vol.Optional("secondary_url"): validate_url,
-        vol.Optional("end_date"): vol.Coerce(int),
-        vol.Optional("total_steps"): vol.Coerce(int),
-        vol.Optional("current_step"): vol.Coerce(int),
-        vol.Optional("severity"): vol.In(SEVERITIES),
-        vol.Optional("completion_message"): str,
-        vol.Optional("value"): vol.Any(vol.Coerce(float), dict),
-        vol.Optional("min_value"): vol.Coerce(float),
-        vol.Optional("max_value"): vol.Coerce(float),
-        vol.Optional("unit"): str,
-        vol.Optional("scale"): vol.In(SCALES),
-        vol.Optional("decimals"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
-        vol.Optional("smoothing"): bool,
-        vol.Optional("thresholds"): list,
-        vol.Optional("sound"): vol.In(SOUNDS),
-        vol.Optional("priority"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
-        vol.Optional("warning_threshold"): vol.All(vol.Coerce(int), vol.Range(min=0)),
-        vol.Optional("alarm"): cv.boolean,
-        vol.Optional("snooze_seconds"): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
-        vol.Optional("step_labels"): list,
-        vol.Optional("step_rows"): list,
-        vol.Optional("fired_at"): vol.Coerce(int),
-        vol.Optional("units"): dict,
-    }
+# Composable field-groups for the update services. The shared groups (top-level +
+# universal labels/appearance) merge with one template-specific group per service, so each
+# per-template schema accepts only that template's fields; the deprecated update_activity
+# schema is rebuilt below as the union of all of them.
+_UPDATE_TOPLEVEL_FIELDS = {
+    vol.Required("slug"): validate_slug,
+    vol.Required("state"): vol.In(ACTIVITY_STATES),
+}
+_UNIVERSAL_LABEL_FIELDS = {
+    vol.Optional("state_text"): str,
+    vol.Optional("subtitle"): str,
+    vol.Optional("icon"): str,
+    vol.Optional("progress"): vol.Coerce(float),
+}
+_UNIVERSAL_APPEARANCE_FIELDS = {
+    vol.Optional("completion_message"): str,
+    vol.Optional("accent_color"): str,
+    vol.Optional("background_color"): str,
+    vol.Optional("text_color"): str,
+    vol.Optional("remaining_time"): vol.Coerce(int),
+    vol.Optional("sound"): vol.In(SOUNDS),
+    vol.Optional("priority"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
+}
+_COUNTDOWN_TEMPLATE_FIELDS = {
+    vol.Optional("end_date"): vol.Coerce(int),
+    vol.Optional("warning_threshold"): vol.All(vol.Coerce(int), vol.Range(min=0)),
+    vol.Optional("alarm"): cv.boolean,
+    vol.Optional("snooze_seconds"): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
+}
+_STEPS_TEMPLATE_FIELDS = {
+    vol.Optional("total_steps"): vol.Coerce(int),
+    vol.Optional("current_step"): vol.Coerce(int),
+    vol.Optional("step_labels"): list,
+    vol.Optional("step_rows"): list,
+    vol.Optional("url"): validate_url,
+    vol.Optional("secondary_url"): validate_url,
+}
+_ALERT_TEMPLATE_FIELDS = {
+    vol.Optional("severity"): vol.In(SEVERITIES),
+    vol.Optional("fired_at"): vol.Coerce(int),
+    vol.Optional("url"): validate_url,
+    vol.Optional("secondary_url"): validate_url,
+}
+_GAUGE_TEMPLATE_FIELDS = {
+    # A gauge value is a single number (timeline's `value` is the dict form).
+    vol.Optional("value"): vol.Coerce(float),
+    vol.Optional("min_value"): vol.Coerce(float),
+    vol.Optional("max_value"): vol.Coerce(float),
+    vol.Optional("unit"): str,
+}
+_TIMELINE_TEMPLATE_FIELDS = {
+    vol.Optional("value"): vol.Any(vol.Coerce(float), dict),
+    vol.Optional("unit"): str,
+    vol.Optional("units"): dict,
+    vol.Optional("scale"): vol.In(SCALES),
+    vol.Optional("decimals"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
+    vol.Optional("smoothing"): bool,
+    vol.Optional("thresholds"): list,
+}
+
+
+def _update_template_schema(*template_fields: dict) -> vol.Schema:
+    """Build an update_activity schema from the shared groups plus the given template groups."""
+    merged = {**_UPDATE_TOPLEVEL_FIELDS, **_UNIVERSAL_LABEL_FIELDS, **_UNIVERSAL_APPEARANCE_FIELDS}
+    for group in template_fields:
+        merged.update(group)
+    return vol.Schema(merged)
+
+
+_UPDATE_TEMPLATE_SCHEMAS = {
+    "generic": _update_template_schema(),
+    "countdown": _update_template_schema(_COUNTDOWN_TEMPLATE_FIELDS),
+    "steps": _update_template_schema(_STEPS_TEMPLATE_FIELDS),
+    "alert": _update_template_schema(_ALERT_TEMPLATE_FIELDS),
+    "gauge": _update_template_schema(_GAUGE_TEMPLATE_FIELDS),
+    "timeline": _update_template_schema(_TIMELINE_TEMPLATE_FIELDS),
+}
+
+# The deprecated update_activity accepts every template's fields (plus an explicit
+# `template` selector) — i.e. the union of all per-template schemas.
+SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
+    {vol.Optional("template"): str},
+    _COUNTDOWN_TEMPLATE_FIELDS,
+    _STEPS_TEMPLATE_FIELDS,
+    _ALERT_TEMPLATE_FIELDS,
+    _GAUGE_TEMPLATE_FIELDS,
+    _TIMELINE_TEMPLATE_FIELDS,
 )
 
 SCHEMA_CREATE_ACTIVITY = vol.Schema(
@@ -265,21 +285,49 @@ def _surface_api_errors():
         raise HomeAssistantError(str(err)) from err
 
 
-async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) -> None:
-    """Handle the update_activity service call."""
+async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, template: str | None = None) -> None:
+    """PATCH an activity from a service call.
+
+    sound/priority are top-level PATCH kwargs; every remaining field is content. state_text
+    is the user-facing name for the content "state" string. The per-template actions inject
+    their template (their schema omits it); the deprecated alias lets the caller pass it.
+    """
     api = _get_api(hass)
-    slug = call.data["slug"]
-    state = call.data["state"]
-    content = {}
-    for field in _CONTENT_FIELDS:
-        if field in call.data:
-            # Map state_text -> state for the API
-            key = "state" if field == "state_text" else field
-            content[key] = call.data[field]
-    sound = call.data.get("sound") or None
-    priority_override = call.data.get("priority")
+    content = dict(call.data)
+    slug = content.pop("slug")
+    state = content.pop("state")
+    sound = content.pop("sound", None) or None
+    priority = content.pop("priority", None)
+    if "state_text" in content:
+        content["state"] = content.pop("state_text")
+    if template is not None:
+        content["template"] = template
     with _surface_api_errors():
-        await api.update_activity(slug, state, content, sound=sound, priority=priority_override)
+        await api.update_activity(slug, state, content, sound=sound, priority=priority)
+
+
+async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the deprecated update_activity service call.
+
+    Superseded by the per-template ``update_activity_<template>`` services. Kept as a
+    backward-compatible alias; raises an idempotent Repair issue (cleared on restart once
+    automations migrate) instead of logging a warning on every call.
+    """
+    ir.async_create_issue(
+        hass,
+        DOMAIN,
+        "deprecated_update_activity",
+        is_fixable=False,
+        is_persistent=False,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key="deprecated_update_activity",
+    )
+    await _send_activity_update(hass, call)
+
+
+async def _async_handle_update_template(hass: HomeAssistant, call: ServiceCall, *, template: str) -> None:
+    """Handle an update_activity_<template> service call (template implied by the name)."""
+    await _send_activity_update(hass, call, template=template)
 
 
 async def _async_handle_create_activity(hass: HomeAssistant, call: ServiceCall) -> None:
@@ -396,6 +444,13 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(
         DOMAIN, SERVICE_UPDATE_ACTIVITY, partial(_async_handle_update_activity, hass), SCHEMA_UPDATE_ACTIVITY
     )
+    for template in TEMPLATES:
+        hass.services.async_register(
+            DOMAIN,
+            f"{SERVICE_UPDATE_TEMPLATE_PREFIX}{template}",
+            partial(_async_handle_update_template, hass, template=template),
+            _UPDATE_TEMPLATE_SCHEMAS[template],
+        )
     hass.services.async_register(
         DOMAIN, SERVICE_CREATE_ACTIVITY, partial(_async_handle_create_activity, hass), SCHEMA_CREATE_ACTIVITY
     )
@@ -412,6 +467,17 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(
         DOMAIN, SERVICE_WIDGET_REFRESH, partial(_async_handle_widget_refresh, hass), SCHEMA_WIDGET_REFRESH
     )
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Register PushWard services at component setup.
+
+    Services live for the component's lifetime (not per config entry) so automations that
+    reference them validate even before an entry loads; the handlers raise a clear error via
+    ``_get_api`` when no entry is configured.
+    """
+    _register_services(hass)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -440,8 +506,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-
-    _register_services(hass)
 
     entry.async_on_unload(entry.add_update_listener(_async_entry_updated))
 
@@ -486,16 +550,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if widget_manager is not None:
             stops.append(widget_manager.async_stop())
         await asyncio.gather(*stops)
-
-    # Unregister services when no entries remain
-    if not hass.data.get(DOMAIN):
-        hass.services.async_remove(DOMAIN, SERVICE_UPDATE_ACTIVITY)
-        hass.services.async_remove(DOMAIN, SERVICE_CREATE_ACTIVITY)
-        hass.services.async_remove(DOMAIN, SERVICE_END_ACTIVITY)
-        hass.services.async_remove(DOMAIN, SERVICE_DELETE_ACTIVITY)
-        hass.services.async_remove(DOMAIN, SERVICE_SEND_NOTIFICATION)
-        hass.services.async_remove(DOMAIN, SERVICE_SEND_EMAIL)
-        hass.services.async_remove(DOMAIN, SERVICE_WIDGET_REFRESH)
 
     return True
 

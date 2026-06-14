@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "অ্যাক্টিভিটি আপডেট করুন",
+      "name": "অ্যাক্টিভিটি আপডেট করুন (deprecated)",
       "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "ধাপের লেবেল",
-          "description": "steps টেমপ্লেট ধাপগুলির জন্য কাস্টম লেবেল। ফরম্যাট: 1=লেবেল, 2=লেবেল। খালি থাকলে ধাপ নম্বর ব্যবহার হয়।"
+          "description": "ধাপ লেবেলের ক্রমানুসারী তালিকা। দৈর্ঘ্য total_steps-এর সমান হতে হবে। শুধুমাত্র steps টেমপ্লেট।"
         },
         "step_rows": {
           "name": "ধাপের সারি",
-          "description": "steps টেমপ্লেটে একটি সারিতে দেখানো ধাপের সংখ্যা।"
+          "description": "প্রতি ধাপের সারির উচ্চতার (১-১০) ক্রমানুসারী তালিকা। দৈর্ঘ্য total_steps-এর সমান হতে হবে। শুধুমাত্র steps টেমপ্লেট।"
         },
         "fired_at": {
           "name": "সক্রিয়করণের সময়",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "অ্যাকশন বোতাম",
           "description": "ট্যাপযোগ্য URL বোতাম। শুধুমাত্র steps ও alert টেমপ্লেটের জন্য।"
+        },
+        "display_options": {
+          "name": "প্রদর্শন, রঙ ও শব্দ",
+          "description": "ঐচ্ছিক স্টাইল ও প্রতি-আপডেট ওভাররাইড। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "অ্যাক্টিভিটি আপডেট করুন (Generic)",
+      "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "state": {
+          "name": "অবস্থা",
+          "description": "কাঙ্ক্ষিত অ্যাক্টিভিটির অবস্থা।"
+        },
+        "state_text": {
+          "name": "অবস্থার টেক্সট",
+          "description": "অ্যাক্টিভিটির অবস্থা হিসেবে প্রদর্শিত টেক্সট।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "অ্যাক্টিভিটিতে প্রদর্শিত সাবটাইটেল টেক্সট।"
+        },
+        "icon": {
+          "name": "আইকন",
+          "description": "SF Symbol বা MDI আইকনের নাম (যেমন arrow.down.circle.fill, mdi:download)।"
+        },
+        "progress": {
+          "name": "অগ্রগতি",
+          "description": "0.0 থেকে 1.0 এর মধ্যে অগ্রগতির মান।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত বার্তা।"
+        },
+        "accent_color": {
+          "name": "অ্যাকসেন্ট রঙ",
+          "description": "অ্যাক্টিভিটির জন্য অ্যাকসেন্ট রঙের নাম।"
+        },
+        "background_color": {
+          "name": "পটভূমির রং",
+          "description": "Live Activity পটভূমির রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "text_color": {
+          "name": "টেক্সট রং",
+          "description": "Live Activity টেক্সট রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "remaining_time": {
+          "name": "অবশিষ্ট সময়",
+          "description": "সেকেন্ডে অবশিষ্ট সময়।"
+        },
+        "sound": {
+          "name": "শব্দ",
+          "description": "এই আপডেটের জন্য বিজ্ঞপ্তি শব্দের নাম। iOS সিস্টেম শব্দ ব্যবহার করতে খালি রাখুন।"
+        },
+        "priority": {
+          "name": "অগ্রাধিকার",
+          "description": "অ্যাক্টিভিটির অগ্রাধিকার (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "লেবেল ও আইকন",
+          "description": "ঐচ্ছিক টেক্সট লেবেল ও আইকন। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        },
+        "display_options": {
+          "name": "প্রদর্শন, রঙ ও শব্দ",
+          "description": "ঐচ্ছিক স্টাইল ও প্রতি-আপডেট ওভাররাইড। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "অ্যাক্টিভিটি আপডেট করুন (Countdown)",
+      "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "state": {
+          "name": "অবস্থা",
+          "description": "কাঙ্ক্ষিত অ্যাক্টিভিটির অবস্থা।"
+        },
+        "end_date": {
+          "name": "শেষ তারিখ",
+          "description": "countdown শেষ তারিখের Unix টাইমস্ট্যাম্প।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত বার্তা।"
+        },
+        "state_text": {
+          "name": "অবস্থার টেক্সট",
+          "description": "অ্যাক্টিভিটির অবস্থা হিসেবে প্রদর্শিত টেক্সট।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "অ্যাক্টিভিটিতে প্রদর্শিত সাবটাইটেল টেক্সট।"
+        },
+        "icon": {
+          "name": "আইকন",
+          "description": "SF Symbol বা MDI আইকনের নাম (যেমন arrow.down.circle.fill, mdi:download)।"
+        },
+        "progress": {
+          "name": "অগ্রগতি",
+          "description": "0.0 থেকে 1.0 এর মধ্যে অগ্রগতির মান।"
+        },
+        "warning_threshold": {
+          "name": "সতর্কতা থ্রেশহোল্ড",
+          "description": "gauge বা timeline মান এই মানে পৌঁছালে বা অতিক্রম করলে সতর্কতা রং দেখানো হয়।"
+        },
+        "alarm": {
+          "name": "অ্যালার্ম",
+          "description": "সতর্কতা থ্রেশহোল্ড অতিক্রম করলে AlarmKit অ্যালার্ম সক্রিয় করে। শুধুমাত্র iOS 26+ এ কাজ করে।"
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "অ্যাকসেন্ট রঙ",
+          "description": "অ্যাক্টিভিটির জন্য অ্যাকসেন্ট রঙের নাম।"
+        },
+        "background_color": {
+          "name": "পটভূমির রং",
+          "description": "Live Activity পটভূমির রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "text_color": {
+          "name": "টেক্সট রং",
+          "description": "Live Activity টেক্সট রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "remaining_time": {
+          "name": "অবশিষ্ট সময়",
+          "description": "সেকেন্ডে অবশিষ্ট সময়।"
+        },
+        "sound": {
+          "name": "শব্দ",
+          "description": "এই আপডেটের জন্য বিজ্ঞপ্তি শব্দের নাম। iOS সিস্টেম শব্দ ব্যবহার করতে খালি রাখুন।"
+        },
+        "priority": {
+          "name": "অগ্রাধিকার",
+          "description": "অ্যাক্টিভিটির অগ্রাধিকার (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "লেবেল ও আইকন",
+          "description": "ঐচ্ছিক টেক্সট লেবেল ও আইকন। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        },
+        "countdown_options": {
+          "name": "countdown অপশন",
+          "description": "শুধুমাত্র countdown টেমপ্লেটের জন্য।"
+        },
+        "display_options": {
+          "name": "প্রদর্শন, রঙ ও শব্দ",
+          "description": "ঐচ্ছিক স্টাইল ও প্রতি-আপডেট ওভাররাইড। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "অ্যাক্টিভিটি আপডেট করুন (Steps)",
+      "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "state": {
+          "name": "অবস্থা",
+          "description": "কাঙ্ক্ষিত অ্যাক্টিভিটির অবস্থা।"
+        },
+        "total_steps": {
+          "name": "মোট Steps",
+          "description": "মোট steps সংখ্যা।"
+        },
+        "current_step": {
+          "name": "বর্তমান ধাপ",
+          "description": "বর্তমান ধাপের নম্বর।"
+        },
+        "state_text": {
+          "name": "অবস্থার টেক্সট",
+          "description": "অ্যাক্টিভিটির অবস্থা হিসেবে প্রদর্শিত টেক্সট।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "অ্যাক্টিভিটিতে প্রদর্শিত সাবটাইটেল টেক্সট।"
+        },
+        "icon": {
+          "name": "আইকন",
+          "description": "SF Symbol বা MDI আইকনের নাম (যেমন arrow.down.circle.fill, mdi:download)।"
+        },
+        "progress": {
+          "name": "অগ্রগতি",
+          "description": "0.0 থেকে 1.0 এর মধ্যে অগ্রগতির মান।"
+        },
+        "step_labels": {
+          "name": "ধাপের লেবেল",
+          "description": "ধাপ লেবেলের ক্রমানুসারী তালিকা। দৈর্ঘ্য total_steps-এর সমান হতে হবে। শুধুমাত্র steps টেমপ্লেট।"
+        },
+        "step_rows": {
+          "name": "ধাপের সারি",
+          "description": "প্রতি ধাপের সারির উচ্চতার (১-১০) ক্রমানুসারী তালিকা। দৈর্ঘ্য total_steps-এর সমান হতে হবে। শুধুমাত্র steps টেমপ্লেট।"
+        },
+        "url": {
+          "name": "URL",
+          "description": "ট্যাপযোগ্য বোতাম হিসেবে প্রদর্শিত প্রাথমিক URL। শুধুমাত্র steps এবং alert টেমপ্লেটে সমর্থিত।"
+        },
+        "secondary_url": {
+          "name": "সেকেন্ডারি URL",
+          "description": "দ্বিতীয় ট্যাপযোগ্য বোতাম হিসেবে প্রদর্শিত সেকেন্ডারি URL। শুধুমাত্র steps এবং alert টেমপ্লেটে সমর্থিত।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত বার্তা।"
+        },
+        "accent_color": {
+          "name": "অ্যাকসেন্ট রঙ",
+          "description": "অ্যাক্টিভিটির জন্য অ্যাকসেন্ট রঙের নাম।"
+        },
+        "background_color": {
+          "name": "পটভূমির রং",
+          "description": "Live Activity পটভূমির রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "text_color": {
+          "name": "টেক্সট রং",
+          "description": "Live Activity টেক্সট রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "remaining_time": {
+          "name": "অবশিষ্ট সময়",
+          "description": "সেকেন্ডে অবশিষ্ট সময়।"
+        },
+        "sound": {
+          "name": "শব্দ",
+          "description": "এই আপডেটের জন্য বিজ্ঞপ্তি শব্দের নাম। iOS সিস্টেম শব্দ ব্যবহার করতে খালি রাখুন।"
+        },
+        "priority": {
+          "name": "অগ্রাধিকার",
+          "description": "অ্যাক্টিভিটির অগ্রাধিকার (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "লেবেল ও আইকন",
+          "description": "ঐচ্ছিক টেক্সট লেবেল ও আইকন। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        },
+        "steps_options": {
+          "name": "steps অপশন",
+          "description": "শুধুমাত্র steps টেমপ্লেটের জন্য।"
+        },
+        "action_buttons": {
+          "name": "অ্যাকশন বোতাম",
+          "description": "ট্যাপযোগ্য URL বোতাম। শুধুমাত্র steps ও alert টেমপ্লেটের জন্য।"
+        },
+        "display_options": {
+          "name": "প্রদর্শন, রঙ ও শব্দ",
+          "description": "ঐচ্ছিক স্টাইল ও প্রতি-আপডেট ওভাররাইড। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "অ্যাক্টিভিটি আপডেট করুন (Alert)",
+      "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "state": {
+          "name": "অবস্থা",
+          "description": "কাঙ্ক্ষিত অ্যাক্টিভিটির অবস্থা।"
+        },
+        "severity": {
+          "name": "তীব্রতা",
+          "description": "Alert তীব্রতার স্তর।"
+        },
+        "state_text": {
+          "name": "অবস্থার টেক্সট",
+          "description": "অ্যাক্টিভিটির অবস্থা হিসেবে প্রদর্শিত টেক্সট।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "অ্যাক্টিভিটিতে প্রদর্শিত সাবটাইটেল টেক্সট।"
+        },
+        "icon": {
+          "name": "আইকন",
+          "description": "SF Symbol বা MDI আইকনের নাম (যেমন arrow.down.circle.fill, mdi:download)।"
+        },
+        "progress": {
+          "name": "অগ্রগতি",
+          "description": "0.0 থেকে 1.0 এর মধ্যে অগ্রগতির মান।"
+        },
+        "fired_at": {
+          "name": "সক্রিয়করণের সময়",
+          "description": "অ্যাক্টিভিটি সক্রিয় হওয়ার Unix টাইমস্ট্যাম্প। আপেক্ষিক সময় দেখাতে ব্যবহৃত হয়।"
+        },
+        "url": {
+          "name": "URL",
+          "description": "ট্যাপযোগ্য বোতাম হিসেবে প্রদর্শিত প্রাথমিক URL। শুধুমাত্র steps এবং alert টেমপ্লেটে সমর্থিত।"
+        },
+        "secondary_url": {
+          "name": "সেকেন্ডারি URL",
+          "description": "দ্বিতীয় ট্যাপযোগ্য বোতাম হিসেবে প্রদর্শিত সেকেন্ডারি URL। শুধুমাত্র steps এবং alert টেমপ্লেটে সমর্থিত।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত বার্তা।"
+        },
+        "accent_color": {
+          "name": "অ্যাকসেন্ট রঙ",
+          "description": "অ্যাক্টিভিটির জন্য অ্যাকসেন্ট রঙের নাম।"
+        },
+        "background_color": {
+          "name": "পটভূমির রং",
+          "description": "Live Activity পটভূমির রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "text_color": {
+          "name": "টেক্সট রং",
+          "description": "Live Activity টেক্সট রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "remaining_time": {
+          "name": "অবশিষ্ট সময়",
+          "description": "সেকেন্ডে অবশিষ্ট সময়।"
+        },
+        "sound": {
+          "name": "শব্দ",
+          "description": "এই আপডেটের জন্য বিজ্ঞপ্তি শব্দের নাম। iOS সিস্টেম শব্দ ব্যবহার করতে খালি রাখুন।"
+        },
+        "priority": {
+          "name": "অগ্রাধিকার",
+          "description": "অ্যাক্টিভিটির অগ্রাধিকার (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "লেবেল ও আইকন",
+          "description": "ঐচ্ছিক টেক্সট লেবেল ও আইকন। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        },
+        "alert_options": {
+          "name": "alert অপশন",
+          "description": "শুধুমাত্র alert টেমপ্লেটের জন্য।"
+        },
+        "action_buttons": {
+          "name": "অ্যাকশন বোতাম",
+          "description": "ট্যাপযোগ্য URL বোতাম। শুধুমাত্র steps ও alert টেমপ্লেটের জন্য।"
+        },
+        "display_options": {
+          "name": "প্রদর্শন, রঙ ও শব্দ",
+          "description": "ঐচ্ছিক স্টাইল ও প্রতি-আপডেট ওভাররাইড। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "অ্যাক্টিভিটি আপডেট করুন (Gauge)",
+      "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "state": {
+          "name": "অবস্থা",
+          "description": "কাঙ্ক্ষিত অ্যাক্টিভিটির অবস্থা।"
+        },
+        "value": {
+          "name": "মান",
+          "description": "Gauge: সংখ্যাসূচক মান। Timeline: লেবেলযুক্ত মানের অবজেক্ট (যেমন Temp=22.5)।"
+        },
+        "min_value": {
+          "name": "সর্বনিম্ন মান",
+          "description": "Minimum gauge মান।"
+        },
+        "max_value": {
+          "name": "সর্বোচ্চ মান",
+          "description": "Maximum gauge মান।"
+        },
+        "unit": {
+          "name": "একক",
+          "description": "মানের পাশে প্রদর্শিত একক (যেমন °C, %)।"
+        },
+        "state_text": {
+          "name": "অবস্থার টেক্সট",
+          "description": "অ্যাক্টিভিটির অবস্থা হিসেবে প্রদর্শিত টেক্সট।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "অ্যাক্টিভিটিতে প্রদর্শিত সাবটাইটেল টেক্সট।"
+        },
+        "icon": {
+          "name": "আইকন",
+          "description": "SF Symbol বা MDI আইকনের নাম (যেমন arrow.down.circle.fill, mdi:download)।"
+        },
+        "progress": {
+          "name": "অগ্রগতি",
+          "description": "0.0 থেকে 1.0 এর মধ্যে অগ্রগতির মান।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত বার্তা।"
+        },
+        "accent_color": {
+          "name": "অ্যাকসেন্ট রঙ",
+          "description": "অ্যাক্টিভিটির জন্য অ্যাকসেন্ট রঙের নাম।"
+        },
+        "background_color": {
+          "name": "পটভূমির রং",
+          "description": "Live Activity পটভূমির রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "text_color": {
+          "name": "টেক্সট রং",
+          "description": "Live Activity টেক্সট রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "remaining_time": {
+          "name": "অবশিষ্ট সময়",
+          "description": "সেকেন্ডে অবশিষ্ট সময়।"
+        },
+        "sound": {
+          "name": "শব্দ",
+          "description": "এই আপডেটের জন্য বিজ্ঞপ্তি শব্দের নাম। iOS সিস্টেম শব্দ ব্যবহার করতে খালি রাখুন।"
+        },
+        "priority": {
+          "name": "অগ্রাধিকার",
+          "description": "অ্যাক্টিভিটির অগ্রাধিকার (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "লেবেল ও আইকন",
+          "description": "ঐচ্ছিক টেক্সট লেবেল ও আইকন। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        },
+        "display_options": {
+          "name": "প্রদর্শন, রঙ ও শব্দ",
+          "description": "ঐচ্ছিক স্টাইল ও প্রতি-আপডেট ওভাররাইড। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "অ্যাক্টিভিটি আপডেট করুন (Timeline)",
+      "description": "একটি PushWard Live Activity-র অবস্থা এবং কন্টেন্ট আপডেট করুন।",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "অ্যাক্টিভিটির slug পরিচয়কারী।"
+        },
+        "state": {
+          "name": "অবস্থা",
+          "description": "কাঙ্ক্ষিত অ্যাক্টিভিটির অবস্থা।"
+        },
+        "value": {
+          "name": "মান",
+          "description": "Gauge: সংখ্যাসূচক মান। Timeline: লেবেলযুক্ত মানের অবজেক্ট (যেমন Temp=22.5)।"
+        },
+        "unit": {
+          "name": "একক",
+          "description": "মানের পাশে প্রদর্শিত একক (যেমন °C, %)।"
+        },
+        "state_text": {
+          "name": "অবস্থার টেক্সট",
+          "description": "অ্যাক্টিভিটির অবস্থা হিসেবে প্রদর্শিত টেক্সট।"
+        },
+        "subtitle": {
+          "name": "সাবটাইটেল",
+          "description": "অ্যাক্টিভিটিতে প্রদর্শিত সাবটাইটেল টেক্সট।"
+        },
+        "icon": {
+          "name": "আইকন",
+          "description": "SF Symbol বা MDI আইকনের নাম (যেমন arrow.down.circle.fill, mdi:download)।"
+        },
+        "progress": {
+          "name": "অগ্রগতি",
+          "description": "0.0 থেকে 1.0 এর মধ্যে অগ্রগতির মান।"
+        },
+        "units": {
+          "name": "একক",
+          "description": "Timeline সিরিজের জন্য একক লেবেল। ফরম্যাট: attribute=একক। উদাহরণ: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "স্কেল",
+          "description": "Y-অক্ষের স্কেল মোড (রৈখিক বা লগারিদমিক)। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        },
+        "decimals": {
+          "name": "দশমিক স্থান",
+          "description": "মান প্রদর্শনের জন্য দশমিক স্থানের সংখ্যা (0-10)। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        },
+        "smoothing": {
+          "name": "মসৃণ রেখা",
+          "description": "ডেটা পয়েন্টের মধ্যে কার্ভ ইন্টারপোলেশন সক্ষম করুন। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        },
+        "thresholds": {
+          "name": "থ্রেশহোল্ড",
+          "description": "স্পার্কলাইনে অনুভূমিক রেফারেন্স লাইন। শুধুমাত্র Timeline টেমপ্লেটের জন্য।"
+        },
+        "completion_message": {
+          "name": "সমাপ্তি বার্তা",
+          "description": "অ্যাক্টিভিটি শেষ হলে প্রদর্শিত বার্তা।"
+        },
+        "accent_color": {
+          "name": "অ্যাকসেন্ট রঙ",
+          "description": "অ্যাক্টিভিটির জন্য অ্যাকসেন্ট রঙের নাম।"
+        },
+        "background_color": {
+          "name": "পটভূমির রং",
+          "description": "Live Activity পটভূমির রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "text_color": {
+          "name": "টেক্সট রং",
+          "description": "Live Activity টেক্সট রং। #RRGGBB বা নামযুক্ত রং। সিস্টেম ডিফল্টের জন্য খালি রাখুন।"
+        },
+        "remaining_time": {
+          "name": "অবশিষ্ট সময়",
+          "description": "সেকেন্ডে অবশিষ্ট সময়।"
+        },
+        "sound": {
+          "name": "শব্দ",
+          "description": "এই আপডেটের জন্য বিজ্ঞপ্তি শব্দের নাম। iOS সিস্টেম শব্দ ব্যবহার করতে খালি রাখুন।"
+        },
+        "priority": {
+          "name": "অগ্রাধিকার",
+          "description": "অ্যাক্টিভিটির অগ্রাধিকার (0 = সর্বনিম্ন, 10 = সর্বোচ্চ)।"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "লেবেল ও আইকন",
+          "description": "ঐচ্ছিক টেক্সট লেবেল ও আইকন। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge ও timeline অপশন",
+          "description": "শুধুমাত্র gauge ও timeline টেমপ্লেটের জন্য।"
         },
         "display_options": {
           "name": "প্রদর্শন, রঙ ও শব্দ",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "PushWard-এর সাথে সংযুক্ত হন",
-        "description": "শুরু করতে আপনার PushWard ইন্টিগ্রেশন কী লিখুন। iOS অ্যাপটি এখনও App Store-এ নেই; এটি বর্তমানে TestFlight-এ পাবলিক বিটায় রয়েছে: {testflight_url}",
         "data": {
           "integration_key": "ইন্টিগ্রেশন কী"
-        },
-        "data_description": {
-          "integration_key": "PushWard iOS অ্যাপ খুলুন (TestFlight: {testflight_url}) → Settings → Integration Keys। আপনি ডিফল্ট কী পেস্ট করতে পারেন, অথবা 'ha-*' স্কোপ সহ একটি নতুন তৈরি করতে পারেন।"
         }
       },
       "reconfigure": {

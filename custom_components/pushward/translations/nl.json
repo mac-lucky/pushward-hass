@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Activiteit bijwerken",
+      "name": "Activiteit bijwerken (deprecated)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
         "slug": {
@@ -168,6 +168,538 @@
         }
       }
     },
+    "update_activity_generic": {
+      "name": "Activiteit bijwerken (Generic)",
+      "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Voortgang",
+          "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleurnaam voor de activiteit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "remaining_time": {
+          "name": "Resterende tijd",
+          "description": "Resterende tijd in seconden."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & pictogram",
+          "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "display_options": {
+          "name": "Weergave, kleur & geluid",
+          "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Activiteit bijwerken (Countdown)",
+      "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "end_date": {
+          "name": "Einddatum",
+          "description": "Unix-tijdstempel voor de countdown-einddatum."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Voortgang",
+          "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "warning_threshold": {
+          "name": "Waarschuwingsdrempel",
+          "description": "Seconden vóór end_date waarop de countdown in waarschuwingsstatus gaat. Alleen voor het sjabloon countdown."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+, alleen voor het sjabloon countdown)."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleurnaam voor de activiteit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "remaining_time": {
+          "name": "Resterende tijd",
+          "description": "Resterende tijd in seconden."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & pictogram",
+          "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "countdown_options": {
+          "name": "countdown-opties",
+          "description": "Alleen voor het sjabloon countdown."
+        },
+        "display_options": {
+          "name": "Weergave, kleur & geluid",
+          "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Activiteit bijwerken (Steps)",
+      "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "total_steps": {
+          "name": "Totaal aantal steps",
+          "description": "Totaal aantal steps."
+        },
+        "current_step": {
+          "name": "Huidige stap",
+          "description": "Huidig stapnummer."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Voortgang",
+          "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "step_labels": {
+          "name": "Staplabels",
+          "description": "Geordende lijst met staplabels. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "step_rows": {
+          "name": "Stap-rijhoogten",
+          "description": "Geordende lijst met rijhoogten (1–10) per stap. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primaire URL als aanklikbare knop. Alleen ondersteund voor de sjablonen steps en alert."
+        },
+        "secondary_url": {
+          "name": "Secundaire URL",
+          "description": "Secundaire URL als tweede aanklikbare knop. Alleen ondersteund voor de sjablonen steps en alert."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleurnaam voor de activiteit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "remaining_time": {
+          "name": "Resterende tijd",
+          "description": "Resterende tijd in seconden."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & pictogram",
+          "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "steps_options": {
+          "name": "steps-opties",
+          "description": "Alleen voor het sjabloon steps."
+        },
+        "action_buttons": {
+          "name": "Actieknoppen",
+          "description": "Aanklikbare URL-knoppen. Alleen voor de sjablonen steps en alert."
+        },
+        "display_options": {
+          "name": "Weergave, kleur & geluid",
+          "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Activiteit bijwerken (Alert)",
+      "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "severity": {
+          "name": "Ernst",
+          "description": "alert-ernstniveau."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Voortgang",
+          "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "fired_at": {
+          "name": "Afgevuurd om",
+          "description": "Unix-tijdstempel wanneer de alert werd geactiveerd. Alleen voor het sjabloon alert."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primaire URL als aanklikbare knop. Alleen ondersteund voor de sjablonen steps en alert."
+        },
+        "secondary_url": {
+          "name": "Secundaire URL",
+          "description": "Secundaire URL als tweede aanklikbare knop. Alleen ondersteund voor de sjablonen steps en alert."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleurnaam voor de activiteit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "remaining_time": {
+          "name": "Resterende tijd",
+          "description": "Resterende tijd in seconden."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & pictogram",
+          "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "alert_options": {
+          "name": "alert-opties",
+          "description": "Alleen voor het sjabloon alert."
+        },
+        "action_buttons": {
+          "name": "Actieknoppen",
+          "description": "Aanklikbare URL-knoppen. Alleen voor de sjablonen steps en alert."
+        },
+        "display_options": {
+          "name": "Weergave, kleur & geluid",
+          "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Activiteit bijwerken (Gauge)",
+      "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "value": {
+          "name": "Waarde",
+          "description": "Gauge: numerieke waarde. Timeline: object met gelabelde waarden (bijv. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Minimumwaarde",
+          "description": "Minimale gauge-waarde."
+        },
+        "max_value": {
+          "name": "Maximumwaarde",
+          "description": "Maximale gauge-waarde."
+        },
+        "unit": {
+          "name": "Eenheid",
+          "description": "Weergave-eenheid naast de waarde (bijv. °C, %)."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Voortgang",
+          "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleurnaam voor de activiteit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "remaining_time": {
+          "name": "Resterende tijd",
+          "description": "Resterende tijd in seconden."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & pictogram",
+          "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "display_options": {
+          "name": "Weergave, kleur & geluid",
+          "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Activiteit bijwerken (Timeline)",
+      "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "value": {
+          "name": "Waarde",
+          "description": "Gauge: numerieke waarde. Timeline: object met gelabelde waarden (bijv. Temp=22.5)."
+        },
+        "unit": {
+          "name": "Eenheid",
+          "description": "Weergave-eenheid naast de waarde (bijv. °C, %)."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Voortgang",
+          "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "units": {
+          "name": "Eenhedenkaart",
+          "description": "Eenheidslabels per reeks. Sleutels moeten overeenkomen met de sleutels van het value dict. Alleen voor het sjabloon timeline."
+        },
+        "scale": {
+          "name": "Schaal",
+          "description": "Y-as schaalmodus (lineair of logaritmisch). Alleen voor het sjabloon timeline."
+        },
+        "decimals": {
+          "name": "Decimalen",
+          "description": "Aantal decimalen voor de waardeweergave (0-10). Alleen voor het sjabloon timeline."
+        },
+        "smoothing": {
+          "name": "Vloeiende lijnen",
+          "description": "Schakel curve-interpolatie in tussen gegevenspunten. Alleen voor het sjabloon timeline."
+        },
+        "thresholds": {
+          "name": "Drempelwaarden",
+          "description": "Horizontale referentielijnen op de sparkline. Alleen voor het sjabloon timeline."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleurnaam voor de activiteit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "remaining_time": {
+          "name": "Resterende tijd",
+          "description": "Resterende tijd in seconden."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & pictogram",
+          "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge- en timeline-opties",
+          "description": "Alleen voor de sjablonen gauge en timeline."
+        },
+        "display_options": {
+          "name": "Weergave, kleur & geluid",
+          "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activiteit aanmaken",
       "description": "Maak een nieuwe PushWard Live Activity aan.",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "Verbinding maken met PushWard",
-        "description": "Voer je PushWard-integratiesleutel in om te beginnen. De iOS-app is momenteel in publieke bèta op TestFlight (nog niet in de App Store): {testflight_url}",
         "data": {
           "integration_key": "Integratiesleutel"
-        },
-        "data_description": {
-          "integration_key": "Open de PushWard iOS-app (TestFlight: {testflight_url}) → Instellingen → Integratiesleutels. Je kunt de standaardsleutel plakken of een nieuwe aanmaken met bereik 'ha-*'."
         }
       },
       "reconfigure": {

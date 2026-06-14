@@ -9,6 +9,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.helpers import issue_registry as ir
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import (
@@ -22,6 +23,7 @@ from custom_components.pushward.const import (
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
     DOMAIN,
+    TEMPLATES,
 )
 
 from .conftest import make_usage_payload
@@ -70,28 +72,33 @@ async def _setup_entry(hass: HomeAssistant, mock_api: AsyncMock) -> MockConfigEn
     return entry
 
 
+_BASE_SERVICES = (
+    "update_activity",
+    "create_activity",
+    "end_activity",
+    "delete_activity",
+    "send_notification",
+    "send_email",
+)
+
+
 async def test_services_registered_on_setup(hass: HomeAssistant) -> None:
-    """Services are registered when the integration is set up."""
+    """Services register at component setup and persist after an entry unloads.
+
+    They are registered in async_setup (component lifetime), not per entry, so unloading
+    the only entry must not remove them — automations keep validating against them.
+    """
     api = _mock_api()
     entry = await _setup_entry(hass, api)
 
-    assert hass.services.has_service(DOMAIN, "update_activity")
-    assert hass.services.has_service(DOMAIN, "create_activity")
-    assert hass.services.has_service(DOMAIN, "end_activity")
-    assert hass.services.has_service(DOMAIN, "delete_activity")
-    assert hass.services.has_service(DOMAIN, "send_notification")
-    assert hass.services.has_service(DOMAIN, "send_email")
+    for name in _BASE_SERVICES:
+        assert hass.services.has_service(DOMAIN, name)
 
-    # Unload should remove services
     await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
 
-    assert not hass.services.has_service(DOMAIN, "update_activity")
-    assert not hass.services.has_service(DOMAIN, "create_activity")
-    assert not hass.services.has_service(DOMAIN, "end_activity")
-    assert not hass.services.has_service(DOMAIN, "delete_activity")
-    assert not hass.services.has_service(DOMAIN, "send_notification")
-    assert not hass.services.has_service(DOMAIN, "send_email")
+    for name in _BASE_SERVICES:
+        assert hass.services.has_service(DOMAIN, name)
 
 
 async def test_service_update_activity(hass: HomeAssistant) -> None:
@@ -533,7 +540,7 @@ async def test_update_activity_service_rejects_invalid_sound(hass: HomeAssistant
     api = _mock_api()
     await _setup_entry(hass, api)
 
-    with pytest.raises((vol.Invalid, Exception)):
+    with pytest.raises(vol.MultipleInvalid):
         await hass.services.async_call(
             DOMAIN,
             "update_activity",
@@ -547,7 +554,7 @@ async def test_update_activity_service_rejects_priority_out_of_range(hass: HomeA
     api = _mock_api()
     await _setup_entry(hass, api)
 
-    with pytest.raises((vol.Invalid, Exception)):
+    with pytest.raises(vol.MultipleInvalid):
         await hass.services.async_call(
             DOMAIN,
             "update_activity",
@@ -572,6 +579,261 @@ async def test_update_activity_service_accepts_background_and_text_color(hass: H
     content = api.update_activity.call_args[0][2]
     assert content["background_color"] == "#123456"
     assert content["text_color"] == "red"
+
+
+# --- per-template update_activity_<template> services ---
+
+
+async def test_per_template_services_registered_and_persist(hass: HomeAssistant) -> None:
+    """All six update_activity_<template> services register on setup and persist after unload."""
+    api = _mock_api()
+    entry = await _setup_entry(hass, api)
+
+    for template in TEMPLATES:
+        assert hass.services.has_service(DOMAIN, f"update_activity_{template}")
+
+    await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+
+    for template in TEMPLATES:
+        assert hass.services.has_service(DOMAIN, f"update_activity_{template}")
+
+
+@pytest.mark.parametrize("template", TEMPLATES)
+async def test_update_activity_template_injects_template(hass: HomeAssistant, template: str) -> None:
+    """The service name implies the template; the handler injects it and remaps state_text -> state."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        f"update_activity_{template}",
+        {"slug": "x", "state": "ongoing", "state_text": "Running"},
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    slug, state, content = api.update_activity.call_args[0]
+    assert (slug, state) == ("x", "ongoing")
+    assert content["template"] == template
+    assert content["state"] == "Running"
+    assert "state_text" not in content
+
+
+@pytest.mark.parametrize("template", TEMPLATES)
+async def test_per_template_keeps_sound_priority_top_level(hass: HomeAssistant, template: str) -> None:
+    """Every template's schema accepts sound/priority and keeps them out of content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        f"update_activity_{template}",
+        {"slug": "x", "state": "ongoing", "sound": "chime", "priority": 7},
+        blocking=True,
+    )
+
+    call = api.update_activity.call_args
+    content = call[0][2]
+    assert "sound" not in content and "priority" not in content
+    assert call.kwargs["sound"] == "chime"
+    assert call.kwargs["priority"] == 7
+
+
+async def test_update_activity_countdown_forwards_fields(hass: HomeAssistant) -> None:
+    """Countdown-specific fields go into content; sound/priority stay top-level kwargs."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {
+            "slug": "c",
+            "state": "ongoing",
+            "end_date": 1700000000,
+            "warning_threshold": 30,
+            "alarm": True,
+            "snooze_seconds": 600,
+            "completion_message": "Done",
+            "sound": "chime",
+            "priority": 7,
+        },
+        blocking=True,
+    )
+
+    call = api.update_activity.call_args
+    content = call[0][2]
+    assert content["template"] == "countdown"
+    assert content["end_date"] == 1700000000
+    assert content["warning_threshold"] == 30
+    assert content["alarm"] is True
+    assert content["snooze_seconds"] == 600
+    assert content["completion_message"] == "Done"
+    assert "sound" not in content and "priority" not in content
+    assert call.kwargs["sound"] == "chime"
+    assert call.kwargs["priority"] == 7
+
+
+async def test_update_activity_alert_forwards_fields(hass: HomeAssistant) -> None:
+    """Alert-specific fields (severity, fired_at, url, secondary_url) are forwarded into content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_alert",
+        {
+            "slug": "a",
+            "state": "ongoing",
+            "severity": "critical",
+            "fired_at": 1700000000,
+            "url": "https://example.com",
+            "secondary_url": "https://example.com/details",
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "alert"
+    assert content["severity"] == "critical"
+    assert content["fired_at"] == 1700000000
+    assert content["url"] == "https://example.com"
+    assert content["secondary_url"] == "https://example.com/details"
+
+
+async def test_update_activity_gauge_forwards_fields(hass: HomeAssistant) -> None:
+    """Gauge-specific fields (value, min/max, unit) are forwarded into content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_gauge",
+        {"slug": "g", "state": "ongoing", "value": 22.5, "min_value": 0, "max_value": 100, "unit": "°C"},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "gauge"
+    assert content["value"] == 22.5
+    assert content["min_value"] == 0
+    assert content["max_value"] == 100
+    assert content["unit"] == "°C"
+
+
+async def test_update_activity_gauge_rejects_dict_value(hass: HomeAssistant) -> None:
+    """A gauge value must be a single number, not the timeline dict form."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_gauge",
+            {"slug": "g", "state": "ongoing", "value": {"Temp": 22.5}},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_timeline_forwards_fields(hass: HomeAssistant) -> None:
+    """Timeline-specific fields (units, scale, decimals, smoothing, thresholds) are forwarded."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_timeline",
+        {
+            "slug": "t",
+            "state": "ongoing",
+            "value": {"Temp": 22.5},
+            "units": {"Temp": "°C"},
+            "scale": "linear",
+            "decimals": 2,
+            "smoothing": True,
+            "thresholds": [10, 20],
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "timeline"
+    assert content["units"] == {"Temp": "°C"}
+    assert content["scale"] == "linear"
+    assert content["decimals"] == 2
+    assert content["smoothing"] is True
+    assert content["thresholds"] == [10, 20]
+
+
+async def test_update_activity_steps_accepts_list_step_labels(hass: HomeAssistant) -> None:
+    """step_labels is an ordered list and is forwarded verbatim (matches the server contract)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_steps",
+        {"slug": "s", "state": "ongoing", "total_steps": 3, "step_labels": ["A", "B", "C"]},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "steps"
+    assert content["step_labels"] == ["A", "B", "C"]
+
+
+async def test_update_activity_steps_rejects_dict_step_labels(hass: HomeAssistant) -> None:
+    """A dict for step_labels is rejected — the schema requires a list (the old docs were wrong)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_steps",
+            {"slug": "s", "state": "ongoing", "step_labels": {"1": "A", "2": "B"}},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_gauge_has_no_countdown_fields(hass: HomeAssistant) -> None:
+    """Per-template schemas are scoped: a countdown field is rejected by the gauge service."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_gauge",
+            {"slug": "g", "state": "ongoing", "end_date": 1700000000},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_deprecated_update_activity_raises_repair_issue(hass: HomeAssistant) -> None:
+    """The legacy update_activity action still forwards, and surfaces a deprecation Repair issue."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ongoing", "template": "generic"},
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    slug, state, content = api.update_activity.call_args[0]
+    assert (slug, state) == ("x", "ongoing")
+    assert content["template"] == "generic"
+
+    issue = ir.async_get(hass).async_get_issue(DOMAIN, "deprecated_update_activity")
+    assert issue is not None
+    assert issue.severity == ir.IssueSeverity.WARNING
 
 
 async def test_update_activity_service_accepts_warning_threshold(hass: HomeAssistant) -> None:
@@ -750,7 +1012,7 @@ async def test_send_notification_service_rejects_invalid_media_type(hass: HomeAs
     api = _mock_api()
     await _setup_entry(hass, api)
 
-    with pytest.raises((vol.Invalid, Exception)):
+    with pytest.raises(vol.MultipleInvalid):
         await hass.services.async_call(
             DOMAIN,
             "send_notification",

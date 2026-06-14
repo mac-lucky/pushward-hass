@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Atualizar Atividade",
+      "name": "Atualizar Atividade (deprecated)",
       "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
       "fields": {
         "slug": {
@@ -168,6 +168,538 @@
         }
       }
     },
+    "update_activity_generic": {
+      "name": "Atualizar Atividade (Generic)",
+      "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progresso",
+          "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Nome da cor de destaque da atividade."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "remaining_time": {
+          "name": "Tempo Restante",
+          "description": "Tempo restante em segundos."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Rótulos e ícone",
+          "description": "Rótulos de texto e ícone opcionais. Aplicam-se a qualquer modelo."
+        },
+        "display_options": {
+          "name": "Exibição, cor e som",
+          "description": "Estilo opcional e substituições por atualização. Aplicam-se a qualquer modelo."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Atualizar Atividade (Countdown)",
+      "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "end_date": {
+          "name": "Data de Término",
+          "description": "Timestamp Unix para a data de término do countdown."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progresso",
+          "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "warning_threshold": {
+          "name": "Limite de Aviso",
+          "description": "Segundos antes de end_date quando o countdown entra no estado de aviso. Apenas para o modelo countdown."
+        },
+        "alarm": {
+          "name": "Alarme",
+          "description": "Acionar alarme AlarmKit ao expirar o countdown (iOS 26+, apenas para o modelo countdown)."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Nome da cor de destaque da atividade."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "remaining_time": {
+          "name": "Tempo Restante",
+          "description": "Tempo restante em segundos."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Rótulos e ícone",
+          "description": "Rótulos de texto e ícone opcionais. Aplicam-se a qualquer modelo."
+        },
+        "countdown_options": {
+          "name": "Opções de countdown",
+          "description": "Apenas para o modelo countdown."
+        },
+        "display_options": {
+          "name": "Exibição, cor e som",
+          "description": "Estilo opcional e substituições por atualização. Aplicam-se a qualquer modelo."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Atualizar Atividade (Steps)",
+      "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "total_steps": {
+          "name": "Total steps",
+          "description": "Número total de steps."
+        },
+        "current_step": {
+          "name": "Etapa Atual",
+          "description": "Número da etapa atual."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progresso",
+          "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "step_labels": {
+          "name": "Rótulos de Etapas",
+          "description": "Lista ordenada de rótulos de etapas. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "step_rows": {
+          "name": "Alturas de Linha das Etapas",
+          "description": "Lista ordenada de alturas de linha (1-10) por etapa. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL principal exibida como botão tocável. Suportado apenas nos modelos steps e alert."
+        },
+        "secondary_url": {
+          "name": "URL Secundária",
+          "description": "URL secundária exibida como segundo botão tocável. Suportado apenas nos modelos steps e alert."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Nome da cor de destaque da atividade."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "remaining_time": {
+          "name": "Tempo Restante",
+          "description": "Tempo restante em segundos."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Rótulos e ícone",
+          "description": "Rótulos de texto e ícone opcionais. Aplicam-se a qualquer modelo."
+        },
+        "steps_options": {
+          "name": "Opções de steps",
+          "description": "Apenas para o modelo steps."
+        },
+        "action_buttons": {
+          "name": "Botões de ação",
+          "description": "Botões de URL tocáveis. Apenas para os modelos steps e alert."
+        },
+        "display_options": {
+          "name": "Exibição, cor e som",
+          "description": "Estilo opcional e substituições por atualização. Aplicam-se a qualquer modelo."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Atualizar Atividade (Alert)",
+      "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "severity": {
+          "name": "Severidade",
+          "description": "Nível de severidade do alert."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progresso",
+          "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "fired_at": {
+          "name": "Disparado em",
+          "description": "Timestamp Unix quando o alert foi disparado. Apenas para o modelo alert."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL principal exibida como botão tocável. Suportado apenas nos modelos steps e alert."
+        },
+        "secondary_url": {
+          "name": "URL Secundária",
+          "description": "URL secundária exibida como segundo botão tocável. Suportado apenas nos modelos steps e alert."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Nome da cor de destaque da atividade."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "remaining_time": {
+          "name": "Tempo Restante",
+          "description": "Tempo restante em segundos."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Rótulos e ícone",
+          "description": "Rótulos de texto e ícone opcionais. Aplicam-se a qualquer modelo."
+        },
+        "alert_options": {
+          "name": "Opções de alert",
+          "description": "Apenas para o modelo alert."
+        },
+        "action_buttons": {
+          "name": "Botões de ação",
+          "description": "Botões de URL tocáveis. Apenas para os modelos steps e alert."
+        },
+        "display_options": {
+          "name": "Exibição, cor e som",
+          "description": "Estilo opcional e substituições por atualização. Aplicam-se a qualquer modelo."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Atualizar Atividade (Gauge)",
+      "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "value": {
+          "name": "Valor",
+          "description": "Gauge: valor numérico. Timeline: objeto de valores rotulados (ex.: Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Valor Mínimo",
+          "description": "Valor mínimo do gauge."
+        },
+        "max_value": {
+          "name": "Valor Máximo",
+          "description": "Valor máximo do gauge."
+        },
+        "unit": {
+          "name": "Unidade",
+          "description": "Unidade de exibição para o valor (ex.: °C, %)."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progresso",
+          "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Nome da cor de destaque da atividade."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "remaining_time": {
+          "name": "Tempo Restante",
+          "description": "Tempo restante em segundos."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Rótulos e ícone",
+          "description": "Rótulos de texto e ícone opcionais. Aplicam-se a qualquer modelo."
+        },
+        "display_options": {
+          "name": "Exibição, cor e som",
+          "description": "Estilo opcional e substituições por atualização. Aplicam-se a qualquer modelo."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Atualizar Atividade (Timeline)",
+      "description": "Atualizar o estado e o conteúdo de uma PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "value": {
+          "name": "Valor",
+          "description": "Gauge: valor numérico. Timeline: objeto de valores rotulados (ex.: Temp=22.5)."
+        },
+        "unit": {
+          "name": "Unidade",
+          "description": "Unidade de exibição para o valor (ex.: °C, %)."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progresso",
+          "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "units": {
+          "name": "Mapa de Unidades",
+          "description": "Rótulos de unidades por série. As chaves devem corresponder às chaves do value dict. Apenas para o modelo timeline."
+        },
+        "scale": {
+          "name": "Escala",
+          "description": "Modo de escala do eixo Y (linear ou logarítmico). Apenas para o modelo timeline."
+        },
+        "decimals": {
+          "name": "Casas Decimais",
+          "description": "Casas decimais para exibição de valores (0–10). Apenas para o modelo timeline."
+        },
+        "smoothing": {
+          "name": "Linhas Suavizadas",
+          "description": "Ativar interpolação de curva entre pontos de dados. Apenas para o modelo timeline."
+        },
+        "thresholds": {
+          "name": "Limites",
+          "description": "Linhas de referência horizontais no sparkline. Apenas para o modelo timeline."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Nome da cor de destaque da atividade."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "remaining_time": {
+          "name": "Tempo Restante",
+          "description": "Tempo restante em segundos."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Rótulos e ícone",
+          "description": "Rótulos de texto e ícone opcionais. Aplicam-se a qualquer modelo."
+        },
+        "gauge_timeline_options": {
+          "name": "Opções de gauge e timeline",
+          "description": "Apenas para os modelos gauge e timeline."
+        },
+        "display_options": {
+          "name": "Exibição, cor e som",
+          "description": "Estilo opcional e substituições por atualização. Aplicam-se a qualquer modelo."
+        }
+      }
+    },
     "create_activity": {
       "name": "Criar Atividade",
       "description": "Criar uma nova PushWard Live Activity.",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "Conectar ao PushWard",
-        "description": "Informe sua chave de integração PushWard para começar. O aplicativo iOS está atualmente em beta pública no TestFlight (ainda não está na App Store): {testflight_url}",
         "data": {
           "integration_key": "Chave de Integração"
-        },
-        "data_description": {
-          "integration_key": "Abra o aplicativo PushWard iOS (TestFlight: {testflight_url}) → Configurações → Chaves de Integração. Você pode colar a chave padrão ou criar uma nova com escopo 'ha-*'."
         }
       },
       "reconfigure": {

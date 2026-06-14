@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "سرگرمی اپڈیٹ کریں",
+      "name": "سرگرمی اپڈیٹ کریں (deprecated)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "مرحلے کے لیبل",
-          "description": "steps ٹیمپلیٹ کے مرحلوں کے لیے کسٹم لیبل۔ فارمیٹ: 1=لیبل، 2=لیبل۔ خالی ہونے پر مرحلے کے نمبر استعمال ہوتے ہیں۔"
+          "description": "مرحلوں کے لیبلز کی ترتیب شدہ فہرست۔ لمبائی total_steps کے برابر ہونی چاہیے۔ صرف steps ٹیمپلیٹ۔"
         },
         "step_rows": {
           "name": "مرحلے کی قطاریں",
-          "description": "steps ٹیمپلیٹ میں ایک قطار میں دکھائے جانے والے مراحل کی تعداد۔"
+          "description": "ہر مرحلے کے لیے قطار کی اونچائیوں (1-10) کی ترتیب شدہ فہرست۔ لمبائی total_steps کے برابر ہونی چاہیے۔ صرف steps ٹیمپلیٹ۔"
         },
         "fired_at": {
           "name": "فعال ہونے کا وقت",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "ایکشن بٹن",
           "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
+        },
+        "display_options": {
+          "name": "ڈسپلے، رنگ اور آواز",
+          "description": "اختیاری اسٹائلنگ اور فی اپڈیٹ اوور رائیڈز۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "سرگرمی اپڈیٹ کریں (Generic)",
+      "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً arrow.down.circle.fill، mdi:download)۔"
+        },
+        "progress": {
+          "name": "پیش رفت",
+          "description": "0.0 سے 1.0 کے درمیان پیش رفت کی قدر۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کے رنگ کا نام۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کا پس منظر رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کا متن رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "remaining_time": {
+          "name": "بقیہ وقت",
+          "description": "سیکنڈوں میں بقیہ وقت۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے اطلاع کی آواز کا نام۔ iOS کی کیڑے آواز کے لیے خالی چھوڑیں۔"
+        },
+        "priority": {
+          "name": "ترجیح",
+          "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "لیبلز اور آئیکن",
+          "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "display_options": {
+          "name": "ڈسپلے، رنگ اور آواز",
+          "description": "اختیاری اسٹائلنگ اور فی اپڈیٹ اوور رائیڈز۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "سرگرمی اپڈیٹ کریں (Countdown)",
+      "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "end_date": {
+          "name": "اختتام کی تاریخ",
+          "description": "countdown اختتامی تاریخ کے لیے Unix ٹائم اسٹیمپ۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً arrow.down.circle.fill، mdi:download)۔"
+        },
+        "progress": {
+          "name": "پیش رفت",
+          "description": "0.0 سے 1.0 کے درمیان پیش رفت کی قدر۔"
+        },
+        "warning_threshold": {
+          "name": "انتباہ کی حد",
+          "description": "gauge یا timeline قدر اس قدر کو پہنچنے یا اس سے تجاوز کرنے پر انتباہ رنگ ظاہر ہوتا ہے۔"
+        },
+        "alarm": {
+          "name": "الارم",
+          "description": "انتباہ کی حد تجاوز کرنے پر AlarmKit الارم کو متحرک کرتا ہے۔ صرف iOS 26+ پر کام کرتا ہے۔"
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کے رنگ کا نام۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کا پس منظر رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کا متن رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "remaining_time": {
+          "name": "بقیہ وقت",
+          "description": "سیکنڈوں میں بقیہ وقت۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے اطلاع کی آواز کا نام۔ iOS کی کیڑے آواز کے لیے خالی چھوڑیں۔"
+        },
+        "priority": {
+          "name": "ترجیح",
+          "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "لیبلز اور آئیکن",
+          "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "countdown_options": {
+          "name": "countdown اختیارات",
+          "description": "صرف countdown ٹیمپلیٹ کے لیے۔"
+        },
+        "display_options": {
+          "name": "ڈسپلے، رنگ اور آواز",
+          "description": "اختیاری اسٹائلنگ اور فی اپڈیٹ اوور رائیڈز۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "سرگرمی اپڈیٹ کریں (Steps)",
+      "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "total_steps": {
+          "name": "کل steps",
+          "description": "steps کی کل تعداد۔"
+        },
+        "current_step": {
+          "name": "موجودہ مرحلہ",
+          "description": "موجودہ مرحلے کا نمبر۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً arrow.down.circle.fill، mdi:download)۔"
+        },
+        "progress": {
+          "name": "پیش رفت",
+          "description": "0.0 سے 1.0 کے درمیان پیش رفت کی قدر۔"
+        },
+        "step_labels": {
+          "name": "مرحلے کے لیبل",
+          "description": "مرحلوں کے لیبلز کی ترتیب شدہ فہرست۔ لمبائی total_steps کے برابر ہونی چاہیے۔ صرف steps ٹیمپلیٹ۔"
+        },
+        "step_rows": {
+          "name": "مرحلے کی قطاریں",
+          "description": "ہر مرحلے کے لیے قطار کی اونچائیوں (1-10) کی ترتیب شدہ فہرست۔ لمبائی total_steps کے برابر ہونی چاہیے۔ صرف steps ٹیمپلیٹ۔"
+        },
+        "url": {
+          "name": "URL",
+          "description": "بنیادی URL جو ٹیپ کیے جانے والے بٹن کے طور پر ظاہر ہوتا ہے۔ صرف steps اور alert ٹیمپلیٹس پر سپورٹ ہے۔"
+        },
+        "secondary_url": {
+          "name": "ثانوی URL",
+          "description": "ثانوی URL جو دوسرے ٹیپ کیے جانے والے بٹن کے طور پر ظاہر ہوتا ہے۔ صرف steps اور alert ٹیمپلیٹس پر سپورٹ ہے۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کے رنگ کا نام۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کا پس منظر رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کا متن رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "remaining_time": {
+          "name": "بقیہ وقت",
+          "description": "سیکنڈوں میں بقیہ وقت۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے اطلاع کی آواز کا نام۔ iOS کی کیڑے آواز کے لیے خالی چھوڑیں۔"
+        },
+        "priority": {
+          "name": "ترجیح",
+          "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "لیبلز اور آئیکن",
+          "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "steps_options": {
+          "name": "steps اختیارات",
+          "description": "صرف steps ٹیمپلیٹ کے لیے۔"
+        },
+        "action_buttons": {
+          "name": "ایکشن بٹن",
+          "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
+        },
+        "display_options": {
+          "name": "ڈسپلے، رنگ اور آواز",
+          "description": "اختیاری اسٹائلنگ اور فی اپڈیٹ اوور رائیڈز۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "سرگرمی اپڈیٹ کریں (Alert)",
+      "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "severity": {
+          "name": "شدت",
+          "description": "alert کی شدت کی سطح۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً arrow.down.circle.fill، mdi:download)۔"
+        },
+        "progress": {
+          "name": "پیش رفت",
+          "description": "0.0 سے 1.0 کے درمیان پیش رفت کی قدر۔"
+        },
+        "fired_at": {
+          "name": "فعال ہونے کا وقت",
+          "description": "سرگرمی فعال ہونے کی Unix ٹائم اسٹیمپ۔ ملتوی وقت ظاہر کرنے کے لیے استعمال ہوتی ہے۔"
+        },
+        "url": {
+          "name": "URL",
+          "description": "بنیادی URL جو ٹیپ کیے جانے والے بٹن کے طور پر ظاہر ہوتا ہے۔ صرف steps اور alert ٹیمپلیٹس پر سپورٹ ہے۔"
+        },
+        "secondary_url": {
+          "name": "ثانوی URL",
+          "description": "ثانوی URL جو دوسرے ٹیپ کیے جانے والے بٹن کے طور پر ظاہر ہوتا ہے۔ صرف steps اور alert ٹیمپلیٹس پر سپورٹ ہے۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کے رنگ کا نام۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کا پس منظر رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کا متن رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "remaining_time": {
+          "name": "بقیہ وقت",
+          "description": "سیکنڈوں میں بقیہ وقت۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے اطلاع کی آواز کا نام۔ iOS کی کیڑے آواز کے لیے خالی چھوڑیں۔"
+        },
+        "priority": {
+          "name": "ترجیح",
+          "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "لیبلز اور آئیکن",
+          "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "alert_options": {
+          "name": "alert اختیارات",
+          "description": "صرف alert ٹیمپلیٹ کے لیے۔"
+        },
+        "action_buttons": {
+          "name": "ایکشن بٹن",
+          "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
+        },
+        "display_options": {
+          "name": "ڈسپلے، رنگ اور آواز",
+          "description": "اختیاری اسٹائلنگ اور فی اپڈیٹ اوور رائیڈز۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "سرگرمی اپڈیٹ کریں (Gauge)",
+      "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "value": {
+          "name": "قدر",
+          "description": "Gauge: عددی قدر۔ Timeline: لیبل شدہ قدروں کی آبجیکٹ (مثلاً Temp=22.5)۔"
+        },
+        "min_value": {
+          "name": "کم از کم قدر",
+          "description": "Gauge کی کم از کم قدر۔"
+        },
+        "max_value": {
+          "name": "زیادہ سے زیادہ قدر",
+          "description": "Gauge کی زیادہ سے زیادہ قدر۔"
+        },
+        "unit": {
+          "name": "اکائی",
+          "description": "قدر کے ساتھ ظاہر ہونے والی اکائی (مثلاً °C، %)۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً arrow.down.circle.fill، mdi:download)۔"
+        },
+        "progress": {
+          "name": "پیش رفت",
+          "description": "0.0 سے 1.0 کے درمیان پیش رفت کی قدر۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کے رنگ کا نام۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کا پس منظر رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کا متن رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "remaining_time": {
+          "name": "بقیہ وقت",
+          "description": "سیکنڈوں میں بقیہ وقت۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے اطلاع کی آواز کا نام۔ iOS کی کیڑے آواز کے لیے خالی چھوڑیں۔"
+        },
+        "priority": {
+          "name": "ترجیح",
+          "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "لیبلز اور آئیکن",
+          "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "display_options": {
+          "name": "ڈسپلے، رنگ اور آواز",
+          "description": "اختیاری اسٹائلنگ اور فی اپڈیٹ اوور رائیڈز۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "سرگرمی اپڈیٹ کریں (Timeline)",
+      "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "value": {
+          "name": "قدر",
+          "description": "Gauge: عددی قدر۔ Timeline: لیبل شدہ قدروں کی آبجیکٹ (مثلاً Temp=22.5)۔"
+        },
+        "unit": {
+          "name": "اکائی",
+          "description": "قدر کے ساتھ ظاہر ہونے والی اکائی (مثلاً °C، %)۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً arrow.down.circle.fill، mdi:download)۔"
+        },
+        "progress": {
+          "name": "پیش رفت",
+          "description": "0.0 سے 1.0 کے درمیان پیش رفت کی قدر۔"
+        },
+        "units": {
+          "name": "اکائیاں",
+          "description": "Timeline سیریز کے لیے اکائی لیبل۔ فارمیٹ: attribute=اکائی۔ مثال: temp=°C، humidity=%"
+        },
+        "scale": {
+          "name": "پیمانہ",
+          "description": "Y-محور کا پیمانہ (linear یا logarithmic)۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        },
+        "decimals": {
+          "name": "اعشاریہ مقامات",
+          "description": "قدر ظاہر کرنے کے لیے اعشاریہ مقامات (0-10)۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        },
+        "smoothing": {
+          "name": "ہموار لکیریں",
+          "description": "ڈیٹا پوائنٹس کے درمیان منحنی انٹرپولیشن فعال کریں۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        },
+        "thresholds": {
+          "name": "حدود",
+          "description": "sparkline پر افقی حوالہ لکیریں۔ صرف Timeline ٹیمپلیٹ کے لیے۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کے رنگ کا نام۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کا پس منظر رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کا متن رنگ۔ #RRGGBB یا نامزد رنگ۔ کیڑے ڈیفالٹ کے لیے خالی چھوڑیں۔"
+        },
+        "remaining_time": {
+          "name": "بقیہ وقت",
+          "description": "سیکنڈوں میں بقیہ وقت۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے اطلاع کی آواز کا نام۔ iOS کی کیڑے آواز کے لیے خالی چھوڑیں۔"
+        },
+        "priority": {
+          "name": "ترجیح",
+          "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "لیبلز اور آئیکن",
+          "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge اور timeline اختیارات",
+          "description": "صرف gauge اور timeline ٹیمپلیٹس کے لیے۔"
         },
         "display_options": {
           "name": "ڈسپلے، رنگ اور آواز",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "PushWard سے جڑیں",
-        "description": "شروع کرنے کے لیے اپنی PushWard انٹیگریشن کی درج کریں۔ iOS ایپ ابھی App Store پر دستیاب نہیں ہے؛ یہ فی الحال TestFlight پر پبلک بیٹا میں ہے: {testflight_url}",
         "data": {
           "integration_key": "انٹیگریشن کی"
-        },
-        "data_description": {
-          "integration_key": "PushWard iOS ایپ کھولیں (TestFlight: {testflight_url}) → Settings → Integration Keys۔ آپ ڈیفالٹ کی پیسٹ کر سکتے ہیں، یا 'ha-*' scope کے ساتھ نئی کی بنا سکتے ہیں۔"
         }
       },
       "reconfigure": {

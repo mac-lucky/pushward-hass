@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "I-update ang Activity",
+      "name": "I-update ang Activity (deprecated)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "Mga Label ng Hakbang",
-          "description": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang."
+          "description": "Nakaayos na listahan ng mga label ng hakbang. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
         },
         "step_rows": {
           "name": "Mga Hilera ng Hakbang",
-          "description": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template."
+          "description": "Nakaayos na listahan ng mga taas ng hilera (1-10) bawat hakbang. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
         },
         "fired_at": {
           "name": "Oras ng Pag-trigger",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "Mga action button",
           "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
+        },
+        "display_options": {
+          "name": "Display, kulay at tunog",
+          "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "I-update ang Activity (Generic)",
+      "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progreso",
+          "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Pangalan ng accent color para sa activity."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "remaining_time": {
+          "name": "Natitirang Oras",
+          "description": "Natitirang oras sa mga segundo."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Mga label at icon",
+          "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "display_options": {
+          "name": "Display, kulay at tunog",
+          "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "I-update ang Activity (Countdown)",
+      "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "end_date": {
+          "name": "Petsa ng Pagtatapos",
+          "description": "Unix timestamp para sa petsa ng pagtatapos ng countdown."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progreso",
+          "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "warning_threshold": {
+          "name": "Babala na Threshold",
+          "description": "Kapag ang halaga ng gauge o timeline ay umabot o lumampas sa halagang ito, ipinapakita ang kulay ng babala."
+        },
+        "alarm": {
+          "name": "Alarma",
+          "description": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Gumagana lamang sa iOS 26+."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Pangalan ng accent color para sa activity."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "remaining_time": {
+          "name": "Natitirang Oras",
+          "description": "Natitirang oras sa mga segundo."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Mga label at icon",
+          "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "countdown_options": {
+          "name": "Mga opsyon ng countdown",
+          "description": "Para sa countdown template lamang."
+        },
+        "display_options": {
+          "name": "Display, kulay at tunog",
+          "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "I-update ang Activity (Steps)",
+      "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "total_steps": {
+          "name": "Kabuuang Steps",
+          "description": "Kabuuang bilang ng mga steps."
+        },
+        "current_step": {
+          "name": "Kasalukuyang Hakbang",
+          "description": "Numero ng kasalukuyang hakbang."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progreso",
+          "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "step_labels": {
+          "name": "Mga Label ng Hakbang",
+          "description": "Nakaayos na listahan ng mga label ng hakbang. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
+        },
+        "step_rows": {
+          "name": "Mga Hilera ng Hakbang",
+          "description": "Nakaayos na listahan ng mga taas ng hilera (1-10) bawat hakbang. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Pangunahing URL na ipinapakita bilang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL na ipinapakita bilang pangalawang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Pangalan ng accent color para sa activity."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "remaining_time": {
+          "name": "Natitirang Oras",
+          "description": "Natitirang oras sa mga segundo."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Mga label at icon",
+          "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "steps_options": {
+          "name": "Mga opsyon ng steps",
+          "description": "Para sa steps template lamang."
+        },
+        "action_buttons": {
+          "name": "Mga action button",
+          "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
+        },
+        "display_options": {
+          "name": "Display, kulay at tunog",
+          "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "I-update ang Activity (Alert)",
+      "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "severity": {
+          "name": "Kalubhaan",
+          "description": "Antas ng kalubhaan ng alert."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progreso",
+          "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "fired_at": {
+          "name": "Oras ng Pag-trigger",
+          "description": "Unix timestamp ng pag-trigger ng activity. Ginagamit para ipakita ang kamag-anak na oras."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Pangunahing URL na ipinapakita bilang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL na ipinapakita bilang pangalawang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Pangalan ng accent color para sa activity."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "remaining_time": {
+          "name": "Natitirang Oras",
+          "description": "Natitirang oras sa mga segundo."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Mga label at icon",
+          "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "alert_options": {
+          "name": "Mga opsyon ng alert",
+          "description": "Para sa alert template lamang."
+        },
+        "action_buttons": {
+          "name": "Mga action button",
+          "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
+        },
+        "display_options": {
+          "name": "Display, kulay at tunog",
+          "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "I-update ang Activity (Gauge)",
+      "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "value": {
+          "name": "Halaga",
+          "description": "Gauge: numerikong halaga. Timeline: object ng mga may label na halaga (hal. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Pinakamababang Halaga",
+          "description": "Pinakamababang halaga ng gauge."
+        },
+        "max_value": {
+          "name": "Pinakamataas na Halaga",
+          "description": "Pinakamataas na halaga ng gauge."
+        },
+        "unit": {
+          "name": "Yunit",
+          "description": "Yunit na ipinapakita para sa halaga (hal. °C, %)."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progreso",
+          "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Pangalan ng accent color para sa activity."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "remaining_time": {
+          "name": "Natitirang Oras",
+          "description": "Natitirang oras sa mga segundo."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Mga label at icon",
+          "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "display_options": {
+          "name": "Display, kulay at tunog",
+          "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "I-update ang Activity (Timeline)",
+      "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "value": {
+          "name": "Halaga",
+          "description": "Gauge: numerikong halaga. Timeline: object ng mga may label na halaga (hal. Temp=22.5)."
+        },
+        "unit": {
+          "name": "Yunit",
+          "description": "Yunit na ipinapakita para sa halaga (hal. °C, %)."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progreso",
+          "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "units": {
+          "name": "Mga Yunit",
+          "description": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "Sukat",
+          "description": "Mode ng sukat ng Y-axis (linear o logarithmic). Para sa timeline template lamang."
+        },
+        "decimals": {
+          "name": "Mga Decimal na Lugar",
+          "description": "Mga decimal na lugar para sa pagpapakita ng halaga (0-10). Para sa timeline template lamang."
+        },
+        "smoothing": {
+          "name": "Maayos na Linya",
+          "description": "Paganahin ang curve interpolation sa pagitan ng mga data point. Para sa timeline template lamang."
+        },
+        "thresholds": {
+          "name": "Mga Threshold",
+          "description": "Mga pahalang na reference line sa sparkline. Para sa timeline template lamang."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Pangalan ng accent color para sa activity."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema."
+        },
+        "remaining_time": {
+          "name": "Natitirang Oras",
+          "description": "Natitirang oras sa mga segundo."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS."
+        },
+        "priority": {
+          "name": "Priyoridad",
+          "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Mga label at icon",
+          "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "gauge_timeline_options": {
+          "name": "Mga opsyon ng gauge at timeline",
+          "description": "Para sa gauge at timeline na template lamang."
         },
         "display_options": {
           "name": "Display, kulay at tunog",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "Kumonekta sa PushWard",
-        "description": "Ilagay ang iyong PushWard integration key para makapagsimula. Ang iOS app ay kasalukuyang nasa public beta sa TestFlight (hindi pa sa App Store): {testflight_url}",
         "data": {
           "integration_key": "Integration Key"
-        },
-        "data_description": {
-          "integration_key": "Buksan ang PushWard iOS app (TestFlight: {testflight_url}) → Settings → Integration Keys. Maaari mong i-paste ang default key, o lumikha ng bago na may scope na 'ha-*'."
         }
       },
       "reconfigure": {

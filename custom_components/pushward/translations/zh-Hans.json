@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "更新活动",
+      "name": "更新活动 (deprecated)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
         "slug": {
@@ -168,6 +168,538 @@
         }
       }
     },
+    "update_activity_generic": {
+      "name": "更新活动 (Generic)",
+      "description": "更新 PushWard Live Activity 的状态和内容。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
+        },
+        "progress": {
+          "name": "进度",
+          "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "remaining_time": {
+          "name": "剩余时间",
+          "description": "剩余时间（秒）。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "标签和图标",
+          "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "display_options": {
+          "name": "显示、颜色和声音",
+          "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "更新活动 (Countdown)",
+      "description": "更新 PushWard Live Activity 的状态和内容。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "end_date": {
+          "name": "结束日期",
+          "description": "countdown 结束日期的 Unix 时间戳。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
+        },
+        "progress": {
+          "name": "进度",
+          "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "warning_threshold": {
+          "name": "警告阈值",
+          "description": "倒计时进入警告状态前距 end_date 的秒数。仅适用于 countdown 模板。"
+        },
+        "alarm": {
+          "name": "闹钟",
+          "description": "在倒计时到期时触发 AlarmKit 闹钟（iOS 26+，仅适用于 countdown 模板）。"
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "remaining_time": {
+          "name": "剩余时间",
+          "description": "剩余时间（秒）。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "标签和图标",
+          "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "countdown_options": {
+          "name": "countdown 选项",
+          "description": "仅适用于 countdown 模板。"
+        },
+        "display_options": {
+          "name": "显示、颜色和声音",
+          "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "更新活动 (Steps)",
+      "description": "更新 PushWard Live Activity 的状态和内容。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "total_steps": {
+          "name": "总 steps 数",
+          "description": "steps 总数。"
+        },
+        "current_step": {
+          "name": "当前步骤",
+          "description": "当前步骤编号。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
+        },
+        "progress": {
+          "name": "进度",
+          "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "step_labels": {
+          "name": "步骤标签",
+          "description": "步骤标签的有序列表。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "step_rows": {
+          "name": "步骤行高",
+          "description": "每个步骤的行高（1-10）有序列表。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "作为可点击按钮显示的主要 URL。仅支持 steps 和 alert 模板。"
+        },
+        "secondary_url": {
+          "name": "次要 URL",
+          "description": "作为第二个可点击按钮显示的次要 URL。仅支持 steps 和 alert 模板。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "remaining_time": {
+          "name": "剩余时间",
+          "description": "剩余时间（秒）。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "标签和图标",
+          "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "steps_options": {
+          "name": "steps 选项",
+          "description": "仅适用于 steps 模板。"
+        },
+        "action_buttons": {
+          "name": "操作按钮",
+          "description": "可点击的 URL 按钮。仅适用于 steps 和 alert 模板。"
+        },
+        "display_options": {
+          "name": "显示、颜色和声音",
+          "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "更新活动 (Alert)",
+      "description": "更新 PushWard Live Activity 的状态和内容。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "severity": {
+          "name": "严重程度",
+          "description": "alert 严重程度级别。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
+        },
+        "progress": {
+          "name": "进度",
+          "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "fired_at": {
+          "name": "触发时间",
+          "description": "告警触发时的 Unix 时间戳。仅适用于 alert 模板。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "作为可点击按钮显示的主要 URL。仅支持 steps 和 alert 模板。"
+        },
+        "secondary_url": {
+          "name": "次要 URL",
+          "description": "作为第二个可点击按钮显示的次要 URL。仅支持 steps 和 alert 模板。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "remaining_time": {
+          "name": "剩余时间",
+          "description": "剩余时间（秒）。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "标签和图标",
+          "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "alert_options": {
+          "name": "alert 选项",
+          "description": "仅适用于 alert 模板。"
+        },
+        "action_buttons": {
+          "name": "操作按钮",
+          "description": "可点击的 URL 按钮。仅适用于 steps 和 alert 模板。"
+        },
+        "display_options": {
+          "name": "显示、颜色和声音",
+          "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "更新活动 (Gauge)",
+      "description": "更新 PushWard Live Activity 的状态和内容。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "value": {
+          "name": "值",
+          "description": "gauge：数值。timeline：带标签的值对象（例如 Temp=22.5）。"
+        },
+        "min_value": {
+          "name": "最小值",
+          "description": "gauge 的最小值。"
+        },
+        "max_value": {
+          "name": "最大值",
+          "description": "gauge 的最大值。"
+        },
+        "unit": {
+          "name": "单位",
+          "description": "值的显示单位（例如 °C、%）。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
+        },
+        "progress": {
+          "name": "进度",
+          "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "remaining_time": {
+          "name": "剩余时间",
+          "description": "剩余时间（秒）。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "标签和图标",
+          "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "display_options": {
+          "name": "显示、颜色和声音",
+          "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "更新活动 (Timeline)",
+      "description": "更新 PushWard Live Activity 的状态和内容。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "value": {
+          "name": "值",
+          "description": "gauge：数值。timeline：带标签的值对象（例如 Temp=22.5）。"
+        },
+        "unit": {
+          "name": "单位",
+          "description": "值的显示单位（例如 °C、%）。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
+        },
+        "progress": {
+          "name": "进度",
+          "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "units": {
+          "name": "单位映射",
+          "description": "每个系列的单位标签。键必须与 value dict 的键匹配。仅适用于 timeline 模板。"
+        },
+        "scale": {
+          "name": "刻度",
+          "description": "Y 轴刻度模式（线性或对数）。仅适用于 timeline 模板。"
+        },
+        "decimals": {
+          "name": "小数位数",
+          "description": "值显示的小数位数（0-10）。仅适用于 timeline 模板。"
+        },
+        "smoothing": {
+          "name": "平滑曲线",
+          "description": "启用数据点之间的曲线插值。仅适用于 timeline 模板。"
+        },
+        "thresholds": {
+          "name": "阈值",
+          "description": "迷你图上的水平参考线。仅适用于 timeline 模板。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "remaining_time": {
+          "name": "剩余时间",
+          "description": "剩余时间（秒）。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "标签和图标",
+          "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge 和 timeline 选项",
+          "description": "仅适用于 gauge 和 timeline 模板。"
+        },
+        "display_options": {
+          "name": "显示、颜色和声音",
+          "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        }
+      }
+    },
     "create_activity": {
       "name": "创建活动",
       "description": "创建新的 PushWard Live Activity。",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "连接到 PushWard",
-        "description": "输入您的 PushWard 集成密钥以开始使用。iOS 应用目前在 TestFlight 公测中(尚未在 App Store 上架):{testflight_url}",
         "data": {
           "integration_key": "集成密钥"
-        },
-        "data_description": {
-          "integration_key": "打开 PushWard iOS 应用(TestFlight:{testflight_url})→ 设置 → 集成密钥。您可以直接粘贴默认密钥,或创建一个范围为 'ha-*' 的新密钥。"
         }
       },
       "reconfigure": {

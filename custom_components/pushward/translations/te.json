@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Activity అప్‌డేట్ చేయి",
+      "name": "Activity అప్‌డేట్ చేయి (deprecated)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "స్టెప్ లేబుళ్ళు",
-          "description": "steps టెంప్లేట్ స్టెప్‌లకు అనుకూల లేబుళ్ళు. ఆకృతి: 1=లేబుల్, 2=లేబుల్. ఖాళీగా వదిలితే స్టెప్ నంబర్లు ఉపయోగించబడతాయి."
+          "description": "స్టెప్ లేబుళ్ళ క్రమబద్ధ జాబితా. పొడవు total_steps కి సమానంగా ఉండాలి. steps టెంప్లేట్ మాత్రమే."
         },
         "step_rows": {
           "name": "స్టెప్ వరుసలు",
-          "description": "steps టెంప్లేట్‌లో ఒక వరుసలో చూపించే స్టెప్‌ల సంఖ్య."
+          "description": "ప్రతి స్టెప్‌కు వరుస ఎత్తుల (1-10) క్రమబద్ధ జాబితా. పొడవు total_steps కి సమానంగా ఉండాలి. steps టెంప్లేట్ మాత్రమే."
         },
         "fired_at": {
           "name": "ట్రిగ్గర్ సమయం",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "చర్య బటన్‌లు",
           "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
+        },
+        "display_options": {
+          "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
+          "description": "ఐచ్ఛిక శైలి మరియు ప్రతి-నవీకరణ ఓవర్‌రైడ్‌లు. ఏ టెంప్లేట్‌కైనా వర్తిస్తాయి."
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "Activity అప్‌డేట్ చేయి (Generic)",
+      "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "పురోగతి",
+          "description": "0.0 మరియు 1.0 మధ్య పురోగతి విలువ."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity నేపథ్య రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity టెక్స్ట్ రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "remaining_time": {
+          "name": "మిగిలిన సమయం",
+          "description": "సెకన్లలో మిగిలిన సమయం."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం నోటిఫికేషన్ సౌండ్ పేరు. iOS సిస్టమ్ సౌండ్ ఉపయోగించడానికి ఖాళీగా వదలండి."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత",
+          "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "లేబుళ్ళు & చిహ్నం",
+          "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "display_options": {
+          "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
+          "description": "ఐచ్ఛిక శైలి మరియు ప్రతి-నవీకరణ ఓవర్‌రైడ్‌లు. ఏ టెంప్లేట్‌కైనా వర్తిస్తాయి."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Activity అప్‌డేట్ చేయి (Countdown)",
+      "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "end_date": {
+          "name": "ముగింపు తేదీ",
+          "description": "countdown ముగింపు తేదీ కోసం Unix టైమ్‌స్టాంప్."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "పురోగతి",
+          "description": "0.0 మరియు 1.0 మధ్య పురోగతి విలువ."
+        },
+        "warning_threshold": {
+          "name": "హెచ్చరిక థ్రెషోల్డ్",
+          "description": "gauge లేదా timeline విలువ ఈ విలువకు చేరినప్పుడు లేదా మించినప్పుడు హెచ్చరిక రంగు చూపబడుతుంది."
+        },
+        "alarm": {
+          "name": "అలారం",
+          "description": "హెచ్చరిక థ్రెషోల్డ్ మించినప్పుడు AlarmKit అలారంను ట్రిగ్గర్ చేస్తుంది. iOS 26+ పై మాత్రమే పనిచేస్తుంది."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity నేపథ్య రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity టెక్స్ట్ రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "remaining_time": {
+          "name": "మిగిలిన సమయం",
+          "description": "సెకన్లలో మిగిలిన సమయం."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం నోటిఫికేషన్ సౌండ్ పేరు. iOS సిస్టమ్ సౌండ్ ఉపయోగించడానికి ఖాళీగా వదలండి."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత",
+          "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "లేబుళ్ళు & చిహ్నం",
+          "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "countdown_options": {
+          "name": "countdown ఎంపికలు",
+          "description": "countdown టెంప్లేట్ మాత్రమే."
+        },
+        "display_options": {
+          "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
+          "description": "ఐచ్ఛిక శైలి మరియు ప్రతి-నవీకరణ ఓవర్‌రైడ్‌లు. ఏ టెంప్లేట్‌కైనా వర్తిస్తాయి."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Activity అప్‌డేట్ చేయి (Steps)",
+      "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "total_steps": {
+          "name": "మొత్తం steps",
+          "description": "మొత్తం steps సంఖ్య."
+        },
+        "current_step": {
+          "name": "ప్రస్తుత దశ",
+          "description": "ప్రస్తుత దశ సంఖ్య."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "పురోగతి",
+          "description": "0.0 మరియు 1.0 మధ్య పురోగతి విలువ."
+        },
+        "step_labels": {
+          "name": "స్టెప్ లేబుళ్ళు",
+          "description": "స్టెప్ లేబుళ్ళ క్రమబద్ధ జాబితా. పొడవు total_steps కి సమానంగా ఉండాలి. steps టెంప్లేట్ మాత్రమే."
+        },
+        "step_rows": {
+          "name": "స్టెప్ వరుసలు",
+          "description": "ప్రతి స్టెప్‌కు వరుస ఎత్తుల (1-10) క్రమబద్ధ జాబితా. పొడవు total_steps కి సమానంగా ఉండాలి. steps టెంప్లేట్ మాత్రమే."
+        },
+        "url": {
+          "name": "URL",
+          "description": "నొక్కగలిగే బటన్‌గా చూపబడే ప్రాథమిక URL. steps మరియు alert టెంప్లేట్‌లలో మాత్రమే మద్దతు ఉంది."
+        },
+        "secondary_url": {
+          "name": "ద్వితీయ URL",
+          "description": "రెండవ నొక్కగలిగే బటన్‌గా చూపబడే ద్వితీయ URL. steps మరియు alert టెంప్లేట్‌లలో మాత్రమే మద్దతు ఉంది."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity నేపథ్య రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity టెక్స్ట్ రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "remaining_time": {
+          "name": "మిగిలిన సమయం",
+          "description": "సెకన్లలో మిగిలిన సమయం."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం నోటిఫికేషన్ సౌండ్ పేరు. iOS సిస్టమ్ సౌండ్ ఉపయోగించడానికి ఖాళీగా వదలండి."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత",
+          "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "లేబుళ్ళు & చిహ్నం",
+          "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "steps_options": {
+          "name": "steps ఎంపికలు",
+          "description": "steps టెంప్లేట్ మాత్రమే."
+        },
+        "action_buttons": {
+          "name": "చర్య బటన్‌లు",
+          "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
+        },
+        "display_options": {
+          "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
+          "description": "ఐచ్ఛిక శైలి మరియు ప్రతి-నవీకరణ ఓవర్‌రైడ్‌లు. ఏ టెంప్లేట్‌కైనా వర్తిస్తాయి."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Activity అప్‌డేట్ చేయి (Alert)",
+      "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "severity": {
+          "name": "తీవ్రత",
+          "description": "alert తీవ్రత స్థాయి."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "పురోగతి",
+          "description": "0.0 మరియు 1.0 మధ్య పురోగతి విలువ."
+        },
+        "fired_at": {
+          "name": "ట్రిగ్గర్ సమయం",
+          "description": "Activity ట్రిగ్గర్ అయిన Unix టైమ్‌స్టాంప్. సాపేక్ష సమయం చూపడానికి ఉపయోగించబడుతుంది."
+        },
+        "url": {
+          "name": "URL",
+          "description": "నొక్కగలిగే బటన్‌గా చూపబడే ప్రాథమిక URL. steps మరియు alert టెంప్లేట్‌లలో మాత్రమే మద్దతు ఉంది."
+        },
+        "secondary_url": {
+          "name": "ద్వితీయ URL",
+          "description": "రెండవ నొక్కగలిగే బటన్‌గా చూపబడే ద్వితీయ URL. steps మరియు alert టెంప్లేట్‌లలో మాత్రమే మద్దతు ఉంది."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity నేపథ్య రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity టెక్స్ట్ రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "remaining_time": {
+          "name": "మిగిలిన సమయం",
+          "description": "సెకన్లలో మిగిలిన సమయం."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం నోటిఫికేషన్ సౌండ్ పేరు. iOS సిస్టమ్ సౌండ్ ఉపయోగించడానికి ఖాళీగా వదలండి."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత",
+          "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "లేబుళ్ళు & చిహ్నం",
+          "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "alert_options": {
+          "name": "alert ఎంపికలు",
+          "description": "alert టెంప్లేట్ మాత్రమే."
+        },
+        "action_buttons": {
+          "name": "చర్య బటన్‌లు",
+          "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
+        },
+        "display_options": {
+          "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
+          "description": "ఐచ్ఛిక శైలి మరియు ప్రతి-నవీకరణ ఓవర్‌రైడ్‌లు. ఏ టెంప్లేట్‌కైనా వర్తిస్తాయి."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Activity అప్‌డేట్ చేయి (Gauge)",
+      "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "value": {
+          "name": "విలువ",
+          "description": "Gauge: సంఖ్యా విలువ. Timeline: లేబుల్ చేయబడిన విలువల ఆబ్జెక్ట్ (ఉదా. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "కనిష్ట విలువ",
+          "description": "కనిష్ట gauge విలువ."
+        },
+        "max_value": {
+          "name": "గరిష్ట విలువ",
+          "description": "గరిష్ట gauge విలువ."
+        },
+        "unit": {
+          "name": "యూనిట్",
+          "description": "విలువ పక్కన చూపబడే యూనిట్ (ఉదా. °C, %)."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "పురోగతి",
+          "description": "0.0 మరియు 1.0 మధ్య పురోగతి విలువ."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity నేపథ్య రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity టెక్స్ట్ రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "remaining_time": {
+          "name": "మిగిలిన సమయం",
+          "description": "సెకన్లలో మిగిలిన సమయం."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం నోటిఫికేషన్ సౌండ్ పేరు. iOS సిస్టమ్ సౌండ్ ఉపయోగించడానికి ఖాళీగా వదలండి."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత",
+          "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "లేబుళ్ళు & చిహ్నం",
+          "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "display_options": {
+          "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
+          "description": "ఐచ్ఛిక శైలి మరియు ప్రతి-నవీకరణ ఓవర్‌రైడ్‌లు. ఏ టెంప్లేట్‌కైనా వర్తిస్తాయి."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Activity అప్‌డేట్ చేయి (Timeline)",
+      "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "value": {
+          "name": "విలువ",
+          "description": "Gauge: సంఖ్యా విలువ. Timeline: లేబుల్ చేయబడిన విలువల ఆబ్జెక్ట్ (ఉదా. Temp=22.5)."
+        },
+        "unit": {
+          "name": "యూనిట్",
+          "description": "విలువ పక్కన చూపబడే యూనిట్ (ఉదా. °C, %)."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "పురోగతి",
+          "description": "0.0 మరియు 1.0 మధ్య పురోగతి విలువ."
+        },
+        "units": {
+          "name": "యూనిట్లు",
+          "description": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "స్కేల్",
+          "description": "Y-అక్షం స్కేల్ మోడ్ (linear లేదా logarithmic). Timeline టెంప్లేట్ మాత్రమే."
+        },
+        "decimals": {
+          "name": "దశాంశ స్థానాలు",
+          "description": "విలువ ప్రదర్శన కోసం దశాంశ స్థానాలు (0-10). Timeline టెంప్లేట్ మాత్రమే."
+        },
+        "smoothing": {
+          "name": "మృదువైన రేఖలు",
+          "description": "డేటా పాయింట్ల మధ్య వక్ర ఇంటర్‌పోలేషన్ ప్రారంభించండి. Timeline టెంప్లేట్ మాత్రమే."
+        },
+        "thresholds": {
+          "name": "థ్రెషోల్డ్‌లు",
+          "description": "స్పార్క్‌లైన్‌పై క్షితిజ సమాంతర సూచన రేఖలు. Timeline టెంప్లేట్ మాత్రమే."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity నేపథ్య రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity టెక్స్ట్ రంగు. #RRGGBB లేదా పేరున్న రంగు. సిస్టమ్ డిఫాల్ట్ కోసం ఖాళీగా వదలండి."
+        },
+        "remaining_time": {
+          "name": "మిగిలిన సమయం",
+          "description": "సెకన్లలో మిగిలిన సమయం."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం నోటిఫికేషన్ సౌండ్ పేరు. iOS సిస్టమ్ సౌండ్ ఉపయోగించడానికి ఖాళీగా వదలండి."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత",
+          "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "లేబుళ్ళు & చిహ్నం",
+          "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge మరియు timeline ఎంపికలు",
+          "description": "gauge మరియు timeline టెంప్లేట్‌లు మాత్రమే."
         },
         "display_options": {
           "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "PushWard కు కనెక్ట్ అవ్వండి",
-        "description": "ప్రారంభించడానికి మీ PushWard ఇంటిగ్రేషన్ కీని నమోదు చేయండి. iOS యాప్ ప్రస్తుతం App Store లో లేదు; ఇది TestFlight లో పబ్లిక్ బీటాలో ఉంది: {testflight_url}",
         "data": {
           "integration_key": "ఇంటిగ్రేషన్ కీ"
-        },
-        "data_description": {
-          "integration_key": "PushWard iOS యాప్‌ను తెరవండి (TestFlight: {testflight_url}) → Settings → Integration Keys. మీరు డిఫాల్ట్ కీని పేస్ట్ చేయవచ్చు లేదా 'ha-*' స్కోప్‌తో కొత్తదాన్ని సృష్టించవచ్చు."
         }
       },
       "reconfigure": {

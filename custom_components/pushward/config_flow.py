@@ -35,6 +35,7 @@ from homeassistant.helpers.selector import (
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
+    APP_STORE_URL,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
@@ -130,7 +131,6 @@ from .const import (
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
-    TESTFLIGHT_URL,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
     WARNING_THRESHOLD_MAX,
@@ -929,7 +929,7 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=_INTEGRATION_KEY_SCHEMA,
             errors=errors,
-            description_placeholders={"testflight_url": TESTFLIGHT_URL},
+            description_placeholders={"app_store_url": APP_STORE_URL},
         )
 
     async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:

@@ -1,6 +1,6 @@
 update_activity:
-  name: Update Activity
-  description: Update a PushWard Live Activity state and content.
+  name: Update Activity (deprecated)
+  description: "Deprecated — use the template-specific Update actions (e.g. Update Activity (Countdown)). Kept for backward compatibility; will be removed in a future release."
   fields:
     slug:
       name: Slug
@@ -20,8 +20,7 @@ update_activity:
             - "ended"
     template:
       name: Template
-      description: "Required. Activity layout template. For steps: also provide total_steps and current_step. For alert: also provide severity. For gauge: also provide min_value and max_value. For countdown: also provide end_date."
-      required: true
+      description: "Activity layout template. Optional — omit to keep the activity's current template. For steps also set total_steps and current_step; for alert, severity; for gauge, min_value and max_value; for countdown, end_date."
       example: "generic"
       selector:
         select:
@@ -122,7 +121,7 @@ update_activity:
               mode: box
         step_labels:
           name: Step Labels
-          description: Labels for each step as a YAML object keyed by step number (e.g. {"1":"Step 1","2":"Step 2"}). Steps template only.
+          description: 'Labels for each step, in order, as a list — one per step (e.g. ["Build","Test","Deploy"]). Length must equal total_steps. Steps template only.'
           selector:
             object:
         step_rows:
@@ -278,6 +277,653 @@ update_activity:
         priority:
           name: Priority Override
           description: Override activity priority for this update (0 = lowest, 10 = highest).
+          example: 5
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: slider
+
+update_activity_generic:
+  fields:
+    slug:
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    state_text:
+      example: "Downloading"
+      selector:
+        text:
+    labels:
+      collapsed: true
+      fields:
+        subtitle:
+          example: "episode-01.mkv"
+          selector:
+            text:
+        icon:
+          example: "arrow.down.circle.fill"
+          selector:
+            text:
+        progress:
+          example: 0.5
+          selector:
+            number:
+              min: 0.0
+              max: 1.0
+              step: 0.01
+              mode: slider
+    display_options:
+      collapsed: true
+      fields:
+        completion_message:
+          example: "Download complete!"
+          selector:
+            text:
+        accent_color:
+          example: "blue"
+          selector:
+            text:
+        background_color:
+          example: "#1a2b3c"
+          selector:
+            text:
+        text_color:
+          example: "#ffffff"
+          selector:
+            text:
+        remaining_time:
+          example: 120
+          selector:
+            number:
+              min: 0
+              mode: box
+        sound:
+          example: "chime"
+          selector:
+            select:
+              options:
+                - "default"
+                - "chime"
+                - "alert"
+                - "success"
+                - "warning"
+                - "bell"
+                - "ding"
+                - "buzz"
+                - "notification"
+        priority:
+          example: 5
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: slider
+
+update_activity_countdown:
+  fields:
+    slug:
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    end_date:
+      example: 1700000000
+      selector:
+        number:
+          min: 0
+          mode: box
+    completion_message:
+      example: "Download complete!"
+      selector:
+        text:
+    labels:
+      collapsed: true
+      fields:
+        state_text:
+          example: "Downloading"
+          selector:
+            text:
+        subtitle:
+          example: "episode-01.mkv"
+          selector:
+            text:
+        icon:
+          example: "arrow.down.circle.fill"
+          selector:
+            text:
+        progress:
+          example: 0.5
+          selector:
+            number:
+              min: 0.0
+              max: 1.0
+              step: 0.01
+              mode: slider
+    countdown_options:
+      collapsed: true
+      fields:
+        warning_threshold:
+          example: 30
+          selector:
+            number:
+              min: 0
+              mode: box
+              unit_of_measurement: seconds
+        alarm:
+          selector:
+            boolean:
+        snooze_seconds:
+          example: 600
+          selector:
+            number:
+              min: 60
+              max: 3600
+              mode: box
+              unit_of_measurement: seconds
+    display_options:
+      collapsed: true
+      fields:
+        accent_color:
+          example: "blue"
+          selector:
+            text:
+        background_color:
+          example: "#1a2b3c"
+          selector:
+            text:
+        text_color:
+          example: "#ffffff"
+          selector:
+            text:
+        remaining_time:
+          example: 120
+          selector:
+            number:
+              min: 0
+              mode: box
+        sound:
+          example: "chime"
+          selector:
+            select:
+              options:
+                - "default"
+                - "chime"
+                - "alert"
+                - "success"
+                - "warning"
+                - "bell"
+                - "ding"
+                - "buzz"
+                - "notification"
+        priority:
+          example: 5
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: slider
+
+update_activity_steps:
+  fields:
+    slug:
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    total_steps:
+      example: 5
+      selector:
+        number:
+          min: 1
+          mode: box
+    current_step:
+      example: 2
+      selector:
+        number:
+          min: 0
+          mode: box
+    labels:
+      collapsed: true
+      fields:
+        state_text:
+          example: "Downloading"
+          selector:
+            text:
+        subtitle:
+          example: "episode-01.mkv"
+          selector:
+            text:
+        icon:
+          example: "arrow.down.circle.fill"
+          selector:
+            text:
+        progress:
+          example: 0.5
+          selector:
+            number:
+              min: 0.0
+              max: 1.0
+              step: 0.01
+              mode: slider
+    steps_options:
+      collapsed: true
+      fields:
+        step_labels:
+          selector:
+            object:
+        step_rows:
+          selector:
+            object:
+    action_buttons:
+      collapsed: true
+      fields:
+        url:
+          example: "https://example.com"
+          selector:
+            text:
+        secondary_url:
+          example: "https://example.com/details"
+          selector:
+            text:
+    display_options:
+      collapsed: true
+      fields:
+        completion_message:
+          example: "Download complete!"
+          selector:
+            text:
+        accent_color:
+          example: "blue"
+          selector:
+            text:
+        background_color:
+          example: "#1a2b3c"
+          selector:
+            text:
+        text_color:
+          example: "#ffffff"
+          selector:
+            text:
+        remaining_time:
+          example: 120
+          selector:
+            number:
+              min: 0
+              mode: box
+        sound:
+          example: "chime"
+          selector:
+            select:
+              options:
+                - "default"
+                - "chime"
+                - "alert"
+                - "success"
+                - "warning"
+                - "bell"
+                - "ding"
+                - "buzz"
+                - "notification"
+        priority:
+          example: 5
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: slider
+
+update_activity_alert:
+  fields:
+    slug:
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    severity:
+      example: "warning"
+      selector:
+        select:
+          options:
+            - "critical"
+            - "warning"
+            - "info"
+    labels:
+      collapsed: true
+      fields:
+        state_text:
+          example: "Downloading"
+          selector:
+            text:
+        subtitle:
+          example: "episode-01.mkv"
+          selector:
+            text:
+        icon:
+          example: "arrow.down.circle.fill"
+          selector:
+            text:
+        progress:
+          example: 0.5
+          selector:
+            number:
+              min: 0.0
+              max: 1.0
+              step: 0.01
+              mode: slider
+    alert_options:
+      collapsed: true
+      fields:
+        fired_at:
+          example: 1700000000
+          selector:
+            number:
+              min: 0
+              mode: box
+    action_buttons:
+      collapsed: true
+      fields:
+        url:
+          example: "https://example.com"
+          selector:
+            text:
+        secondary_url:
+          example: "https://example.com/details"
+          selector:
+            text:
+    display_options:
+      collapsed: true
+      fields:
+        completion_message:
+          example: "Download complete!"
+          selector:
+            text:
+        accent_color:
+          example: "blue"
+          selector:
+            text:
+        background_color:
+          example: "#1a2b3c"
+          selector:
+            text:
+        text_color:
+          example: "#ffffff"
+          selector:
+            text:
+        remaining_time:
+          example: 120
+          selector:
+            number:
+              min: 0
+              mode: box
+        sound:
+          example: "chime"
+          selector:
+            select:
+              options:
+                - "default"
+                - "chime"
+                - "alert"
+                - "success"
+                - "warning"
+                - "bell"
+                - "ding"
+                - "buzz"
+                - "notification"
+        priority:
+          example: 5
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: slider
+
+update_activity_gauge:
+  fields:
+    slug:
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    value:
+      example: 22.5
+      selector:
+        number:
+          step: 0.1
+          mode: box
+    min_value:
+      example: 0
+      selector:
+        number:
+          step: 0.1
+          mode: box
+    max_value:
+      example: 100
+      selector:
+        number:
+          step: 0.1
+          mode: box
+    unit:
+      example: "°C"
+      selector:
+        text:
+    labels:
+      collapsed: true
+      fields:
+        state_text:
+          example: "Downloading"
+          selector:
+            text:
+        subtitle:
+          example: "episode-01.mkv"
+          selector:
+            text:
+        icon:
+          example: "arrow.down.circle.fill"
+          selector:
+            text:
+        progress:
+          example: 0.5
+          selector:
+            number:
+              min: 0.0
+              max: 1.0
+              step: 0.01
+              mode: slider
+    display_options:
+      collapsed: true
+      fields:
+        completion_message:
+          example: "Download complete!"
+          selector:
+            text:
+        accent_color:
+          example: "blue"
+          selector:
+            text:
+        background_color:
+          example: "#1a2b3c"
+          selector:
+            text:
+        text_color:
+          example: "#ffffff"
+          selector:
+            text:
+        remaining_time:
+          example: 120
+          selector:
+            number:
+              min: 0
+              mode: box
+        sound:
+          example: "chime"
+          selector:
+            select:
+              options:
+                - "default"
+                - "chime"
+                - "alert"
+                - "success"
+                - "warning"
+                - "bell"
+                - "ding"
+                - "buzz"
+                - "notification"
+        priority:
+          example: 5
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: slider
+
+update_activity_timeline:
+  fields:
+    slug:
+      required: true
+      example: "ha-washer"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    value:
+      example: 22.5
+      selector:
+        object:
+    unit:
+      example: "°C"
+      selector:
+        text:
+    labels:
+      collapsed: true
+      fields:
+        state_text:
+          example: "Downloading"
+          selector:
+            text:
+        subtitle:
+          example: "episode-01.mkv"
+          selector:
+            text:
+        icon:
+          example: "arrow.down.circle.fill"
+          selector:
+            text:
+        progress:
+          example: 0.5
+          selector:
+            number:
+              min: 0.0
+              max: 1.0
+              step: 0.01
+              mode: slider
+    gauge_timeline_options:
+      collapsed: true
+      fields:
+        units:
+          selector:
+            object:
+        scale:
+          example: "linear"
+          selector:
+            select:
+              options:
+                - "linear"
+                - "logarithmic"
+        decimals:
+          example: 1
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: box
+        smoothing:
+          selector:
+            boolean:
+        thresholds:
+          selector:
+            object:
+    display_options:
+      collapsed: true
+      fields:
+        completion_message:
+          example: "Download complete!"
+          selector:
+            text:
+        accent_color:
+          example: "blue"
+          selector:
+            text:
+        background_color:
+          example: "#1a2b3c"
+          selector:
+            text:
+        text_color:
+          example: "#ffffff"
+          selector:
+            text:
+        remaining_time:
+          example: 120
+          selector:
+            number:
+              min: 0
+              mode: box
+        sound:
+          example: "chime"
+          selector:
+            select:
+              options:
+                - "default"
+                - "chime"
+                - "alert"
+                - "success"
+                - "warning"
+                - "bell"
+                - "ding"
+                - "buzz"
+                - "notification"
+        priority:
           example: 5
           selector:
             number:

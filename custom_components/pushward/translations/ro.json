@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Actualizați activitatea",
+      "name": "Actualizați activitatea (deprecated)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "Etichete pași",
-          "description": "Etichete personalizate pentru pașii șablonului steps. Format: 1=Etichetă, 2=Etichetă. Gol folosește numerele pașilor."
+          "description": "Listă ordonată de etichete pentru pași. Lungimea trebuie să fie egală cu total_steps. Doar șablonul steps."
         },
         "step_rows": {
           "name": "Rânduri pași",
-          "description": "Numărul de pași afișați pe un rând în șablonul steps."
+          "description": "Listă ordonată de înălțimi de rând (1-10) pentru fiecare pas. Lungimea trebuie să fie egală cu total_steps. Doar șablonul steps."
         },
         "fired_at": {
           "name": "Timp declanșare",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "Butoane de acțiune",
           "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
+        },
+        "display_options": {
+          "name": "Afișare, culoare și sunet",
+          "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "Actualizați activitatea (Generic)",
+      "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progres",
+          "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Numele culorii de accent pentru activitate."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "remaining_time": {
+          "name": "Timp rămas",
+          "description": "Timpul rămas în secunde."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etichete și pictogramă",
+          "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "display_options": {
+          "name": "Afișare, culoare și sunet",
+          "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Actualizați activitatea (Countdown)",
+      "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "end_date": {
+          "name": "Dată de încheiere",
+          "description": "Marcaj de timp Unix pentru data de încheiere countdown."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progres",
+          "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "warning_threshold": {
+          "name": "Prag de avertizare",
+          "description": "Când valoarea gauge sau timeline atinge sau depășește această valoare, se afișează culoarea de avertizare."
+        },
+        "alarm": {
+          "name": "Alarmă",
+          "description": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Funcționează doar pe iOS 26+."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Numele culorii de accent pentru activitate."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "remaining_time": {
+          "name": "Timp rămas",
+          "description": "Timpul rămas în secunde."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etichete și pictogramă",
+          "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "countdown_options": {
+          "name": "Opțiuni countdown",
+          "description": "Numai pentru șablonul countdown."
+        },
+        "display_options": {
+          "name": "Afișare, culoare și sunet",
+          "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Actualizați activitatea (Steps)",
+      "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "total_steps": {
+          "name": "Total steps",
+          "description": "Numărul total de steps."
+        },
+        "current_step": {
+          "name": "Pas curent",
+          "description": "Numărul pasului curent."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progres",
+          "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "step_labels": {
+          "name": "Etichete pași",
+          "description": "Listă ordonată de etichete pentru pași. Lungimea trebuie să fie egală cu total_steps. Doar șablonul steps."
+        },
+        "step_rows": {
+          "name": "Rânduri pași",
+          "description": "Listă ordonată de înălțimi de rând (1-10) pentru fiecare pas. Lungimea trebuie să fie egală cu total_steps. Doar șablonul steps."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL-ul principal afișat ca buton apăsabil. Acceptat doar pe șabloanele steps și alert."
+        },
+        "secondary_url": {
+          "name": "URL secundar",
+          "description": "URL secundar afișat ca al doilea buton apăsabil. Acceptat doar pe șabloanele steps și alert."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Numele culorii de accent pentru activitate."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "remaining_time": {
+          "name": "Timp rămas",
+          "description": "Timpul rămas în secunde."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etichete și pictogramă",
+          "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "steps_options": {
+          "name": "Opțiuni steps",
+          "description": "Numai pentru șablonul steps."
+        },
+        "action_buttons": {
+          "name": "Butoane de acțiune",
+          "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
+        },
+        "display_options": {
+          "name": "Afișare, culoare și sunet",
+          "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Actualizați activitatea (Alert)",
+      "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "severity": {
+          "name": "Severitate",
+          "description": "Nivelul de severitate alert."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progres",
+          "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "fired_at": {
+          "name": "Timp declanșare",
+          "description": "Marca temporală Unix când activitatea a fost declanșată. Folosit pentru a afișa timpul relativ."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL-ul principal afișat ca buton apăsabil. Acceptat doar pe șabloanele steps și alert."
+        },
+        "secondary_url": {
+          "name": "URL secundar",
+          "description": "URL secundar afișat ca al doilea buton apăsabil. Acceptat doar pe șabloanele steps și alert."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Numele culorii de accent pentru activitate."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "remaining_time": {
+          "name": "Timp rămas",
+          "description": "Timpul rămas în secunde."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etichete și pictogramă",
+          "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "alert_options": {
+          "name": "Opțiuni alert",
+          "description": "Numai pentru șablonul alert."
+        },
+        "action_buttons": {
+          "name": "Butoane de acțiune",
+          "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
+        },
+        "display_options": {
+          "name": "Afișare, culoare și sunet",
+          "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Actualizați activitatea (Gauge)",
+      "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "value": {
+          "name": "Valoare",
+          "description": "gauge: valoare numerică. timeline: obiect cu valori etichetate (ex. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Valoare minimă",
+          "description": "Valoarea minimă a gauge-ului."
+        },
+        "max_value": {
+          "name": "Valoare maximă",
+          "description": "Valoarea maximă a gauge-ului."
+        },
+        "unit": {
+          "name": "Unitate",
+          "description": "Unitatea de afișare pentru valoare (ex. °C, %)."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progres",
+          "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Numele culorii de accent pentru activitate."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "remaining_time": {
+          "name": "Timp rămas",
+          "description": "Timpul rămas în secunde."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etichete și pictogramă",
+          "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "display_options": {
+          "name": "Afișare, culoare și sunet",
+          "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Actualizați activitatea (Timeline)",
+      "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "value": {
+          "name": "Valoare",
+          "description": "gauge: valoare numerică. timeline: obiect cu valori etichetate (ex. Temp=22.5)."
+        },
+        "unit": {
+          "name": "Unitate",
+          "description": "Unitatea de afișare pentru valoare (ex. °C, %)."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progres",
+          "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "units": {
+          "name": "Unități",
+          "description": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "Scală",
+          "description": "Modul de scală al axei Y (liniară sau logaritmică). Numai pentru șablonul timeline."
+        },
+        "decimals": {
+          "name": "Zecimale",
+          "description": "Numărul de zecimale pentru afișarea valorilor (0-10). Numai pentru șablonul timeline."
+        },
+        "smoothing": {
+          "name": "Linii netezite",
+          "description": "Activați interpolarea curbei între punctele de date. Numai pentru șablonul timeline."
+        },
+        "thresholds": {
+          "name": "Praguri",
+          "description": "Linii de referință orizontale pe sparkline. Numai pentru șablonul timeline."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Numele culorii de accent pentru activitate."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului."
+        },
+        "remaining_time": {
+          "name": "Timp rămas",
+          "description": "Timpul rămas în secunde."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritate",
+          "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etichete și pictogramă",
+          "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "gauge_timeline_options": {
+          "name": "Opțiuni gauge și timeline",
+          "description": "Numai pentru șabloanele gauge și timeline."
         },
         "display_options": {
           "name": "Afișare, culoare și sunet",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "Conectați-vă la PushWard",
-        "description": "Introduceți cheia de integrare PushWard pentru a începe. Aplicația iOS este în prezent în beta publică pe TestFlight (încă nu este în App Store): {testflight_url}",
         "data": {
           "integration_key": "Cheie de integrare"
-        },
-        "data_description": {
-          "integration_key": "Deschideți aplicația PushWard iOS (TestFlight: {testflight_url}) → Setări → Chei de integrare. Puteți lipi cheia implicită sau crea una nouă cu domeniul 'ha-*'."
         }
       },
       "reconfigure": {

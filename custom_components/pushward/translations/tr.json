@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Aktiviteyi Güncelle",
+      "name": "Aktiviteyi Güncelle (deprecated)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
         "slug": {
@@ -10,7 +10,7 @@
         },
         "state": {
           "name": "Durum",
-          "description": "\u0130stenen aktivite durumu."
+          "description": "İstenen aktivite durumu."
         },
         "template": {
           "name": "Şablon",
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "Adım Etiketleri",
-          "description": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır."
+          "description": "Adım etiketlerinin sıralı listesi. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
         },
         "step_rows": {
           "name": "Adım Satırları",
-          "description": "Steps şablonunda bir satırda gösterilecek adım sayısı."
+          "description": "Her adım için satır yüksekliklerinin (1-10) sıralı listesi. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
         },
         "fired_at": {
           "name": "Tetiklenme Zamanı",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "Eylem düğmeleri",
           "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
+        },
+        "display_options": {
+          "name": "Görünüm, renk ve ses",
+          "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "Aktiviteyi Güncelle (Generic)",
+      "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "İlerleme",
+          "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi adı."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "remaining_time": {
+          "name": "Kalan Süre",
+          "description": "Saniye cinsinden kalan süre."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etiketler ve simge",
+          "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "display_options": {
+          "name": "Görünüm, renk ve ses",
+          "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Aktiviteyi Güncelle (Countdown)",
+      "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "end_date": {
+          "name": "Bitiş Tarihi",
+          "description": "countdown bitiş tarihi için Unix zaman damgası."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "İlerleme",
+          "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "warning_threshold": {
+          "name": "Uyarı Eşiği",
+          "description": "Gauge veya timeline değerinin bu değere ulaşması veya aşması durumunda uyarı rengi gösterilir."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "Uyarı eşiği aşıldığında AlarmKit alarmını tetikler. Yalnızca iOS 26+ üzerinde çalışır."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi adı."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "remaining_time": {
+          "name": "Kalan Süre",
+          "description": "Saniye cinsinden kalan süre."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etiketler ve simge",
+          "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "countdown_options": {
+          "name": "countdown seçenekleri",
+          "description": "Yalnızca countdown şablonu."
+        },
+        "display_options": {
+          "name": "Görünüm, renk ve ses",
+          "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Aktiviteyi Güncelle (Steps)",
+      "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "total_steps": {
+          "name": "Toplam steps",
+          "description": "Toplam steps adedi."
+        },
+        "current_step": {
+          "name": "Geçerli Adım",
+          "description": "Geçerli adım numarası."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "İlerleme",
+          "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "step_labels": {
+          "name": "Adım Etiketleri",
+          "description": "Adım etiketlerinin sıralı listesi. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
+        },
+        "step_rows": {
+          "name": "Adım Satırları",
+          "description": "Her adım için satır yüksekliklerinin (1-10) sıralı listesi. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Dokunulabilir düğme olarak gösterilen birincil URL. Yalnızca steps ve alert şablonlarında desteklenir."
+        },
+        "secondary_url": {
+          "name": "İkincil URL",
+          "description": "İkinci dokunulabilir düğme olarak gösterilen ikincil URL. Yalnızca steps ve alert şablonlarında desteklenir."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi adı."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "remaining_time": {
+          "name": "Kalan Süre",
+          "description": "Saniye cinsinden kalan süre."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etiketler ve simge",
+          "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "steps_options": {
+          "name": "steps seçenekleri",
+          "description": "Yalnızca steps şablonu."
+        },
+        "action_buttons": {
+          "name": "Eylem düğmeleri",
+          "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
+        },
+        "display_options": {
+          "name": "Görünüm, renk ve ses",
+          "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Aktiviteyi Güncelle (Alert)",
+      "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "severity": {
+          "name": "Önem Derecesi",
+          "description": "alert önem düzeyi."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "İlerleme",
+          "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "fired_at": {
+          "name": "Tetiklenme Zamanı",
+          "description": "Aktivitenin tetiklendiği Unix zaman damgası. Gösterilecek göreceli zaman için kullanılır."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Dokunulabilir düğme olarak gösterilen birincil URL. Yalnızca steps ve alert şablonlarında desteklenir."
+        },
+        "secondary_url": {
+          "name": "İkincil URL",
+          "description": "İkinci dokunulabilir düğme olarak gösterilen ikincil URL. Yalnızca steps ve alert şablonlarında desteklenir."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi adı."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "remaining_time": {
+          "name": "Kalan Süre",
+          "description": "Saniye cinsinden kalan süre."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etiketler ve simge",
+          "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "alert_options": {
+          "name": "alert seçenekleri",
+          "description": "Yalnızca alert şablonu."
+        },
+        "action_buttons": {
+          "name": "Eylem düğmeleri",
+          "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
+        },
+        "display_options": {
+          "name": "Görünüm, renk ve ses",
+          "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Aktiviteyi Güncelle (Gauge)",
+      "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "value": {
+          "name": "Değer",
+          "description": "gauge: sayısal değer. timeline: etiketli değerler nesnesi (örn. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Minimum Değer",
+          "description": "Minimum gauge değeri."
+        },
+        "max_value": {
+          "name": "Maksimum Değer",
+          "description": "Maksimum gauge değeri."
+        },
+        "unit": {
+          "name": "Birim",
+          "description": "Değer için görüntü birimi (örn. °C, %)."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "İlerleme",
+          "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi adı."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "remaining_time": {
+          "name": "Kalan Süre",
+          "description": "Saniye cinsinden kalan süre."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etiketler ve simge",
+          "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "display_options": {
+          "name": "Görünüm, renk ve ses",
+          "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Aktiviteyi Güncelle (Timeline)",
+      "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "value": {
+          "name": "Değer",
+          "description": "gauge: sayısal değer. timeline: etiketli değerler nesnesi (örn. Temp=22.5)."
+        },
+        "unit": {
+          "name": "Birim",
+          "description": "Değer için görüntü birimi (örn. °C, %)."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "İlerleme",
+          "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "units": {
+          "name": "Birimler",
+          "description": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "Ölçek",
+          "description": "Y ekseni ölçek modu (doğrusal veya logaritmik). Yalnızca timeline şablonu."
+        },
+        "decimals": {
+          "name": "Ondalık Basamak",
+          "description": "Değer görüntüsü için ondalık basamak sayısı (0-10). Yalnızca timeline şablonu."
+        },
+        "smoothing": {
+          "name": "Düzgün Çizgiler",
+          "description": "Veri noktaları arasında eğri aradeğerlemeyi etkinleştir. Yalnızca timeline şablonu."
+        },
+        "thresholds": {
+          "name": "Eşikler",
+          "description": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Yalnızca timeline şablonu."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi adı."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Boş bırakılırsa sistem varsayılanı kullanılır."
+        },
+        "remaining_time": {
+          "name": "Kalan Süre",
+          "description": "Saniye cinsinden kalan süre."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın."
+        },
+        "priority": {
+          "name": "Öncelik",
+          "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Etiketler ve simge",
+          "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge ve timeline seçenekleri",
+          "description": "Yalnızca gauge ve timeline şablonları."
         },
         "display_options": {
           "name": "Görünüm, renk ve ses",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "PushWard'a Bağlan",
-        "description": "Başlamak için PushWard entegrasyon anahtarınızı girin. iOS uygulaması şu anda TestFlight'ta herkese açık beta sürümünde (henüz App Store'da değil): {testflight_url}",
         "data": {
           "integration_key": "Entegrasyon Anahtarı"
-        },
-        "data_description": {
-          "integration_key": "PushWard iOS uygulamasını açın (TestFlight: {testflight_url}) → Ayarlar → Entegrasyon Anahtarları. Varsayılan anahtarı yapıştırabilir veya 'ha-*' kapsamıyla yeni bir tane oluşturabilirsiniz."
         }
       },
       "reconfigure": {

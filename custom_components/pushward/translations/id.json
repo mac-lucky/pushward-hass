@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Perbarui Aktivitas",
+      "name": "Perbarui Aktivitas (deprecated)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "Label Langkah",
-          "description": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah."
+          "description": "Daftar terurut label langkah. Panjang harus sama dengan total_steps. Hanya templat steps."
         },
         "step_rows": {
           "name": "Baris Langkah",
-          "description": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps."
+          "description": "Daftar terurut tinggi baris (1-10) per langkah. Panjang harus sama dengan total_steps. Hanya templat steps."
         },
         "fired_at": {
           "name": "Waktu Dipicu",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "Tombol tindakan",
           "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
+        },
+        "display_options": {
+          "name": "Tampilan, warna & suara",
+          "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "Perbarui Aktivitas (Generic)",
+      "description": "Perbarui status dan konten PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Kemajuan",
+          "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Nama warna aksen untuk aktivitas."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "remaining_time": {
+          "name": "Waktu Tersisa",
+          "description": "Waktu tersisa dalam detik."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Label & ikon",
+          "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "display_options": {
+          "name": "Tampilan, warna & suara",
+          "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Perbarui Aktivitas (Countdown)",
+      "description": "Perbarui status dan konten PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "end_date": {
+          "name": "Tanggal Akhir",
+          "description": "Stempel waktu Unix untuk tanggal akhir countdown."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Kemajuan",
+          "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "warning_threshold": {
+          "name": "Ambang Peringatan",
+          "description": "Saat nilai gauge atau timeline mencapai atau melebihi nilai ini, warna peringatan ditampilkan."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya berfungsi di iOS 26+."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Nama warna aksen untuk aktivitas."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "remaining_time": {
+          "name": "Waktu Tersisa",
+          "description": "Waktu tersisa dalam detik."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Label & ikon",
+          "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "countdown_options": {
+          "name": "Opsi countdown",
+          "description": "Hanya untuk templat countdown."
+        },
+        "display_options": {
+          "name": "Tampilan, warna & suara",
+          "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Perbarui Aktivitas (Steps)",
+      "description": "Perbarui status dan konten PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "total_steps": {
+          "name": "Total Steps",
+          "description": "Total jumlah steps."
+        },
+        "current_step": {
+          "name": "Langkah Saat Ini",
+          "description": "Nomor langkah saat ini."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Kemajuan",
+          "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "step_labels": {
+          "name": "Label Langkah",
+          "description": "Daftar terurut label langkah. Panjang harus sama dengan total_steps. Hanya templat steps."
+        },
+        "step_rows": {
+          "name": "Baris Langkah",
+          "description": "Daftar terurut tinggi baris (1-10) per langkah. Panjang harus sama dengan total_steps. Hanya templat steps."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL utama yang ditampilkan sebagai tombol yang dapat ditekan. Hanya didukung pada templat steps dan alert."
+        },
+        "secondary_url": {
+          "name": "URL Sekunder",
+          "description": "URL sekunder yang ditampilkan sebagai tombol kedua yang dapat ditekan. Hanya didukung pada templat steps dan alert."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Nama warna aksen untuk aktivitas."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "remaining_time": {
+          "name": "Waktu Tersisa",
+          "description": "Waktu tersisa dalam detik."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Label & ikon",
+          "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "steps_options": {
+          "name": "Opsi steps",
+          "description": "Hanya untuk templat steps."
+        },
+        "action_buttons": {
+          "name": "Tombol tindakan",
+          "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
+        },
+        "display_options": {
+          "name": "Tampilan, warna & suara",
+          "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Perbarui Aktivitas (Alert)",
+      "description": "Perbarui status dan konten PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "severity": {
+          "name": "Tingkat Keparahan",
+          "description": "Tingkat keparahan alert."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Kemajuan",
+          "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "fired_at": {
+          "name": "Waktu Dipicu",
+          "description": "Unix timestamp saat aktivitas dipicu. Digunakan untuk menampilkan waktu relatif."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL utama yang ditampilkan sebagai tombol yang dapat ditekan. Hanya didukung pada templat steps dan alert."
+        },
+        "secondary_url": {
+          "name": "URL Sekunder",
+          "description": "URL sekunder yang ditampilkan sebagai tombol kedua yang dapat ditekan. Hanya didukung pada templat steps dan alert."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Nama warna aksen untuk aktivitas."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "remaining_time": {
+          "name": "Waktu Tersisa",
+          "description": "Waktu tersisa dalam detik."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Label & ikon",
+          "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "alert_options": {
+          "name": "Opsi alert",
+          "description": "Hanya untuk templat alert."
+        },
+        "action_buttons": {
+          "name": "Tombol tindakan",
+          "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
+        },
+        "display_options": {
+          "name": "Tampilan, warna & suara",
+          "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Perbarui Aktivitas (Gauge)",
+      "description": "Perbarui status dan konten PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "value": {
+          "name": "Nilai",
+          "description": "Gauge: nilai numerik. Timeline: objek nilai berlabel (misalnya Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Nilai Minimum",
+          "description": "Nilai minimum gauge."
+        },
+        "max_value": {
+          "name": "Nilai Maksimum",
+          "description": "Nilai maksimum gauge."
+        },
+        "unit": {
+          "name": "Satuan",
+          "description": "Satuan tampilan untuk nilai (misalnya °C, %)."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Kemajuan",
+          "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Nama warna aksen untuk aktivitas."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "remaining_time": {
+          "name": "Waktu Tersisa",
+          "description": "Waktu tersisa dalam detik."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Label & ikon",
+          "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "display_options": {
+          "name": "Tampilan, warna & suara",
+          "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Perbarui Aktivitas (Timeline)",
+      "description": "Perbarui status dan konten PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "value": {
+          "name": "Nilai",
+          "description": "Gauge: nilai numerik. Timeline: objek nilai berlabel (misalnya Temp=22.5)."
+        },
+        "unit": {
+          "name": "Satuan",
+          "description": "Satuan tampilan untuk nilai (misalnya °C, %)."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Kemajuan",
+          "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "units": {
+          "name": "Satuan",
+          "description": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "Skala",
+          "description": "Mode skala sumbu Y (linear atau logaritmik). Hanya untuk templat timeline."
+        },
+        "decimals": {
+          "name": "Angka Desimal",
+          "description": "Jumlah angka desimal untuk tampilan nilai (0-10). Hanya untuk templat timeline."
+        },
+        "smoothing": {
+          "name": "Garis Halus",
+          "description": "Aktifkan interpolasi kurva antar titik data. Hanya untuk templat timeline."
+        },
+        "thresholds": {
+          "name": "Ambang Batas",
+          "description": "Garis referensi horizontal pada sparkline. Hanya untuk templat timeline."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Nama warna aksen untuk aktivitas."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "remaining_time": {
+          "name": "Waktu Tersisa",
+          "description": "Waktu tersisa dalam detik."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Prioritas",
+          "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Label & ikon",
+          "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "gauge_timeline_options": {
+          "name": "Opsi gauge dan timeline",
+          "description": "Hanya untuk templat gauge dan timeline."
         },
         "display_options": {
           "name": "Tampilan, warna & suara",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "Hubungkan ke PushWard",
-        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Aplikasi iOS saat ini tersedia dalam beta publik di TestFlight (belum di App Store): {testflight_url}",
         "data": {
           "integration_key": "Kunci Integrasi"
-        },
-        "data_description": {
-          "integration_key": "Buka aplikasi PushWard iOS (TestFlight: {testflight_url}) → Pengaturan → Integration Keys. Anda bisa menempelkan kunci default, atau membuat yang baru dengan cakupan 'ha-*'."
         }
       },
       "reconfigure": {

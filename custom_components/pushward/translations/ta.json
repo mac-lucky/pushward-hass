@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "செயல்பாட்டை புதுப்பி",
+      "name": "செயல்பாட்டை புதுப்பி (deprecated)",
       "description": "PushWard Live Activity நிலை மற்றும் உள்ளடக்கத்தை புதுப்பிக்கவும்.",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "படி தலைப்புகள்",
-          "description": "steps வார்ப்புரு படிகளுக்கான தனிப்பயன் தலைப்புகள். வடிவம்: 1=தலைப்பு, 2=தலைப்பு. காலியாக இருந்தால் படி எண்கள் பயன்படுத்தப்படும்."
+          "description": "படி தலைப்புகளின் வரிசைப்படுத்தப்பட்ட பட்டியல். நீளம் total_steps-க்கு சமமாக இருக்க வேண்டும். steps வார்ப்புரு மட்டுமே."
         },
         "step_rows": {
           "name": "படி வரிசைகள்",
-          "description": "steps வார்ப்புருவில் ஒரு வரிசையில் காட்டப்படும் படிகளின் எண்ணிக்கை."
+          "description": "ஒவ்வொரு படிக்கும் வரிசை உயரங்களின் (1-10) வரிசைப்படுத்தப்பட்ட பட்டியல். நீளம் total_steps-க்கு சமமாக இருக்க வேண்டும். steps வார்ப்புரு மட்டுமே."
         },
         "fired_at": {
           "name": "தூண்டப்பட்ட நேரம்",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "செயல் பொத்தான்கள்",
           "description": "தட்டக்கூடிய URL பொத்தான்கள். steps மற்றும் alert வார்ப்புருகள் மட்டுமே."
+        },
+        "display_options": {
+          "name": "காட்சி, நிறம் மற்றும் ஒலி",
+          "description": "விருப்பத் தேர்வு பாணி மற்றும் ஒவ்வொரு புதுப்பிப்புக்கான மேலெழுதல்கள். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "செயல்பாட்டை புதுப்பி (Generic)",
+      "description": "PushWard Live Activity நிலை மற்றும் உள்ளடக்கத்தை புதுப்பிக்கவும்.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "செயல்பாட்டின் slug அடையாளம்."
+        },
+        "state": {
+          "name": "நிலை",
+          "description": "விரும்பிய செயல்பாட்டு நிலை."
+        },
+        "state_text": {
+          "name": "நிலை உரை",
+          "description": "செயல்பாட்டு நிலையாகக் காட்டப்படும் உரை."
+        },
+        "subtitle": {
+          "name": "துணைத் தலைப்பு",
+          "description": "செயல்பாட்டில் காட்டப்படும் துணைத் தலைப்பு உரை."
+        },
+        "icon": {
+          "name": "படவுரு",
+          "description": "SF Symbol அல்லது MDI படவுரு பெயர் (எ.கா. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "முன்னேற்றம்",
+          "description": "0.0 மற்றும் 1.0 இடையேயான முன்னேற்ற மதிப்பு."
+        },
+        "completion_message": {
+          "name": "நிறைவு செய்தி",
+          "description": "செயல்பாடு முடிந்தபோது காட்டப்படும் செய்தி."
+        },
+        "accent_color": {
+          "name": "உச்சட வண்ணம்",
+          "description": "செயல்பாட்டிற்கான உச்சட வண்ணப் பெயர்."
+        },
+        "background_color": {
+          "name": "பின்னணி வண்ணம்",
+          "description": "Live Activity பின்னணி வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "text_color": {
+          "name": "உரை வண்ணம்",
+          "description": "Live Activity உரை வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "remaining_time": {
+          "name": "மீதமுள்ள நேரம்",
+          "description": "மீதமுள்ள நேரம் வினாடிகளில்."
+        },
+        "sound": {
+          "name": "ஒலி",
+          "description": "புதுப்பிப்பிற்கான அறிவிப்பு ஒலி பெயர். iOS கணினி ஒலி பயன்படுத்த காலியாக விடவும்."
+        },
+        "priority": {
+          "name": "முன்னுரிமை",
+          "description": "செயல்பாட்டு முன்னுரிமை (0 = குறைந்தது, 10 = அதிகமானது)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "லேபிள்கள் & சின்னம்",
+          "description": "விருப்ப உரை லேபிள்கள் மற்றும் சின்னம். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        },
+        "display_options": {
+          "name": "காட்சி, நிறம் மற்றும் ஒலி",
+          "description": "விருப்பத் தேர்வு பாணி மற்றும் ஒவ்வொரு புதுப்பிப்புக்கான மேலெழுதல்கள். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "செயல்பாட்டை புதுப்பி (Countdown)",
+      "description": "PushWard Live Activity நிலை மற்றும் உள்ளடக்கத்தை புதுப்பிக்கவும்.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "செயல்பாட்டின் slug அடையாளம்."
+        },
+        "state": {
+          "name": "நிலை",
+          "description": "விரும்பிய செயல்பாட்டு நிலை."
+        },
+        "end_date": {
+          "name": "முடிவு தேதி",
+          "description": "countdown முடிவு தேதிக்கான Unix நேர முத்திரை."
+        },
+        "completion_message": {
+          "name": "நிறைவு செய்தி",
+          "description": "செயல்பாடு முடிந்தபோது காட்டப்படும் செய்தி."
+        },
+        "state_text": {
+          "name": "நிலை உரை",
+          "description": "செயல்பாட்டு நிலையாகக் காட்டப்படும் உரை."
+        },
+        "subtitle": {
+          "name": "துணைத் தலைப்பு",
+          "description": "செயல்பாட்டில் காட்டப்படும் துணைத் தலைப்பு உரை."
+        },
+        "icon": {
+          "name": "படவுரு",
+          "description": "SF Symbol அல்லது MDI படவுரு பெயர் (எ.கா. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "முன்னேற்றம்",
+          "description": "0.0 மற்றும் 1.0 இடையேயான முன்னேற்ற மதிப்பு."
+        },
+        "warning_threshold": {
+          "name": "எச்சரிக்கை வரம்பு",
+          "description": "gauge அல்லது timeline மதிப்பு இந்த மதிப்பை எட்டும் அல்லது மீறும்போது எச்சரிக்கை வண்ணம் காட்டப்படும்."
+        },
+        "alarm": {
+          "name": "அலாரம்",
+          "description": "எச்சரிக்கை வரம்பு மீறும்போது AlarmKit அலாரத்தை தூண்டுகிறது. iOS 26+ இல் மட்டுமே செயல்படுகிறது."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "உச்சட வண்ணம்",
+          "description": "செயல்பாட்டிற்கான உச்சட வண்ணப் பெயர்."
+        },
+        "background_color": {
+          "name": "பின்னணி வண்ணம்",
+          "description": "Live Activity பின்னணி வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "text_color": {
+          "name": "உரை வண்ணம்",
+          "description": "Live Activity உரை வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "remaining_time": {
+          "name": "மீதமுள்ள நேரம்",
+          "description": "மீதமுள்ள நேரம் வினாடிகளில்."
+        },
+        "sound": {
+          "name": "ஒலி",
+          "description": "புதுப்பிப்பிற்கான அறிவிப்பு ஒலி பெயர். iOS கணினி ஒலி பயன்படுத்த காலியாக விடவும்."
+        },
+        "priority": {
+          "name": "முன்னுரிமை",
+          "description": "செயல்பாட்டு முன்னுரிமை (0 = குறைந்தது, 10 = அதிகமானது)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "லேபிள்கள் & சின்னம்",
+          "description": "விருப்ப உரை லேபிள்கள் மற்றும் சின்னம். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        },
+        "countdown_options": {
+          "name": "countdown விருப்பங்கள்",
+          "description": "countdown வார்ப்புரு மட்டுமே."
+        },
+        "display_options": {
+          "name": "காட்சி, நிறம் மற்றும் ஒலி",
+          "description": "விருப்பத் தேர்வு பாணி மற்றும் ஒவ்வொரு புதுப்பிப்புக்கான மேலெழுதல்கள். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "செயல்பாட்டை புதுப்பி (Steps)",
+      "description": "PushWard Live Activity நிலை மற்றும் உள்ளடக்கத்தை புதுப்பிக்கவும்.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "செயல்பாட்டின் slug அடையாளம்."
+        },
+        "state": {
+          "name": "நிலை",
+          "description": "விரும்பிய செயல்பாட்டு நிலை."
+        },
+        "total_steps": {
+          "name": "Total steps",
+          "description": "மொத்த steps எண்ணிக்கை."
+        },
+        "current_step": {
+          "name": "தற்போதைய படி",
+          "description": "தற்போதைய படி எண்."
+        },
+        "state_text": {
+          "name": "நிலை உரை",
+          "description": "செயல்பாட்டு நிலையாகக் காட்டப்படும் உரை."
+        },
+        "subtitle": {
+          "name": "துணைத் தலைப்பு",
+          "description": "செயல்பாட்டில் காட்டப்படும் துணைத் தலைப்பு உரை."
+        },
+        "icon": {
+          "name": "படவுரு",
+          "description": "SF Symbol அல்லது MDI படவுரு பெயர் (எ.கா. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "முன்னேற்றம்",
+          "description": "0.0 மற்றும் 1.0 இடையேயான முன்னேற்ற மதிப்பு."
+        },
+        "step_labels": {
+          "name": "படி தலைப்புகள்",
+          "description": "படி தலைப்புகளின் வரிசைப்படுத்தப்பட்ட பட்டியல். நீளம் total_steps-க்கு சமமாக இருக்க வேண்டும். steps வார்ப்புரு மட்டுமே."
+        },
+        "step_rows": {
+          "name": "படி வரிசைகள்",
+          "description": "ஒவ்வொரு படிக்கும் வரிசை உயரங்களின் (1-10) வரிசைப்படுத்தப்பட்ட பட்டியல். நீளம் total_steps-க்கு சமமாக இருக்க வேண்டும். steps வார்ப்புரு மட்டுமே."
+        },
+        "url": {
+          "name": "URL",
+          "description": "தட்டக்கூடிய பொத்தானாகக் காட்டப்படும் முதன்மை URL. steps மற்றும் alert வார்ப்புருக்களில் மட்டுமே ஆதரிக்கப்படுகிறது."
+        },
+        "secondary_url": {
+          "name": "இரண்டாம் URL",
+          "description": "இரண்டாவது தட்டக்கூடிய பொத்தானாகக் காட்டப்படும் இரண்டாம் URL. steps மற்றும் alert வார்ப்புருக்களில் மட்டுமே ஆதரிக்கப்படுகிறது."
+        },
+        "completion_message": {
+          "name": "நிறைவு செய்தி",
+          "description": "செயல்பாடு முடிந்தபோது காட்டப்படும் செய்தி."
+        },
+        "accent_color": {
+          "name": "உச்சட வண்ணம்",
+          "description": "செயல்பாட்டிற்கான உச்சட வண்ணப் பெயர்."
+        },
+        "background_color": {
+          "name": "பின்னணி வண்ணம்",
+          "description": "Live Activity பின்னணி வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "text_color": {
+          "name": "உரை வண்ணம்",
+          "description": "Live Activity உரை வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "remaining_time": {
+          "name": "மீதமுள்ள நேரம்",
+          "description": "மீதமுள்ள நேரம் வினாடிகளில்."
+        },
+        "sound": {
+          "name": "ஒலி",
+          "description": "புதுப்பிப்பிற்கான அறிவிப்பு ஒலி பெயர். iOS கணினி ஒலி பயன்படுத்த காலியாக விடவும்."
+        },
+        "priority": {
+          "name": "முன்னுரிமை",
+          "description": "செயல்பாட்டு முன்னுரிமை (0 = குறைந்தது, 10 = அதிகமானது)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "லேபிள்கள் & சின்னம்",
+          "description": "விருப்ப உரை லேபிள்கள் மற்றும் சின்னம். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        },
+        "steps_options": {
+          "name": "steps விருப்பங்கள்",
+          "description": "steps வார்ப்புரு மட்டுமே."
+        },
+        "action_buttons": {
+          "name": "செயல் பொத்தான்கள்",
+          "description": "தட்டக்கூடிய URL பொத்தான்கள். steps மற்றும் alert வார்ப்புருகள் மட்டுமே."
+        },
+        "display_options": {
+          "name": "காட்சி, நிறம் மற்றும் ஒலி",
+          "description": "விருப்பத் தேர்வு பாணி மற்றும் ஒவ்வொரு புதுப்பிப்புக்கான மேலெழுதல்கள். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "செயல்பாட்டை புதுப்பி (Alert)",
+      "description": "PushWard Live Activity நிலை மற்றும் உள்ளடக்கத்தை புதுப்பிக்கவும்.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "செயல்பாட்டின் slug அடையாளம்."
+        },
+        "state": {
+          "name": "நிலை",
+          "description": "விரும்பிய செயல்பாட்டு நிலை."
+        },
+        "severity": {
+          "name": "தீவிரம்",
+          "description": "alert தீவிர நிலை."
+        },
+        "state_text": {
+          "name": "நிலை உரை",
+          "description": "செயல்பாட்டு நிலையாகக் காட்டப்படும் உரை."
+        },
+        "subtitle": {
+          "name": "துணைத் தலைப்பு",
+          "description": "செயல்பாட்டில் காட்டப்படும் துணைத் தலைப்பு உரை."
+        },
+        "icon": {
+          "name": "படவுரு",
+          "description": "SF Symbol அல்லது MDI படவுரு பெயர் (எ.கா. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "முன்னேற்றம்",
+          "description": "0.0 மற்றும் 1.0 இடையேயான முன்னேற்ற மதிப்பு."
+        },
+        "fired_at": {
+          "name": "தூண்டப்பட்ட நேரம்",
+          "description": "செயல்பாடு தூண்டப்பட்ட Unix நேர முத்திரை. ஒப்பீட்டு நேரம் காட்ட பயன்படுகிறது."
+        },
+        "url": {
+          "name": "URL",
+          "description": "தட்டக்கூடிய பொத்தானாகக் காட்டப்படும் முதன்மை URL. steps மற்றும் alert வார்ப்புருக்களில் மட்டுமே ஆதரிக்கப்படுகிறது."
+        },
+        "secondary_url": {
+          "name": "இரண்டாம் URL",
+          "description": "இரண்டாவது தட்டக்கூடிய பொத்தானாகக் காட்டப்படும் இரண்டாம் URL. steps மற்றும் alert வார்ப்புருக்களில் மட்டுமே ஆதரிக்கப்படுகிறது."
+        },
+        "completion_message": {
+          "name": "நிறைவு செய்தி",
+          "description": "செயல்பாடு முடிந்தபோது காட்டப்படும் செய்தி."
+        },
+        "accent_color": {
+          "name": "உச்சட வண்ணம்",
+          "description": "செயல்பாட்டிற்கான உச்சட வண்ணப் பெயர்."
+        },
+        "background_color": {
+          "name": "பின்னணி வண்ணம்",
+          "description": "Live Activity பின்னணி வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "text_color": {
+          "name": "உரை வண்ணம்",
+          "description": "Live Activity உரை வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "remaining_time": {
+          "name": "மீதமுள்ள நேரம்",
+          "description": "மீதமுள்ள நேரம் வினாடிகளில்."
+        },
+        "sound": {
+          "name": "ஒலி",
+          "description": "புதுப்பிப்பிற்கான அறிவிப்பு ஒலி பெயர். iOS கணினி ஒலி பயன்படுத்த காலியாக விடவும்."
+        },
+        "priority": {
+          "name": "முன்னுரிமை",
+          "description": "செயல்பாட்டு முன்னுரிமை (0 = குறைந்தது, 10 = அதிகமானது)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "லேபிள்கள் & சின்னம்",
+          "description": "விருப்ப உரை லேபிள்கள் மற்றும் சின்னம். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        },
+        "alert_options": {
+          "name": "alert விருப்பங்கள்",
+          "description": "alert வார்ப்புரு மட்டுமே."
+        },
+        "action_buttons": {
+          "name": "செயல் பொத்தான்கள்",
+          "description": "தட்டக்கூடிய URL பொத்தான்கள். steps மற்றும் alert வார்ப்புருகள் மட்டுமே."
+        },
+        "display_options": {
+          "name": "காட்சி, நிறம் மற்றும் ஒலி",
+          "description": "விருப்பத் தேர்வு பாணி மற்றும் ஒவ்வொரு புதுப்பிப்புக்கான மேலெழுதல்கள். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "செயல்பாட்டை புதுப்பி (Gauge)",
+      "description": "PushWard Live Activity நிலை மற்றும் உள்ளடக்கத்தை புதுப்பிக்கவும்.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "செயல்பாட்டின் slug அடையாளம்."
+        },
+        "state": {
+          "name": "நிலை",
+          "description": "விரும்பிய செயல்பாட்டு நிலை."
+        },
+        "value": {
+          "name": "மதிப்பு",
+          "description": "gauge: எண் மதிப்பு. Timeline: பெயரிடப்பட்ட மதிப்புகள் object (எ.கா. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "குறைந்தபட்ச மதிப்பு",
+          "description": "குறைந்தபட்ச gauge மதிப்பு."
+        },
+        "max_value": {
+          "name": "அதிகபட்ச மதிப்பு",
+          "description": "அதிகபட்ச gauge மதிப்பு."
+        },
+        "unit": {
+          "name": "அலகு",
+          "description": "மதிப்பிற்கான காட்சி அலகு (எ.கா. °C, %)."
+        },
+        "state_text": {
+          "name": "நிலை உரை",
+          "description": "செயல்பாட்டு நிலையாகக் காட்டப்படும் உரை."
+        },
+        "subtitle": {
+          "name": "துணைத் தலைப்பு",
+          "description": "செயல்பாட்டில் காட்டப்படும் துணைத் தலைப்பு உரை."
+        },
+        "icon": {
+          "name": "படவுரு",
+          "description": "SF Symbol அல்லது MDI படவுரு பெயர் (எ.கா. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "முன்னேற்றம்",
+          "description": "0.0 மற்றும் 1.0 இடையேயான முன்னேற்ற மதிப்பு."
+        },
+        "completion_message": {
+          "name": "நிறைவு செய்தி",
+          "description": "செயல்பாடு முடிந்தபோது காட்டப்படும் செய்தி."
+        },
+        "accent_color": {
+          "name": "உச்சட வண்ணம்",
+          "description": "செயல்பாட்டிற்கான உச்சட வண்ணப் பெயர்."
+        },
+        "background_color": {
+          "name": "பின்னணி வண்ணம்",
+          "description": "Live Activity பின்னணி வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "text_color": {
+          "name": "உரை வண்ணம்",
+          "description": "Live Activity உரை வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "remaining_time": {
+          "name": "மீதமுள்ள நேரம்",
+          "description": "மீதமுள்ள நேரம் வினாடிகளில்."
+        },
+        "sound": {
+          "name": "ஒலி",
+          "description": "புதுப்பிப்பிற்கான அறிவிப்பு ஒலி பெயர். iOS கணினி ஒலி பயன்படுத்த காலியாக விடவும்."
+        },
+        "priority": {
+          "name": "முன்னுரிமை",
+          "description": "செயல்பாட்டு முன்னுரிமை (0 = குறைந்தது, 10 = அதிகமானது)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "லேபிள்கள் & சின்னம்",
+          "description": "விருப்ப உரை லேபிள்கள் மற்றும் சின்னம். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        },
+        "display_options": {
+          "name": "காட்சி, நிறம் மற்றும் ஒலி",
+          "description": "விருப்பத் தேர்வு பாணி மற்றும் ஒவ்வொரு புதுப்பிப்புக்கான மேலெழுதல்கள். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "செயல்பாட்டை புதுப்பி (Timeline)",
+      "description": "PushWard Live Activity நிலை மற்றும் உள்ளடக்கத்தை புதுப்பிக்கவும்.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "செயல்பாட்டின் slug அடையாளம்."
+        },
+        "state": {
+          "name": "நிலை",
+          "description": "விரும்பிய செயல்பாட்டு நிலை."
+        },
+        "value": {
+          "name": "மதிப்பு",
+          "description": "gauge: எண் மதிப்பு. Timeline: பெயரிடப்பட்ட மதிப்புகள் object (எ.கா. Temp=22.5)."
+        },
+        "unit": {
+          "name": "அலகு",
+          "description": "மதிப்பிற்கான காட்சி அலகு (எ.கா. °C, %)."
+        },
+        "state_text": {
+          "name": "நிலை உரை",
+          "description": "செயல்பாட்டு நிலையாகக் காட்டப்படும் உரை."
+        },
+        "subtitle": {
+          "name": "துணைத் தலைப்பு",
+          "description": "செயல்பாட்டில் காட்டப்படும் துணைத் தலைப்பு உரை."
+        },
+        "icon": {
+          "name": "படவுரு",
+          "description": "SF Symbol அல்லது MDI படவுரு பெயர் (எ.கா. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "முன்னேற்றம்",
+          "description": "0.0 மற்றும் 1.0 இடையேயான முன்னேற்ற மதிப்பு."
+        },
+        "units": {
+          "name": "அலகுகள்",
+          "description": "Timeline தொடர்களுக்கான அலகு தலைப்புகள். வடிவம்: attribute=அலகு. எ.கா: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "அளவுகோல்",
+          "description": "Y-அச்சு அளவுகோல் முறை (நேரியல் அல்லது மடக்கை). Timeline வார்ப்புரு மட்டுமே."
+        },
+        "decimals": {
+          "name": "தசம இடங்கள்",
+          "description": "மதிப்பு காட்சிக்கான தசம இடங்கள் (0-10). Timeline வார்ப்புரு மட்டுமே."
+        },
+        "smoothing": {
+          "name": "வளைவு கோடுகள்",
+          "description": "தரவு புள்ளிகளுக்கிடையில் வளைவு இடைச்செருகலை இயக்கவும். Timeline வார்ப்புரு மட்டுமே."
+        },
+        "thresholds": {
+          "name": "வரம்புகள்",
+          "description": "sparkline இல் கிடைமட்ட குறிப்பு கோடுகள். Timeline வார்ப்புரு மட்டுமே."
+        },
+        "completion_message": {
+          "name": "நிறைவு செய்தி",
+          "description": "செயல்பாடு முடிந்தபோது காட்டப்படும் செய்தி."
+        },
+        "accent_color": {
+          "name": "உச்சட வண்ணம்",
+          "description": "செயல்பாட்டிற்கான உச்சட வண்ணப் பெயர்."
+        },
+        "background_color": {
+          "name": "பின்னணி வண்ணம்",
+          "description": "Live Activity பின்னணி வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "text_color": {
+          "name": "உரை வண்ணம்",
+          "description": "Live Activity உரை வண்ணம். #RRGGBB அல்லது பெயரிடப்பட்ட வண்ணம். கணினி இயல்புநிலைக்கு காலியாக விடவும்."
+        },
+        "remaining_time": {
+          "name": "மீதமுள்ள நேரம்",
+          "description": "மீதமுள்ள நேரம் வினாடிகளில்."
+        },
+        "sound": {
+          "name": "ஒலி",
+          "description": "புதுப்பிப்பிற்கான அறிவிப்பு ஒலி பெயர். iOS கணினி ஒலி பயன்படுத்த காலியாக விடவும்."
+        },
+        "priority": {
+          "name": "முன்னுரிமை",
+          "description": "செயல்பாட்டு முன்னுரிமை (0 = குறைந்தது, 10 = அதிகமானது)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "லேபிள்கள் & சின்னம்",
+          "description": "விருப்ப உரை லேபிள்கள் மற்றும் சின்னம். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge மற்றும் timeline விருப்பங்கள்",
+          "description": "gauge மற்றும் timeline வார்ப்புருகள் மட்டுமே."
         },
         "display_options": {
           "name": "காட்சி, நிறம் மற்றும் ஒலி",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "PushWard உடன் இணை",
-        "description": "தொடங்க உங்கள் PushWard ஒருங்கிணைப்பு விசையை உள்ளிடவும். iOS app தற்போது App Store-இல் இல்லை; இது TestFlight-இல் பொது பீட்டாவில் உள்ளது: {testflight_url}",
         "data": {
           "integration_key": "ஒருங்கிணைப்பு விசை"
-        },
-        "data_description": {
-          "integration_key": "PushWard iOS app-ஐ திறக்கவும் (TestFlight: {testflight_url}) → Settings → Integration Keys. நீங்கள் இயல்புநிலை விசையை ஒட்டலாம், அல்லது 'ha-*' scope உடன் ஒரு புதியதை உருவாக்கலாம்."
         }
       },
       "reconfigure": {

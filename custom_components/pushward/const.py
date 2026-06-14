@@ -88,7 +88,7 @@ CONF_STAT_ROWS = "stat_rows"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
-TESTFLIGHT_URL = "https://testflight.apple.com/join/T4aT6s3W"
+APP_STORE_URL = "https://apps.apple.com/app/id6759689999"
 DEFAULT_PRIORITY = 1
 DEFAULT_UPDATE_INTERVAL = 5
 DEFAULT_TOTAL_STEPS = 1

@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "アクティビティを更新",
+      "name": "アクティビティを更新 (deprecated)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
         "slug": {
@@ -168,6 +168,538 @@
         }
       }
     },
+    "update_activity_generic": {
+      "name": "アクティビティを更新 (Generic)",
+      "description": "PushWard Live Activityの状態とコンテンツを更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
+        },
+        "progress": {
+          "name": "進捗",
+          "description": "0.0〜1.0の進捗値。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "remaining_time": {
+          "name": "残り時間",
+          "description": "残り時間（秒）。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "ラベルとアイコン",
+          "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "display_options": {
+          "name": "表示・色・サウンド",
+          "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "アクティビティを更新 (Countdown)",
+      "description": "PushWard Live Activityの状態とコンテンツを更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "end_date": {
+          "name": "終了日時",
+          "description": "countdown の終了日時のUnixタイムスタンプ。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
+        },
+        "progress": {
+          "name": "進捗",
+          "description": "0.0〜1.0の進捗値。"
+        },
+        "warning_threshold": {
+          "name": "警告しきい値",
+          "description": "countdown が警告状態に入る end_date までの秒数。countdown テンプレートのみ。"
+        },
+        "alarm": {
+          "name": "アラーム",
+          "description": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+、countdown テンプレートのみ）。"
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "remaining_time": {
+          "name": "残り時間",
+          "description": "残り時間（秒）。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "ラベルとアイコン",
+          "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "countdown_options": {
+          "name": "countdown オプション",
+          "description": "countdown テンプレートのみ。"
+        },
+        "display_options": {
+          "name": "表示・色・サウンド",
+          "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "アクティビティを更新 (Steps)",
+      "description": "PushWard Live Activityの状態とコンテンツを更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "total_steps": {
+          "name": "総 steps 数",
+          "description": "steps の総数。"
+        },
+        "current_step": {
+          "name": "現在のステップ",
+          "description": "現在のステップ番号。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
+        },
+        "progress": {
+          "name": "進捗",
+          "description": "0.0〜1.0の進捗値。"
+        },
+        "step_labels": {
+          "name": "ステップラベル",
+          "description": "ステップラベルの順序付きリスト。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "step_rows": {
+          "name": "ステップ行高",
+          "description": "各ステップの行高（1〜10）の順序付きリスト。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "タップ可能なボタンとして表示されるプライマリURL。steps および alert テンプレートのみ対応。"
+        },
+        "secondary_url": {
+          "name": "セカンダリURL",
+          "description": "2番目のタップ可能なボタンとして表示されるセカンダリURL。steps および alert テンプレートのみ対応。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "remaining_time": {
+          "name": "残り時間",
+          "description": "残り時間（秒）。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "ラベルとアイコン",
+          "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "steps_options": {
+          "name": "steps オプション",
+          "description": "steps テンプレートのみ。"
+        },
+        "action_buttons": {
+          "name": "アクションボタン",
+          "description": "タップ可能なURLボタン。steps および alert テンプレートのみ。"
+        },
+        "display_options": {
+          "name": "表示・色・サウンド",
+          "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "アクティビティを更新 (Alert)",
+      "description": "PushWard Live Activityの状態とコンテンツを更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "severity": {
+          "name": "重大度",
+          "description": "alert の重大度レベル。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
+        },
+        "progress": {
+          "name": "進捗",
+          "description": "0.0〜1.0の進捗値。"
+        },
+        "fired_at": {
+          "name": "発火時刻",
+          "description": "alert が発火したときの Unix タイムスタンプ。alert テンプレートのみ。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "タップ可能なボタンとして表示されるプライマリURL。steps および alert テンプレートのみ対応。"
+        },
+        "secondary_url": {
+          "name": "セカンダリURL",
+          "description": "2番目のタップ可能なボタンとして表示されるセカンダリURL。steps および alert テンプレートのみ対応。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "remaining_time": {
+          "name": "残り時間",
+          "description": "残り時間（秒）。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "ラベルとアイコン",
+          "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "alert_options": {
+          "name": "alert オプション",
+          "description": "alert テンプレートのみ。"
+        },
+        "action_buttons": {
+          "name": "アクションボタン",
+          "description": "タップ可能なURLボタン。steps および alert テンプレートのみ。"
+        },
+        "display_options": {
+          "name": "表示・色・サウンド",
+          "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "アクティビティを更新 (Gauge)",
+      "description": "PushWard Live Activityの状態とコンテンツを更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "value": {
+          "name": "値",
+          "description": "gauge: 数値。timeline: ラベル付きの値オブジェクト（例: Temp=22.5）。"
+        },
+        "min_value": {
+          "name": "最小値",
+          "description": "gauge の最小値。"
+        },
+        "max_value": {
+          "name": "最大値",
+          "description": "gauge の最大値。"
+        },
+        "unit": {
+          "name": "単位",
+          "description": "値の表示単位（例: °C, %）。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
+        },
+        "progress": {
+          "name": "進捗",
+          "description": "0.0〜1.0の進捗値。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "remaining_time": {
+          "name": "残り時間",
+          "description": "残り時間（秒）。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "ラベルとアイコン",
+          "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "display_options": {
+          "name": "表示・色・サウンド",
+          "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "アクティビティを更新 (Timeline)",
+      "description": "PushWard Live Activityの状態とコンテンツを更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "value": {
+          "name": "値",
+          "description": "gauge: 数値。timeline: ラベル付きの値オブジェクト（例: Temp=22.5）。"
+        },
+        "unit": {
+          "name": "単位",
+          "description": "値の表示単位（例: °C, %）。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
+        },
+        "progress": {
+          "name": "進捗",
+          "description": "0.0〜1.0の進捗値。"
+        },
+        "units": {
+          "name": "単位マップ",
+          "description": "系列ごとの単位ラベル。キーは value dict のキーと一致する必要があります。timeline テンプレートのみ。"
+        },
+        "scale": {
+          "name": "スケール",
+          "description": "Y軸のスケールモード（線形または対数）。timeline テンプレートのみ。"
+        },
+        "decimals": {
+          "name": "小数点以下の桁数",
+          "description": "値表示の小数点以下の桁数（0〜10）。timeline テンプレートのみ。"
+        },
+        "smoothing": {
+          "name": "スムーズな折れ線",
+          "description": "データポイント間のカーブ補間を有効にします。timeline テンプレートのみ。"
+        },
+        "thresholds": {
+          "name": "しきい値",
+          "description": "スパークラインの水平参照線。timeline テンプレートのみ。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "remaining_time": {
+          "name": "残り時間",
+          "description": "残り時間（秒）。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "ラベルとアイコン",
+          "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge・timeline オプション",
+          "description": "gauge および timeline テンプレートのみ。"
+        },
+        "display_options": {
+          "name": "表示・色・サウンド",
+          "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        }
+      }
+    },
     "create_activity": {
       "name": "アクティビティを作成",
       "description": "新しいPushWard Live Activityを作成します。",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "PushWardに接続",
-        "description": "PushWardの統合キーを入力して開始してください。iOSアプリは現在TestFlightでパブリックベータ版です(App Storeにはまだ公開されていません): {testflight_url}",
         "data": {
           "integration_key": "統合キー"
-        },
-        "data_description": {
-          "integration_key": "PushWard iOSアプリ(TestFlight: {testflight_url})を開き、設定 → 統合キーへ移動します。デフォルトのキーをそのまま貼り付けるか、スコープ 'ha-*' で新しいキーを作成してください。"
         }
       },
       "reconfigure": {

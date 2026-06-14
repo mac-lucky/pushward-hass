@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Оновити активність",
+      "name": "Оновити активність (deprecated)",
       "description": "Оновити стан та вміст PushWard Live Activity.",
       "fields": {
         "slug": {
@@ -126,11 +126,11 @@
         },
         "step_labels": {
           "name": "Мітки кроків",
-          "description": "Власні мітки для кроків шаблону steps. Формат: 1=Мітка, 2=Мітка. Якщо порожньо — використовуються номери кроків."
+          "description": "Упорядкований список міток кроків. Довжина має дорівнювати total_steps. Лише шаблон steps."
         },
         "step_rows": {
           "name": "Рядки кроків",
-          "description": "Кількість кроків для відображення в одному рядку в шаблоні steps."
+          "description": "Упорядкований список висот рядків (1–10) для кожного кроку. Довжина має дорівнювати total_steps. Лише шаблон steps."
         },
         "fired_at": {
           "name": "Час спрацювання",
@@ -161,6 +161,538 @@
         "action_buttons": {
           "name": "Кнопки дій",
           "description": "Натискні кнопки-посилання. Лише для шаблонів steps та alert."
+        },
+        "display_options": {
+          "name": "Відображення, колір і звук",
+          "description": "Необов'язкове оформлення та перевизначення для оновлення. Застосовуються до будь-якого шаблону."
+        }
+      }
+    },
+    "update_activity_generic": {
+      "name": "Оновити активність (Generic)",
+      "description": "Оновити стан та вміст PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Ідентифікатор-slug активності."
+        },
+        "state": {
+          "name": "Стан",
+          "description": "Бажаний стан активності."
+        },
+        "state_text": {
+          "name": "Текст стану",
+          "description": "Текст, що відображається як стан активності."
+        },
+        "subtitle": {
+          "name": "Підзаголовок",
+          "description": "Текст підзаголовка активності."
+        },
+        "icon": {
+          "name": "Значок",
+          "description": "Назва SF Symbol або MDI-значка (наприклад, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогрес",
+          "description": "Значення прогресу від 0.0 до 1.0."
+        },
+        "completion_message": {
+          "name": "Повідомлення про завершення",
+          "description": "Повідомлення, що відображається під час завершення активності."
+        },
+        "accent_color": {
+          "name": "Акцентний колір",
+          "description": "Назва акцентного кольору активності."
+        },
+        "background_color": {
+          "name": "Колір фону",
+          "description": "Колір фону Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "text_color": {
+          "name": "Колір тексту",
+          "description": "Колір тексту Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "remaining_time": {
+          "name": "Час, що залишився",
+          "description": "Час, що залишився, у секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Назва звуку сповіщення для оновлення. Залиште порожнім, щоб використовувати системний звук iOS."
+        },
+        "priority": {
+          "name": "Пріоритет",
+          "description": "Пріоритет активності (0 = найнижчий, 10 = найвищий)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Підписи та значок",
+          "description": "Необов'язкові текстові підписи та значок. Застосовуються до будь-якого шаблону."
+        },
+        "display_options": {
+          "name": "Відображення, колір і звук",
+          "description": "Необов'язкове оформлення та перевизначення для оновлення. Застосовуються до будь-якого шаблону."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Оновити активність (Countdown)",
+      "description": "Оновити стан та вміст PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Ідентифікатор-slug активності."
+        },
+        "state": {
+          "name": "Стан",
+          "description": "Бажаний стан активності."
+        },
+        "end_date": {
+          "name": "Дата завершення",
+          "description": "Unix-часова мітка дати завершення countdown."
+        },
+        "completion_message": {
+          "name": "Повідомлення про завершення",
+          "description": "Повідомлення, що відображається під час завершення активності."
+        },
+        "state_text": {
+          "name": "Текст стану",
+          "description": "Текст, що відображається як стан активності."
+        },
+        "subtitle": {
+          "name": "Підзаголовок",
+          "description": "Текст підзаголовка активності."
+        },
+        "icon": {
+          "name": "Значок",
+          "description": "Назва SF Symbol або MDI-значка (наприклад, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогрес",
+          "description": "Значення прогресу від 0.0 до 1.0."
+        },
+        "warning_threshold": {
+          "name": "Попередній поріг",
+          "description": "Коли значення gauge або timeline досягає або перевищує це значення, відображається попереджувальний колір."
+        },
+        "alarm": {
+          "name": "Сигнал",
+          "description": "Активує сигнал AlarmKit при перевищенні попереднього порогу. Працює лише на iOS 26+."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Акцентний колір",
+          "description": "Назва акцентного кольору активності."
+        },
+        "background_color": {
+          "name": "Колір фону",
+          "description": "Колір фону Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "text_color": {
+          "name": "Колір тексту",
+          "description": "Колір тексту Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "remaining_time": {
+          "name": "Час, що залишився",
+          "description": "Час, що залишився, у секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Назва звуку сповіщення для оновлення. Залиште порожнім, щоб використовувати системний звук iOS."
+        },
+        "priority": {
+          "name": "Пріоритет",
+          "description": "Пріоритет активності (0 = найнижчий, 10 = найвищий)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Підписи та значок",
+          "description": "Необов'язкові текстові підписи та значок. Застосовуються до будь-якого шаблону."
+        },
+        "countdown_options": {
+          "name": "Параметри countdown",
+          "description": "Лише для шаблону countdown."
+        },
+        "display_options": {
+          "name": "Відображення, колір і звук",
+          "description": "Необов'язкове оформлення та перевизначення для оновлення. Застосовуються до будь-якого шаблону."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Оновити активність (Steps)",
+      "description": "Оновити стан та вміст PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Ідентифікатор-slug активності."
+        },
+        "state": {
+          "name": "Стан",
+          "description": "Бажаний стан активності."
+        },
+        "total_steps": {
+          "name": "Total Steps",
+          "description": "Загальна кількість steps."
+        },
+        "current_step": {
+          "name": "Поточний крок",
+          "description": "Номер поточного кроку."
+        },
+        "state_text": {
+          "name": "Текст стану",
+          "description": "Текст, що відображається як стан активності."
+        },
+        "subtitle": {
+          "name": "Підзаголовок",
+          "description": "Текст підзаголовка активності."
+        },
+        "icon": {
+          "name": "Значок",
+          "description": "Назва SF Symbol або MDI-значка (наприклад, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогрес",
+          "description": "Значення прогресу від 0.0 до 1.0."
+        },
+        "step_labels": {
+          "name": "Мітки кроків",
+          "description": "Упорядкований список міток кроків. Довжина має дорівнювати total_steps. Лише шаблон steps."
+        },
+        "step_rows": {
+          "name": "Рядки кроків",
+          "description": "Упорядкований список висот рядків (1–10) для кожного кроку. Довжина має дорівнювати total_steps. Лише шаблон steps."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Основна URL-адреса, відображувана як кнопка. Підтримується лише в шаблонах steps та alert."
+        },
+        "secondary_url": {
+          "name": "Додатковий URL",
+          "description": "Додаткова URL-адреса як друга кнопка. Підтримується лише в шаблонах steps та alert."
+        },
+        "completion_message": {
+          "name": "Повідомлення про завершення",
+          "description": "Повідомлення, що відображається під час завершення активності."
+        },
+        "accent_color": {
+          "name": "Акцентний колір",
+          "description": "Назва акцентного кольору активності."
+        },
+        "background_color": {
+          "name": "Колір фону",
+          "description": "Колір фону Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "text_color": {
+          "name": "Колір тексту",
+          "description": "Колір тексту Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "remaining_time": {
+          "name": "Час, що залишився",
+          "description": "Час, що залишився, у секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Назва звуку сповіщення для оновлення. Залиште порожнім, щоб використовувати системний звук iOS."
+        },
+        "priority": {
+          "name": "Пріоритет",
+          "description": "Пріоритет активності (0 = найнижчий, 10 = найвищий)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Підписи та значок",
+          "description": "Необов'язкові текстові підписи та значок. Застосовуються до будь-якого шаблону."
+        },
+        "steps_options": {
+          "name": "Параметри steps",
+          "description": "Лише для шаблону steps."
+        },
+        "action_buttons": {
+          "name": "Кнопки дій",
+          "description": "Натискні кнопки-посилання. Лише для шаблонів steps та alert."
+        },
+        "display_options": {
+          "name": "Відображення, колір і звук",
+          "description": "Необов'язкове оформлення та перевизначення для оновлення. Застосовуються до будь-якого шаблону."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Оновити активність (Alert)",
+      "description": "Оновити стан та вміст PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Ідентифікатор-slug активності."
+        },
+        "state": {
+          "name": "Стан",
+          "description": "Бажаний стан активності."
+        },
+        "severity": {
+          "name": "Серйозність",
+          "description": "Рівень серйозності Alert."
+        },
+        "state_text": {
+          "name": "Текст стану",
+          "description": "Текст, що відображається як стан активності."
+        },
+        "subtitle": {
+          "name": "Підзаголовок",
+          "description": "Текст підзаголовка активності."
+        },
+        "icon": {
+          "name": "Значок",
+          "description": "Назва SF Symbol або MDI-значка (наприклад, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогрес",
+          "description": "Значення прогресу від 0.0 до 1.0."
+        },
+        "fired_at": {
+          "name": "Час спрацювання",
+          "description": "Unix-мітка часу спрацювання активності. Використовується для відображення відносного часу."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Основна URL-адреса, відображувана як кнопка. Підтримується лише в шаблонах steps та alert."
+        },
+        "secondary_url": {
+          "name": "Додатковий URL",
+          "description": "Додаткова URL-адреса як друга кнопка. Підтримується лише в шаблонах steps та alert."
+        },
+        "completion_message": {
+          "name": "Повідомлення про завершення",
+          "description": "Повідомлення, що відображається під час завершення активності."
+        },
+        "accent_color": {
+          "name": "Акцентний колір",
+          "description": "Назва акцентного кольору активності."
+        },
+        "background_color": {
+          "name": "Колір фону",
+          "description": "Колір фону Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "text_color": {
+          "name": "Колір тексту",
+          "description": "Колір тексту Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "remaining_time": {
+          "name": "Час, що залишився",
+          "description": "Час, що залишився, у секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Назва звуку сповіщення для оновлення. Залиште порожнім, щоб використовувати системний звук iOS."
+        },
+        "priority": {
+          "name": "Пріоритет",
+          "description": "Пріоритет активності (0 = найнижчий, 10 = найвищий)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Підписи та значок",
+          "description": "Необов'язкові текстові підписи та значок. Застосовуються до будь-якого шаблону."
+        },
+        "alert_options": {
+          "name": "Параметри alert",
+          "description": "Лише для шаблону alert."
+        },
+        "action_buttons": {
+          "name": "Кнопки дій",
+          "description": "Натискні кнопки-посилання. Лише для шаблонів steps та alert."
+        },
+        "display_options": {
+          "name": "Відображення, колір і звук",
+          "description": "Необов'язкове оформлення та перевизначення для оновлення. Застосовуються до будь-якого шаблону."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Оновити активність (Gauge)",
+      "description": "Оновити стан та вміст PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Ідентифікатор-slug активності."
+        },
+        "state": {
+          "name": "Стан",
+          "description": "Бажаний стан активності."
+        },
+        "value": {
+          "name": "Значення",
+          "description": "Gauge: числове значення. timeline: об'єкт підписаних значень (наприклад, Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Мінімальне значення",
+          "description": "Мінімальне значення gauge."
+        },
+        "max_value": {
+          "name": "Максимальне значення",
+          "description": "Максимальне значення gauge."
+        },
+        "unit": {
+          "name": "Одиниця",
+          "description": "Одиниця вимірювання поруч із значенням (наприклад, °C, %)."
+        },
+        "state_text": {
+          "name": "Текст стану",
+          "description": "Текст, що відображається як стан активності."
+        },
+        "subtitle": {
+          "name": "Підзаголовок",
+          "description": "Текст підзаголовка активності."
+        },
+        "icon": {
+          "name": "Значок",
+          "description": "Назва SF Symbol або MDI-значка (наприклад, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогрес",
+          "description": "Значення прогресу від 0.0 до 1.0."
+        },
+        "completion_message": {
+          "name": "Повідомлення про завершення",
+          "description": "Повідомлення, що відображається під час завершення активності."
+        },
+        "accent_color": {
+          "name": "Акцентний колір",
+          "description": "Назва акцентного кольору активності."
+        },
+        "background_color": {
+          "name": "Колір фону",
+          "description": "Колір фону Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "text_color": {
+          "name": "Колір тексту",
+          "description": "Колір тексту Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "remaining_time": {
+          "name": "Час, що залишився",
+          "description": "Час, що залишився, у секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Назва звуку сповіщення для оновлення. Залиште порожнім, щоб використовувати системний звук iOS."
+        },
+        "priority": {
+          "name": "Пріоритет",
+          "description": "Пріоритет активності (0 = найнижчий, 10 = найвищий)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Підписи та значок",
+          "description": "Необов'язкові текстові підписи та значок. Застосовуються до будь-якого шаблону."
+        },
+        "display_options": {
+          "name": "Відображення, колір і звук",
+          "description": "Необов'язкове оформлення та перевизначення для оновлення. Застосовуються до будь-якого шаблону."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Оновити активність (Timeline)",
+      "description": "Оновити стан та вміст PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Ідентифікатор-slug активності."
+        },
+        "state": {
+          "name": "Стан",
+          "description": "Бажаний стан активності."
+        },
+        "value": {
+          "name": "Значення",
+          "description": "Gauge: числове значення. timeline: об'єкт підписаних значень (наприклад, Temp=22.5)."
+        },
+        "unit": {
+          "name": "Одиниця",
+          "description": "Одиниця вимірювання поруч із значенням (наприклад, °C, %)."
+        },
+        "state_text": {
+          "name": "Текст стану",
+          "description": "Текст, що відображається як стан активності."
+        },
+        "subtitle": {
+          "name": "Підзаголовок",
+          "description": "Текст підзаголовка активності."
+        },
+        "icon": {
+          "name": "Значок",
+          "description": "Назва SF Symbol або MDI-значка (наприклад, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогрес",
+          "description": "Значення прогресу від 0.0 до 1.0."
+        },
+        "units": {
+          "name": "Одиниці",
+          "description": "Мітки одиниць для серій timeline. Формат: attribute=Одиниця. Приклад: temp=°C, humidity=%"
+        },
+        "scale": {
+          "name": "Масштаб",
+          "description": "Режим масштабу осі Y (лінійний або логарифмічний). Лише для шаблону timeline."
+        },
+        "decimals": {
+          "name": "Знаки після коми",
+          "description": "Кількість знаків після коми для відображення значень (0–10). Лише для шаблону timeline."
+        },
+        "smoothing": {
+          "name": "Згладжені лінії",
+          "description": "Увімкнути інтерполяцію кривої між точками даних. Лише для шаблону timeline."
+        },
+        "thresholds": {
+          "name": "Пороги",
+          "description": "Горизонтальні опорні лінії на спарклайні. Лише для шаблону timeline."
+        },
+        "completion_message": {
+          "name": "Повідомлення про завершення",
+          "description": "Повідомлення, що відображається під час завершення активності."
+        },
+        "accent_color": {
+          "name": "Акцентний колір",
+          "description": "Назва акцентного кольору активності."
+        },
+        "background_color": {
+          "name": "Колір фону",
+          "description": "Колір фону Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "text_color": {
+          "name": "Колір тексту",
+          "description": "Колір тексту Live Activity. #RRGGBB або ім'я кольору. Залиште порожнім для системного значення за замовчуванням."
+        },
+        "remaining_time": {
+          "name": "Час, що залишився",
+          "description": "Час, що залишився, у секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Назва звуку сповіщення для оновлення. Залиште порожнім, щоб використовувати системний звук iOS."
+        },
+        "priority": {
+          "name": "Пріоритет",
+          "description": "Пріоритет активності (0 = найнижчий, 10 = найвищий)."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Підписи та значок",
+          "description": "Необов'язкові текстові підписи та значок. Застосовуються до будь-якого шаблону."
+        },
+        "gauge_timeline_options": {
+          "name": "Параметри gauge і timeline",
+          "description": "Лише для шаблонів gauge та timeline."
         },
         "display_options": {
           "name": "Відображення, колір і звук",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "Підключитися до PushWard",
-        "description": "Введіть ключ інтеграції PushWard для початку роботи. Додаток для iOS зараз доступний у публічній бета-версії в TestFlight (ще не в App Store): {testflight_url}",
         "data": {
           "integration_key": "Ключ інтеграції"
-        },
-        "data_description": {
-          "integration_key": "Відкрийте додаток PushWard iOS (TestFlight: {testflight_url}) → Налаштування → Ключі інтеграції. Можна вставити ключ за замовчуванням або створити новий зі сферою 'ha-*'."
         }
       },
       "reconfigure": {

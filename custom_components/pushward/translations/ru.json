@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "Обновить активность",
+      "name": "Обновить активность (deprecated)",
       "description": "Обновить состояние и содержимое PushWard Live Activity.",
       "fields": {
         "slug": {
@@ -168,6 +168,538 @@
         }
       }
     },
+    "update_activity_generic": {
+      "name": "Обновить активность (Generic)",
+      "description": "Обновить состояние и содержимое PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Идентификатор активности (slug)."
+        },
+        "state": {
+          "name": "Состояние",
+          "description": "Желаемое состояние активности."
+        },
+        "state_text": {
+          "name": "Текст состояния",
+          "description": "Текст, отображаемый как состояние активности."
+        },
+        "subtitle": {
+          "name": "Подзаголовок",
+          "description": "Текст подзаголовка, отображаемый в активности."
+        },
+        "icon": {
+          "name": "Иконка",
+          "description": "Имя иконки SF Symbol или MDI (например, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогресс",
+          "description": "Значение прогресса от 0.0 до 1.0."
+        },
+        "completion_message": {
+          "name": "Сообщение о завершении",
+          "description": "Сообщение, отображаемое при завершении активности."
+        },
+        "accent_color": {
+          "name": "Акцентный цвет",
+          "description": "Название акцентного цвета для активности."
+        },
+        "background_color": {
+          "name": "Цвет фона",
+          "description": "Цвет фона Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "text_color": {
+          "name": "Цвет текста",
+          "description": "Цвет текста Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "remaining_time": {
+          "name": "Оставшееся время",
+          "description": "Оставшееся время в секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Звук уведомления, воспроизводимый на устройстве при этом обновлении."
+        },
+        "priority": {
+          "name": "Переопределение приоритета",
+          "description": "Приоритет для одного обновления (0–10). Переопределяет настроенный приоритет активности только для этого push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Подписи и значок",
+          "description": "Необязательные текстовые подписи и значок. Применяются к любому шаблону."
+        },
+        "display_options": {
+          "name": "Отображение, цвет и звук",
+          "description": "Необязательное оформление и переопределения для обновления. Применяются к любому шаблону."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Обновить активность (Countdown)",
+      "description": "Обновить состояние и содержимое PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Идентификатор активности (slug)."
+        },
+        "state": {
+          "name": "Состояние",
+          "description": "Желаемое состояние активности."
+        },
+        "end_date": {
+          "name": "Дата окончания",
+          "description": "Unix-временная метка для даты окончания countdown."
+        },
+        "completion_message": {
+          "name": "Сообщение о завершении",
+          "description": "Сообщение, отображаемое при завершении активности."
+        },
+        "state_text": {
+          "name": "Текст состояния",
+          "description": "Текст, отображаемый как состояние активности."
+        },
+        "subtitle": {
+          "name": "Подзаголовок",
+          "description": "Текст подзаголовка, отображаемый в активности."
+        },
+        "icon": {
+          "name": "Иконка",
+          "description": "Имя иконки SF Symbol или MDI (например, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогресс",
+          "description": "Значение прогресса от 0.0 до 1.0."
+        },
+        "warning_threshold": {
+          "name": "Порог предупреждения",
+          "description": "Секунды до end_date, при достижении которых countdown переходит в состояние предупреждения. Только для шаблона countdown."
+        },
+        "alarm": {
+          "name": "Будильник",
+          "description": "Активировать будильник AlarmKit по истечении countdown (iOS 26+, только для шаблона countdown)."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "Акцентный цвет",
+          "description": "Название акцентного цвета для активности."
+        },
+        "background_color": {
+          "name": "Цвет фона",
+          "description": "Цвет фона Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "text_color": {
+          "name": "Цвет текста",
+          "description": "Цвет текста Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "remaining_time": {
+          "name": "Оставшееся время",
+          "description": "Оставшееся время в секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Звук уведомления, воспроизводимый на устройстве при этом обновлении."
+        },
+        "priority": {
+          "name": "Переопределение приоритета",
+          "description": "Приоритет для одного обновления (0–10). Переопределяет настроенный приоритет активности только для этого push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Подписи и значок",
+          "description": "Необязательные текстовые подписи и значок. Применяются к любому шаблону."
+        },
+        "countdown_options": {
+          "name": "Параметры countdown",
+          "description": "Только для шаблона countdown."
+        },
+        "display_options": {
+          "name": "Отображение, цвет и звук",
+          "description": "Необязательное оформление и переопределения для обновления. Применяются к любому шаблону."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Обновить активность (Steps)",
+      "description": "Обновить состояние и содержимое PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Идентификатор активности (slug)."
+        },
+        "state": {
+          "name": "Состояние",
+          "description": "Желаемое состояние активности."
+        },
+        "total_steps": {
+          "name": "Total Steps",
+          "description": "Общее количество steps."
+        },
+        "current_step": {
+          "name": "Текущий шаг",
+          "description": "Номер текущего шага."
+        },
+        "state_text": {
+          "name": "Текст состояния",
+          "description": "Текст, отображаемый как состояние активности."
+        },
+        "subtitle": {
+          "name": "Подзаголовок",
+          "description": "Текст подзаголовка, отображаемый в активности."
+        },
+        "icon": {
+          "name": "Иконка",
+          "description": "Имя иконки SF Symbol или MDI (например, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогресс",
+          "description": "Значение прогресса от 0.0 до 1.0."
+        },
+        "step_labels": {
+          "name": "Метки шагов",
+          "description": "Упорядоченный список меток шагов. Длина должна равняться total_steps. Только для шаблона steps."
+        },
+        "step_rows": {
+          "name": "Высоты строк шагов",
+          "description": "Упорядоченный список высот строк (1–10) для каждого шага. Длина должна равняться total_steps. Только для шаблона steps."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Основная ссылка, отображаемая как кнопка. Поддерживается только в шаблонах steps и alert."
+        },
+        "secondary_url": {
+          "name": "Вторичный URL",
+          "description": "Вторичная ссылка, отображаемая как вторая кнопка. Поддерживается только в шаблонах steps и alert."
+        },
+        "completion_message": {
+          "name": "Сообщение о завершении",
+          "description": "Сообщение, отображаемое при завершении активности."
+        },
+        "accent_color": {
+          "name": "Акцентный цвет",
+          "description": "Название акцентного цвета для активности."
+        },
+        "background_color": {
+          "name": "Цвет фона",
+          "description": "Цвет фона Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "text_color": {
+          "name": "Цвет текста",
+          "description": "Цвет текста Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "remaining_time": {
+          "name": "Оставшееся время",
+          "description": "Оставшееся время в секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Звук уведомления, воспроизводимый на устройстве при этом обновлении."
+        },
+        "priority": {
+          "name": "Переопределение приоритета",
+          "description": "Приоритет для одного обновления (0–10). Переопределяет настроенный приоритет активности только для этого push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Подписи и значок",
+          "description": "Необязательные текстовые подписи и значок. Применяются к любому шаблону."
+        },
+        "steps_options": {
+          "name": "Параметры steps",
+          "description": "Только для шаблона steps."
+        },
+        "action_buttons": {
+          "name": "Кнопки действий",
+          "description": "Нажимаемые кнопки-ссылки. Только для шаблонов steps и alert."
+        },
+        "display_options": {
+          "name": "Отображение, цвет и звук",
+          "description": "Необязательное оформление и переопределения для обновления. Применяются к любому шаблону."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Обновить активность (Alert)",
+      "description": "Обновить состояние и содержимое PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Идентификатор активности (slug)."
+        },
+        "state": {
+          "name": "Состояние",
+          "description": "Желаемое состояние активности."
+        },
+        "severity": {
+          "name": "Серьёзность",
+          "description": "Уровень серьёзности alert."
+        },
+        "state_text": {
+          "name": "Текст состояния",
+          "description": "Текст, отображаемый как состояние активности."
+        },
+        "subtitle": {
+          "name": "Подзаголовок",
+          "description": "Текст подзаголовка, отображаемый в активности."
+        },
+        "icon": {
+          "name": "Иконка",
+          "description": "Имя иконки SF Symbol или MDI (например, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогресс",
+          "description": "Значение прогресса от 0.0 до 1.0."
+        },
+        "fired_at": {
+          "name": "Время срабатывания",
+          "description": "Unix-временная метка момента срабатывания alert. Только для шаблона alert."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Основная ссылка, отображаемая как кнопка. Поддерживается только в шаблонах steps и alert."
+        },
+        "secondary_url": {
+          "name": "Вторичный URL",
+          "description": "Вторичная ссылка, отображаемая как вторая кнопка. Поддерживается только в шаблонах steps и alert."
+        },
+        "completion_message": {
+          "name": "Сообщение о завершении",
+          "description": "Сообщение, отображаемое при завершении активности."
+        },
+        "accent_color": {
+          "name": "Акцентный цвет",
+          "description": "Название акцентного цвета для активности."
+        },
+        "background_color": {
+          "name": "Цвет фона",
+          "description": "Цвет фона Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "text_color": {
+          "name": "Цвет текста",
+          "description": "Цвет текста Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "remaining_time": {
+          "name": "Оставшееся время",
+          "description": "Оставшееся время в секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Звук уведомления, воспроизводимый на устройстве при этом обновлении."
+        },
+        "priority": {
+          "name": "Переопределение приоритета",
+          "description": "Приоритет для одного обновления (0–10). Переопределяет настроенный приоритет активности только для этого push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Подписи и значок",
+          "description": "Необязательные текстовые подписи и значок. Применяются к любому шаблону."
+        },
+        "alert_options": {
+          "name": "Параметры alert",
+          "description": "Только для шаблона alert."
+        },
+        "action_buttons": {
+          "name": "Кнопки действий",
+          "description": "Нажимаемые кнопки-ссылки. Только для шаблонов steps и alert."
+        },
+        "display_options": {
+          "name": "Отображение, цвет и звук",
+          "description": "Необязательное оформление и переопределения для обновления. Применяются к любому шаблону."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Обновить активность (Gauge)",
+      "description": "Обновить состояние и содержимое PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Идентификатор активности (slug)."
+        },
+        "state": {
+          "name": "Состояние",
+          "description": "Желаемое состояние активности."
+        },
+        "value": {
+          "name": "Значение",
+          "description": "Gauge: числовое значение. Timeline: объект с подписанными значениями (например, Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Минимальное значение",
+          "description": "Минимальное значение gauge."
+        },
+        "max_value": {
+          "name": "Максимальное значение",
+          "description": "Максимальное значение gauge."
+        },
+        "unit": {
+          "name": "Единица измерения",
+          "description": "Единица измерения, отображаемая рядом со значением (например, °C, %)."
+        },
+        "state_text": {
+          "name": "Текст состояния",
+          "description": "Текст, отображаемый как состояние активности."
+        },
+        "subtitle": {
+          "name": "Подзаголовок",
+          "description": "Текст подзаголовка, отображаемый в активности."
+        },
+        "icon": {
+          "name": "Иконка",
+          "description": "Имя иконки SF Symbol или MDI (например, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогресс",
+          "description": "Значение прогресса от 0.0 до 1.0."
+        },
+        "completion_message": {
+          "name": "Сообщение о завершении",
+          "description": "Сообщение, отображаемое при завершении активности."
+        },
+        "accent_color": {
+          "name": "Акцентный цвет",
+          "description": "Название акцентного цвета для активности."
+        },
+        "background_color": {
+          "name": "Цвет фона",
+          "description": "Цвет фона Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "text_color": {
+          "name": "Цвет текста",
+          "description": "Цвет текста Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "remaining_time": {
+          "name": "Оставшееся время",
+          "description": "Оставшееся время в секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Звук уведомления, воспроизводимый на устройстве при этом обновлении."
+        },
+        "priority": {
+          "name": "Переопределение приоритета",
+          "description": "Приоритет для одного обновления (0–10). Переопределяет настроенный приоритет активности только для этого push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Подписи и значок",
+          "description": "Необязательные текстовые подписи и значок. Применяются к любому шаблону."
+        },
+        "display_options": {
+          "name": "Отображение, цвет и звук",
+          "description": "Необязательное оформление и переопределения для обновления. Применяются к любому шаблону."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Обновить активность (Timeline)",
+      "description": "Обновить состояние и содержимое PushWard Live Activity.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Идентификатор активности (slug)."
+        },
+        "state": {
+          "name": "Состояние",
+          "description": "Желаемое состояние активности."
+        },
+        "value": {
+          "name": "Значение",
+          "description": "Gauge: числовое значение. Timeline: объект с подписанными значениями (например, Temp=22.5)."
+        },
+        "unit": {
+          "name": "Единица измерения",
+          "description": "Единица измерения, отображаемая рядом со значением (например, °C, %)."
+        },
+        "state_text": {
+          "name": "Текст состояния",
+          "description": "Текст, отображаемый как состояние активности."
+        },
+        "subtitle": {
+          "name": "Подзаголовок",
+          "description": "Текст подзаголовка, отображаемый в активности."
+        },
+        "icon": {
+          "name": "Иконка",
+          "description": "Имя иконки SF Symbol или MDI (например, arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Прогресс",
+          "description": "Значение прогресса от 0.0 до 1.0."
+        },
+        "units": {
+          "name": "Карта единиц",
+          "description": "Метки единиц измерения для каждой серии. Ключи должны совпадать с ключами value dict. Только для шаблона timeline."
+        },
+        "scale": {
+          "name": "Масштаб",
+          "description": "Режим масштабирования оси Y (линейный или логарифмический). Только для шаблона timeline."
+        },
+        "decimals": {
+          "name": "Знаки после запятой",
+          "description": "Количество знаков после запятой при отображении значений (0–10). Только для шаблона timeline."
+        },
+        "smoothing": {
+          "name": "Сглаживание линий",
+          "description": "Включить интерполяцию кривой между точками данных. Только для шаблона timeline."
+        },
+        "thresholds": {
+          "name": "Пороги",
+          "description": "Горизонтальные опорные линии на спарклайне. Только для шаблона timeline."
+        },
+        "completion_message": {
+          "name": "Сообщение о завершении",
+          "description": "Сообщение, отображаемое при завершении активности."
+        },
+        "accent_color": {
+          "name": "Акцентный цвет",
+          "description": "Название акцентного цвета для активности."
+        },
+        "background_color": {
+          "name": "Цвет фона",
+          "description": "Цвет фона Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "text_color": {
+          "name": "Цвет текста",
+          "description": "Цвет текста Live Activity. Hex (#RRGGBB) или название цвета."
+        },
+        "remaining_time": {
+          "name": "Оставшееся время",
+          "description": "Оставшееся время в секундах."
+        },
+        "sound": {
+          "name": "Звук",
+          "description": "Звук уведомления, воспроизводимый на устройстве при этом обновлении."
+        },
+        "priority": {
+          "name": "Переопределение приоритета",
+          "description": "Приоритет для одного обновления (0–10). Переопределяет настроенный приоритет активности только для этого push."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Подписи и значок",
+          "description": "Необязательные текстовые подписи и значок. Применяются к любому шаблону."
+        },
+        "gauge_timeline_options": {
+          "name": "Параметры gauge и timeline",
+          "description": "Только для шаблонов gauge и timeline."
+        },
+        "display_options": {
+          "name": "Отображение, цвет и звук",
+          "description": "Необязательное оформление и переопределения для обновления. Применяются к любому шаблону."
+        }
+      }
+    },
     "create_activity": {
       "name": "Создать активность",
       "description": "Создать новую PushWard Live Activity.",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "Подключиться к PushWard",
-        "description": "Введите ключ интеграции PushWard для начала работы. Приложение для iOS сейчас доступно в публичной бета-версии в TestFlight (пока не в App Store): {testflight_url}",
         "data": {
           "integration_key": "Ключ интеграции"
-        },
-        "data_description": {
-          "integration_key": "Откройте приложение PushWard iOS (TestFlight: {testflight_url}) → Настройки → Ключи интеграции. Можно вставить ключ по умолчанию или создать новый с областью 'ha-*'."
         }
       },
       "reconfigure": {

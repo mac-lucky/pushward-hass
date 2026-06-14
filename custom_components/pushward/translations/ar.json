@@ -1,7 +1,7 @@
 {
   "services": {
     "update_activity": {
-      "name": "تحديث النشاط",
+      "name": "تحديث النشاط (deprecated)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
         "slug": {
@@ -168,6 +168,538 @@
         }
       }
     },
+    "update_activity_generic": {
+      "name": "تحديث النشاط (Generic)",
+      "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: arrow.down.circle.fill، mdi:download)."
+        },
+        "progress": {
+          "name": "التقدم",
+          "description": "قيمة التقدم بين 0.0 و 1.0."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "اسم لون التمييز للنشاط."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "remaining_time": {
+          "name": "الوقت المتبقي",
+          "description": "الوقت المتبقي بالثواني."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "التسميات والأيقونة",
+          "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "display_options": {
+          "name": "العرض واللون والصوت",
+          "description": "تنسيق اختياري وتجاوزات لكل تحديث. تنطبق على أي قالب."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "تحديث النشاط (Countdown)",
+      "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "end_date": {
+          "name": "تاريخ الانتهاء",
+          "description": "الطابع الزمني Unix لتاريخ انتهاء countdown."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: arrow.down.circle.fill، mdi:download)."
+        },
+        "progress": {
+          "name": "التقدم",
+          "description": "قيمة التقدم بين 0.0 و 1.0."
+        },
+        "warning_threshold": {
+          "name": "عتبة التحذير",
+          "description": "الثواني قبل end_date التي يدخل فيها countdown حالة التحذير. قالب countdown فقط."
+        },
+        "alarm": {
+          "name": "تنبيه",
+          "description": "تشغيل تنبيه AlarmKit عند انتهاء countdown (iOS 26+، قالب countdown فقط)."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "اسم لون التمييز للنشاط."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "remaining_time": {
+          "name": "الوقت المتبقي",
+          "description": "الوقت المتبقي بالثواني."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "التسميات والأيقونة",
+          "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "countdown_options": {
+          "name": "خيارات countdown",
+          "description": "قالب countdown فقط."
+        },
+        "display_options": {
+          "name": "العرض واللون والصوت",
+          "description": "تنسيق اختياري وتجاوزات لكل تحديث. تنطبق على أي قالب."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "تحديث النشاط (Steps)",
+      "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "total_steps": {
+          "name": "إجمالي Steps",
+          "description": "العدد الإجمالي لـ steps."
+        },
+        "current_step": {
+          "name": "الخطوة الحالية",
+          "description": "رقم الخطوة الحالية."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: arrow.down.circle.fill، mdi:download)."
+        },
+        "progress": {
+          "name": "التقدم",
+          "description": "قيمة التقدم بين 0.0 و 1.0."
+        },
+        "step_labels": {
+          "name": "تسميات الخطوات",
+          "description": "قائمة مرتبة من تسميات الخطوات. يجب أن يساوي طولها total_steps. قالب steps فقط."
+        },
+        "step_rows": {
+          "name": "ارتفاعات صفوف الخطوات",
+          "description": "قائمة مرتبة من ارتفاعات الصفوف (1-10) لكل خطوة. يجب أن يساوي طولها total_steps. قالب steps فقط."
+        },
+        "url": {
+          "name": "الرابط",
+          "description": "الرابط الأساسي الظاهر كزر قابل للنقر. مدعوم في قوالب steps و alert فقط."
+        },
+        "secondary_url": {
+          "name": "الرابط الثانوي",
+          "description": "الرابط الثانوي الظاهر كزر ثانٍ قابل للنقر. مدعوم في قوالب steps و alert فقط."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "اسم لون التمييز للنشاط."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "remaining_time": {
+          "name": "الوقت المتبقي",
+          "description": "الوقت المتبقي بالثواني."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "التسميات والأيقونة",
+          "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "steps_options": {
+          "name": "خيارات steps",
+          "description": "قالب steps فقط."
+        },
+        "action_buttons": {
+          "name": "أزرار الإجراءات",
+          "description": "أزرار روابط قابلة للنقر. قوالب steps وalert فقط."
+        },
+        "display_options": {
+          "name": "العرض واللون والصوت",
+          "description": "تنسيق اختياري وتجاوزات لكل تحديث. تنطبق على أي قالب."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "تحديث النشاط (Alert)",
+      "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "severity": {
+          "name": "مستوى الخطورة",
+          "description": "مستوى خطورة Alert."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: arrow.down.circle.fill، mdi:download)."
+        },
+        "progress": {
+          "name": "التقدم",
+          "description": "قيمة التقدم بين 0.0 و 1.0."
+        },
+        "fired_at": {
+          "name": "وقت التفعيل",
+          "description": "الطابع الزمني Unix عند تفعيل Alert. قالب alert فقط."
+        },
+        "url": {
+          "name": "الرابط",
+          "description": "الرابط الأساسي الظاهر كزر قابل للنقر. مدعوم في قوالب steps و alert فقط."
+        },
+        "secondary_url": {
+          "name": "الرابط الثانوي",
+          "description": "الرابط الثانوي الظاهر كزر ثانٍ قابل للنقر. مدعوم في قوالب steps و alert فقط."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "اسم لون التمييز للنشاط."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "remaining_time": {
+          "name": "الوقت المتبقي",
+          "description": "الوقت المتبقي بالثواني."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "التسميات والأيقونة",
+          "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "alert_options": {
+          "name": "خيارات alert",
+          "description": "قالب alert فقط."
+        },
+        "action_buttons": {
+          "name": "أزرار الإجراءات",
+          "description": "أزرار روابط قابلة للنقر. قوالب steps وalert فقط."
+        },
+        "display_options": {
+          "name": "العرض واللون والصوت",
+          "description": "تنسيق اختياري وتجاوزات لكل تحديث. تنطبق على أي قالب."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "تحديث النشاط (Gauge)",
+      "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "value": {
+          "name": "القيمة",
+          "description": "Gauge: قيمة رقمية. Timeline: كائن القيم المسماة (مثال: Temp=22.5)."
+        },
+        "min_value": {
+          "name": "الحد الأدنى للقيمة",
+          "description": "الحد الأدنى لقيمة gauge."
+        },
+        "max_value": {
+          "name": "الحد الأقصى للقيمة",
+          "description": "الحد الأقصى لقيمة gauge."
+        },
+        "unit": {
+          "name": "الوحدة",
+          "description": "وحدة عرض القيمة (مثال: °C، %)."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: arrow.down.circle.fill، mdi:download)."
+        },
+        "progress": {
+          "name": "التقدم",
+          "description": "قيمة التقدم بين 0.0 و 1.0."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "اسم لون التمييز للنشاط."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "remaining_time": {
+          "name": "الوقت المتبقي",
+          "description": "الوقت المتبقي بالثواني."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "التسميات والأيقونة",
+          "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "display_options": {
+          "name": "العرض واللون والصوت",
+          "description": "تنسيق اختياري وتجاوزات لكل تحديث. تنطبق على أي قالب."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "تحديث النشاط (Timeline)",
+      "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "value": {
+          "name": "القيمة",
+          "description": "Gauge: قيمة رقمية. Timeline: كائن القيم المسماة (مثال: Temp=22.5)."
+        },
+        "unit": {
+          "name": "الوحدة",
+          "description": "وحدة عرض القيمة (مثال: °C، %)."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: arrow.down.circle.fill، mdi:download)."
+        },
+        "progress": {
+          "name": "التقدم",
+          "description": "قيمة التقدم بين 0.0 و 1.0."
+        },
+        "units": {
+          "name": "خريطة الوحدات",
+          "description": "تسميات وحدات لكل سلسلة. يجب أن تتطابق المفاتيح مع مفاتيح value dict. قالب timeline فقط."
+        },
+        "scale": {
+          "name": "المقياس",
+          "description": "وضع مقياس المحور الصادي (خطي أو لوغاريتمي). قالب timeline فقط."
+        },
+        "decimals": {
+          "name": "المنازل العشرية",
+          "description": "عدد المنازل العشرية لعرض القيمة (0-10). قالب timeline فقط."
+        },
+        "smoothing": {
+          "name": "تنعيم الخطوط",
+          "description": "تفعيل الاستيفاء المنحني بين نقاط البيانات. قالب timeline فقط."
+        },
+        "thresholds": {
+          "name": "العتبات",
+          "description": "خطوط مرجعية أفقية على الرسم البياني المصغّر. قالب timeline فقط."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "اسم لون التمييز للنشاط."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "remaining_time": {
+          "name": "الوقت المتبقي",
+          "description": "الوقت المتبقي بالثواني."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "التسميات والأيقونة",
+          "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "gauge_timeline_options": {
+          "name": "خيارات gauge وtimeline",
+          "description": "قوالب gauge وtimeline فقط."
+        },
+        "display_options": {
+          "name": "العرض واللون والصوت",
+          "description": "تنسيق اختياري وتجاوزات لكل تحديث. تنطبق على أي قالب."
+        }
+      }
+    },
     "create_activity": {
       "name": "إنشاء نشاط",
       "description": "إنشاء Live Activity جديد في PushWard.",
@@ -281,12 +813,8 @@
     "step": {
       "user": {
         "title": "الاتصال بـ PushWard",
-        "description": "أدخل مفتاح التكامل الخاص بك في PushWard للبدء. تطبيق iOS متاح حاليًا في النسخة التجريبية العامة عبر TestFlight (وليس بعد على App Store): {testflight_url}",
         "data": {
           "integration_key": "مفتاح التكامل"
-        },
-        "data_description": {
-          "integration_key": "افتح تطبيق PushWard iOS (TestFlight: {testflight_url}) ← الإعدادات ← Integration Keys. يمكنك لصق المفتاح الافتراضي، أو إنشاء مفتاح جديد بنطاق 'ha-*'."
         }
       },
       "reconfigure": {

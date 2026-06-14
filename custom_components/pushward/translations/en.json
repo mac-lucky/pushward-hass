@@ -24,7 +24,7 @@
   },
   "services": {
     "update_activity": {
-      "name": "Update Activity",
+      "name": "Update Activity (deprecated)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
         "slug": {
@@ -195,6 +195,538 @@
         }
       }
     },
+    "update_activity_generic": {
+      "name": "Update Activity (Generic)",
+      "description": "Update a PushWard Live Activity state and content.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progress",
+          "description": "Progress value between 0.0 and 1.0."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color name for the activity."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "remaining_time": {
+          "name": "Remaining Time",
+          "description": "Remaining time in seconds."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & icon",
+          "description": "Optional text labels and icon. Apply to any template."
+        },
+        "display_options": {
+          "name": "Display, color & sound",
+          "description": "Optional styling and per-update overrides. Apply to any template."
+        }
+      }
+    },
+    "update_activity_countdown": {
+      "name": "Update Activity (Countdown)",
+      "description": "Update a PushWard Live Activity state and content.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "end_date": {
+          "name": "End Date",
+          "description": "Unix timestamp for countdown end date."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progress",
+          "description": "Progress value between 0.0 and 1.0."
+        },
+        "warning_threshold": {
+          "name": "Warning Threshold",
+          "description": "Seconds before end_date when the countdown enters warning state. Countdown template only."
+        },
+        "alarm": {
+          "name": "Alarm",
+          "description": "Trigger AlarmKit alarm on countdown expiry (iOS 26+, countdown template only)."
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Requires alarm (iOS 26+, countdown template only)."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color name for the activity."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "remaining_time": {
+          "name": "Remaining Time",
+          "description": "Remaining time in seconds."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & icon",
+          "description": "Optional text labels and icon. Apply to any template."
+        },
+        "countdown_options": {
+          "name": "Countdown options",
+          "description": "Only used by the countdown template."
+        },
+        "display_options": {
+          "name": "Display, color & sound",
+          "description": "Optional styling and per-update overrides. Apply to any template."
+        }
+      }
+    },
+    "update_activity_steps": {
+      "name": "Update Activity (Steps)",
+      "description": "Update a PushWard Live Activity state and content.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "total_steps": {
+          "name": "Total Steps",
+          "description": "Total number of steps."
+        },
+        "current_step": {
+          "name": "Current Step",
+          "description": "Current step number."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progress",
+          "description": "Progress value between 0.0 and 1.0."
+        },
+        "step_labels": {
+          "name": "Step Labels",
+          "description": "Ordered list of step labels. Length must equal total_steps. Steps template only."
+        },
+        "step_rows": {
+          "name": "Step Rows",
+          "description": "Ordered list of row heights (1-10) per step. Length must equal total_steps. Steps template only."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primary URL displayed as a tappable button. Only supported on steps and alert templates."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL displayed as a second tappable button. Only supported on steps and alert templates."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color name for the activity."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "remaining_time": {
+          "name": "Remaining Time",
+          "description": "Remaining time in seconds."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & icon",
+          "description": "Optional text labels and icon. Apply to any template."
+        },
+        "steps_options": {
+          "name": "Steps options",
+          "description": "Only used by the steps template."
+        },
+        "action_buttons": {
+          "name": "Action buttons",
+          "description": "Tappable URL buttons. Only used by the steps and alert templates."
+        },
+        "display_options": {
+          "name": "Display, color & sound",
+          "description": "Optional styling and per-update overrides. Apply to any template."
+        }
+      }
+    },
+    "update_activity_alert": {
+      "name": "Update Activity (Alert)",
+      "description": "Update a PushWard Live Activity state and content.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "severity": {
+          "name": "Severity",
+          "description": "Alert severity level."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progress",
+          "description": "Progress value between 0.0 and 1.0."
+        },
+        "fired_at": {
+          "name": "Fired At",
+          "description": "Unix timestamp when the alert was triggered. Alert template only."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primary URL displayed as a tappable button. Only supported on steps and alert templates."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL displayed as a second tappable button. Only supported on steps and alert templates."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color name for the activity."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "remaining_time": {
+          "name": "Remaining Time",
+          "description": "Remaining time in seconds."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & icon",
+          "description": "Optional text labels and icon. Apply to any template."
+        },
+        "alert_options": {
+          "name": "Alert options",
+          "description": "Only used by the alert template."
+        },
+        "action_buttons": {
+          "name": "Action buttons",
+          "description": "Tappable URL buttons. Only used by the steps and alert templates."
+        },
+        "display_options": {
+          "name": "Display, color & sound",
+          "description": "Optional styling and per-update overrides. Apply to any template."
+        }
+      }
+    },
+    "update_activity_gauge": {
+      "name": "Update Activity (Gauge)",
+      "description": "Update a PushWard Live Activity state and content.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "value": {
+          "name": "Value",
+          "description": "Gauge: numeric value. Timeline: labeled values object (e.g. Temp=22.5)."
+        },
+        "min_value": {
+          "name": "Min Value",
+          "description": "Minimum gauge value."
+        },
+        "max_value": {
+          "name": "Max Value",
+          "description": "Maximum gauge value."
+        },
+        "unit": {
+          "name": "Unit",
+          "description": "Display unit for the value (e.g. °C, %)."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progress",
+          "description": "Progress value between 0.0 and 1.0."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color name for the activity."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "remaining_time": {
+          "name": "Remaining Time",
+          "description": "Remaining time in seconds."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & icon",
+          "description": "Optional text labels and icon. Apply to any template."
+        },
+        "display_options": {
+          "name": "Display, color & sound",
+          "description": "Optional styling and per-update overrides. Apply to any template."
+        }
+      }
+    },
+    "update_activity_timeline": {
+      "name": "Update Activity (Timeline)",
+      "description": "Update a PushWard Live Activity state and content.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "value": {
+          "name": "Value",
+          "description": "Gauge: numeric value. Timeline: labeled values object (e.g. Temp=22.5)."
+        },
+        "unit": {
+          "name": "Unit",
+          "description": "Display unit for the value (e.g. °C, %)."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
+        },
+        "progress": {
+          "name": "Progress",
+          "description": "Progress value between 0.0 and 1.0."
+        },
+        "units": {
+          "name": "Units Map",
+          "description": "Per-series unit labels. Keys must match value dict keys. Timeline template only."
+        },
+        "scale": {
+          "name": "Scale",
+          "description": "Y-axis scale mode (linear or logarithmic). Timeline template only."
+        },
+        "decimals": {
+          "name": "Decimal Places",
+          "description": "Decimal places for value display (0-10). Timeline template only."
+        },
+        "smoothing": {
+          "name": "Smooth Lines",
+          "description": "Enable curve interpolation between data points. Timeline template only."
+        },
+        "thresholds": {
+          "name": "Thresholds",
+          "description": "Horizontal reference lines on the sparkline. Timeline template only."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color name for the activity."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "remaining_time": {
+          "name": "Remaining Time",
+          "description": "Remaining time in seconds."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        }
+      },
+      "sections": {
+        "labels": {
+          "name": "Labels & icon",
+          "description": "Optional text labels and icon. Apply to any template."
+        },
+        "gauge_timeline_options": {
+          "name": "Gauge & Timeline options",
+          "description": "Only used by the gauge and timeline templates."
+        },
+        "display_options": {
+          "name": "Display, color & sound",
+          "description": "Optional styling and per-update overrides. Apply to any template."
+        }
+      }
+    },
     "create_activity": {
       "name": "Create Activity",
       "description": "Create a new PushWard Live Activity.",
@@ -357,12 +889,12 @@
     "step": {
       "user": {
         "title": "Connect to PushWard",
-        "description": "Enter your PushWard integration key to get started. The iOS app is in public beta on TestFlight (not yet on the App Store): {testflight_url}",
+        "description": "Enter your PushWard integration key to get started. Get the PushWard iOS app from the App Store: {app_store_url}",
         "data": {
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Open the PushWard iOS app (TestFlight: {testflight_url}) → Settings → Integration Keys. You can paste the default key, or create a new one with scope 'ha-*'."
+          "integration_key": "Open the PushWard iOS app (App Store: {app_store_url}) → Settings → Integration Keys. You can paste the default key, or create a new one with scope 'ha-*'."
         }
       },
       "reconfigure": {
@@ -643,6 +1175,12 @@
         "already_configured": "A widget with this slug already exists.",
         "reconfigure_successful": "Widget configuration updated."
       }
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "The PushWard update_activity action is deprecated",
+      "description": "The `pushward.update_activity` action is deprecated. Switch your automations to the template-specific action instead — for example `pushward.update_activity_countdown` or `pushward.update_activity_gauge`. The old action still works for now but will be removed in a future release."
     }
   }
 }
