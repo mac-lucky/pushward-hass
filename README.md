@@ -146,7 +146,7 @@ By default every value (remaining time, progress, subtitle, gauge value, current
 
 #### Timeline sparkline backfill
 
-**Back-History Period** seeds the sparkline when the activity starts. Because Home Assistant 2024.8 [removed light/climate attributes from the recorder](https://github.com/home-assistant/core/issues/123028), attribute-based history (e.g. a light's `brightness`) can't be rebuilt from the recorder. The integration keeps its own in-memory ring buffer (≤300 samples per entity), populated from live state changes and persisted to `.storage/pushward_history.<entry_id>` so it survives restarts. Practical notes: the buffer is empty right after install and fills as the tracked attribute changes; backfill resolution matches state-change frequency (no polling); for **numeric-state sensors** the recorder is still used as a fallback, so those backfill immediately.
+**Back-History Period** seeds the sparkline when the activity starts. Because Home Assistant 2024.8 [removed light/climate attributes from the recorder](https://github.com/home-assistant/core/issues/123028), attribute-based history (e.g. a light's `brightness`) can't be rebuilt from the recorder. The integration keeps its own in-memory ring buffer (≤300 samples per entity), populated from live state changes and persisted to `.storage/pushward.history.<entry_id>` so it survives restarts. Practical notes: the buffer is empty right after install and fills as the tracked attribute changes; backfill resolution matches state-change frequency (no polling); for **numeric-state sensors** the recorder is still used as a fallback, so those backfill immediately.
 
 ### Add a tracked widget
 
@@ -406,7 +406,7 @@ Narrow to one area with `custom_components.pushward.api` (HTTP calls) or `custom
 - **Setup / reauth fails** — the integration key is invalid or expired (401). Create a fresh key in the iOS app and re-enter it.
 - **Service call rejected with a server reason** — fixable problems surface as a validation error (e.g. a missing `widgets`/`emails` capability, or an unverified email recipient). Read the `custom_components.pushward.api` debug lines for the HTTP status and body.
 - **`slug` doesn't match an existing activity** — create it first with `pushward.create_activity`.
-- **Wrong field for the chosen template** — see [which fields apply to which template](#pushwardupdate_activity).
+- **Wrong field for the chosen template** — see [which fields apply to which template](#pushwardupdate_activity_template).
 - **Widget never appears** — confirm the key has the `widgets` permission, and that the bound entity has a renderable value (value/progress/gauge widgets are skipped when the value isn't numeric).
 
 ## Requirements & License
