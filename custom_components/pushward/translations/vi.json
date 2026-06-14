@@ -140,6 +140,32 @@
           "name": "Đơn Vị",
           "description": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Tùy chọn countdown",
+          "description": "Chỉ dành cho mẫu countdown."
+        },
+        "steps_options": {
+          "name": "Tùy chọn steps",
+          "description": "Chỉ dành cho mẫu steps."
+        },
+        "alert_options": {
+          "name": "Tùy chọn alert",
+          "description": "Chỉ dành cho mẫu alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Tùy chọn gauge và timeline",
+          "description": "Chỉ dành cho mẫu gauge và timeline."
+        },
+        "action_buttons": {
+          "name": "Nút hành động",
+          "description": "Nút URL có thể nhấn. Chỉ dành cho mẫu steps và alert."
+        },
+        "display_options": {
+          "name": "Hiển thị, màu sắc và âm thanh",
+          "description": "Tùy chọn định kiểu và ghi đè theo từng cập nhật. Áp dụng cho mọi mẫu."
+        }
       }
     },
     "create_activity": {

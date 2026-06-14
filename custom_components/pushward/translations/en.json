@@ -167,6 +167,32 @@
           "name": "Units Map",
           "description": "Per-series unit labels. Keys must match value dict keys. Timeline template only."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Countdown options",
+          "description": "Only used by the countdown template."
+        },
+        "steps_options": {
+          "name": "Steps options",
+          "description": "Only used by the steps template."
+        },
+        "alert_options": {
+          "name": "Alert options",
+          "description": "Only used by the alert template."
+        },
+        "gauge_timeline_options": {
+          "name": "Gauge & Timeline options",
+          "description": "Only used by the gauge and timeline templates."
+        },
+        "action_buttons": {
+          "name": "Action buttons",
+          "description": "Tappable URL buttons. Only used by the steps and alert templates."
+        },
+        "display_options": {
+          "name": "Display, color & sound",
+          "description": "Optional styling and per-update overrides. Apply to any template."
+        }
       }
     },
     "create_activity": {

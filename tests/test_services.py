@@ -8,13 +8,14 @@ import pytest
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import (
     PushWardApiError,
     PushWardAuthError,
     PushWardEmailPermissionError,
+    PushWardForbiddenError,
 )
 from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
@@ -760,3 +761,133 @@ async def test_send_notification_service_rejects_invalid_media_type(hass: HomeAs
             },
             blocking=True,
         )
+
+
+# --- service error surfacing tests ---
+
+
+async def test_update_activity_api_error_becomes_home_assistant_error(hass: HomeAssistant) -> None:
+    """A generic API failure surfaces the server message, not a bare exception.
+
+    Previously the handler had no try/except, so the failure reached the UI as
+    "Unknown error". It now raises HomeAssistantError carrying the real reason.
+    """
+    api = _mock_api()
+    api.update_activity = AsyncMock(side_effect=PushWardApiError("activity not found"))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="activity not found") as exc:
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity",
+            {"slug": "missing", "state": "ongoing"},
+            blocking=True,
+        )
+    # A generic failure must NOT be downgraded to the user-fixable tier
+    # (ServiceValidationError subclasses HomeAssistantError, so the match above alone
+    # would still pass if the mapping regressed).
+    assert not isinstance(exc.value, ServiceValidationError)
+
+
+async def test_update_activity_forbidden_becomes_validation_error(hass: HomeAssistant) -> None:
+    """A 403 is user-fixable, so it surfaces as a clean ServiceValidationError."""
+    api = _mock_api()
+    api.update_activity = AsyncMock(
+        side_effect=PushWardForbiddenError("integration key lacks the required capability", status_code=403)
+    )
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError, match="capability"):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity",
+            {"slug": "x", "state": "ongoing"},
+            blocking=True,
+        )
+
+
+async def test_create_activity_api_error_becomes_home_assistant_error(hass: HomeAssistant) -> None:
+    """create_activity also surfaces the server message instead of a bare exception."""
+    api = _mock_api()
+    api.create_activity = AsyncMock(side_effect=PushWardApiError("slug already exists"))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="slug already exists") as exc:
+        await hass.services.async_call(
+            DOMAIN,
+            "create_activity",
+            {"slug": "dup", "name": "Dup", "priority": 1},
+            blocking=True,
+        )
+    assert not isinstance(exc.value, ServiceValidationError)
+
+
+async def test_create_activity_forbidden_becomes_validation_error(hass: HomeAssistant) -> None:
+    """create_activity's 403 tier surfaces as a clean ServiceValidationError."""
+    api = _mock_api()
+    api.create_activity = AsyncMock(
+        side_effect=PushWardForbiddenError("integration key lacks the required capability", status_code=403)
+    )
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError, match="capability"):
+        await hass.services.async_call(
+            DOMAIN,
+            "create_activity",
+            {"slug": "x", "name": "X", "priority": 1},
+            blocking=True,
+        )
+
+
+async def test_end_activity_api_error_becomes_home_assistant_error(hass: HomeAssistant) -> None:
+    """end_activity routes through the shared error guard (it calls update_activity)."""
+    api = _mock_api()
+    api.update_activity = AsyncMock(side_effect=PushWardApiError("activity not found"))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="activity not found") as exc:
+        await hass.services.async_call(DOMAIN, "end_activity", {"slug": "missing"}, blocking=True)
+    assert not isinstance(exc.value, ServiceValidationError)
+
+
+async def test_delete_activity_api_error_becomes_home_assistant_error(hass: HomeAssistant) -> None:
+    """delete_activity surfaces the server message instead of a bare exception."""
+    api = _mock_api()
+    api.delete_activity = AsyncMock(side_effect=PushWardApiError("activity not found"))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="activity not found") as exc:
+        await hass.services.async_call(DOMAIN, "delete_activity", {"slug": "missing"}, blocking=True)
+    assert not isinstance(exc.value, ServiceValidationError)
+
+
+async def test_send_notification_api_error_becomes_home_assistant_error(hass: HomeAssistant) -> None:
+    """send_notification surfaces the server message instead of a bare exception."""
+    api = _mock_api()
+    api.create_notification = AsyncMock(side_effect=PushWardApiError("notification rejected"))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="notification rejected") as exc:
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {"title": "t", "body": "b"},
+            blocking=True,
+        )
+    assert not isinstance(exc.value, ServiceValidationError)
+
+
+async def test_send_email_api_error_becomes_home_assistant_error(hass: HomeAssistant) -> None:
+    """send_email's non-403 tier surfaces as HomeAssistantError (403 is covered separately)."""
+    api = _mock_api()
+    api.send_email = AsyncMock(side_effect=PushWardApiError("smtp temporarily unavailable"))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="smtp temporarily unavailable") as exc:
+        await hass.services.async_call(
+            DOMAIN,
+            "send_email",
+            {"to": "a@b.com", "subject": "s", "body": "x"},
+            blocking=True,
+        )
+    assert not isinstance(exc.value, ServiceValidationError)

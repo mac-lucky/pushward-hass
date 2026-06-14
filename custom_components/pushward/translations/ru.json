@@ -140,6 +140,32 @@
           "name": "Карта единиц",
           "description": "Метки единиц измерения для каждой серии. Ключи должны совпадать с ключами value dict. Только для шаблона timeline."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Параметры countdown",
+          "description": "Только для шаблона countdown."
+        },
+        "steps_options": {
+          "name": "Параметры steps",
+          "description": "Только для шаблона steps."
+        },
+        "alert_options": {
+          "name": "Параметры alert",
+          "description": "Только для шаблона alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Параметры gauge и timeline",
+          "description": "Только для шаблонов gauge и timeline."
+        },
+        "action_buttons": {
+          "name": "Кнопки действий",
+          "description": "Нажимаемые кнопки-ссылки. Только для шаблонов steps и alert."
+        },
+        "display_options": {
+          "name": "Отображение, цвет и звук",
+          "description": "Необязательное оформление и переопределения для обновления. Применяются к любому шаблону."
+        }
       }
     },
     "create_activity": {

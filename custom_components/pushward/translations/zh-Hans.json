@@ -140,6 +140,32 @@
           "name": "单位映射",
           "description": "每个系列的单位标签。键必须与 value dict 的键匹配。仅适用于 timeline 模板。"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown 选项",
+          "description": "仅适用于 countdown 模板。"
+        },
+        "steps_options": {
+          "name": "steps 选项",
+          "description": "仅适用于 steps 模板。"
+        },
+        "alert_options": {
+          "name": "alert 选项",
+          "description": "仅适用于 alert 模板。"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge 和 timeline 选项",
+          "description": "仅适用于 gauge 和 timeline 模板。"
+        },
+        "action_buttons": {
+          "name": "操作按钮",
+          "description": "可点击的 URL 按钮。仅适用于 steps 和 alert 模板。"
+        },
+        "display_options": {
+          "name": "显示、颜色和声音",
+          "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        }
       }
     },
     "create_activity": {

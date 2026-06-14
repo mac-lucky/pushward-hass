@@ -140,6 +140,32 @@
           "name": "इकाइयां",
           "description": "Timeline श्रृंखला के लिए इकाई लेबल। प्रारूप: attribute=इकाई। उदाहरण: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown विकल्प",
+          "description": "केवल countdown टेम्पलेट।"
+        },
+        "steps_options": {
+          "name": "steps विकल्प",
+          "description": "केवल steps टेम्पलेट।"
+        },
+        "alert_options": {
+          "name": "alert विकल्प",
+          "description": "केवल alert टेम्पलेट।"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge और timeline विकल्प",
+          "description": "केवल gauge और timeline टेम्पलेट।"
+        },
+        "action_buttons": {
+          "name": "क्रिया बटन",
+          "description": "टैप करने योग्य URL बटन। केवल steps और alert टेम्पलेट।"
+        },
+        "display_options": {
+          "name": "प्रदर्शन, रंग और ध्वनि",
+          "description": "वैकल्पिक स्टाइलिंग और प्रति-अपडेट ओवरराइड। किसी भी टेम्पलेट पर लागू।"
+        }
       }
     },
     "create_activity": {

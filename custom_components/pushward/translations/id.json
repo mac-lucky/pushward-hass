@@ -140,6 +140,32 @@
           "name": "Satuan",
           "description": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Opsi countdown",
+          "description": "Hanya untuk templat countdown."
+        },
+        "steps_options": {
+          "name": "Opsi steps",
+          "description": "Hanya untuk templat steps."
+        },
+        "alert_options": {
+          "name": "Opsi alert",
+          "description": "Hanya untuk templat alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Opsi gauge dan timeline",
+          "description": "Hanya untuk templat gauge dan timeline."
+        },
+        "action_buttons": {
+          "name": "Tombol tindakan",
+          "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
+        },
+        "display_options": {
+          "name": "Tampilan, warna & suara",
+          "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        }
       }
     },
     "create_activity": {

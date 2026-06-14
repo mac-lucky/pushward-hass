@@ -140,6 +140,32 @@
           "name": "اکائیاں",
           "description": "Timeline سیریز کے لیے اکائی لیبل۔ فارمیٹ: attribute=اکائی۔ مثال: temp=°C، humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown اختیارات",
+          "description": "صرف countdown ٹیمپلیٹ کے لیے۔"
+        },
+        "steps_options": {
+          "name": "steps اختیارات",
+          "description": "صرف steps ٹیمپلیٹ کے لیے۔"
+        },
+        "alert_options": {
+          "name": "alert اختیارات",
+          "description": "صرف alert ٹیمپلیٹ کے لیے۔"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge اور timeline اختیارات",
+          "description": "صرف gauge اور timeline ٹیمپلیٹس کے لیے۔"
+        },
+        "action_buttons": {
+          "name": "ایکشن بٹن",
+          "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
+        },
+        "display_options": {
+          "name": "ڈسپلے، رنگ اور آواز",
+          "description": "اختیاری اسٹائلنگ اور فی اپڈیٹ اوور رائیڈز۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        }
       }
     },
     "create_activity": {

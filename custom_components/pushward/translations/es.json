@@ -140,6 +140,32 @@
           "name": "Mapa de unidades",
           "description": "Etiquetas de unidades por serie. Las claves deben coincidir con las claves del value dict. Solo para la plantilla timeline."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Opciones de countdown",
+          "description": "Solo para la plantilla countdown."
+        },
+        "steps_options": {
+          "name": "Opciones de steps",
+          "description": "Solo para la plantilla steps."
+        },
+        "alert_options": {
+          "name": "Opciones de alert",
+          "description": "Solo para la plantilla alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Opciones de gauge y timeline",
+          "description": "Solo para las plantillas gauge y timeline."
+        },
+        "action_buttons": {
+          "name": "Botones de acción",
+          "description": "Botones de URL interactivos. Solo para las plantillas steps y alert."
+        },
+        "display_options": {
+          "name": "Visualización, color y sonido",
+          "description": "Estilo opcional y ajustes por actualización. Se aplican a cualquier plantilla."
+        }
       }
     },
     "create_activity": {

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from contextlib import contextmanager
 from functools import partial
 
 import homeassistant.helpers.config_validation as cv
@@ -246,6 +247,24 @@ def _get_api(hass: HomeAssistant) -> PushWardApiClient:
     return next(iter(entries.values()))["api"]
 
 
+@contextmanager
+def _surface_api_errors():
+    """Translate PushWard API errors into user-facing HA errors.
+
+    Without this, an exception from the API bubbles up to the service layer as a
+    generic "Unknown error" with no hint of the cause. A 403 (missing capability,
+    unverified recipient, …) is user-fixable, so it becomes a ServiceValidationError;
+    everything else (4xx/5xx/connection) becomes a HomeAssistantError carrying the
+    server's message.
+    """
+    try:
+        yield
+    except PushWardForbiddenError as err:
+        raise ServiceValidationError(str(err)) from err
+    except PushWardApiError as err:
+        raise HomeAssistantError(str(err)) from err
+
+
 async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the update_activity service call."""
     api = _get_api(hass)
@@ -259,19 +278,21 @@ async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) 
             content[key] = call.data[field]
     sound = call.data.get("sound") or None
     priority_override = call.data.get("priority")
-    await api.update_activity(slug, state, content, sound=sound, priority=priority_override)
+    with _surface_api_errors():
+        await api.update_activity(slug, state, content, sound=sound, priority=priority_override)
 
 
 async def _async_handle_create_activity(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the create_activity service call."""
     api = _get_api(hass)
-    await api.create_activity(
-        slug=call.data["slug"],
-        name=call.data["name"],
-        priority=call.data["priority"],
-        ended_ttl=call.data.get("ended_ttl"),
-        stale_ttl=call.data.get("stale_ttl"),
-    )
+    with _surface_api_errors():
+        await api.create_activity(
+            slug=call.data["slug"],
+            name=call.data["name"],
+            priority=call.data["priority"],
+            ended_ttl=call.data.get("ended_ttl"),
+            stale_ttl=call.data.get("stale_ttl"),
+        )
 
 
 async def _async_handle_end_activity(hass: HomeAssistant, call: ServiceCall) -> None:
@@ -281,13 +302,15 @@ async def _async_handle_end_activity(hass: HomeAssistant, call: ServiceCall) -> 
     content = {}
     if "completion_message" in call.data:
         content["completion_message"] = call.data["completion_message"]
-    await api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
+    with _surface_api_errors():
+        await api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
 
 
 async def _async_handle_delete_activity(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the delete_activity service call."""
     api = _get_api(hass)
-    await api.delete_activity(call.data["slug"])
+    with _surface_api_errors():
+        await api.delete_activity(call.data["slug"])
 
 
 _NOTIFICATION_FIELDS = [
@@ -314,29 +337,25 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
     for field in _NOTIFICATION_FIELDS:
         if field in call.data:
             kwargs[field] = call.data[field]
-    await api.create_notification(
-        title=call.data["title"],
-        body=call.data["body"],
-        push=call.data["push"],
-        **kwargs,
-    )
+    with _surface_api_errors():
+        await api.create_notification(
+            title=call.data["title"],
+            body=call.data["body"],
+            push=call.data["push"],
+            **kwargs,
+        )
 
 
 async def _async_handle_send_email(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the send_email service call."""
     api = _get_api(hass)
-    try:
+    with _surface_api_errors():
         await api.send_email(
             to=call.data["to"],
             subject=call.data["subject"],
             text_body=call.data.get("body") or None,
             html_body=call.data.get("html_body") or None,
         )
-    except PushWardForbiddenError as err:
-        # Missing `emails` capability or an unverified recipient — user-fixable.
-        raise ServiceValidationError(str(err)) from err
-    except PushWardApiError as err:
-        raise HomeAssistantError(str(err)) from err
 
 
 async def _async_handle_widget_refresh(hass: HomeAssistant, call: ServiceCall) -> None:

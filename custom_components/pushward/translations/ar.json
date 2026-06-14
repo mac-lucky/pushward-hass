@@ -140,6 +140,32 @@
           "name": "خريطة الوحدات",
           "description": "تسميات وحدات لكل سلسلة. يجب أن تتطابق المفاتيح مع مفاتيح value dict. قالب timeline فقط."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "خيارات countdown",
+          "description": "قالب countdown فقط."
+        },
+        "steps_options": {
+          "name": "خيارات steps",
+          "description": "قالب steps فقط."
+        },
+        "alert_options": {
+          "name": "خيارات alert",
+          "description": "قالب alert فقط."
+        },
+        "gauge_timeline_options": {
+          "name": "خيارات gauge وtimeline",
+          "description": "قوالب gauge وtimeline فقط."
+        },
+        "action_buttons": {
+          "name": "أزرار الإجراءات",
+          "description": "أزرار روابط قابلة للنقر. قوالب steps وalert فقط."
+        },
+        "display_options": {
+          "name": "العرض واللون والصوت",
+          "description": "تنسيق اختياري وتجاوزات لكل تحديث. تنطبق على أي قالب."
+        }
       }
     },
     "create_activity": {

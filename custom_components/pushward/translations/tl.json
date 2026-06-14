@@ -140,6 +140,32 @@
           "name": "Mga Yunit",
           "description": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Mga opsyon ng countdown",
+          "description": "Para sa countdown template lamang."
+        },
+        "steps_options": {
+          "name": "Mga opsyon ng steps",
+          "description": "Para sa steps template lamang."
+        },
+        "alert_options": {
+          "name": "Mga opsyon ng alert",
+          "description": "Para sa alert template lamang."
+        },
+        "gauge_timeline_options": {
+          "name": "Mga opsyon ng gauge at timeline",
+          "description": "Para sa gauge at timeline na template lamang."
+        },
+        "action_buttons": {
+          "name": "Mga action button",
+          "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
+        },
+        "display_options": {
+          "name": "Display, kulay at tunog",
+          "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        }
       }
     },
     "create_activity": {

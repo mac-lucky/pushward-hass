@@ -140,6 +140,32 @@
           "name": "একক",
           "description": "Timeline সিরিজের জন্য একক লেবেল। ফরম্যাট: attribute=একক। উদাহরণ: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown অপশন",
+          "description": "শুধুমাত্র countdown টেমপ্লেটের জন্য।"
+        },
+        "steps_options": {
+          "name": "steps অপশন",
+          "description": "শুধুমাত্র steps টেমপ্লেটের জন্য।"
+        },
+        "alert_options": {
+          "name": "alert অপশন",
+          "description": "শুধুমাত্র alert টেমপ্লেটের জন্য।"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge ও timeline অপশন",
+          "description": "শুধুমাত্র gauge ও timeline টেমপ্লেটের জন্য।"
+        },
+        "action_buttons": {
+          "name": "অ্যাকশন বোতাম",
+          "description": "ট্যাপযোগ্য URL বোতাম। শুধুমাত্র steps ও alert টেমপ্লেটের জন্য।"
+        },
+        "display_options": {
+          "name": "প্রদর্শন, রঙ ও শব্দ",
+          "description": "ঐচ্ছিক স্টাইল ও প্রতি-আপডেট ওভাররাইড। যেকোনো টেমপ্লেটে প্রযোজ্য।"
+        }
       }
     },
     "create_activity": {

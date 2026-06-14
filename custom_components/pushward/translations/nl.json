@@ -140,6 +140,32 @@
           "name": "Eenhedenkaart",
           "description": "Eenheidslabels per reeks. Sleutels moeten overeenkomen met de sleutels van het value dict. Alleen voor het sjabloon timeline."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown-opties",
+          "description": "Alleen voor het sjabloon countdown."
+        },
+        "steps_options": {
+          "name": "steps-opties",
+          "description": "Alleen voor het sjabloon steps."
+        },
+        "alert_options": {
+          "name": "alert-opties",
+          "description": "Alleen voor het sjabloon alert."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge- en timeline-opties",
+          "description": "Alleen voor de sjablonen gauge en timeline."
+        },
+        "action_buttons": {
+          "name": "Actieknoppen",
+          "description": "Aanklikbare URL-knoppen. Alleen voor de sjablonen steps en alert."
+        },
+        "display_options": {
+          "name": "Weergave, kleur & geluid",
+          "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        }
       }
     },
     "create_activity": {

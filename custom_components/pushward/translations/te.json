@@ -140,6 +140,32 @@
           "name": "యూనిట్లు",
           "description": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown ఎంపికలు",
+          "description": "countdown టెంప్లేట్ మాత్రమే."
+        },
+        "steps_options": {
+          "name": "steps ఎంపికలు",
+          "description": "steps టెంప్లేట్ మాత్రమే."
+        },
+        "alert_options": {
+          "name": "alert ఎంపికలు",
+          "description": "alert టెంప్లేట్ మాత్రమే."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge మరియు timeline ఎంపికలు",
+          "description": "gauge మరియు timeline టెంప్లేట్‌లు మాత్రమే."
+        },
+        "action_buttons": {
+          "name": "చర్య బటన్‌లు",
+          "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
+        },
+        "display_options": {
+          "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
+          "description": "ఐచ్ఛిక శైలి మరియు ప్రతి-నవీకరణ ఓవర్‌రైడ్‌లు. ఏ టెంప్లేట్‌కైనా వర్తిస్తాయి."
+        }
       }
     },
     "create_activity": {

@@ -173,6 +173,34 @@ Push a content update to an existing activity.
 | `smoothing` | No | Curve interpolation between points (timeline) |
 | `thresholds` | No | Horizontal reference lines on sparkline (timeline) |
 
+> **Why so many fields?** Most are template-specific. In the Home Assistant UI (Developer
+> Tools → Actions, or the automation editor) the template-specific fields are tucked into
+> collapsed sections — **Countdown options**, **Steps options**, **Alert options**,
+> **Gauge & Timeline options**, **Action buttons**, and **Display, color & sound**. Expand
+> only the section that matches your template and ignore the rest. Every field stays optional
+> and can still be set from YAML regardless of which section it lives in.
+
+#### Which fields apply to which template
+
+`slug`, `state`, and `template`, plus the universal display/override fields (`progress`,
+`state_text`, `icon`, `subtitle`, `completion_message`, `accent_color`, `background_color`,
+`text_color`, `remaining_time`, `sound`, `priority`), work with **every** template. The
+remaining fields are template-specific:
+
+| Field(s) | generic | countdown | steps | alert | gauge | timeline |
+|----------|:-------:|:---------:|:-----:|:-----:|:-----:|:--------:|
+| `end_date`, `warning_threshold`, `alarm`, `snooze_seconds` | | ✓ | | | | |
+| `total_steps`, `current_step`, `step_labels`, `step_rows` | | | ✓ | | | |
+| `severity`, `fired_at` | | | | ✓ | | |
+| `min_value`, `max_value` | | | | | ✓ | |
+| `value`, `unit` | | | | | ✓ | ✓ |
+| `scale`, `decimals`, `smoothing`, `thresholds`, `units` | | | | | | ✓ |
+| `url`, `secondary_url` | | | ✓ | ✓ | | |
+
+Fields outside the active template's group have no visible effect for that template. If a call
+fails, the error now carries the server's reason instead of a generic "Unknown error" — see
+[Troubleshooting](#troubleshooting) below.
+
 ### `pushward.end_activity`
 
 End an activity with an optional completion message.
@@ -258,6 +286,38 @@ The integration ships with UI translations for 23 languages in addition to Engli
 If you spot a bad translation, please [open an issue](https://github.com/mac-lucky/pushward-hass/issues) or submit a PR editing the relevant `custom_components/pushward/translations/<lang>.json` file. See [`custom_components/pushward/translations/README.md`](custom_components/pushward/translations/README.md) for details.
 
 To use the English strings regardless of your Home Assistant language, switch your HA user profile language to English (**Settings → user profile → Language**).
+
+## Troubleshooting
+
+### Viewing logs
+
+- **In the UI:** **Settings → System → Logs**, then search for `pushward`. Click an entry to expand the full traceback.
+- **Log file:** the same lines are written to `<config>/home-assistant.log` (rotated to `home-assistant.log.1`).
+- **Enable debug logging** (no restart needed) from **Developer Tools → Actions**, run `logger.set_level`:
+
+  ```yaml
+  action: logger.set_level
+  data:
+    custom_components.pushward: debug
+  ```
+
+  Or persist it in `configuration.yaml`:
+
+  ```yaml
+  logger:
+    logs:
+      custom_components.pushward: debug
+  ```
+
+  Narrow to one area with `custom_components.pushward.api` (HTTP calls) or `custom_components.pushward.activity_manager`.
+
+### "Unknown error" when calling a service
+
+Service calls surface the server's actual reason — a validation error for fixable problems (e.g. a missing key capability or an unverified email recipient), otherwise an error carrying the server's message. If a call still fails with a vague message, enable debug logging as above and read the `custom_components.pushward.api` lines for the HTTP status and response body. Common causes:
+
+- The `slug` doesn't match an existing activity — create it first with `pushward.create_activity`.
+- A value has the wrong type for the chosen template — see [Which fields apply to which template](#which-fields-apply-to-which-template).
+- The integration key is missing a required capability (e.g. `widgets` or `emails`).
 
 ## Requirements
 

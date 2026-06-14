@@ -140,6 +140,32 @@
           "name": "एकके",
           "description": "Timeline मालिकांसाठी एकक लेबल. स्वरूप: attribute=एकक. उदाहरण: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown पर्याय",
+          "description": "फक्त countdown टेम्पलेटसाठी."
+        },
+        "steps_options": {
+          "name": "steps पर्याय",
+          "description": "फक्त steps टेम्पलेटसाठी."
+        },
+        "alert_options": {
+          "name": "alert पर्याय",
+          "description": "फक्त alert टेम्पलेटसाठी."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge आणि timeline पर्याय",
+          "description": "फक्त gauge आणि timeline टेम्पलेटसाठी."
+        },
+        "action_buttons": {
+          "name": "क्रिया बटणे",
+          "description": "टॅप करता येण्याजोगी URL बटणे. फक्त steps आणि alert टेम्पलेटसाठी."
+        },
+        "display_options": {
+          "name": "प्रदर्शन, रंग आणि ध्वनी",
+          "description": "पर्यायी शैली आणि प्रति-अपडेट ओव्हरराइड्स. कोणत्याही टेम्पलेटला लागू."
+        }
       }
     },
     "create_activity": {

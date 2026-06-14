@@ -140,6 +140,32 @@
           "name": "Unități",
           "description": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Opțiuni countdown",
+          "description": "Numai pentru șablonul countdown."
+        },
+        "steps_options": {
+          "name": "Opțiuni steps",
+          "description": "Numai pentru șablonul steps."
+        },
+        "alert_options": {
+          "name": "Opțiuni alert",
+          "description": "Numai pentru șablonul alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Opțiuni gauge și timeline",
+          "description": "Numai pentru șabloanele gauge și timeline."
+        },
+        "action_buttons": {
+          "name": "Butoane de acțiune",
+          "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
+        },
+        "display_options": {
+          "name": "Afișare, culoare și sunet",
+          "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        }
       }
     },
     "create_activity": {

@@ -140,6 +140,32 @@
           "name": "Einheitenzuordnung",
           "description": "Einheitenbeschriftungen pro Datenreihe. Schlüssel müssen mit den Schlüsseln des value dict übereinstimmen. Nur für die Vorlage 'timeline'."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown-Optionen",
+          "description": "Nur für die Vorlage 'countdown'."
+        },
+        "steps_options": {
+          "name": "steps-Optionen",
+          "description": "Nur für die Vorlage 'steps'."
+        },
+        "alert_options": {
+          "name": "alert-Optionen",
+          "description": "Nur für die Vorlage 'alert'."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge- und timeline-Optionen",
+          "description": "Nur für die Vorlagen 'gauge' und 'timeline'."
+        },
+        "action_buttons": {
+          "name": "Aktionsschaltflächen",
+          "description": "Antippbare URL-Schaltflächen. Nur für die Vorlagen 'steps' und 'alert'."
+        },
+        "display_options": {
+          "name": "Anzeige, Farbe & Ton",
+          "description": "Optionale Gestaltung und Überschreibungen pro Update. Gilt für jede Vorlage."
+        }
       }
     },
     "create_activity": {

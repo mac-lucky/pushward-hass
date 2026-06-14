@@ -140,6 +140,32 @@
           "name": "Mapa jednostek",
           "description": "Etykiety jednostek dla każdej serii. Klucze muszą odpowiadać kluczom value dict. Tylko szablon timeline."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Opcje countdown",
+          "description": "Tylko szablon countdown."
+        },
+        "steps_options": {
+          "name": "Opcje steps",
+          "description": "Tylko szablon steps."
+        },
+        "alert_options": {
+          "name": "Opcje alert",
+          "description": "Tylko szablon alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Opcje gauge i timeline",
+          "description": "Tylko szablony gauge i timeline."
+        },
+        "action_buttons": {
+          "name": "Przyciski akcji",
+          "description": "Klikalne przyciski URL. Tylko szablony steps i alert."
+        },
+        "display_options": {
+          "name": "Wyświetlanie, kolor i dźwięk",
+          "description": "Opcjonalna stylizacja i nadpisania dla danej aktualizacji. Dotyczą każdego szablonu."
+        }
       }
     },
     "create_activity": {

@@ -140,6 +140,32 @@
           "name": "அலகுகள்",
           "description": "Timeline தொடர்களுக்கான அலகு தலைப்புகள். வடிவம்: attribute=அலகு. எ.கா: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown விருப்பங்கள்",
+          "description": "countdown வார்ப்புரு மட்டுமே."
+        },
+        "steps_options": {
+          "name": "steps விருப்பங்கள்",
+          "description": "steps வார்ப்புரு மட்டுமே."
+        },
+        "alert_options": {
+          "name": "alert விருப்பங்கள்",
+          "description": "alert வார்ப்புரு மட்டுமே."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge மற்றும் timeline விருப்பங்கள்",
+          "description": "gauge மற்றும் timeline வார்ப்புருகள் மட்டுமே."
+        },
+        "action_buttons": {
+          "name": "செயல் பொத்தான்கள்",
+          "description": "தட்டக்கூடிய URL பொத்தான்கள். steps மற்றும் alert வார்ப்புருகள் மட்டுமே."
+        },
+        "display_options": {
+          "name": "காட்சி, நிறம் மற்றும் ஒலி",
+          "description": "விருப்பத் தேர்வு பாணி மற்றும் ஒவ்வொரு புதுப்பிப்புக்கான மேலெழுதல்கள். எந்த வார்ப்புருவுக்கும் பொருந்தும்."
+        }
       }
     },
     "create_activity": {

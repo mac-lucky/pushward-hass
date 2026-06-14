@@ -60,212 +60,230 @@ update_activity:
       example: "episode-01.mkv"
       selector:
         text:
-    accent_color:
-      name: Accent Color
-      description: Accent color name for the activity.
-      example: "blue"
-      selector:
-        text:
-    remaining_time:
-      name: Remaining Time
-      description: Remaining time in seconds.
-      example: 120
-      selector:
-        number:
-          min: 0
-          mode: box
-    url:
-      name: URL
-      description: Primary URL displayed as a tappable button. Only supported on steps and alert templates.
-      example: "https://example.com"
-      selector:
-        text:
-    secondary_url:
-      name: Secondary URL
-      description: Secondary URL displayed as a second tappable button. Only supported on steps and alert templates.
-      example: "https://example.com/details"
-      selector:
-        text:
-    end_date:
-      name: End Date
-      description: Unix timestamp for countdown end date.
-      example: 1700000000
-      selector:
-        number:
-          min: 0
-          mode: box
-    total_steps:
-      name: Total Steps
-      description: Total number of steps.
-      example: 5
-      selector:
-        number:
-          min: 1
-          mode: box
-    current_step:
-      name: Current Step
-      description: Current step number.
-      example: 2
-      selector:
-        number:
-          min: 0
-          mode: box
-    severity:
-      name: Severity
-      description: Alert severity level.
-      example: "warning"
-      selector:
-        select:
-          options:
-            - "critical"
-            - "warning"
-            - "info"
     completion_message:
       name: Completion Message
       description: Message shown when the activity ends.
       example: "Download complete!"
       selector:
         text:
-    value:
-      name: Value
-      description: "Gauge: numeric value. Timeline: labeled values object (e.g. Temp=22.5)."
-      example: 22.5
-      selector:
-        object:
-    min_value:
-      name: Min Value
-      description: Minimum gauge value.
-      example: 0
-      selector:
-        number:
-          step: 0.1
-          mode: box
-    max_value:
-      name: Max Value
-      description: Maximum gauge value.
-      example: 100
-      selector:
-        number:
-          step: 0.1
-          mode: box
-    unit:
-      name: Unit
-      description: Display unit for the value (e.g. °C, %).
-      example: "\u00b0C"
-      selector:
-        text:
-    scale:
-      name: Scale
-      description: Y-axis scale mode (linear or logarithmic). Timeline template only.
-      example: "linear"
-      selector:
-        select:
-          options:
-            - "linear"
-            - "logarithmic"
-    decimals:
-      name: Decimal Places
-      description: Decimal places for value display (0-10). Timeline template only.
-      example: 1
-      selector:
-        number:
-          min: 0
-          max: 10
-          mode: box
-    smoothing:
-      name: Smooth Lines
-      description: Enable curve interpolation between data points. Timeline template only.
-      selector:
-        boolean:
-    thresholds:
-      name: Thresholds
-      description: Horizontal reference lines on the sparkline. Timeline template only.
-      selector:
-        object:
-    sound:
-      name: Sound
-      description: Override the notification sound for this update.
-      example: "chime"
-      selector:
-        select:
-          options:
-            - "default"
-            - "chime"
-            - "alert"
-            - "success"
-            - "warning"
-            - "bell"
-            - "ding"
-            - "buzz"
-            - "notification"
-    priority:
-      name: Priority Override
-      description: Override activity priority for this update (0 = lowest, 10 = highest).
-      example: 5
-      selector:
-        number:
-          min: 0
-          max: 10
-          mode: slider
-    background_color:
-      name: Background Color
-      description: Background color as a hex value (e.g. #1a2b3c) or named color (e.g. blue).
-      example: "#1a2b3c"
-      selector:
-        text:
-    text_color:
-      name: Text Color
-      description: Text color as a hex value (e.g. #ffffff) or named color (e.g. white).
-      example: "#ffffff"
-      selector:
-        text:
-    warning_threshold:
-      name: Warning Threshold
-      description: Seconds remaining at which the countdown enters warning state. Countdown template only.
-      example: 30
-      selector:
-        number:
-          min: 0
-          mode: box
-          unit_of_measurement: seconds
-    alarm:
-      name: Alarm
-      description: Trigger a device alarm when the countdown expires. Countdown template only (iOS 26+).
-      selector:
-        boolean:
-    snooze_seconds:
-      name: Snooze Seconds
-      description: How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+).
-      example: 600
-      selector:
-        number:
-          min: 60
-          max: 3600
-          mode: box
-          unit_of_measurement: seconds
-    step_labels:
-      name: Step Labels
-      description: Labels for each step as a YAML object keyed by step number (e.g. {"1":"Step 1","2":"Step 2"}). Steps template only.
-      selector:
-        object:
-    step_rows:
-      name: Step Rows
-      description: Row heights for each step as a list of integers (1–10). Steps template only.
-      selector:
-        object:
-    fired_at:
-      name: Fired At
-      description: Unix timestamp when the alert was triggered. Alert template only.
-      example: 1700000000
-      selector:
-        number:
-          min: 0
-          mode: box
-    units:
-      name: Units
-      description: Per-series unit labels as a YAML object (e.g. {"temp":"°C","humidity":"%"}). Timeline template only.
-      selector:
-        object:
+    countdown_options:
+      collapsed: true
+      fields:
+        end_date:
+          name: End Date
+          description: Unix timestamp for countdown end date.
+          example: 1700000000
+          selector:
+            number:
+              min: 0
+              mode: box
+        warning_threshold:
+          name: Warning Threshold
+          description: Seconds remaining at which the countdown enters warning state. Countdown template only.
+          example: 30
+          selector:
+            number:
+              min: 0
+              mode: box
+              unit_of_measurement: seconds
+        alarm:
+          name: Alarm
+          description: Trigger a device alarm when the countdown expires. Countdown template only (iOS 26+).
+          selector:
+            boolean:
+        snooze_seconds:
+          name: Snooze Seconds
+          description: How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+).
+          example: 600
+          selector:
+            number:
+              min: 60
+              max: 3600
+              mode: box
+              unit_of_measurement: seconds
+    steps_options:
+      collapsed: true
+      fields:
+        total_steps:
+          name: Total Steps
+          description: Total number of steps. Steps template only.
+          example: 5
+          selector:
+            number:
+              min: 1
+              mode: box
+        current_step:
+          name: Current Step
+          description: Current step number. Steps template only.
+          example: 2
+          selector:
+            number:
+              min: 0
+              mode: box
+        step_labels:
+          name: Step Labels
+          description: Labels for each step as a YAML object keyed by step number (e.g. {"1":"Step 1","2":"Step 2"}). Steps template only.
+          selector:
+            object:
+        step_rows:
+          name: Step Rows
+          description: Row heights for each step as a list of integers (1–10). Steps template only.
+          selector:
+            object:
+    alert_options:
+      collapsed: true
+      fields:
+        severity:
+          name: Severity
+          description: Alert severity level. Alert template only.
+          example: "warning"
+          selector:
+            select:
+              options:
+                - "critical"
+                - "warning"
+                - "info"
+        fired_at:
+          name: Fired At
+          description: Unix timestamp when the alert was triggered. Alert template only.
+          example: 1700000000
+          selector:
+            number:
+              min: 0
+              mode: box
+    gauge_timeline_options:
+      collapsed: true
+      fields:
+        value:
+          name: Value
+          description: "Gauge: numeric value. Timeline: labeled values object (e.g. Temp=22.5)."
+          example: 22.5
+          selector:
+            object:
+        min_value:
+          name: Min Value
+          description: Minimum gauge value. Gauge template only.
+          example: 0
+          selector:
+            number:
+              step: 0.1
+              mode: box
+        max_value:
+          name: Max Value
+          description: Maximum gauge value. Gauge template only.
+          example: 100
+          selector:
+            number:
+              step: 0.1
+              mode: box
+        unit:
+          name: Unit
+          description: Display unit for the value (e.g. °C, %). Gauge and timeline templates.
+          example: "°C"
+          selector:
+            text:
+        scale:
+          name: Scale
+          description: Y-axis scale mode (linear or logarithmic). Timeline template only.
+          example: "linear"
+          selector:
+            select:
+              options:
+                - "linear"
+                - "logarithmic"
+        decimals:
+          name: Decimal Places
+          description: Decimal places for value display (0-10). Timeline template only.
+          example: 1
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: box
+        smoothing:
+          name: Smooth Lines
+          description: Enable curve interpolation between data points. Timeline template only.
+          selector:
+            boolean:
+        thresholds:
+          name: Thresholds
+          description: Horizontal reference lines on the sparkline. Timeline template only.
+          selector:
+            object:
+        units:
+          name: Units
+          description: Per-series unit labels as a YAML object (e.g. {"temp":"°C","humidity":"%"}). Timeline template only.
+          selector:
+            object:
+    action_buttons:
+      collapsed: true
+      fields:
+        url:
+          name: URL
+          description: Primary URL displayed as a tappable button. Only supported on steps and alert templates.
+          example: "https://example.com"
+          selector:
+            text:
+        secondary_url:
+          name: Secondary URL
+          description: Secondary URL displayed as a second tappable button. Only supported on steps and alert templates.
+          example: "https://example.com/details"
+          selector:
+            text:
+    display_options:
+      collapsed: true
+      fields:
+        accent_color:
+          name: Accent Color
+          description: Accent color name for the activity.
+          example: "blue"
+          selector:
+            text:
+        background_color:
+          name: Background Color
+          description: Background color as a hex value (e.g. #1a2b3c) or named color (e.g. blue).
+          example: "#1a2b3c"
+          selector:
+            text:
+        text_color:
+          name: Text Color
+          description: Text color as a hex value (e.g. #ffffff) or named color (e.g. white).
+          example: "#ffffff"
+          selector:
+            text:
+        remaining_time:
+          name: Remaining Time
+          description: Remaining time in seconds.
+          example: 120
+          selector:
+            number:
+              min: 0
+              mode: box
+        sound:
+          name: Sound
+          description: Override the notification sound for this update.
+          example: "chime"
+          selector:
+            select:
+              options:
+                - "default"
+                - "chime"
+                - "alert"
+                - "success"
+                - "warning"
+                - "bell"
+                - "ding"
+                - "buzz"
+                - "notification"
+        priority:
+          name: Priority Override
+          description: Override activity priority for this update (0 = lowest, 10 = highest).
+          example: 5
+          selector:
+            number:
+              min: 0
+              max: 10
+              mode: slider
 
 create_activity:
   name: Create Activity

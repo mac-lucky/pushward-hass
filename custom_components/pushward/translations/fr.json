@@ -140,6 +140,32 @@
           "name": "Carte des unités",
           "description": "Libellés d'unités par série. Les clés doivent correspondre aux clés du value dict. Modèle timeline uniquement."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Options countdown",
+          "description": "Modèle countdown uniquement."
+        },
+        "steps_options": {
+          "name": "Options steps",
+          "description": "Modèle steps uniquement."
+        },
+        "alert_options": {
+          "name": "Options alert",
+          "description": "Modèle alert uniquement."
+        },
+        "gauge_timeline_options": {
+          "name": "Options gauge et timeline",
+          "description": "Modèles gauge et timeline uniquement."
+        },
+        "action_buttons": {
+          "name": "Boutons d'action",
+          "description": "Boutons URL cliquables. Modèles steps et alert uniquement."
+        },
+        "display_options": {
+          "name": "Affichage, couleur et son",
+          "description": "Style facultatif et substitutions par mise à jour. S'appliquent à tout modèle."
+        }
       }
     },
     "create_activity": {

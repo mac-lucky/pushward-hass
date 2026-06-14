@@ -140,6 +140,32 @@
           "name": "単位マップ",
           "description": "系列ごとの単位ラベル。キーは value dict のキーと一致する必要があります。timeline テンプレートのみ。"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown オプション",
+          "description": "countdown テンプレートのみ。"
+        },
+        "steps_options": {
+          "name": "steps オプション",
+          "description": "steps テンプレートのみ。"
+        },
+        "alert_options": {
+          "name": "alert オプション",
+          "description": "alert テンプレートのみ。"
+        },
+        "gauge_timeline_options": {
+          "name": "gauge・timeline オプション",
+          "description": "gauge および timeline テンプレートのみ。"
+        },
+        "action_buttons": {
+          "name": "アクションボタン",
+          "description": "タップ可能なURLボタン。steps および alert テンプレートのみ。"
+        },
+        "display_options": {
+          "name": "表示・色・サウンド",
+          "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        }
       }
     },
     "create_activity": {

@@ -140,6 +140,32 @@
           "name": "Birimler",
           "description": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "countdown seçenekleri",
+          "description": "Yalnızca countdown şablonu."
+        },
+        "steps_options": {
+          "name": "steps seçenekleri",
+          "description": "Yalnızca steps şablonu."
+        },
+        "alert_options": {
+          "name": "alert seçenekleri",
+          "description": "Yalnızca alert şablonu."
+        },
+        "gauge_timeline_options": {
+          "name": "gauge ve timeline seçenekleri",
+          "description": "Yalnızca gauge ve timeline şablonları."
+        },
+        "action_buttons": {
+          "name": "Eylem düğmeleri",
+          "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
+        },
+        "display_options": {
+          "name": "Görünüm, renk ve ses",
+          "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        }
       }
     },
     "create_activity": {

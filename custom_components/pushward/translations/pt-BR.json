@@ -140,6 +140,32 @@
           "name": "Mapa de Unidades",
           "description": "Rótulos de unidades por série. As chaves devem corresponder às chaves do value dict. Apenas para o modelo timeline."
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Opções de countdown",
+          "description": "Apenas para o modelo countdown."
+        },
+        "steps_options": {
+          "name": "Opções de steps",
+          "description": "Apenas para o modelo steps."
+        },
+        "alert_options": {
+          "name": "Opções de alert",
+          "description": "Apenas para o modelo alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Opções de gauge e timeline",
+          "description": "Apenas para os modelos gauge e timeline."
+        },
+        "action_buttons": {
+          "name": "Botões de ação",
+          "description": "Botões de URL tocáveis. Apenas para os modelos steps e alert."
+        },
+        "display_options": {
+          "name": "Exibição, cor e som",
+          "description": "Estilo opcional e substituições por atualização. Aplicam-se a qualquer modelo."
+        }
       }
     },
     "create_activity": {

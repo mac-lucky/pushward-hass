@@ -140,6 +140,32 @@
           "name": "Одиниці",
           "description": "Мітки одиниць для серій timeline. Формат: attribute=Одиниця. Приклад: temp=°C, humidity=%"
         }
+      },
+      "sections": {
+        "countdown_options": {
+          "name": "Параметри countdown",
+          "description": "Лише для шаблону countdown."
+        },
+        "steps_options": {
+          "name": "Параметри steps",
+          "description": "Лише для шаблону steps."
+        },
+        "alert_options": {
+          "name": "Параметри alert",
+          "description": "Лише для шаблону alert."
+        },
+        "gauge_timeline_options": {
+          "name": "Параметри gauge і timeline",
+          "description": "Лише для шаблонів gauge та timeline."
+        },
+        "action_buttons": {
+          "name": "Кнопки дій",
+          "description": "Натискні кнопки-посилання. Лише для шаблонів steps та alert."
+        },
+        "display_options": {
+          "name": "Відображення, колір і звук",
+          "description": "Необов'язкове оформлення та перевизначення для оновлення. Застосовуються до будь-якого шаблону."
+        }
       }
     },
     "create_activity": {
