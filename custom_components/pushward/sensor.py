@@ -33,7 +33,7 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, QUOTA_DAILY_RESET_KEY, QUOTA_RESET_KEY
 from .coordinator import PushWardUsageCoordinator
 
 
@@ -169,7 +169,7 @@ class PushWardUsageSensor(_PushWardSensorBase):
 
         if (period := data.get("quota_period_month")) is not None:
             attrs["period"] = period
-        if (resets_at := data.get("quota_resets_at")) is not None:
+        if (resets_at := data.get(QUOTA_RESET_KEY)) is not None:
             attrs["resets_at"] = resets_at
 
         if description.is_notifications:
@@ -177,7 +177,7 @@ class PushWardUsageSensor(_PushWardSensorBase):
             # month-to-date total and the daily reset alongside it.
             if (used_month := data.get("notifications_used_month")) is not None:
                 attrs["used_this_month"] = used_month
-            if (daily_resets_at := data.get("quota_resets_day_at")) is not None:
+            if (daily_resets_at := data.get(QUOTA_DAILY_RESET_KEY)) is not None:
                 attrs["daily_resets_at"] = daily_resets_at
 
         return attrs

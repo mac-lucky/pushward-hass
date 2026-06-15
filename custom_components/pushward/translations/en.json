@@ -1181,6 +1181,22 @@
     "deprecated_update_activity": {
       "title": "The PushWard update_activity action is deprecated",
       "description": "The `pushward.update_activity` action is deprecated. Switch your automations to the template-specific action instead — for example `pushward.update_activity_countdown` or `pushward.update_activity_gauge`. The old action still works for now but will be removed in a future release."
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard notification limit reached",
+      "description": "Your PushWard account has used {used} of its {limit} notifications for the current period, so new notifications will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard Live Activity update limit reached",
+      "description": "Your PushWard account has used {used} of its {limit} Live Activity updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard widget update limit reached",
+      "description": "Your PushWard account has used {used} of its {limit} widget updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+    },
+    "usage_limit_emails": {
+      "title": "PushWard email limit reached",
+      "description": "Your PushWard account has used {used} of its {limit} emails for the current period, so new emails will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
     }
   }
 }

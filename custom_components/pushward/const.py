@@ -1,6 +1,7 @@
 """Constants for the PushWard integration."""
 
 import re
+from typing import NamedTuple
 from urllib.parse import urlparse
 
 import voluptuous as vol
@@ -182,6 +183,42 @@ SOUNDS = ("default", "chime", "alert", "success", "warning", "bell", "ding", "bu
 # Usage/quota coordinator poll interval (seconds). Usage moves slowly and
 # /auth/me is per-IP rate-limited, so poll conservatively.
 USAGE_UPDATE_INTERVAL = 900  # 15 min
+
+# /auth/me period-reset timestamp keys. Notifications reset daily on premium
+# (the daily key) and monthly on free (the monthly key, used as the fallback).
+QUOTA_RESET_KEY = "quota_resets_at"
+QUOTA_DAILY_RESET_KEY = "quota_resets_day_at"
+
+
+class MeteredResource(NamedTuple):
+    """A metered account resource tracked for usage-limit repair issues."""
+
+    used_key: str
+    limit_key: str
+    translation_key: str
+    # Preferred /auth/me reset key; falls back to QUOTA_RESET_KEY when absent.
+    reset_key: str
+
+
+# Metered resources checked for usage-limit repair issues. Mirrors the metered
+# keys in USAGE_SENSORS (sensor.py); the drift-guard test keeps the pair in sync.
+# Each resource carries its own translation key so the issue text — including
+# pluralization — is fully localizable, rather than injecting an English resource
+# name as a placeholder (which would arrive untranslated in every locale).
+USAGE_LIMIT_RESOURCES = (
+    MeteredResource("notifications_used", "notifications_limit", "usage_limit_notifications", QUOTA_DAILY_RESET_KEY),
+    MeteredResource(
+        "live_activity_updates_used", "live_activity_updates_limit", "usage_limit_live_activity", QUOTA_RESET_KEY
+    ),
+    MeteredResource("widget_updates_used", "widget_updates_limit", "usage_limit_widgets", QUOTA_RESET_KEY),
+    MeteredResource("emails_used", "emails_limit", "usage_limit_emails", QUOTA_RESET_KEY),
+)
+
+
+def usage_limit_issue_id(entry_id: str, used_key: str) -> str:
+    """Stable repair-issue id for a per-entry, per-resource usage limit."""
+    return f"usage_limit_{entry_id}_{used_key}"
+
 
 # API retry
 MAX_RETRIES = 5

@@ -40,6 +40,8 @@ from .const import (
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
+    USAGE_LIMIT_RESOURCES,
+    usage_limit_issue_id,
     validate_slug,
     validate_url,
 )
@@ -550,6 +552,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if widget_manager is not None:
             stops.append(widget_manager.async_stop())
         await asyncio.gather(*stops)
+
+    # Non-persistent usage-limit repair issues clear on restart but not on a plain
+    # unload/reload — drop any outstanding ones so they don't linger after teardown.
+    for resource in USAGE_LIMIT_RESOURCES:
+        ir.async_delete_issue(hass, DOMAIN, usage_limit_issue_id(entry.entry_id, resource.used_key))
 
     return True
 
