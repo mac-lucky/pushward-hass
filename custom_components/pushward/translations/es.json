@@ -139,6 +139,34 @@
         "units": {
           "name": "Mapa de unidades",
           "description": "Etiquetas de unidades por serie. Las claves deben coincidir con las claves del value dict. Solo para la plantilla timeline."
+        },
+        "snooze_seconds": {
+          "name": "Segundos de posposición",
+          "description": "Cuánto extiende la cuenta atrás el botón Posponer de iOS (60–3600). El valor predeterminado es 300 (5 min). Requiere alarma (iOS 26+, solo plantilla de cuenta atrás)."
+        },
+        "duration": {
+          "name": "Duración",
+          "description": "Alternativa de tipo «configurar y olvidar» a Fecha de fin: segundos (>=1) o una cadena de duración como \"1h30m\". El servidor reancla el inicio/fin al momento actual. Envía Duración o Fecha de fin; si ambas se establecen, Duración tiene prioridad."
+        },
+        "start_date": {
+          "name": "Fecha de inicio",
+          "description": "Marca de tiempo Unix de cuándo comenzó la cuenta atrás (ancla la barra de tiempo transcurrido/restante). El servidor usa el momento actual de forma predeterminada."
+        },
+        "history": {
+          "name": "Historial (inicial)",
+          "description": "Valores iniciales del minigráfico: un objeto que asocia el nombre de la serie con una lista de (timestamp, value). Solo inicial: el servidor toma el control tras la primera actualización."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "url_action": {
+          "name": "Botón principal",
+          "description": "Botón principal pulsable, como objeto: url (obligatorio), title, icon y foreground opcionales, y method/headers/body http(s) para un webhook silencioso."
+        },
+        "secondary_url_action": {
+          "name": "Botón secundario",
+          "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL principal mostrada como botón pulsable. http(s) o un esquema personalizado como homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundaria",
+          "description": "URL secundaria mostrada como un segundo botón pulsable."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "url_action": {
+          "name": "Botón principal",
+          "description": "Botón principal pulsable, como objeto: url (obligatorio), title, icon y foreground opcionales, y method/headers/body http(s) para un webhook silencioso."
+        },
+        "secondary_url_action": {
+          "name": "Botón secundario",
+          "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
         }
       },
       "sections": {
         "labels": {
           "name": "Etiquetas e icono",
           "description": "Etiquetas de texto e icono opcionales. Se aplican a cualquier plantilla."
+        },
+        "action_buttons": {
+          "name": "Botones de acción",
+          "description": "Botones de URL interactivos. Solo para las plantillas steps y alert."
         },
         "display_options": {
           "name": "Visualización, color y sonido",
@@ -281,7 +333,7 @@
           "description": "Activar alarma AlarmKit al expirar el countdown (iOS 26+, solo para la plantilla countdown)."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Segundos de posposición",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "duration": {
+          "name": "Duración",
+          "description": "Alternativa de tipo «configurar y olvidar» a Fecha de fin: segundos (>=1) o una cadena de duración como \"1h30m\". El servidor reancla el inicio/fin al momento actual. Envía Duración o Fecha de fin; si ambas se establecen, Duración tiene prioridad."
+        },
+        "start_date": {
+          "name": "Fecha de inicio",
+          "description": "Marca de tiempo Unix de cuándo comenzó la cuenta atrás (ancla la barra de tiempo transcurrido/restante). El servidor usa el momento actual de forma predeterminada."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL principal mostrada como botón pulsable. http(s) o un esquema personalizado como homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundaria",
+          "description": "URL secundaria mostrada como un segundo botón pulsable."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "url_action": {
+          "name": "Botón principal",
+          "description": "Botón principal pulsable, como objeto: url (obligatorio), title, icon y foreground opcionales, y method/headers/body http(s) para un webhook silencioso."
+        },
+        "secondary_url_action": {
+          "name": "Botón secundario",
+          "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "Opciones de countdown",
           "description": "Solo para la plantilla countdown."
+        },
+        "action_buttons": {
+          "name": "Botones de acción",
+          "description": "Botones de URL interactivos. Solo para las plantillas steps y alert."
         },
         "display_options": {
           "name": "Visualización, color y sonido",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "url_action": {
+          "name": "Botón principal",
+          "description": "Botón principal pulsable, como objeto: url (obligatorio), title, icon y foreground opcionales, y method/headers/body http(s) para un webhook silencioso."
+        },
+        "secondary_url_action": {
+          "name": "Botón secundario",
+          "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "url_action": {
+          "name": "Botón principal",
+          "description": "Botón principal pulsable, como objeto: url (obligatorio), title, icon y foreground opcionales, y method/headers/body http(s) para un webhook silencioso."
+        },
+        "secondary_url_action": {
+          "name": "Botón secundario",
+          "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL principal mostrada como botón pulsable. http(s) o un esquema personalizado como homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundaria",
+          "description": "URL secundaria mostrada como un segundo botón pulsable."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "url_action": {
+          "name": "Botón principal",
+          "description": "Botón principal pulsable, como objeto: url (obligatorio), title, icon y foreground opcionales, y method/headers/body http(s) para un webhook silencioso."
+        },
+        "secondary_url_action": {
+          "name": "Botón secundario",
+          "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
         }
       },
       "sections": {
         "labels": {
           "name": "Etiquetas e icono",
           "description": "Etiquetas de texto e icono opcionales. Se aplican a cualquier plantilla."
+        },
+        "action_buttons": {
+          "name": "Botones de acción",
+          "description": "Botones de URL interactivos. Solo para las plantillas steps y alert."
         },
         "display_options": {
           "name": "Visualización, color y sonido",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "history": {
+          "name": "Historial (inicial)",
+          "description": "Valores iniciales del minigráfico: un objeto que asocia el nombre de la serie con una lista de (timestamp, value). Solo inicial: el servidor toma el control tras la primera actualización."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL principal mostrada como botón pulsable. http(s) o un esquema personalizado como homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundaria",
+          "description": "URL secundaria mostrada como un segundo botón pulsable."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "url_action": {
+          "name": "Botón principal",
+          "description": "Botón principal pulsable, como objeto: url (obligatorio), title, icon y foreground opcionales, y method/headers/body http(s) para un webhook silencioso."
+        },
+        "secondary_url_action": {
+          "name": "Botón secundario",
+          "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "Opciones de gauge y timeline",
           "description": "Solo para las plantillas gauge y timeline."
+        },
+        "action_buttons": {
+          "name": "Botones de acción",
+          "description": "Botones de URL interactivos. Solo para las plantillas steps y alert."
         },
         "display_options": {
           "name": "Visualización, color y sonido",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Metadatos",
           "description": "Pares clave-valor de metadatos adicionales adjuntos a la notificación."
+        },
+        "media": {
+          "name": "Multimedia",
+          "description": "Adjunto multimedia como objeto con `url` (HTTPS) y `type` (image, video o audio)."
+        },
+        "actions": {
+          "name": "Acciones",
+          "description": "Lista de botones de acción. Cada acción es un objeto con id, title, url opcional, foreground, destructive, authentication_required e icon. Para una url http(s) también puedes enviar un webhook silencioso con method (GET/POST/PUT/PATCH/DELETE/HEAD), headers y body."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Actualizar widget",
+      "description": "Fuerza la actualización de un widget de PushWard rastreado. Omite la caché de diferencias en memoria para que el widget se vuelva a renderizar y se envíe a iOS aunque el valor no haya cambiado.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug del widget. Debes indicar slug o entity_id."
+        },
+        "entity_id": {
+          "name": "Entidad",
+          "description": "Entidad de HA vinculada al widget. Debes indicar slug o entity_id."
+        }
+      }
+    },
+    "send_email": {
+      "name": "Enviar correo",
+      "description": "Envía un correo transaccional a través de PushWard. Proporciona un cuerpo de texto, un cuerpo HTML o ambos. La clave de integración necesita la capacidad \"emails\".",
+      "fields": {
+        "to": {
+          "name": "Para",
+          "description": "Dirección de correo del destinatario. Debe ser una dirección que ya hayas añadido y confirmado en la app de PushWard para iOS; se rechazan las direcciones no verificadas."
+        },
+        "subject": {
+          "name": "Asunto",
+          "description": "Línea de asunto del correo."
+        },
+        "body": {
+          "name": "Cuerpo",
+          "description": "Cuerpo del correo en texto sin formato. Proporciona este, un cuerpo HTML o ambos."
+        },
+        "html_body": {
+          "name": "Cuerpo HTML",
+          "description": "Cuerpo del correo en HTML. Proporciona este, un cuerpo de texto sin formato o ambos."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Eliminar widget",
+      "description": "Elimina un widget de PushWard del servidor. Si una entrada de configuración de widget rastreado sigue gestionando este slug, el widget se recrea en el siguiente reinicio/sincronización; elimina la entrada de configuración para borrarlo de forma permanente. Indica slug o entity_id.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug del widget. Debes indicar slug o entity_id."
+        },
+        "entity_id": {
+          "name": "Entidad",
+          "description": "Entidad de HA vinculada al widget. Se resuelve al widget correspondiente según la configuración. Debes indicar slug o entity_id."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Conectar con PushWard",
         "data": {
           "integration_key": "Clave de integración"
+        },
+        "description": "Introduce tu clave de integración de PushWard para empezar. Descarga la app de PushWard para iOS desde la App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "Abre la app de PushWard para iOS (App Store: {app_store_url}) → Ajustes → Claves de integración. Puedes pegar la clave predeterminada o crear una nueva con el ámbito 'ha-*'."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "Etiquetas de pasos",
             "step_rows": "Alturas de fila de pasos",
             "fired_at_attribute": "Atributo de activación",
-            "units": "Unidades por serie"
+            "units": "Unidades por serie",
+            "progress_entity": "Entidad de progreso",
+            "remaining_time_entity": "Entidad de tiempo restante",
+            "current_step_entity": "Entidad del paso actual",
+            "value_entity": "Entidad de valor",
+            "subtitle_entity": "Entidad de subtítulo",
+            "tap_action_url": "URL de acción al tocar",
+            "tap_action_foreground": "Abrir la URL de acción al tocar",
+            "url_foreground": "Abrir la URL del botón principal",
+            "url_title": "Título del botón principal",
+            "secondary_url_foreground": "Abrir la URL del botón secundario",
+            "secondary_url_title": "Título del botón secundario",
+            "snooze_seconds": "Segundos de posposición (iOS 26+)",
+            "fired_at_entity": "Entidad de hora de activación"
           },
           "data_description": {
             "start_states": "Estados de la entidad que inician la Live Activity. Seleccionar de la lista o introducir valores personalizados.",
@@ -957,7 +1192,20 @@
             "step_labels": "Etiquetas para cada paso. Formato: 1=Primer Paso, 2=Segundo Paso. Debe cubrir los pasos 1..total_steps. Solo para la plantilla steps.",
             "step_rows": "Altura de fila (1–10) para cada paso, separada por comas. Debe tener total_steps entradas. Solo para la plantilla steps.",
             "fired_at_attribute": "Atributo de la entidad que contiene la marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert.",
-            "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline."
+            "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline.",
+            "progress_entity": "Lee el progreso de una entidad distinta en lugar de la entidad rastreada. Déjalo vacío para usar la entidad rastreada. Si el campo de atributo está definido, lee ese atributo de esta entidad; de lo contrario, su estado.",
+            "remaining_time_entity": "Lee el tiempo restante de una entidad distinta (p. ej., el sensor de tiempo de una lavadora). Déjalo vacío para usar la entidad rastreada. Interpreta automáticamente un sensor de marca de tiempo (hora de finalización), un sensor de duración con unidades, una cadena H:MM:SS o segundos sin más.",
+            "current_step_entity": "Lee el paso actual de una entidad distinta. Déjalo vacío para usar la entidad rastreada.",
+            "value_entity": "Lee el valor del indicador de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
+            "subtitle_entity": "Muestra el subtítulo de una entidad distinta (p. ej., un sensor de programa/modo). Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
+            "tap_action_url": "URL opcional que se abre al tocar el fondo de la Live Activity. Admite http(s) (abre Safari) o esquemas personalizados como homeassistant://navigate/lovelace/0 (abre esa app).",
+            "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano sin salir de la pantalla de bloqueo.",
+            "url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
+            "url_title": "Etiqueta del botón principal (máx. 64 caracteres).",
+            "secondary_url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
+            "secondary_url_title": "Etiqueta del botón secundario (máx. 64 caracteres).",
+            "snooze_seconds": "Cuánto extiende la cuenta atrás el botón Posponer de iOS (60–3600). Déjalo vacío para el valor predeterminado de 300 s (5 min). Requiere alarma. Solo plantilla de cuenta atrás.",
+            "fired_at_entity": "Lee la hora de activación de la alerta de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Acepta una marca de tiempo Unix o un sensor de marca de tiempo ISO. Solo plantilla de alerta."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "La URL debe usar el esquema http:// o https://.",
-        "invalid_gauge_range": "El valor mínimo debe ser menor que el valor máximo."
+        "invalid_gauge_range": "El valor mínimo debe ser menor que el valor máximo.",
+        "silent_requires_http": "El webhook silencioso (primer plano desactivado) requiere una URL http:// o https://."
       },
       "abort": {
         "already_configured": "Esta entidad ya está rastreada.",
         "reconfigure_successful": "Configuración de entidad actualizada."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Widget rastreado",
+      "initiate_flow": {
+        "user": "Añadir widget rastreado"
+      },
+      "step": {
+        "user": {
+          "title": "Añadir widget a PushWard",
+          "data": {
+            "entity_id": "Entidad",
+            "widget_template": "Plantilla",
+            "slug": "Slug del widget"
+          },
+          "data_description": {
+            "widget_template": "Diseño del widget. Usa `value` para un único número, `progress` para una barra de 0–1, `gauge` para un valor dentro de un rango, `status` para una insignia de gravedad o `stat_list` para hasta 6 filas.",
+            "slug": "Identificador único de este widget. Déjalo vacío para generarlo automáticamente a partir del ID de entidad."
+          }
+        },
+        "reconfigure": {
+          "title": "Editar widget",
+          "data": {
+            "entity_id": "Entidad",
+            "widget_template": "Plantilla",
+            "slug": "Slug del widget"
+          },
+          "data_description": {
+            "widget_template": "Diseño del widget.",
+            "slug": "Identificador único de este widget."
+          }
+        },
+        "details": {
+          "title": "Opciones del widget",
+          "data": {
+            "widget_name": "Nombre del widget",
+            "value_attribute": "Atributo de valor",
+            "unit": "Unidad",
+            "min_value": "Valor mínimo",
+            "max_value": "Valor máximo",
+            "severity": "Gravedad",
+            "stat_rows": "Filas de estadísticas",
+            "label": "Etiqueta",
+            "label_attribute": "Atributo de etiqueta",
+            "subtitle_attribute": "Atributo de subtítulo",
+            "icon": "Icono",
+            "icon_attribute": "Atributo de icono",
+            "accent_color": "Color de acento",
+            "accent_color_attribute": "Atributo de color de acento",
+            "background_color": "Color de fondo",
+            "text_color": "Color de texto",
+            "widget_trigger_mode": "Modo de activación",
+            "widget_poll_interval": "Intervalo de sondeo (segundos)",
+            "tap_action_url": "URL de acción al tocar",
+            "tap_action_foreground": "Abrir la URL de acción al tocar"
+          },
+          "data_description": {
+            "widget_name": "Nombre que se muestra en el selector de widgets de iOS. De forma predeterminada, el nombre descriptivo de la entidad.",
+            "value_attribute": "Atributo de la entidad que contiene el valor. Déjalo vacío para usar el estado principal de la entidad.",
+            "unit": "Unidad que se muestra junto al valor. Máx. 32 caracteres.",
+            "min_value": "Valor mínimo del rango del indicador.",
+            "max_value": "Valor máximo del rango del indicador.",
+            "severity": "Gravedad del estado (info, warning, critical, success).",
+            "stat_rows": "Hasta 6 filas. Formato: `Label=entity_id[:attribute[:unit]]`, separadas por comas. Ejemplo: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Etiqueta estática que se muestra en el widget. Déjalo vacío para derivarla de la entidad.",
+            "label_attribute": "Atributo de la entidad que se usa como etiqueta. Anula la etiqueta estática.",
+            "subtitle_attribute": "Atributo de la entidad que se muestra como subtítulo del widget.",
+            "icon": "Icono estático. Se admiten SF Symbols y nombres MDI.",
+            "icon_attribute": "Atributo de la entidad para un icono dinámico. Anula el icono estático.",
+            "accent_color": "Color de acento del widget. Déjalo vacío para el predeterminado.",
+            "accent_color_attribute": "Atributo de la entidad para un color de acento dinámico.",
+            "background_color": "Color de fondo opcional.",
+            "text_color": "Color de texto opcional.",
+            "widget_trigger_mode": "Cómo se activan las actualizaciones. `event` reacciona a los cambios de estado; `poll` reevalúa en un intervalo fijo.",
+            "widget_poll_interval": "Intervalo entre sondeos (10–3600 segundos). Solo se usa cuando el modo de activación es `poll`.",
+            "tap_action_url": "URL opcional que se abre al tocar el widget. Admite http(s) (abre Safari) o esquemas personalizados como homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "La URL debe incluir un esquema válido. Usa http(s):// o un esquema de app personalizado como homeassistant://.",
+        "silent_requires_http": "El webhook silencioso (primer plano desactivado) requiere una URL http:// o https://.",
+        "invalid_gauge_range": "El valor mínimo debe ser menor que el valor máximo.",
+        "stat_rows_required": "Se requiere al menos una fila de estadísticas para la plantilla stat_list."
+      },
+      "abort": {
+        "already_configured": "Ya existe un widget con este slug.",
+        "reconfigure_successful": "Configuración del widget actualizada."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Notificaciones usadas"
+      },
+      "live_activity_updates_used": {
+        "name": "Actualizaciones de Live Activity usadas"
+      },
+      "widget_updates_used": {
+        "name": "Actualizaciones de widget usadas"
+      },
+      "emails_used": {
+        "name": "Correos electrónicos usados"
+      },
+      "subscription_tier": {
+        "name": "Nivel de suscripción",
+        "state": {
+          "free": "Gratis",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Ningún widget de PushWard coincide con slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "La acción update_activity de PushWard está obsoleta",
+      "description": "La acción `pushward.update_activity` está obsoleta. Cambia tus automatizaciones a la acción específica de cada plantilla; por ejemplo, `pushward.update_activity_countdown` o `pushward.update_activity_gauge`. La acción antigua todavía funciona por ahora, pero se eliminará en una versión futura."
+    },
+    "usage_limit_notifications": {
+      "title": "Límite de notificaciones de PushWard alcanzado",
+      "description": "Tu cuenta de PushWard ha usado {used} de sus {limit} notificaciones del periodo actual, por lo que se rechazarán las nuevas notificaciones hasta que la cuota se restablezca ({resets_at}). Mejora tu suscripción en la app de PushWard para iOS para aumentar el límite."
+    },
+    "usage_limit_live_activity": {
+      "title": "Límite de actualizaciones de Live Activity de PushWard alcanzado",
+      "description": "Tu cuenta de PushWard ha usado {used} de sus {limit} actualizaciones de Live Activity del periodo actual, por lo que se rechazarán las nuevas actualizaciones hasta que la cuota se restablezca ({resets_at}). Mejora tu suscripción en la app de PushWard para iOS para aumentar el límite."
+    },
+    "usage_limit_widgets": {
+      "title": "Límite de actualizaciones de widgets de PushWard alcanzado",
+      "description": "Tu cuenta de PushWard ha usado {used} de sus {limit} actualizaciones de widgets del periodo actual, por lo que se rechazarán las nuevas actualizaciones hasta que la cuota se restablezca ({resets_at}). Mejora tu suscripción en la app de PushWard para iOS para aumentar el límite."
+    },
+    "usage_limit_emails": {
+      "title": "Límite de correos de PushWard alcanzado",
+      "description": "Tu cuenta de PushWard ha usado {used} de sus {limit} correos del periodo actual, por lo que se rechazarán los nuevos correos hasta que la cuota se restablezca ({resets_at}). Mejora tu suscripción en la app de PushWard para iOS para aumentar el límite."
     }
   }
 }

@@ -8,7 +8,11 @@ import pytest
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 
-from custom_components.pushward.api import PushWardAuthError, PushWardWidgetPermissionError
+from custom_components.pushward.api import (
+    PushWardApiError,
+    PushWardAuthError,
+    PushWardWidgetPermissionError,
+)
 from custom_components.pushward.const import (
     CONF_ENTITY_ID,
     CONF_SLUG,
@@ -33,7 +37,79 @@ def _mock_api() -> AsyncMock:
     api = AsyncMock()
     api.create_widget = AsyncMock()
     api.patch_widget = AsyncMock()
+    api.delete_widget = AsyncMock()
     return api
+
+
+async def test_reload_deletes_removed_widget(hass: HomeAssistant) -> None:
+    """Removing a tracked widget on reload deletes the server-side widget (no orphan leak)."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    hass.states.async_set("sensor.power", "7")
+    kept = make_widget_config(slug="ha-users", entity_id="sensor.users")
+    removed = make_widget_config(slug="ha-power", entity_id="sensor.power")
+
+    manager = WidgetManager(hass, api, [kept, removed], _mock_entry())
+    await manager.async_start()
+
+    # Reload with only the kept widget → the removed one must be deleted server-side.
+    await manager.async_reload([kept])
+
+    api.delete_widget.assert_awaited_once_with("ha-power")
+
+    await manager.async_stop()
+
+
+async def test_reload_without_removal_deletes_nothing(hass: HomeAssistant) -> None:
+    """A reload that keeps the same widgets must not delete anything."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    config = make_widget_config()
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+
+    await manager.async_reload([config])
+
+    api.delete_widget.assert_not_awaited()
+
+    await manager.async_stop()
+
+
+async def test_reload_isolates_delete_failures(hass: HomeAssistant) -> None:
+    """One failing server-delete must not strand the other removed widgets' deletes."""
+    api = _mock_api()
+    api.delete_widget.side_effect = [PushWardApiError("boom"), None]
+    hass.states.async_set("sensor.a", "1")
+    hass.states.async_set("sensor.b", "2")
+    one = make_widget_config(slug="ha-a", entity_id="sensor.a")
+    two = make_widget_config(slug="ha-b", entity_id="sensor.b")
+
+    manager = WidgetManager(hass, api, [one, two], _mock_entry())
+    await manager.async_start()
+
+    # Remove both → both deletes attempted even though the first raises.
+    await manager.async_reload([])
+
+    assert api.delete_widget.await_count == 2
+    assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-a", "ha-b"}
+
+    await manager.async_stop()
+
+
+async def test_slug_for_entity_resolves_and_misses(hass: HomeAssistant) -> None:
+    """slug_for_entity maps a bound entity to its widget slug, else None."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    config = make_widget_config(slug="ha-users", entity_id="sensor.users")
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+
+    assert manager.slug_for_entity("sensor.users") == "ha-users"
+    assert manager.slug_for_entity("sensor.nope") is None
+    assert manager.slug_for_entity(None) is None
+
+    await manager.async_stop()
 
 
 def _mock_entry() -> MagicMock:

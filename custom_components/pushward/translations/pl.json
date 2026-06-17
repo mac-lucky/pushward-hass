@@ -139,6 +139,34 @@
         "units": {
           "name": "Mapa jednostek",
           "description": "Etykiety jednostek dla każdej serii. Klucze muszą odpowiadać kluczom value dict. Tylko szablon timeline."
+        },
+        "snooze_seconds": {
+          "name": "Sekundy drzemki",
+          "description": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Domyślnie 300 (5 min). Wymaga alarmu (iOS 26+, tylko szablon odliczania)."
+        },
+        "duration": {
+          "name": "Czas trwania",
+          "description": "Bezobsługowa alternatywa dla Daty zakończenia: sekundy (>=1) lub ciąg czasu trwania, np. „1h30m”. Serwer ponownie zakotwicza początek/koniec na teraz. Wyślij Czas trwania albo Datę zakończenia — przy obu ustawionych wygrywa Czas trwania."
+        },
+        "start_date": {
+          "name": "Data rozpoczęcia",
+          "description": "Znacznik czasu Unix rozpoczęcia odliczania (kotwiczy pasek upłynęło/pozostało). Serwer domyślnie ustawia teraz."
+        },
+        "history": {
+          "name": "Historia (wartości początkowe)",
+          "description": "Początkowe dane wykresu sparkline: obiekt mapujący nazwę serii na listę (timestamp, value). Tylko początkowo — po pierwszej aktualizacji przejmuje serwer."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "url_action": {
+          "name": "Przycisk główny",
+          "description": "Główny przycisk dotykowy jako obiekt: url (wymagane), opcjonalne title, icon, foreground oraz method/headers/body http(s) dla cichego webhooka."
+        },
+        "secondary_url_action": {
+          "name": "Przycisk dodatkowy",
+          "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0–10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Główny adres URL pokazywany jako przycisk dotykowy. http(s) lub niestandardowy schemat, np. homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Dodatkowy URL",
+          "description": "Dodatkowy adres URL pokazywany jako drugi przycisk dotykowy."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "url_action": {
+          "name": "Przycisk główny",
+          "description": "Główny przycisk dotykowy jako obiekt: url (wymagane), opcjonalne title, icon, foreground oraz method/headers/body http(s) dla cichego webhooka."
+        },
+        "secondary_url_action": {
+          "name": "Przycisk dodatkowy",
+          "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
         }
       },
       "sections": {
         "labels": {
           "name": "Etykiety i ikona",
           "description": "Opcjonalne etykiety tekstowe i ikona. Dotyczą każdego szablonu."
+        },
+        "action_buttons": {
+          "name": "Przyciski akcji",
+          "description": "Klikalne przyciski URL. Tylko szablony steps i alert."
         },
         "display_options": {
           "name": "Wyświetlanie, kolor i dźwięk",
@@ -281,7 +333,7 @@
           "description": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+, tylko szablon countdown)."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Sekundy drzemki",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0–10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "duration": {
+          "name": "Czas trwania",
+          "description": "Bezobsługowa alternatywa dla Daty zakończenia: sekundy (>=1) lub ciąg czasu trwania, np. „1h30m”. Serwer ponownie zakotwicza początek/koniec na teraz. Wyślij Czas trwania albo Datę zakończenia — przy obu ustawionych wygrywa Czas trwania."
+        },
+        "start_date": {
+          "name": "Data rozpoczęcia",
+          "description": "Znacznik czasu Unix rozpoczęcia odliczania (kotwiczy pasek upłynęło/pozostało). Serwer domyślnie ustawia teraz."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Główny adres URL pokazywany jako przycisk dotykowy. http(s) lub niestandardowy schemat, np. homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Dodatkowy URL",
+          "description": "Dodatkowy adres URL pokazywany jako drugi przycisk dotykowy."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "url_action": {
+          "name": "Przycisk główny",
+          "description": "Główny przycisk dotykowy jako obiekt: url (wymagane), opcjonalne title, icon, foreground oraz method/headers/body http(s) dla cichego webhooka."
+        },
+        "secondary_url_action": {
+          "name": "Przycisk dodatkowy",
+          "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "Opcje countdown",
           "description": "Tylko szablon countdown."
+        },
+        "action_buttons": {
+          "name": "Przyciski akcji",
+          "description": "Klikalne przyciski URL. Tylko szablony steps i alert."
         },
         "display_options": {
           "name": "Wyświetlanie, kolor i dźwięk",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0–10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "url_action": {
+          "name": "Przycisk główny",
+          "description": "Główny przycisk dotykowy jako obiekt: url (wymagane), opcjonalne title, icon, foreground oraz method/headers/body http(s) dla cichego webhooka."
+        },
+        "secondary_url_action": {
+          "name": "Przycisk dodatkowy",
+          "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0–10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "url_action": {
+          "name": "Przycisk główny",
+          "description": "Główny przycisk dotykowy jako obiekt: url (wymagane), opcjonalne title, icon, foreground oraz method/headers/body http(s) dla cichego webhooka."
+        },
+        "secondary_url_action": {
+          "name": "Przycisk dodatkowy",
+          "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0–10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Główny adres URL pokazywany jako przycisk dotykowy. http(s) lub niestandardowy schemat, np. homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Dodatkowy URL",
+          "description": "Dodatkowy adres URL pokazywany jako drugi przycisk dotykowy."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "url_action": {
+          "name": "Przycisk główny",
+          "description": "Główny przycisk dotykowy jako obiekt: url (wymagane), opcjonalne title, icon, foreground oraz method/headers/body http(s) dla cichego webhooka."
+        },
+        "secondary_url_action": {
+          "name": "Przycisk dodatkowy",
+          "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
         }
       },
       "sections": {
         "labels": {
           "name": "Etykiety i ikona",
           "description": "Opcjonalne etykiety tekstowe i ikona. Dotyczą każdego szablonu."
+        },
+        "action_buttons": {
+          "name": "Przyciski akcji",
+          "description": "Klikalne przyciski URL. Tylko szablony steps i alert."
         },
         "display_options": {
           "name": "Wyświetlanie, kolor i dźwięk",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0–10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "history": {
+          "name": "Historia (wartości początkowe)",
+          "description": "Początkowe dane wykresu sparkline: obiekt mapujący nazwę serii na listę (timestamp, value). Tylko początkowo — po pierwszej aktualizacji przejmuje serwer."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Główny adres URL pokazywany jako przycisk dotykowy. http(s) lub niestandardowy schemat, np. homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Dodatkowy URL",
+          "description": "Dodatkowy adres URL pokazywany jako drugi przycisk dotykowy."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "url_action": {
+          "name": "Przycisk główny",
+          "description": "Główny przycisk dotykowy jako obiekt: url (wymagane), opcjonalne title, icon, foreground oraz method/headers/body http(s) dla cichego webhooka."
+        },
+        "secondary_url_action": {
+          "name": "Przycisk dodatkowy",
+          "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "Opcje gauge i timeline",
           "description": "Tylko szablony gauge i timeline."
+        },
+        "action_buttons": {
+          "name": "Przyciski akcji",
+          "description": "Klikalne przyciski URL. Tylko szablony steps i alert."
         },
         "display_options": {
           "name": "Wyświetlanie, kolor i dźwięk",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Metadane",
           "description": "Pary klucz-wartość dodatkowych metadanych załączonych do powiadomienia."
+        },
+        "media": {
+          "name": "Multimedia",
+          "description": "Załącznik multimedialny jako obiekt z `url` (HTTPS) i `type` (image, video lub audio)."
+        },
+        "actions": {
+          "name": "Akcje",
+          "description": "Lista przycisków akcji. Każda akcja to obiekt z id, title, opcjonalnym url, foreground, destructive, authentication_required oraz icon. Dla adresu http(s) możesz też wysłać cichy webhook z method (GET/POST/PUT/PATCH/DELETE/HEAD), headers i body."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Odśwież widżet",
+      "description": "Wymuś odświeżenie śledzonego widżetu PushWard. Pomija pamięć podręczną różnic, dzięki czemu widżet jest ponownie renderowany i wysyłany do iOS, nawet gdy wartość się nie zmieniła.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identyfikator slug widżetu. Należy podać slug lub entity_id."
+        },
+        "entity_id": {
+          "name": "Encja",
+          "description": "Encja HA powiązana z widżetem. Należy podać slug lub entity_id."
+        }
+      }
+    },
+    "send_email": {
+      "name": "Wyślij e-mail",
+      "description": "Wyślij e-mail transakcyjny przez PushWard. Podaj treść tekstową, treść HTML lub obie. Klucz integracji wymaga uprawnienia „emails”.",
+      "fields": {
+        "to": {
+          "name": "Do",
+          "description": "Adres e-mail odbiorcy. Musi to być adres już dodany i potwierdzony w aplikacji PushWard na iOS — niezweryfikowane adresy są odrzucane."
+        },
+        "subject": {
+          "name": "Temat",
+          "description": "Wiersz tematu e-maila."
+        },
+        "body": {
+          "name": "Treść",
+          "description": "Treść e-maila w postaci zwykłego tekstu. Podaj ją, treść HTML lub obie."
+        },
+        "html_body": {
+          "name": "Treść HTML",
+          "description": "Treść e-maila w formacie HTML. Podaj ją, treść tekstową lub obie."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Usuń widżet",
+      "description": "Usuń widżet PushWard z serwera. Jeśli wpis konfiguracji śledzonego widżetu nadal obsługuje ten slug, widżet zostanie odtworzony przy następnym restarcie/synchronizacji — usuń wpis konfiguracji, aby usunąć go trwale. Podaj slug lub entity_id.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identyfikator slug widżetu. Należy podać slug lub entity_id."
+        },
+        "entity_id": {
+          "name": "Encja",
+          "description": "Encja HA powiązana z widżetem. Dopasowywana do odpowiedniego widżetu na podstawie konfiguracji. Należy podać slug lub entity_id."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Połącz z PushWard",
         "data": {
           "integration_key": "Klucz integracji"
+        },
+        "description": "Wprowadź swój klucz integracji PushWard, aby rozpocząć. Pobierz aplikację PushWard na iOS z App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "Otwórz aplikację PushWard na iOS (App Store: {app_store_url}) → Ustawienia → Klucze integracji. Możesz wkleić domyślny klucz lub utworzyć nowy z zakresem „ha-*”."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "Etykiety kroków",
             "step_rows": "Wysokości wierszy kroków",
             "fired_at_attribute": "Atrybut czasu wyzwolenia",
-            "units": "Jednostki dla serii"
+            "units": "Jednostki dla serii",
+            "progress_entity": "Encja postępu",
+            "remaining_time_entity": "Encja pozostałego czasu",
+            "current_step_entity": "Encja bieżącego kroku",
+            "value_entity": "Encja wartości",
+            "subtitle_entity": "Encja podtytułu",
+            "tap_action_url": "URL akcji dotknięcia",
+            "tap_action_foreground": "Otwórz URL akcji dotknięcia",
+            "url_foreground": "Otwórz URL przycisku głównego",
+            "url_title": "Tytuł przycisku głównego",
+            "secondary_url_foreground": "Otwórz URL przycisku dodatkowego",
+            "secondary_url_title": "Tytuł przycisku dodatkowego",
+            "snooze_seconds": "Sekundy drzemki (iOS 26+)",
+            "fired_at_entity": "Encja czasu wyzwolenia"
           },
           "data_description": {
             "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości.",
@@ -957,7 +1192,20 @@
             "step_labels": "Etykiety dla każdego kroku. Format: 1=Pierwszy Krok, 2=Drugi Krok. Musi obejmować kroki 1..total_steps. Tylko szablon steps.",
             "step_rows": "Wysokość wiersza (1–10) dla każdego kroku, oddzielona przecinkami. Musi mieć total_steps wpisów. Tylko szablon steps.",
             "fired_at_attribute": "Atrybut encji zawierający znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert.",
-            "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline."
+            "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline.",
+            "progress_entity": "Odczytuj postęp z osobnej encji zamiast ze śledzonej encji. Pozostaw puste, aby użyć śledzonej encji. Gdy ustawione jest pole atrybutu, odczytuje ten atrybut tej encji; w przeciwnym razie jej stan.",
+            "remaining_time_entity": "Odczytuj pozostały czas z osobnej encji (np. czujnika czasu pralki). Pozostaw puste, aby użyć śledzonej encji. Automatycznie analizuje czujnik znacznika czasu (czas zakończenia), czujnik czasu trwania z jednostkami, ciąg H:MM:SS lub zwykłe sekundy.",
+            "current_step_entity": "Odczytuj bieżący krok z osobnej encji. Pozostaw puste, aby użyć śledzonej encji.",
+            "value_entity": "Odczytuj wartość wskaźnika z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Używa stanu encji źródłowej, chyba że ustawiono atrybut.",
+            "subtitle_entity": "Pokaż podtytuł z osobnej encji (np. czujnika programu/trybu). Pozostaw puste, aby użyć śledzonej encji. Używa stanu encji źródłowej, chyba że ustawiono atrybut.",
+            "tap_action_url": "Opcjonalny adres URL otwierany po dotknięciu tła Live Activity. Obsługuje http(s) (otwiera Safari) lub niestandardowe schematy, np. homeassistant://navigate/lovelace/0 (otwiera daną aplikację).",
+            "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle, bez opuszczania ekranu blokady.",
+            "url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
+            "url_title": "Etykieta przycisku głównego (maks. 64 znaki).",
+            "secondary_url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
+            "secondary_url_title": "Etykieta przycisku dodatkowego (maks. 64 znaki).",
+            "snooze_seconds": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
+            "fired_at_entity": "Odczytuj czas wyzwolenia alertu z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Akceptuje znacznik czasu Unix lub czujnik znacznika czasu ISO. Tylko szablon alertu."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "Adres URL musi używać schematu http:// lub https://.",
-        "invalid_gauge_range": "Wartość minimalna musi być mniejsza od wartości maksymalnej."
+        "invalid_gauge_range": "Wartość minimalna musi być mniejsza od wartości maksymalnej.",
+        "silent_requires_http": "Cichy webhook (wyłączony pierwszy plan) wymaga adresu URL http:// lub https://."
       },
       "abort": {
         "already_configured": "Ta encja jest już śledzona.",
         "reconfigure_successful": "Konfiguracja encji została zaktualizowana."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Śledzony widżet",
+      "initiate_flow": {
+        "user": "Dodaj śledzony widżet"
+      },
+      "step": {
+        "user": {
+          "title": "Dodaj widżet do PushWard",
+          "data": {
+            "entity_id": "Encja",
+            "widget_template": "Szablon",
+            "slug": "Slug widżetu"
+          },
+          "data_description": {
+            "widget_template": "Układ widżetu. Użyj `value` dla pojedynczej liczby, `progress` dla paska 0–1, `gauge` dla wartości w zakresie, `status` dla odznaki istotności lub `stat_list` dla maks. 6 wierszy.",
+            "slug": "Unikalny identyfikator tego widżetu. Pozostaw puste, aby wygenerować automatycznie z identyfikatora encji."
+          }
+        },
+        "reconfigure": {
+          "title": "Edytuj widżet",
+          "data": {
+            "entity_id": "Encja",
+            "widget_template": "Szablon",
+            "slug": "Slug widżetu"
+          },
+          "data_description": {
+            "widget_template": "Układ widżetu.",
+            "slug": "Unikalny identyfikator tego widżetu."
+          }
+        },
+        "details": {
+          "title": "Opcje widżetu",
+          "data": {
+            "widget_name": "Nazwa widżetu",
+            "value_attribute": "Atrybut wartości",
+            "unit": "Jednostka",
+            "min_value": "Wartość minimalna",
+            "max_value": "Wartość maksymalna",
+            "severity": "Poziom istotności",
+            "stat_rows": "Wiersze statystyk",
+            "label": "Etykieta",
+            "label_attribute": "Atrybut etykiety",
+            "subtitle_attribute": "Atrybut podtytułu",
+            "icon": "Ikona",
+            "icon_attribute": "Atrybut ikony",
+            "accent_color": "Kolor akcentu",
+            "accent_color_attribute": "Atrybut koloru akcentu",
+            "background_color": "Kolor tła",
+            "text_color": "Kolor tekstu",
+            "widget_trigger_mode": "Tryb wyzwalania",
+            "widget_poll_interval": "Interwał odpytywania (sekundy)",
+            "tap_action_url": "URL akcji dotknięcia",
+            "tap_action_foreground": "Otwórz URL akcji dotknięcia"
+          },
+          "data_description": {
+            "widget_name": "Nazwa wyświetlana w selektorze widżetów iOS. Domyślnie przyjazna nazwa encji.",
+            "value_attribute": "Atrybut encji przechowujący wartość. Pozostaw puste, aby użyć podstawowego stanu encji.",
+            "unit": "Jednostka wyświetlana obok wartości. Maks. 32 znaki.",
+            "min_value": "Wartość minimalna zakresu wskaźnika.",
+            "max_value": "Wartość maksymalna zakresu wskaźnika.",
+            "severity": "Istotność statusu (info, warning, critical, success).",
+            "stat_rows": "Maks. 6 wierszy. Format: `Label=entity_id[:attribute[:unit]]`, oddzielone przecinkami. Przykład: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Statyczna etykieta pokazywana na widżecie. Pozostaw puste, aby wyprowadzić z encji.",
+            "label_attribute": "Atrybut encji używany jako etykieta. Nadpisuje etykietę statyczną.",
+            "subtitle_attribute": "Atrybut encji pokazywany jako podtytuł widżetu.",
+            "icon": "Statyczna ikona. Obsługiwane nazwy SF Symbols i MDI.",
+            "icon_attribute": "Atrybut encji dla dynamicznej ikony. Nadpisuje statyczną ikonę.",
+            "accent_color": "Kolor akcentu widżetu. Pozostaw puste dla wartości domyślnej.",
+            "accent_color_attribute": "Atrybut encji dla dynamicznego koloru akcentu.",
+            "background_color": "Opcjonalny kolor tła.",
+            "text_color": "Opcjonalny kolor tekstu.",
+            "widget_trigger_mode": "Sposób wyzwalania aktualizacji. `event` reaguje na zmiany stanu; `poll` ponownie oblicza w stałym interwale.",
+            "widget_poll_interval": "Interwał między odpytaniami (10–3600 sekund). Używany tylko, gdy tryb wyzwalania to `poll`.",
+            "tap_action_url": "Opcjonalny adres URL otwierany po dotknięciu widżetu. Obsługuje http(s) (otwiera Safari) lub niestandardowe schematy, np. homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "Adres URL musi zawierać prawidłowy schemat. Użyj http(s):// lub niestandardowego schematu aplikacji, np. homeassistant://.",
+        "silent_requires_http": "Cichy webhook (wyłączony pierwszy plan) wymaga adresu URL http:// lub https://.",
+        "invalid_gauge_range": "Wartość minimalna musi być mniejsza niż wartość maksymalna.",
+        "stat_rows_required": "Szablon stat_list wymaga co najmniej jednego wiersza statystyk."
+      },
+      "abort": {
+        "already_configured": "Widżet z tym slugiem już istnieje.",
+        "reconfigure_successful": "Zaktualizowano konfigurację widżetu."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Wykorzystane powiadomienia"
+      },
+      "live_activity_updates_used": {
+        "name": "Wykorzystane aktualizacje Live Activity"
+      },
+      "widget_updates_used": {
+        "name": "Wykorzystane aktualizacje widżetu"
+      },
+      "emails_used": {
+        "name": "Wykorzystane e-maile"
+      },
+      "subscription_tier": {
+        "name": "Poziom subskrypcji",
+        "state": {
+          "free": "Darmowy",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Żaden widżet PushWard nie pasuje do slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "Akcja PushWard update_activity jest przestarzała",
+      "description": "Akcja `pushward.update_activity` jest przestarzała. Przełącz swoje automatyzacje na akcję specyficzną dla szablonu — na przykład `pushward.update_activity_countdown` lub `pushward.update_activity_gauge`. Stara akcja na razie nadal działa, ale zostanie usunięta w przyszłej wersji."
+    },
+    "usage_limit_notifications": {
+      "title": "Osiągnięto limit powiadomień PushWard",
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} powiadomień w bieżącym okresie, więc nowe powiadomienia będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+    },
+    "usage_limit_live_activity": {
+      "title": "Osiągnięto limit aktualizacji Live Activity PushWard",
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} aktualizacji Live Activity w bieżącym okresie, więc nowe aktualizacje będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+    },
+    "usage_limit_widgets": {
+      "title": "Osiągnięto limit aktualizacji widżetów PushWard",
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} aktualizacji widżetów w bieżącym okresie, więc nowe aktualizacje będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+    },
+    "usage_limit_emails": {
+      "title": "Osiągnięto limit e-maili PushWard",
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} e-maili w bieżącym okresie, więc nowe e-maile będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
     }
   }
 }

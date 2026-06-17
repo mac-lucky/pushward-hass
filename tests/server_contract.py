@@ -29,6 +29,7 @@ from urllib.parse import urlparse
 
 from custom_components.pushward.const import (
     MAX_LONG_TEXT_LEN,
+    MAX_TAP_ACTION_ICON_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_LEN,
     MAX_URL_LEN,
@@ -62,7 +63,6 @@ from custom_components.pushward.content_mapper import _COLOR_HEX_RE, _COLOR_NAME
 # once here so the contract validator can't drift. Do NOT alias these onto unrelated
 # const.py symbols that merely share a value (that would couple distinct fields).
 ICON_MAX = 128
-TAP_ICON_MAX = 64
 ACTIVITY_UNIT_MAX = 32  # config_flow caps gauge/timeline unit at 32
 STEP_LABEL_MAX = 32
 STEP_ROW_MIN = 1
@@ -137,7 +137,7 @@ def _check_tap_action(action: object, field: str, where: str) -> None:
         _fail(where, f"{field}.url is required when {field} is present")
     _check_len(url, MAX_URL_LEN, f"{field}.url", where)
     _check_len(action.get("title", ""), MAX_TAP_ACTION_TITLE_LEN, f"{field}.title", where)
-    _check_len(action.get("icon", ""), TAP_ICON_MAX, f"{field}.icon", where)
+    _check_len(action.get("icon", ""), MAX_TAP_ACTION_ICON_LEN, f"{field}.icon", where)
     # method/headers/body are HTTP-only — they may only accompany an http(s) URL.
     if any(k in action for k in ("method", "headers", "body")):
         scheme = urlparse(str(url)).scheme.lower()

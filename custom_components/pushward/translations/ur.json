@@ -139,6 +139,34 @@
         "units": {
           "name": "اکائیاں",
           "description": "Timeline سیریز کے لیے اکائی لیبل۔ فارمیٹ: attribute=اکائی۔ مثال: temp=°C، humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "iOS Snooze بٹن کاؤنٹ ڈاؤن کو کتنا بڑھاتا ہے (60–3600)۔ بطور ڈیفالٹ 300 (5 منٹ)۔ alarm درکار ہے (iOS 26+، صرف countdown ٹیمپلیٹ)۔"
+        },
+        "duration": {
+          "name": "دورانیہ",
+          "description": "End Date کا متبادل جسے سیٹ کر کے بھول جائیں: سیکنڈ (>=1) یا دورانیہ سٹرنگ جیسے \"1h30m\"۔ سرور start/end کو ابھی کے وقت پر دوبارہ سیٹ کر دیتا ہے۔ یا تو Duration بھیجیں یا End Date — دونوں سیٹ ہوں تو Duration ترجیح پاتا ہے۔"
+        },
+        "start_date": {
+          "name": "آغاز کی تاریخ",
+          "description": "Unix ٹائم اسٹیمپ جب کاؤنٹ ڈاؤن شروع ہوا (گزرے/باقی وقت کی بار کو لنگر کرتا ہے)۔ سرور اسے بطور ڈیفالٹ ابھی کے وقت پر رکھتا ہے۔"
+        },
+        "history": {
+          "name": "ہسٹری (سیڈ)",
+          "description": "ابتدائی sparkline سیڈ: سیریز نام سے (timestamp, value) کی فہرست تک کا آبجیکٹ۔ صرف سیڈ — پہلی اپڈیٹ کے بعد سرور سنبھال لیتا ہے۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "url_action": {
+          "name": "پرائمری بٹن",
+          "description": "پرائمری ٹیپ ایبل بٹن بطور آبجیکٹ: url (لازمی)، اختیاری title، icon، foreground، اور خاموش webhook کے لیے http(s) method/headers/body۔"
+        },
+        "secondary_url_action": {
+          "name": "ثانوی بٹن",
+          "description": "ثانوی ٹیپ ایبل بٹن — وہی آبجیکٹ ساخت جو پرائمری بٹن کی ہے۔"
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "ترجیح",
           "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        },
+        "url": {
+          "name": "URL",
+          "description": "پرائمری URL جو ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔ http(s) یا کوئی کسٹم اسکیم جیسے homeassistant://۔"
+        },
+        "secondary_url": {
+          "name": "ثانوی URL",
+          "description": "ثانوی URL جو دوسرے ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "url_action": {
+          "name": "پرائمری بٹن",
+          "description": "پرائمری ٹیپ ایبل بٹن بطور آبجیکٹ: url (لازمی)، اختیاری title، icon، foreground، اور خاموش webhook کے لیے http(s) method/headers/body۔"
+        },
+        "secondary_url_action": {
+          "name": "ثانوی بٹن",
+          "description": "ثانوی ٹیپ ایبل بٹن — وہی آبجیکٹ ساخت جو پرائمری بٹن کی ہے۔"
         }
       },
       "sections": {
         "labels": {
           "name": "لیبلز اور آئیکن",
           "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "action_buttons": {
+          "name": "ایکشن بٹن",
+          "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
         },
         "display_options": {
           "name": "ڈسپلے، رنگ اور آواز",
@@ -307,6 +359,34 @@
         "priority": {
           "name": "ترجیح",
           "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        },
+        "duration": {
+          "name": "دورانیہ",
+          "description": "End Date کا متبادل جسے سیٹ کر کے بھول جائیں: سیکنڈ (>=1) یا دورانیہ سٹرنگ جیسے \"1h30m\"۔ سرور start/end کو ابھی کے وقت پر دوبارہ سیٹ کر دیتا ہے۔ یا تو Duration بھیجیں یا End Date — دونوں سیٹ ہوں تو Duration ترجیح پاتا ہے۔"
+        },
+        "start_date": {
+          "name": "آغاز کی تاریخ",
+          "description": "Unix ٹائم اسٹیمپ جب کاؤنٹ ڈاؤن شروع ہوا (گزرے/باقی وقت کی بار کو لنگر کرتا ہے)۔ سرور اسے بطور ڈیفالٹ ابھی کے وقت پر رکھتا ہے۔"
+        },
+        "url": {
+          "name": "URL",
+          "description": "پرائمری URL جو ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔ http(s) یا کوئی کسٹم اسکیم جیسے homeassistant://۔"
+        },
+        "secondary_url": {
+          "name": "ثانوی URL",
+          "description": "ثانوی URL جو دوسرے ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "url_action": {
+          "name": "پرائمری بٹن",
+          "description": "پرائمری ٹیپ ایبل بٹن بطور آبجیکٹ: url (لازمی)، اختیاری title، icon، foreground، اور خاموش webhook کے لیے http(s) method/headers/body۔"
+        },
+        "secondary_url_action": {
+          "name": "ثانوی بٹن",
+          "description": "ثانوی ٹیپ ایبل بٹن — وہی آبجیکٹ ساخت جو پرائمری بٹن کی ہے۔"
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown اختیارات",
           "description": "صرف countdown ٹیمپلیٹ کے لیے۔"
+        },
+        "action_buttons": {
+          "name": "ایکشن بٹن",
+          "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
         },
         "display_options": {
           "name": "ڈسپلے، رنگ اور آواز",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "ترجیح",
           "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "url_action": {
+          "name": "پرائمری بٹن",
+          "description": "پرائمری ٹیپ ایبل بٹن بطور آبجیکٹ: url (لازمی)، اختیاری title، icon، foreground، اور خاموش webhook کے لیے http(s) method/headers/body۔"
+        },
+        "secondary_url_action": {
+          "name": "ثانوی بٹن",
+          "description": "ثانوی ٹیپ ایبل بٹن — وہی آبجیکٹ ساخت جو پرائمری بٹن کی ہے۔"
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "ترجیح",
           "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "url_action": {
+          "name": "پرائمری بٹن",
+          "description": "پرائمری ٹیپ ایبل بٹن بطور آبجیکٹ: url (لازمی)، اختیاری title، icon، foreground، اور خاموش webhook کے لیے http(s) method/headers/body۔"
+        },
+        "secondary_url_action": {
+          "name": "ثانوی بٹن",
+          "description": "ثانوی ٹیپ ایبل بٹن — وہی آبجیکٹ ساخت جو پرائمری بٹن کی ہے۔"
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "ترجیح",
           "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        },
+        "url": {
+          "name": "URL",
+          "description": "پرائمری URL جو ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔ http(s) یا کوئی کسٹم اسکیم جیسے homeassistant://۔"
+        },
+        "secondary_url": {
+          "name": "ثانوی URL",
+          "description": "ثانوی URL جو دوسرے ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "url_action": {
+          "name": "پرائمری بٹن",
+          "description": "پرائمری ٹیپ ایبل بٹن بطور آبجیکٹ: url (لازمی)، اختیاری title، icon، foreground، اور خاموش webhook کے لیے http(s) method/headers/body۔"
+        },
+        "secondary_url_action": {
+          "name": "ثانوی بٹن",
+          "description": "ثانوی ٹیپ ایبل بٹن — وہی آبجیکٹ ساخت جو پرائمری بٹن کی ہے۔"
         }
       },
       "sections": {
         "labels": {
           "name": "لیبلز اور آئیکن",
           "description": "اختیاری ٹیکسٹ لیبلز اور آئیکن۔ کسی بھی ٹیمپلیٹ پر لاگو۔"
+        },
+        "action_buttons": {
+          "name": "ایکشن بٹن",
+          "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
         },
         "display_options": {
           "name": "ڈسپلے، رنگ اور آواز",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "ترجیح",
           "description": "سرگرمی کی ترجیح (0 = کم ترین، 10 = سب سے زیادہ)۔"
+        },
+        "history": {
+          "name": "ہسٹری (سیڈ)",
+          "description": "ابتدائی sparkline سیڈ: سیریز نام سے (timestamp, value) کی فہرست تک کا آبجیکٹ۔ صرف سیڈ — پہلی اپڈیٹ کے بعد سرور سنبھال لیتا ہے۔"
+        },
+        "url": {
+          "name": "URL",
+          "description": "پرائمری URL جو ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔ http(s) یا کوئی کسٹم اسکیم جیسے homeassistant://۔"
+        },
+        "secondary_url": {
+          "name": "ثانوی URL",
+          "description": "ثانوی URL جو دوسرے ٹیپ ایبل بٹن کے طور پر دکھایا جاتا ہے۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "url_action": {
+          "name": "پرائمری بٹن",
+          "description": "پرائمری ٹیپ ایبل بٹن بطور آبجیکٹ: url (لازمی)، اختیاری title، icon، foreground، اور خاموش webhook کے لیے http(s) method/headers/body۔"
+        },
+        "secondary_url_action": {
+          "name": "ثانوی بٹن",
+          "description": "ثانوی ٹیپ ایبل بٹن — وہی آبجیکٹ ساخت جو پرائمری بٹن کی ہے۔"
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge اور timeline اختیارات",
           "description": "صرف gauge اور timeline ٹیمپلیٹس کے لیے۔"
+        },
+        "action_buttons": {
+          "name": "ایکشن بٹن",
+          "description": "ٹیپ کیے جانے والے URL بٹن۔ صرف steps اور alert ٹیمپلیٹس کے لیے۔"
         },
         "display_options": {
           "name": "ڈسپلے، رنگ اور آواز",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "میٹا ڈیٹا",
           "description": "اطلاع کے ساتھ بھیجا جانے والا اضافی کلید-قدر جوڑا میٹا ڈیٹا۔"
+        },
+        "media": {
+          "name": "میڈیا",
+          "description": "میڈیا منسلکہ بطور آبجیکٹ جس میں `url` (HTTPS) اور `type` (image، video، یا audio) ہو۔"
+        },
+        "actions": {
+          "name": "ایکشنز",
+          "description": "ایکشن بٹنوں کی فہرست۔ ہر ایکشن ایک آبجیکٹ ہے جس میں id، title، اختیاری url، foreground، destructive، authentication_required، اور icon ہوتے ہیں۔ http(s) url کے لیے آپ method (GET/POST/PUT/PATCH/DELETE/HEAD)، headers، اور body کے ساتھ خاموش webhook بھی بھیج سکتے ہیں۔"
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "ویجٹ ریفریش کریں",
+      "description": "کسی ٹریک شدہ PushWard ویجٹ کو زبردستی ریفریش کریں۔ ان-میموری diff کیش کو نظر انداز کرتا ہے تاکہ قدر تبدیل نہ ہونے کے باوجود ویجٹ دوبارہ رینڈر ہو کر iOS پر بھیجا جائے۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "ویجٹ کا slug شناخت کنندہ۔ slug یا entity_id میں سے ایک لازمی فراہم کرنا ہوگا۔"
+        },
+        "entity_id": {
+          "name": "اینٹٹی",
+          "description": "ویجٹ سے منسلک HA اینٹٹی۔ slug یا entity_id میں سے ایک لازمی فراہم کرنا ہوگا۔"
+        }
+      }
+    },
+    "send_email": {
+      "name": "ای میل بھیجیں",
+      "description": "PushWard کے ذریعے ٹرانزیکشنل ای میل بھیجیں۔ ایک text باڈی، ایک HTML باڈی، یا دونوں فراہم کریں۔ انٹیگریشن کلید کو \"emails\" صلاحیت درکار ہے۔",
+      "fields": {
+        "to": {
+          "name": "بنام",
+          "description": "وصول کنندہ کا ای میل پتہ۔ یہ ایسا پتہ ہونا چاہیے جسے آپ پہلے ہی PushWard iOS ایپ میں شامل اور تصدیق کر چکے ہوں — غیر تصدیق شدہ پتے مسترد کر دیے جاتے ہیں۔"
+        },
+        "subject": {
+          "name": "موضوع",
+          "description": "ای میل کی موضوع لائن۔"
+        },
+        "body": {
+          "name": "متن",
+          "description": "سادہ متن کی ای میل باڈی۔ یہ، ایک HTML باڈی، یا دونوں فراہم کریں۔"
+        },
+        "html_body": {
+          "name": "HTML باڈی",
+          "description": "HTML ای میل باڈی۔ یہ، ایک سادہ متن باڈی، یا دونوں فراہم کریں۔"
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "ویجٹ حذف کریں",
+      "description": "سرور سے کوئی PushWard ویجٹ حذف کریں۔ اگر کوئی ٹریک شدہ ویجٹ کنفگ انٹری اب بھی اس slug کو چلا رہی ہے، تو اگلے ری اسٹارٹ/سنک پر ویجٹ دوبارہ بن جائے گا — اسے مستقل حذف کرنے کے لیے کنفگ انٹری ہٹا دیں۔ slug یا entity_id میں سے ایک فراہم کریں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "ویجٹ کا slug شناخت کنندہ۔ slug یا entity_id میں سے ایک لازمی فراہم کرنا ہوگا۔"
+        },
+        "entity_id": {
+          "name": "اینٹٹی",
+          "description": "ویجٹ سے منسلک HA اینٹٹی۔ کنفگ کے ذریعے مماثل ویجٹ سے حل کی جاتی ہے۔ slug یا entity_id میں سے ایک لازمی فراہم کرنا ہوگا۔"
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "PushWard سے جڑیں",
         "data": {
           "integration_key": "انٹیگریشن کی"
+        },
+        "description": "شروع کرنے کے لیے اپنی PushWard انٹیگریشن کلید درج کریں۔ PushWard iOS ایپ App Store سے حاصل کریں: {app_store_url}",
+        "data_description": {
+          "integration_key": "PushWard iOS ایپ کھولیں (App Store: {app_store_url}) → Settings → Integration Keys۔ آپ ڈیفالٹ کلید پیسٹ کر سکتے ہیں، یا 'ha-*' اسکوپ کے ساتھ نئی بنا سکتے ہیں۔"
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "مرحلے کے لیبل",
             "step_rows": "مرحلے کی قطاریں",
             "fired_at_attribute": "فعال ہونے کے وقت کی خصوصیت",
-            "units": "اکائیاں"
+            "units": "اکائیاں",
+            "progress_entity": "پیش رفت اینٹٹی",
+            "remaining_time_entity": "بقیہ وقت اینٹٹی",
+            "current_step_entity": "موجودہ مرحلہ اینٹٹی",
+            "value_entity": "قدر اینٹٹی",
+            "subtitle_entity": "ذیلی عنوان اینٹٹی",
+            "tap_action_url": "ٹیپ ایکشن URL",
+            "tap_action_foreground": "ٹیپ ایکشن URL کھولیں",
+            "url_foreground": "پرائمری بٹن URL کھولیں",
+            "url_title": "پرائمری بٹن کا عنوان",
+            "secondary_url_foreground": "ثانوی بٹن URL کھولیں",
+            "secondary_url_title": "ثانوی بٹن کا عنوان",
+            "snooze_seconds": "Snooze Seconds (iOS 26+)",
+            "fired_at_entity": "Fired At اینٹٹی"
           },
           "data_description": {
             "start_states": "اینٹٹی کی وہ حالتیں جو Live Activity شروع کرتی ہیں۔ فہرست سے منتخب کریں یا اپنی مرضی کی قدریں ٹائپ کریں۔",
@@ -957,7 +1192,20 @@
             "step_labels": "steps ٹیمپلیٹ کے مراحل کے لیے کسٹم لیبل۔ فارمیٹ: 1=لیبل، 2=لیبل۔ خالی ہونے پر مرحلے کے نمبر استعمال ہوتے ہیں۔",
             "step_rows": "steps ٹیمپلیٹ میں ایک قطار میں دکھائے جانے والے مراحل کی تعداد۔",
             "fired_at_attribute": "ٹرگر کی Unix ٹائم اسٹیمپ رکھنے والی اینٹٹی کی خصوصیت۔ ملتوی وقت ظاہر کرنے کے لیے استعمال۔",
-            "units": "Timeline سیریز کے لیے اکائی لیبل۔ فارمیٹ: attribute=اکائی۔ مثال: temp=°C، humidity=%"
+            "units": "Timeline سیریز کے لیے اکائی لیبل۔ فارمیٹ: attribute=اکائی۔ مثال: temp=°C، humidity=%",
+            "progress_entity": "ٹریک شدہ اینٹٹی کے بجائے کسی الگ اینٹٹی سے پیش رفت پڑھیں۔ ٹریک شدہ اینٹٹی استعمال کرنے کے لیے خالی چھوڑیں۔ attribute فیلڈ سیٹ ہونے پر اس اینٹٹی کی وہی خصوصیت پڑھتا ہے؛ ورنہ اس کی state۔",
+            "remaining_time_entity": "کسی الگ اینٹٹی (مثلاً واشر کے ٹائم سینسر) سے بقیہ وقت پڑھیں۔ ٹریک شدہ اینٹٹی استعمال کرنے کے لیے خالی چھوڑیں۔ ایک timestamp (مکمل ہونے کا وقت) سینسر، اکائیوں والا duration سینسر، H:MM:SS سٹرنگ، یا سادہ سیکنڈ خودکار پارس کرتا ہے۔",
+            "current_step_entity": "کسی الگ اینٹٹی سے موجودہ مرحلہ پڑھیں۔ ٹریک شدہ اینٹٹی استعمال کرنے کے لیے خالی چھوڑیں۔",
+            "value_entity": "کسی الگ اینٹٹی سے gauge قدر پڑھیں۔ ٹریک شدہ اینٹٹی استعمال کرنے کے لیے خالی چھوڑیں۔ جب تک کوئی attribute سیٹ نہ ہو، ماخذ اینٹٹی کی state استعمال کرتا ہے۔",
+            "subtitle_entity": "کسی الگ اینٹٹی (مثلاً program/mode سینسر) سے ذیلی عنوان دکھائیں۔ ٹریک شدہ اینٹٹی استعمال کرنے کے لیے خالی چھوڑیں۔ جب تک کوئی attribute سیٹ نہ ہو، ماخذ اینٹٹی کی state استعمال کرتا ہے۔",
+            "tap_action_url": "اختیاری URL جو Live Activity کے پس منظر پر ٹیپ کرنے پر کھلتا ہے۔ http(s) (Safari کھولتا ہے) یا کسٹم اسکیمیں جیسے homeassistant://navigate/lovelace/0 (وہ ایپ کھولتی ہے) سپورٹ کرتا ہے۔",
+            "tap_action_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s)) — Lock Screen چھوڑے بغیر پس منظر میں POST چلاتا ہے۔",
+            "url_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s))۔",
+            "url_title": "پرائمری بٹن کا لیبل (زیادہ سے زیادہ 64 حروف)۔",
+            "secondary_url_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s))۔",
+            "secondary_url_title": "ثانوی بٹن کا لیبل (زیادہ سے زیادہ 64 حروف)۔",
+            "snooze_seconds": "iOS Snooze بٹن کاؤنٹ ڈاؤن کو کتنا بڑھاتا ہے (60–3600)۔ 300s (5 منٹ) ڈیفالٹ کے لیے خالی چھوڑیں۔ Alarm درکار ہے۔ صرف Countdown ٹیمپلیٹ۔",
+            "fired_at_entity": "کسی الگ اینٹٹی سے alert کے fired-at وقت کو پڑھیں۔ ٹریک شدہ اینٹٹی استعمال کرنے کے لیے خالی چھوڑیں۔ ایک unix timestamp یا ISO timestamp سینسر قبول کرتا ہے۔ صرف Alert ٹیمپلیٹ۔"
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL کو http:// یا https:// scheme استعمال کرنی چاہیے۔",
-        "invalid_gauge_range": "کم از کم قدر زیادہ سے زیادہ قدر سے کم ہونی چاہیے۔"
+        "invalid_gauge_range": "کم از کم قدر زیادہ سے زیادہ قدر سے کم ہونی چاہیے۔",
+        "silent_requires_http": "خاموش webhook (foreground آف) کے لیے http:// یا https:// URL درکار ہے۔"
       },
       "abort": {
         "already_configured": "یہ اینٹٹی پہلے سے ٹریک ہو رہی ہے۔",
         "reconfigure_successful": "اینٹٹی کی ترتیب اپڈیٹ ہو گئی۔"
       }
+    },
+    "tracked_widget": {
+      "entry_type": "ٹریک شدہ ویجٹ",
+      "initiate_flow": {
+        "user": "ٹریک شدہ ویجٹ شامل کریں"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard میں ویجٹ شامل کریں",
+          "data": {
+            "entity_id": "اینٹٹی",
+            "widget_template": "ٹیمپلیٹ",
+            "slug": "ویجٹ Slug"
+          },
+          "data_description": {
+            "widget_template": "ویجٹ کا لے آؤٹ۔ ایک واحد عدد کے لیے `value`، 0–1 بار کے لیے `progress`، رینج میں قدر کے لیے `gauge`، شدت بیج کے لیے `status`، یا 6 تک قطاروں کے لیے `stat_list` استعمال کریں۔",
+            "slug": "اس ویجٹ کا منفرد شناخت کنندہ۔ entity ID سے خودکار بنانے کے لیے خالی چھوڑیں۔"
+          }
+        },
+        "reconfigure": {
+          "title": "ویجٹ میں ترمیم کریں",
+          "data": {
+            "entity_id": "اینٹٹی",
+            "widget_template": "ٹیمپلیٹ",
+            "slug": "ویجٹ Slug"
+          },
+          "data_description": {
+            "widget_template": "ویجٹ کا لے آؤٹ۔",
+            "slug": "اس ویجٹ کا منفرد شناخت کنندہ۔"
+          }
+        },
+        "details": {
+          "title": "ویجٹ اختیارات",
+          "data": {
+            "widget_name": "ویجٹ کا نام",
+            "value_attribute": "قدر خصوصیت",
+            "unit": "اکائی",
+            "min_value": "کم از کم قدر",
+            "max_value": "زیادہ سے زیادہ قدر",
+            "severity": "شدت",
+            "stat_rows": "Stat قطاریں",
+            "label": "لیبل",
+            "label_attribute": "لیبل خصوصیت",
+            "subtitle_attribute": "ذیلی عنوان خصوصیت",
+            "icon": "آئیکن",
+            "icon_attribute": "آئیکن خصوصیت",
+            "accent_color": "لہجے کا رنگ",
+            "accent_color_attribute": "لہجے کے رنگ کی خصوصیت",
+            "background_color": "پس منظر کا رنگ",
+            "text_color": "متن کا رنگ",
+            "widget_trigger_mode": "ٹرگر موڈ",
+            "widget_poll_interval": "Poll وقفہ (سیکنڈ)",
+            "tap_action_url": "ٹیپ ایکشن URL",
+            "tap_action_foreground": "ٹیپ ایکشن URL کھولیں"
+          },
+          "data_description": {
+            "widget_name": "iOS ویجٹ پکر میں دکھایا جانے والا ڈسپلے نام۔ بطور ڈیفالٹ اینٹٹی کا friendly نام۔",
+            "value_attribute": "قدر رکھنے والی اینٹٹی خصوصیت۔ اینٹٹی کی پرائمری state استعمال کرنے کے لیے خالی چھوڑیں۔",
+            "unit": "قدر کے ساتھ دکھائی جانے والی ڈسپلے اکائی۔ زیادہ سے زیادہ 32 حروف۔",
+            "min_value": "gauge رینج کے لیے کم از کم قدر۔",
+            "max_value": "gauge رینج کے لیے زیادہ سے زیادہ قدر۔",
+            "severity": "اسٹیٹس شدت (info، warning، critical، success)۔",
+            "stat_rows": "6 تک قطاریں۔ فارمیٹ: `Label=entity_id[:attribute[:unit]]`، کاما سے جدا۔ مثال: `Users=sensor.user_count, Active=sensor.active_devices:count`۔",
+            "label": "ویجٹ پر دکھایا جانے والا static لیبل۔ اینٹٹی سے اخذ کرنے کے لیے خالی چھوڑیں۔",
+            "label_attribute": "لیبل کے طور پر استعمال ہونے والی اینٹٹی خصوصیت۔ static لیبل کو اوور رائڈ کرتی ہے۔",
+            "subtitle_attribute": "ویجٹ کے ذیلی عنوان کے طور پر دکھائی جانے والی اینٹٹی خصوصیت۔",
+            "icon": "static آئیکن۔ SF Symbols اور MDI نام سپورٹ شدہ۔",
+            "icon_attribute": "متحرک آئیکن کے لیے اینٹٹی خصوصیت۔ static آئیکن کو اوور رائڈ کرتی ہے۔",
+            "accent_color": "ویجٹ کے لیے لہجے کا رنگ۔ ڈیفالٹ کے لیے خالی چھوڑیں۔",
+            "accent_color_attribute": "متحرک لہجے کے رنگ کے لیے اینٹٹی خصوصیت۔",
+            "background_color": "اختیاری پس منظر کا رنگ۔",
+            "text_color": "اختیاری متن کا رنگ۔",
+            "widget_trigger_mode": "اپڈیٹس کیسے ٹرگر ہوتی ہیں۔ `event` state تبدیلیوں پر ردِعمل دیتا ہے؛ `poll` ایک مقررہ وقفے پر دوبارہ جانچتا ہے۔",
+            "widget_poll_interval": "polls کے درمیان وقفہ (10–3600 سیکنڈ)۔ صرف اس وقت استعمال ہوتا ہے جب ٹرگر موڈ `poll` ہو۔",
+            "tap_action_url": "اختیاری URL جو ویجٹ پر ٹیپ کرنے پر کھلتا ہے۔ http(s) (Safari کھولتا ہے) یا کسٹم اسکیمیں جیسے homeassistant://navigate/lovelace/0 سپورٹ کرتا ہے۔",
+            "tap_action_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s)) — پس منظر میں POST چلاتا ہے۔"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL میں ایک درست اسکیم ہونی چاہیے۔ http(s):// یا کوئی کسٹم ایپ اسکیم جیسے homeassistant:// استعمال کریں۔",
+        "silent_requires_http": "خاموش webhook (foreground آف) کے لیے http:// یا https:// URL درکار ہے۔",
+        "invalid_gauge_range": "کم از کم قدر زیادہ سے زیادہ قدر سے کم ہونی چاہیے۔",
+        "stat_rows_required": "stat_list ٹیمپلیٹ کے لیے کم از کم ایک stat قطار درکار ہے۔"
+      },
+      "abort": {
+        "already_configured": "اس slug والا ویجٹ پہلے سے موجود ہے۔",
+        "reconfigure_successful": "ویجٹ کنفیگریشن اپڈیٹ ہو گئی۔"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "استعمال شدہ اطلاعات"
+      },
+      "live_activity_updates_used": {
+        "name": "استعمال شدہ Live Activity اپڈیٹس"
+      },
+      "widget_updates_used": {
+        "name": "استعمال شدہ ویجٹ اپڈیٹس"
+      },
+      "emails_used": {
+        "name": "استعمال شدہ ای میلز"
+      },
+      "subscription_tier": {
+        "name": "سبسکرپشن ٹیئر",
+        "state": {
+          "free": "مفت",
+          "premium": "پریمیم"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "کوئی PushWard ویجٹ slug={slug} entity_id={entity_id} سے مماثل نہیں۔"
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "PushWard update_activity ایکشن متروک ہے",
+      "description": "`pushward.update_activity` ایکشن متروک ہے۔ اپنی آٹومیشنز کو اس کے بجائے ٹیمپلیٹ کے مخصوص ایکشن پر منتقل کریں — مثلاً `pushward.update_activity_countdown` یا `pushward.update_activity_gauge`۔ پرانا ایکشن فی الحال کام کرتا رہے گا لیکن مستقبل کی ریلیز میں ہٹا دیا جائے گا۔"
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard اطلاعات کی حد پہنچ گئی",
+      "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} اطلاعات میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی اطلاعات مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard Live Activity اپڈیٹ کی حد پہنچ گئی",
+      "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} Live Activity اپڈیٹس میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی اپڈیٹس مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard ویجٹ اپڈیٹ کی حد پہنچ گئی",
+      "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} ویجٹ اپڈیٹس میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی اپڈیٹس مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
+    },
+    "usage_limit_emails": {
+      "title": "PushWard ای میل کی حد پہنچ گئی",
+      "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} ای میلز میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی ای میلز مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
     }
   }
 }

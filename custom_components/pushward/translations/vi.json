@@ -139,6 +139,34 @@
         "units": {
           "name": "Đơn Vị",
           "description": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "Số giây hoãn",
+          "description": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Mặc định là 300 (5 phút). Yêu cầu báo thức (iOS 26+, chỉ mẫu đếm ngược)."
+        },
+        "duration": {
+          "name": "Thời lượng",
+          "description": "Tùy chọn thay thế cho Ngày kết thúc, đặt một lần là xong: số giây (>=1) hoặc một chuỗi thời lượng như \"1h30m\". Máy chủ neo lại thời điểm bắt đầu/kết thúc về hiện tại. Gửi Thời lượng hoặc Ngày kết thúc — Thời lượng được ưu tiên nếu cả hai cùng được đặt."
+        },
+        "start_date": {
+          "name": "Ngày bắt đầu",
+          "description": "Dấu thời gian Unix khi bắt đầu đếm ngược (neo thanh thời gian đã trôi qua/còn lại). Máy chủ mặc định đặt giá trị này về hiện tại."
+        },
+        "history": {
+          "name": "Lịch sử (dữ liệu khởi tạo)",
+          "description": "Dữ liệu khởi tạo cho biểu đồ sparkline: một đối tượng ánh xạ tên chuỗi tới danh sách (timestamp, value). Chỉ dùng để khởi tạo — máy chủ tiếp quản sau lần cập nhật đầu tiên."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "url_action": {
+          "name": "Nút chính",
+          "description": "Nút chính có thể chạm dưới dạng đối tượng: url (bắt buộc), title, icon, foreground tùy chọn, và method/headers/body http(s) cho một webhook im lặng."
+        },
+        "secondary_url_action": {
+          "name": "Nút phụ",
+          "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Ưu Tiên",
           "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL chính hiển thị dưới dạng nút có thể chạm. http(s) hoặc một scheme tùy chỉnh như homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL phụ",
+          "description": "URL phụ hiển thị dưới dạng nút thứ hai có thể chạm."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "url_action": {
+          "name": "Nút chính",
+          "description": "Nút chính có thể chạm dưới dạng đối tượng: url (bắt buộc), title, icon, foreground tùy chọn, và method/headers/body http(s) cho một webhook im lặng."
+        },
+        "secondary_url_action": {
+          "name": "Nút phụ",
+          "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
         }
       },
       "sections": {
         "labels": {
           "name": "Nhãn & biểu tượng",
           "description": "Nhãn văn bản và biểu tượng tùy chọn. Áp dụng cho mọi mẫu."
+        },
+        "action_buttons": {
+          "name": "Nút hành động",
+          "description": "Nút URL có thể nhấn. Chỉ dành cho mẫu steps và alert."
         },
         "display_options": {
           "name": "Hiển thị, màu sắc và âm thanh",
@@ -281,7 +333,7 @@
           "description": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ hoạt động trên iOS 26+."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Số giây hoãn",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Ưu Tiên",
           "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "duration": {
+          "name": "Thời lượng",
+          "description": "Tùy chọn thay thế cho Ngày kết thúc, đặt một lần là xong: số giây (>=1) hoặc một chuỗi thời lượng như \"1h30m\". Máy chủ neo lại thời điểm bắt đầu/kết thúc về hiện tại. Gửi Thời lượng hoặc Ngày kết thúc — Thời lượng được ưu tiên nếu cả hai cùng được đặt."
+        },
+        "start_date": {
+          "name": "Ngày bắt đầu",
+          "description": "Dấu thời gian Unix khi bắt đầu đếm ngược (neo thanh thời gian đã trôi qua/còn lại). Máy chủ mặc định đặt giá trị này về hiện tại."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL chính hiển thị dưới dạng nút có thể chạm. http(s) hoặc một scheme tùy chỉnh như homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL phụ",
+          "description": "URL phụ hiển thị dưới dạng nút thứ hai có thể chạm."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "url_action": {
+          "name": "Nút chính",
+          "description": "Nút chính có thể chạm dưới dạng đối tượng: url (bắt buộc), title, icon, foreground tùy chọn, và method/headers/body http(s) cho một webhook im lặng."
+        },
+        "secondary_url_action": {
+          "name": "Nút phụ",
+          "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "Tùy chọn countdown",
           "description": "Chỉ dành cho mẫu countdown."
+        },
+        "action_buttons": {
+          "name": "Nút hành động",
+          "description": "Nút URL có thể nhấn. Chỉ dành cho mẫu steps và alert."
         },
         "display_options": {
           "name": "Hiển thị, màu sắc và âm thanh",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Ưu Tiên",
           "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "url_action": {
+          "name": "Nút chính",
+          "description": "Nút chính có thể chạm dưới dạng đối tượng: url (bắt buộc), title, icon, foreground tùy chọn, và method/headers/body http(s) cho một webhook im lặng."
+        },
+        "secondary_url_action": {
+          "name": "Nút phụ",
+          "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Ưu Tiên",
           "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "url_action": {
+          "name": "Nút chính",
+          "description": "Nút chính có thể chạm dưới dạng đối tượng: url (bắt buộc), title, icon, foreground tùy chọn, và method/headers/body http(s) cho một webhook im lặng."
+        },
+        "secondary_url_action": {
+          "name": "Nút phụ",
+          "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Ưu Tiên",
           "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL chính hiển thị dưới dạng nút có thể chạm. http(s) hoặc một scheme tùy chỉnh như homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL phụ",
+          "description": "URL phụ hiển thị dưới dạng nút thứ hai có thể chạm."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "url_action": {
+          "name": "Nút chính",
+          "description": "Nút chính có thể chạm dưới dạng đối tượng: url (bắt buộc), title, icon, foreground tùy chọn, và method/headers/body http(s) cho một webhook im lặng."
+        },
+        "secondary_url_action": {
+          "name": "Nút phụ",
+          "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
         }
       },
       "sections": {
         "labels": {
           "name": "Nhãn & biểu tượng",
           "description": "Nhãn văn bản và biểu tượng tùy chọn. Áp dụng cho mọi mẫu."
+        },
+        "action_buttons": {
+          "name": "Nút hành động",
+          "description": "Nút URL có thể nhấn. Chỉ dành cho mẫu steps và alert."
         },
         "display_options": {
           "name": "Hiển thị, màu sắc và âm thanh",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Ưu Tiên",
           "description": "Mức ưu tiên của hoạt động (0 = thấp nhất, 10 = cao nhất)."
+        },
+        "history": {
+          "name": "Lịch sử (dữ liệu khởi tạo)",
+          "description": "Dữ liệu khởi tạo cho biểu đồ sparkline: một đối tượng ánh xạ tên chuỗi tới danh sách (timestamp, value). Chỉ dùng để khởi tạo — máy chủ tiếp quản sau lần cập nhật đầu tiên."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL chính hiển thị dưới dạng nút có thể chạm. http(s) hoặc một scheme tùy chỉnh như homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL phụ",
+          "description": "URL phụ hiển thị dưới dạng nút thứ hai có thể chạm."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "url_action": {
+          "name": "Nút chính",
+          "description": "Nút chính có thể chạm dưới dạng đối tượng: url (bắt buộc), title, icon, foreground tùy chọn, và method/headers/body http(s) cho một webhook im lặng."
+        },
+        "secondary_url_action": {
+          "name": "Nút phụ",
+          "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "Tùy chọn gauge và timeline",
           "description": "Chỉ dành cho mẫu gauge và timeline."
+        },
+        "action_buttons": {
+          "name": "Nút hành động",
+          "description": "Nút URL có thể nhấn. Chỉ dành cho mẫu steps và alert."
         },
         "display_options": {
           "name": "Hiển thị, màu sắc và âm thanh",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Dữ Liệu Phụ",
           "description": "Dữ liệu meta dạng cặp khóa-giá trị bổ sung gửi kèm thông báo."
+        },
+        "media": {
+          "name": "Phương tiện",
+          "description": "Tệp đính kèm phương tiện dưới dạng đối tượng với `url` (HTTPS) và `type` (image, video hoặc audio)."
+        },
+        "actions": {
+          "name": "Hành động",
+          "description": "Danh sách các nút hành động. Mỗi hành động là một đối tượng với id, title, và url, foreground, destructive, authentication_required, icon tùy chọn. Với url http(s) bạn cũng có thể gửi một webhook im lặng với method (GET/POST/PUT/PATCH/DELETE/HEAD), headers và body."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Làm mới widget",
+      "description": "Buộc làm mới một widget PushWard đang được theo dõi. Bỏ qua bộ nhớ đệm khác biệt trong bộ nhớ để widget được kết xuất lại và đẩy tới iOS ngay cả khi giá trị không thay đổi.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Định danh slug của widget. Phải cung cấp slug hoặc entity_id."
+        },
+        "entity_id": {
+          "name": "Thực thể",
+          "description": "Thực thể HA gắn với widget. Phải cung cấp slug hoặc entity_id."
+        }
+      }
+    },
+    "send_email": {
+      "name": "Gửi email",
+      "description": "Gửi một email giao dịch qua PushWard. Cung cấp nội dung văn bản, nội dung HTML, hoặc cả hai. Khóa tích hợp cần có quyền \"emails\".",
+      "fields": {
+        "to": {
+          "name": "Đến",
+          "description": "Địa chỉ email người nhận. Phải là địa chỉ bạn đã thêm và xác nhận trong ứng dụng PushWard trên iOS — các địa chỉ chưa xác minh sẽ bị từ chối."
+        },
+        "subject": {
+          "name": "Tiêu đề",
+          "description": "Dòng tiêu đề email."
+        },
+        "body": {
+          "name": "Nội dung",
+          "description": "Nội dung email dạng văn bản thuần. Cung cấp mục này, nội dung HTML, hoặc cả hai."
+        },
+        "html_body": {
+          "name": "Nội dung HTML",
+          "description": "Nội dung email dạng HTML. Cung cấp mục này, nội dung văn bản thuần, hoặc cả hai."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Xóa widget",
+      "description": "Xóa một widget PushWard khỏi máy chủ. Nếu một mục cấu hình widget được theo dõi vẫn điều khiển slug này, widget sẽ được tạo lại ở lần khởi động lại/đồng bộ tiếp theo — hãy gỡ mục cấu hình để xóa vĩnh viễn. Cung cấp slug hoặc entity_id.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Định danh slug của widget. Phải cung cấp slug hoặc entity_id."
+        },
+        "entity_id": {
+          "name": "Thực thể",
+          "description": "Thực thể HA gắn với widget. Được phân giải tới widget tương ứng theo cấu hình. Phải cung cấp slug hoặc entity_id."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Kết Nối với PushWard",
         "data": {
           "integration_key": "Khóa Tích Hợp"
+        },
+        "description": "Nhập khóa tích hợp PushWard của bạn để bắt đầu. Tải ứng dụng PushWard cho iOS từ App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "Mở ứng dụng PushWard trên iOS (App Store: {app_store_url}) → Cài đặt → Khóa tích hợp. Bạn có thể dán khóa mặc định, hoặc tạo khóa mới với phạm vi 'ha-*'."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "Nhãn Bước",
             "step_rows": "Số Hàng Bước",
             "fired_at_attribute": "Thuộc Tính Thời Điểm Kích Hoạt",
-            "units": "Đơn Vị"
+            "units": "Đơn Vị",
+            "progress_entity": "Thực thể tiến trình",
+            "remaining_time_entity": "Thực thể thời gian còn lại",
+            "current_step_entity": "Thực thể bước hiện tại",
+            "value_entity": "Thực thể giá trị",
+            "subtitle_entity": "Thực thể phụ đề",
+            "tap_action_url": "URL hành động khi chạm",
+            "tap_action_foreground": "Mở URL hành động khi chạm",
+            "url_foreground": "Mở URL nút chính",
+            "url_title": "Tiêu đề nút chính",
+            "secondary_url_foreground": "Mở URL nút phụ",
+            "secondary_url_title": "Tiêu đề nút phụ",
+            "snooze_seconds": "Số giây hoãn (iOS 26+)",
+            "fired_at_entity": "Thực thể thời điểm kích hoạt"
           },
           "data_description": {
             "start_states": "Trạng thái thực thể khởi động Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
@@ -957,7 +1192,20 @@
             "step_labels": "Nhãn tùy chỉnh cho các bước trong mẫu steps. Định dạng: 1=Nhãn, 2=Nhãn. Để trống để dùng số bước.",
             "step_rows": "Số bước hiển thị trong một hàng trong mẫu steps.",
             "fired_at_attribute": "Thuộc tính thực thể chứa dấu thời gian Unix khi kích hoạt. Dùng để hiển thị thời gian tương đối.",
-            "units": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%"
+            "units": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%",
+            "progress_entity": "Đọc tiến trình từ một thực thể riêng thay vì thực thể được theo dõi. Để trống để dùng thực thể được theo dõi. Nếu đặt trường thuộc tính, đọc thuộc tính đó của thực thể này; nếu không thì đọc trạng thái của nó.",
+            "remaining_time_entity": "Đọc thời gian còn lại từ một thực thể riêng (ví dụ cảm biến thời gian của máy giặt). Để trống để dùng thực thể được theo dõi. Tự động phân tích cảm biến dấu thời gian (thời điểm hoàn thành), cảm biến thời lượng có đơn vị, chuỗi H:MM:SS, hoặc số giây thuần.",
+            "current_step_entity": "Đọc bước hiện tại từ một thực thể riêng. Để trống để dùng thực thể được theo dõi.",
+            "value_entity": "Đọc giá trị đồng hồ đo từ một thực thể riêng. Để trống để dùng thực thể được theo dõi. Dùng trạng thái của thực thể nguồn trừ khi đặt một thuộc tính.",
+            "subtitle_entity": "Hiển thị phụ đề từ một thực thể riêng (ví dụ cảm biến chương trình/chế độ). Để trống để dùng thực thể được theo dõi. Dùng trạng thái của thực thể nguồn trừ khi đặt một thuộc tính.",
+            "tap_action_url": "URL tùy chọn được mở khi chạm vào nền của Live Activity. Hỗ trợ http(s) (mở Safari) hoặc scheme tùy chỉnh như homeassistant://navigate/lovelace/0 (mở ứng dụng đó).",
+            "tap_action_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)) — gửi một POST ở chế độ nền mà không rời khỏi Màn hình khóa.",
+            "url_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)).",
+            "url_title": "Nhãn nút chính (tối đa 64 ký tự).",
+            "secondary_url_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)).",
+            "secondary_url_title": "Nhãn nút phụ (tối đa 64 ký tự).",
+            "snooze_seconds": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Để trống để dùng mặc định 300s (5 phút). Yêu cầu Báo thức. Chỉ mẫu đếm ngược.",
+            "fired_at_entity": "Đọc thời điểm kích hoạt của cảnh báo từ một thực thể riêng. Để trống để dùng thực thể được theo dõi. Chấp nhận dấu thời gian unix hoặc cảm biến dấu thời gian ISO. Chỉ mẫu cảnh báo."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL phải sử dụng giao thức http:// hoặc https://.",
-        "invalid_gauge_range": "Giá trị tối thiểu phải nhỏ hơn giá trị tối đa."
+        "invalid_gauge_range": "Giá trị tối thiểu phải nhỏ hơn giá trị tối đa.",
+        "silent_requires_http": "Webhook im lặng (tắt foreground) yêu cầu URL http:// hoặc https://."
       },
       "abort": {
         "already_configured": "Thực thể này đã được theo dõi.",
         "reconfigure_successful": "Đã cập nhật cấu hình thực thể."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Widget được theo dõi",
+      "initiate_flow": {
+        "user": "Thêm widget được theo dõi"
+      },
+      "step": {
+        "user": {
+          "title": "Thêm widget vào PushWard",
+          "data": {
+            "entity_id": "Thực thể",
+            "widget_template": "Mẫu",
+            "slug": "Slug của widget"
+          },
+          "data_description": {
+            "widget_template": "Bố cục widget. Dùng `value` cho một số đơn, `progress` cho thanh 0–1, `gauge` cho giá trị trong khoảng, `status` cho huy hiệu mức độ nghiêm trọng, hoặc `stat_list` cho tối đa 6 hàng.",
+            "slug": "Định danh duy nhất cho widget này. Để trống để tự động tạo từ ID thực thể."
+          }
+        },
+        "reconfigure": {
+          "title": "Chỉnh sửa widget",
+          "data": {
+            "entity_id": "Thực thể",
+            "widget_template": "Mẫu",
+            "slug": "Slug của widget"
+          },
+          "data_description": {
+            "widget_template": "Bố cục widget.",
+            "slug": "Định danh duy nhất cho widget này."
+          }
+        },
+        "details": {
+          "title": "Tùy chọn widget",
+          "data": {
+            "widget_name": "Tên widget",
+            "value_attribute": "Thuộc tính giá trị",
+            "unit": "Đơn vị",
+            "min_value": "Giá trị tối thiểu",
+            "max_value": "Giá trị tối đa",
+            "severity": "Mức độ nghiêm trọng",
+            "stat_rows": "Hàng thống kê",
+            "label": "Nhãn",
+            "label_attribute": "Thuộc tính nhãn",
+            "subtitle_attribute": "Thuộc tính phụ đề",
+            "icon": "Biểu tượng",
+            "icon_attribute": "Thuộc tính biểu tượng",
+            "accent_color": "Màu nhấn",
+            "accent_color_attribute": "Thuộc tính màu nhấn",
+            "background_color": "Màu nền",
+            "text_color": "Màu chữ",
+            "widget_trigger_mode": "Chế độ kích hoạt",
+            "widget_poll_interval": "Khoảng thời gian thăm dò (giây)",
+            "tap_action_url": "URL hành động khi chạm",
+            "tap_action_foreground": "Mở URL hành động khi chạm"
+          },
+          "data_description": {
+            "widget_name": "Tên hiển thị trong bộ chọn widget trên iOS. Mặc định là tên thân thiện của thực thể.",
+            "value_attribute": "Thuộc tính của thực thể chứa giá trị. Để trống để dùng trạng thái chính của thực thể.",
+            "unit": "Đơn vị hiển thị bên cạnh giá trị. Tối đa 32 ký tự.",
+            "min_value": "Giá trị tối thiểu cho khoảng đồng hồ đo.",
+            "max_value": "Giá trị tối đa cho khoảng đồng hồ đo.",
+            "severity": "Mức độ nghiêm trọng của trạng thái (info, warning, critical, success).",
+            "stat_rows": "Tối đa 6 hàng. Định dạng: `Label=entity_id[:attribute[:unit]]`, phân tách bằng dấu phẩy. Ví dụ: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Nhãn tĩnh hiển thị trên widget. Để trống để lấy từ thực thể.",
+            "label_attribute": "Thuộc tính của thực thể được dùng làm nhãn. Ghi đè nhãn tĩnh.",
+            "subtitle_attribute": "Thuộc tính của thực thể hiển thị làm phụ đề widget.",
+            "icon": "Biểu tượng tĩnh. Hỗ trợ tên SF Symbols và MDI.",
+            "icon_attribute": "Thuộc tính của thực thể cho biểu tượng động. Ghi đè biểu tượng tĩnh.",
+            "accent_color": "Màu nhấn cho widget. Để trống để dùng mặc định.",
+            "accent_color_attribute": "Thuộc tính của thực thể cho màu nhấn động.",
+            "background_color": "Màu nền tùy chọn.",
+            "text_color": "Màu chữ tùy chọn.",
+            "widget_trigger_mode": "Cách cập nhật được kích hoạt. `event` phản ứng với thay đổi trạng thái; `poll` đánh giá lại theo khoảng thời gian cố định.",
+            "widget_poll_interval": "Khoảng thời gian giữa các lần thăm dò (10–3600 giây). Chỉ dùng khi chế độ kích hoạt là `poll`.",
+            "tap_action_url": "URL tùy chọn được mở khi chạm vào widget. Hỗ trợ http(s) (mở Safari) hoặc scheme tùy chỉnh như homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)) — gửi một POST ở chế độ nền."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL phải bao gồm một scheme hợp lệ. Dùng http(s):// hoặc một scheme ứng dụng tùy chỉnh như homeassistant://.",
+        "silent_requires_http": "Webhook im lặng (tắt foreground) yêu cầu URL http:// hoặc https://.",
+        "invalid_gauge_range": "Giá trị tối thiểu phải nhỏ hơn giá trị tối đa.",
+        "stat_rows_required": "Cần ít nhất một hàng thống kê cho mẫu stat_list."
+      },
+      "abort": {
+        "already_configured": "Đã tồn tại một widget với slug này.",
+        "reconfigure_successful": "Đã cập nhật cấu hình widget."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Thông báo đã dùng"
+      },
+      "live_activity_updates_used": {
+        "name": "Cập nhật Live Activity đã dùng"
+      },
+      "widget_updates_used": {
+        "name": "Cập nhật widget đã dùng"
+      },
+      "emails_used": {
+        "name": "Email đã dùng"
+      },
+      "subscription_tier": {
+        "name": "Gói đăng ký",
+        "state": {
+          "free": "Miễn phí",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Không có widget PushWard nào khớp với slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "Hành động update_activity của PushWard đã lỗi thời",
+      "description": "Hành động `pushward.update_activity` đã lỗi thời. Hãy chuyển các tự động hóa của bạn sang hành động dành riêng cho từng mẫu — ví dụ `pushward.update_activity_countdown` hoặc `pushward.update_activity_gauge`. Hành động cũ vẫn hoạt động hiện tại nhưng sẽ bị gỡ bỏ trong một bản phát hành tương lai."
+    },
+    "usage_limit_notifications": {
+      "title": "Đã đạt giới hạn thông báo của PushWard",
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} thông báo cho kỳ hiện tại, nên các thông báo mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+    },
+    "usage_limit_live_activity": {
+      "title": "Đã đạt giới hạn cập nhật Live Activity của PushWard",
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật Live Activity cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+    },
+    "usage_limit_widgets": {
+      "title": "Đã đạt giới hạn cập nhật widget của PushWard",
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật widget cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+    },
+    "usage_limit_emails": {
+      "title": "Đã đạt giới hạn email của PushWard",
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} email cho kỳ hiện tại, nên các email mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
     }
   }
 }

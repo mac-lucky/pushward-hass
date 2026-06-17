@@ -5,7 +5,7 @@
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
         },
         "state": {
@@ -139,6 +139,34 @@
         "units": {
           "name": "एकके",
           "description": "Timeline मालिकांसाठी एकक लेबल. स्वरूप: attribute=एकक. उदाहरण: temp=°C, humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "स्नूझ सेकंद",
+          "description": "iOS स्नूझ बटण काउंटडाउन किती वेळ वाढवते (60–3600). डीफॉल्ट 300 (5 मिनिटे). अलार्म आवश्यक (iOS 26+, फक्त काउंटडाउन टेम्पलेट)."
+        },
+        "duration": {
+          "name": "कालावधी",
+          "description": "शेवटच्या तारखेला सेट-अँड-फरगेट पर्याय: सेकंद (>=1) किंवा \"1h30m\" सारखी कालावधी स्ट्रिंग. सर्व्हर सुरुवात/शेवट आता पुन्हा अँकर करतो. कालावधी किंवा शेवटची तारीख यापैकी एक पाठवा — दोन्ही सेट असल्यास कालावधी प्राधान्य घेतो."
+        },
+        "start_date": {
+          "name": "सुरुवातीची तारीख",
+          "description": "काउंटडाउन सुरू झाल्याचा Unix टाइमस्टॅम्प (गेलेला/उरलेला बार अँकर करतो). सर्व्हर यासाठी डीफॉल्ट आता वापरतो."
+        },
+        "history": {
+          "name": "इतिहास (सीड)",
+          "description": "प्रारंभिक स्पार्कलाइन सीड: सिरीज नावाचे (timestamp, value) च्या यादीशी मॅपिंग करणारा ऑब्जेक्ट. फक्त सीड — पहिल्या अपडेटनंतर सर्व्हर ताबा घेतो."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "url_action": {
+          "name": "प्राथमिक बटण",
+          "description": "प्राथमिक टॅप करण्यायोग्य बटण एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी title, icon, foreground, आणि सायलेंट वेबहूकसाठी http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "दुय्यम बटण",
+          "description": "दुय्यम टॅप करण्यायोग्य बटण — प्राथमिक बटणासारखीच ऑब्जेक्ट रचना."
         }
       },
       "sections": {
@@ -173,7 +201,7 @@
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
         },
         "state": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "प्राधान्य",
           "description": "Activity ची प्राधान्यता (0 = किमान, 10 = कमाल)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "टॅप करण्यायोग्य बटण म्हणून दाखवलेले प्राथमिक URL. http(s) किंवा homeassistant:// सारखी कस्टम स्कीम."
+        },
+        "secondary_url": {
+          "name": "दुय्यम URL",
+          "description": "दुसरे टॅप करण्यायोग्य बटण म्हणून दाखवलेले दुय्यम URL."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "url_action": {
+          "name": "प्राथमिक बटण",
+          "description": "प्राथमिक टॅप करण्यायोग्य बटण एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी title, icon, foreground, आणि सायलेंट वेबहूकसाठी http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "दुय्यम बटण",
+          "description": "दुय्यम टॅप करण्यायोग्य बटण — प्राथमिक बटणासारखीच ऑब्जेक्ट रचना."
         }
       },
       "sections": {
         "labels": {
           "name": "लेबल आणि चिन्ह",
           "description": "पर्यायी मजकूर लेबल आणि चिन्ह. कोणत्याही टेम्पलेटला लागू."
+        },
+        "action_buttons": {
+          "name": "क्रिया बटणे",
+          "description": "टॅप करता येण्याजोगी URL बटणे. फक्त steps आणि alert टेम्पलेटसाठी."
         },
         "display_options": {
           "name": "प्रदर्शन, रंग आणि ध्वनी",
@@ -241,7 +293,7 @@
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
         },
         "state": {
@@ -281,7 +333,7 @@
           "description": "इशारा थ्रेशोल्ड ओलांडल्यावर AlarmKit अलार्म सक्रिय करतो. फक्त iOS 26+ वर कार्य करतो."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "स्नूझ सेकंद",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "प्राधान्य",
           "description": "Activity ची प्राधान्यता (0 = किमान, 10 = कमाल)."
+        },
+        "duration": {
+          "name": "कालावधी",
+          "description": "शेवटच्या तारखेला सेट-अँड-फरगेट पर्याय: सेकंद (>=1) किंवा \"1h30m\" सारखी कालावधी स्ट्रिंग. सर्व्हर सुरुवात/शेवट आता पुन्हा अँकर करतो. कालावधी किंवा शेवटची तारीख यापैकी एक पाठवा — दोन्ही सेट असल्यास कालावधी प्राधान्य घेतो."
+        },
+        "start_date": {
+          "name": "सुरुवातीची तारीख",
+          "description": "काउंटडाउन सुरू झाल्याचा Unix टाइमस्टॅम्प (गेलेला/उरलेला बार अँकर करतो). सर्व्हर यासाठी डीफॉल्ट आता वापरतो."
+        },
+        "url": {
+          "name": "URL",
+          "description": "टॅप करण्यायोग्य बटण म्हणून दाखवलेले प्राथमिक URL. http(s) किंवा homeassistant:// सारखी कस्टम स्कीम."
+        },
+        "secondary_url": {
+          "name": "दुय्यम URL",
+          "description": "दुसरे टॅप करण्यायोग्य बटण म्हणून दाखवलेले दुय्यम URL."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "url_action": {
+          "name": "प्राथमिक बटण",
+          "description": "प्राथमिक टॅप करण्यायोग्य बटण एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी title, icon, foreground, आणि सायलेंट वेबहूकसाठी http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "दुय्यम बटण",
+          "description": "दुय्यम टॅप करण्यायोग्य बटण — प्राथमिक बटणासारखीच ऑब्जेक्ट रचना."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown पर्याय",
           "description": "फक्त countdown टेम्पलेटसाठी."
+        },
+        "action_buttons": {
+          "name": "क्रिया बटणे",
+          "description": "टॅप करता येण्याजोगी URL बटणे. फक्त steps आणि alert टेम्पलेटसाठी."
         },
         "display_options": {
           "name": "प्रदर्शन, रंग आणि ध्वनी",
@@ -329,7 +413,7 @@
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
         },
         "state": {
@@ -403,6 +487,18 @@
         "priority": {
           "name": "प्राधान्य",
           "description": "Activity ची प्राधान्यता (0 = किमान, 10 = कमाल)."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "url_action": {
+          "name": "प्राथमिक बटण",
+          "description": "प्राथमिक टॅप करण्यायोग्य बटण एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी title, icon, foreground, आणि सायलेंट वेबहूकसाठी http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "दुय्यम बटण",
+          "description": "दुय्यम टॅप करण्यायोग्य बटण — प्राथमिक बटणासारखीच ऑब्जेक्ट रचना."
         }
       },
       "sections": {
@@ -429,7 +525,7 @@
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
         },
         "state": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "प्राधान्य",
           "description": "Activity ची प्राधान्यता (0 = किमान, 10 = कमाल)."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "url_action": {
+          "name": "प्राथमिक बटण",
+          "description": "प्राथमिक टॅप करण्यायोग्य बटण एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी title, icon, foreground, आणि सायलेंट वेबहूकसाठी http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "दुय्यम बटण",
+          "description": "दुय्यम टॅप करण्यायोग्य बटण — प्राथमिक बटणासारखीच ऑब्जेक्ट रचना."
         }
       },
       "sections": {
@@ -521,7 +629,7 @@
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
         },
         "state": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "प्राधान्य",
           "description": "Activity ची प्राधान्यता (0 = किमान, 10 = कमाल)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "टॅप करण्यायोग्य बटण म्हणून दाखवलेले प्राथमिक URL. http(s) किंवा homeassistant:// सारखी कस्टम स्कीम."
+        },
+        "secondary_url": {
+          "name": "दुय्यम URL",
+          "description": "दुसरे टॅप करण्यायोग्य बटण म्हणून दाखवलेले दुय्यम URL."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "url_action": {
+          "name": "प्राथमिक बटण",
+          "description": "प्राथमिक टॅप करण्यायोग्य बटण एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी title, icon, foreground, आणि सायलेंट वेबहूकसाठी http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "दुय्यम बटण",
+          "description": "दुय्यम टॅप करण्यायोग्य बटण — प्राथमिक बटणासारखीच ऑब्जेक्ट रचना."
         }
       },
       "sections": {
         "labels": {
           "name": "लेबल आणि चिन्ह",
           "description": "पर्यायी मजकूर लेबल आणि चिन्ह. कोणत्याही टेम्पलेटला लागू."
+        },
+        "action_buttons": {
+          "name": "क्रिया बटणे",
+          "description": "टॅप करता येण्याजोगी URL बटणे. फक्त steps आणि alert टेम्पलेटसाठी."
         },
         "display_options": {
           "name": "प्रदर्शन, रंग आणि ध्वनी",
@@ -605,7 +737,7 @@
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
         },
         "state": {
@@ -683,6 +815,30 @@
         "priority": {
           "name": "प्राधान्य",
           "description": "Activity ची प्राधान्यता (0 = किमान, 10 = कमाल)."
+        },
+        "history": {
+          "name": "इतिहास (सीड)",
+          "description": "प्रारंभिक स्पार्कलाइन सीड: सिरीज नावाचे (timestamp, value) च्या यादीशी मॅपिंग करणारा ऑब्जेक्ट. फक्त सीड — पहिल्या अपडेटनंतर सर्व्हर ताबा घेतो."
+        },
+        "url": {
+          "name": "URL",
+          "description": "टॅप करण्यायोग्य बटण म्हणून दाखवलेले प्राथमिक URL. http(s) किंवा homeassistant:// सारखी कस्टम स्कीम."
+        },
+        "secondary_url": {
+          "name": "दुय्यम URL",
+          "description": "दुसरे टॅप करण्यायोग्य बटण म्हणून दाखवलेले दुय्यम URL."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "url_action": {
+          "name": "प्राथमिक बटण",
+          "description": "प्राथमिक टॅप करण्यायोग्य बटण एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी title, icon, foreground, आणि सायलेंट वेबहूकसाठी http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "दुय्यम बटण",
+          "description": "दुय्यम टॅप करण्यायोग्य बटण — प्राथमिक बटणासारखीच ऑब्जेक्ट रचना."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge आणि timeline पर्याय",
           "description": "फक्त gauge आणि timeline टेम्पलेटसाठी."
+        },
+        "action_buttons": {
+          "name": "क्रिया बटणे",
+          "description": "टॅप करता येण्याजोगी URL बटणे. फक्त steps आणि alert टेम्पलेटसाठी."
         },
         "display_options": {
           "name": "प्रदर्शन, रंग आणि ध्वनी",
@@ -705,7 +865,7 @@
       "description": "नवीन PushWard Live Activity तयार करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "Activity साठी अद्वितीय slug ओळखकर्ता."
         },
         "name": {
@@ -717,11 +877,11 @@
           "description": "Activity प्राधान्य (0 = सर्वात कमी, 10 = सर्वात जास्त)."
         },
         "ended_ttl": {
-          "name": "Ended TTL",
+          "name": "समाप्त TTL",
           "description": "Activity समाप्त झाल्यानंतर ती किती सेकंद ठेवायची."
         },
         "stale_ttl": {
-          "name": "Stale TTL",
+          "name": "जुना TTL",
           "description": "Activity जुनी मानली जाण्यापूर्वीचे सेकंद."
         }
       }
@@ -731,7 +891,7 @@
       "description": "PushWard Live Activity समाप्त करा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "समाप्त करण्यासाठी Activity चा slug ओळखकर्ता."
         },
         "completion_message": {
@@ -745,7 +905,7 @@
       "description": "PushWard Live Activity हटवा.",
       "fields": {
         "slug": {
-          "name": "Slug",
+          "name": "स्लग",
           "description": "हटवण्यासाठी Activity चा slug ओळखकर्ता."
         }
       }
@@ -771,11 +931,11 @@
           "description": "iOS व्यत्यय पातळी. सूचना कशी वितरित केली जाते ते नियंत्रित करते."
         },
         "thread_id": {
-          "name": "Thread ID",
+          "name": "थ्रेड आयडी",
           "description": "Notification Center मध्ये सूचना एकत्र गटबद्ध करते."
         },
         "collapse_id": {
-          "name": "Collapse ID",
+          "name": "कोलॅप्स आयडी",
           "description": "APNs डिडुप्लिकेशन की. समान की असलेल्या मागील सूचनेची जागा घेते."
         },
         "source": {
@@ -787,11 +947,11 @@
           "description": "PushWard inbox मध्ये दाखवले जाणारे मानव-वाचनीय स्रोत नाव."
         },
         "activity_slug": {
-          "name": "Activity Slug",
+          "name": "Activity स्लग",
           "description": "ही सूचना विद्यमान Live Activity शी जोडा."
         },
         "push": {
-          "name": "Push",
+          "name": "पुश",
           "description": "सर्व डिव्हाइसवर APNs push alert म्हणून पाठवा. खोटे असल्यास, सूचना फक्त inbox मध्ये संग्रहित केली जाते."
         },
         "url": {
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "मेटाडेटा",
           "description": "सूचनेसोबत पाठवलेला अतिरिक्त की-मूल्य जोडी मेटाडेटा."
+        },
+        "media": {
+          "name": "मीडिया",
+          "description": "`url` (HTTPS) आणि `type` (image, video, किंवा audio) असलेल्या ऑब्जेक्ट म्हणून मीडिया संलग्नक."
+        },
+        "actions": {
+          "name": "क्रिया",
+          "description": "क्रिया बटणांची यादी. प्रत्येक क्रिया id, title, पर्यायी url, foreground, destructive, authentication_required, आणि icon असलेला ऑब्जेक्ट आहे. http(s) url साठी तुम्ही method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, आणि body सह सायलेंट वेबहूक देखील पाठवू शकता."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "विजेट रिफ्रेश करा",
+      "description": "ट्रॅक केलेले PushWard विजेट सक्तीने रिफ्रेश करा. इन-मेमरी diff कॅशला बायपास करते जेणेकरून मूल्य बदलले नसले तरी विजेट पुन्हा रेंडर होऊन iOS ला पाठवले जाते.",
+      "fields": {
+        "slug": {
+          "name": "स्लग",
+          "description": "विजेट स्लग आयडेंटिफायर. slug किंवा entity_id यापैकी एक देणे आवश्यक आहे."
+        },
+        "entity_id": {
+          "name": "घटक",
+          "description": "विजेटशी जोडलेला HA घटक. slug किंवा entity_id यापैकी एक देणे आवश्यक आहे."
+        }
+      }
+    },
+    "send_email": {
+      "name": "ईमेल पाठवा",
+      "description": "PushWard द्वारे ट्रान्झॅक्शनल ईमेल पाठवा. टेक्स्ट मजकूर, HTML मजकूर, किंवा दोन्ही द्या. इंटिग्रेशन कीला \"emails\" क्षमता आवश्यक आहे.",
+      "fields": {
+        "to": {
+          "name": "प्रति",
+          "description": "प्राप्तकर्त्याचा ईमेल पत्ता. तुम्ही PushWard iOS अॅपमध्ये आधीच जोडलेला आणि पुष्टी केलेला पत्ता असावा — असत्यापित पत्ते नाकारले जातात."
+        },
+        "subject": {
+          "name": "विषय",
+          "description": "ईमेल विषय ओळ."
+        },
+        "body": {
+          "name": "मजकूर",
+          "description": "साध्या मजकुराचा ईमेल मजकूर. हा, HTML मजकूर, किंवा दोन्ही द्या."
+        },
+        "html_body": {
+          "name": "HTML मजकूर",
+          "description": "HTML ईमेल मजकूर. हा, साध्या-मजकुराचा मजकूर, किंवा दोन्ही द्या."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "विजेट हटवा",
+      "description": "सर्व्हरवरून PushWard विजेट हटवा. ट्रॅक-केलेल्या विजेटची कॉन्फिग एन्ट्री अजूनही हा स्लग चालवत असल्यास, पुढील रीस्टार्ट/सिंकवर विजेट पुन्हा तयार होते — कायमचे हटवण्यासाठी कॉन्फिग एन्ट्री काढा. slug किंवा entity_id यापैकी एक द्या.",
+      "fields": {
+        "slug": {
+          "name": "स्लग",
+          "description": "विजेट स्लग आयडेंटिफायर. slug किंवा entity_id यापैकी एक देणे आवश्यक आहे."
+        },
+        "entity_id": {
+          "name": "घटक",
+          "description": "विजेटशी जोडलेला HA घटक. कॉन्फिगद्वारे जुळणाऱ्या विजेटशी रिझॉल्व्ह केले जाते. slug किंवा entity_id यापैकी एक देणे आवश्यक आहे."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "PushWard शी कनेक्ट करा",
         "data": {
           "integration_key": "इंटिग्रेशन की"
+        },
+        "description": "सुरू करण्यासाठी तुमची PushWard इंटिग्रेशन की प्रविष्ट करा. App Store वरून PushWard iOS अॅप मिळवा: {app_store_url}",
+        "data_description": {
+          "integration_key": "PushWard iOS अॅप उघडा (App Store: {app_store_url}) → Settings → Integration Keys. तुम्ही डीफॉल्ट की पेस्ट करू शकता, किंवा 'ha-*' स्कोपसह नवीन तयार करू शकता."
         }
       },
       "reconfigure": {
@@ -887,7 +1109,7 @@
             "smoothing": "रेषा गुळगुळीत करा",
             "thresholds": "थ्रेशोल्ड",
             "history_period": "मागील इतिहास कालावधी",
-            "slug": "Activity Slug",
+            "slug": "Activity स्लग",
             "activity_name": "Activity नाव",
             "icon": "आयकॉन",
             "icon_attribute": "आयकॉन गुणधर्म",
@@ -912,7 +1134,20 @@
             "step_labels": "पायऱ्यांचे लेबल",
             "step_rows": "पायऱ्यांच्या ओळी",
             "fired_at_attribute": "सक्रियण वेळ गुणधर्म",
-            "units": "एकके"
+            "units": "एकके",
+            "progress_entity": "प्रगती घटक",
+            "remaining_time_entity": "उरलेला वेळ घटक",
+            "current_step_entity": "सध्याची पायरी घटक",
+            "value_entity": "मूल्य घटक",
+            "subtitle_entity": "उपशीर्षक घटक",
+            "tap_action_url": "टॅप क्रिया URL",
+            "tap_action_foreground": "टॅप क्रिया URL उघडा",
+            "url_foreground": "प्राथमिक बटण URL उघडा",
+            "url_title": "प्राथमिक बटण शीर्षक",
+            "secondary_url_foreground": "दुय्यम बटण URL उघडा",
+            "secondary_url_title": "दुय्यम बटण शीर्षक",
+            "snooze_seconds": "स्नूझ सेकंद (iOS 26+)",
+            "fired_at_entity": "फायर झाल्याची वेळ घटक"
           },
           "data_description": {
             "start_states": "Live Activity सुरू करणाऱ्या एंटिटी स्थिती. यादीतून निवडा किंवा कस्टम मूल्ये टाइप करा.",
@@ -957,7 +1192,20 @@
             "step_labels": "steps टेम्पलेट पायऱ्यांसाठी सानुकूल लेबल. स्वरूप: 1=लेबल, 2=लेबल. रिकामे असल्यास पायरी क्रमांक वापरले जातात.",
             "step_rows": "steps टेम्पलेटमध्ये एका ओळीत दाखवल्या जाणाऱ्या पायऱ्यांची संख्या.",
             "fired_at_attribute": "ट्रिगर Unix टाइमस्टॅम्प धारण करणारा एन्टिटी गुणधर्म. सापेक्ष वेळ प्रदर्शनासाठी वापरला जातो.",
-            "units": "Timeline मालिकांसाठी एकक लेबल. स्वरूप: attribute=एकक. उदाहरण: temp=°C, humidity=%"
+            "units": "Timeline मालिकांसाठी एकक लेबल. स्वरूप: attribute=एकक. उदाहरण: temp=°C, humidity=%",
+            "progress_entity": "ट्रॅक केलेल्या घटकाऐवजी वेगळ्या घटकातून प्रगती वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म फील्ड सेट असल्यास, या घटकाचा तो गुणधर्म वाचते; अन्यथा त्याची स्थिती.",
+            "remaining_time_entity": "वेगळ्या घटकातून उरलेला वेळ वाचा (उदा. वॉशरचा वेळ सेन्सर). ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. टाइमस्टॅम्प (समाप्ती-वेळ) सेन्सर, युनिटसह कालावधी सेन्सर, H:MM:SS स्ट्रिंग, किंवा साधे सेकंद आपोआप पार्स करते.",
+            "current_step_entity": "वेगळ्या घटकातून सध्याची पायरी वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा.",
+            "value_entity": "वेगळ्या घटकातून गेज मूल्य वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म सेट नसल्यास स्रोत घटकाची स्थिती वापरते.",
+            "subtitle_entity": "वेगळ्या घटकातून उपशीर्षक दाखवा (उदा. प्रोग्राम/मोड सेन्सर). ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म सेट नसल्यास स्रोत घटकाची स्थिती वापरते.",
+            "tap_action_url": "Live Activity पार्श्वभूमीवर टॅप केल्यावर उघडले जाणारे पर्यायी URL. http(s) (Safari उघडते) किंवा homeassistant://navigate/lovelace/0 सारख्या कस्टम स्कीम (ते अॅप उघडते) समर्थित.",
+            "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — Lock Screen न सोडता पार्श्वभूमीत POST फायर करते.",
+            "url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
+            "url_title": "प्राथमिक बटण लेबल (कमाल 64 अक्षरे).",
+            "secondary_url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
+            "secondary_url_title": "दुय्यम बटण लेबल (कमाल 64 अक्षरे).",
+            "snooze_seconds": "iOS स्नूझ बटण काउंटडाउन किती वेळ वाढवते (60–3600). 300s (5 मिनिटे) डीफॉल्टसाठी रिकामे ठेवा. अलार्म आवश्यक. फक्त काउंटडाउन टेम्पलेट.",
+            "fired_at_entity": "वेगळ्या घटकातून अलर्टची फायर-झाल्याची वेळ वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. unix टाइमस्टॅम्प किंवा ISO टाइमस्टॅम्प सेन्सर स्वीकारते. फक्त अलर्ट टेम्पलेट."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL ने http:// किंवा https:// स्कीम वापरणे आवश्यक आहे.",
-        "invalid_gauge_range": "किमान मूल्य कमाल मूल्यापेक्षा कमी असणे आवश्यक आहे."
+        "invalid_gauge_range": "किमान मूल्य कमाल मूल्यापेक्षा कमी असणे आवश्यक आहे.",
+        "silent_requires_http": "सायलेंट वेबहूक (foreground बंद) साठी http:// किंवा https:// URL आवश्यक आहे."
       },
       "abort": {
         "already_configured": "ही एंटिटी आधीच ट्रॅक केली जात आहे.",
         "reconfigure_successful": "एंटिटी कॉन्फिगरेशन अपडेट झाले."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "ट्रॅक केलेले विजेट",
+      "initiate_flow": {
+        "user": "ट्रॅक केलेले विजेट जोडा"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard ला विजेट जोडा",
+          "data": {
+            "entity_id": "घटक",
+            "widget_template": "टेम्पलेट",
+            "slug": "विजेट स्लग"
+          },
+          "data_description": {
+            "widget_template": "विजेट लेआउट. एका संख्येसाठी `value`, 0–1 बारसाठी `progress`, श्रेणीतील-मूल्यासाठी `gauge`, तीव्रता बॅजसाठी `status`, किंवा 6 पर्यंत ओळींसाठी `stat_list` वापरा.",
+            "slug": "या विजेटसाठी अद्वितीय आयडेंटिफायर. entity ID वरून आपोआप तयार करण्यासाठी रिकामे ठेवा."
+          }
+        },
+        "reconfigure": {
+          "title": "विजेट संपादित करा",
+          "data": {
+            "entity_id": "घटक",
+            "widget_template": "टेम्पलेट",
+            "slug": "विजेट स्लग"
+          },
+          "data_description": {
+            "widget_template": "विजेट लेआउट.",
+            "slug": "या विजेटसाठी अद्वितीय आयडेंटिफायर."
+          }
+        },
+        "details": {
+          "title": "विजेट पर्याय",
+          "data": {
+            "widget_name": "विजेट नाव",
+            "value_attribute": "मूल्य गुणधर्म",
+            "unit": "एकक",
+            "min_value": "किमान मूल्य",
+            "max_value": "कमाल मूल्य",
+            "severity": "तीव्रता",
+            "stat_rows": "स्टॅट ओळी",
+            "label": "लेबल",
+            "label_attribute": "लेबल गुणधर्म",
+            "subtitle_attribute": "उपशीर्षक गुणधर्म",
+            "icon": "चिन्ह",
+            "icon_attribute": "चिन्ह गुणधर्म",
+            "accent_color": "अॅक्सेंट रंग",
+            "accent_color_attribute": "अॅक्सेंट रंग गुणधर्म",
+            "background_color": "पार्श्वभूमी रंग",
+            "text_color": "मजकूर रंग",
+            "widget_trigger_mode": "ट्रिगर मोड",
+            "widget_poll_interval": "पोल अंतराल (सेकंद)",
+            "tap_action_url": "टॅप क्रिया URL",
+            "tap_action_foreground": "टॅप क्रिया URL उघडा"
+          },
+          "data_description": {
+            "widget_name": "iOS विजेट पिकरमध्ये दाखवले जाणारे प्रदर्शन नाव. डीफॉल्ट घटकाचे फ्रेंडली नाव.",
+            "value_attribute": "मूल्य धारण करणारा घटक गुणधर्म. घटकाची प्राथमिक स्थिती वापरण्यासाठी रिकामे ठेवा.",
+            "unit": "मूल्याशेजारी दाखवले जाणारे प्रदर्शन एकक. कमाल 32 अक्षरे.",
+            "min_value": "गेज श्रेणीसाठी किमान मूल्य.",
+            "max_value": "गेज श्रेणीसाठी कमाल मूल्य.",
+            "severity": "स्थिती तीव्रता (info, warning, critical, success).",
+            "stat_rows": "6 पर्यंत ओळी. स्वरूप: `Label=entity_id[:attribute[:unit]]`, स्वल्पविरामाने विभक्त. उदाहरण: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "विजेटवर दाखवले जाणारे स्थिर लेबल. घटकातून मिळवण्यासाठी रिकामे ठेवा.",
+            "label_attribute": "लेबल म्हणून वापरलेला घटक गुणधर्म. स्थिर लेबलला ओव्हरराइड करते.",
+            "subtitle_attribute": "विजेट उपशीर्षक म्हणून दाखवलेला घटक गुणधर्म.",
+            "icon": "स्थिर चिन्ह. SF Symbols आणि MDI नावे समर्थित.",
+            "icon_attribute": "डायनॅमिक चिन्हासाठी घटक गुणधर्म. स्थिर चिन्हाला ओव्हरराइड करते.",
+            "accent_color": "विजेटसाठी अॅक्सेंट रंग. डीफॉल्टसाठी रिकामे ठेवा.",
+            "accent_color_attribute": "डायनॅमिक अॅक्सेंट रंगासाठी घटक गुणधर्म.",
+            "background_color": "पर्यायी पार्श्वभूमी रंग.",
+            "text_color": "पर्यायी मजकूर रंग.",
+            "widget_trigger_mode": "अपडेट्स कसे ट्रिगर होतात. `event` स्थिती बदलांना प्रतिसाद देतो; `poll` निश्चित अंतरालावर पुन्हा मूल्यांकन करतो.",
+            "widget_poll_interval": "पोल्समधील अंतराल (10–3600 सेकंद). फक्त ट्रिगर मोड `poll` असताना वापरले जाते.",
+            "tap_action_url": "विजेटवर टॅप केल्यावर उघडले जाणारे पर्यायी URL. http(s) (Safari उघडते) किंवा homeassistant://navigate/lovelace/0 सारख्या कस्टम स्कीम समर्थित.",
+            "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — पार्श्वभूमीत POST फायर करते."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL मध्ये वैध स्कीम असावी. http(s):// किंवा homeassistant:// सारखी कस्टम अॅप स्कीम वापरा.",
+        "silent_requires_http": "सायलेंट वेबहूक (foreground बंद) साठी http:// किंवा https:// URL आवश्यक आहे.",
+        "invalid_gauge_range": "किमान मूल्य कमाल मूल्यापेक्षा कमी असावे.",
+        "stat_rows_required": "stat_list टेम्पलेटसाठी किमान एक स्टॅट ओळ आवश्यक आहे."
+      },
+      "abort": {
+        "already_configured": "या स्लगसह विजेट आधीच अस्तित्वात आहे.",
+        "reconfigure_successful": "विजेट कॉन्फिगरेशन अपडेट केले."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "वापरलेल्या सूचना"
+      },
+      "live_activity_updates_used": {
+        "name": "वापरलेली Live Activity अपडेट्स"
+      },
+      "widget_updates_used": {
+        "name": "वापरलेली विजेट अपडेट्स"
+      },
+      "emails_used": {
+        "name": "वापरलेले ईमेल"
+      },
+      "subscription_tier": {
+        "name": "सदस्यता स्तर",
+        "state": {
+          "free": "मोफत",
+          "premium": "प्रीमियम"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "slug={slug} entity_id={entity_id} शी जुळणारे कोणतेही PushWard विजेट नाही."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "PushWard update_activity क्रिया कालबाह्य झाली आहे",
+      "description": "`pushward.update_activity` क्रिया कालबाह्य झाली आहे. त्याऐवजी तुमची ऑटोमेशन्स टेम्पलेट-विशिष्ट क्रियेवर स्विच करा — उदाहरणार्थ `pushward.update_activity_countdown` किंवा `pushward.update_activity_gauge`. जुनी क्रिया सध्या कार्यरत आहे पण भविष्यातील रिलीझमध्ये काढून टाकली जाईल."
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard सूचना मर्यादा गाठली",
+      "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} सूचना वापरल्या आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन सूचना नाकारल्या जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard Live Activity अपडेट मर्यादा गाठली",
+      "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} Live Activity अपडेट्स वापरल्या आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन अपडेट्स नाकारल्या जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard विजेट अपडेट मर्यादा गाठली",
+      "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} विजेट अपडेट्स वापरल्या आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन अपडेट्स नाकारल्या जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
+    },
+    "usage_limit_emails": {
+      "title": "PushWard ईमेल मर्यादा गाठली",
+      "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} ईमेल वापरले आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन ईमेल नाकारले जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
     }
   }
 }

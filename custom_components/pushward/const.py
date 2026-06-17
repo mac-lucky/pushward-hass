@@ -116,6 +116,16 @@ MAX_LONG_TEXT_LEN = 1024
 MAX_URL_LEN = 2048
 MAX_SLUG_LEN = 128
 MAX_TAP_ACTION_TITLE_LEN = 64
+MAX_TAP_ACTION_ICON_LEN = 64
+MAX_TAP_ACTION_BODY_LEN = 1024  # server maxTapActionBodyRunes
+MAX_TAP_ACTION_HEADERS_LEN = 1024  # server maxTapActionHeadersBytes (sum of name+value byte lengths)
+
+# Tap-action / action-button HTTP routing — mirrors pushward-server action_validation.go.
+# method/headers/body are only valid on http(s) URLs; custom-scheme URLs (homeassistant://,
+# youtube://, …) are tap targets only.
+TAP_ACTION_METHODS = ("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD")
+# Schemes the server rejects outright for any URL (XSS / local-file vectors).
+DANGEROUS_URL_SCHEMES = frozenset({"javascript", "data", "file", "vbscript"})
 
 # Activity wire-format states (must match pushward-server enum).
 ACTIVITY_STATE_ONGOING = "ongoing"
@@ -412,6 +422,80 @@ def validate_url(value: str) -> str:
         raise vol.Invalid("URL must use http:// or https:// scheme")
     if not parsed.netloc:
         raise vol.Invalid("URL must include a host")
+    return value
+
+
+def validate_tap_action_url(value: str) -> str:
+    """Validate a tap-action / action-button URL the way the server does.
+
+    Unlike ``validate_url`` (http/https only), the server accepts any scheme except
+    javascript/data/file/vbscript: custom schemes like ``homeassistant://`` or
+    ``youtube://`` open the matching app. http(s) URLs still require a host.
+    Mirrors pushward-server ValidateActionURL.
+    """
+    if not isinstance(value, str) or not value:
+        raise vol.Invalid("URL must be a non-empty string")
+    if len(value) > MAX_URL_LEN:
+        raise vol.Invalid(f"URL must be at most {MAX_URL_LEN} characters")
+    parsed = urlparse(value)
+    scheme = parsed.scheme.lower()
+    if not scheme:
+        raise vol.Invalid("URL must include a scheme (e.g. https:// or homeassistant://)")
+    if scheme in DANGEROUS_URL_SCHEMES:
+        raise vol.Invalid(f"URL scheme '{scheme}' is not allowed")
+    if scheme in ("http", "https") and not parsed.netloc:
+        raise vol.Invalid("http(s) URL must include a host")
+    return value
+
+
+# RFC 7230 token: the only characters allowed in an HTTP header field-name.
+_HEADER_NAME_RE = re.compile(r"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")
+
+
+def validate_action_headers(value: dict) -> dict:
+    """Validate action HTTP headers the way the server does (action_validation.go).
+
+    Rejects non-token header names, CR/LF/NUL in values, and a combined name+value
+    size over ``MAX_TAP_ACTION_HEADERS_LEN`` bytes — so the caller gets a clear HA
+    error instead of a server 400. The byte cap mirrors the server's Go ``len()``,
+    hence ``encode("utf-8")``.
+    """
+    total = 0
+    for name, val in value.items():
+        if not _HEADER_NAME_RE.match(name):
+            raise vol.Invalid(f"header name {name!r} is not a valid HTTP token (RFC 7230)")
+        if any(ch in val for ch in "\r\n\x00"):
+            raise vol.Invalid(f"header {name!r} value contains a CR, LF, or NUL character")
+        total += len(name.encode("utf-8")) + len(val.encode("utf-8"))
+    if total > MAX_TAP_ACTION_HEADERS_LEN:
+        raise vol.Invalid(f"headers total size must not exceed {MAX_TAP_ACTION_HEADERS_LEN} bytes")
+    return value
+
+
+# Server ParseDuration: plain integer seconds, or h/m/s unit groups in that order.
+_DURATION_RE = re.compile(r"\d+|(?:\d+h)?(?:\d+m)?(?:\d+s)?")
+
+
+def validate_duration(value: object) -> object:
+    """Validate a countdown duration: int seconds (>=1) or a Go-style string ("60s", "1h30m").
+
+    Mirrors pushward-server ParseDuration + ResolveDuration (which rejects a
+    non-positive result), so "0", "-5", "abc", and "1x" fail here instead of as a
+    server 400. Integer/float input is coerced to int; string input passes through
+    for the server to expand.
+    """
+    if isinstance(value, bool):
+        raise vol.Invalid("duration must be seconds or a duration string")
+    if isinstance(value, (int, float)):
+        seconds = int(value)
+        if seconds < 1:
+            raise vol.Invalid("duration must be at least 1 second")
+        return seconds
+    if not isinstance(value, str):
+        raise vol.Invalid("duration must be an integer or a duration string")
+    text = value.strip()
+    if not _DURATION_RE.fullmatch(text) or not any(ch in "123456789" for ch in text):
+        raise vol.Invalid('invalid duration; use seconds (90) or units like "1h30m"')
     return value
 
 

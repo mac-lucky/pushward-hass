@@ -139,6 +139,34 @@
         "units": {
           "name": "Birimler",
           "description": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "Erteleme Saniyeleri",
+          "description": "iOS Ertele düğmesinin geri sayımı ne kadar uzattığı (60–3600). Varsayılan 300 (5 dk). Alarm gerektirir (yalnızca iOS 26+, geri sayım şablonu)."
+        },
+        "duration": {
+          "name": "Süre",
+          "description": "Bitiş Tarihi'ne kur-ve-unut alternatifi: saniye (>=1) veya \"1h30m\" gibi bir süre dizesi. Sunucu başlangıç/bitişi şimdiye yeniden sabitler. Süre veya Bitiş Tarihi'nden birini gönderin — ikisi de ayarlanırsa Süre öncelik kazanır."
+        },
+        "start_date": {
+          "name": "Başlangıç Tarihi",
+          "description": "Geri sayımın başladığı Unix zaman damgası (geçen/kalan çubuğunu sabitler). Sunucu bunu varsayılan olarak şimdiye ayarlar."
+        },
+        "history": {
+          "name": "Geçmiş (başlangıç)",
+          "description": "İlk sparkline başlangıç verisi: seri adından (timestamp, value) listesine eşleyen bir nesne. Yalnızca başlangıç — ilk güncellemeden sonra sunucu devralır."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "url_action": {
+          "name": "Birincil Düğme",
+          "description": "Nesne olarak birincil dokunulabilir düğme: url (gerekli), isteğe bağlı title, icon, foreground ve sessiz bir webhook için http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "İkincil Düğme",
+          "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Öncelik",
           "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Dokunulabilir düğme olarak gösterilen birincil URL. http(s) veya homeassistant:// gibi özel bir şema."
+        },
+        "secondary_url": {
+          "name": "İkincil URL",
+          "description": "İkinci dokunulabilir düğme olarak gösterilen ikincil URL."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "url_action": {
+          "name": "Birincil Düğme",
+          "description": "Nesne olarak birincil dokunulabilir düğme: url (gerekli), isteğe bağlı title, icon, foreground ve sessiz bir webhook için http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "İkincil Düğme",
+          "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
         }
       },
       "sections": {
         "labels": {
           "name": "Etiketler ve simge",
           "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "action_buttons": {
+          "name": "Eylem düğmeleri",
+          "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
         },
         "display_options": {
           "name": "Görünüm, renk ve ses",
@@ -281,7 +333,7 @@
           "description": "Uyarı eşiği aşıldığında AlarmKit alarmını tetikler. Yalnızca iOS 26+ üzerinde çalışır."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Erteleme Saniyeleri",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Öncelik",
           "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "duration": {
+          "name": "Süre",
+          "description": "Bitiş Tarihi'ne kur-ve-unut alternatifi: saniye (>=1) veya \"1h30m\" gibi bir süre dizesi. Sunucu başlangıç/bitişi şimdiye yeniden sabitler. Süre veya Bitiş Tarihi'nden birini gönderin — ikisi de ayarlanırsa Süre öncelik kazanır."
+        },
+        "start_date": {
+          "name": "Başlangıç Tarihi",
+          "description": "Geri sayımın başladığı Unix zaman damgası (geçen/kalan çubuğunu sabitler). Sunucu bunu varsayılan olarak şimdiye ayarlar."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Dokunulabilir düğme olarak gösterilen birincil URL. http(s) veya homeassistant:// gibi özel bir şema."
+        },
+        "secondary_url": {
+          "name": "İkincil URL",
+          "description": "İkinci dokunulabilir düğme olarak gösterilen ikincil URL."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "url_action": {
+          "name": "Birincil Düğme",
+          "description": "Nesne olarak birincil dokunulabilir düğme: url (gerekli), isteğe bağlı title, icon, foreground ve sessiz bir webhook için http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "İkincil Düğme",
+          "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown seçenekleri",
           "description": "Yalnızca countdown şablonu."
+        },
+        "action_buttons": {
+          "name": "Eylem düğmeleri",
+          "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
         },
         "display_options": {
           "name": "Görünüm, renk ve ses",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Öncelik",
           "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "url_action": {
+          "name": "Birincil Düğme",
+          "description": "Nesne olarak birincil dokunulabilir düğme: url (gerekli), isteğe bağlı title, icon, foreground ve sessiz bir webhook için http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "İkincil Düğme",
+          "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Öncelik",
           "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "url_action": {
+          "name": "Birincil Düğme",
+          "description": "Nesne olarak birincil dokunulabilir düğme: url (gerekli), isteğe bağlı title, icon, foreground ve sessiz bir webhook için http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "İkincil Düğme",
+          "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Öncelik",
           "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Dokunulabilir düğme olarak gösterilen birincil URL. http(s) veya homeassistant:// gibi özel bir şema."
+        },
+        "secondary_url": {
+          "name": "İkincil URL",
+          "description": "İkinci dokunulabilir düğme olarak gösterilen ikincil URL."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "url_action": {
+          "name": "Birincil Düğme",
+          "description": "Nesne olarak birincil dokunulabilir düğme: url (gerekli), isteğe bağlı title, icon, foreground ve sessiz bir webhook için http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "İkincil Düğme",
+          "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
         }
       },
       "sections": {
         "labels": {
           "name": "Etiketler ve simge",
           "description": "İsteğe bağlı metin etiketleri ve simge. Tüm şablonlar için geçerlidir."
+        },
+        "action_buttons": {
+          "name": "Eylem düğmeleri",
+          "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
         },
         "display_options": {
           "name": "Görünüm, renk ve ses",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Öncelik",
           "description": "Aktivite önceliği (0 = en düşük, 10 = en yüksek)."
+        },
+        "history": {
+          "name": "Geçmiş (başlangıç)",
+          "description": "İlk sparkline başlangıç verisi: seri adından (timestamp, value) listesine eşleyen bir nesne. Yalnızca başlangıç — ilk güncellemeden sonra sunucu devralır."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Dokunulabilir düğme olarak gösterilen birincil URL. http(s) veya homeassistant:// gibi özel bir şema."
+        },
+        "secondary_url": {
+          "name": "İkincil URL",
+          "description": "İkinci dokunulabilir düğme olarak gösterilen ikincil URL."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "url_action": {
+          "name": "Birincil Düğme",
+          "description": "Nesne olarak birincil dokunulabilir düğme: url (gerekli), isteğe bağlı title, icon, foreground ve sessiz bir webhook için http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "İkincil Düğme",
+          "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge ve timeline seçenekleri",
           "description": "Yalnızca gauge ve timeline şablonları."
+        },
+        "action_buttons": {
+          "name": "Eylem düğmeleri",
+          "description": "Dokunulabilir URL düğmeleri. Yalnızca steps ve alert şablonları."
         },
         "display_options": {
           "name": "Görünüm, renk ve ses",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Meta Veri",
           "description": "Bildirimle gönderilecek ek anahtar-değer çifti meta verisi."
+        },
+        "media": {
+          "name": "Medya",
+          "description": "`url` (HTTPS) ve `type` (image, video veya audio) içeren bir nesne olarak medya eki."
+        },
+        "actions": {
+          "name": "Eylemler",
+          "description": "Eylem düğmelerinin listesi. Her eylem; id, title, isteğe bağlı url, foreground, destructive, authentication_required ve icon içeren bir nesnedir. Bir http(s) url için method (GET/POST/PUT/PATCH/DELETE/HEAD), headers ve body ile sessiz bir webhook da gönderebilirsiniz."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Widget'ı Yenile",
+      "description": "İzlenen bir PushWard widget'ını zorla yeniler. Bellekteki fark önbelleğini atlar, böylece değer değişmemiş olsa bile widget yeniden oluşturulur ve iOS'a gönderilir.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Widget slug tanımlayıcısı. slug veya entity_id'den biri sağlanmalıdır."
+        },
+        "entity_id": {
+          "name": "Varlık",
+          "description": "Widget'a bağlı HA varlığı. slug veya entity_id'den biri sağlanmalıdır."
+        }
+      }
+    },
+    "send_email": {
+      "name": "E-posta Gönder",
+      "description": "PushWard üzerinden işlemsel bir e-posta gönderin. Bir metin gövdesi, bir HTML gövdesi veya her ikisini sağlayın. Entegrasyon anahtarının \"emails\" yetkisine sahip olması gerekir.",
+      "fields": {
+        "to": {
+          "name": "Alıcı",
+          "description": "Alıcı e-posta adresi. PushWard iOS uygulamasında daha önce eklediğiniz ve onayladığınız bir adres olmalıdır — doğrulanmamış adresler reddedilir."
+        },
+        "subject": {
+          "name": "Konu",
+          "description": "E-posta konu satırı."
+        },
+        "body": {
+          "name": "Gövde",
+          "description": "Düz metin e-posta gövdesi. Bunu, bir HTML gövdesini veya her ikisini sağlayın."
+        },
+        "html_body": {
+          "name": "HTML Gövde",
+          "description": "HTML e-posta gövdesi. Bunu, bir düz metin gövdesini veya her ikisini sağlayın."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Widget'ı Sil",
+      "description": "Bir PushWard widget'ını sunucudan siler. İzlenen widget yapılandırma girdisi bu slug'ı hâlâ yönetiyorsa, widget bir sonraki yeniden başlatma/eşitlemede yeniden oluşturulur — kalıcı olarak silmek için yapılandırma girdisini kaldırın. slug veya entity_id'den birini sağlayın.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Widget slug tanımlayıcısı. slug veya entity_id'den biri sağlanmalıdır."
+        },
+        "entity_id": {
+          "name": "Varlık",
+          "description": "Widget'a bağlı HA varlığı. Yapılandırmaya göre eşleşen widget'a çözümlenir. slug veya entity_id'den biri sağlanmalıdır."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "PushWard'a Bağlan",
         "data": {
           "integration_key": "Entegrasyon Anahtarı"
+        },
+        "description": "Başlamak için PushWard entegrasyon anahtarınızı girin. PushWard iOS uygulamasını App Store'dan edinin: {app_store_url}",
+        "data_description": {
+          "integration_key": "PushWard iOS uygulamasını açın (App Store: {app_store_url}) → Ayarlar → Entegrasyon Anahtarları. Varsayılan anahtarı yapıştırabilir veya 'ha-*' kapsamıyla yeni bir tane oluşturabilirsiniz."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "Adım Etiketleri",
             "step_rows": "Adım Satırları",
             "fired_at_attribute": "Tetiklenme Zamanı Niteliği",
-            "units": "Birimler"
+            "units": "Birimler",
+            "progress_entity": "İlerleme Varlığı",
+            "remaining_time_entity": "Kalan Süre Varlığı",
+            "current_step_entity": "Geçerli Adım Varlığı",
+            "value_entity": "Değer Varlığı",
+            "subtitle_entity": "Alt Başlık Varlığı",
+            "tap_action_url": "Dokunma Eylemi URL'si",
+            "tap_action_foreground": "Dokunma Eylemi URL'sini Aç",
+            "url_foreground": "Birincil Düğme URL'sini Aç",
+            "url_title": "Birincil Düğme Başlığı",
+            "secondary_url_foreground": "İkincil Düğme URL'sini Aç",
+            "secondary_url_title": "İkincil Düğme Başlığı",
+            "snooze_seconds": "Erteleme Saniyeleri (iOS 26+)",
+            "fired_at_entity": "Tetiklenme Zamanı Varlığı"
           },
           "data_description": {
             "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin.",
@@ -957,7 +1192,20 @@
             "step_labels": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır.",
             "step_rows": "Steps şablonunda bir satırda gösterilecek adım sayısı.",
             "fired_at_attribute": "Tetiklenme Unix zaman damgasını tutan varlık niteliği. Göreceli zaman görüntüsü için kullanılır.",
-            "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%"
+            "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%",
+            "progress_entity": "İlerlemeyi izlenen varlık yerine ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Öznitelik alanı ayarlandığında bu varlığın o özniteliğini okur; aksi takdirde durumunu.",
+            "remaining_time_entity": "Kalan süreyi ayrı bir varlıktan okur (ör. bir çamaşır makinesinin süre sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir zaman damgası (bitiş zamanı) sensörünü, birimli bir süre sensörünü, bir H:MM:SS dizesini veya düz saniyeyi otomatik olarak ayrıştırır.",
+            "current_step_entity": "Geçerli adımı ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın.",
+            "value_entity": "Gösterge değerini ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
+            "subtitle_entity": "Alt başlığı ayrı bir varlıktan gösterir (ör. bir program/mod sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
+            "tap_action_url": "Live Activity arka planına dokunulduğunda açılan isteğe bağlı URL. http(s) (Safari'yi açar) veya homeassistant://navigate/lovelace/0 gibi özel şemaları (o uygulamayı açar) destekler.",
+            "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — Kilit Ekranı'ndan ayrılmadan arka planda bir POST tetikler.",
+            "url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
+            "url_title": "Birincil düğme etiketi (en fazla 64 karakter).",
+            "secondary_url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
+            "secondary_url_title": "İkincil düğme etiketi (en fazla 64 karakter).",
+            "snooze_seconds": "iOS Ertele düğmesinin geri sayımı ne kadar uzattığı (60–3600). 300s (5 dk) varsayılanı için boş bırakın. Alarm gerektirir. Yalnızca geri sayım şablonu.",
+            "fired_at_entity": "Uyarının tetiklenme zamanını ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir unix zaman damgası veya bir ISO zaman damgası sensörü kabul eder. Yalnızca uyarı şablonu."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL, http:// veya https:// şeması kullanmalıdır.",
-        "invalid_gauge_range": "Minimum değer, maksimum değerden küçük olmalıdır."
+        "invalid_gauge_range": "Minimum değer, maksimum değerden küçük olmalıdır.",
+        "silent_requires_http": "Sessiz webhook (foreground kapalı) bir http:// veya https:// URL'si gerektirir."
       },
       "abort": {
         "already_configured": "Bu varlık zaten izleniyor.",
         "reconfigure_successful": "Varlık yapılandırması güncellendi."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "İzlenen Widget",
+      "initiate_flow": {
+        "user": "İzlenen widget ekle"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard'a Widget Ekle",
+          "data": {
+            "entity_id": "Varlık",
+            "widget_template": "Şablon",
+            "slug": "Widget Slug'ı"
+          },
+          "data_description": {
+            "widget_template": "Widget düzeni. Tek bir sayı için `value`, 0–1 çubuğu için `progress`, aralıktaki bir değer için `gauge`, önem rozeti için `status` veya en fazla 6 satır için `stat_list` kullanın.",
+            "slug": "Bu widget için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın."
+          }
+        },
+        "reconfigure": {
+          "title": "Widget'ı Düzenle",
+          "data": {
+            "entity_id": "Varlık",
+            "widget_template": "Şablon",
+            "slug": "Widget Slug'ı"
+          },
+          "data_description": {
+            "widget_template": "Widget düzeni.",
+            "slug": "Bu widget için benzersiz tanımlayıcı."
+          }
+        },
+        "details": {
+          "title": "Widget Seçenekleri",
+          "data": {
+            "widget_name": "Widget Adı",
+            "value_attribute": "Değer Özniteliği",
+            "unit": "Birim",
+            "min_value": "Minimum Değer",
+            "max_value": "Maksimum Değer",
+            "severity": "Önem Derecesi",
+            "stat_rows": "İstatistik Satırları",
+            "label": "Etiket",
+            "label_attribute": "Etiket Özniteliği",
+            "subtitle_attribute": "Alt Başlık Özniteliği",
+            "icon": "Simge",
+            "icon_attribute": "Simge Özniteliği",
+            "accent_color": "Vurgu Rengi",
+            "accent_color_attribute": "Vurgu Rengi Özniteliği",
+            "background_color": "Arka Plan Rengi",
+            "text_color": "Metin Rengi",
+            "widget_trigger_mode": "Tetikleme Modu",
+            "widget_poll_interval": "Yoklama Aralığı (saniye)",
+            "tap_action_url": "Dokunma Eylemi URL'si",
+            "tap_action_foreground": "Dokunma Eylemi URL'sini Aç"
+          },
+          "data_description": {
+            "widget_name": "iOS widget seçicide gösterilen görünen ad. Varsayılan olarak varlığın kolay adıdır.",
+            "value_attribute": "Değeri tutan varlık özniteliği. Varlığın birincil durumunu kullanmak için boş bırakın.",
+            "unit": "Değerin yanında gösterilen görünen birim. En fazla 32 karakter.",
+            "min_value": "Gösterge aralığı için minimum değer.",
+            "max_value": "Gösterge aralığı için maksimum değer.",
+            "severity": "Durum önem derecesi (info, warning, critical, success).",
+            "stat_rows": "En fazla 6 satır. Biçim: `Label=entity_id[:attribute[:unit]]`, virgülle ayrılmış. Örnek: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Widget'ta gösterilen statik etiket. Varlıktan türetmek için boş bırakın.",
+            "label_attribute": "Etiket olarak kullanılan varlık özniteliği. Statik etiketi geçersiz kılar.",
+            "subtitle_attribute": "Widget alt başlığı olarak gösterilen varlık özniteliği.",
+            "icon": "Statik simge. SF Symbols ve MDI adları desteklenir.",
+            "icon_attribute": "Dinamik bir simge için varlık özniteliği. Statik simgeyi geçersiz kılar.",
+            "accent_color": "Widget için vurgu rengi. Varsayılan için boş bırakın.",
+            "accent_color_attribute": "Dinamik bir vurgu rengi için varlık özniteliği.",
+            "background_color": "İsteğe bağlı arka plan rengi.",
+            "text_color": "İsteğe bağlı metin rengi.",
+            "widget_trigger_mode": "Güncellemelerin nasıl tetiklendiği. `event` durum değişikliklerine tepki verir; `poll` sabit bir aralıkta yeniden değerlendirir.",
+            "widget_poll_interval": "Yoklamalar arasındaki aralık (10–3600 saniye). Yalnızca tetikleme modu `poll` olduğunda kullanılır.",
+            "tap_action_url": "Widget'a dokunulduğunda açılan isteğe bağlı URL. http(s) (Safari'yi açar) veya homeassistant://navigate/lovelace/0 gibi özel şemaları destekler.",
+            "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — arka planda bir POST tetikler."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL geçerli bir şema içermelidir. http(s):// veya homeassistant:// gibi özel bir uygulama şeması kullanın.",
+        "silent_requires_http": "Sessiz webhook (foreground kapalı) bir http:// veya https:// URL'si gerektirir.",
+        "invalid_gauge_range": "Minimum değer maksimum değerden küçük olmalıdır.",
+        "stat_rows_required": "stat_list şablonu için en az bir istatistik satırı gereklidir."
+      },
+      "abort": {
+        "already_configured": "Bu slug'a sahip bir widget zaten var.",
+        "reconfigure_successful": "Widget yapılandırması güncellendi."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Kullanılan bildirimler"
+      },
+      "live_activity_updates_used": {
+        "name": "Kullanılan Live Activity güncellemeleri"
+      },
+      "widget_updates_used": {
+        "name": "Kullanılan widget güncellemeleri"
+      },
+      "emails_used": {
+        "name": "Kullanılan e-postalar"
+      },
+      "subscription_tier": {
+        "name": "Abonelik katmanı",
+        "state": {
+          "free": "Ücretsiz",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "slug={slug} entity_id={entity_id} ile eşleşen PushWard widget'ı yok."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "PushWard update_activity eylemi kullanımdan kaldırıldı",
+      "description": "`pushward.update_activity` eylemi kullanımdan kaldırıldı. Otomasyonlarınızı bunun yerine şablona özgü eyleme geçirin — örneğin `pushward.update_activity_countdown` veya `pushward.update_activity_gauge`. Eski eylem şimdilik hâlâ çalışıyor ancak gelecekteki bir sürümde kaldırılacak."
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard bildirim limitine ulaşıldı",
+      "description": "PushWard hesabınız mevcut dönem için {limit} bildiriminin {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni bildirimler reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard Live Activity güncelleme limitine ulaşıldı",
+      "description": "PushWard hesabınız mevcut dönem için {limit} Live Activity güncellemesinin {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni güncellemeler reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard widget güncelleme limitine ulaşıldı",
+      "description": "PushWard hesabınız mevcut dönem için {limit} widget güncellemesinin {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni güncellemeler reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
+    },
+    "usage_limit_emails": {
+      "title": "PushWard e-posta limitine ulaşıldı",
+      "description": "PushWard hesabınız mevcut dönem için {limit} e-postasının {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni e-postalar reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
     }
   }
 }

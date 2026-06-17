@@ -139,6 +139,34 @@
         "units": {
           "name": "خريطة الوحدات",
           "description": "تسميات وحدات لكل سلسلة. يجب أن تتطابق المفاتيح مع مفاتيح value dict. قالب timeline فقط."
+        },
+        "snooze_seconds": {
+          "name": "ثواني الغفوة",
+          "description": "المدة التي يطيلها زر الغفوة في iOS للعد التنازلي (60–3600). القيمة الافتراضية 300 (5 دقائق). يتطلب منبهًا (iOS 26+، قالب العد التنازلي فقط)."
+        },
+        "duration": {
+          "name": "المدة",
+          "description": "بديل بسيط لتاريخ الانتهاء: ثوانٍ (>=1) أو سلسلة مدة مثل \"1h30m\". يعيد الخادم ضبط البداية/النهاية إلى الآن. أرسل المدة أو تاريخ الانتهاء — تُغلَّب المدة إذا تم ضبط كليهما."
+        },
+        "start_date": {
+          "name": "تاريخ البدء",
+          "description": "طابع زمني Unix لبدء العد التنازلي (يثبّت شريط الوقت المنقضي/المتبقي). يضبطه الخادم افتراضيًا إلى الآن."
+        },
+        "history": {
+          "name": "السجل (بذرة أولية)",
+          "description": "بذرة أولية للمخطط المصغّر: كائن يربط اسم السلسلة بقائمة من (timestamp, value). للبذرة فقط — يتولى الخادم الأمر بعد أول تحديث."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "url_action": {
+          "name": "الزر الأساسي",
+          "description": "زر أساسي قابل للنقر ككائن: url (مطلوب)، وtitle وicon وforeground اختيارية، وmethod/headers/body لعنوان http(s) من أجل خطاف ويب صامت."
+        },
+        "secondary_url_action": {
+          "name": "الزر الثانوي",
+          "description": "زر ثانوي قابل للنقر — بنفس شكل كائن الزر الأساسي."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "تجاوز الأولوية",
           "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "url": {
+          "name": "عنوان URL",
+          "description": "عنوان URL الأساسي المعروض كزر قابل للنقر. http(s) أو مخطط مخصص مثل homeassistant://."
+        },
+        "secondary_url": {
+          "name": "عنوان URL الثانوي",
+          "description": "عنوان URL ثانوي معروض كزر ثانٍ قابل للنقر."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "url_action": {
+          "name": "الزر الأساسي",
+          "description": "زر أساسي قابل للنقر ككائن: url (مطلوب)، وtitle وicon وforeground اختيارية، وmethod/headers/body لعنوان http(s) من أجل خطاف ويب صامت."
+        },
+        "secondary_url_action": {
+          "name": "الزر الثانوي",
+          "description": "زر ثانوي قابل للنقر — بنفس شكل كائن الزر الأساسي."
         }
       },
       "sections": {
         "labels": {
           "name": "التسميات والأيقونة",
           "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "action_buttons": {
+          "name": "أزرار الإجراءات",
+          "description": "أزرار روابط قابلة للنقر. قوالب steps وalert فقط."
         },
         "display_options": {
           "name": "العرض واللون والصوت",
@@ -281,7 +333,7 @@
           "description": "تشغيل تنبيه AlarmKit عند انتهاء countdown (iOS 26+، قالب countdown فقط)."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "ثواني الغفوة",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "تجاوز الأولوية",
           "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "duration": {
+          "name": "المدة",
+          "description": "بديل بسيط لتاريخ الانتهاء: ثوانٍ (>=1) أو سلسلة مدة مثل \"1h30m\". يعيد الخادم ضبط البداية/النهاية إلى الآن. أرسل المدة أو تاريخ الانتهاء — تُغلَّب المدة إذا تم ضبط كليهما."
+        },
+        "start_date": {
+          "name": "تاريخ البدء",
+          "description": "طابع زمني Unix لبدء العد التنازلي (يثبّت شريط الوقت المنقضي/المتبقي). يضبطه الخادم افتراضيًا إلى الآن."
+        },
+        "url": {
+          "name": "عنوان URL",
+          "description": "عنوان URL الأساسي المعروض كزر قابل للنقر. http(s) أو مخطط مخصص مثل homeassistant://."
+        },
+        "secondary_url": {
+          "name": "عنوان URL الثانوي",
+          "description": "عنوان URL ثانوي معروض كزر ثانٍ قابل للنقر."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "url_action": {
+          "name": "الزر الأساسي",
+          "description": "زر أساسي قابل للنقر ككائن: url (مطلوب)، وtitle وicon وforeground اختيارية، وmethod/headers/body لعنوان http(s) من أجل خطاف ويب صامت."
+        },
+        "secondary_url_action": {
+          "name": "الزر الثانوي",
+          "description": "زر ثانوي قابل للنقر — بنفس شكل كائن الزر الأساسي."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "خيارات countdown",
           "description": "قالب countdown فقط."
+        },
+        "action_buttons": {
+          "name": "أزرار الإجراءات",
+          "description": "أزرار روابط قابلة للنقر. قوالب steps وalert فقط."
         },
         "display_options": {
           "name": "العرض واللون والصوت",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "تجاوز الأولوية",
           "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "url_action": {
+          "name": "الزر الأساسي",
+          "description": "زر أساسي قابل للنقر ككائن: url (مطلوب)، وtitle وicon وforeground اختيارية، وmethod/headers/body لعنوان http(s) من أجل خطاف ويب صامت."
+        },
+        "secondary_url_action": {
+          "name": "الزر الثانوي",
+          "description": "زر ثانوي قابل للنقر — بنفس شكل كائن الزر الأساسي."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "تجاوز الأولوية",
           "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "url_action": {
+          "name": "الزر الأساسي",
+          "description": "زر أساسي قابل للنقر ككائن: url (مطلوب)، وtitle وicon وforeground اختيارية، وmethod/headers/body لعنوان http(s) من أجل خطاف ويب صامت."
+        },
+        "secondary_url_action": {
+          "name": "الزر الثانوي",
+          "description": "زر ثانوي قابل للنقر — بنفس شكل كائن الزر الأساسي."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "تجاوز الأولوية",
           "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "url": {
+          "name": "عنوان URL",
+          "description": "عنوان URL الأساسي المعروض كزر قابل للنقر. http(s) أو مخطط مخصص مثل homeassistant://."
+        },
+        "secondary_url": {
+          "name": "عنوان URL الثانوي",
+          "description": "عنوان URL ثانوي معروض كزر ثانٍ قابل للنقر."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "url_action": {
+          "name": "الزر الأساسي",
+          "description": "زر أساسي قابل للنقر ككائن: url (مطلوب)، وtitle وicon وforeground اختيارية، وmethod/headers/body لعنوان http(s) من أجل خطاف ويب صامت."
+        },
+        "secondary_url_action": {
+          "name": "الزر الثانوي",
+          "description": "زر ثانوي قابل للنقر — بنفس شكل كائن الزر الأساسي."
         }
       },
       "sections": {
         "labels": {
           "name": "التسميات والأيقونة",
           "description": "تسميات نصية وأيقونة اختيارية. تنطبق على أي قالب."
+        },
+        "action_buttons": {
+          "name": "أزرار الإجراءات",
+          "description": "أزرار روابط قابلة للنقر. قوالب steps وalert فقط."
         },
         "display_options": {
           "name": "العرض واللون والصوت",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "تجاوز الأولوية",
           "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "history": {
+          "name": "السجل (بذرة أولية)",
+          "description": "بذرة أولية للمخطط المصغّر: كائن يربط اسم السلسلة بقائمة من (timestamp, value). للبذرة فقط — يتولى الخادم الأمر بعد أول تحديث."
+        },
+        "url": {
+          "name": "عنوان URL",
+          "description": "عنوان URL الأساسي المعروض كزر قابل للنقر. http(s) أو مخطط مخصص مثل homeassistant://."
+        },
+        "secondary_url": {
+          "name": "عنوان URL الثانوي",
+          "description": "عنوان URL ثانوي معروض كزر ثانٍ قابل للنقر."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "url_action": {
+          "name": "الزر الأساسي",
+          "description": "زر أساسي قابل للنقر ككائن: url (مطلوب)، وtitle وicon وforeground اختيارية، وmethod/headers/body لعنوان http(s) من أجل خطاف ويب صامت."
+        },
+        "secondary_url_action": {
+          "name": "الزر الثانوي",
+          "description": "زر ثانوي قابل للنقر — بنفس شكل كائن الزر الأساسي."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "خيارات gauge وtimeline",
           "description": "قوالب gauge وtimeline فقط."
+        },
+        "action_buttons": {
+          "name": "أزرار الإجراءات",
+          "description": "أزرار روابط قابلة للنقر. قوالب steps وalert فقط."
         },
         "display_options": {
           "name": "العرض واللون والصوت",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "البيانات التعريفية",
           "description": "أزواج مفتاح-قيمة من بيانات تعريفية إضافية مرفقة بالإشعار."
+        },
+        "media": {
+          "name": "الوسائط",
+          "description": "مرفق وسائط ككائن يحتوي على `url` (HTTPS) و`type` (image أو video أو audio)."
+        },
+        "actions": {
+          "name": "الإجراءات",
+          "description": "قائمة بأزرار الإجراءات. كل إجراء هو كائن يحتوي على id وtitle، وurl وforeground وdestructive وauthentication_required وicon اختيارية. بالنسبة لعنوان http(s) يمكنك أيضًا إرسال خطاف ويب صامت باستخدام method (GET/POST/PUT/PATCH/DELETE/HEAD) وheaders وbody."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "تحديث الأداة",
+      "description": "فرض تحديث أداة PushWard متتبَّعة. يتجاوز ذاكرة التخزين المؤقت للفروقات في الذاكرة بحيث يُعاد عرض الأداة ودفعها إلى iOS حتى عندما لا تتغير القيمة.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف النصي",
+          "description": "معرّف slug للأداة. يجب توفير slug أو entity_id."
+        },
+        "entity_id": {
+          "name": "الكيان",
+          "description": "كيان HA المرتبط بالأداة. يجب توفير slug أو entity_id."
+        }
+      }
+    },
+    "send_email": {
+      "name": "إرسال بريد إلكتروني",
+      "description": "إرسال بريد إلكتروني معاملاتي عبر PushWard. قدّم نص الرسالة أو نص HTML أو كليهما. يحتاج مفتاح التكامل إلى صلاحية \"emails\".",
+      "fields": {
+        "to": {
+          "name": "إلى",
+          "description": "عنوان البريد الإلكتروني للمستلم. يجب أن يكون عنوانًا أضفته وأكّدته بالفعل في تطبيق PushWard على iOS — تُرفض العناوين غير المُتحقَّق منها."
+        },
+        "subject": {
+          "name": "الموضوع",
+          "description": "سطر موضوع البريد الإلكتروني."
+        },
+        "body": {
+          "name": "النص",
+          "description": "نص البريد الإلكتروني بصيغة نص عادي. قدّم هذا أو نص HTML أو كليهما."
+        },
+        "html_body": {
+          "name": "نص HTML",
+          "description": "نص البريد الإلكتروني بصيغة HTML. قدّم هذا أو نصًا عاديًا أو كليهما."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "حذف الأداة",
+      "description": "حذف أداة PushWard من الخادم. إذا كان لا يزال هناك إدخال إعداد لأداة متتبَّعة يقود هذا الـ slug، فستُعاد الأداة عند إعادة التشغيل/المزامنة التالية — أزل إدخال الإعداد لحذفها نهائيًا. قدّم slug أو entity_id.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف النصي",
+          "description": "معرّف slug للأداة. يجب توفير slug أو entity_id."
+        },
+        "entity_id": {
+          "name": "الكيان",
+          "description": "كيان HA المرتبط بالأداة. يُحلّ إلى الأداة المطابقة حسب الإعداد. يجب توفير slug أو entity_id."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "الاتصال بـ PushWard",
         "data": {
           "integration_key": "مفتاح التكامل"
+        },
+        "description": "أدخل مفتاح تكامل PushWard للبدء. احصل على تطبيق PushWard لنظام iOS من App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "افتح تطبيق PushWard على iOS (App Store: {app_store_url}) ← الإعدادات ← مفاتيح التكامل. يمكنك لصق المفتاح الافتراضي، أو إنشاء مفتاح جديد بالنطاق 'ha-*'."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "تسميات الخطوات",
             "step_rows": "ارتفاعات صفوف الخطوات",
             "fired_at_attribute": "سمة وقت التفعيل",
-            "units": "وحدات لكل سلسلة"
+            "units": "وحدات لكل سلسلة",
+            "progress_entity": "كيان التقدّم",
+            "remaining_time_entity": "كيان الوقت المتبقي",
+            "current_step_entity": "كيان الخطوة الحالية",
+            "value_entity": "كيان القيمة",
+            "subtitle_entity": "كيان العنوان الفرعي",
+            "tap_action_url": "عنوان URL لإجراء النقر",
+            "tap_action_foreground": "فتح عنوان URL لإجراء النقر",
+            "url_foreground": "فتح عنوان URL للزر الأساسي",
+            "url_title": "عنوان الزر الأساسي",
+            "secondary_url_foreground": "فتح عنوان URL للزر الثانوي",
+            "secondary_url_title": "عنوان الزر الثانوي",
+            "snooze_seconds": "ثواني الغفوة (iOS 26+)",
+            "fired_at_entity": "كيان وقت الإطلاق"
           },
           "data_description": {
             "start_states": "حالات الكيان التي تبدأ Live Activity. اختر من القائمة أو أدخل قيماً مخصصة.",
@@ -957,7 +1192,20 @@
             "step_labels": "تسميات كل خطوة. الصيغة: 1=الخطوة الأولى، 2=الخطوة الثانية. يجب أن تغطي الخطوات 1..total_steps. قالب steps فقط.",
             "step_rows": "ارتفاع الصف (1–10) لكل خطوة، مفصولة بفواصل. يجب أن تحتوي على total_steps إدخالات. قالب steps فقط.",
             "fired_at_attribute": "سمة الكيان التي تحمل الطابع الزمني Unix لتفعيل Alert. قالب alert فقط.",
-            "units": "تسميات وحدات لكل سلسلة. الصيغة: تسميةالسلسلة=وحدة، درجةالحرارة=°C، رطوبة=%. قالب timeline فقط."
+            "units": "تسميات وحدات لكل سلسلة. الصيغة: تسميةالسلسلة=وحدة، درجةالحرارة=°C، رطوبة=%. قالب timeline فقط.",
+            "progress_entity": "اقرأ التقدّم من كيان منفصل بدلًا من الكيان المتتبَّع. اتركه فارغًا لاستخدام الكيان المتتبَّع. عند ضبط حقل السمة، يقرأ تلك السمة من هذا الكيان؛ وإلا فحالته.",
+            "remaining_time_entity": "اقرأ الوقت المتبقي من كيان منفصل (مثل مستشعر الوقت في الغسالة). اتركه فارغًا لاستخدام الكيان المتتبَّع. يحلّل تلقائيًا مستشعر طابع زمني (وقت الانتهاء)، أو مستشعر مدة بوحدات، أو سلسلة بصيغة H:MM:SS، أو ثوانٍ عادية.",
+            "current_step_entity": "اقرأ الخطوة الحالية من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع.",
+            "value_entity": "اقرأ قيمة المقياس من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع. يستخدم حالة الكيان المصدر ما لم تُضبط سمة.",
+            "subtitle_entity": "اعرض العنوان الفرعي من كيان منفصل (مثل مستشعر البرنامج/الوضع). اتركه فارغًا لاستخدام الكيان المتتبَّع. يستخدم حالة الكيان المصدر ما لم تُضبط سمة.",
+            "tap_action_url": "عنوان URL اختياري يُفتح عند النقر على خلفية النشاط المباشر. يدعم http(s) (يفتح Safari) أو مخططات مخصصة مثل homeassistant://navigate/lovelace/0 (يفتح ذلك التطبيق).",
+            "tap_action_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط) — يُطلق طلب POST في الخلفية دون مغادرة شاشة القفل.",
+            "url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
+            "url_title": "تسمية الزر الأساسي (64 حرفًا كحد أقصى).",
+            "secondary_url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
+            "secondary_url_title": "تسمية الزر الثانوي (64 حرفًا كحد أقصى).",
+            "snooze_seconds": "المدة التي يطيلها زر الغفوة في iOS للعد التنازلي (60–3600). اتركه فارغًا للقيمة الافتراضية 300 ثانية (5 دقائق). يتطلب منبهًا. قالب العد التنازلي فقط.",
+            "fired_at_entity": "اقرأ وقت إطلاق التنبيه من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع. يقبل طابعًا زمنيًا بصيغة unix أو مستشعر طابع زمني بصيغة ISO. قالب التنبيه فقط."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "يجب أن يستخدم الرابط نظام http:// أو https://.",
-        "invalid_gauge_range": "يجب أن يكون الحد الأدنى للقيمة أصغر من الحد الأقصى."
+        "invalid_gauge_range": "يجب أن يكون الحد الأدنى للقيمة أصغر من الحد الأقصى.",
+        "silent_requires_http": "يتطلب خطاف الويب الصامت (إيقاف foreground) عنوان URL بصيغة http:// أو https://."
       },
       "abort": {
         "already_configured": "هذا الكيان مُتتبَّع بالفعل.",
         "reconfigure_successful": "تم تحديث إعداد الكيان."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "أداة متتبَّعة",
+      "initiate_flow": {
+        "user": "إضافة أداة متتبَّعة"
+      },
+      "step": {
+        "user": {
+          "title": "إضافة أداة إلى PushWard",
+          "data": {
+            "entity_id": "الكيان",
+            "widget_template": "القالب",
+            "slug": "المعرّف النصي للأداة"
+          },
+          "data_description": {
+            "widget_template": "تخطيط الأداة. استخدم `value` لرقم واحد، أو `progress` لشريط من 0–1، أو `gauge` لقيمة ضمن نطاق، أو `status` لشارة خطورة، أو `stat_list` لما يصل إلى 6 صفوف.",
+            "slug": "معرّف فريد لهذه الأداة. اتركه فارغًا للتوليد التلقائي من معرّف الكيان."
+          }
+        },
+        "reconfigure": {
+          "title": "تعديل الأداة",
+          "data": {
+            "entity_id": "الكيان",
+            "widget_template": "القالب",
+            "slug": "المعرّف النصي للأداة"
+          },
+          "data_description": {
+            "widget_template": "تخطيط الأداة.",
+            "slug": "معرّف فريد لهذه الأداة."
+          }
+        },
+        "details": {
+          "title": "خيارات الأداة",
+          "data": {
+            "widget_name": "اسم الأداة",
+            "value_attribute": "سمة القيمة",
+            "unit": "الوحدة",
+            "min_value": "القيمة الدنيا",
+            "max_value": "القيمة القصوى",
+            "severity": "الخطورة",
+            "stat_rows": "صفوف الإحصاءات",
+            "label": "التسمية",
+            "label_attribute": "سمة التسمية",
+            "subtitle_attribute": "سمة العنوان الفرعي",
+            "icon": "الأيقونة",
+            "icon_attribute": "سمة الأيقونة",
+            "accent_color": "لون التمييز",
+            "accent_color_attribute": "سمة لون التمييز",
+            "background_color": "لون الخلفية",
+            "text_color": "لون النص",
+            "widget_trigger_mode": "وضع التشغيل",
+            "widget_poll_interval": "فترة الاستطلاع (ثوانٍ)",
+            "tap_action_url": "عنوان URL لإجراء النقر",
+            "tap_action_foreground": "فتح عنوان URL لإجراء النقر"
+          },
+          "data_description": {
+            "widget_name": "الاسم المعروض في منتقي أدوات iOS. القيمة الافتراضية هي الاسم الودّي للكيان.",
+            "value_attribute": "سمة الكيان التي تحمل القيمة. اتركه فارغًا لاستخدام الحالة الأساسية للكيان.",
+            "unit": "وحدة العرض المعروضة بجوار القيمة. 32 حرفًا كحد أقصى.",
+            "min_value": "القيمة الدنيا لنطاق المقياس.",
+            "max_value": "القيمة القصوى لنطاق المقياس.",
+            "severity": "خطورة الحالة (info أو warning أو critical أو success).",
+            "stat_rows": "ما يصل إلى 6 صفوف. الصيغة: `Label=entity_id[:attribute[:unit]]`، مفصولة بفواصل. مثال: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "تسمية ثابتة معروضة على الأداة. اتركه فارغًا لاشتقاقها من الكيان.",
+            "label_attribute": "سمة الكيان المستخدمة كتسمية. تتجاوز التسمية الثابتة.",
+            "subtitle_attribute": "سمة الكيان المعروضة كعنوان فرعي للأداة.",
+            "icon": "أيقونة ثابتة. مدعومة بأسماء SF Symbols وMDI.",
+            "icon_attribute": "سمة الكيان لأيقونة ديناميكية. تتجاوز الأيقونة الثابتة.",
+            "accent_color": "لون التمييز للأداة. اتركه فارغًا للقيمة الافتراضية.",
+            "accent_color_attribute": "سمة الكيان للون تمييز ديناميكي.",
+            "background_color": "لون خلفية اختياري.",
+            "text_color": "لون نص اختياري.",
+            "widget_trigger_mode": "كيفية تشغيل التحديثات. يتفاعل `event` مع تغيّرات الحالة؛ ويُعيد `poll` التقييم على فترة ثابتة.",
+            "widget_poll_interval": "الفترة بين عمليات الاستطلاع (10–3600 ثانية). تُستخدم فقط عندما يكون وضع التشغيل `poll`.",
+            "tap_action_url": "عنوان URL اختياري يُفتح عند النقر على الأداة. يدعم http(s) (يفتح Safari) أو مخططات مخصصة مثل homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط) — يُطلق طلب POST في الخلفية."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "يجب أن يتضمن عنوان URL مخططًا صالحًا. استخدم http(s):// أو مخطط تطبيق مخصصًا مثل homeassistant://.",
+        "silent_requires_http": "يتطلب خطاف الويب الصامت (إيقاف foreground) عنوان URL بصيغة http:// أو https://.",
+        "invalid_gauge_range": "يجب أن تكون القيمة الدنيا أقل من القيمة القصوى.",
+        "stat_rows_required": "يلزم صف إحصائي واحد على الأقل لقالب stat_list."
+      },
+      "abort": {
+        "already_configured": "توجد بالفعل أداة بهذا الـ slug.",
+        "reconfigure_successful": "تم تحديث إعداد الأداة."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "الإشعارات المستخدمة"
+      },
+      "live_activity_updates_used": {
+        "name": "تحديثات النشاط المباشر المستخدمة"
+      },
+      "widget_updates_used": {
+        "name": "تحديثات الأداة المستخدمة"
+      },
+      "emails_used": {
+        "name": "رسائل البريد الإلكتروني المستخدمة"
+      },
+      "subscription_tier": {
+        "name": "مستوى الاشتراك",
+        "state": {
+          "free": "مجاني",
+          "premium": "مميز"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "لا توجد أداة PushWard تطابق slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "إجراء update_activity في PushWard مهمَل",
+      "description": "إجراء `pushward.update_activity` مهمَل. بدّل عمليات الأتمتة لديك إلى الإجراء الخاص بالقالب بدلًا منه — على سبيل المثال `pushward.update_activity_countdown` أو `pushward.update_activity_gauge`. لا يزال الإجراء القديم يعمل حاليًا لكنه سيُزال في إصدار مستقبلي."
+    },
+    "usage_limit_notifications": {
+      "title": "تم بلوغ حد إشعارات PushWard",
+      "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} إشعار للفترة الحالية، لذا ستُرفض الإشعارات الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
+    },
+    "usage_limit_live_activity": {
+      "title": "تم بلوغ حد تحديثات النشاط المباشر في PushWard",
+      "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} تحديث للنشاط المباشر للفترة الحالية، لذا ستُرفض التحديثات الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
+    },
+    "usage_limit_widgets": {
+      "title": "تم بلوغ حد تحديثات الأدوات في PushWard",
+      "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} تحديث للأدوات للفترة الحالية، لذا ستُرفض التحديثات الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
+    },
+    "usage_limit_emails": {
+      "title": "تم بلوغ حد رسائل البريد الإلكتروني في PushWard",
+      "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} رسالة بريد إلكتروني للفترة الحالية، لذا ستُرفض الرسائل الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
     }
   }
 }

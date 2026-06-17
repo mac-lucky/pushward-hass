@@ -103,6 +103,7 @@ from .const import (
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    DANGEROUS_URL_SCHEMES,
     DEFAULT_DECIMALS,
     DEFAULT_HISTORY_PERIOD,
     DEFAULT_MAX_VALUE,
@@ -720,9 +721,6 @@ def _details_schema(
     return vol.Schema(fields)
 
 
-_BLOCKED_URL_SCHEMES = frozenset({"javascript", "data", "file", "vbscript"})
-
-
 def _tap_action_url_error(url: str, foreground: bool) -> str | None:
     """Return the error code for an invalid tap-action URL, or None when valid.
 
@@ -739,7 +737,7 @@ def _tap_action_url_error(url: str, foreground: bool) -> str | None:
     scheme = parsed.scheme.lower()
     if scheme in ("http", "https"):
         return None if parsed.netloc else "invalid_url"
-    if scheme in _BLOCKED_URL_SCHEMES:
+    if scheme in DANGEROUS_URL_SCHEMES:
         return "invalid_url"
     if not foreground:
         return "silent_requires_http"

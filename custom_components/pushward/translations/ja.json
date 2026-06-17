@@ -139,6 +139,34 @@
         "units": {
           "name": "単位マップ",
           "description": "系列ごとの単位ラベル。キーは value dict のキーと一致する必要があります。timeline テンプレートのみ。"
+        },
+        "snooze_seconds": {
+          "name": "スヌーズ秒数",
+          "description": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。デフォルトは 300（5分）。アラームが必要（iOS 26+、countdown テンプレートのみ）。"
+        },
+        "duration": {
+          "name": "継続時間",
+          "description": "終了日時の代わりに使える「設定したら任せる」方式: 秒数（1以上）または「1h30m」のような継続時間文字列。サーバーは開始/終了を現在時刻に再設定します。継続時間か終了日時のどちらかを指定してください。両方を設定した場合は継続時間が優先されます。"
+        },
+        "start_date": {
+          "name": "開始日時",
+          "description": "countdown が始まった時刻の Unix タイムスタンプ（経過/残りバーの基準）。サーバーのデフォルトは現在時刻です。"
+        },
+        "history": {
+          "name": "履歴（シード）",
+          "description": "スパークラインの初期シード: シリーズ名を (timestamp, value) のリストにマッピングするオブジェクト。シードのみ — 最初の更新以降はサーバーが引き継ぎます。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "url_action": {
+          "name": "プライマリボタン",
+          "description": "タップ可能なプライマリボタンをオブジェクトで指定: url（必須）、任意の title、icon、foreground、サイレント Webhook 用の http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "セカンダリボタン",
+          "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "タップ可能なボタンとして表示されるプライマリ URL。http(s) または homeassistant:// のようなカスタムスキーム。"
+        },
+        "secondary_url": {
+          "name": "セカンダリURL",
+          "description": "2番目のタップ可能なボタンとして表示されるセカンダリ URL。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "url_action": {
+          "name": "プライマリボタン",
+          "description": "タップ可能なプライマリボタンをオブジェクトで指定: url（必須）、任意の title、icon、foreground、サイレント Webhook 用の http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "セカンダリボタン",
+          "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
         }
       },
       "sections": {
         "labels": {
           "name": "ラベルとアイコン",
           "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "action_buttons": {
+          "name": "アクションボタン",
+          "description": "タップ可能なURLボタン。steps および alert テンプレートのみ。"
         },
         "display_options": {
           "name": "表示・色・サウンド",
@@ -281,7 +333,7 @@
           "description": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+、countdown テンプレートのみ）。"
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "スヌーズ秒数",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "duration": {
+          "name": "継続時間",
+          "description": "終了日時の代わりに使える「設定したら任せる」方式: 秒数（1以上）または「1h30m」のような継続時間文字列。サーバーは開始/終了を現在時刻に再設定します。継続時間か終了日時のどちらかを指定してください。両方を設定した場合は継続時間が優先されます。"
+        },
+        "start_date": {
+          "name": "開始日時",
+          "description": "countdown が始まった時刻の Unix タイムスタンプ（経過/残りバーの基準）。サーバーのデフォルトは現在時刻です。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "タップ可能なボタンとして表示されるプライマリ URL。http(s) または homeassistant:// のようなカスタムスキーム。"
+        },
+        "secondary_url": {
+          "name": "セカンダリURL",
+          "description": "2番目のタップ可能なボタンとして表示されるセカンダリ URL。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "url_action": {
+          "name": "プライマリボタン",
+          "description": "タップ可能なプライマリボタンをオブジェクトで指定: url（必須）、任意の title、icon、foreground、サイレント Webhook 用の http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "セカンダリボタン",
+          "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown オプション",
           "description": "countdown テンプレートのみ。"
+        },
+        "action_buttons": {
+          "name": "アクションボタン",
+          "description": "タップ可能なURLボタン。steps および alert テンプレートのみ。"
         },
         "display_options": {
           "name": "表示・色・サウンド",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "url_action": {
+          "name": "プライマリボタン",
+          "description": "タップ可能なプライマリボタンをオブジェクトで指定: url（必須）、任意の title、icon、foreground、サイレント Webhook 用の http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "セカンダリボタン",
+          "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "url_action": {
+          "name": "プライマリボタン",
+          "description": "タップ可能なプライマリボタンをオブジェクトで指定: url（必須）、任意の title、icon、foreground、サイレント Webhook 用の http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "セカンダリボタン",
+          "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "タップ可能なボタンとして表示されるプライマリ URL。http(s) または homeassistant:// のようなカスタムスキーム。"
+        },
+        "secondary_url": {
+          "name": "セカンダリURL",
+          "description": "2番目のタップ可能なボタンとして表示されるセカンダリ URL。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "url_action": {
+          "name": "プライマリボタン",
+          "description": "タップ可能なプライマリボタンをオブジェクトで指定: url（必須）、任意の title、icon、foreground、サイレント Webhook 用の http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "セカンダリボタン",
+          "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
         }
       },
       "sections": {
         "labels": {
           "name": "ラベルとアイコン",
           "description": "任意のテキストラベルとアイコン。すべてのテンプレートに適用されます。"
+        },
+        "action_buttons": {
+          "name": "アクションボタン",
+          "description": "タップ可能なURLボタン。steps および alert テンプレートのみ。"
         },
         "display_options": {
           "name": "表示・色・サウンド",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "history": {
+          "name": "履歴（シード）",
+          "description": "スパークラインの初期シード: シリーズ名を (timestamp, value) のリストにマッピングするオブジェクト。シードのみ — 最初の更新以降はサーバーが引き継ぎます。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "タップ可能なボタンとして表示されるプライマリ URL。http(s) または homeassistant:// のようなカスタムスキーム。"
+        },
+        "secondary_url": {
+          "name": "セカンダリURL",
+          "description": "2番目のタップ可能なボタンとして表示されるセカンダリ URL。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "url_action": {
+          "name": "プライマリボタン",
+          "description": "タップ可能なプライマリボタンをオブジェクトで指定: url（必須）、任意の title、icon、foreground、サイレント Webhook 用の http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "セカンダリボタン",
+          "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge・timeline オプション",
           "description": "gauge および timeline テンプレートのみ。"
+        },
+        "action_buttons": {
+          "name": "アクションボタン",
+          "description": "タップ可能なURLボタン。steps および alert テンプレートのみ。"
         },
         "display_options": {
           "name": "表示・色・サウンド",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "メタデータ",
           "description": "通知に添付される追加メタデータのキーと値のペア。"
+        },
+        "media": {
+          "name": "メディア",
+          "description": "`url`（HTTPS）と `type`（image、video、または audio）を持つオブジェクトとしてのメディア添付。"
+        },
+        "actions": {
+          "name": "アクション",
+          "description": "アクションボタンのリスト。各アクションは id、title、任意の url、foreground、destructive、authentication_required、icon を持つオブジェクトです。http(s) URL の場合は method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers、body を指定してサイレント Webhook を送信することもできます。"
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "ウィジェットを更新",
+      "description": "追跡中の PushWard ウィジェットを強制的に更新します。メモリ内の差分キャッシュをバイパスし、値が変わっていなくてもウィジェットを再描画して iOS にプッシュします。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "ウィジェットのスラッグ識別子。slug または entity_id のいずれかを指定する必要があります。"
+        },
+        "entity_id": {
+          "name": "エンティティ",
+          "description": "ウィジェットに紐付けられた HA エンティティ。slug または entity_id のいずれかを指定する必要があります。"
+        }
+      }
+    },
+    "send_email": {
+      "name": "メールを送信",
+      "description": "PushWard 経由でトランザクションメールを送信します。テキスト本文、HTML 本文、またはその両方を指定してください。統合キーには「emails」の権限が必要です。",
+      "fields": {
+        "to": {
+          "name": "宛先",
+          "description": "受信者のメールアドレス。PushWard iOS アプリですでに追加・確認済みのアドレスである必要があります — 未確認のアドレスは拒否されます。"
+        },
+        "subject": {
+          "name": "件名",
+          "description": "メールの件名。"
+        },
+        "body": {
+          "name": "本文",
+          "description": "プレーンテキストのメール本文。これ、HTML 本文、またはその両方を指定してください。"
+        },
+        "html_body": {
+          "name": "HTML本文",
+          "description": "HTML のメール本文。これ、プレーンテキスト本文、またはその両方を指定してください。"
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "ウィジェットを削除",
+      "description": "サーバーから PushWard ウィジェットを削除します。追跡ウィジェットの設定エントリがまだこのスラッグを管理している場合、次回の再起動/同期時にウィジェットが再作成されます — 完全に削除するには設定エントリを削除してください。slug または entity_id のいずれかを指定してください。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "ウィジェットのスラッグ識別子。slug または entity_id のいずれかを指定する必要があります。"
+        },
+        "entity_id": {
+          "name": "エンティティ",
+          "description": "ウィジェットに紐付けられた HA エンティティ。設定に基づいて該当するウィジェットに解決されます。slug または entity_id のいずれかを指定する必要があります。"
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "PushWardに接続",
         "data": {
           "integration_key": "統合キー"
+        },
+        "description": "始めるには PushWard 統合キーを入力してください。PushWard iOS アプリは App Store から入手できます: {app_store_url}",
+        "data_description": {
+          "integration_key": "PushWard iOS アプリ（App Store: {app_store_url}）を開き、設定 → 統合キーへ進みます。デフォルトのキーを貼り付けるか、スコープ 'ha-*' で新しいキーを作成できます。"
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "ステップラベル",
             "step_rows": "ステップ行高",
             "fired_at_attribute": "発火時刻属性",
-            "units": "系列ごとの単位"
+            "units": "系列ごとの単位",
+            "progress_entity": "進捗エンティティ",
+            "remaining_time_entity": "残り時間エンティティ",
+            "current_step_entity": "現在のステップエンティティ",
+            "value_entity": "値エンティティ",
+            "subtitle_entity": "サブタイトルエンティティ",
+            "tap_action_url": "タップアクションURL",
+            "tap_action_foreground": "タップアクションURLを開く",
+            "url_foreground": "プライマリボタンURLを開く",
+            "url_title": "プライマリボタンのタイトル",
+            "secondary_url_foreground": "セカンダリボタンURLを開く",
+            "secondary_url_title": "セカンダリボタンのタイトル",
+            "snooze_seconds": "スヌーズ秒数（iOS 26+）",
+            "fired_at_entity": "発火時刻エンティティ"
           },
           "data_description": {
             "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
@@ -957,7 +1192,20 @@
             "step_labels": "各ステップのラベル。形式: 1=最初のステップ, 2=2番目のステップ。ステップ 1..total_steps をカバーする必要があります。steps テンプレートのみ。",
             "step_rows": "各ステップの行高（1–10）、カンマ区切り。total_steps 個のエントリが必要です。steps テンプレートのみ。",
             "fired_at_attribute": "alert が発火したときの Unix タイムスタンプを持つエンティティ属性。alert テンプレートのみ。",
-            "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。"
+            "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。",
+            "progress_entity": "追跡エンティティの代わりに別のエンティティから進捗を読み取ります。空白のままにすると追跡エンティティを使用します。属性フィールドを設定するとこのエンティティのその属性を、設定しない場合は状態を読み取ります。",
+            "remaining_time_entity": "別のエンティティ（例: 洗濯機の時間センサー）から残り時間を読み取ります。空白のままにすると追跡エンティティを使用します。タイムスタンプ（終了時刻）センサー、単位付きの継続時間センサー、H:MM:SS 文字列、または単純な秒数を自動的に解析します。",
+            "current_step_entity": "別のエンティティから現在のステップを読み取ります。空白のままにすると追跡エンティティを使用します。",
+            "value_entity": "別のエンティティから gauge の値を読み取ります。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
+            "subtitle_entity": "別のエンティティ（例: プログラム/モードセンサー）からサブタイトルを表示します。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
+            "tap_action_url": "Live Activity の背景をタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキーム（そのアプリを開く）に対応しています。",
+            "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— ロック画面を離れずにバックグラウンドで POST を送信します。",
+            "url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+            "url_title": "プライマリボタンのラベル（最大 64 文字）。",
+            "secondary_url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+            "secondary_url_title": "セカンダリボタンのラベル（最大 64 文字）。",
+            "snooze_seconds": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
+            "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。"
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URLは http:// または https:// で始まる必要があります。",
-        "invalid_gauge_range": "最小値は最大値より小さくなければなりません。"
+        "invalid_gauge_range": "最小値は最大値より小さくなければなりません。",
+        "silent_requires_http": "サイレント Webhook（フォアグラウンドオフ）には http:// または https:// の URL が必要です。"
       },
       "abort": {
         "already_configured": "このエンティティはすでに追跡されています。",
         "reconfigure_successful": "エンティティの設定を更新しました。"
       }
+    },
+    "tracked_widget": {
+      "entry_type": "追跡ウィジェット",
+      "initiate_flow": {
+        "user": "追跡ウィジェットを追加"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard にウィジェットを追加",
+          "data": {
+            "entity_id": "エンティティ",
+            "widget_template": "テンプレート",
+            "slug": "ウィジェットスラッグ"
+          },
+          "data_description": {
+            "widget_template": "ウィジェットのレイアウト。単一の数値には `value`、0〜1 のバーには `progress`、範囲内の値には `gauge`、重大度バッジには `status`、最大 6 行には `stat_list` を使用します。",
+            "slug": "このウィジェットの一意の識別子。空白のままにするとエンティティ ID から自動生成されます。"
+          }
+        },
+        "reconfigure": {
+          "title": "ウィジェットを編集",
+          "data": {
+            "entity_id": "エンティティ",
+            "widget_template": "テンプレート",
+            "slug": "ウィジェットスラッグ"
+          },
+          "data_description": {
+            "widget_template": "ウィジェットのレイアウト。",
+            "slug": "このウィジェットの一意の識別子。"
+          }
+        },
+        "details": {
+          "title": "ウィジェットオプション",
+          "data": {
+            "widget_name": "ウィジェット名",
+            "value_attribute": "値属性",
+            "unit": "単位",
+            "min_value": "最小値",
+            "max_value": "最大値",
+            "severity": "重大度",
+            "stat_rows": "統計行",
+            "label": "ラベル",
+            "label_attribute": "ラベル属性",
+            "subtitle_attribute": "サブタイトル属性",
+            "icon": "アイコン",
+            "icon_attribute": "アイコン属性",
+            "accent_color": "アクセントカラー",
+            "accent_color_attribute": "アクセントカラー属性",
+            "background_color": "背景色",
+            "text_color": "テキスト色",
+            "widget_trigger_mode": "トリガーモード",
+            "widget_poll_interval": "ポーリング間隔（秒）",
+            "tap_action_url": "タップアクションURL",
+            "tap_action_foreground": "タップアクションURLを開く"
+          },
+          "data_description": {
+            "widget_name": "iOS のウィジェット選択画面に表示される表示名。デフォルトはエンティティのフレンドリー名です。",
+            "value_attribute": "値を保持するエンティティ属性。空白のままにするとエンティティの主状態を使用します。",
+            "unit": "値の横に表示される単位。最大 32 文字。",
+            "min_value": "gauge 範囲の最小値。",
+            "max_value": "gauge 範囲の最大値。",
+            "severity": "ステータスの重大度（info、warning、critical、success）。",
+            "stat_rows": "最大 6 行。形式: `Label=entity_id[:attribute[:unit]]`、カンマ区切り。例: `Users=sensor.user_count, Active=sensor.active_devices:count`。",
+            "label": "ウィジェットに表示される静的ラベル。空白のままにするとエンティティから取得します。",
+            "label_attribute": "ラベルとして使用するエンティティ属性。静的ラベルより優先されます。",
+            "subtitle_attribute": "ウィジェットのサブタイトルとして表示するエンティティ属性。",
+            "icon": "静的アイコン。SF Symbols と MDI 名に対応しています。",
+            "icon_attribute": "動的アイコン用のエンティティ属性。静的アイコンより優先されます。",
+            "accent_color": "ウィジェットのアクセントカラー。空白のままにするとデフォルトになります。",
+            "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。",
+            "background_color": "任意の背景色。",
+            "text_color": "任意のテキスト色。",
+            "widget_trigger_mode": "更新がトリガーされる方法。`event` は状態変化に反応し、`poll` は一定間隔で再評価します。",
+            "widget_poll_interval": "ポーリングの間隔（10〜3600 秒）。トリガーモードが `poll` の場合にのみ使用されます。",
+            "tap_action_url": "ウィジェットをタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキームに対応しています。",
+            "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— バックグラウンドで POST を送信します。"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL には有効なスキームを含める必要があります。http(s):// または homeassistant:// のようなカスタムアプリスキームを使用してください。",
+        "silent_requires_http": "サイレント Webhook（フォアグラウンドオフ）には http:// または https:// の URL が必要です。",
+        "invalid_gauge_range": "最小値は最大値より小さくなければなりません。",
+        "stat_rows_required": "stat_list テンプレートには少なくとも 1 つの統計行が必要です。"
+      },
+      "abort": {
+        "already_configured": "このスラッグのウィジェットはすでに存在します。",
+        "reconfigure_successful": "ウィジェットの設定を更新しました。"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "使用済み通知数"
+      },
+      "live_activity_updates_used": {
+        "name": "使用済み Live Activity 更新数"
+      },
+      "widget_updates_used": {
+        "name": "使用済みウィジェット更新数"
+      },
+      "emails_used": {
+        "name": "使用済みメール数"
+      },
+      "subscription_tier": {
+        "name": "サブスクリプション層",
+        "state": {
+          "free": "無料",
+          "premium": "プレミアム"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "slug={slug} entity_id={entity_id} に一致する PushWard ウィジェットがありません。"
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "PushWard の update_activity アクションは非推奨です",
+      "description": "`pushward.update_activity` アクションは非推奨です。代わりにテンプレート固有のアクション — 例えば `pushward.update_activity_countdown` や `pushward.update_activity_gauge` — にオートメーションを切り替えてください。古いアクションは当面は動作しますが、将来のリリースで削除されます。"
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard の通知上限に達しました",
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の通知を使用したため、クォータがリセットされる（{resets_at}）まで新しい通知は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard の Live Activity 更新上限に達しました",
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の Live Activity 更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard のウィジェット更新上限に達しました",
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のウィジェット更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+    },
+    "usage_limit_emails": {
+      "title": "PushWard のメール上限に達しました",
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のメールを使用したため、クォータがリセットされる（{resets_at}）まで新しいメールは拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
     }
   }
 }

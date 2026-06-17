@@ -139,6 +139,34 @@
         "units": {
           "name": "Unități",
           "description": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "Secunde amânare",
+          "description": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Implicit 300 (5 min). Necesită alarmă (iOS 26+, doar șablonul countdown)."
+        },
+        "duration": {
+          "name": "Durată",
+          "description": "Alternativă „setează și uită” la Data de încheiere: secunde (>=1) sau un șir de durată precum „1h30m”. Serverul reancorează începutul/sfârșitul la momentul curent. Trimiteți fie Durata, fie Data de încheiere — Durata are prioritate dacă ambele sunt setate."
+        },
+        "start_date": {
+          "name": "Dată de început",
+          "description": "Marca temporală Unix când a început numărătoarea inversă (ancorează bara timp scurs/rămas). Serverul folosește implicit momentul curent."
+        },
+        "history": {
+          "name": "Istoric (valori inițiale)",
+          "description": "Valori inițiale pentru sparkline: un obiect care mapează numele seriei la o listă de (timestamp, value). Doar inițiale — serverul preia controlul după prima actualizare."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "url_action": {
+          "name": "Buton principal",
+          "description": "Buton principal apăsabil, sub formă de obiect: url (obligatoriu), title, icon, foreground opționale și method/headers/body http(s) pentru un webhook silențios."
+        },
+        "secondary_url_action": {
+          "name": "Buton secundar",
+          "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Prioritate",
           "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL-ul principal afișat ca buton apăsabil. http(s) sau o schemă personalizată precum homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundar",
+          "description": "URL secundar afișat ca al doilea buton apăsabil."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "url_action": {
+          "name": "Buton principal",
+          "description": "Buton principal apăsabil, sub formă de obiect: url (obligatoriu), title, icon, foreground opționale și method/headers/body http(s) pentru un webhook silențios."
+        },
+        "secondary_url_action": {
+          "name": "Buton secundar",
+          "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
         }
       },
       "sections": {
         "labels": {
           "name": "Etichete și pictogramă",
           "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "action_buttons": {
+          "name": "Butoane de acțiune",
+          "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
         },
         "display_options": {
           "name": "Afișare, culoare și sunet",
@@ -281,7 +333,7 @@
           "description": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Funcționează doar pe iOS 26+."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Secunde amânare",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Prioritate",
           "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        },
+        "duration": {
+          "name": "Durată",
+          "description": "Alternativă „setează și uită” la Data de încheiere: secunde (>=1) sau un șir de durată precum „1h30m”. Serverul reancorează începutul/sfârșitul la momentul curent. Trimiteți fie Durata, fie Data de încheiere — Durata are prioritate dacă ambele sunt setate."
+        },
+        "start_date": {
+          "name": "Dată de început",
+          "description": "Marca temporală Unix când a început numărătoarea inversă (ancorează bara timp scurs/rămas). Serverul folosește implicit momentul curent."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL-ul principal afișat ca buton apăsabil. http(s) sau o schemă personalizată precum homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundar",
+          "description": "URL secundar afișat ca al doilea buton apăsabil."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "url_action": {
+          "name": "Buton principal",
+          "description": "Buton principal apăsabil, sub formă de obiect: url (obligatoriu), title, icon, foreground opționale și method/headers/body http(s) pentru un webhook silențios."
+        },
+        "secondary_url_action": {
+          "name": "Buton secundar",
+          "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "Opțiuni countdown",
           "description": "Numai pentru șablonul countdown."
+        },
+        "action_buttons": {
+          "name": "Butoane de acțiune",
+          "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
         },
         "display_options": {
           "name": "Afișare, culoare și sunet",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Prioritate",
           "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "url_action": {
+          "name": "Buton principal",
+          "description": "Buton principal apăsabil, sub formă de obiect: url (obligatoriu), title, icon, foreground opționale și method/headers/body http(s) pentru un webhook silențios."
+        },
+        "secondary_url_action": {
+          "name": "Buton secundar",
+          "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Prioritate",
           "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "url_action": {
+          "name": "Buton principal",
+          "description": "Buton principal apăsabil, sub formă de obiect: url (obligatoriu), title, icon, foreground opționale și method/headers/body http(s) pentru un webhook silențios."
+        },
+        "secondary_url_action": {
+          "name": "Buton secundar",
+          "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Prioritate",
           "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL-ul principal afișat ca buton apăsabil. http(s) sau o schemă personalizată precum homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundar",
+          "description": "URL secundar afișat ca al doilea buton apăsabil."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "url_action": {
+          "name": "Buton principal",
+          "description": "Buton principal apăsabil, sub formă de obiect: url (obligatoriu), title, icon, foreground opționale și method/headers/body http(s) pentru un webhook silențios."
+        },
+        "secondary_url_action": {
+          "name": "Buton secundar",
+          "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
         }
       },
       "sections": {
         "labels": {
           "name": "Etichete și pictogramă",
           "description": "Etichete text și pictogramă opționale. Se aplică oricărui șablon."
+        },
+        "action_buttons": {
+          "name": "Butoane de acțiune",
+          "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
         },
         "display_options": {
           "name": "Afișare, culoare și sunet",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Prioritate",
           "description": "Prioritatea activității (0 = minimă, 10 = maximă)."
+        },
+        "history": {
+          "name": "Istoric (valori inițiale)",
+          "description": "Valori inițiale pentru sparkline: un obiect care mapează numele seriei la o listă de (timestamp, value). Doar inițiale — serverul preia controlul după prima actualizare."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL-ul principal afișat ca buton apăsabil. http(s) sau o schemă personalizată precum homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL secundar",
+          "description": "URL secundar afișat ca al doilea buton apăsabil."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "url_action": {
+          "name": "Buton principal",
+          "description": "Buton principal apăsabil, sub formă de obiect: url (obligatoriu), title, icon, foreground opționale și method/headers/body http(s) pentru un webhook silențios."
+        },
+        "secondary_url_action": {
+          "name": "Buton secundar",
+          "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "Opțiuni gauge și timeline",
           "description": "Numai pentru șabloanele gauge și timeline."
+        },
+        "action_buttons": {
+          "name": "Butoane de acțiune",
+          "description": "Butoane URL apăsabile. Numai pentru șabloanele steps și alert."
         },
         "display_options": {
           "name": "Afișare, culoare și sunet",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Metadate",
           "description": "Metadate suplimentare tip cheie-valoare trimise cu notificarea."
+        },
+        "media": {
+          "name": "Media",
+          "description": "Atașament media sub formă de obiect cu `url` (HTTPS) și `type` (image, video sau audio)."
+        },
+        "actions": {
+          "name": "Acțiuni",
+          "description": "Listă de butoane de acțiune. Fiecare acțiune este un obiect cu id, title și, opțional, url, foreground, destructive, authentication_required și icon. Pentru un url http(s) puteți trimite și un webhook silențios cu method (GET/POST/PUT/PATCH/DELETE/HEAD), headers și body."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Reîmprospătați widget-ul",
+      "description": "Forțați reîmprospătarea unui widget PushWard urmărit. Ocolește memoria cache de diferențe, astfel încât widget-ul este redat din nou și trimis către iOS chiar dacă valoarea nu s-a schimbat.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al widget-ului. Trebuie furnizat fie slug, fie entity_id."
+        },
+        "entity_id": {
+          "name": "Entitate",
+          "description": "Entitate HA asociată widget-ului. Trebuie furnizat fie slug, fie entity_id."
+        }
+      }
+    },
+    "send_email": {
+      "name": "Trimiteți e-mail",
+      "description": "Trimiteți un e-mail tranzacțional prin PushWard. Furnizați un corp text, un corp HTML sau ambele. Cheia de integrare necesită capacitatea „emails”.",
+      "fields": {
+        "to": {
+          "name": "Către",
+          "description": "Adresa de e-mail a destinatarului. Trebuie să fie o adresă pe care ați adăugat-o și confirmat-o deja în aplicația PushWard pentru iOS — adresele neverificate sunt respinse."
+        },
+        "subject": {
+          "name": "Subiect",
+          "description": "Linia de subiect a e-mailului."
+        },
+        "body": {
+          "name": "Corp",
+          "description": "Corpul e-mailului în text simplu. Furnizați acesta, un corp HTML sau ambele."
+        },
+        "html_body": {
+          "name": "Corp HTML",
+          "description": "Corpul e-mailului în HTML. Furnizați acesta, un corp în text simplu sau ambele."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Ștergeți widget-ul",
+      "description": "Ștergeți un widget PushWard de pe server. Dacă o intrare de configurare de tip widget urmărit încă gestionează acest slug, widget-ul este recreat la următoarea repornire/sincronizare — eliminați intrarea de configurare pentru a-l șterge definitiv. Furnizați fie slug, fie entity_id.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al widget-ului. Trebuie furnizat fie slug, fie entity_id."
+        },
+        "entity_id": {
+          "name": "Entitate",
+          "description": "Entitate HA asociată widget-ului. Rezolvată la widget-ul corespunzător pe baza configurației. Trebuie furnizat fie slug, fie entity_id."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Conectați-vă la PushWard",
         "data": {
           "integration_key": "Cheie de integrare"
+        },
+        "description": "Introduceți cheia de integrare PushWard pentru a începe. Obțineți aplicația PushWard pentru iOS din App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "Deschideți aplicația PushWard pentru iOS (App Store: {app_store_url}) → Setări → Chei de integrare. Puteți lipi cheia implicită sau puteți crea una nouă cu domeniul „ha-*”."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "Etichete pași",
             "step_rows": "Rânduri pași",
             "fired_at_attribute": "Atribut timp declanșare",
-            "units": "Unități"
+            "units": "Unități",
+            "progress_entity": "Entitate progres",
+            "remaining_time_entity": "Entitate timp rămas",
+            "current_step_entity": "Entitate pas curent",
+            "value_entity": "Entitate valoare",
+            "subtitle_entity": "Entitate subtitrare",
+            "tap_action_url": "URL acțiune la atingere",
+            "tap_action_foreground": "Deschideți URL-ul acțiunii la atingere",
+            "url_foreground": "Deschideți URL-ul butonului principal",
+            "url_title": "Titlu buton principal",
+            "secondary_url_foreground": "Deschideți URL-ul butonului secundar",
+            "secondary_url_title": "Titlu buton secundar",
+            "snooze_seconds": "Secunde amânare (iOS 26+)",
+            "fired_at_entity": "Entitate moment declanșare"
           },
           "data_description": {
             "start_states": "Stările entității care pornesc Live Activity. Selectați din listă sau introduceți valori personalizate.",
@@ -957,7 +1192,20 @@
             "step_labels": "Etichete personalizate pentru pașii șablonului steps. Format: 1=Etichetă, 2=Etichetă. Gol folosește numerele pașilor.",
             "step_rows": "Numărul de pași afișați pe un rând în șablonul steps.",
             "fired_at_attribute": "Atribut entitate care conține marca temporală Unix a declanșării. Folosit pentru afișarea timpului relativ.",
-            "units": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%"
+            "units": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%",
+            "progress_entity": "Citește progresul dintr-o entitate separată în loc de entitatea urmărită. Lăsați gol pentru a folosi entitatea urmărită. Dacă este setat câmpul de atribut, citește acel atribut al acestei entități; altfel starea ei.",
+            "remaining_time_entity": "Citește timpul rămas dintr-o entitate separată (de ex. senzorul de timp al unei mașini de spălat). Lăsați gol pentru a folosi entitatea urmărită. Analizează automat un senzor de marcă temporală (ora de finalizare), un senzor de durată cu unități, un șir H:MM:SS sau secunde simple.",
+            "current_step_entity": "Citește pasul curent dintr-o entitate separată. Lăsați gol pentru a folosi entitatea urmărită.",
+            "value_entity": "Citește valoarea gauge dintr-o entitate separată. Lăsați gol pentru a folosi entitatea urmărită. Folosește starea entității sursă dacă nu este setat un atribut.",
+            "subtitle_entity": "Afișează subtitrarea dintr-o entitate separată (de ex. un senzor de program/mod). Lăsați gol pentru a folosi entitatea urmărită. Folosește starea entității sursă dacă nu este setat un atribut.",
+            "tap_action_url": "URL opțional deschis la atingerea fundalului Live Activity. Acceptă http(s) (deschide Safari) sau scheme personalizate precum homeassistant://navigate/lovelace/0 (deschide aplicația respectivă).",
+            "tap_action_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)) — declanșează un POST în fundal fără a părăsi ecranul de blocare.",
+            "url_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)).",
+            "url_title": "Eticheta butonului principal (maximum 64 de caractere).",
+            "secondary_url_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)).",
+            "secondary_url_title": "Eticheta butonului secundar (maximum 64 de caractere).",
+            "snooze_seconds": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Lăsați gol pentru valoarea implicită de 300s (5 min). Necesită Alarmă. Doar șablonul countdown.",
+            "fired_at_entity": "Citește momentul declanșării alertei dintr-o entitate separată. Lăsați gol pentru a folosi entitatea urmărită. Acceptă o marcă temporală Unix sau un senzor de marcă temporală ISO. Doar șablonul alert."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL-ul trebuie să folosească schema http:// sau https://.",
-        "invalid_gauge_range": "Valoarea minimă trebuie să fie mai mică decât valoarea maximă."
+        "invalid_gauge_range": "Valoarea minimă trebuie să fie mai mică decât valoarea maximă.",
+        "silent_requires_http": "Webhook-ul silențios (prim-plan dezactivat) necesită un URL http:// sau https://."
       },
       "abort": {
         "already_configured": "Această entitate este deja urmărită.",
         "reconfigure_successful": "Configurația entității a fost actualizată."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Widget urmărit",
+      "initiate_flow": {
+        "user": "Adăugați un widget urmărit"
+      },
+      "step": {
+        "user": {
+          "title": "Adăugați un widget în PushWard",
+          "data": {
+            "entity_id": "Entitate",
+            "widget_template": "Șablon",
+            "slug": "Slug widget"
+          },
+          "data_description": {
+            "widget_template": "Aspectul widget-ului. Folosiți `value` pentru un singur număr, `progress` pentru o bară 0–1, `gauge` pentru o valoare într-un interval, `status` pentru o insignă de severitate sau `stat_list` pentru până la 6 rânduri.",
+            "slug": "Identificator unic pentru acest widget. Lăsați gol pentru a-l genera automat din ID-ul entității."
+          }
+        },
+        "reconfigure": {
+          "title": "Editați widget-ul",
+          "data": {
+            "entity_id": "Entitate",
+            "widget_template": "Șablon",
+            "slug": "Slug widget"
+          },
+          "data_description": {
+            "widget_template": "Aspectul widget-ului.",
+            "slug": "Identificator unic pentru acest widget."
+          }
+        },
+        "details": {
+          "title": "Opțiuni widget",
+          "data": {
+            "widget_name": "Nume widget",
+            "value_attribute": "Atribut valoare",
+            "unit": "Unitate",
+            "min_value": "Valoare minimă",
+            "max_value": "Valoare maximă",
+            "severity": "Severitate",
+            "stat_rows": "Rânduri statistici",
+            "label": "Etichetă",
+            "label_attribute": "Atribut etichetă",
+            "subtitle_attribute": "Atribut subtitrare",
+            "icon": "Pictogramă",
+            "icon_attribute": "Atribut pictogramă",
+            "accent_color": "Culoare accent",
+            "accent_color_attribute": "Atribut culoare accent",
+            "background_color": "Culoare fundal",
+            "text_color": "Culoare text",
+            "widget_trigger_mode": "Mod declanșare",
+            "widget_poll_interval": "Interval interogare (secunde)",
+            "tap_action_url": "URL acțiune la atingere",
+            "tap_action_foreground": "Deschideți URL-ul acțiunii la atingere"
+          },
+          "data_description": {
+            "widget_name": "Numele afișat în selectorul de widget-uri din iOS. Implicit, numele prietenos al entității.",
+            "value_attribute": "Atributul entității care conține valoarea. Lăsați gol pentru a folosi starea principală a entității.",
+            "unit": "Unitatea de afișare arătată lângă valoare. Maximum 32 de caractere.",
+            "min_value": "Valoarea minimă pentru intervalul gauge.",
+            "max_value": "Valoarea maximă pentru intervalul gauge.",
+            "severity": "Severitatea stării (info, warning, critical, success).",
+            "stat_rows": "Până la 6 rânduri. Format: `Label=entity_id[:attribute[:unit]]`, separate prin virgulă. Exemplu: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Etichetă statică afișată pe widget. Lăsați gol pentru a o deriva din entitate.",
+            "label_attribute": "Atributul entității folosit ca etichetă. Suprascrie eticheta statică.",
+            "subtitle_attribute": "Atributul entității afișat ca subtitrare a widget-ului.",
+            "icon": "Pictogramă statică. Sunt acceptate denumiri SF Symbols și MDI.",
+            "icon_attribute": "Atributul entității pentru o pictogramă dinamică. Suprascrie pictograma statică.",
+            "accent_color": "Culoarea de accent pentru widget. Lăsați gol pentru valoarea implicită.",
+            "accent_color_attribute": "Atributul entității pentru o culoare de accent dinamică.",
+            "background_color": "Culoare de fundal opțională.",
+            "text_color": "Culoare de text opțională.",
+            "widget_trigger_mode": "Cum sunt declanșate actualizările. `event` reacționează la schimbările de stare; `poll` reevaluează la un interval fix.",
+            "widget_poll_interval": "Intervalul dintre interogări (10–3600 secunde). Folosit doar când modul de declanșare este `poll`.",
+            "tap_action_url": "URL opțional deschis la atingerea widget-ului. Acceptă http(s) (deschide Safari) sau scheme personalizate precum homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)) — declanșează un POST în fundal."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL-ul trebuie să includă o schemă validă. Folosiți http(s):// sau o schemă personalizată de aplicație precum homeassistant://.",
+        "silent_requires_http": "Webhook-ul silențios (prim-plan dezactivat) necesită un URL http:// sau https://.",
+        "invalid_gauge_range": "Valoarea minimă trebuie să fie mai mică decât valoarea maximă.",
+        "stat_rows_required": "Cel puțin un rând de statistici este necesar pentru șablonul stat_list."
+      },
+      "abort": {
+        "already_configured": "Există deja un widget cu acest slug.",
+        "reconfigure_successful": "Configurația widget-ului a fost actualizată."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Notificări utilizate"
+      },
+      "live_activity_updates_used": {
+        "name": "Actualizări Live Activity utilizate"
+      },
+      "widget_updates_used": {
+        "name": "Actualizări widget utilizate"
+      },
+      "emails_used": {
+        "name": "E-mailuri utilizate"
+      },
+      "subscription_tier": {
+        "name": "Nivel abonament",
+        "state": {
+          "free": "Gratuit",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Niciun widget PushWard nu corespunde slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "Acțiunea PushWard update_activity este deprecated",
+      "description": "Acțiunea `pushward.update_activity` este deprecated. Comutați automatizările la acțiunea specifică șablonului — de exemplu `pushward.update_activity_countdown` sau `pushward.update_activity_gauge`. Vechea acțiune încă funcționează deocamdată, dar va fi eliminată într-o versiune viitoare."
+    },
+    "usage_limit_notifications": {
+      "title": "Limita de notificări PushWard a fost atinsă",
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} notificări pentru perioada curentă, așa că noile notificări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+    },
+    "usage_limit_live_activity": {
+      "title": "Limita de actualizări Live Activity PushWard a fost atinsă",
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări Live Activity pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+    },
+    "usage_limit_widgets": {
+      "title": "Limita de actualizări widget PushWard a fost atinsă",
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări de widget pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+    },
+    "usage_limit_emails": {
+      "title": "Limita de e-mailuri PushWard a fost atinsă",
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} e-mailuri pentru perioada curentă, așa că noile e-mailuri vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
     }
   }
 }

@@ -6,12 +6,13 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 import voluptuous as vol
-from homeassistant.config_entries import ConfigEntryState
+from homeassistant.config_entries import ConfigEntryState, ConfigSubentryData
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import issue_registry as ir
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.pushward import async_remove_entry
 from custom_components.pushward.api import (
     PushWardApiError,
     PushWardAuthError,
@@ -23,10 +24,15 @@ from custom_components.pushward.const import (
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
     DOMAIN,
+    MAX_URL_LEN,
+    SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
+    validate_tap_action_url,
 )
+from custom_components.pushward.widget_manager import WidgetManager
 
-from .conftest import make_usage_payload
+from .conftest import make_usage_payload, make_widget_config
+from .server_contract import assert_valid_activity_content
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -54,6 +60,7 @@ def _mock_api() -> AsyncMock:
     api.delete_activity = AsyncMock()
     api.create_notification = AsyncMock()
     api.send_email = AsyncMock()
+    api.delete_widget = AsyncMock()
     return api
 
 
@@ -1023,6 +1030,519 @@ async def test_send_notification_service_rejects_invalid_media_type(hass: HomeAs
             },
             blocking=True,
         )
+
+
+# --- countdown duration / start_date ---
+
+
+async def test_update_activity_countdown_forwards_duration_string(hass: HomeAssistant) -> None:
+    """A duration string (e.g. "30m") is forwarded verbatim — the server expands it."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "c", "state": "ongoing", "duration": "1h30m"},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["duration"] == "1h30m"
+
+
+async def test_update_activity_countdown_forwards_duration_int_and_start_date(hass: HomeAssistant) -> None:
+    """An integer duration and an explicit start_date are forwarded into content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "c", "state": "ongoing", "duration": 1800, "start_date": 1700000000},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["duration"] == 1800
+    assert content["start_date"] == 1700000000
+
+
+async def test_update_activity_countdown_rejects_zero_duration(hass: HomeAssistant) -> None:
+    """An integer duration must be >= 1 second."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_countdown",
+            {"slug": "c", "state": "ongoing", "duration": 0},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+# --- universal action fields (all templates) ---
+
+
+@pytest.mark.parametrize("template", TEMPLATES)
+async def test_action_fields_forwarded_on_every_template(hass: HomeAssistant, template: str) -> None:
+    """url / secondary_url / tap_action / url_action / secondary_url_action reach content on all templates."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        f"update_activity_{template}",
+        {
+            "slug": "x",
+            "state": "ongoing",
+            "url": "https://example.com",
+            "secondary_url": "https://example.com/more",
+            "tap_action": {"url": "homeassistant://navigate/lovelace/0"},
+            "url_action": {"url": "https://example.com", "title": "Open", "method": "POST", "body": "go"},
+            "secondary_url_action": {"url": "https://example.com/more", "title": "More"},
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["url"] == "https://example.com"
+    assert content["secondary_url"] == "https://example.com/more"
+    assert content["tap_action"] == {"url": "homeassistant://navigate/lovelace/0"}
+    assert content["url_action"]["method"] == "POST"
+    assert content["url_action"]["title"] == "Open"
+    assert content["secondary_url_action"]["title"] == "More"
+
+
+async def test_tap_action_accepts_custom_scheme_url(hass: HomeAssistant) -> None:
+    """A custom-scheme tap_action url (homeassistant://) is accepted — unlike the http-only url field of old."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {"slug": "x", "state": "ongoing", "tap_action": {"url": "homeassistant://navigate/lovelace/0"}},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["tap_action"]["url"] == "homeassistant://navigate/lovelace/0"
+
+
+async def test_tap_action_rejects_http_fields_on_custom_scheme(hass: HomeAssistant) -> None:
+    """method/headers/body require an http(s) url — they're rejected on a custom scheme."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "x", "state": "ongoing", "tap_action": {"url": "homeassistant://x", "method": "POST"}},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_tap_action_rejects_dangerous_scheme(hass: HomeAssistant) -> None:
+    """A javascript: url is rejected outright (mirrors the server)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "x", "state": "ongoing", "tap_action": {"url": "javascript:alert(1)"}},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_url_action_rejects_bad_method(hass: HomeAssistant) -> None:
+    """An unknown HTTP method is rejected by the schema enum."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "x", "state": "ongoing", "url_action": {"url": "https://example.com", "method": "FETCH"}},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_url_action_lowercase_method_is_upper_cased(hass: HomeAssistant) -> None:
+    """A lowercase method is normalized to upper-case (vol.Upper) before forwarding."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {"slug": "x", "state": "ongoing", "url_action": {"url": "https://example.com", "method": "post"}},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["url_action"]["method"] == "POST"
+
+
+# --- timeline history seed ---
+
+
+async def test_update_activity_timeline_forwards_history(hass: HomeAssistant) -> None:
+    """The optional timeline history seed is forwarded into content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    history = {"Temp": [{"timestamp": 1700000000, "value": 21.0}]}
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_timeline",
+        {"slug": "t", "state": "ongoing", "value": {"Temp": 22.5}, "history": history},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["history"] == history
+
+
+# --- notification action HTTP webhook fields ---
+
+
+async def test_send_notification_action_http_fields_forwarded(hass: HomeAssistant) -> None:
+    """A notification action button can carry method/headers/body for a silent webhook."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    actions = [
+        {
+            "id": "ack",
+            "title": "Acknowledge",
+            "url": "https://example.com/ack",
+            "method": "POST",
+            "headers": {"X-Token": "abc"},
+            "body": "ok",
+        }
+    ]
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "t", "body": "b", "actions": actions},
+        blocking=True,
+    )
+
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["actions"][0]["method"] == "POST"
+    assert call_kwargs["actions"][0]["headers"] == {"X-Token": "abc"}
+    assert call_kwargs["actions"][0]["body"] == "ok"
+
+
+async def test_send_notification_action_rejects_method_without_http_url(hass: HomeAssistant) -> None:
+    """method on an action with no http(s) url is rejected (the server requires an http shape)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {"title": "t", "body": "b", "actions": [{"id": "a", "title": "A", "method": "POST"}]},
+            blocking=True,
+        )
+    api.create_notification.assert_not_awaited()
+
+
+# --- delete_widget service ---
+
+
+async def test_delete_widget_service_registered(hass: HomeAssistant) -> None:
+    """delete_widget registers at setup and persists after the entry unloads."""
+    api = _mock_api()
+    entry = await _setup_entry(hass, api)
+    assert hass.services.has_service(DOMAIN, "delete_widget")
+
+    await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert hass.services.has_service(DOMAIN, "delete_widget")
+
+
+async def test_delete_widget_by_slug(hass: HomeAssistant) -> None:
+    """delete_widget with a slug calls api.delete_widget directly."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "delete_widget",
+        {"slug": "ha-temp"},
+        blocking=True,
+    )
+
+    api.delete_widget.assert_awaited_once_with("ha-temp")
+
+
+async def test_delete_widget_unknown_entity_raises(hass: HomeAssistant) -> None:
+    """delete_widget with an entity_id that no tracked widget owns raises a validation error."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError):
+        await hass.services.async_call(
+            DOMAIN,
+            "delete_widget",
+            {"entity_id": "sensor.nope"},
+            blocking=True,
+        )
+    api.delete_widget.assert_not_awaited()
+
+
+async def test_delete_widget_by_entity_id_resolves_and_deletes(hass: HomeAssistant) -> None:
+    """delete_widget with an entity_id resolves the bound widget's slug and deletes it."""
+    api = _mock_api()
+    api.create_widget = AsyncMock()
+    api.patch_widget = AsyncMock()
+    entry = await _setup_entry(hass, api)
+
+    # Seed a tracked widget bound to an entity and expose it via hass.data so the service's
+    # _find_widget_slug → slug_for_entity path has something to resolve.
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config(slug="ha-users", entity_id="sensor.users")], entry)
+    await manager.async_start()
+    hass.data[DOMAIN][entry.entry_id]["widget_manager"] = manager
+
+    await hass.services.async_call(DOMAIN, "delete_widget", {"entity_id": "sensor.users"}, blocking=True)
+
+    api.delete_widget.assert_awaited_once_with("ha-users")
+    await manager.async_stop()
+
+
+async def test_async_remove_entry_deletes_server_widgets(hass: HomeAssistant) -> None:
+    """Removing the whole integration deletes every tracked widget server-side (no orphan leak)."""
+    api = _mock_api()
+    subentries = [
+        ConfigSubentryData(
+            data=make_widget_config(slug=slug, entity_id=f"sensor.{slug}"),
+            subentry_type=SUBENTRY_TYPE_WIDGET,
+            title=slug,
+            unique_id=slug,
+        )
+        for slug in ("ha-one", "ha-two")
+    ]
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="PushWard",
+        data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY},
+        version=2,
+        unique_id=DOMAIN,
+        subentries_data=subentries,
+    )
+    entry.add_to_hass(hass)
+
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        await async_remove_entry(hass, entry)
+
+    assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-one", "ha-two"}
+
+
+async def test_action_objects_satisfy_server_contract(hass: HomeAssistant) -> None:
+    """The action objects the service forwards are accepted by the public server contract."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {
+            "slug": "x",
+            "state": "ongoing",
+            "url": "https://example.com",
+            "secondary_url": "homeassistant://navigate/lovelace/0",
+            "tap_action": {"url": "homeassistant://navigate/lovelace/0"},
+            "url_action": {"url": "https://example.com", "title": "Open", "method": "POST", "body": "go"},
+            "secondary_url_action": {"url": "https://example.com/more", "title": "More"},
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    # Would raise PushWardContractError if the server would reject the emitted action shapes.
+    assert_valid_activity_content({**content, "template": "generic"})
+
+
+async def test_timeline_history_seed_satisfies_server_contract(hass: HomeAssistant) -> None:
+    """The timeline history seed the service forwards is contract-valid."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_timeline",
+        {
+            "slug": "t",
+            "state": "ongoing",
+            "value": {"Temp": 22.5},
+            "history": {"Temp": [{"timestamp": 1700000000, "value": 21.0}]},
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert_valid_activity_content({**content, "template": "timeline"})
+
+
+def test_validate_tap_action_url_rejection_branches() -> None:
+    """validate_tap_action_url rejects schemeless, hostless http(s), dangerous, and over-long URLs."""
+    for bad in ("example.com", "http://", "https://", "javascript:alert(1)", "https://x/" + "a" * MAX_URL_LEN):
+        with pytest.raises(vol.Invalid):
+            validate_tap_action_url(bad)
+    # Accepts http(s) with a host and any non-blocked custom scheme.
+    assert validate_tap_action_url("https://example.com") == "https://example.com"
+    assert validate_tap_action_url("homeassistant://x") == "homeassistant://x"
+
+
+async def test_url_action_rejects_oversized_fields(hass: HomeAssistant) -> None:
+    """body > 1024, title > 64, and icon > 64 are rejected by the schema caps."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for action in (
+        {"url": "https://example.com", "body": "x" * 1025},
+        {"url": "https://example.com", "title": "t" * 65},
+        {"url": "https://example.com", "icon": "i" * 65},
+    ):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "update_activity_generic",
+                {"slug": "x", "state": "ongoing", "url_action": action},
+                blocking=True,
+            )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_url_action_rejects_http_fields_on_custom_scheme(hass: HomeAssistant) -> None:
+    """method/headers/body on a url_action require an http(s) url (covers the url_action gate)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "x", "state": "ongoing", "url_action": {"url": "homeassistant://x", "method": "POST"}},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_action_headers_forwarded_and_validated(hass: HomeAssistant) -> None:
+    """Valid headers on a tap_action forward; bad name, control chars, and oversize reject."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {
+            "slug": "x",
+            "state": "ongoing",
+            "tap_action": {"url": "https://example.com", "headers": {"X-Token": "abc"}},
+        },
+        blocking=True,
+    )
+    assert api.update_activity.call_args[0][2]["tap_action"]["headers"] == {"X-Token": "abc"}
+
+    for headers in (
+        {"Bad Name": "v"},  # space is not an RFC 7230 token char
+        {"X-Evil": "line1\r\nline2"},  # CR/LF forbidden
+        {"X-Big": "v" * 1100},  # > 1024 bytes total
+    ):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "update_activity_generic",
+                {"slug": "x", "state": "ongoing", "tap_action": {"url": "https://example.com", "headers": headers}},
+                blocking=True,
+            )
+
+
+async def test_update_activity_countdown_rejects_invalid_duration_string(hass: HomeAssistant) -> None:
+    """A non-positive or malformed duration string is rejected (mirrors server ParseDuration)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad in ("0", "0s", "abc", "1x", "-5"):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "update_activity_countdown",
+                {"slug": "c", "state": "ongoing", "duration": bad},
+                blocking=True,
+            )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_countdown_accepts_plain_seconds_string(hass: HomeAssistant) -> None:
+    """A plain-integer duration string is forwarded verbatim (server treats it as seconds)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "c", "state": "ongoing", "duration": "90"},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args[0][2]["duration"] == "90"
+
+
+async def test_send_notification_action_accepts_custom_scheme_url(hass: HomeAssistant) -> None:
+    """A notification action button can deep-link via a custom scheme (server parity)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    actions = [{"id": "open", "title": "Open", "url": "homeassistant://navigate/lovelace/0"}]
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "t", "body": "b", "actions": actions},
+        blocking=True,
+    )
+
+    assert api.create_notification.call_args[1]["actions"][0]["url"] == "homeassistant://navigate/lovelace/0"
+
+
+async def test_deprecated_update_activity_accepts_action_and_template_fields(hass: HomeAssistant) -> None:
+    """The deprecated update_activity union still accepts the new action + countdown fields."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {
+            "slug": "x",
+            "state": "ongoing",
+            "template": "countdown",
+            "duration": "30m",
+            "tap_action": {"url": "homeassistant://x"},
+            "url_action": {"url": "https://example.com", "method": "POST"},
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["duration"] == "30m"
+    assert content["tap_action"] == {"url": "homeassistant://x"}
+    assert content["url_action"]["method"] == "POST"
 
 
 # --- service error surfacing tests ---

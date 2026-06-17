@@ -6,6 +6,7 @@ import asyncio
 import logging
 from contextlib import contextmanager
 from functools import partial
+from urllib.parse import urlparse
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
@@ -31,18 +32,26 @@ from .const import (
     ACTIVITY_STATES,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
+    CONF_SLUG,
     DEFAULT_PRIORITY,
     DOMAIN,
+    MAX_TAP_ACTION_BODY_LEN,
+    MAX_TAP_ACTION_ICON_LEN,
+    MAX_TAP_ACTION_TITLE_LEN,
     NOTIFICATION_LEVELS,
     SCALES,
     SEVERITIES,
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
+    TAP_ACTION_METHODS,
     TEMPLATES,
     USAGE_LIMIT_RESOURCES,
     usage_limit_issue_id,
+    validate_action_headers,
+    validate_duration,
     validate_slug,
+    validate_tap_action_url,
     validate_url,
 )
 from .coordinator import PushWardUsageCoordinator
@@ -63,11 +72,74 @@ SERVICE_DELETE_ACTIVITY = "delete_activity"
 SERVICE_SEND_NOTIFICATION = "send_notification"
 SERVICE_SEND_EMAIL = "send_email"
 SERVICE_WIDGET_REFRESH = "widget_refresh"
+SERVICE_DELETE_WIDGET = "delete_widget"
+
+# Keys that turn an action into a silent HTTP webhook — gated by _validate_http_action_fields.
+_HTTP_ACTION_KEYS = ("method", "headers", "body")
+
+# Shared HTTP-routing fields for tap actions / action buttons. method/headers/body only
+# apply to http(s) URLs — the server (and _validate_http_action_fields below) reject them on
+# a custom-scheme URL. Spread into both the activity tap-action schemas and the notification
+# action schema.
+_HTTP_ACTION_FIELDS = {
+    vol.Optional("method"): vol.All(str, vol.Upper, vol.In(TAP_ACTION_METHODS)),
+    vol.Optional("headers"): vol.All(vol.Schema({str: str}), validate_action_headers),
+    vol.Optional("body"): vol.All(str, vol.Length(max=MAX_TAP_ACTION_BODY_LEN)),
+}
+
+
+def _validate_http_action_fields(data: dict) -> dict:
+    """Reject method/headers/body on a non-http(s) action URL.
+
+    Mirrors pushward-server ValidateAction (hasHTTPShape && !isHTTP): only a *non-empty*
+    method/headers/body needs an http(s) url, so an empty body/headers on a custom-scheme
+    tap target is fine. The caller gets a clear HA error instead of a server 400; a
+    missing/empty url has no scheme and fails here too.
+    """
+    if any(data.get(key) for key in _HTTP_ACTION_KEYS):
+        scheme = urlparse(str(data.get("url", ""))).scheme.lower()
+        if scheme not in ("http", "https"):
+            raise vol.Invalid("method, headers, and body require an http or https url")
+    return data
+
+
+# Base tap target / silent webhook (title/icon not rendered for this slot). _URL_ACTION_SCHEMA
+# extends this with the button-facing label/icon, so the shared slot is defined once.
+_TAP_ACTION_BASE = vol.Schema(
+    {
+        vol.Required("url"): validate_tap_action_url,
+        vol.Optional("foreground"): cv.boolean,
+        **_HTTP_ACTION_FIELDS,
+    }
+)
+_TAP_ACTION_SCHEMA = vol.All(_TAP_ACTION_BASE, _validate_http_action_fields)
+
+# Tappable button (primary / secondary): tap-action routing plus a button label + SF Symbol.
+_URL_ACTION_SCHEMA = vol.All(
+    _TAP_ACTION_BASE.extend(
+        {
+            vol.Optional("title"): vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN)),
+            vol.Optional("icon"): vol.All(str, vol.Length(max=MAX_TAP_ACTION_ICON_LEN)),
+        }
+    ),
+    _validate_http_action_fields,
+)
+
+# Action fields the server accepts on EVERY activity template (content_schema.go
+# tapActionProperties). Legacy url/secondary_url strings sit alongside the richer
+# *_action objects; the server allows custom-scheme URLs here, hence validate_tap_action_url.
+_UNIVERSAL_ACTION_FIELDS = {
+    vol.Optional("url"): validate_tap_action_url,
+    vol.Optional("secondary_url"): validate_tap_action_url,
+    vol.Optional("tap_action"): _TAP_ACTION_SCHEMA,
+    vol.Optional("url_action"): _URL_ACTION_SCHEMA,
+    vol.Optional("secondary_url_action"): _URL_ACTION_SCHEMA,
+}
 
 # Composable field-groups for the update services. The shared groups (top-level +
-# universal labels/appearance) merge with one template-specific group per service, so each
-# per-template schema accepts only that template's fields; the deprecated update_activity
-# schema is rebuilt below as the union of all of them.
+# universal labels/appearance/actions) merge with one template-specific group per service, so
+# each per-template schema accepts that template's fields plus the universal ones; the
+# deprecated update_activity schema is rebuilt below as the union of all of them.
 _UPDATE_TOPLEVEL_FIELDS = {
     vol.Required("slug"): validate_slug,
     vol.Required("state"): vol.In(ACTIVITY_STATES),
@@ -89,6 +161,11 @@ _UNIVERSAL_APPEARANCE_FIELDS = {
 }
 _COUNTDOWN_TEMPLATE_FIELDS = {
     vol.Optional("end_date"): vol.Coerce(int),
+    # Set-and-forget alternative to end_date: int seconds (>=1) or a Go-style duration
+    # string ("60s", "1h30m"). The server re-anchors start_date=now / end_date=now+duration
+    # whenever duration is present, so duration takes precedence if end_date is also sent.
+    vol.Optional("duration"): validate_duration,
+    vol.Optional("start_date"): vol.Coerce(int),
     vol.Optional("warning_threshold"): vol.All(vol.Coerce(int), vol.Range(min=0)),
     vol.Optional("alarm"): cv.boolean,
     vol.Optional("snooze_seconds"): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
@@ -98,14 +175,10 @@ _STEPS_TEMPLATE_FIELDS = {
     vol.Optional("current_step"): vol.Coerce(int),
     vol.Optional("step_labels"): list,
     vol.Optional("step_rows"): list,
-    vol.Optional("url"): validate_url,
-    vol.Optional("secondary_url"): validate_url,
 }
 _ALERT_TEMPLATE_FIELDS = {
     vol.Optional("severity"): vol.In(SEVERITIES),
     vol.Optional("fired_at"): vol.Coerce(int),
-    vol.Optional("url"): validate_url,
-    vol.Optional("secondary_url"): validate_url,
 }
 _GAUGE_TEMPLATE_FIELDS = {
     # A gauge value is a single number (timeline's `value` is the dict form).
@@ -122,12 +195,20 @@ _TIMELINE_TEMPLATE_FIELDS = {
     vol.Optional("decimals"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
     vol.Optional("smoothing"): bool,
     vol.Optional("thresholds"): list,
+    # Initial history seed only (series-name -> [{timestamp, value}]). The server takes over
+    # as source of truth after the first update — see PrepareTimelineUpdate.
+    vol.Optional("history"): dict,
 }
 
 
 def _update_template_schema(*template_fields: dict) -> vol.Schema:
     """Build an update_activity schema from the shared groups plus the given template groups."""
-    merged = {**_UPDATE_TOPLEVEL_FIELDS, **_UNIVERSAL_LABEL_FIELDS, **_UNIVERSAL_APPEARANCE_FIELDS}
+    merged = {
+        **_UPDATE_TOPLEVEL_FIELDS,
+        **_UNIVERSAL_LABEL_FIELDS,
+        **_UNIVERSAL_APPEARANCE_FIELDS,
+        **_UNIVERSAL_ACTION_FIELDS,
+    }
     for group in template_fields:
         merged.update(group)
     return vol.Schema(merged)
@@ -185,16 +266,23 @@ SCHEMA_MEDIA = vol.Schema(
     }
 )
 
-SCHEMA_ACTION = vol.Schema(
-    {
-        vol.Required("id"): vol.All(str, vol.Length(min=1)),
-        vol.Required("title"): vol.All(str, vol.Length(min=1)),
-        vol.Optional("url"): validate_url,
-        vol.Optional("foreground"): cv.boolean,
-        vol.Optional("destructive"): cv.boolean,
-        vol.Optional("authentication_required"): cv.boolean,
-        vol.Optional("icon"): str,
-    }
+SCHEMA_ACTION = vol.All(
+    vol.Schema(
+        {
+            vol.Required("id"): vol.All(str, vol.Length(min=1)),
+            vol.Required("title"): vol.All(str, vol.Length(min=1)),
+            # The server accepts any non-blocked scheme on a notification action (deep links
+            # like homeassistant:// / tel: / mailto:), matching the activity tap-action fields.
+            vol.Optional("url"): validate_tap_action_url,
+            vol.Optional("foreground"): cv.boolean,
+            vol.Optional("destructive"): cv.boolean,
+            vol.Optional("authentication_required"): cv.boolean,
+            vol.Optional("icon"): str,
+            **_HTTP_ACTION_FIELDS,
+        }
+    ),
+    # method/headers/body turn the button into a webhook — they need an http(s) url.
+    _validate_http_action_fields,
 )
 
 SCHEMA_SEND_NOTIFICATION = vol.Schema(
@@ -250,7 +338,9 @@ SCHEMA_SEND_EMAIL = vol.All(
     _require_email_body,
 )
 
-SCHEMA_WIDGET_REFRESH = vol.All(
+# Target a single widget by slug XOR entity_id (an entity_id resolves to its tracked widget's
+# slug). Shared by widget_refresh and delete_widget so the targeting contract is defined once.
+SCHEMA_WIDGET_TARGET = vol.All(
     vol.Schema(
         {
             vol.Exclusive("slug", "widget_target"): validate_slug,
@@ -259,6 +349,8 @@ SCHEMA_WIDGET_REFRESH = vol.All(
     ),
     cv.has_at_least_one_key("slug", "entity_id"),
 )
+SCHEMA_WIDGET_REFRESH = SCHEMA_WIDGET_TARGET
+SCHEMA_DELETE_WIDGET = SCHEMA_WIDGET_TARGET
 
 
 def _get_api(hass: HomeAssistant) -> PushWardApiClient:
@@ -434,8 +526,42 @@ async def _async_handle_widget_refresh(hass: HomeAssistant, call: ServiceCall) -
         raise ServiceValidationError(
             translation_domain=DOMAIN,
             translation_key="widget_not_found",
-            translation_placeholders={"slug": str(slug), "entity_id": str(entity_id)},
+            translation_placeholders={"slug": slug or "", "entity_id": entity_id or ""},
         )
+
+
+def _find_widget_slug(hass: HomeAssistant, entity_id: str | None) -> str | None:
+    """Resolve an entity_id to the slug of the tracked widget bound to it."""
+    for entry_data in (hass.data.get(DOMAIN) or {}).values():
+        manager: WidgetManager | None = entry_data.get("widget_manager")
+        if manager is None:
+            continue
+        slug = manager.slug_for_entity(entity_id)
+        if slug:
+            return slug
+    return None
+
+
+async def _async_handle_delete_widget(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the delete_widget service call.
+
+    Deletes the server-side widget (DELETE /widgets/{slug}). If a tracked_widget subentry
+    still drives this slug it will be recreated on the next restart/sync — remove the subentry
+    to delete it permanently (subentry removal also deletes the server widget automatically).
+    """
+    api = _get_api(hass)
+    slug = call.data.get("slug")
+    entity_id = call.data.get("entity_id")
+    if slug is None:
+        slug = _find_widget_slug(hass, entity_id)
+        if slug is None:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="widget_not_found",
+                translation_placeholders={"slug": slug or "", "entity_id": entity_id or ""},
+            )
+    with _surface_api_errors():
+        await api.delete_widget(slug)
 
 
 def _register_services(hass: HomeAssistant) -> None:
@@ -468,6 +594,9 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)
     hass.services.async_register(
         DOMAIN, SERVICE_WIDGET_REFRESH, partial(_async_handle_widget_refresh, hass), SCHEMA_WIDGET_REFRESH
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_DELETE_WIDGET, partial(_async_handle_delete_widget, hass), SCHEMA_DELETE_WIDGET
     )
 
 
@@ -562,6 +691,25 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Delete persisted history and widget cache when the config entry is removed."""
+    """Delete server-side widgets, then persisted history and widget cache, on removal.
+
+    Removing the whole integration must also delete every tracked widget server-side —
+    otherwise the widget rows + device widget-push tokens leak forever. Per-subentry removal
+    is handled by WidgetManager.async_reload, but no manager is live here (async_unload_entry
+    already ran and popped hass.data), so build a throwaway client from entry.data.
+    """
+    widget_slugs = [
+        slug
+        for sub in entry.subentries.values()
+        if sub.subentry_type == SUBENTRY_TYPE_WIDGET and (slug := sub.data.get(CONF_SLUG))
+    ]
+    if widget_slugs:
+        api = PushWardApiClient(
+            async_get_clientsession(hass),
+            entry.data[CONF_SERVER_URL],
+            entry.data[CONF_INTEGRATION_KEY],
+        )
+        # delete_widget is 404-safe; isolate failures so one bad slug can't strand the rest.
+        await asyncio.gather(*(api.delete_widget(slug) for slug in widget_slugs), return_exceptions=True)
     await build_history_store(hass, entry.entry_id).async_remove()
     await build_widget_store(hass, entry.entry_id).async_remove()

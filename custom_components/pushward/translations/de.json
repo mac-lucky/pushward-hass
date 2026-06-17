@@ -139,6 +139,34 @@
         "units": {
           "name": "Einheitenzuordnung",
           "description": "Einheitenbeschriftungen pro Datenreihe. Schlüssel müssen mit den Schlüsseln des value dict übereinstimmen. Nur für die Vorlage 'timeline'."
+        },
+        "snooze_seconds": {
+          "name": "Schlummersekunden",
+          "description": "Wie lange die iOS-Schlummern-Schaltfläche den Countdown verlängert (60–3600). Standardmäßig 300 (5 Min.). Erfordert Alarm (iOS 26+, nur Vorlage 'countdown')."
+        },
+        "duration": {
+          "name": "Dauer",
+          "description": "Bequeme Alternative zum Enddatum: Sekunden (>=1) oder eine Dauer-Zeichenkette wie \"1h30m\". Der Server verankert Start/Ende neu auf jetzt. Entweder Dauer oder Enddatum senden – bei beiden gewinnt die Dauer."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-Zeitstempel des Countdown-Beginns (verankert die Leiste für vergangene/verbleibende Zeit). Der Server setzt dies standardmäßig auf jetzt."
+        },
+        "history": {
+          "name": "Verlauf (Startwert)",
+          "description": "Anfänglicher Sparkline-Startwert: ein Objekt aus Datenreihenname zu einer Liste von (timestamp, value). Nur als Startwert – nach dem ersten Update übernimmt der Server."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "url_action": {
+          "name": "Primäre Schaltfläche",
+          "description": "Primäre tippbare Schaltfläche als Objekt: url (erforderlich), optional title, icon, foreground sowie http(s)-method/headers/body für einen stillen Webhook."
+        },
+        "secondary_url_action": {
+          "name": "Sekundäre Schaltfläche",
+          "description": "Sekundäre tippbare Schaltfläche – dieselbe Objektform wie die primäre Schaltfläche."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Priorität überschreiben",
           "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primäre URL, angezeigt als tippbare Schaltfläche. http(s) oder ein benutzerdefiniertes Schema wie homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Sekundäre URL",
+          "description": "Sekundäre URL, angezeigt als zweite tippbare Schaltfläche."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "url_action": {
+          "name": "Primäre Schaltfläche",
+          "description": "Primäre tippbare Schaltfläche als Objekt: url (erforderlich), optional title, icon, foreground sowie http(s)-method/headers/body für einen stillen Webhook."
+        },
+        "secondary_url_action": {
+          "name": "Sekundäre Schaltfläche",
+          "description": "Sekundäre tippbare Schaltfläche – dieselbe Objektform wie die primäre Schaltfläche."
         }
       },
       "sections": {
         "labels": {
           "name": "Beschriftungen & Symbol",
           "description": "Optionale Textbeschriftungen und Symbol. Gelten für jede Vorlage."
+        },
+        "action_buttons": {
+          "name": "Aktionsschaltflächen",
+          "description": "Antippbare URL-Schaltflächen. Nur für die Vorlagen 'steps' und 'alert'."
         },
         "display_options": {
           "name": "Anzeige, Farbe & Ton",
@@ -281,7 +333,7 @@
           "description": "AlarmKit-Alarm beim Ablauf des Countdowns auslösen (iOS 26+, nur für die Vorlage 'countdown')."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Schlummersekunden",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Priorität überschreiben",
           "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "duration": {
+          "name": "Dauer",
+          "description": "Bequeme Alternative zum Enddatum: Sekunden (>=1) oder eine Dauer-Zeichenkette wie \"1h30m\". Der Server verankert Start/Ende neu auf jetzt. Entweder Dauer oder Enddatum senden – bei beiden gewinnt die Dauer."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-Zeitstempel des Countdown-Beginns (verankert die Leiste für vergangene/verbleibende Zeit). Der Server setzt dies standardmäßig auf jetzt."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primäre URL, angezeigt als tippbare Schaltfläche. http(s) oder ein benutzerdefiniertes Schema wie homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Sekundäre URL",
+          "description": "Sekundäre URL, angezeigt als zweite tippbare Schaltfläche."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "url_action": {
+          "name": "Primäre Schaltfläche",
+          "description": "Primäre tippbare Schaltfläche als Objekt: url (erforderlich), optional title, icon, foreground sowie http(s)-method/headers/body für einen stillen Webhook."
+        },
+        "secondary_url_action": {
+          "name": "Sekundäre Schaltfläche",
+          "description": "Sekundäre tippbare Schaltfläche – dieselbe Objektform wie die primäre Schaltfläche."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown-Optionen",
           "description": "Nur für die Vorlage 'countdown'."
+        },
+        "action_buttons": {
+          "name": "Aktionsschaltflächen",
+          "description": "Antippbare URL-Schaltflächen. Nur für die Vorlagen 'steps' und 'alert'."
         },
         "display_options": {
           "name": "Anzeige, Farbe & Ton",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Priorität überschreiben",
           "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "url_action": {
+          "name": "Primäre Schaltfläche",
+          "description": "Primäre tippbare Schaltfläche als Objekt: url (erforderlich), optional title, icon, foreground sowie http(s)-method/headers/body für einen stillen Webhook."
+        },
+        "secondary_url_action": {
+          "name": "Sekundäre Schaltfläche",
+          "description": "Sekundäre tippbare Schaltfläche – dieselbe Objektform wie die primäre Schaltfläche."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Priorität überschreiben",
           "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "url_action": {
+          "name": "Primäre Schaltfläche",
+          "description": "Primäre tippbare Schaltfläche als Objekt: url (erforderlich), optional title, icon, foreground sowie http(s)-method/headers/body für einen stillen Webhook."
+        },
+        "secondary_url_action": {
+          "name": "Sekundäre Schaltfläche",
+          "description": "Sekundäre tippbare Schaltfläche – dieselbe Objektform wie die primäre Schaltfläche."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Priorität überschreiben",
           "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primäre URL, angezeigt als tippbare Schaltfläche. http(s) oder ein benutzerdefiniertes Schema wie homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Sekundäre URL",
+          "description": "Sekundäre URL, angezeigt als zweite tippbare Schaltfläche."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "url_action": {
+          "name": "Primäre Schaltfläche",
+          "description": "Primäre tippbare Schaltfläche als Objekt: url (erforderlich), optional title, icon, foreground sowie http(s)-method/headers/body für einen stillen Webhook."
+        },
+        "secondary_url_action": {
+          "name": "Sekundäre Schaltfläche",
+          "description": "Sekundäre tippbare Schaltfläche – dieselbe Objektform wie die primäre Schaltfläche."
         }
       },
       "sections": {
         "labels": {
           "name": "Beschriftungen & Symbol",
           "description": "Optionale Textbeschriftungen und Symbol. Gelten für jede Vorlage."
+        },
+        "action_buttons": {
+          "name": "Aktionsschaltflächen",
+          "description": "Antippbare URL-Schaltflächen. Nur für die Vorlagen 'steps' und 'alert'."
         },
         "display_options": {
           "name": "Anzeige, Farbe & Ton",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Priorität überschreiben",
           "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "history": {
+          "name": "Verlauf (Startwert)",
+          "description": "Anfänglicher Sparkline-Startwert: ein Objekt aus Datenreihenname zu einer Liste von (timestamp, value). Nur als Startwert – nach dem ersten Update übernimmt der Server."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primäre URL, angezeigt als tippbare Schaltfläche. http(s) oder ein benutzerdefiniertes Schema wie homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Sekundäre URL",
+          "description": "Sekundäre URL, angezeigt als zweite tippbare Schaltfläche."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "url_action": {
+          "name": "Primäre Schaltfläche",
+          "description": "Primäre tippbare Schaltfläche als Objekt: url (erforderlich), optional title, icon, foreground sowie http(s)-method/headers/body für einen stillen Webhook."
+        },
+        "secondary_url_action": {
+          "name": "Sekundäre Schaltfläche",
+          "description": "Sekundäre tippbare Schaltfläche – dieselbe Objektform wie die primäre Schaltfläche."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge- und timeline-Optionen",
           "description": "Nur für die Vorlagen 'gauge' und 'timeline'."
+        },
+        "action_buttons": {
+          "name": "Aktionsschaltflächen",
+          "description": "Antippbare URL-Schaltflächen. Nur für die Vorlagen 'steps' und 'alert'."
         },
         "display_options": {
           "name": "Anzeige, Farbe & Ton",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Metadaten",
           "description": "Schlüssel-Wert-Paare mit zusätzlichen Metadaten der Benachrichtigung."
+        },
+        "media": {
+          "name": "Medien",
+          "description": "Medienanhang als Objekt mit `url` (HTTPS) und `type` (image, video oder audio)."
+        },
+        "actions": {
+          "name": "Aktionen",
+          "description": "Liste von Aktionsschaltflächen. Jede Aktion ist ein Objekt mit id, title, optional url, foreground, destructive, authentication_required und icon. Bei einer http(s)-URL kann zusätzlich ein stiller Webhook mit method (GET/POST/PUT/PATCH/DELETE/HEAD), headers und body gesendet werden."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Widget aktualisieren",
+      "description": "Erzwingt die Aktualisierung eines verfolgten PushWard-Widgets. Umgeht den In-Memory-Diff-Cache, sodass das Widget neu gerendert und an iOS gesendet wird, auch wenn sich der Wert nicht geändert hat.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-Kennung des Widgets. Es muss entweder slug oder entity_id angegeben werden."
+        },
+        "entity_id": {
+          "name": "Entität",
+          "description": "HA-Entität, die mit dem Widget verknüpft ist. Es muss entweder slug oder entity_id angegeben werden."
+        }
+      }
+    },
+    "send_email": {
+      "name": "E-Mail senden",
+      "description": "Eine transaktionale E-Mail über PushWard senden. Einen Textinhalt, einen HTML-Inhalt oder beides angeben. Der Integrationsschlüssel benötigt die Berechtigung \"emails\".",
+      "fields": {
+        "to": {
+          "name": "An",
+          "description": "E-Mail-Adresse des Empfängers. Muss eine Adresse sein, die bereits in der PushWard-iOS-App hinzugefügt und bestätigt wurde – nicht verifizierte Adressen werden abgelehnt."
+        },
+        "subject": {
+          "name": "Betreff",
+          "description": "Betreffzeile der E-Mail."
+        },
+        "body": {
+          "name": "Inhalt",
+          "description": "Reiner Text-Inhalt der E-Mail. Diesen, einen HTML-Inhalt oder beides angeben."
+        },
+        "html_body": {
+          "name": "HTML-Inhalt",
+          "description": "HTML-Inhalt der E-Mail. Diesen, einen Text-Inhalt oder beides angeben."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Widget löschen",
+      "description": "Ein PushWard-Widget vom Server löschen. Wenn noch ein Konfigurationseintrag für ein verfolgtes Widget diesen Slug steuert, wird das Widget beim nächsten Neustart/Sync neu erstellt – den Konfigurationseintrag entfernen, um es dauerhaft zu löschen. Entweder slug oder entity_id angeben.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-Kennung des Widgets. Es muss entweder slug oder entity_id angegeben werden."
+        },
+        "entity_id": {
+          "name": "Entität",
+          "description": "HA-Entität, die mit dem Widget verknüpft ist. Wird per Konfiguration dem passenden Widget zugeordnet. Es muss entweder slug oder entity_id angegeben werden."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Mit PushWard verbinden",
         "data": {
           "integration_key": "Integrationsschlüssel"
+        },
+        "description": "Den PushWard-Integrationsschlüssel eingeben, um zu starten. Die PushWard-iOS-App im App Store herunterladen: {app_store_url}",
+        "data_description": {
+          "integration_key": "Die PushWard-iOS-App öffnen (App Store: {app_store_url}) → Einstellungen → Integrationsschlüssel. Den Standardschlüssel einfügen oder einen neuen mit dem Geltungsbereich 'ha-*' erstellen."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "Schrittbeschriftungen",
             "step_rows": "Schrittzeilenhöhen",
             "fired_at_attribute": "Attribut 'Ausgelöst um'",
-            "units": "Einheiten pro Datenreihe"
+            "units": "Einheiten pro Datenreihe",
+            "progress_entity": "Fortschritts-Entität",
+            "remaining_time_entity": "Entität für verbleibende Zeit",
+            "current_step_entity": "Entität für aktuellen Schritt",
+            "value_entity": "Wert-Entität",
+            "subtitle_entity": "Untertitel-Entität",
+            "tap_action_url": "URL der Tippaktion",
+            "tap_action_foreground": "URL der Tippaktion öffnen",
+            "url_foreground": "URL der primären Schaltfläche öffnen",
+            "url_title": "Titel der primären Schaltfläche",
+            "secondary_url_foreground": "URL der sekundären Schaltfläche öffnen",
+            "secondary_url_title": "Titel der sekundären Schaltfläche",
+            "snooze_seconds": "Schlummersekunden (iOS 26+)",
+            "fired_at_entity": "Entität 'Ausgelöst um'"
           },
           "data_description": {
             "start_states": "Entitätszustände, die die Live Activity starten. Aus der Liste wählen oder eigene Werte eingeben.",
@@ -957,7 +1192,20 @@
             "step_labels": "Beschriftungen für jeden Schritt. Format: 1=Erster Schritt, 2=Zweiter Schritt. Muss Schritte 1..total_steps abdecken. Nur für die Vorlage 'steps'.",
             "step_rows": "Zeilenhöhe (1–10) für jeden Schritt, kommagetrennt. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'.",
             "fired_at_attribute": "Entitätsattribut mit dem Unix-Zeitstempel, wann der Alert ausgelöst wurde. Nur für die Vorlage 'alert'.",
-            "units": "Einheitenbeschriftungen pro Datenreihe. Format: Datenreihe=Einheit, Temperatur=°C, Luftfeuchtigkeit=%. Nur für die Vorlage 'timeline'."
+            "units": "Einheitenbeschriftungen pro Datenreihe. Format: Datenreihe=Einheit, Temperatur=°C, Luftfeuchtigkeit=%. Nur für die Vorlage 'timeline'.",
+            "progress_entity": "Fortschritt aus einer separaten Entität statt aus der verfolgten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden. Wenn das Attributfeld gesetzt ist, wird dieses Attribut dieser Entität gelesen, andernfalls ihr Zustand.",
+            "remaining_time_entity": "Verbleibende Zeit aus einer separaten Entität lesen (z. B. dem Zeitsensor einer Waschmaschine). Leer lassen, um die verfolgte Entität zu verwenden. Erkennt automatisch einen Zeitstempel-Sensor (Endzeit), einen Dauersensor mit Einheiten, eine H:MM:SS-Zeichenkette oder reine Sekunden.",
+            "current_step_entity": "Den aktuellen Schritt aus einer separaten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden.",
+            "value_entity": "Den Gauge-Wert aus einer separaten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden. Verwendet den Zustand der Quell-Entität, sofern kein Attribut gesetzt ist.",
+            "subtitle_entity": "Den Untertitel aus einer separaten Entität anzeigen (z. B. einem Programm-/Modus-Sensor). Leer lassen, um die verfolgte Entität zu verwenden. Verwendet den Zustand der Quell-Entität, sofern kein Attribut gesetzt ist.",
+            "tap_action_url": "Optionale URL, die beim Tippen auf den Hintergrund der Live Activity geöffnet wird. Unterstützt http(s) (öffnet Safari) oder benutzerdefinierte Schemata wie homeassistant://navigate/lovelace/0 (öffnet diese App).",
+            "tap_action_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)) – sendet im Hintergrund einen POST, ohne den Sperrbildschirm zu verlassen.",
+            "url_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)).",
+            "url_title": "Beschriftung der primären Schaltfläche (max. 64 Zeichen).",
+            "secondary_url_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)).",
+            "secondary_url_title": "Beschriftung der sekundären Schaltfläche (max. 64 Zeichen).",
+            "snooze_seconds": "Wie lange die iOS-Schlummern-Schaltfläche den Countdown verlängert (60–3600). Leer lassen für den Standardwert 300 s (5 Min.). Erfordert Alarm. Nur für die Vorlage 'countdown'.",
+            "fired_at_entity": "Die Auslösezeit des Alerts aus einer separaten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden. Akzeptiert einen Unix-Zeitstempel oder einen ISO-Zeitstempel-Sensor. Nur für die Vorlage 'alert'."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "Die URL muss mit http:// oder https:// beginnen.",
-        "invalid_gauge_range": "Der Minimalwert muss kleiner als der Maximalwert sein."
+        "invalid_gauge_range": "Der Minimalwert muss kleiner als der Maximalwert sein.",
+        "silent_requires_http": "Ein stiller Webhook (Vordergrund aus) erfordert eine http://- oder https://-URL."
       },
       "abort": {
         "already_configured": "Diese Entität wird bereits verfolgt.",
         "reconfigure_successful": "Entitätskonfiguration aktualisiert."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Verfolgtes Widget",
+      "initiate_flow": {
+        "user": "Verfolgtes Widget hinzufügen"
+      },
+      "step": {
+        "user": {
+          "title": "Widget zu PushWard hinzufügen",
+          "data": {
+            "entity_id": "Entität",
+            "widget_template": "Vorlage",
+            "slug": "Widget-Slug"
+          },
+          "data_description": {
+            "widget_template": "Widget-Layout. `value` für eine einzelne Zahl, `progress` für eine 0–1-Leiste, `gauge` für einen Wert in einem Bereich, `status` für ein Schweregrad-Abzeichen oder `stat_list` für bis zu 6 Zeilen verwenden.",
+            "slug": "Eindeutige Kennung für dieses Widget. Leer lassen, um aus der Entitäts-ID automatisch zu generieren."
+          }
+        },
+        "reconfigure": {
+          "title": "Widget bearbeiten",
+          "data": {
+            "entity_id": "Entität",
+            "widget_template": "Vorlage",
+            "slug": "Widget-Slug"
+          },
+          "data_description": {
+            "widget_template": "Widget-Layout.",
+            "slug": "Eindeutige Kennung für dieses Widget."
+          }
+        },
+        "details": {
+          "title": "Widget-Optionen",
+          "data": {
+            "widget_name": "Widget-Name",
+            "value_attribute": "Wert-Attribut",
+            "unit": "Einheit",
+            "min_value": "Minimalwert",
+            "max_value": "Maximalwert",
+            "severity": "Schweregrad",
+            "stat_rows": "Statistikzeilen",
+            "label": "Beschriftung",
+            "label_attribute": "Beschriftungs-Attribut",
+            "subtitle_attribute": "Untertitel-Attribut",
+            "icon": "Symbol",
+            "icon_attribute": "Symbol-Attribut",
+            "accent_color": "Akzentfarbe",
+            "accent_color_attribute": "Attribut für Akzentfarbe",
+            "background_color": "Hintergrundfarbe",
+            "text_color": "Textfarbe",
+            "widget_trigger_mode": "Auslösemodus",
+            "widget_poll_interval": "Abfrageintervall (Sekunden)",
+            "tap_action_url": "URL der Tippaktion",
+            "tap_action_foreground": "URL der Tippaktion öffnen"
+          },
+          "data_description": {
+            "widget_name": "Anzeigename in der iOS-Widget-Auswahl. Standardmäßig der Anzeigename der Entität.",
+            "value_attribute": "Entitätsattribut, das den Wert enthält. Leer lassen, um den primären Zustand der Entität zu verwenden.",
+            "unit": "Neben dem Wert angezeigte Einheit. Maximal 32 Zeichen.",
+            "min_value": "Minimalwert für den Gauge-Bereich.",
+            "max_value": "Maximalwert für den Gauge-Bereich.",
+            "severity": "Schweregrad des Status (info, warning, critical, success).",
+            "stat_rows": "Bis zu 6 Zeilen. Format: `Label=entity_id[:attribute[:unit]]`, kommagetrennt. Beispiel: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Statische Beschriftung auf dem Widget. Leer lassen, um aus der Entität abzuleiten.",
+            "label_attribute": "Entitätsattribut, das als Beschriftung verwendet wird. Überschreibt die statische Beschriftung.",
+            "subtitle_attribute": "Entitätsattribut, das als Untertitel des Widgets angezeigt wird.",
+            "icon": "Statisches Symbol. SF Symbols und MDI-Namen werden unterstützt.",
+            "icon_attribute": "Entitätsattribut für ein dynamisches Symbol. Überschreibt das statische Symbol.",
+            "accent_color": "Akzentfarbe für das Widget. Leer lassen für den Standard.",
+            "accent_color_attribute": "Entitätsattribut für eine dynamische Akzentfarbe.",
+            "background_color": "Optionale Hintergrundfarbe.",
+            "text_color": "Optionale Textfarbe.",
+            "widget_trigger_mode": "Wie Updates ausgelöst werden. `event` reagiert auf Zustandsänderungen; `poll` wertet in festem Intervall neu aus.",
+            "widget_poll_interval": "Intervall zwischen Abfragen (10–3600 Sekunden). Wird nur verwendet, wenn der Auslösemodus `poll` ist.",
+            "tap_action_url": "Optionale URL, die beim Tippen auf das Widget geöffnet wird. Unterstützt http(s) (öffnet Safari) oder benutzerdefinierte Schemata wie homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)) – sendet im Hintergrund einen POST."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "Die URL muss ein gültiges Schema enthalten. http(s):// oder ein benutzerdefiniertes App-Schema wie homeassistant:// verwenden.",
+        "silent_requires_http": "Ein stiller Webhook (Vordergrund aus) erfordert eine http://- oder https://-URL.",
+        "invalid_gauge_range": "Der Minimalwert muss kleiner als der Maximalwert sein.",
+        "stat_rows_required": "Für die Vorlage 'stat_list' ist mindestens eine Statistikzeile erforderlich."
+      },
+      "abort": {
+        "already_configured": "Ein Widget mit diesem Slug existiert bereits.",
+        "reconfigure_successful": "Widget-Konfiguration aktualisiert."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Verwendete Benachrichtigungen"
+      },
+      "live_activity_updates_used": {
+        "name": "Verwendete Live-Activity-Updates"
+      },
+      "widget_updates_used": {
+        "name": "Verwendete Widget-Updates"
+      },
+      "emails_used": {
+        "name": "Verwendete E-Mails"
+      },
+      "subscription_tier": {
+        "name": "Abonnementstufe",
+        "state": {
+          "free": "Kostenlos",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Kein PushWard-Widget passt zu slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "Die PushWard-Aktion update_activity ist veraltet",
+      "description": "Die Aktion `pushward.update_activity` ist veraltet. Die Automatisierungen stattdessen auf die vorlagenspezifische Aktion umstellen – zum Beispiel `pushward.update_activity_countdown` oder `pushward.update_activity_gauge`. Die alte Aktion funktioniert vorerst weiterhin, wird aber in einer zukünftigen Version entfernt."
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard-Benachrichtigungslimit erreicht",
+      "description": "Das PushWard-Konto hat im aktuellen Zeitraum {used} von {limit} Benachrichtigungen verwendet, daher werden neue Benachrichtigungen abgelehnt, bis das Kontingent zurückgesetzt wird ({resets_at}). Für ein höheres Limit das Abonnement in der PushWard-iOS-App upgraden."
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard-Limit für Live-Activity-Updates erreicht",
+      "description": "Das PushWard-Konto hat im aktuellen Zeitraum {used} von {limit} Live-Activity-Updates verwendet, daher werden neue Updates abgelehnt, bis das Kontingent zurückgesetzt wird ({resets_at}). Für ein höheres Limit das Abonnement in der PushWard-iOS-App upgraden."
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard-Limit für Widget-Updates erreicht",
+      "description": "Das PushWard-Konto hat im aktuellen Zeitraum {used} von {limit} Widget-Updates verwendet, daher werden neue Updates abgelehnt, bis das Kontingent zurückgesetzt wird ({resets_at}). Für ein höheres Limit das Abonnement in der PushWard-iOS-App upgraden."
+    },
+    "usage_limit_emails": {
+      "title": "PushWard-E-Mail-Limit erreicht",
+      "description": "Das PushWard-Konto hat im aktuellen Zeitraum {used} von {limit} E-Mails verwendet, daher werden neue E-Mails abgelehnt, bis das Kontingent zurückgesetzt wird ({resets_at}). Für ein höheres Limit das Abonnement in der PushWard-iOS-App upgraden."
     }
   }
 }

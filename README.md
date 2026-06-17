@@ -49,7 +49,7 @@ The two surfaces are independent — separate config, managers, and caches — a
 - **6-level icon fallback** — attribute → config → entity → registry → device class → domain default
 - **Color support** — RGB, HSV, XY, Kelvin, named colors
 - **TTL controls** — auto-delete after end, auto-end on stale activity
-- **7 services** — create/update/end/delete activities, send notifications, send email, refresh widgets
+- **8 services** — create/update/end/delete activities, send notifications, send email, refresh/delete widgets
 
 ## Prerequisites
 
@@ -233,17 +233,35 @@ every template's fields). The template is implied by the action name; you no lon
 | `remaining_time` | No | Seconds remaining |
 | `sound` | No | default, chime, alert, success, warning, bell, ding, buzz, notification |
 | `priority` | No | Per-update priority override (0–10) |
+| `url` / `secondary_url` | No | Tap-target URLs (http(s) **or** a custom scheme like `homeassistant://`) |
+| `tap_action` | No | Whole-activity tap target / silent webhook as an object — see [Action objects](#action-objects) |
+| `url_action` / `secondary_url_action` | No | Primary / secondary button as an object (adds `title`, `icon`) — see [Action objects](#action-objects) |
+
+> **Action objects** <a id="action-objects"></a> — `tap_action`, `url_action`, and
+> `secondary_url_action` take `{ url, foreground, method, headers, body }` (the button forms
+> also accept `title` and `icon`). `url` is required and may use any scheme except
+> `javascript`/`data`/`file`/`vbscript`; `method`/`headers`/`body` turn the action into a
+> silent HTTP webhook and are only valid on an `http(s)` URL. The legacy `url`/`secondary_url`
+> strings remain as a shorthand for a plain tap target.
 
 **Template-specific fields** — added by the matching action:
 
 | Action | Extra fields |
 |--------|--------------|
-| `update_activity_countdown` | `end_date`, `warning_threshold`, `alarm`, `snooze_seconds` |
-| `update_activity_steps` | `total_steps`, `current_step`, `step_labels`, `step_rows`, `url`, `secondary_url` |
-| `update_activity_alert` | `severity`, `fired_at`, `url`, `secondary_url` |
+| `update_activity_countdown` | `end_date`, `duration`, `start_date`, `warning_threshold`, `alarm`, `snooze_seconds` |
+| `update_activity_steps` | `total_steps`, `current_step`, `step_labels`, `step_rows` |
+| `update_activity_alert` | `severity`, `fired_at` |
 | `update_activity_gauge` | `value`, `min_value`, `max_value`, `unit` |
-| `update_activity_timeline` | `value`, `unit`, `units`, `scale`, `decimals`, `smoothing`, `thresholds` |
+| `update_activity_timeline` | `value`, `unit`, `units`, `scale`, `decimals`, `smoothing`, `thresholds`, `history` |
 | `update_activity_generic` | _(common fields only)_ |
+
+> `duration` (integer seconds or a string like `"30m"` / `"1h30m"`) is the set-and-forget
+> alternative to `end_date`: the server re-anchors `start_date = now` and
+> `end_date = now + duration`, which is what lets iOS animate the countdown's progress bar.
+> Send `end_date` directly for mid-flight updates that must preserve the original timer —
+> **if both are sent, `duration` wins** (it overwrites start/end). `timeline`'s `history`
+> is a one-time seed (`{ series: [{ timestamp, value }] }`); the server owns the series
+> after the first update.
 
 `step_labels` and `step_rows` are **ordered lists** (one entry per step, length must equal
 `total_steps`) — e.g. `step_labels: ["Build", "Test", "Deploy"]`, `step_rows: [1, 1, 2]`.
@@ -288,7 +306,7 @@ Send a push notification.
 | `media` | No | Object `{ url, type }` — type is image, video, or audio |
 | `icon_url` | No | Custom icon URL |
 | `metadata` | No | Arbitrary key-value pairs for custom app handling |
-| `actions` | No | List of action buttons `{ id, title, url, foreground, destructive, authentication_required, icon }` |
+| `actions` | No | List of action buttons `{ id, title, url, foreground, destructive, authentication_required, icon }`; `url` may use a custom scheme, and `method`/`headers`/`body` make the button a silent HTTP webhook (http(s) only) |
 | `push` | No | Send as APNs push (default: true); when false, inbox-only |
 
 ### `pushward.send_email`
@@ -312,6 +330,17 @@ Force-refresh a tracked widget, bypassing the diff cache so it re-renders even w
 | `entity_id` | No\* | HA entity bound to the widget |
 
 \* Exactly one of `slug` or `entity_id` is required.
+
+### `pushward.delete_widget`
+
+Delete a widget on the server (`DELETE /widgets/{slug}`). Provide **exactly one** of `slug` or `entity_id`. Removing a tracked-widget subentry (or the whole integration) already deletes its server-side widget automatically — use this to clean up a widget published manually or one whose subentry is gone.
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `slug` | No\* | Widget slug identifier |
+| `entity_id` | No\* | HA entity bound to the widget |
+
+\* Exactly one of `slug` or `entity_id` is required. If a tracked-widget subentry still drives the slug, it will be re-created on the next restart/sync — remove the subentry to delete it permanently.
 
 ### Example automation
 
@@ -373,7 +402,7 @@ Requires Python **3.13.2+**. CI additionally runs **HACS validation** and **hass
 ## CI/CD & Releases
 
 - **CI** (`.github/workflows/ci.yml`): HACS validation, hassfest, ruff lint+format, and pytest with coverage on every push/PR.
-- **Releases**: the integration version lives in `custom_components/pushward/manifest.json` (currently **0.29.0**). Bump it and push a matching **`v*`** git tag — CI builds the changelog and creates the GitHub release automatically. **Do not create releases manually.** HACS only sees GitHub releases, and `hide_default_branch: true` is set in `hacs.json`.
+- **Releases**: the integration version lives in `custom_components/pushward/manifest.json` (currently **0.30.0**). Bump it and push a matching **`v*`** git tag — CI builds the changelog and creates the GitHub release automatically. **Do not create releases manually.** HACS only sees GitHub releases, and `hide_default_branch: true` is set in `hacs.json`.
 
 ## Server compatibility
 

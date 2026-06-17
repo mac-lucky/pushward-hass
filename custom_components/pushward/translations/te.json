@@ -139,6 +139,34 @@
         "units": {
           "name": "యూనిట్లు",
           "description": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "iOS Snooze బటన్ కౌంట్‌డౌన్‌ను ఎంత పొడిగిస్తుందో (60–3600). డిఫాల్ట్ 300 (5 నిమి). అలారం అవసరం (iOS 26+, countdown టెంప్లేట్ మాత్రమే)."
+        },
+        "duration": {
+          "name": "వ్యవధి",
+          "description": "End Date కు సెట్-అండ్-ఫర్‌గెట్ ప్రత్యామ్నాయం: సెకన్లు (>=1) లేదా \"1h30m\" వంటి వ్యవధి స్ట్రింగ్. సర్వర్ ప్రారంభ/ముగింపును ఇప్పటికి తిరిగి యాంకర్ చేస్తుంది. వ్యవధి లేదా End Date లో ఒకదాన్ని పంపండి — రెండూ సెట్ అయితే వ్యవధి గెలుస్తుంది."
+        },
+        "start_date": {
+          "name": "ప్రారంభ తేదీ",
+          "description": "కౌంట్‌డౌన్ ప్రారంభమైన Unix టైమ్‌స్టాంప్ (గడిచిన/మిగిలిన బార్‌ను యాంకర్ చేస్తుంది). సర్వర్ దీన్ని డిఫాల్ట్‌గా ఇప్పటికి సెట్ చేస్తుంది."
+        },
+        "history": {
+          "name": "చరిత్ర (సీడ్)",
+          "description": "ప్రారంభ స్పార్క్‌లైన్ సీడ్: శ్రేణి పేరును (timestamp, value) జాబితాకు మ్యాప్ చేసే ఆబ్జెక్ట్. సీడ్-మాత్రమే — మొదటి అప్‌డేట్ తర్వాత సర్వర్ స్వీకరిస్తుంది."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "url_action": {
+          "name": "ప్రాథమిక బటన్",
+          "description": "ప్రాథమిక నొక్కగలిగే బటన్ ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక title, icon, foreground, మరియు నిశ్శబ్ద webhook కోసం http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "ద్వితీయ బటన్",
+          "description": "ద్వితీయ నొక్కగలిగే బటన్ — ప్రాథమిక బటన్‌తో అదే ఆబ్జెక్ట్ ఆకృతి."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "ప్రాధాన్యత",
           "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "నొక్కగలిగే బటన్‌గా చూపబడే ప్రాథమిక URL. http(s) లేదా homeassistant:// వంటి అనుకూల స్కీమ్."
+        },
+        "secondary_url": {
+          "name": "ద్వితీయ URL",
+          "description": "రెండవ నొక్కగలిగే బటన్‌గా చూపబడే ద్వితీయ URL."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "url_action": {
+          "name": "ప్రాథమిక బటన్",
+          "description": "ప్రాథమిక నొక్కగలిగే బటన్ ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక title, icon, foreground, మరియు నిశ్శబ్ద webhook కోసం http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "ద్వితీయ బటన్",
+          "description": "ద్వితీయ నొక్కగలిగే బటన్ — ప్రాథమిక బటన్‌తో అదే ఆబ్జెక్ట్ ఆకృతి."
         }
       },
       "sections": {
         "labels": {
           "name": "లేబుళ్ళు & చిహ్నం",
           "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "action_buttons": {
+          "name": "చర్య బటన్‌లు",
+          "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
         },
         "display_options": {
           "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
@@ -307,6 +359,34 @@
         "priority": {
           "name": "ప్రాధాన్యత",
           "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        },
+        "duration": {
+          "name": "వ్యవధి",
+          "description": "End Date కు సెట్-అండ్-ఫర్‌గెట్ ప్రత్యామ్నాయం: సెకన్లు (>=1) లేదా \"1h30m\" వంటి వ్యవధి స్ట్రింగ్. సర్వర్ ప్రారంభ/ముగింపును ఇప్పటికి తిరిగి యాంకర్ చేస్తుంది. వ్యవధి లేదా End Date లో ఒకదాన్ని పంపండి — రెండూ సెట్ అయితే వ్యవధి గెలుస్తుంది."
+        },
+        "start_date": {
+          "name": "ప్రారంభ తేదీ",
+          "description": "కౌంట్‌డౌన్ ప్రారంభమైన Unix టైమ్‌స్టాంప్ (గడిచిన/మిగిలిన బార్‌ను యాంకర్ చేస్తుంది). సర్వర్ దీన్ని డిఫాల్ట్‌గా ఇప్పటికి సెట్ చేస్తుంది."
+        },
+        "url": {
+          "name": "URL",
+          "description": "నొక్కగలిగే బటన్‌గా చూపబడే ప్రాథమిక URL. http(s) లేదా homeassistant:// వంటి అనుకూల స్కీమ్."
+        },
+        "secondary_url": {
+          "name": "ద్వితీయ URL",
+          "description": "రెండవ నొక్కగలిగే బటన్‌గా చూపబడే ద్వితీయ URL."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "url_action": {
+          "name": "ప్రాథమిక బటన్",
+          "description": "ప్రాథమిక నొక్కగలిగే బటన్ ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక title, icon, foreground, మరియు నిశ్శబ్ద webhook కోసం http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "ద్వితీయ బటన్",
+          "description": "ద్వితీయ నొక్కగలిగే బటన్ — ప్రాథమిక బటన్‌తో అదే ఆబ్జెక్ట్ ఆకృతి."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown ఎంపికలు",
           "description": "countdown టెంప్లేట్ మాత్రమే."
+        },
+        "action_buttons": {
+          "name": "చర్య బటన్‌లు",
+          "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
         },
         "display_options": {
           "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "ప్రాధాన్యత",
           "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "url_action": {
+          "name": "ప్రాథమిక బటన్",
+          "description": "ప్రాథమిక నొక్కగలిగే బటన్ ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక title, icon, foreground, మరియు నిశ్శబ్ద webhook కోసం http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "ద్వితీయ బటన్",
+          "description": "ద్వితీయ నొక్కగలిగే బటన్ — ప్రాథమిక బటన్‌తో అదే ఆబ్జెక్ట్ ఆకృతి."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "ప్రాధాన్యత",
           "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "url_action": {
+          "name": "ప్రాథమిక బటన్",
+          "description": "ప్రాథమిక నొక్కగలిగే బటన్ ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక title, icon, foreground, మరియు నిశ్శబ్ద webhook కోసం http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "ద్వితీయ బటన్",
+          "description": "ద్వితీయ నొక్కగలిగే బటన్ — ప్రాథమిక బటన్‌తో అదే ఆబ్జెక్ట్ ఆకృతి."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "ప్రాధాన్యత",
           "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "నొక్కగలిగే బటన్‌గా చూపబడే ప్రాథమిక URL. http(s) లేదా homeassistant:// వంటి అనుకూల స్కీమ్."
+        },
+        "secondary_url": {
+          "name": "ద్వితీయ URL",
+          "description": "రెండవ నొక్కగలిగే బటన్‌గా చూపబడే ద్వితీయ URL."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "url_action": {
+          "name": "ప్రాథమిక బటన్",
+          "description": "ప్రాథమిక నొక్కగలిగే బటన్ ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక title, icon, foreground, మరియు నిశ్శబ్ద webhook కోసం http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "ద్వితీయ బటన్",
+          "description": "ద్వితీయ నొక్కగలిగే బటన్ — ప్రాథమిక బటన్‌తో అదే ఆబ్జెక్ట్ ఆకృతి."
         }
       },
       "sections": {
         "labels": {
           "name": "లేబుళ్ళు & చిహ్నం",
           "description": "ఐచ్ఛిక టెక్స్ట్ లేబుళ్ళు మరియు చిహ్నం. ఏ టెంప్లేట్‌కైనా వర్తిస్తుంది."
+        },
+        "action_buttons": {
+          "name": "చర్య బటన్‌లు",
+          "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
         },
         "display_options": {
           "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "ప్రాధాన్యత",
           "description": "Activity ప్రాధాన్యత (0 = అత్యల్పం, 10 = అత్యధికం)."
+        },
+        "history": {
+          "name": "చరిత్ర (సీడ్)",
+          "description": "ప్రారంభ స్పార్క్‌లైన్ సీడ్: శ్రేణి పేరును (timestamp, value) జాబితాకు మ్యాప్ చేసే ఆబ్జెక్ట్. సీడ్-మాత్రమే — మొదటి అప్‌డేట్ తర్వాత సర్వర్ స్వీకరిస్తుంది."
+        },
+        "url": {
+          "name": "URL",
+          "description": "నొక్కగలిగే బటన్‌గా చూపబడే ప్రాథమిక URL. http(s) లేదా homeassistant:// వంటి అనుకూల స్కీమ్."
+        },
+        "secondary_url": {
+          "name": "ద్వితీయ URL",
+          "description": "రెండవ నొక్కగలిగే బటన్‌గా చూపబడే ద్వితీయ URL."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "url_action": {
+          "name": "ప్రాథమిక బటన్",
+          "description": "ప్రాథమిక నొక్కగలిగే బటన్ ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక title, icon, foreground, మరియు నిశ్శబ్ద webhook కోసం http(s) method/headers/body."
+        },
+        "secondary_url_action": {
+          "name": "ద్వితీయ బటన్",
+          "description": "ద్వితీయ నొక్కగలిగే బటన్ — ప్రాథమిక బటన్‌తో అదే ఆబ్జెక్ట్ ఆకృతి."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge మరియు timeline ఎంపికలు",
           "description": "gauge మరియు timeline టెంప్లేట్‌లు మాత్రమే."
+        },
+        "action_buttons": {
+          "name": "చర్య బటన్‌లు",
+          "description": "నొక్కగలిగే URL బటన్‌లు. steps మరియు alert టెంప్లేట్‌లు మాత్రమే."
         },
         "display_options": {
           "name": "ప్రదర్శన, రంగు మరియు ధ్వని",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "మెటాడేటా",
           "description": "నోటిఫికేషన్‌తో పంపబడే అదనపు కీ-విలువ జంట మెటాడేటా."
+        },
+        "media": {
+          "name": "మీడియా",
+          "description": "`url` (HTTPS) మరియు `type` (image, video, లేదా audio) తో మీడియా జోడింపు ఆబ్జెక్ట్."
+        },
+        "actions": {
+          "name": "చర్యలు",
+          "description": "చర్య బటన్‌ల జాబితా. ప్రతి చర్య id, title, ఐచ్ఛిక url, foreground, destructive, authentication_required, మరియు icon తో ఆబ్జెక్ట్. http(s) url కోసం మీరు method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, మరియు body తో నిశ్శబ్ద webhook కూడా పంపవచ్చు."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "విడ్జెట్ రిఫ్రెష్ చేయి",
+      "description": "ట్రాక్ చేయబడిన PushWard విడ్జెట్‌ను బలవంతంగా రిఫ్రెష్ చేయండి. ఇన్-మెమరీ డిఫ్ కాష్‌ను దాటవేస్తుంది, తద్వారా విలువ మారకపోయినా కూడా విడ్జెట్ తిరిగి రెండర్ అయి iOS కు పంపబడుతుంది.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "విడ్జెట్ slug గుర్తింపు. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
+        },
+        "entity_id": {
+          "name": "ఎంటిటీ",
+          "description": "విడ్జెట్‌కు బంధించబడిన HA ఎంటిటీ. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
+        }
+      }
+    },
+    "send_email": {
+      "name": "ఇమెయిల్ పంపు",
+      "description": "PushWard ద్వారా లావాదేవీ ఇమెయిల్ పంపండి. టెక్స్ట్ బాడీ, HTML బాడీ, లేదా రెండింటినీ అందించండి. ఇంటిగ్రేషన్ కీకి \"emails\" సామర్థ్యం అవసరం.",
+      "fields": {
+        "to": {
+          "name": "కు",
+          "description": "గ్రహీత ఇమెయిల్ చిరునామా. మీరు ఇప్పటికే PushWard iOS యాప్‌లో జోడించి, నిర్ధారించిన చిరునామా అయి ఉండాలి — ధృవీకరించని చిరునామాలు తిరస్కరించబడతాయి."
+        },
+        "subject": {
+          "name": "విషయం",
+          "description": "ఇమెయిల్ విషయ రేఖ."
+        },
+        "body": {
+          "name": "బాడీ",
+          "description": "సాదా-టెక్స్ట్ ఇమెయిల్ బాడీ. దీన్ని, HTML బాడీని, లేదా రెండింటినీ అందించండి."
+        },
+        "html_body": {
+          "name": "HTML బాడీ",
+          "description": "HTML ఇమెయిల్ బాడీ. దీన్ని, సాదా-టెక్స్ట్ బాడీని, లేదా రెండింటినీ అందించండి."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "విడ్జెట్ తొలగించు",
+      "description": "సర్వర్ నుండి PushWard విడ్జెట్‌ను తొలగించండి. ఈ slug ను ఇంకా ట్రాక్ చేయబడిన-విడ్జెట్ కాన్ఫిగ్ ఎంట్రీ నడిపిస్తుంటే, తదుపరి రీస్టార్ట్/సింక్‌లో విడ్జెట్ మళ్ళీ సృష్టించబడుతుంది — శాశ్వతంగా తొలగించడానికి కాన్ఫిగ్ ఎంట్రీని తీసివేయండి. slug లేదా entity_id లో ఒకదాన్ని అందించండి.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "విడ్జెట్ slug గుర్తింపు. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
+        },
+        "entity_id": {
+          "name": "ఎంటిటీ",
+          "description": "విడ్జెట్‌కు బంధించబడిన HA ఎంటిటీ. కాన్ఫిగ్ ద్వారా సరిపోలే విడ్జెట్‌కు పరిష్కరించబడుతుంది. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "PushWard కు కనెక్ట్ అవ్వండి",
         "data": {
           "integration_key": "ఇంటిగ్రేషన్ కీ"
+        },
+        "description": "ప్రారంభించడానికి మీ PushWard ఇంటిగ్రేషన్ కీని నమోదు చేయండి. App Store నుండి PushWard iOS యాప్‌ను పొందండి: {app_store_url}",
+        "data_description": {
+          "integration_key": "PushWard iOS యాప్‌ను తెరవండి (App Store: {app_store_url}) → Settings → Integration Keys. మీరు డిఫాల్ట్ కీని అతికించవచ్చు, లేదా 'ha-*' స్కోప్‌తో కొత్తది సృష్టించవచ్చు."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "స్టెప్ లేబుళ్ళు",
             "step_rows": "స్టెప్ వరుసలు",
             "fired_at_attribute": "ట్రిగ్గర్ సమయం ఆట్రిబ్యూట్",
-            "units": "యూనిట్లు"
+            "units": "యూనిట్లు",
+            "progress_entity": "పురోగతి ఎంటిటీ",
+            "remaining_time_entity": "మిగిలిన సమయం ఎంటిటీ",
+            "current_step_entity": "ప్రస్తుత దశ ఎంటిటీ",
+            "value_entity": "విలువ ఎంటిటీ",
+            "subtitle_entity": "ఉప శీర్షిక ఎంటిటీ",
+            "tap_action_url": "ట్యాప్ చర్య URL",
+            "tap_action_foreground": "ట్యాప్ చర్య URL తెరువు",
+            "url_foreground": "ప్రాథమిక బటన్ URL తెరువు",
+            "url_title": "ప్రాథమిక బటన్ శీర్షిక",
+            "secondary_url_foreground": "ద్వితీయ బటన్ URL తెరువు",
+            "secondary_url_title": "ద్వితీయ బటన్ శీర్షిక",
+            "snooze_seconds": "Snooze Seconds (iOS 26+)",
+            "fired_at_entity": "ట్రిగ్గర్ సమయం ఎంటిటీ"
           },
           "data_description": {
             "start_states": "Live Activity ప్రారంభించే ఎంటిటీ స్థితులు. జాబితా నుండి ఎంచుకోండి లేదా అనుకూల విలువలు టైప్ చేయండి.",
@@ -957,7 +1192,20 @@
             "step_labels": "steps టెంప్లేట్ స్టెప్‌లకు అనుకూల లేబుళ్ళు. ఆకృతి: 1=లేబుల్, 2=లేబుల్. ఖాళీగా వదిలితే స్టెప్ నంబర్లు ఉపయోగించబడతాయి.",
             "step_rows": "steps టెంప్లేట్‌లో ఒక వరుసలో చూపించే స్టెప్‌ల సంఖ్య.",
             "fired_at_attribute": "ట్రిగ్గర్ Unix టైమ్‌స్టాంప్‌ను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. సాపేక్ష సమయం ప్రదర్శన కోసం ఉపయోగించబడుతుంది.",
-            "units": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%"
+            "units": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%",
+            "progress_entity": "ట్రాక్ చేయబడిన ఎంటిటీకి బదులుగా వేరే ఎంటిటీ నుండి పురోగతిని చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ ఫీల్డ్ సెట్ చేస్తే, ఈ ఎంటిటీ యొక్క ఆ ఆట్రిబ్యూట్‌ను చదువుతుంది; లేకపోతే దాని స్థితిని.",
+            "remaining_time_entity": "వేరే ఎంటిటీ నుండి మిగిలిన సమయాన్ని చదవండి (ఉదా. వాషర్ యొక్క సమయ సెన్సార్). ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. టైమ్‌స్టాంప్ (ముగింపు-సమయం) సెన్సార్, యూనిట్‌లతో వ్యవధి సెన్సార్, H:MM:SS స్ట్రింగ్, లేదా సాదా సెకన్లను స్వయంచాలకంగా అన్వయిస్తుంది.",
+            "current_step_entity": "వేరే ఎంటిటీ నుండి ప్రస్తుత దశను చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి.",
+            "value_entity": "వేరే ఎంటిటీ నుండి gauge విలువను చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ సెట్ చేయకపోతే మూల ఎంటిటీ యొక్క స్థితిని ఉపయోగిస్తుంది.",
+            "subtitle_entity": "వేరే ఎంటిటీ నుండి ఉప శీర్షికను చూపండి (ఉదా. ప్రోగ్రామ్/మోడ్ సెన్సార్). ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ సెట్ చేయకపోతే మూల ఎంటిటీ యొక్క స్థితిని ఉపయోగిస్తుంది.",
+            "tap_action_url": "Live Activity నేపథ్యాన్ని నొక్కినప్పుడు తెరిచే ఐచ్ఛిక URL. http(s) (Safari తెరుస్తుంది) లేదా homeassistant://navigate/lovelace/0 వంటి అనుకూల స్కీమ్‌లకు (ఆ యాప్‌ను తెరుస్తుంది) మద్దతు ఇస్తుంది.",
+            "tap_action_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే) — Lock Screen ను వదలకుండా నేపథ్యంలో POST ను ఫైర్ చేస్తుంది.",
+            "url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
+            "url_title": "ప్రాథమిక బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు).",
+            "secondary_url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
+            "secondary_url_title": "ద్వితీయ బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు).",
+            "snooze_seconds": "iOS Snooze బటన్ కౌంట్‌డౌన్‌ను ఎంత పొడిగిస్తుందో (60–3600). 300s (5 నిమి) డిఫాల్ట్ కోసం ఖాళీగా వదలండి. అలారం అవసరం. Countdown టెంప్లేట్ మాత్రమే.",
+            "fired_at_entity": "వేరే ఎంటిటీ నుండి alert యొక్క ట్రిగ్గర్-సమయాన్ని చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. unix టైమ్‌స్టాంప్ లేదా ISO టైమ్‌స్టాంప్ సెన్సార్‌ను అంగీకరిస్తుంది. Alert టెంప్లేట్ మాత్రమే."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL http:// లేదా https:// స్కీమ్ ఉపయోగించాలి.",
-        "invalid_gauge_range": "కనిష్ట విలువ గరిష్ట విలువ కంటే తక్కువగా ఉండాలి."
+        "invalid_gauge_range": "కనిష్ట విలువ గరిష్ట విలువ కంటే తక్కువగా ఉండాలి.",
+        "silent_requires_http": "నిశ్శబ్ద webhook (foreground ఆఫ్) కు http:// లేదా https:// URL అవసరం."
       },
       "abort": {
         "already_configured": "ఈ ఎంటిటీ ఇప్పటికే ట్రాక్ చేయబడుతోంది.",
         "reconfigure_successful": "ఎంటిటీ కాన్ఫిగరేషన్ అప్‌డేట్ చేయబడింది."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "ట్రాక్ చేయబడిన విడ్జెట్",
+      "initiate_flow": {
+        "user": "ట్రాక్ చేయబడిన విడ్జెట్ జోడించు"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard కు విడ్జెట్ జోడించు",
+          "data": {
+            "entity_id": "ఎంటిటీ",
+            "widget_template": "టెంప్లేట్",
+            "slug": "విడ్జెట్ Slug"
+          },
+          "data_description": {
+            "widget_template": "విడ్జెట్ లేఅవుట్. ఒకే సంఖ్యకు `value`, 0–1 బార్‌కు `progress`, పరిధిలో-విలువకు `gauge`, తీవ్రత బ్యాడ్జ్‌కు `status`, లేదా 6 వరుసల వరకు `stat_list` ను ఉపయోగించండి.",
+            "slug": "ఈ విడ్జెట్ కోసం ప్రత్యేక గుర్తింపు. entity ID నుండి స్వయంచాలకంగా రూపొందించడానికి ఖాళీగా వదలండి."
+          }
+        },
+        "reconfigure": {
+          "title": "విడ్జెట్ సవరించు",
+          "data": {
+            "entity_id": "ఎంటిటీ",
+            "widget_template": "టెంప్లేట్",
+            "slug": "విడ్జెట్ Slug"
+          },
+          "data_description": {
+            "widget_template": "విడ్జెట్ లేఅవుట్.",
+            "slug": "ఈ విడ్జెట్ కోసం ప్రత్యేక గుర్తింపు."
+          }
+        },
+        "details": {
+          "title": "విడ్జెట్ ఎంపికలు",
+          "data": {
+            "widget_name": "విడ్జెట్ పేరు",
+            "value_attribute": "విలువ ఆట్రిబ్యూట్",
+            "unit": "యూనిట్",
+            "min_value": "కనిష్ట విలువ",
+            "max_value": "గరిష్ట విలువ",
+            "severity": "తీవ్రత",
+            "stat_rows": "స్టాట్ వరుసలు",
+            "label": "లేబుల్",
+            "label_attribute": "లేబుల్ ఆట్రిబ్యూట్",
+            "subtitle_attribute": "ఉప శీర్షిక ఆట్రిబ్యూట్",
+            "icon": "చిహ్నం",
+            "icon_attribute": "చిహ్నం ఆట్రిబ్యూట్",
+            "accent_color": "యాక్సెంట్ రంగు",
+            "accent_color_attribute": "యాక్సెంట్ రంగు ఆట్రిబ్యూట్",
+            "background_color": "నేపథ్య రంగు",
+            "text_color": "టెక్స్ట్ రంగు",
+            "widget_trigger_mode": "ట్రిగ్గర్ మోడ్",
+            "widget_poll_interval": "పోల్ విరామం (సెకన్లు)",
+            "tap_action_url": "ట్యాప్ చర్య URL",
+            "tap_action_foreground": "ట్యాప్ చర్య URL తెరువు"
+          },
+          "data_description": {
+            "widget_name": "iOS విడ్జెట్ ఎంపికలో చూపబడే ప్రదర్శన పేరు. డిఫాల్ట్‌గా ఎంటిటీ యొక్క స్నేహపూర్వక పేరు.",
+            "value_attribute": "విలువను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. ఎంటిటీ యొక్క ప్రాథమిక స్థితిని ఉపయోగించడానికి ఖాళీగా వదలండి.",
+            "unit": "విలువ పక్కన చూపబడే ప్రదర్శన యూనిట్. గరిష్టంగా 32 అక్షరాలు.",
+            "min_value": "gauge పరిధి కోసం కనిష్ట విలువ.",
+            "max_value": "gauge పరిధి కోసం గరిష్ట విలువ.",
+            "severity": "స్థితి తీవ్రత (info, warning, critical, success).",
+            "stat_rows": "6 వరుసల వరకు. ఆకృతి: `Label=entity_id[:attribute[:unit]]`, కామాతో వేరుచేయబడినవి. ఉదాహరణ: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "విడ్జెట్‌పై చూపబడే స్థిర లేబుల్. ఎంటిటీ నుండి తీసుకోవడానికి ఖాళీగా వదలండి.",
+            "label_attribute": "లేబుల్‌గా ఉపయోగించే ఎంటిటీ ఆట్రిబ్యూట్. స్థిర లేబుల్‌ను భర్తీ చేస్తుంది.",
+            "subtitle_attribute": "విడ్జెట్ ఉప శీర్షికగా చూపబడే ఎంటిటీ ఆట్రిబ్యూట్.",
+            "icon": "స్థిర చిహ్నం. SF Symbols మరియు MDI పేర్లకు మద్దతు ఉంది.",
+            "icon_attribute": "డైనమిక్ చిహ్నం కోసం ఎంటిటీ ఆట్రిబ్యూట్. స్థిర చిహ్నాన్ని భర్తీ చేస్తుంది.",
+            "accent_color": "విడ్జెట్ కోసం యాక్సెంట్ రంగు. డిఫాల్ట్ కోసం ఖాళీగా వదలండి.",
+            "accent_color_attribute": "డైనమిక్ యాక్సెంట్ రంగు కోసం ఎంటిటీ ఆట్రిబ్యూట్.",
+            "background_color": "ఐచ్ఛిక నేపథ్య రంగు.",
+            "text_color": "ఐచ్ఛిక టెక్స్ట్ రంగు.",
+            "widget_trigger_mode": "అప్‌డేట్‌లు ఎలా ట్రిగ్గర్ అవుతాయి. `event` స్థితి మార్పులకు ప్రతిస్పందిస్తుంది; `poll` స్థిర విరామంలో తిరిగి మూల్యాంకనం చేస్తుంది.",
+            "widget_poll_interval": "పోల్‌ల మధ్య విరామం (10–3600 సెకన్లు). ట్రిగ్గర్ మోడ్ `poll` అయినప్పుడు మాత్రమే ఉపయోగించబడుతుంది.",
+            "tap_action_url": "విడ్జెట్‌ను నొక్కినప్పుడు తెరిచే ఐచ్ఛిక URL. http(s) (Safari తెరుస్తుంది) లేదా homeassistant://navigate/lovelace/0 వంటి అనుకూల స్కీమ్‌లకు మద్దతు ఇస్తుంది.",
+            "tap_action_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే) — నేపథ్యంలో POST ను ఫైర్ చేస్తుంది."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL తప్పనిసరిగా చెల్లుబాటు అయ్యే స్కీమ్‌ను కలిగి ఉండాలి. http(s):// లేదా homeassistant:// వంటి అనుకూల యాప్ స్కీమ్‌ను ఉపయోగించండి.",
+        "silent_requires_http": "నిశ్శబ్ద webhook (foreground ఆఫ్) కు http:// లేదా https:// URL అవసరం.",
+        "invalid_gauge_range": "కనిష్ట విలువ గరిష్ట విలువ కంటే తక్కువగా ఉండాలి.",
+        "stat_rows_required": "stat_list టెంప్లేట్ కోసం కనీసం ఒక స్టాట్ వరుస అవసరం."
+      },
+      "abort": {
+        "already_configured": "ఈ slug తో విడ్జెట్ ఇప్పటికే ఉంది.",
+        "reconfigure_successful": "విడ్జెట్ కాన్ఫిగరేషన్ అప్‌డేట్ చేయబడింది."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "ఉపయోగించిన నోటిఫికేషన్లు"
+      },
+      "live_activity_updates_used": {
+        "name": "ఉపయోగించిన Live Activity అప్‌డేట్లు"
+      },
+      "widget_updates_used": {
+        "name": "ఉపయోగించిన విడ్జెట్ అప్‌డేట్లు"
+      },
+      "emails_used": {
+        "name": "ఉపయోగించిన ఇమెయిల్‌లు"
+      },
+      "subscription_tier": {
+        "name": "సబ్‌స్క్రిప్షన్ స్థాయి",
+        "state": {
+          "free": "ఉచితం",
+          "premium": "ప్రీమియం"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "slug={slug} entity_id={entity_id} కు సరిపోలే PushWard విడ్జెట్ లేదు."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "PushWard update_activity చర్య నిరుపయోగం చేయబడింది",
+      "description": "`pushward.update_activity` చర్య నిరుపయోగం చేయబడింది. బదులుగా మీ ఆటోమేషన్‌లను టెంప్లేట్-నిర్దిష్ట చర్యకు మార్చండి — ఉదాహరణకు `pushward.update_activity_countdown` లేదా `pushward.update_activity_gauge`. పాత చర్య ప్రస్తుతానికి ఇంకా పనిచేస్తుంది కానీ భవిష్యత్ విడుదలలో తీసివేయబడుతుంది."
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard నోటిఫికేషన్ పరిమితి చేరుకుంది",
+      "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} నోటిఫికేషన్లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త నోటిఫికేషన్ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard Live Activity అప్‌డేట్ పరిమితి చేరుకుంది",
+      "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} Live Activity అప్‌డేట్లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త Live Activity అప్‌డేట్ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard విడ్జెట్ అప్‌డేట్ పరిమితి చేరుకుంది",
+      "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} విడ్జెట్ అప్‌డేట్లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త విడ్జెట్ అప్‌డేట్ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
+    },
+    "usage_limit_emails": {
+      "title": "PushWard ఇమెయిల్ పరిమితి చేరుకుంది",
+      "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} ఇమెయిల్‌లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త ఇమెయిల్‌ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
     }
   }
 }

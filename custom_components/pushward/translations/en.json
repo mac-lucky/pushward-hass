@@ -65,11 +65,11 @@
         },
         "url": {
           "name": "URL",
-          "description": "Primary URL displayed as a tappable button. Only supported on steps and alert templates."
+          "description": "Primary URL shown as a tappable button. http(s) or a custom scheme such as homeassistant://."
         },
         "secondary_url": {
           "name": "Secondary URL",
-          "description": "Secondary URL displayed as a second tappable button. Only supported on steps and alert templates."
+          "description": "Secondary URL shown as a second tappable button."
         },
         "end_date": {
           "name": "End Date",
@@ -166,6 +166,30 @@
         "units": {
           "name": "Units Map",
           "description": "Per-series unit labels. Keys must match value dict keys. Timeline template only."
+        },
+        "duration": {
+          "name": "Duration",
+          "description": "Set-and-forget alternative to End Date: seconds (>=1) or a duration string like \"1h30m\". The server re-anchors start/end to now. Send either Duration or End Date — Duration wins if both are set."
+        },
+        "start_date": {
+          "name": "Start Date",
+          "description": "Unix timestamp when the countdown began (anchors the elapsed/remaining bar). The server defaults this to now."
+        },
+        "history": {
+          "name": "History (seed)",
+          "description": "Initial sparkline seed: an object of series name to a list of (timestamp, value). Seed-only — the server takes over after the first update."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primary Button",
+          "description": "Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secondary Button",
+          "description": "Secondary tappable button — same object shape as the Primary Button."
         }
       },
       "sections": {
@@ -187,7 +211,7 @@
         },
         "action_buttons": {
           "name": "Action buttons",
-          "description": "Tappable URL buttons. Only used by the steps and alert templates."
+          "description": "Tappable URLs and rich button / tap actions for the activity."
         },
         "display_options": {
           "name": "Display, color & sound",
@@ -250,12 +274,36 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primary URL shown as a tappable button. http(s) or a custom scheme such as homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL shown as a second tappable button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primary Button",
+          "description": "Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secondary Button",
+          "description": "Secondary tappable button — same object shape as the Primary Button."
         }
       },
       "sections": {
         "labels": {
           "name": "Labels & icon",
           "description": "Optional text labels and icon. Apply to any template."
+        },
+        "action_buttons": {
+          "name": "Action buttons",
+          "description": "Tappable URLs and rich button / tap actions for the activity."
         },
         "display_options": {
           "name": "Display, color & sound",
@@ -334,6 +382,34 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "duration": {
+          "name": "Duration",
+          "description": "Set-and-forget alternative to End Date: seconds (>=1) or a duration string like \"1h30m\". The server re-anchors start/end to now. Send either Duration or End Date — Duration wins if both are set."
+        },
+        "start_date": {
+          "name": "Start Date",
+          "description": "Unix timestamp when the countdown began (anchors the elapsed/remaining bar). The server defaults this to now."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primary URL shown as a tappable button. http(s) or a custom scheme such as homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL shown as a second tappable button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primary Button",
+          "description": "Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secondary Button",
+          "description": "Secondary tappable button — same object shape as the Primary Button."
         }
       },
       "sections": {
@@ -344,6 +420,10 @@
         "countdown_options": {
           "name": "Countdown options",
           "description": "Only used by the countdown template."
+        },
+        "action_buttons": {
+          "name": "Action buttons",
+          "description": "Tappable URLs and rich button / tap actions for the activity."
         },
         "display_options": {
           "name": "Display, color & sound",
@@ -397,11 +477,11 @@
         },
         "url": {
           "name": "URL",
-          "description": "Primary URL displayed as a tappable button. Only supported on steps and alert templates."
+          "description": "Primary URL shown as a tappable button. http(s) or a custom scheme such as homeassistant://."
         },
         "secondary_url": {
           "name": "Secondary URL",
-          "description": "Secondary URL displayed as a second tappable button. Only supported on steps and alert templates."
+          "description": "Secondary URL shown as a second tappable button."
         },
         "completion_message": {
           "name": "Completion Message",
@@ -430,6 +510,18 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primary Button",
+          "description": "Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secondary Button",
+          "description": "Secondary tappable button — same object shape as the Primary Button."
         }
       },
       "sections": {
@@ -443,7 +535,7 @@
         },
         "action_buttons": {
           "name": "Action buttons",
-          "description": "Tappable URL buttons. Only used by the steps and alert templates."
+          "description": "Tappable URLs and rich button / tap actions for the activity."
         },
         "display_options": {
           "name": "Display, color & sound",
@@ -489,11 +581,11 @@
         },
         "url": {
           "name": "URL",
-          "description": "Primary URL displayed as a tappable button. Only supported on steps and alert templates."
+          "description": "Primary URL shown as a tappable button. http(s) or a custom scheme such as homeassistant://."
         },
         "secondary_url": {
           "name": "Secondary URL",
-          "description": "Secondary URL displayed as a second tappable button. Only supported on steps and alert templates."
+          "description": "Secondary URL shown as a second tappable button."
         },
         "completion_message": {
           "name": "Completion Message",
@@ -522,6 +614,18 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primary Button",
+          "description": "Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secondary Button",
+          "description": "Secondary tappable button — same object shape as the Primary Button."
         }
       },
       "sections": {
@@ -535,7 +639,7 @@
         },
         "action_buttons": {
           "name": "Action buttons",
-          "description": "Tappable URL buttons. Only used by the steps and alert templates."
+          "description": "Tappable URLs and rich button / tap actions for the activity."
         },
         "display_options": {
           "name": "Display, color & sound",
@@ -614,12 +718,36 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primary URL shown as a tappable button. http(s) or a custom scheme such as homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL shown as a second tappable button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primary Button",
+          "description": "Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secondary Button",
+          "description": "Secondary tappable button — same object shape as the Primary Button."
         }
       },
       "sections": {
         "labels": {
           "name": "Labels & icon",
           "description": "Optional text labels and icon. Apply to any template."
+        },
+        "action_buttons": {
+          "name": "Action buttons",
+          "description": "Tappable URLs and rich button / tap actions for the activity."
         },
         "display_options": {
           "name": "Display, color & sound",
@@ -710,6 +838,30 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "history": {
+          "name": "History (seed)",
+          "description": "Initial sparkline seed: an object of series name to a list of (timestamp, value). Seed-only — the server takes over after the first update."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primary URL shown as a tappable button. http(s) or a custom scheme such as homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secondary URL",
+          "description": "Secondary URL shown as a second tappable button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primary Button",
+          "description": "Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secondary Button",
+          "description": "Secondary tappable button — same object shape as the Primary Button."
         }
       },
       "sections": {
@@ -720,6 +872,10 @@
         "gauge_timeline_options": {
           "name": "Gauge & Timeline options",
           "description": "Only used by the gauge and timeline templates."
+        },
+        "action_buttons": {
+          "name": "Action buttons",
+          "description": "Tappable URLs and rich button / tap actions for the activity."
         },
         "display_options": {
           "name": "Display, color & sound",
@@ -853,7 +1009,7 @@
         },
         "actions": {
           "name": "Actions",
-          "description": "List of action button objects with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`."
+          "description": "List of action buttons. Each action is an object with id, title, optional url, foreground, destructive, authentication_required, and icon. For an http(s) url you can also send a silent webhook with method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, and body."
         }
       }
     },
@@ -876,6 +1032,20 @@
         "html_body": {
           "name": "HTML Body",
           "description": "HTML email body. Provide this, a plain-text body, or both."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Delete Widget",
+      "description": "Delete a PushWard widget from the server. If a tracked-widget config entry still drives this slug, the widget is recreated on the next restart/sync — remove the config entry to delete it permanently. Provide either slug or entity_id.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Widget slug identifier. Either slug or entity_id must be provided."
+        },
+        "entity_id": {
+          "name": "Entity",
+          "description": "HA entity bound to the widget. Resolved to the matching widget by config. Either slug or entity_id must be provided."
         }
       }
     }

@@ -33,7 +33,7 @@
           "description": "Subtitle na teksto na ipinapakita sa activity."
         },
         "accent_color": {
-          "name": "Accent Color",
+          "name": "Accent na Kulay",
           "description": "Pangalan ng accent color para sa activity."
         },
         "remaining_time": {
@@ -45,7 +45,7 @@
           "description": "Pangunahing URL na ipinapakita bilang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
         },
         "secondary_url": {
-          "name": "Secondary URL",
+          "name": "Pangalawang URL",
           "description": "Secondary URL na ipinapakita bilang pangalawang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
         },
         "end_date": {
@@ -139,6 +139,34 @@
         "units": {
           "name": "Mga Yunit",
           "description": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "Snooze na Segundo",
+          "description": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Default ay 300 (5 min). Nangangailangan ng alarm (iOS 26+, countdown template lamang)."
+        },
+        "duration": {
+          "name": "Tagal",
+          "description": "Set-and-forget na alternatibo sa End Date: segundo (>=1) o duration string tulad ng \"1h30m\". Muling ini-anchor ng server ang start/end sa ngayon. Magpadala ng alinman sa Tagal o End Date — mananaig ang Tagal kung pareho silang nakatakda."
+        },
+        "start_date": {
+          "name": "Petsa ng Simula",
+          "description": "Unix timestamp kung kailan nagsimula ang countdown (nag-aanchor sa elapsed/remaining bar). Ang default nito sa server ay ngayon."
+        },
+        "history": {
+          "name": "Kasaysayan (seed)",
+          "description": "Panimulang sparkline seed: isang object ng pangalan ng series patungo sa listahan ng (timestamp, value). Seed lamang — sasakupin ng server pagkatapos ng unang update."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "url_action": {
+          "name": "Pangunahing Button",
+          "description": "Pangunahing matatap na button bilang object: url (kinakailangan), opsyonal na title, icon, foreground, at http(s) method/headers/body para sa silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Pangalawang Button",
+          "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
         }
       },
       "sections": {
@@ -201,7 +229,7 @@
           "description": "Mensaheng ipinapakita kapag natapos ang activity."
         },
         "accent_color": {
-          "name": "Accent Color",
+          "name": "Accent na Kulay",
           "description": "Pangalan ng accent color para sa activity."
         },
         "background_color": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Priyoridad",
           "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Pangunahing URL na ipinapakita bilang matatap na button. http(s) o custom scheme tulad ng homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Pangalawang URL",
+          "description": "Pangalawang URL na ipinapakita bilang pangalawang matatap na button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "url_action": {
+          "name": "Pangunahing Button",
+          "description": "Pangunahing matatap na button bilang object: url (kinakailangan), opsyonal na title, icon, foreground, at http(s) method/headers/body para sa silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Pangalawang Button",
+          "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
         }
       },
       "sections": {
         "labels": {
           "name": "Mga label at icon",
           "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "action_buttons": {
+          "name": "Mga action button",
+          "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
         },
         "display_options": {
           "name": "Display, kulay at tunog",
@@ -281,11 +333,11 @@
           "description": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Gumagana lamang sa iOS 26+."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Snooze na Segundo",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
-          "name": "Accent Color",
+          "name": "Accent na Kulay",
           "description": "Pangalan ng accent color para sa activity."
         },
         "background_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Priyoridad",
           "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "duration": {
+          "name": "Tagal",
+          "description": "Set-and-forget na alternatibo sa End Date: segundo (>=1) o duration string tulad ng \"1h30m\". Muling ini-anchor ng server ang start/end sa ngayon. Magpadala ng alinman sa Tagal o End Date — mananaig ang Tagal kung pareho silang nakatakda."
+        },
+        "start_date": {
+          "name": "Petsa ng Simula",
+          "description": "Unix timestamp kung kailan nagsimula ang countdown (nag-aanchor sa elapsed/remaining bar). Ang default nito sa server ay ngayon."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Pangunahing URL na ipinapakita bilang matatap na button. http(s) o custom scheme tulad ng homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Pangalawang URL",
+          "description": "Pangalawang URL na ipinapakita bilang pangalawang matatap na button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "url_action": {
+          "name": "Pangunahing Button",
+          "description": "Pangunahing matatap na button bilang object: url (kinakailangan), opsyonal na title, icon, foreground, at http(s) method/headers/body para sa silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Pangalawang Button",
+          "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "Mga opsyon ng countdown",
           "description": "Para sa countdown template lamang."
+        },
+        "action_buttons": {
+          "name": "Mga action button",
+          "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
         },
         "display_options": {
           "name": "Display, kulay at tunog",
@@ -373,7 +457,7 @@
           "description": "Pangunahing URL na ipinapakita bilang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
         },
         "secondary_url": {
-          "name": "Secondary URL",
+          "name": "Pangalawang URL",
           "description": "Secondary URL na ipinapakita bilang pangalawang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
         },
         "completion_message": {
@@ -381,7 +465,7 @@
           "description": "Mensaheng ipinapakita kapag natapos ang activity."
         },
         "accent_color": {
-          "name": "Accent Color",
+          "name": "Accent na Kulay",
           "description": "Pangalan ng accent color para sa activity."
         },
         "background_color": {
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Priyoridad",
           "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "url_action": {
+          "name": "Pangunahing Button",
+          "description": "Pangunahing matatap na button bilang object: url (kinakailangan), opsyonal na title, icon, foreground, at http(s) method/headers/body para sa silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Pangalawang Button",
+          "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
         }
       },
       "sections": {
@@ -465,7 +561,7 @@
           "description": "Pangunahing URL na ipinapakita bilang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
         },
         "secondary_url": {
-          "name": "Secondary URL",
+          "name": "Pangalawang URL",
           "description": "Secondary URL na ipinapakita bilang pangalawang tappable na button. Sinusuportahan lamang sa mga steps at alert na template."
         },
         "completion_message": {
@@ -473,7 +569,7 @@
           "description": "Mensaheng ipinapakita kapag natapos ang activity."
         },
         "accent_color": {
-          "name": "Accent Color",
+          "name": "Accent na Kulay",
           "description": "Pangalan ng accent color para sa activity."
         },
         "background_color": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Priyoridad",
           "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "url_action": {
+          "name": "Pangunahing Button",
+          "description": "Pangunahing matatap na button bilang object: url (kinakailangan), opsyonal na title, icon, foreground, at http(s) method/headers/body para sa silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Pangalawang Button",
+          "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
         }
       },
       "sections": {
@@ -565,7 +673,7 @@
           "description": "Mensaheng ipinapakita kapag natapos ang activity."
         },
         "accent_color": {
-          "name": "Accent Color",
+          "name": "Accent na Kulay",
           "description": "Pangalan ng accent color para sa activity."
         },
         "background_color": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Priyoridad",
           "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Pangunahing URL na ipinapakita bilang matatap na button. http(s) o custom scheme tulad ng homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Pangalawang URL",
+          "description": "Pangalawang URL na ipinapakita bilang pangalawang matatap na button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "url_action": {
+          "name": "Pangunahing Button",
+          "description": "Pangunahing matatap na button bilang object: url (kinakailangan), opsyonal na title, icon, foreground, at http(s) method/headers/body para sa silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Pangalawang Button",
+          "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
         }
       },
       "sections": {
         "labels": {
           "name": "Mga label at icon",
           "description": "Opsyonal na mga text label at icon. Naaangkop sa anumang template."
+        },
+        "action_buttons": {
+          "name": "Mga action button",
+          "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
         },
         "display_options": {
           "name": "Display, kulay at tunog",
@@ -661,7 +793,7 @@
           "description": "Mensaheng ipinapakita kapag natapos ang activity."
         },
         "accent_color": {
-          "name": "Accent Color",
+          "name": "Accent na Kulay",
           "description": "Pangalan ng accent color para sa activity."
         },
         "background_color": {
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Priyoridad",
           "description": "Priyoridad ng activity (0 = pinakamababa, 10 = pinakamataas)."
+        },
+        "history": {
+          "name": "Kasaysayan (seed)",
+          "description": "Panimulang sparkline seed: isang object ng pangalan ng series patungo sa listahan ng (timestamp, value). Seed lamang — sasakupin ng server pagkatapos ng unang update."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Pangunahing URL na ipinapakita bilang matatap na button. http(s) o custom scheme tulad ng homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Pangalawang URL",
+          "description": "Pangalawang URL na ipinapakita bilang pangalawang matatap na button."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "url_action": {
+          "name": "Pangunahing Button",
+          "description": "Pangunahing matatap na button bilang object: url (kinakailangan), opsyonal na title, icon, foreground, at http(s) method/headers/body para sa silent webhook."
+        },
+        "secondary_url_action": {
+          "name": "Pangalawang Button",
+          "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "Mga opsyon ng gauge at timeline",
           "description": "Para sa gauge at timeline na template lamang."
+        },
+        "action_buttons": {
+          "name": "Mga action button",
+          "description": "Mga nada-tap na URL button. Para sa steps at alert na template lamang."
         },
         "display_options": {
           "name": "Display, kulay at tunog",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Metadata",
           "description": "Karagdagang key-value pair na metadata na ipinapadala kasama ang notification."
+        },
+        "media": {
+          "name": "Media",
+          "description": "Media attachment bilang object na may `url` (HTTPS) at `type` (image, video, o audio)."
+        },
+        "actions": {
+          "name": "Mga Aksyon",
+          "description": "Listahan ng action buttons. Ang bawat aksyon ay isang object na may id, title, opsyonal na url, foreground, destructive, authentication_required, at icon. Para sa http(s) url, maaari ka ring magpadala ng silent webhook na may method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, at body."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "I-refresh ang Widget",
+      "description": "Pwersahang i-refresh ang isang na-track na PushWard widget. Nila-laktawan ang in-memory diff cache upang muling ma-render at maipadala sa iOS ang widget kahit hindi nagbago ang halaga.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng widget. Dapat ibigay ang alinman sa slug o entity_id."
+        },
+        "entity_id": {
+          "name": "Entity",
+          "description": "HA entity na nakatali sa widget. Dapat ibigay ang alinman sa slug o entity_id."
+        }
+      }
+    },
+    "send_email": {
+      "name": "Magpadala ng Email",
+      "description": "Magpadala ng transactional na email sa pamamagitan ng PushWard. Magbigay ng text body, HTML body, o pareho. Kailangan ng integration key ang \"emails\" na kakayahan.",
+      "fields": {
+        "to": {
+          "name": "Tatanggap",
+          "description": "Email address ng tatanggap. Dapat itong isang address na naidagdag at nakumpirma mo na sa PushWard iOS app — tinatanggihan ang mga hindi na-verify na address."
+        },
+        "subject": {
+          "name": "Paksa",
+          "description": "Subject line ng email."
+        },
+        "body": {
+          "name": "Nilalaman",
+          "description": "Plain-text na nilalaman ng email. Ibigay ito, isang HTML body, o pareho."
+        },
+        "html_body": {
+          "name": "HTML Body",
+          "description": "HTML na nilalaman ng email. Ibigay ito, isang plain-text body, o pareho."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Tanggalin ang Widget",
+      "description": "Tanggalin ang isang PushWard widget mula sa server. Kung may tracked-widget config entry pa ring nagpapatakbo sa slug na ito, muling gagawin ang widget sa susunod na restart/sync — alisin ang config entry upang permanenteng matanggal ito. Magbigay ng alinman sa slug o entity_id.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng widget. Dapat ibigay ang alinman sa slug o entity_id."
+        },
+        "entity_id": {
+          "name": "Entity",
+          "description": "HA entity na nakatali sa widget. Niri-resolve sa tumutugmang widget ayon sa config. Dapat ibigay ang alinman sa slug o entity_id."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Kumonekta sa PushWard",
         "data": {
           "integration_key": "Integration Key"
+        },
+        "description": "Ilagay ang iyong PushWard integration key upang magsimula. Kunin ang PushWard iOS app mula sa App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "Buksan ang PushWard iOS app (App Store: {app_store_url}) → Settings → Integration Keys. Maaari mong i-paste ang default key, o gumawa ng bago na may scope na 'ha-*'."
         }
       },
       "reconfigure": {
@@ -852,7 +1074,7 @@
   },
   "config_subentries": {
     "tracked_entity": {
-      "entry_type": "Tracked Entity",
+      "entry_type": "Na-track na Entity",
       "initiate_flow": {
         "user": "Magdagdag ng tracked entity"
       },
@@ -872,12 +1094,12 @@
           "data": {
             "start_states": "Mga Start State",
             "end_states": "Mga End State",
-            "progress_attribute": "Progress Attribute",
-            "remaining_time_attribute": "Remaining Time Attribute",
+            "progress_attribute": "Attribute ng Progreso",
+            "remaining_time_attribute": "Attribute ng Natitirang Oras",
             "total_steps": "Kabuuang Steps",
-            "current_step_attribute": "Current Step Attribute",
+            "current_step_attribute": "Attribute ng Kasalukuyang Hakbang",
             "severity": "Kalubhaan",
-            "value_attribute": "Value Attribute",
+            "value_attribute": "Attribute ng Halaga",
             "min_value": "Pinakamababang Halaga",
             "max_value": "Pinakamataas na Halaga",
             "unit": "Yunit",
@@ -890,14 +1112,14 @@
             "slug": "Activity Slug",
             "activity_name": "Pangalan ng Activity",
             "icon": "Icon",
-            "icon_attribute": "Icon Attribute",
+            "icon_attribute": "Attribute ng Icon",
             "priority": "Priyoridad (0-10)",
             "update_interval": "Pinakamababang Agwat ng Update (segundo)",
-            "subtitle_attribute": "Subtitle Attribute",
+            "subtitle_attribute": "Attribute ng Subtitle",
             "state_labels": "Mga Label ng Estado",
             "completion_message": "Mensahe ng Pagkumpleto",
-            "accent_color": "Accent Color",
-            "accent_color_attribute": "Accent Color Attribute",
+            "accent_color": "Accent na Kulay",
+            "accent_color_attribute": "Attribute ng Accent na Kulay",
             "url": "URL",
             "secondary_url": "Secondary URL",
             "ended_ttl": "Awtomatikong Burahin Pagkatapos ng Pagtatapos (segundo)",
@@ -912,7 +1134,20 @@
             "step_labels": "Mga Label ng Hakbang",
             "step_rows": "Mga Hilera ng Hakbang",
             "fired_at_attribute": "Attribute ng Oras ng Pag-trigger",
-            "units": "Mga Yunit"
+            "units": "Mga Yunit",
+            "progress_entity": "Entity ng Progreso",
+            "remaining_time_entity": "Entity ng Natitirang Oras",
+            "current_step_entity": "Entity ng Kasalukuyang Hakbang",
+            "value_entity": "Entity ng Halaga",
+            "subtitle_entity": "Entity ng Subtitle",
+            "tap_action_url": "Tap Action URL",
+            "tap_action_foreground": "Buksan ang Tap Action URL",
+            "url_foreground": "Buksan ang Primary Button URL",
+            "url_title": "Title ng Pangunahing Button",
+            "secondary_url_foreground": "Buksan ang Secondary Button URL",
+            "secondary_url_title": "Title ng Pangalawang Button",
+            "snooze_seconds": "Snooze na Segundo (iOS 26+)",
+            "fired_at_entity": "Entity ng Fired At"
           },
           "data_description": {
             "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
@@ -957,7 +1192,20 @@
             "step_labels": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang.",
             "step_rows": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template.",
             "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
-            "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
+            "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%",
+            "progress_entity": "Basahin ang progreso mula sa hiwalay na entity sa halip na sa na-track na entity. Iwanang blanko upang gamitin ang na-track na entity. Kapag nakatakda ang attribute field, babasahin ang attribute na iyon ng entity na ito; kung hindi, ang state nito.",
+            "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
+            "current_step_entity": "Basahin ang kasalukuyang hakbang mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity.",
+            "value_entity": "Basahin ang gauge value mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
+            "subtitle_entity": "Ipakita ang subtitle mula sa hiwalay na entity (hal. program/mode sensor). Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
+            "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang background ng Live Activity. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0 (bumubukas ng app na iyon).",
+            "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background nang hindi umaalis sa Lock Screen.",
+            "url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+            "url_title": "Label ng pangunahing button (max 64 na character).",
+            "secondary_url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+            "secondary_url_title": "Label ng pangalawang button (max 64 na character).",
+            "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
+            "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "Ang URL ay dapat gumamit ng http:// o https:// scheme.",
-        "invalid_gauge_range": "Ang pinakamababang halaga ay dapat na mas mababa sa pinakamataas na halaga."
+        "invalid_gauge_range": "Ang pinakamababang halaga ay dapat na mas mababa sa pinakamataas na halaga.",
+        "silent_requires_http": "Ang silent webhook (naka-off ang foreground) ay nangangailangan ng http:// o https:// URL."
       },
       "abort": {
         "already_configured": "Ang entity na ito ay naka-track na.",
         "reconfigure_successful": "Na-update na ang configuration ng entity."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Na-track na Widget",
+      "initiate_flow": {
+        "user": "Magdagdag ng na-track na widget"
+      },
+      "step": {
+        "user": {
+          "title": "Magdagdag ng Widget sa PushWard",
+          "data": {
+            "entity_id": "Entity",
+            "widget_template": "Template",
+            "slug": "Widget Slug"
+          },
+          "data_description": {
+            "widget_template": "Layout ng widget. Gamitin ang `value` para sa iisang numero, `progress` para sa 0–1 bar, `gauge` para sa value-in-range, `status` para sa severity badge, o `stat_list` para sa hanggang 6 na row.",
+            "slug": "Natatanging identifier para sa widget na ito. Iwanang blanko upang awtomatikong ma-generate mula sa entity ID."
+          }
+        },
+        "reconfigure": {
+          "title": "I-edit ang Widget",
+          "data": {
+            "entity_id": "Entity",
+            "widget_template": "Template",
+            "slug": "Widget Slug"
+          },
+          "data_description": {
+            "widget_template": "Layout ng widget.",
+            "slug": "Natatanging identifier para sa widget na ito."
+          }
+        },
+        "details": {
+          "title": "Mga Opsyon ng Widget",
+          "data": {
+            "widget_name": "Pangalan ng Widget",
+            "value_attribute": "Attribute ng Halaga",
+            "unit": "Unit",
+            "min_value": "Pinakamababang Halaga",
+            "max_value": "Pinakamataas na Halaga",
+            "severity": "Severity",
+            "stat_rows": "Stat Rows",
+            "label": "Label",
+            "label_attribute": "Attribute ng Label",
+            "subtitle_attribute": "Attribute ng Subtitle",
+            "icon": "Icon",
+            "icon_attribute": "Attribute ng Icon",
+            "accent_color": "Accent na Kulay",
+            "accent_color_attribute": "Attribute ng Accent na Kulay",
+            "background_color": "Kulay ng Background",
+            "text_color": "Kulay ng Teksto",
+            "widget_trigger_mode": "Trigger Mode",
+            "widget_poll_interval": "Poll Interval (segundo)",
+            "tap_action_url": "Tap Action URL",
+            "tap_action_foreground": "Buksan ang Tap Action URL"
+          },
+          "data_description": {
+            "widget_name": "Display name na ipinapakita sa iOS widget picker. Default sa friendly name ng entity.",
+            "value_attribute": "Entity attribute na naglalaman ng halaga. Iwanang blanko upang gamitin ang pangunahing state ng entity.",
+            "unit": "Display unit na ipinapakita sa tabi ng halaga. Max 32 na character.",
+            "min_value": "Pinakamababang halaga para sa gauge range.",
+            "max_value": "Pinakamataas na halaga para sa gauge range.",
+            "severity": "Severity ng status (info, warning, critical, success).",
+            "stat_rows": "Hanggang 6 na row. Format: `Label=entity_id[:attribute[:unit]]`, pinaghihiwalay ng kuwit. Halimbawa: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Static na label na ipinapakita sa widget. Iwanang blanko upang kunin mula sa entity.",
+            "label_attribute": "Entity attribute na ginagamit bilang label. Ina-override ang static na label.",
+            "subtitle_attribute": "Entity attribute na ipinapakita bilang subtitle ng widget.",
+            "icon": "Static na icon. Sinusuportahan ang SF Symbols at MDI names.",
+            "icon_attribute": "Entity attribute para sa dynamic na icon. Ina-override ang static na icon.",
+            "accent_color": "Accent na kulay para sa widget. Iwanang blanko para sa default.",
+            "accent_color_attribute": "Entity attribute para sa dynamic na accent na kulay.",
+            "background_color": "Opsyonal na kulay ng background.",
+            "text_color": "Opsyonal na kulay ng teksto.",
+            "widget_trigger_mode": "Kung paano nati-trigger ang mga update. Ang `event` ay tumutugon sa mga pagbabago ng state; ang `poll` ay muling sinusuri sa nakatakdang interval.",
+            "widget_poll_interval": "Interval sa pagitan ng mga poll (10–3600 na segundo). Ginagamit lamang kapag ang trigger mode ay `poll`.",
+            "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang widget. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "Dapat may kasamang valid na scheme ang URL. Gamitin ang http(s):// o custom app scheme tulad ng homeassistant://.",
+        "silent_requires_http": "Ang silent webhook (naka-off ang foreground) ay nangangailangan ng http:// o https:// URL.",
+        "invalid_gauge_range": "Ang pinakamababang halaga ay dapat mas mababa sa pinakamataas na halaga.",
+        "stat_rows_required": "Kailangan ng kahit isang stat row para sa stat_list template."
+      },
+      "abort": {
+        "already_configured": "May widget na umiiral na sa slug na ito.",
+        "reconfigure_successful": "Na-update ang configuration ng widget."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Mga notification na nagamit"
+      },
+      "live_activity_updates_used": {
+        "name": "Mga Live Activity update na nagamit"
+      },
+      "widget_updates_used": {
+        "name": "Mga widget update na nagamit"
+      },
+      "emails_used": {
+        "name": "Mga email na nagamit"
+      },
+      "subscription_tier": {
+        "name": "Tier ng subscription",
+        "state": {
+          "free": "Libre",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Walang PushWard widget na tumutugma sa slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "Hindi na ginagamit ang PushWard update_activity action",
+      "description": "Hindi na ginagamit ang `pushward.update_activity` action. Ilipat ang iyong mga automation sa template-specific na action sa halip — halimbawa `pushward.update_activity_countdown` o `pushward.update_activity_gauge`. Gumagana pa ang lumang action sa ngayon ngunit aalisin sa hinaharap na release."
+    },
+    "usage_limit_notifications": {
+      "title": "Naabot na ang limitasyon ng notification sa PushWard",
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na notification para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong notification hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
+    },
+    "usage_limit_live_activity": {
+      "title": "Naabot na ang limitasyon ng Live Activity update sa PushWard",
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na Live Activity update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
+    },
+    "usage_limit_widgets": {
+      "title": "Naabot na ang limitasyon ng widget update sa PushWard",
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na widget update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
+    },
+    "usage_limit_emails": {
+      "title": "Naabot na ang limitasyon ng email sa PushWard",
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na email para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong email hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
     }
   }
 }

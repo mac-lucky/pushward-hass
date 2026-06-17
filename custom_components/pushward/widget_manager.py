@@ -185,9 +185,30 @@ class WidgetManager:
         self._tracked.clear()
 
     async def async_reload(self, widgets: list[dict]) -> None:
+        # A removed tracked_widget subentry must delete its server-side widget, otherwise the
+        # row + device widget-push token leak forever (HA just stops driving it). Diff against
+        # the previous config set BEFORE reassigning self._widgets below.
+        removed = self._slug_set(self._widgets) - self._slug_set(widgets)
         await self.async_stop()
         self._widgets = widgets
         await self.async_start()
+        # _delete_widget swallows expected API errors per slug; return_exceptions keeps an
+        # unexpected one from stranding the rest.
+        await asyncio.gather(*(self._delete_widget(slug) for slug in removed), return_exceptions=True)
+
+    @staticmethod
+    def _slug_set(widgets: list[dict]) -> set[str]:
+        return {cfg[CONF_SLUG] for cfg in widgets if cfg.get(CONF_SLUG)}
+
+    async def _delete_widget(self, slug: str) -> None:
+        """Delete a server-side widget whose subentry was removed (best-effort, 404-safe)."""
+        async with self._api_error_guard(slug, "deleting"):
+            await self._api.delete_widget(slug)
+
+    def slug_for_entity(self, entity_id: str | None) -> str | None:
+        """Return the slug of the tracked widget bound to entity_id, if any."""
+        target = self._resolve_target(entity_id=entity_id)
+        return target.config.get(CONF_SLUG) if target else None
 
     async def async_refresh(self, slug: str | None = None, entity_id: str | None = None) -> None:
         """Manual refresh: bypass diff cache and force a PATCH.

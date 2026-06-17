@@ -76,6 +76,20 @@ update_activity:
             number:
               min: 0
               mode: box
+        duration:
+          name: Duration
+          description: 'Set-and-forget alternative to End Date: seconds (≥1) or a duration string like "1h30m". The server re-anchors start/end to now. Send either Duration or End Date — Duration wins if both are set. Countdown template only.'
+          example: "30m"
+          selector:
+            text:
+        start_date:
+          name: Start Date
+          description: Unix timestamp when the countdown began (anchors the elapsed/remaining bar). The server defaults this to now. Countdown template only.
+          example: 1700000000
+          selector:
+            number:
+              min: 0
+              mode: box
         warning_threshold:
           name: Warning Threshold
           description: Seconds remaining at which the countdown enters warning state. Countdown template only.
@@ -214,21 +228,44 @@ update_activity:
           description: Per-series unit labels as a YAML object (e.g. {"temp":"°C","humidity":"%"}). Timeline template only.
           selector:
             object:
+        history:
+          name: History (seed)
+          description: 'Initial sparkline seed as an object of series name → list of (timestamp, value). Seed-only — the server takes over as source of truth after the first update. Timeline template only.'
+          selector:
+            object:
     action_buttons:
       collapsed: true
       fields:
         url:
           name: URL
-          description: Primary URL displayed as a tappable button. Only supported on steps and alert templates.
+          description: Primary URL displayed as a tappable button.
           example: "https://example.com"
           selector:
             text:
         secondary_url:
           name: Secondary URL
-          description: Secondary URL displayed as a second tappable button. Only supported on steps and alert templates.
+          description: Secondary URL displayed as a second tappable button.
           example: "https://example.com/details"
           selector:
             text:
+        tap_action:
+          name: Tap Action
+          description: 'Whole-activity tap target as an object: url (required; http(s) or a custom scheme like homeassistant://), optional foreground, and for http(s) a silent webhook via method/headers/body.'
+          example: '{"url": "homeassistant://navigate/lovelace/0"}'
+          selector:
+            object:
+        url_action:
+          name: Primary Button
+          description: 'Primary tappable button as an object: url (required), optional title, icon, foreground, and http(s) method/headers/body for a silent webhook.'
+          example: '{"url": "https://example.com", "title": "Open", "method": "POST"}'
+          selector:
+            object:
+        secondary_url_action:
+          name: Secondary Button
+          description: Secondary tappable button — same object shape as Primary Button.
+          example: '{"url": "https://example.com/details", "title": "Details"}'
+          selector:
+            object:
     display_options:
       collapsed: true
       fields:
@@ -321,6 +358,29 @@ update_activity_generic:
               max: 1.0
               step: 0.01
               mode: slider
+    action_buttons:
+      collapsed: true
+      fields:
+        url:
+          example: "https://example.com"
+          selector:
+            text:
+        secondary_url:
+          example: "https://example.com/details"
+          selector:
+            text:
+        tap_action:
+          example: '{"url": "homeassistant://navigate/lovelace/0"}'
+          selector:
+            object:
+        url_action:
+          example: '{"url": "https://example.com", "title": "Open", "method": "POST"}'
+          selector:
+            object:
+        secondary_url_action:
+          example: '{"url": "https://example.com/details", "title": "Details"}'
+          selector:
+            object:
     display_options:
       collapsed: true
       fields:
@@ -388,6 +448,10 @@ update_activity_countdown:
         number:
           min: 0
           mode: box
+    duration:
+      example: "30m"
+      selector:
+        text:
     completion_message:
       example: "Download complete!"
       selector:
@@ -418,6 +482,12 @@ update_activity_countdown:
     countdown_options:
       collapsed: true
       fields:
+        start_date:
+          example: 1700000000
+          selector:
+            number:
+              min: 0
+              mode: box
         warning_threshold:
           example: 30
           selector:
@@ -436,6 +506,29 @@ update_activity_countdown:
               max: 3600
               mode: box
               unit_of_measurement: seconds
+    action_buttons:
+      collapsed: true
+      fields:
+        url:
+          example: "https://example.com"
+          selector:
+            text:
+        secondary_url:
+          example: "https://example.com/details"
+          selector:
+            text:
+        tap_action:
+          example: '{"url": "homeassistant://navigate/lovelace/0"}'
+          selector:
+            object:
+        url_action:
+          example: '{"url": "https://example.com", "title": "Open", "method": "POST"}'
+          selector:
+            object:
+        secondary_url_action:
+          example: '{"url": "https://example.com/details", "title": "Details"}'
+          selector:
+            object:
     display_options:
       collapsed: true
       fields:
@@ -548,6 +641,18 @@ update_activity_steps:
           example: "https://example.com/details"
           selector:
             text:
+        tap_action:
+          example: '{"url": "homeassistant://navigate/lovelace/0"}'
+          selector:
+            object:
+        url_action:
+          example: '{"url": "https://example.com", "title": "Open", "method": "POST"}'
+          selector:
+            object:
+        secondary_url_action:
+          example: '{"url": "https://example.com/details", "title": "Details"}'
+          selector:
+            object:
     display_options:
       collapsed: true
       fields:
@@ -660,6 +765,18 @@ update_activity_alert:
           example: "https://example.com/details"
           selector:
             text:
+        tap_action:
+          example: '{"url": "homeassistant://navigate/lovelace/0"}'
+          selector:
+            object:
+        url_action:
+          example: '{"url": "https://example.com", "title": "Open", "method": "POST"}'
+          selector:
+            object:
+        secondary_url_action:
+          example: '{"url": "https://example.com/details", "title": "Details"}'
+          selector:
+            object:
     display_options:
       collapsed: true
       fields:
@@ -766,6 +883,29 @@ update_activity_gauge:
               max: 1.0
               step: 0.01
               mode: slider
+    action_buttons:
+      collapsed: true
+      fields:
+        url:
+          example: "https://example.com"
+          selector:
+            text:
+        secondary_url:
+          example: "https://example.com/details"
+          selector:
+            text:
+        tap_action:
+          example: '{"url": "homeassistant://navigate/lovelace/0"}'
+          selector:
+            object:
+        url_action:
+          example: '{"url": "https://example.com", "title": "Open", "method": "POST"}'
+          selector:
+            object:
+        secondary_url_action:
+          example: '{"url": "https://example.com/details", "title": "Details"}'
+          selector:
+            object:
     display_options:
       collapsed: true
       fields:
@@ -882,6 +1022,32 @@ update_activity_timeline:
           selector:
             boolean:
         thresholds:
+          selector:
+            object:
+        history:
+          selector:
+            object:
+    action_buttons:
+      collapsed: true
+      fields:
+        url:
+          example: "https://example.com"
+          selector:
+            text:
+        secondary_url:
+          example: "https://example.com/details"
+          selector:
+            text:
+        tap_action:
+          example: '{"url": "homeassistant://navigate/lovelace/0"}'
+          selector:
+            object:
+        url_action:
+          example: '{"url": "https://example.com", "title": "Open", "method": "POST"}'
+          selector:
+            object:
+        secondary_url_action:
+          example: '{"url": "https://example.com/details", "title": "Details"}'
           selector:
             object:
     display_options:
@@ -1099,8 +1265,8 @@ send_notification:
         object:
     actions:
       name: Actions
-      description: List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`.
-      example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}]'
+      description: 'List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`. For an http(s) `url` you can also send a silent webhook with `method` (GET/POST/PUT/PATCH/DELETE/HEAD), `headers`, and `body`.'
+      example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}, {"id": "ack", "title": "Acknowledge", "url": "https://example.com/ack", "method": "POST", "body": "ok"}]'
       selector:
         object:
     push:
@@ -1147,6 +1313,23 @@ send_email:
 widget_refresh:
   name: Refresh Widget
   description: Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to iOS even when the value hasn't changed.
+  fields:
+    slug:
+      name: Slug
+      description: Widget slug identifier. Either `slug` or `entity_id` must be provided.
+      example: "ha-sensor-registered-users"
+      selector:
+        text:
+    entity_id:
+      name: Entity
+      description: HA entity bound to the widget. Resolved to the matching widget by config. Either `slug` or `entity_id` must be provided.
+      example: "sensor.registered_users"
+      selector:
+        entity:
+
+delete_widget:
+  name: Delete Widget
+  description: Delete a PushWard widget from the server. If a tracked-widget config entry still drives this slug, the widget is recreated on the next restart/sync — remove the config entry to delete it permanently. Provide either slug or entity_id.
   fields:
     slug:
       name: Slug

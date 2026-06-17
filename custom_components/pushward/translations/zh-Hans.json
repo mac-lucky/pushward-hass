@@ -139,6 +139,34 @@
         "units": {
           "name": "单位映射",
           "description": "每个系列的单位标签。键必须与 value dict 的键匹配。仅适用于 timeline 模板。"
+        },
+        "snooze_seconds": {
+          "name": "稍后提醒秒数",
+          "description": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。默认为 300（5 分钟）。需要启用闹钟（仅限 iOS 26+，countdown 模板）。"
+        },
+        "duration": {
+          "name": "时长",
+          "description": "结束日期的“设置后无需管理”替代方案：秒数（>=1）或时长字符串，例如 \"1h30m\"。服务器会将开始/结束时间重新锚定到当前时间。请发送时长或结束日期之一——若两者都设置，则以时长为准。"
+        },
+        "start_date": {
+          "name": "开始日期",
+          "description": "倒计时开始时的 Unix 时间戳（用于锚定已用/剩余进度条）。服务器默认将其设为当前时间。"
+        },
+        "history": {
+          "name": "历史记录（初始值）",
+          "description": "迷你折线图的初始填充值：一个将系列名称映射到 (timestamp, value) 列表的对象。仅用于初始填充——首次更新后由服务器接管。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "url_action": {
+          "name": "主按钮",
+          "description": "可点击的主按钮，为一个对象：url（必填）、可选的 title、icon、foreground，以及用于静默 webhook 的 http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "次按钮",
+          "description": "可点击的次按钮——对象结构与主按钮相同。"
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "作为可点击按钮显示的主 URL。可为 http(s) 或自定义协议，例如 homeassistant://。"
+        },
+        "secondary_url": {
+          "name": "次 URL",
+          "description": "作为第二个可点击按钮显示的次 URL。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "url_action": {
+          "name": "主按钮",
+          "description": "可点击的主按钮，为一个对象：url（必填）、可选的 title、icon、foreground，以及用于静默 webhook 的 http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "次按钮",
+          "description": "可点击的次按钮——对象结构与主按钮相同。"
         }
       },
       "sections": {
         "labels": {
           "name": "标签和图标",
           "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "action_buttons": {
+          "name": "操作按钮",
+          "description": "可点击的 URL 按钮。仅适用于 steps 和 alert 模板。"
         },
         "display_options": {
           "name": "显示、颜色和声音",
@@ -281,7 +333,7 @@
           "description": "在倒计时到期时触发 AlarmKit 闹钟（iOS 26+，仅适用于 countdown 模板）。"
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "稍后提醒秒数",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "duration": {
+          "name": "时长",
+          "description": "结束日期的“设置后无需管理”替代方案：秒数（>=1）或时长字符串，例如 \"1h30m\"。服务器会将开始/结束时间重新锚定到当前时间。请发送时长或结束日期之一——若两者都设置，则以时长为准。"
+        },
+        "start_date": {
+          "name": "开始日期",
+          "description": "倒计时开始时的 Unix 时间戳（用于锚定已用/剩余进度条）。服务器默认将其设为当前时间。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "作为可点击按钮显示的主 URL。可为 http(s) 或自定义协议，例如 homeassistant://。"
+        },
+        "secondary_url": {
+          "name": "次 URL",
+          "description": "作为第二个可点击按钮显示的次 URL。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "url_action": {
+          "name": "主按钮",
+          "description": "可点击的主按钮，为一个对象：url（必填）、可选的 title、icon、foreground，以及用于静默 webhook 的 http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "次按钮",
+          "description": "可点击的次按钮——对象结构与主按钮相同。"
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown 选项",
           "description": "仅适用于 countdown 模板。"
+        },
+        "action_buttons": {
+          "name": "操作按钮",
+          "description": "可点击的 URL 按钮。仅适用于 steps 和 alert 模板。"
         },
         "display_options": {
           "name": "显示、颜色和声音",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "url_action": {
+          "name": "主按钮",
+          "description": "可点击的主按钮，为一个对象：url（必填）、可选的 title、icon、foreground，以及用于静默 webhook 的 http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "次按钮",
+          "description": "可点击的次按钮——对象结构与主按钮相同。"
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "url_action": {
+          "name": "主按钮",
+          "description": "可点击的主按钮，为一个对象：url（必填）、可选的 title、icon、foreground，以及用于静默 webhook 的 http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "次按钮",
+          "description": "可点击的次按钮——对象结构与主按钮相同。"
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "作为可点击按钮显示的主 URL。可为 http(s) 或自定义协议，例如 homeassistant://。"
+        },
+        "secondary_url": {
+          "name": "次 URL",
+          "description": "作为第二个可点击按钮显示的次 URL。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "url_action": {
+          "name": "主按钮",
+          "description": "可点击的主按钮，为一个对象：url（必填）、可选的 title、icon、foreground，以及用于静默 webhook 的 http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "次按钮",
+          "description": "可点击的次按钮——对象结构与主按钮相同。"
         }
       },
       "sections": {
         "labels": {
           "name": "标签和图标",
           "description": "可选的文本标签和图标。适用于任何模板。"
+        },
+        "action_buttons": {
+          "name": "操作按钮",
+          "description": "可点击的 URL 按钮。仅适用于 steps 和 alert 模板。"
         },
         "display_options": {
           "name": "显示、颜色和声音",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "history": {
+          "name": "历史记录（初始值）",
+          "description": "迷你折线图的初始填充值：一个将系列名称映射到 (timestamp, value) 列表的对象。仅用于初始填充——首次更新后由服务器接管。"
+        },
+        "url": {
+          "name": "URL",
+          "description": "作为可点击按钮显示的主 URL。可为 http(s) 或自定义协议，例如 homeassistant://。"
+        },
+        "secondary_url": {
+          "name": "次 URL",
+          "description": "作为第二个可点击按钮显示的次 URL。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "url_action": {
+          "name": "主按钮",
+          "description": "可点击的主按钮，为一个对象：url（必填）、可选的 title、icon、foreground，以及用于静默 webhook 的 http(s) method/headers/body。"
+        },
+        "secondary_url_action": {
+          "name": "次按钮",
+          "description": "可点击的次按钮——对象结构与主按钮相同。"
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge 和 timeline 选项",
           "description": "仅适用于 gauge 和 timeline 模板。"
+        },
+        "action_buttons": {
+          "name": "操作按钮",
+          "description": "可点击的 URL 按钮。仅适用于 steps 和 alert 模板。"
         },
         "display_options": {
           "name": "显示、颜色和声音",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "元数据",
           "description": "附加到通知的额外元数据键值对。"
+        },
+        "media": {
+          "name": "媒体",
+          "description": "媒体附件，为一个包含 `url`（HTTPS）和 `type`（image、video 或 audio）的对象。"
+        },
+        "actions": {
+          "name": "动作",
+          "description": "动作按钮列表。每个动作是一个对象，包含 id、title、可选的 url、foreground、destructive、authentication_required 和 icon。对于 http(s) URL，还可通过 method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers 和 body 发送静默 webhook。"
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "刷新小组件",
+      "description": "强制刷新已追踪的 PushWard 小组件。绕过内存中的差异缓存，即使值未改变也会重新渲染小组件并推送到 iOS。",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "小组件 slug 标识符。必须提供 slug 或 entity_id 之一。"
+        },
+        "entity_id": {
+          "name": "实体",
+          "description": "绑定到小组件的 HA 实体。必须提供 slug 或 entity_id 之一。"
+        }
+      }
+    },
+    "send_email": {
+      "name": "发送邮件",
+      "description": "通过 PushWard 发送事务性邮件。可提供纯文本正文、HTML 正文或两者。集成密钥需要具备“emails”权限。",
+      "fields": {
+        "to": {
+          "name": "收件人",
+          "description": "收件人邮箱地址。必须是你已在 PushWard iOS 应用中添加并确认过的地址——未验证的地址会被拒绝。"
+        },
+        "subject": {
+          "name": "主题",
+          "description": "邮件主题行。"
+        },
+        "body": {
+          "name": "正文",
+          "description": "纯文本邮件正文。可提供此项、HTML 正文或两者。"
+        },
+        "html_body": {
+          "name": "HTML 正文",
+          "description": "HTML 邮件正文。可提供此项、纯文本正文或两者。"
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "删除小组件",
+      "description": "从服务器删除 PushWard 小组件。如果仍有追踪小组件的配置项驱动此 slug，则该小组件会在下次重启/同步时重新创建——请移除该配置项以永久删除。请提供 slug 或 entity_id 之一。",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "小组件 slug 标识符。必须提供 slug 或 entity_id 之一。"
+        },
+        "entity_id": {
+          "name": "实体",
+          "description": "绑定到小组件的 HA 实体。会根据配置解析为匹配的小组件。必须提供 slug 或 entity_id 之一。"
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "连接到 PushWard",
         "data": {
           "integration_key": "集成密钥"
+        },
+        "description": "输入你的 PushWard 集成密钥以开始使用。可从 App Store 获取 PushWard iOS 应用：{app_store_url}",
+        "data_description": {
+          "integration_key": "打开 PushWard iOS 应用（App Store：{app_store_url}）→ 设置 → 集成密钥。你可以粘贴默认密钥，或创建一个作用域为 'ha-*' 的新密钥。"
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "步骤标签",
             "step_rows": "步骤行高",
             "fired_at_attribute": "触发时间属性",
-            "units": "每系列单位"
+            "units": "每系列单位",
+            "progress_entity": "进度实体",
+            "remaining_time_entity": "剩余时间实体",
+            "current_step_entity": "当前步骤实体",
+            "value_entity": "数值实体",
+            "subtitle_entity": "副标题实体",
+            "tap_action_url": "点击动作 URL",
+            "tap_action_foreground": "打开点击动作 URL",
+            "url_foreground": "打开主按钮 URL",
+            "url_title": "主按钮标题",
+            "secondary_url_foreground": "打开次按钮 URL",
+            "secondary_url_title": "次按钮标题",
+            "snooze_seconds": "稍后提醒秒数（iOS 26+）",
+            "fired_at_entity": "触发时间实体"
           },
           "data_description": {
             "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
@@ -957,7 +1192,20 @@
             "step_labels": "每个步骤的标签。格式：1=第一步, 2=第二步。必须覆盖步骤 1..total_steps。仅适用于 steps 模板。",
             "step_rows": "每个步骤的行高（1–10），以逗号分隔。必须有 total_steps 个条目。仅适用于 steps 模板。",
             "fired_at_attribute": "持有告警触发时 Unix 时间戳的实体属性。仅适用于 alert 模板。",
-            "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。"
+            "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。",
+            "progress_entity": "从单独的实体（而非被追踪实体）读取进度。留空则使用被追踪实体。若设置了属性字段，则读取此实体的该属性；否则读取其状态。",
+            "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
+            "current_step_entity": "从单独的实体读取当前步骤。留空则使用被追踪实体。",
+            "value_entity": "从单独的实体读取 gauge 数值。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
+            "subtitle_entity": "从单独的实体（例如程序/模式传感器）显示副标题。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
+            "tap_action_url": "点击 Live Activity 背景时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0（打开对应应用）。",
+            "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST，无需离开锁屏。",
+            "url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+            "url_title": "主按钮标签（最多 64 个字符）。",
+            "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+            "secondary_url_title": "次按钮标签（最多 64 个字符）。",
+            "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
+            "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。"
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL 必须使用 http:// 或 https:// 协议。",
-        "invalid_gauge_range": "最小值必须小于最大值。"
+        "invalid_gauge_range": "最小值必须小于最大值。",
+        "silent_requires_http": "静默 webhook（关闭 foreground）需要 http:// 或 https:// URL。"
       },
       "abort": {
         "already_configured": "此实体已被追踪。",
         "reconfigure_successful": "实体配置已更新。"
       }
+    },
+    "tracked_widget": {
+      "entry_type": "追踪的小组件",
+      "initiate_flow": {
+        "user": "添加追踪的小组件"
+      },
+      "step": {
+        "user": {
+          "title": "将小组件添加到 PushWard",
+          "data": {
+            "entity_id": "实体",
+            "widget_template": "模板",
+            "slug": "小组件 Slug"
+          },
+          "data_description": {
+            "widget_template": "小组件布局。`value` 用于单个数字，`progress` 用于 0–1 进度条，`gauge` 用于范围内数值，`status` 用于严重程度徽章，`stat_list` 用于最多 6 行。",
+            "slug": "此小组件的唯一标识符。留空则根据实体 ID 自动生成。"
+          }
+        },
+        "reconfigure": {
+          "title": "编辑小组件",
+          "data": {
+            "entity_id": "实体",
+            "widget_template": "模板",
+            "slug": "小组件 Slug"
+          },
+          "data_description": {
+            "widget_template": "小组件布局。",
+            "slug": "此小组件的唯一标识符。"
+          }
+        },
+        "details": {
+          "title": "小组件选项",
+          "data": {
+            "widget_name": "小组件名称",
+            "value_attribute": "数值属性",
+            "unit": "单位",
+            "min_value": "最小值",
+            "max_value": "最大值",
+            "severity": "严重程度",
+            "stat_rows": "统计行",
+            "label": "标签",
+            "label_attribute": "标签属性",
+            "subtitle_attribute": "副标题属性",
+            "icon": "图标",
+            "icon_attribute": "图标属性",
+            "accent_color": "强调色",
+            "accent_color_attribute": "强调色属性",
+            "background_color": "背景颜色",
+            "text_color": "文字颜色",
+            "widget_trigger_mode": "触发模式",
+            "widget_poll_interval": "轮询间隔（秒）",
+            "tap_action_url": "点击动作 URL",
+            "tap_action_foreground": "打开点击动作 URL"
+          },
+          "data_description": {
+            "widget_name": "在 iOS 小组件选择器中显示的名称。默认使用实体的友好名称。",
+            "value_attribute": "持有数值的实体属性。留空则使用实体的主状态。",
+            "unit": "显示在数值旁边的单位。最多 32 个字符。",
+            "min_value": "gauge 范围的最小值。",
+            "max_value": "gauge 范围的最大值。",
+            "severity": "状态严重程度（info、warning、critical、success）。",
+            "stat_rows": "最多 6 行。格式：`Label=entity_id[:attribute[:unit]]`，以逗号分隔。示例：`Users=sensor.user_count, Active=sensor.active_devices:count`。",
+            "label": "显示在小组件上的静态标签。留空则从实体推导。",
+            "label_attribute": "用作标签的实体属性。会覆盖静态标签。",
+            "subtitle_attribute": "作为小组件副标题显示的实体属性。",
+            "icon": "静态图标。支持 SF Symbols 和 MDI 名称。",
+            "icon_attribute": "用于动态图标的实体属性。会覆盖静态图标。",
+            "accent_color": "小组件的强调色。留空则使用默认值。",
+            "accent_color_attribute": "用于动态强调色的实体属性。",
+            "background_color": "可选的背景颜色。",
+            "text_color": "可选的文字颜色。",
+            "widget_trigger_mode": "更新的触发方式。`event` 响应状态变化；`poll` 按固定间隔重新评估。",
+            "widget_poll_interval": "两次轮询之间的间隔（10–3600 秒）。仅在触发模式为 `poll` 时使用。",
+            "tap_action_url": "点击小组件时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0。",
+            "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST。"
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL 必须包含有效的协议。请使用 http(s):// 或自定义应用协议，例如 homeassistant://。",
+        "silent_requires_http": "静默 webhook（关闭 foreground）需要 http:// 或 https:// URL。",
+        "invalid_gauge_range": "最小值必须小于最大值。",
+        "stat_rows_required": "stat_list 模板至少需要一个统计行。"
+      },
+      "abort": {
+        "already_configured": "已存在使用此 slug 的小组件。",
+        "reconfigure_successful": "小组件配置已更新。"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "已用通知数"
+      },
+      "live_activity_updates_used": {
+        "name": "已用 Live Activity 更新数"
+      },
+      "widget_updates_used": {
+        "name": "已用小组件更新数"
+      },
+      "emails_used": {
+        "name": "已用邮件数"
+      },
+      "subscription_tier": {
+        "name": "订阅等级",
+        "state": {
+          "free": "免费",
+          "premium": "高级"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "没有与 slug={slug} entity_id={entity_id} 匹配的 PushWard 小组件。"
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "PushWard update_activity 动作已弃用",
+      "description": "`pushward.update_activity` 动作已弃用。请将你的自动化改用特定模板的动作——例如 `pushward.update_activity_countdown` 或 `pushward.update_activity_gauge`。旧动作目前仍可使用，但将在未来版本中移除。"
+    },
+    "usage_limit_notifications": {
+      "title": "已达到 PushWard 通知上限",
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 条通知中的 {used} 条，因此在配额重置（{resets_at}）之前，新通知将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+    },
+    "usage_limit_live_activity": {
+      "title": "已达到 PushWard Live Activity 更新上限",
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次 Live Activity 更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+    },
+    "usage_limit_widgets": {
+      "title": "已达到 PushWard 小组件更新上限",
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次小组件更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+    },
+    "usage_limit_emails": {
+      "title": "已达到 PushWard 邮件上限",
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 封邮件中的 {used} 封，因此在配额重置（{resets_at}）之前，新邮件将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
     }
   }
 }

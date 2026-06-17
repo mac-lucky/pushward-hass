@@ -53,7 +53,7 @@
           "description": "Stempel waktu Unix untuk tanggal akhir countdown."
         },
         "total_steps": {
-          "name": "Total Steps",
+          "name": "Total Langkah",
           "description": "Total jumlah steps."
         },
         "current_step": {
@@ -139,6 +139,34 @@
         "units": {
           "name": "Satuan",
           "description": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
+        },
+        "snooze_seconds": {
+          "name": "Detik Tunda",
+          "description": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Default 300 (5 mnt). Memerlukan alarm (iOS 26+, hanya templat hitung mundur)."
+        },
+        "duration": {
+          "name": "Durasi",
+          "description": "Alternatif atur-sekali untuk Tanggal Berakhir: detik (>=1) atau string durasi seperti \"1h30m\". Server menyetel ulang awal/akhir ke sekarang. Kirim Durasi atau Tanggal Berakhir — Durasi menang jika keduanya disetel."
+        },
+        "start_date": {
+          "name": "Tanggal Mulai",
+          "description": "Stempel waktu Unix saat hitung mundur dimulai (menjadi acuan bilah berlalu/tersisa). Server menetapkan default ini ke sekarang."
+        },
+        "history": {
+          "name": "Riwayat (seed)",
+          "description": "Seed sparkline awal: objek berisi nama seri ke daftar (timestamp, value). Hanya seed — server mengambil alih setelah pembaruan pertama."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "url_action": {
+          "name": "Tombol Utama",
+          "description": "Tombol utama yang dapat diketuk sebagai objek: url (wajib), title, icon, foreground opsional, dan method/headers/body http(s) untuk webhook senyap."
+        },
+        "secondary_url_action": {
+          "name": "Tombol Sekunder",
+          "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Prioritas",
           "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL utama yang ditampilkan sebagai tombol yang dapat diketuk. http(s) atau skema khusus seperti homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL Sekunder",
+          "description": "URL sekunder yang ditampilkan sebagai tombol kedua yang dapat diketuk."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "url_action": {
+          "name": "Tombol Utama",
+          "description": "Tombol utama yang dapat diketuk sebagai objek: url (wajib), title, icon, foreground opsional, dan method/headers/body http(s) untuk webhook senyap."
+        },
+        "secondary_url_action": {
+          "name": "Tombol Sekunder",
+          "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
         }
       },
       "sections": {
         "labels": {
           "name": "Label & ikon",
           "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "action_buttons": {
+          "name": "Tombol tindakan",
+          "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
         },
         "display_options": {
           "name": "Tampilan, warna & suara",
@@ -281,7 +333,7 @@
           "description": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya berfungsi di iOS 26+."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Detik Tunda",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Prioritas",
           "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "duration": {
+          "name": "Durasi",
+          "description": "Alternatif atur-sekali untuk Tanggal Berakhir: detik (>=1) atau string durasi seperti \"1h30m\". Server menyetel ulang awal/akhir ke sekarang. Kirim Durasi atau Tanggal Berakhir — Durasi menang jika keduanya disetel."
+        },
+        "start_date": {
+          "name": "Tanggal Mulai",
+          "description": "Stempel waktu Unix saat hitung mundur dimulai (menjadi acuan bilah berlalu/tersisa). Server menetapkan default ini ke sekarang."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL utama yang ditampilkan sebagai tombol yang dapat diketuk. http(s) atau skema khusus seperti homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL Sekunder",
+          "description": "URL sekunder yang ditampilkan sebagai tombol kedua yang dapat diketuk."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "url_action": {
+          "name": "Tombol Utama",
+          "description": "Tombol utama yang dapat diketuk sebagai objek: url (wajib), title, icon, foreground opsional, dan method/headers/body http(s) untuk webhook senyap."
+        },
+        "secondary_url_action": {
+          "name": "Tombol Sekunder",
+          "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "Opsi countdown",
           "description": "Hanya untuk templat countdown."
+        },
+        "action_buttons": {
+          "name": "Tombol tindakan",
+          "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
         },
         "display_options": {
           "name": "Tampilan, warna & suara",
@@ -337,7 +421,7 @@
           "description": "Status aktivitas yang diinginkan."
         },
         "total_steps": {
-          "name": "Total Steps",
+          "name": "Total Langkah",
           "description": "Total jumlah steps."
         },
         "current_step": {
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Prioritas",
           "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "url_action": {
+          "name": "Tombol Utama",
+          "description": "Tombol utama yang dapat diketuk sebagai objek: url (wajib), title, icon, foreground opsional, dan method/headers/body http(s) untuk webhook senyap."
+        },
+        "secondary_url_action": {
+          "name": "Tombol Sekunder",
+          "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Prioritas",
           "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "url_action": {
+          "name": "Tombol Utama",
+          "description": "Tombol utama yang dapat diketuk sebagai objek: url (wajib), title, icon, foreground opsional, dan method/headers/body http(s) untuk webhook senyap."
+        },
+        "secondary_url_action": {
+          "name": "Tombol Sekunder",
+          "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Prioritas",
           "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL utama yang ditampilkan sebagai tombol yang dapat diketuk. http(s) atau skema khusus seperti homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL Sekunder",
+          "description": "URL sekunder yang ditampilkan sebagai tombol kedua yang dapat diketuk."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "url_action": {
+          "name": "Tombol Utama",
+          "description": "Tombol utama yang dapat diketuk sebagai objek: url (wajib), title, icon, foreground opsional, dan method/headers/body http(s) untuk webhook senyap."
+        },
+        "secondary_url_action": {
+          "name": "Tombol Sekunder",
+          "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
         }
       },
       "sections": {
         "labels": {
           "name": "Label & ikon",
           "description": "Label teks dan ikon opsional. Berlaku untuk templat apa pun."
+        },
+        "action_buttons": {
+          "name": "Tombol tindakan",
+          "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
         },
         "display_options": {
           "name": "Tampilan, warna & suara",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Prioritas",
           "description": "Prioritas aktivitas (0 = terendah, 10 = tertinggi)."
+        },
+        "history": {
+          "name": "Riwayat (seed)",
+          "description": "Seed sparkline awal: objek berisi nama seri ke daftar (timestamp, value). Hanya seed — server mengambil alih setelah pembaruan pertama."
+        },
+        "url": {
+          "name": "URL",
+          "description": "URL utama yang ditampilkan sebagai tombol yang dapat diketuk. http(s) atau skema khusus seperti homeassistant://."
+        },
+        "secondary_url": {
+          "name": "URL Sekunder",
+          "description": "URL sekunder yang ditampilkan sebagai tombol kedua yang dapat diketuk."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "url_action": {
+          "name": "Tombol Utama",
+          "description": "Tombol utama yang dapat diketuk sebagai objek: url (wajib), title, icon, foreground opsional, dan method/headers/body http(s) untuk webhook senyap."
+        },
+        "secondary_url_action": {
+          "name": "Tombol Sekunder",
+          "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "Opsi gauge dan timeline",
           "description": "Hanya untuk templat gauge dan timeline."
+        },
+        "action_buttons": {
+          "name": "Tombol tindakan",
+          "description": "Tombol URL yang dapat ditekan. Hanya untuk templat steps dan alert."
         },
         "display_options": {
           "name": "Tampilan, warna & suara",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Metadata",
           "description": "Metadata pasangan kunci-nilai tambahan yang dikirim bersama notifikasi."
+        },
+        "media": {
+          "name": "Media",
+          "description": "Lampiran media sebagai objek dengan `url` (HTTPS) dan `type` (image, video, atau audio)."
+        },
+        "actions": {
+          "name": "Aksi",
+          "description": "Daftar tombol aksi. Setiap aksi adalah objek dengan id, title, serta url, foreground, destructive, authentication_required, dan icon opsional. Untuk url http(s) Anda juga dapat mengirim webhook senyap dengan method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, dan body."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Segarkan Widget",
+      "description": "Paksa segarkan widget PushWard yang dilacak. Melewati cache diff dalam memori sehingga widget dirender ulang dan dikirim ke iOS meski nilainya tidak berubah.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Pengidentifikasi slug widget. Slug atau entity_id harus diberikan."
+        },
+        "entity_id": {
+          "name": "Entitas",
+          "description": "Entitas HA yang terikat ke widget. Slug atau entity_id harus diberikan."
+        }
+      }
+    },
+    "send_email": {
+      "name": "Kirim Email",
+      "description": "Kirim email transaksional melalui PushWard. Berikan body teks, body HTML, atau keduanya. Kunci integrasi memerlukan kapabilitas \"emails\".",
+      "fields": {
+        "to": {
+          "name": "Kepada",
+          "description": "Alamat email penerima. Harus merupakan alamat yang sudah Anda tambahkan dan konfirmasi di aplikasi PushWard iOS — alamat yang belum diverifikasi akan ditolak."
+        },
+        "subject": {
+          "name": "Subjek",
+          "description": "Baris subjek email."
+        },
+        "body": {
+          "name": "Isi",
+          "description": "Isi email teks biasa. Berikan ini, isi HTML, atau keduanya."
+        },
+        "html_body": {
+          "name": "Isi HTML",
+          "description": "Isi email HTML. Berikan ini, isi teks biasa, atau keduanya."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Hapus Widget",
+      "description": "Hapus widget PushWard dari server. Jika entri konfigurasi widget-terlacak masih menggerakkan slug ini, widget akan dibuat ulang pada mulai ulang/sinkronisasi berikutnya — hapus entri konfigurasi untuk menghapusnya secara permanen. Berikan slug atau entity_id.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Pengidentifikasi slug widget. Slug atau entity_id harus diberikan."
+        },
+        "entity_id": {
+          "name": "Entitas",
+          "description": "Entitas HA yang terikat ke widget. Dipetakan ke widget yang cocok berdasarkan konfigurasi. Slug atau entity_id harus diberikan."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Hubungkan ke PushWard",
         "data": {
           "integration_key": "Kunci Integrasi"
+        },
+        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Dapatkan aplikasi PushWard iOS dari App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "Buka aplikasi PushWard iOS (App Store: {app_store_url}) → Pengaturan → Kunci Integrasi. Anda dapat menempelkan kunci default, atau membuat kunci baru dengan cakupan 'ha-*'."
         }
       },
       "reconfigure": {
@@ -874,7 +1096,7 @@
             "end_states": "Status Akhir",
             "progress_attribute": "Atribut Kemajuan",
             "remaining_time_attribute": "Atribut Waktu Tersisa",
-            "total_steps": "Total Steps",
+            "total_steps": "Total Langkah",
             "current_step_attribute": "Atribut Langkah Saat Ini",
             "severity": "Tingkat Keparahan",
             "value_attribute": "Atribut Nilai",
@@ -912,7 +1134,20 @@
             "step_labels": "Label Langkah",
             "step_rows": "Baris Langkah",
             "fired_at_attribute": "Atribut Waktu Dipicu",
-            "units": "Satuan"
+            "units": "Satuan",
+            "progress_entity": "Entitas Kemajuan",
+            "remaining_time_entity": "Entitas Waktu Tersisa",
+            "current_step_entity": "Entitas Langkah Saat Ini",
+            "value_entity": "Entitas Nilai",
+            "subtitle_entity": "Entitas Subjudul",
+            "tap_action_url": "URL Aksi Ketuk",
+            "tap_action_foreground": "Buka URL Aksi Ketuk",
+            "url_foreground": "Buka URL Tombol Utama",
+            "url_title": "Judul Tombol Utama",
+            "secondary_url_foreground": "Buka URL Tombol Sekunder",
+            "secondary_url_title": "Judul Tombol Sekunder",
+            "snooze_seconds": "Detik Tunda (iOS 26+)",
+            "fired_at_entity": "Entitas Waktu Terpicu"
           },
           "data_description": {
             "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
@@ -957,7 +1192,20 @@
             "step_labels": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah.",
             "step_rows": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps.",
             "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
-            "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
+            "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%",
+            "progress_entity": "Baca kemajuan dari entitas terpisah alih-alih entitas yang dilacak. Biarkan kosong untuk menggunakan entitas yang dilacak. Jika kolom atribut disetel, baca atribut tersebut dari entitas ini; jika tidak, statusnya.",
+            "remaining_time_entity": "Baca waktu tersisa dari entitas terpisah (mis. sensor waktu mesin cuci). Biarkan kosong untuk menggunakan entitas yang dilacak. Mengurai otomatis sensor stempel waktu (waktu selesai), sensor durasi dengan satuan, string H:MM:SS, atau detik biasa.",
+            "current_step_entity": "Baca langkah saat ini dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak.",
+            "value_entity": "Baca nilai gauge dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
+            "subtitle_entity": "Tampilkan subjudul dari entitas terpisah (mis. sensor program/mode). Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
+            "tap_action_url": "URL opsional yang dibuka saat mengetuk latar Live Activity. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0 (membuka aplikasi itu).",
+            "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang tanpa meninggalkan Layar Kunci.",
+            "url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+            "url_title": "Label tombol utama (maks 64 karakter).",
+            "secondary_url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+            "secondary_url_title": "Label tombol sekunder (maks 64 karakter).",
+            "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
+            "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL harus menggunakan skema http:// atau https://.",
-        "invalid_gauge_range": "Nilai minimum harus lebih kecil dari nilai maksimum."
+        "invalid_gauge_range": "Nilai minimum harus lebih kecil dari nilai maksimum.",
+        "silent_requires_http": "Webhook senyap (foreground nonaktif) memerlukan URL http:// atau https://."
       },
       "abort": {
         "already_configured": "Entitas ini sudah dilacak.",
         "reconfigure_successful": "Konfigurasi entitas diperbarui."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Widget Terlacak",
+      "initiate_flow": {
+        "user": "Tambahkan widget terlacak"
+      },
+      "step": {
+        "user": {
+          "title": "Tambahkan Widget ke PushWard",
+          "data": {
+            "entity_id": "Entitas",
+            "widget_template": "Templat",
+            "slug": "Slug Widget"
+          },
+          "data_description": {
+            "widget_template": "Tata letak widget. Gunakan `value` untuk satu angka, `progress` untuk bilah 0–1, `gauge` untuk nilai dalam rentang, `status` untuk lencana tingkat keparahan, atau `stat_list` untuk hingga 6 baris.",
+            "slug": "Pengidentifikasi unik untuk widget ini. Biarkan kosong untuk membuat otomatis dari ID entitas."
+          }
+        },
+        "reconfigure": {
+          "title": "Edit Widget",
+          "data": {
+            "entity_id": "Entitas",
+            "widget_template": "Templat",
+            "slug": "Slug Widget"
+          },
+          "data_description": {
+            "widget_template": "Tata letak widget.",
+            "slug": "Pengidentifikasi unik untuk widget ini."
+          }
+        },
+        "details": {
+          "title": "Opsi Widget",
+          "data": {
+            "widget_name": "Nama Widget",
+            "value_attribute": "Atribut Nilai",
+            "unit": "Satuan",
+            "min_value": "Nilai Minimum",
+            "max_value": "Nilai Maksimum",
+            "severity": "Tingkat Keparahan",
+            "stat_rows": "Baris Statistik",
+            "label": "Label",
+            "label_attribute": "Atribut Label",
+            "subtitle_attribute": "Atribut Subjudul",
+            "icon": "Ikon",
+            "icon_attribute": "Atribut Ikon",
+            "accent_color": "Warna Aksen",
+            "accent_color_attribute": "Atribut Warna Aksen",
+            "background_color": "Warna Latar",
+            "text_color": "Warna Teks",
+            "widget_trigger_mode": "Mode Pemicu",
+            "widget_poll_interval": "Interval Polling (detik)",
+            "tap_action_url": "URL Aksi Ketuk",
+            "tap_action_foreground": "Buka URL Aksi Ketuk"
+          },
+          "data_description": {
+            "widget_name": "Nama tampilan yang ditampilkan di pemilih widget iOS. Default ke nama ramah entitas.",
+            "value_attribute": "Atribut entitas yang menyimpan nilai. Biarkan kosong untuk menggunakan status utama entitas.",
+            "unit": "Satuan tampilan yang ditampilkan di samping nilai. Maks 32 karakter.",
+            "min_value": "Nilai minimum untuk rentang gauge.",
+            "max_value": "Nilai maksimum untuk rentang gauge.",
+            "severity": "Tingkat keparahan status (info, warning, critical, success).",
+            "stat_rows": "Hingga 6 baris. Format: `Label=entity_id[:attribute[:unit]]`, dipisah koma. Contoh: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Label statis yang ditampilkan pada widget. Biarkan kosong untuk diturunkan dari entitas.",
+            "label_attribute": "Atribut entitas yang digunakan sebagai label. Menggantikan label statis.",
+            "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul widget.",
+            "icon": "Ikon statis. Mendukung nama SF Symbols dan MDI.",
+            "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis.",
+            "accent_color": "Warna aksen untuk widget. Biarkan kosong untuk default.",
+            "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis.",
+            "background_color": "Warna latar opsional.",
+            "text_color": "Warna teks opsional.",
+            "widget_trigger_mode": "Bagaimana pembaruan dipicu. `event` bereaksi terhadap perubahan status; `poll` mengevaluasi ulang pada interval tetap.",
+            "widget_poll_interval": "Interval antar polling (10–3600 detik). Hanya digunakan saat mode pemicu adalah `poll`.",
+            "tap_action_url": "URL opsional yang dibuka saat mengetuk widget. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL harus menyertakan skema yang valid. Gunakan http(s):// atau skema aplikasi khusus seperti homeassistant://.",
+        "silent_requires_http": "Webhook senyap (foreground nonaktif) memerlukan URL http:// atau https://.",
+        "invalid_gauge_range": "Nilai minimum harus lebih kecil dari nilai maksimum.",
+        "stat_rows_required": "Minimal satu baris statistik diperlukan untuk templat stat_list."
+      },
+      "abort": {
+        "already_configured": "Widget dengan slug ini sudah ada.",
+        "reconfigure_successful": "Konfigurasi widget diperbarui."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Notifikasi terpakai"
+      },
+      "live_activity_updates_used": {
+        "name": "Pembaruan Live Activity terpakai"
+      },
+      "widget_updates_used": {
+        "name": "Pembaruan widget terpakai"
+      },
+      "emails_used": {
+        "name": "Email terpakai"
+      },
+      "subscription_tier": {
+        "name": "Tingkat langganan",
+        "state": {
+          "free": "Gratis",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Tidak ada widget PushWard yang cocok dengan slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "Tindakan update_activity PushWard sudah usang",
+      "description": "Tindakan `pushward.update_activity` sudah usang. Alihkan otomasi Anda ke tindakan khusus templat — misalnya `pushward.update_activity_countdown` atau `pushward.update_activity_gauge`. Tindakan lama masih berfungsi untuk saat ini tetapi akan dihapus pada rilis mendatang."
+    },
+    "usage_limit_notifications": {
+      "title": "Batas notifikasi PushWard tercapai",
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} notifikasi untuk periode saat ini, sehingga notifikasi baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+    },
+    "usage_limit_live_activity": {
+      "title": "Batas pembaruan Live Activity PushWard tercapai",
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan Live Activity untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+    },
+    "usage_limit_widgets": {
+      "title": "Batas pembaruan widget PushWard tercapai",
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan widget untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+    },
+    "usage_limit_emails": {
+      "title": "Batas email PushWard tercapai",
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} email untuk periode saat ini, sehingga email baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
     }
   }
 }

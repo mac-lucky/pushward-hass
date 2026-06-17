@@ -139,6 +139,34 @@
         "units": {
           "name": "Eenhedenkaart",
           "description": "Eenheidslabels per reeks. Sleutels moeten overeenkomen met de sleutels van het value dict. Alleen voor het sjabloon timeline."
+        },
+        "snooze_seconds": {
+          "name": "Snooze-seconden",
+          "description": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Standaard 300 (5 min). Vereist alarm (alleen iOS 26+, aftelsjabloon)."
+        },
+        "duration": {
+          "name": "Duur",
+          "description": "Instellen-en-vergeten alternatief voor einddatum: seconden (>=1) of een duurtekst zoals \"1h30m\". De server verankert start/einde opnieuw op nu. Verstuur óf Duur óf Einddatum — Duur wint als beide zijn ingesteld."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-tijdstempel waarop het aftellen begon (verankert de verstreken/resterende balk). De server stelt dit standaard in op nu."
+        },
+        "history": {
+          "name": "Geschiedenis (seed)",
+          "description": "Initiële sparkline-seed: een object van seriesnaam naar een lijst van (timestamp, value). Alleen seed — de server neemt het over na de eerste update."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primaire knop",
+          "description": "Primaire aantikbare knop als object: url (verplicht), optionele title, icon, foreground, en http(s) method/headers/body voor een stille webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secundaire knop",
+          "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
         }
       },
       "sections": {
@@ -223,12 +251,36 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primaire URL die als aantikbare knop wordt getoond. http(s) of een aangepast schema zoals homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secundaire URL",
+          "description": "Secundaire URL die als tweede aantikbare knop wordt getoond."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primaire knop",
+          "description": "Primaire aantikbare knop als object: url (verplicht), optionele title, icon, foreground, en http(s) method/headers/body voor een stille webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secundaire knop",
+          "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
         }
       },
       "sections": {
         "labels": {
           "name": "Labels & pictogram",
           "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "action_buttons": {
+          "name": "Actieknoppen",
+          "description": "Aanklikbare URL-knoppen. Alleen voor de sjablonen steps en alert."
         },
         "display_options": {
           "name": "Weergave, kleur & geluid",
@@ -281,7 +333,7 @@
           "description": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+, alleen voor het sjabloon countdown)."
         },
         "snooze_seconds": {
-          "name": "Snooze Seconds",
+          "name": "Snooze-seconden",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
         "accent_color": {
@@ -307,6 +359,34 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "duration": {
+          "name": "Duur",
+          "description": "Instellen-en-vergeten alternatief voor einddatum: seconden (>=1) of een duurtekst zoals \"1h30m\". De server verankert start/einde opnieuw op nu. Verstuur óf Duur óf Einddatum — Duur wint als beide zijn ingesteld."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-tijdstempel waarop het aftellen begon (verankert de verstreken/resterende balk). De server stelt dit standaard in op nu."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primaire URL die als aantikbare knop wordt getoond. http(s) of een aangepast schema zoals homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secundaire URL",
+          "description": "Secundaire URL die als tweede aantikbare knop wordt getoond."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primaire knop",
+          "description": "Primaire aantikbare knop als object: url (verplicht), optionele title, icon, foreground, en http(s) method/headers/body voor een stille webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secundaire knop",
+          "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
         }
       },
       "sections": {
@@ -317,6 +397,10 @@
         "countdown_options": {
           "name": "countdown-opties",
           "description": "Alleen voor het sjabloon countdown."
+        },
+        "action_buttons": {
+          "name": "Actieknoppen",
+          "description": "Aanklikbare URL-knoppen. Alleen voor de sjablonen steps en alert."
         },
         "display_options": {
           "name": "Weergave, kleur & geluid",
@@ -403,6 +487,18 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primaire knop",
+          "description": "Primaire aantikbare knop als object: url (verplicht), optionele title, icon, foreground, en http(s) method/headers/body voor een stille webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secundaire knop",
+          "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
         }
       },
       "sections": {
@@ -495,6 +591,18 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primaire knop",
+          "description": "Primaire aantikbare knop als object: url (verplicht), optionele title, icon, foreground, en http(s) method/headers/body voor een stille webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secundaire knop",
+          "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
         }
       },
       "sections": {
@@ -587,12 +695,36 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primaire URL die als aantikbare knop wordt getoond. http(s) of een aangepast schema zoals homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secundaire URL",
+          "description": "Secundaire URL die als tweede aantikbare knop wordt getoond."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primaire knop",
+          "description": "Primaire aantikbare knop als object: url (verplicht), optionele title, icon, foreground, en http(s) method/headers/body voor een stille webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secundaire knop",
+          "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
         }
       },
       "sections": {
         "labels": {
           "name": "Labels & pictogram",
           "description": "Optionele tekstlabels en pictogram. Gelden voor elk sjabloon."
+        },
+        "action_buttons": {
+          "name": "Actieknoppen",
+          "description": "Aanklikbare URL-knoppen. Alleen voor de sjablonen steps en alert."
         },
         "display_options": {
           "name": "Weergave, kleur & geluid",
@@ -683,6 +815,30 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0–10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "history": {
+          "name": "Geschiedenis (seed)",
+          "description": "Initiële sparkline-seed: een object van seriesnaam naar een lijst van (timestamp, value). Alleen seed — de server neemt het over na de eerste update."
+        },
+        "url": {
+          "name": "URL",
+          "description": "Primaire URL die als aantikbare knop wordt getoond. http(s) of een aangepast schema zoals homeassistant://."
+        },
+        "secondary_url": {
+          "name": "Secundaire URL",
+          "description": "Secundaire URL die als tweede aantikbare knop wordt getoond."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "url_action": {
+          "name": "Primaire knop",
+          "description": "Primaire aantikbare knop als object: url (verplicht), optionele title, icon, foreground, en http(s) method/headers/body voor een stille webhook."
+        },
+        "secondary_url_action": {
+          "name": "Secundaire knop",
+          "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
         }
       },
       "sections": {
@@ -693,6 +849,10 @@
         "gauge_timeline_options": {
           "name": "gauge- en timeline-opties",
           "description": "Alleen voor de sjablonen gauge en timeline."
+        },
+        "action_buttons": {
+          "name": "Actieknoppen",
+          "description": "Aanklikbare URL-knoppen. Alleen voor de sjablonen steps en alert."
         },
         "display_options": {
           "name": "Weergave, kleur & geluid",
@@ -805,6 +965,64 @@
         "metadata": {
           "name": "Metagegevens",
           "description": "Sleutel-waardeparen van aanvullende metagegevens gekoppeld aan de melding."
+        },
+        "media": {
+          "name": "Media",
+          "description": "Mediabijlage als object met `url` (HTTPS) en `type` (image, video of audio)."
+        },
+        "actions": {
+          "name": "Acties",
+          "description": "Lijst met actieknoppen. Elke actie is een object met id, title, optionele url, foreground, destructive, authentication_required en icon. Voor een http(s)-url kun je ook een stille webhook versturen met method (GET/POST/PUT/PATCH/DELETE/HEAD), headers en body."
+        }
+      }
+    },
+    "widget_refresh": {
+      "name": "Widget vernieuwen",
+      "description": "Forceer het vernieuwen van een gevolgde PushWard-widget. Omzeilt de in-memory diff-cache zodat de widget opnieuw wordt gerenderd en naar iOS wordt gepusht, zelfs als de waarde niet is veranderd.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificatie van de widget. Geef óf slug óf entity_id op."
+        },
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "HA-entiteit gekoppeld aan de widget. Geef óf slug óf entity_id op."
+        }
+      }
+    },
+    "send_email": {
+      "name": "E-mail versturen",
+      "description": "Verstuur een transactionele e-mail via PushWard. Geef een tekstinhoud, een HTML-inhoud of beide op. De integratiesleutel heeft de \"emails\"-capaciteit nodig.",
+      "fields": {
+        "to": {
+          "name": "Aan",
+          "description": "E-mailadres van de ontvanger. Moet een adres zijn dat je al hebt toegevoegd en bevestigd in de PushWard iOS-app — niet-geverifieerde adressen worden geweigerd."
+        },
+        "subject": {
+          "name": "Onderwerp",
+          "description": "Onderwerpregel van de e-mail."
+        },
+        "body": {
+          "name": "Inhoud",
+          "description": "Platte-tekst-inhoud van de e-mail. Geef dit, een HTML-inhoud of beide op."
+        },
+        "html_body": {
+          "name": "HTML-inhoud",
+          "description": "HTML-inhoud van de e-mail. Geef dit, een platte-tekst-inhoud of beide op."
+        }
+      }
+    },
+    "delete_widget": {
+      "name": "Widget verwijderen",
+      "description": "Verwijder een PushWard-widget van de server. Als een gevolgde-widget-configuratie-item deze slug nog aanstuurt, wordt de widget bij de volgende herstart/synchronisatie opnieuw aangemaakt — verwijder het configuratie-item om hem permanent te verwijderen. Geef óf slug óf entity_id op.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificatie van de widget. Geef óf slug óf entity_id op."
+        },
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "HA-entiteit gekoppeld aan de widget. Wordt via de configuratie omgezet naar de bijbehorende widget. Geef óf slug óf entity_id op."
         }
       }
     }
@@ -815,6 +1033,10 @@
         "title": "Verbinding maken met PushWard",
         "data": {
           "integration_key": "Integratiesleutel"
+        },
+        "description": "Voer je PushWard-integratiesleutel in om te beginnen. Download de PushWard iOS-app uit de App Store: {app_store_url}",
+        "data_description": {
+          "integration_key": "Open de PushWard iOS-app (App Store: {app_store_url}) → Instellingen → Integratiesleutels. Je kunt de standaardsleutel plakken of een nieuwe aanmaken met scope 'ha-*'."
         }
       },
       "reconfigure": {
@@ -912,7 +1134,20 @@
             "step_labels": "Staplabels",
             "step_rows": "Stap-rijhoogten",
             "fired_at_attribute": "Attribuut activeringstijd",
-            "units": "Eenheden per reeks"
+            "units": "Eenheden per reeks",
+            "progress_entity": "Voortgangsentiteit",
+            "remaining_time_entity": "Resterende-tijd-entiteit",
+            "current_step_entity": "Huidige-stap-entiteit",
+            "value_entity": "Waarde-entiteit",
+            "subtitle_entity": "Ondertitel-entiteit",
+            "tap_action_url": "Tikactie-URL",
+            "tap_action_foreground": "Tikactie-URL openen",
+            "url_foreground": "Primaire-knop-URL openen",
+            "url_title": "Titel primaire knop",
+            "secondary_url_foreground": "Secundaire-knop-URL openen",
+            "secondary_url_title": "Titel secundaire knop",
+            "snooze_seconds": "Snooze-seconden (iOS 26+)",
+            "fired_at_entity": "Geactiveerd-op-entiteit"
           },
           "data_description": {
             "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
@@ -957,7 +1192,20 @@
             "step_labels": "Labels voor elke stap. Indeling: 1=Eerste Stap, 2=Tweede Stap. Moet stappen 1..total_steps omvatten. Alleen voor het sjabloon steps.",
             "step_rows": "Rijhoogte (1–10) voor elke stap, kommagescheiden. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
             "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
-            "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline."
+            "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline.",
+            "progress_entity": "Lees de voortgang van een aparte entiteit in plaats van de gevolgde entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Als het attribuutveld is ingesteld, leest het dat attribuut van deze entiteit; anders de status.",
+            "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
+            "current_step_entity": "Lees de huidige stap van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken.",
+            "value_entity": "Lees de meterwaarde van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
+            "subtitle_entity": "Toon de ondertitel van een aparte entiteit (bijv. een programma-/modussensor). Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
+            "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de achtergrond van de Live Activity. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0 (opent die app).",
+            "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST zonder het toegangsscherm te verlaten.",
+            "url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+            "url_title": "Label van de primaire knop (max. 64 tekens).",
+            "secondary_url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+            "secondary_url_title": "Label van de secundaire knop (max. 64 tekens).",
+            "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
+            "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon."
           }
         },
         "reconfigure": {
@@ -973,12 +1221,152 @@
       },
       "error": {
         "invalid_url": "URL moet het schema http:// of https:// gebruiken.",
-        "invalid_gauge_range": "De minimumwaarde moet kleiner zijn dan de maximumwaarde."
+        "invalid_gauge_range": "De minimumwaarde moet kleiner zijn dan de maximumwaarde.",
+        "silent_requires_http": "Stille webhook (foreground uit) vereist een http:// of https://-URL."
       },
       "abort": {
         "already_configured": "Deze entiteit wordt al gevolgd.",
         "reconfigure_successful": "Entiteitsconfiguratie bijgewerkt."
       }
+    },
+    "tracked_widget": {
+      "entry_type": "Gevolgde widget",
+      "initiate_flow": {
+        "user": "Gevolgde widget toevoegen"
+      },
+      "step": {
+        "user": {
+          "title": "Widget toevoegen aan PushWard",
+          "data": {
+            "entity_id": "Entiteit",
+            "widget_template": "Sjabloon",
+            "slug": "Widget-slug"
+          },
+          "data_description": {
+            "widget_template": "Widgetindeling. Gebruik `value` voor een enkel getal, `progress` voor een 0–1-balk, `gauge` voor een waarde-binnen-bereik, `status` voor een ernst-badge, of `stat_list` voor maximaal 6 rijen.",
+            "slug": "Unieke identificatie voor deze widget. Laat leeg om automatisch te genereren op basis van de entiteits-ID."
+          }
+        },
+        "reconfigure": {
+          "title": "Widget bewerken",
+          "data": {
+            "entity_id": "Entiteit",
+            "widget_template": "Sjabloon",
+            "slug": "Widget-slug"
+          },
+          "data_description": {
+            "widget_template": "Widgetindeling.",
+            "slug": "Unieke identificatie voor deze widget."
+          }
+        },
+        "details": {
+          "title": "Widgetopties",
+          "data": {
+            "widget_name": "Widgetnaam",
+            "value_attribute": "Waarde-attribuut",
+            "unit": "Eenheid",
+            "min_value": "Minimumwaarde",
+            "max_value": "Maximumwaarde",
+            "severity": "Ernst",
+            "stat_rows": "Statistiekrijen",
+            "label": "Label",
+            "label_attribute": "Label-attribuut",
+            "subtitle_attribute": "Ondertitel-attribuut",
+            "icon": "Pictogram",
+            "icon_attribute": "Pictogram-attribuut",
+            "accent_color": "Accentkleur",
+            "accent_color_attribute": "Accentkleur-attribuut",
+            "background_color": "Achtergrondkleur",
+            "text_color": "Tekstkleur",
+            "widget_trigger_mode": "Triggermodus",
+            "widget_poll_interval": "Pollinginterval (seconden)",
+            "tap_action_url": "Tikactie-URL",
+            "tap_action_foreground": "Tikactie-URL openen"
+          },
+          "data_description": {
+            "widget_name": "Weergavenaam in de iOS-widgetkiezer. Standaard de vriendelijke naam van de entiteit.",
+            "value_attribute": "Entiteitsattribuut dat de waarde bevat. Laat leeg om de primaire status van de entiteit te gebruiken.",
+            "unit": "Weergegeven eenheid naast de waarde. Max. 32 tekens.",
+            "min_value": "Minimumwaarde voor het meterbereik.",
+            "max_value": "Maximumwaarde voor het meterbereik.",
+            "severity": "Ernst van de status (info, warning, critical, success).",
+            "stat_rows": "Maximaal 6 rijen. Formaat: `Label=entity_id[:attribute[:unit]]`, door komma's gescheiden. Voorbeeld: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "label": "Statisch label op de widget. Laat leeg om af te leiden van de entiteit.",
+            "label_attribute": "Entiteitsattribuut dat als label wordt gebruikt. Overschrijft het statische label.",
+            "subtitle_attribute": "Entiteitsattribuut dat als ondertitel van de widget wordt getoond.",
+            "icon": "Statisch pictogram. SF Symbols- en MDI-namen worden ondersteund.",
+            "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Overschrijft het statische pictogram.",
+            "accent_color": "Accentkleur voor de widget. Laat leeg voor de standaard.",
+            "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur.",
+            "background_color": "Optionele achtergrondkleur.",
+            "text_color": "Optionele tekstkleur.",
+            "widget_trigger_mode": "Hoe updates worden getriggerd. `event` reageert op statuswijzigingen; `poll` evalueert opnieuw met een vast interval.",
+            "widget_poll_interval": "Interval tussen pollingacties (10–3600 seconden). Wordt alleen gebruikt als de triggermodus `poll` is.",
+            "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de widget. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0.",
+            "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST."
+          }
+        }
+      },
+      "error": {
+        "invalid_url": "URL moet een geldig schema bevatten. Gebruik http(s):// of een aangepast app-schema zoals homeassistant://.",
+        "silent_requires_http": "Stille webhook (foreground uit) vereist een http:// of https://-URL.",
+        "invalid_gauge_range": "Minimumwaarde moet kleiner zijn dan de maximumwaarde.",
+        "stat_rows_required": "Voor het stat_list-sjabloon is minimaal één statistiekrij vereist."
+      },
+      "abort": {
+        "already_configured": "Er bestaat al een widget met deze slug.",
+        "reconfigure_successful": "Widgetconfiguratie bijgewerkt."
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Gebruikte meldingen"
+      },
+      "live_activity_updates_used": {
+        "name": "Gebruikte Live Activity-updates"
+      },
+      "widget_updates_used": {
+        "name": "Gebruikte widget-updates"
+      },
+      "emails_used": {
+        "name": "Gebruikte e-mails"
+      },
+      "subscription_tier": {
+        "name": "Abonnementsniveau",
+        "state": {
+          "free": "Gratis",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Geen PushWard-widget komt overeen met slug={slug} entity_id={entity_id}."
+    }
+  },
+  "issues": {
+    "deprecated_update_activity": {
+      "title": "De PushWard-actie update_activity is verouderd",
+      "description": "De actie `pushward.update_activity` is verouderd. Schakel je automatiseringen over naar de sjabloonspecifieke actie — bijvoorbeeld `pushward.update_activity_countdown` of `pushward.update_activity_gauge`. De oude actie werkt voorlopig nog, maar wordt in een toekomstige release verwijderd."
+    },
+    "usage_limit_notifications": {
+      "title": "PushWard-meldingslimiet bereikt",
+      "description": "Je PushWard-account heeft {used} van zijn {limit} meldingen voor de huidige periode gebruikt, dus nieuwe meldingen worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+    },
+    "usage_limit_live_activity": {
+      "title": "PushWard Live Activity-updatelimiet bereikt",
+      "description": "Je PushWard-account heeft {used} van zijn {limit} Live Activity-updates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+    },
+    "usage_limit_widgets": {
+      "title": "PushWard-widgetupdatelimiet bereikt",
+      "description": "Je PushWard-account heeft {used} van zijn {limit} widgetupdates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+    },
+    "usage_limit_emails": {
+      "title": "PushWard-e-maillimiet bereikt",
+      "description": "Je PushWard-account heeft {used} van zijn {limit} e-mails voor de huidige periode gebruikt, dus nieuwe e-mails worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
     }
   }
 }
