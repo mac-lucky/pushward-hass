@@ -35,6 +35,8 @@ from custom_components.pushward.const import (
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_ICON,
+    CONF_LABEL,
+    CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PROGRESS_ENTITY,
@@ -47,6 +49,7 @@ from custom_components.pushward.const import (
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
+    CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_VALUE_ATTRIBUTE,
@@ -527,3 +530,143 @@ async def test_alarm_triggered_alert_lifecycle(hass: HomeAssistant) -> None:
     assert _ended(api)
 
     await manager.async_stop()
+
+
+# ===========================================================================
+# Board — a multi-entity status dashboard (tiles read from separate entities)
+# ===========================================================================
+
+
+def test_home_status_board_content(hass: HomeAssistant) -> None:
+    """A 'Home Status' board folds three unrelated entities into one Live Activity.
+
+    The anchor (``binary_sensor.home_occupied``) owns start/end while each tile binds
+    to its *own* entity, so temperature, a door and humidity — entities no single
+    template could combine — render side by side. Tile values are read from
+    ``hass.states`` at map time, which is why the real ``hass`` fixture holds them.
+    """
+    hass.states.async_set(
+        "sensor.living_room_temperature",
+        "21.5",
+        {"friendly_name": "Living Room Temperature", "device_class": "temperature", "unit_of_measurement": "°C"},
+    )
+    hass.states.async_set(
+        "binary_sensor.front_door",
+        "open",
+        {"friendly_name": "Front Door", "device_class": "door"},
+    )
+    hass.states.async_set(
+        "sensor.living_room_humidity",
+        "48",
+        {"friendly_name": "Living Room Humidity", "device_class": "humidity", "unit_of_measurement": "%"},
+    )
+
+    config = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.home_occupied",
+            CONF_SLUG: "ha-home-status",
+            CONF_ACTIVITY_NAME: "Home Status",
+            CONF_ICON: "mdi:home-account",
+            CONF_TEMPLATE: "board",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_TILES: [
+                {CONF_LABEL: "Temperature", CONF_ENTITY_ID: "sensor.living_room_temperature", CONF_UNIT: "°C"},
+                {CONF_LABEL: "Front Door", CONF_ENTITY_ID: "binary_sensor.front_door"},
+                {CONF_LABEL: "Humidity", CONF_ENTITY_ID: "sensor.living_room_humidity", CONF_UNIT: "%"},
+            ],
+        }
+    )
+    state = make_mock_state("on", {"friendly_name": "Home Occupied"}, "binary_sensor.home_occupied")
+
+    content = map_content(state, config, hass=hass)
+    assert content["template"] == "board"
+    # Board has no progress bar, but the server still requires the field in [0, 1].
+    assert content["progress"] == 0.0
+
+    tiles = content["tiles"]
+    assert len(tiles) == 3
+    by_label = {tile["label"]: tile for tile in tiles}
+    assert by_label["Temperature"]["value"] == "21.5"
+    assert by_label["Temperature"]["unit"] == "°C"
+    assert by_label["Front Door"]["value"] == "open"
+    assert "unit" not in by_label["Front Door"]  # no unit configured for the door tile
+    assert by_label["Humidity"]["value"] == "48"
+    assert by_label["Humidity"]["unit"] == "%"
+
+    assert_valid_activity_content(content)
+
+
+def test_board_skips_unavailable_tile(hass: HomeAssistant) -> None:
+    """An unavailable tile entity is dropped, not rendered with a blank value."""
+    hass.states.async_set(
+        "sensor.living_room_temperature",
+        "20.0",
+        {"friendly_name": "Living Room Temperature", "device_class": "temperature", "unit_of_measurement": "°C"},
+    )
+    hass.states.async_set("sensor.living_room_humidity", "unavailable", {"friendly_name": "Living Room Humidity"})
+
+    config = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.home_occupied",
+            CONF_SLUG: "ha-home-status",
+            CONF_ACTIVITY_NAME: "Home Status",
+            CONF_ICON: "mdi:home-account",
+            CONF_TEMPLATE: "board",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_TILES: [
+                {CONF_LABEL: "Temperature", CONF_ENTITY_ID: "sensor.living_room_temperature", CONF_UNIT: "°C"},
+                {CONF_LABEL: "Humidity", CONF_ENTITY_ID: "sensor.living_room_humidity", CONF_UNIT: "%"},
+            ],
+        }
+    )
+    state = make_mock_state("on", {"friendly_name": "Home Occupied"}, "binary_sensor.home_occupied")
+
+    content = map_content(state, config, hass=hass)
+    labels = [tile["label"] for tile in content["tiles"]]
+    assert labels == ["Temperature"]  # the unavailable humidity tile is skipped
+    assert_valid_activity_content(content)
+
+
+# ===========================================================================
+# Log — an append-only event feed (one line per state, server-valid shape)
+# ===========================================================================
+
+
+def test_security_log_single_line_content(hass: HomeAssistant) -> None:
+    """A security log renders the current state as one formatted, server-valid line.
+
+    ``map_content`` emits a single line for the *current* state; the manager later
+    overrides it with the accumulated newest-first ring buffer (covered by the log
+    lifecycle test). Here we pin the per-state line shape that buffer is built from.
+    """
+    config = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "sensor.security_event",
+            CONF_SLUG: "ha-security-log",
+            CONF_ACTIVITY_NAME: "Security Log",
+            CONF_ICON: "mdi:shield-alert",
+            CONF_TEMPLATE: "log",
+            CONF_START_STATES: ["motion_detected"],
+            CONF_END_STATES: ["cleared"],
+            CONF_LOG_LEVEL_ATTRIBUTE: "severity",
+        }
+    )
+    state = make_mock_state(
+        "motion_detected",
+        {"friendly_name": "Security Event", "severity": "warn"},
+        "sensor.security_event",
+    )
+
+    content = map_content(state, config, hass=hass)
+    assert content["template"] == "log"
+    assert content["progress"] == 0.0
+    assert len(content["lines"]) == 1
+    line = content["lines"][0]
+    # "motion_detected" → underscores spaced out, then capitalized.
+    assert line["text"] == "Motion detected"
+    # The severity attribute resolved to a recognised log level.
+    assert line["level"] == "warn"
+
+    assert_valid_activity_content(content)

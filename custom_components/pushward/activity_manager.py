@@ -45,17 +45,29 @@ from .const import (
     CONF_START_STATES,
     CONF_SUBTITLE_ENTITY,
     CONF_TEMPLATE,
+    CONF_TILES,
     CONF_UPDATE_INTERVAL,
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_ENTITY,
     END_DELAY_SECONDS,
+    LOG_MAX_LINES,
 )
-from .content_mapper import _get_timeline_values, lookup_registry_icon, map_completion_content, map_content
+from .content_mapper import (
+    _build_log_line,
+    _get_timeline_values,
+    lookup_registry_icon,
+    map_completion_content,
+    map_content,
+)
 
 _HISTORY_BUFFER_MAX = 300
 _HISTORY_STORAGE_VERSION = 1
 _HISTORY_SAVE_DELAY_S = 30
 _HISTORY_SAMPLES_KEY = "samples"
+# Persisted log ring buffers live in the same Store as timeline history so log
+# templates survive restarts (the server backlog is the durable source of truth,
+# but this avoids a visible gap before the first post-restart push).
+_LOG_SAMPLES_KEY = "logs"
 
 _ACTIVITY_LIMIT_NOTIFICATION_ID = "pushward_activity_limit"
 
@@ -73,8 +85,26 @@ _COMPANION_ENTITY_KEYS = (
 
 
 def _companion_entity_ids(config: dict) -> list[str]:
-    """Return the order-preserving, deduped, non-empty companion entity_ids for an activity."""
-    return list(dict.fromkeys(eid for key in _COMPANION_ENTITY_KEYS if (eid := config.get(key))))
+    """Return the order-preserving, deduped, non-empty companion entity_ids for an activity.
+
+    For board templates the per-tile entities are also companions: a change to any
+    tile entity refreshes the board even though the anchor entity owns start/end.
+    """
+    ids = [eid for key in _COMPANION_ENTITY_KEYS if (eid := config.get(key))]
+    if config.get(CONF_TEMPLATE) == "board":
+        for tile in config.get(CONF_TILES) or []:
+            if isinstance(tile, dict) and (eid := tile.get(CONF_ENTITY_ID)):
+                ids.append(eid)
+    return list(dict.fromkeys(ids))
+
+
+def _same_log_line(head: dict | None, line: dict) -> bool:
+    """Two log lines are "the same event" when text+level match (``at`` ignored).
+
+    Used to collapse consecutive identical log lines so a re-reported state (turn-on
+    attribute churn, periodic re-reports, restart re-seed) doesn't spam duplicates.
+    """
+    return head is not None and head.get("text") == line.get("text") and head.get("level") == line.get("level")
 
 
 def _forbidden_notification_id(slug: str) -> str:
@@ -112,6 +142,9 @@ class TrackedEntity:
     # strips light attributes from the recorder DB, so recorder queries can't
     # rebuild brightness history. Keep our own ring buffer instead.
     history_buffer: deque = field(default_factory=lambda: deque(maxlen=_HISTORY_BUFFER_MAX))
+    # Newest-first log lines for the log template. Appended on every state change
+    # (and seeded at start) so the pushed snapshot accrues history up to the cap.
+    log_buffer: deque = field(default_factory=lambda: deque(maxlen=LOG_MAX_LINES))
 
 
 class ActivityManager:
@@ -181,15 +214,21 @@ class ActivityManager:
 
     async def async_start(self) -> None:
         """Subscribe to state changes and resume any active entities."""
-        persisted = await self._async_load_history()
+        persisted, persisted_logs = await self._async_load_history()
 
         for entity_cfg in self._entities:
             entity_id = entity_cfg[CONF_ENTITY_ID]
             tracked = TrackedEntity(config=entity_cfg)
 
-            # Rehydrate the buffer from disk so sparklines survive restarts.
+            # Rehydrate the buffers from disk so sparklines / logs survive restarts.
             for ts, values in persisted.get(entity_id, ()):
                 tracked.history_buffer.append((ts, values))
+            for line in persisted_logs.get(entity_id, ()):
+                # Collapse consecutive same-text lines persisted by older builds
+                # (the buffer is newest-first, so [-1] is the previous in sequence).
+                if _same_log_line(tracked.log_buffer[-1] if tracked.log_buffer else None, line):
+                    continue
+                tracked.log_buffer.append(line)
 
             tracked.unsub_state = async_track_state_change_event(
                 self._hass,
@@ -213,24 +252,31 @@ class ActivityManager:
             self._tracked[entity_id] = tracked
 
             current = self._hass.states.get(entity_id)
-            # Seed the history buffer with the current value so the first
-            # activity start has at least one point.
+            # Seed the history / log buffers with the current value so the first
+            # activity start has at least one point / line.
             if current is not None:
                 self._record_history_sample(tracked, current)
+                self._record_log_sample(tracked, current)
 
             # Resume if entity is currently in a start state (HA restart)
             if current and current.state in entity_cfg.get(CONF_START_STATES, []):
                 await self._start_activity(entity_id)
 
-    async def _async_load_history(self) -> dict[str, list[tuple[int, dict[str, float]]]]:
-        """Read the persisted ring buffers from .storage."""
+    async def _async_load_history(
+        self,
+    ) -> tuple[dict[str, list[tuple[int, dict[str, float]]]], dict[str, list[dict]]]:
+        """Read the persisted ring buffers from .storage.
+
+        Returns ``(history, logs)``: history is per-entity timeline samples; logs
+        is per-entity newest-first log-line dicts.
+        """
         try:
             raw = await self._history_store.async_load()
         except Exception:
             _LOGGER.debug("Failed to load persisted history, starting fresh", exc_info=True)
-            return {}
+            return {}, {}
         if not raw:
-            return {}
+            return {}, {}
         result: dict[str, list[tuple[int, dict[str, float]]]] = {}
         for entity_id, samples in raw.get(_HISTORY_SAMPLES_KEY, {}).items():
             rehydrated: list[tuple[int, dict[str, float]]] = []
@@ -244,7 +290,13 @@ class ActivityManager:
                 rehydrated.append((ts, values))
             if rehydrated:
                 result[entity_id] = rehydrated
-        return result
+
+        logs: dict[str, list[dict]] = {}
+        for entity_id, lines in raw.get(_LOG_SAMPLES_KEY, {}).items():
+            rehydrated_lines = [line for line in lines if isinstance(line, dict) and line.get("text")]
+            if rehydrated_lines:
+                logs[entity_id] = rehydrated_lines[:LOG_MAX_LINES]
+        return result, logs
 
     @callback
     def _schedule_history_save(self) -> None:
@@ -259,7 +311,12 @@ class ActivityManager:
                 entity_id: [[ts, values] for ts, values in tracked.history_buffer]
                 for entity_id, tracked in self._tracked.items()
                 if tracked.history_buffer
-            }
+            },
+            _LOG_SAMPLES_KEY: {
+                entity_id: list(tracked.log_buffer)
+                for entity_id, tracked in self._tracked.items()
+                if tracked.log_buffer
+            },
         }
 
     async def async_stop(self) -> None:
@@ -314,9 +371,10 @@ class ActivityManager:
         if tracked is None:
             return
 
-        # Always sample into the history buffer, even when the activity is not
-        # active — that's exactly how we accumulate backfill material.
+        # Always sample into the history / log buffers, even when the activity is
+        # not active — that's exactly how we accumulate backfill material.
         self._record_history_sample(tracked, new_state)
+        self._record_log_sample(tracked, new_state)
 
         config = tracked.config
         start_states = config.get(CONF_START_STATES, [])
@@ -338,18 +396,36 @@ class ActivityManager:
         tracked entity's current state so the timeline series label stays stable.
         """
         new_state: State | None = event.data.get("new_state")
-        if new_state is None or new_state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
-            return
-
         tracked = self._tracked.get(entity_id)
-        if tracked is None or not tracked.is_active:
+        if tracked is None:
             return
 
-        primary_state = self._hass.states.get(entity_id)
-        if primary_state is not None:
-            # Stamp with the companion's update time: the tracked entity is
-            # unchanged here, so its last_updated would collide on every tick.
-            self._record_history_sample(tracked, primary_state, ts=int(new_state.last_updated.timestamp()))
+        is_board = tracked.config.get(CONF_TEMPLATE) == "board"
+
+        if not tracked.is_active:
+            # A board defers its start when no tile is renderable yet (every tile
+            # entity unavailable, e.g. right after restart). Retry now that a tile
+            # changed, provided the anchor is still in a start state.
+            if is_board:
+                anchor = self._hass.states.get(entity_id)
+                if anchor is not None and anchor.state in tracked.config.get(CONF_START_STATES, []):
+                    self._hass.async_create_task(self._start_activity(entity_id))
+            return
+
+        unavailable = new_state is None or new_state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN)
+        # A timeline value-companion going unavailable carries no value to plot —
+        # ignore it. A board tile going unavailable IS a meaningful change (the
+        # tile must drop from the grid), so still refresh and let _build_board_tiles
+        # re-render without it.
+        if unavailable and not is_board:
+            return
+
+        if not unavailable:
+            primary_state = self._hass.states.get(entity_id)
+            if primary_state is not None:
+                # Stamp with the companion's update time: the tracked entity is
+                # unchanged here, so its last_updated would collide on every tick.
+                self._record_history_sample(tracked, primary_state, ts=int(new_state.last_updated.timestamp()))
 
         self._schedule_throttled_update(entity_id)
 
@@ -373,6 +449,42 @@ class ActivityManager:
         tracked.history_buffer.append((ts, values))
         self._schedule_history_save()
 
+    def _record_log_sample(self, tracked: TrackedEntity, state: State) -> None:
+        """Prepend a log line (newest-first) to the per-entity log ring buffer.
+
+        No-op for non-log templates. A log tracks state *changes*, so consecutive
+        lines with the same text+level are collapsed: an entity that re-reports
+        the same displayed state is not a new event. This covers three cases that
+        would otherwise spam duplicates — attribute settling on turn-on (a light
+        fires several state_changed events with state "on" while brightness/color
+        converge), periodic re-reports, and the start-time re-seed after a restart
+        or subentry reconfigure. The first occurrence's timestamp is kept (when
+        the entity entered that state) and ``at`` is ignored in the compare, so a
+        restart's regenerated ``last_updated`` can't slip a copy of the persisted
+        newest line past the guard.
+        """
+        if tracked.config.get(CONF_TEMPLATE) != "log":
+            return
+        line = _build_log_line(state, tracked.config)
+        if not line.get("text"):
+            return
+        if _same_log_line(tracked.log_buffer[0] if tracked.log_buffer else None, line):
+            return
+        tracked.log_buffer.appendleft(line)
+        self._schedule_history_save()
+
+    def _apply_log_lines(self, tracked: TrackedEntity, content: dict) -> None:
+        """Override content['lines'] with the full newest-first log ring buffer.
+
+        Falls back to whatever single line map_content produced when the buffer is
+        empty (the seam mirrors _seed_timeline_history injecting content['history']).
+        """
+        if tracked.config.get(CONF_TEMPLATE) != "log":
+            return
+        lines = list(tracked.log_buffer)
+        if lines:
+            content["lines"] = lines
+
     async def _start_activity(self, entity_id: str) -> None:
         """Create and start a PushWard Live Activity."""
         tracked = self._tracked[entity_id]
@@ -387,11 +499,33 @@ class ActivityManager:
         tracked.generation += 1
 
         async with self._api_error_guard(slug, "starting"):
+            current_state = self._hass.states.get(entity_id)
+            if current_state is None:
+                return
+
+            tracked.registry_icon = self._get_registry_icon(entity_id)
+            content = map_content(current_state, config, registry_icon=tracked.registry_icon, hass=self._hass)
+
+            # A board needs >=1 renderable tile. If every tile entity is still
+            # unavailable (e.g. the anchor resumes a start state right after
+            # restart, before companion sensors initialize), defer the whole start
+            # — don't create an activity the server would reject as tile-less. A
+            # later companion change retries _start_activity once a tile appears.
+            if config.get(CONF_TEMPLATE) == "board" and not content.get("tiles"):
+                return
+
+            _LOGGER.debug(
+                "Activity %s icon resolution: state_attr=%s, registry=%s, resolved=%s",
+                slug,
+                current_state.attributes.get("icon"),
+                tracked.registry_icon,
+                content.get("icon"),
+            )
+
             # Resolve activity name: configured name > friendly name > entity_id
             name = config.get(CONF_ACTIVITY_NAME) or ""
             if not name:
-                current_state = self._hass.states.get(entity_id)
-                name = current_state.attributes.get("friendly_name", entity_id) if current_state else entity_id
+                name = current_state.attributes.get("friendly_name", entity_id)
 
             await self._api.create_activity(
                 slug,
@@ -401,25 +535,14 @@ class ActivityManager:
                 stale_ttl=config.get(CONF_STALE_TTL),
             )
 
-            current_state = self._hass.states.get(entity_id)
-            if current_state is None:
-                return
-
-            tracked.registry_icon = self._get_registry_icon(entity_id)
-            content = map_content(current_state, config, registry_icon=tracked.registry_icon, hass=self._hass)
-            _LOGGER.debug(
-                "Activity %s icon resolution: state_attr=%s, registry=%s, resolved=%s",
-                slug,
-                current_state.attributes.get("icon"),
-                tracked.registry_icon,
-                content.get("icon"),
-            )
-
             # Seed timeline back-history from HA recorder if configured
             if config.get(CONF_TEMPLATE) == "timeline":
                 history = await self._seed_timeline_history(entity_id, config, content)
                 if history:
                     content["history"] = history
+
+            # Replace the single current line with the accumulated log buffer.
+            self._apply_log_lines(tracked, content)
 
             sound = config.get(CONF_SOUND) or None
             await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
@@ -543,6 +666,13 @@ class ActivityManager:
             return
 
         content = map_content(current_state, tracked.config, registry_icon=tracked.registry_icon, hass=self._hass)
+        # Inject the full log buffer before the dedup check so a new line counts as a change.
+        self._apply_log_lines(tracked, content)
+        # A board whose tile entities are all unavailable renders no tiles; the
+        # server rejects a tile-less board, so keep the last good frame rather
+        # than pushing an empty one — a tile returning re-renders it.
+        if tracked.config.get(CONF_TEMPLATE) == "board" and not content.get("tiles"):
+            return
         if content == tracked.last_content:
             return
 

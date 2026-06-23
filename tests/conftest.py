@@ -30,6 +30,7 @@ from custom_components.pushward.const import (
     CONF_ICON_ATTRIBUTE,
     CONF_LABEL,
     CONF_LABEL_ATTRIBUTE,
+    CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
@@ -60,6 +61,7 @@ from custom_components.pushward.const import (
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
+    CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UNITS,
@@ -147,6 +149,8 @@ def make_entity_config(**overrides) -> dict:
         CONF_BACKGROUND_COLOR_ATTRIBUTE: "",
         CONF_TEXT_COLOR: "",
         CONF_TEXT_COLOR_ATTRIBUTE: "",
+        CONF_TILES: [],
+        CONF_LOG_LEVEL_ATTRIBUTE: "",
     }
     config.update(overrides)
     return config

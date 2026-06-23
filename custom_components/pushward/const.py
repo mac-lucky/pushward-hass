@@ -62,6 +62,12 @@ CONF_STEP_LABELS = "step_labels"
 CONF_STEP_ROWS = "step_rows"
 CONF_FIRED_AT_ATTRIBUTE = "fired_at_attribute"
 CONF_UNITS = "units"
+# Board template: 1-4 tiles, each bound to a separate entity. Stored as a list of
+# tile dicts ({label, entity_id, value_attribute?, unit?, icon?}); the config flow
+# edits them as a comma-separated string (mirrors widget stat_rows).
+CONF_TILES = "tiles"
+# Log template: optional attribute supplying the per-line level (info/warn/error).
+CONF_LOG_LEVEL_ATTRIBUTE = "log_level_attribute"
 
 # Companion source entities — read a value from a SEPARATE entity instead of an
 # attribute of the tracked entity. Empty => use the tracked entity. When set,
@@ -140,7 +146,7 @@ SEVERITIES = ["critical", "warning", "info"]
 NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
 # Templates
-TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline"]
+TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log"]
 
 # Widget templates (server: pushward-server/internal/model/widget.go)
 WIDGET_TEMPLATE_VALUE = "value"
@@ -183,6 +189,28 @@ WIDGET_SEVERITIES = ["", "info", "warning", "critical", "success"]
 WIDGET_TREND_UP = "up"
 WIDGET_TREND_DOWN = "down"
 WIDGET_TREND_FLAT = "flat"
+
+# Board template caps (mirror pushward-server/internal/model/activity.go).
+# A board carries 1-BOARD_MAX_TILES tiles (RFC-7396 atomic replace). Per tile:
+# label (required, ≤32), value (string, required, ≤16 — a string so "Open"/"On"/
+# numbers all render), unit (≤8), icon (≤128, SF Symbol or mdi:), color (named or
+# hex, ValidateColor), trend (up/down/flat), url_action (per-tile TapAction).
+BOARD_MAX_TILES = 4
+BOARD_TILE_LABEL_MAX = 32
+BOARD_TILE_VALUE_MAX = 16
+BOARD_TILE_UNIT_MAX = 8
+BOARD_TILE_ICON_MAX = 128
+# Per-tile trend arrows reuse the widget trend vocabulary (same wire values).
+BOARD_TRENDS = (WIDGET_TREND_UP, WIDGET_TREND_DOWN, WIDGET_TREND_FLAT)
+
+# Log template caps (mirror pushward-server/internal/model/activity.go).
+# A log carries 1-LOG_MAX_LINES lines (newest-first, atomic replace). Per line:
+# text (required, ≤512), at (optional unix timestamp int), level (optional —
+# info/warn/error; NB: a different set from the alert template's `severity`).
+# `log_backlog` is SERVER-OWNED and must never be sent by this integration.
+LOG_MAX_LINES = 20
+LOG_LINE_TEXT_MAX = 512
+LOG_LEVELS = ("info", "warn", "error")
 
 # Timeline scales
 SCALES = ["linear", "logarithmic"]

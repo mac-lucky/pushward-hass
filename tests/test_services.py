@@ -1083,10 +1083,15 @@ async def test_update_activity_countdown_rejects_zero_duration(hass: HomeAssista
     api.update_activity.assert_not_awaited()
 
 
-# --- universal action fields (all templates) ---
+# --- universal action fields (all templates that render button slots) ---
+
+# board/log use a lean schema: only the whole-activity tap_action, no url /
+# secondary_url / url_action / secondary_url_action slots (board uses per-tile
+# url_action; log has no buttons).
+_UNIVERSAL_ACTION_TEMPLATES = [t for t in TEMPLATES if t not in ("board", "log")]
 
 
-@pytest.mark.parametrize("template", TEMPLATES)
+@pytest.mark.parametrize("template", _UNIVERSAL_ACTION_TEMPLATES)
 async def test_action_fields_forwarded_on_every_template(hass: HomeAssistant, template: str) -> None:
     """url / secondary_url / tap_action / url_action / secondary_url_action reach content on all templates."""
     api = _mock_api()
@@ -1114,6 +1119,62 @@ async def test_action_fields_forwarded_on_every_template(hass: HomeAssistant, te
     assert content["url_action"]["method"] == "POST"
     assert content["url_action"]["title"] == "Open"
     assert content["secondary_url_action"]["title"] == "More"
+
+
+@pytest.mark.parametrize("template", ["board", "log"])
+async def test_board_log_accept_only_tap_action(hass: HomeAssistant, template: str) -> None:
+    """board/log forward the whole-activity tap_action but reject the button-slot fields."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    # tap_action (whole-activity) is accepted and forwarded.
+    await hass.services.async_call(
+        DOMAIN,
+        f"update_activity_{template}",
+        {
+            "slug": "x",
+            "state": "ongoing",
+            "tap_action": {"url": "homeassistant://navigate/lovelace/0"},
+        },
+        blocking=True,
+    )
+    content = api.update_activity.call_args[0][2]
+    assert content["tap_action"] == {"url": "homeassistant://navigate/lovelace/0"}
+
+    # The button-slot fields are not part of the lean schema → rejected.
+    for field in ("url", "secondary_url", "url_action", "secondary_url_action", "progress", "remaining_time"):
+        with pytest.raises(vol.Invalid):
+            await hass.services.async_call(
+                DOMAIN,
+                f"update_activity_{template}",
+                {"slug": "x", "state": "ongoing", field: "https://example.com"},
+                blocking=True,
+            )
+
+
+async def test_log_line_at_rejects_non_positive(hass: HomeAssistant) -> None:
+    """update_activity_log rejects a non-positive `at` locally (server requires a positive timestamp)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad_at in (0, -5):
+        with pytest.raises(vol.Invalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "update_activity_log",
+                {"slug": "x", "state": "ongoing", "lines": [{"text": "boom", "at": bad_at}]},
+                blocking=True,
+            )
+
+    # A positive `at` passes and is forwarded unchanged.
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_log",
+        {"slug": "x", "state": "ongoing", "lines": [{"text": "ok", "at": 1735689600}]},
+        blocking=True,
+    )
+    content = api.update_activity.call_args[0][2]
+    assert content["lines"][0]["at"] == 1735689600
 
 
 async def test_tap_action_accepts_custom_scheme_url(hass: HomeAssistant) -> None:

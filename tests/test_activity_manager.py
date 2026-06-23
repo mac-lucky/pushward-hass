@@ -12,22 +12,33 @@ from homeassistant.util import dt as dt_util
 from custom_components.pushward.activity_manager import (
     _ACTIVITY_LIMIT_NOTIFICATION_ID,
     ActivityManager,
+    TrackedEntity,
     _companion_entity_ids,
     _forbidden_notification_id,
 )
 from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardForbiddenError
 from custom_components.pushward.const import (
+    CONF_END_STATES,
     CONF_ENDED_TTL,
+    CONF_ENTITY_ID,
+    CONF_LABEL,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_SLUG,
     CONF_SOUND,
     CONF_STALE_TTL,
+    CONF_START_STATES,
     CONF_TEMPLATE,
+    CONF_TILES,
+    CONF_UNIT,
     CONF_UPDATE_INTERVAL,
     CONF_VALUE_ENTITY,
+    LOG_MAX_LINES,
 )
 
+from .conftest import activity_updates, bump_state, end_activity_via_state
 from .conftest import make_entity_config as _entity_config
+from .server_contract import assert_valid_activity_content
 
 
 def _mock_api() -> AsyncMock:
@@ -835,5 +846,349 @@ async def test_companion_timestamp_anchors_end_date_end_to_end(hass: HomeAssista
     # end_date is the absolute finish epoch (drift-free), independent of "now".
     assert last_content["end_date"] == int(finish.timestamp())
     assert 0 < last_content["remaining_time"] <= 30 * 60
+
+    await manager.async_stop()
+
+
+# ---------------------------------------------------------------------------
+# Board template tests
+# ---------------------------------------------------------------------------
+
+
+def _board_config():
+    """Board config: an anchor entity owns lifecycle; tiles bind to separate entities.
+
+    ``binary_sensor.home`` drives start/end via the default on/off states, while the
+    two tiles read ``sensor.cpu`` and ``binary_sensor.door`` (tracked as companions).
+    """
+    return _entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.home",
+            CONF_SLUG: "ha-board",
+            CONF_TEMPLATE: "board",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_TILES: [
+                {CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu", CONF_UNIT: "%"},
+                {CONF_LABEL: "Door", CONF_ENTITY_ID: "binary_sensor.door"},
+            ],
+        }
+    )
+
+
+async def test_board_start_sends_tiles(hass: HomeAssistant) -> None:
+    """A board's anchor entering a start state emits ONGOING content with both tiles."""
+    api = _mock_api()
+    config = _board_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    # Seed tile values + hold the anchor in an end state so nothing starts on setup.
+    hass.states.async_set("sensor.cpu", "42")
+    hass.states.async_set("binary_sensor.door", "on")
+    hass.states.async_set("binary_sensor.home", "off")
+    await manager.async_start()
+    api.create_activity.assert_not_called()
+
+    # Anchor enters the start state → activity is created with the tile snapshot.
+    hass.states.async_set("binary_sensor.home", "on")
+    await hass.async_block_till_done()
+
+    ongoing = activity_updates(api, "ongoing")
+    assert ongoing, "expected an ONGOING update when the board starts"
+    content = ongoing[-1]
+    assert content["progress"] == 0.0
+    by_label = {tile["label"]: tile for tile in content["tiles"]}
+    assert set(by_label) == {"CPU", "Door"}
+    assert by_label["CPU"]["value"] == "42"
+    assert by_label["CPU"]["unit"] == "%"
+    assert by_label["Door"]["value"] == "on"
+    assert_valid_activity_content(content)
+
+    await manager.async_stop()
+
+
+async def test_board_refreshes_on_tile_change(hass: HomeAssistant) -> None:
+    """Changing a tile entity refreshes the active board with the new tile value."""
+    api = _mock_api()
+    config = _board_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("sensor.cpu", "42")
+    hass.states.async_set("binary_sensor.door", "on")
+    hass.states.async_set("binary_sensor.home", "off")
+    await manager.async_start()
+
+    # Tile entities are companions, not lifecycle drivers.
+    assert "sensor.cpu" in _companion_entity_ids(config)
+
+    hass.states.async_set("binary_sensor.home", "on")
+    await hass.async_block_till_done()
+    ongoing_before = len(activity_updates(api, "ongoing"))
+
+    # Drive a tile change through the real companion subscription (cooldown reset).
+    await bump_state(manager, hass, "binary_sensor.home", "sensor.cpu", "99", {})
+
+    ongoing_after = activity_updates(api, "ongoing")
+    assert len(ongoing_after) == ongoing_before + 1
+    by_label = {tile["label"]: tile for tile in ongoing_after[-1]["tiles"]}
+    assert by_label["CPU"]["value"] == "99"
+    assert_valid_activity_content(ongoing_after[-1])
+
+    await manager.async_stop()
+
+
+async def test_board_two_phase_end_carries_tiles(hass: HomeAssistant) -> None:
+    """The ENDED board frame carries the last tiles (server requires >=1 tile)."""
+    api = _mock_api()
+    config = _board_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("sensor.cpu", "42")
+    hass.states.async_set("binary_sensor.door", "on")
+    hass.states.async_set("binary_sensor.home", "off")
+    await manager.async_start()
+
+    hass.states.async_set("binary_sensor.home", "on")
+    await hass.async_block_till_done()
+    assert manager._tracked["binary_sensor.home"].is_active
+
+    await end_activity_via_state(manager, hass, "binary_sensor.home", "off", {})
+
+    ended = activity_updates(api, "ended")
+    assert ended, "expected an ENDED frame"
+    content = ended[-1]
+    assert content["tiles"], "ENDED board frame must carry tiles"
+    by_label = {tile["label"]: tile for tile in content["tiles"]}
+    assert by_label["CPU"]["value"] == "42"
+    assert_valid_activity_content(content)
+    assert not manager._tracked["binary_sensor.home"].is_active
+
+    await manager.async_stop()
+
+
+async def test_board_defers_start_when_all_tiles_unavailable(hass: HomeAssistant) -> None:
+    """A board with no renderable tile defers its start (no tile-less create), then
+    starts once a tile entity becomes available (server requires >=1 tile)."""
+    api = _mock_api()
+    config = _board_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    # Anchor already in the start state, but both tile entities are unavailable —
+    # the classic post-restart ordering where the anchor resumes before sensors init.
+    hass.states.async_set("sensor.cpu", "unavailable")
+    hass.states.async_set("binary_sensor.door", "unavailable")
+    hass.states.async_set("binary_sensor.home", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    # No tile-less activity created; start is deferred.
+    api.create_activity.assert_not_called()
+    assert manager._tracked["binary_sensor.home"].is_active is False
+
+    # A tile becomes available → the deferred start fires with that tile.
+    hass.states.async_set("sensor.cpu", "73")
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_called()
+    assert manager._tracked["binary_sensor.home"].is_active is True
+    ongoing = activity_updates(api, "ongoing")
+    assert ongoing, "expected an ONGOING update once a tile became available"
+    by_label = {tile["label"]: tile for tile in ongoing[-1]["tiles"]}
+    assert by_label["CPU"]["value"] == "73"
+    assert_valid_activity_content(ongoing[-1])
+
+    await manager.async_stop()
+
+
+async def test_board_drops_tile_when_companion_unavailable(hass: HomeAssistant) -> None:
+    """A tile entity going unavailable refreshes the active board and drops that tile,
+    rather than leaving the stale last value on screen."""
+    api = _mock_api()
+    config = _board_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("sensor.cpu", "42")
+    hass.states.async_set("binary_sensor.door", "on")
+    hass.states.async_set("binary_sensor.home", "off")
+    await manager.async_start()
+
+    hass.states.async_set("binary_sensor.home", "on")
+    await hass.async_block_till_done()
+    assert manager._tracked["binary_sensor.home"].is_active
+
+    # CPU tile goes unavailable → board re-renders without it (Door remains).
+    await bump_state(manager, hass, "binary_sensor.home", "sensor.cpu", "unavailable", {})
+
+    ongoing = activity_updates(api, "ongoing")
+    labels = {tile["label"] for tile in ongoing[-1]["tiles"]}
+    assert "CPU" not in labels, "unavailable tile must be dropped, not left stale"
+    assert "Door" in labels
+    assert_valid_activity_content(ongoing[-1])
+
+    await manager.async_stop()
+
+
+# ---------------------------------------------------------------------------
+# Log template tests
+# ---------------------------------------------------------------------------
+
+
+def _log_config():
+    """Log config: each state change appends to a newest-first ring buffer."""
+    return _entity_config(
+        **{
+            CONF_ENTITY_ID: "sensor.events",
+            CONF_SLUG: "ha-log",
+            CONF_TEMPLATE: "log",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+        }
+    )
+
+
+async def test_log_appends_line_per_state_change_and_caps_at_20(hass: HomeAssistant) -> None:
+    """The log buffer accumulates on every change (even inactive) and caps at LOG_MAX_LINES."""
+    api = _mock_api()
+    config = _log_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    eid = "sensor.events"
+    hass.states.async_set(eid, "boot")
+    await manager.async_start()
+
+    # Drive 25 DISTINCT changes — HA only fires on a real change. None match the
+    # start states, so the activity stays inactive while the buffer still grows.
+    for i in range(25):
+        hass.states.async_set(eid, f"event_{i}")
+        await hass.async_block_till_done()
+
+    assert manager._tracked[eid].is_active is False
+    assert len(manager._tracked[eid].log_buffer) == LOG_MAX_LINES == 20
+
+    await manager.async_stop()
+
+
+async def test_log_start_sends_lines_newest_first(hass: HomeAssistant) -> None:
+    """Starting a log activity emits ONGOING content with the buffer newest-first."""
+    api = _mock_api()
+    config = _log_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    eid = "sensor.events"
+    hass.states.async_set(eid, "off")
+    await manager.async_start()
+
+    for value in ("1", "2", "3"):
+        hass.states.async_set(eid, value)
+        await hass.async_block_till_done()
+
+    hass.states.async_set(eid, "on")
+    await hass.async_block_till_done()
+    assert manager._tracked[eid].is_active
+
+    ongoing = activity_updates(api, "ongoing")
+    assert ongoing, "expected an ONGOING update when the log starts"
+    content = ongoing[-1]
+    lines = content["lines"]
+    assert isinstance(lines, list) and lines
+    texts = [line["text"] for line in lines]
+    # Newest-first: the most recent state ("On") leads, the seed ("Off") trails.
+    assert texts[0] == "On"
+    assert texts == ["On", "3", "2", "1", "Off"]
+    assert texts == [line["text"] for line in manager._tracked[eid].log_buffer]
+    assert_valid_activity_content(content)
+
+    await manager.async_stop()
+
+
+async def test_log_two_phase_end_carries_lines(hass: HomeAssistant) -> None:
+    """The ENDED log frame carries the last lines (server requires >=1 line)."""
+    api = _mock_api()
+    config = _log_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    eid = "sensor.events"
+    hass.states.async_set(eid, "off")
+    await manager.async_start()
+
+    for value in ("1", "2"):
+        hass.states.async_set(eid, value)
+        await hass.async_block_till_done()
+
+    hass.states.async_set(eid, "on")
+    await hass.async_block_till_done()
+    assert manager._tracked[eid].is_active
+
+    await end_activity_via_state(manager, hass, eid, "off", {})
+
+    ended = activity_updates(api, "ended")
+    assert ended, "expected an ENDED frame"
+    content = ended[-1]
+    lines = content["lines"]
+    assert isinstance(lines, list) and lines, "ENDED log frame must carry lines"
+    assert_valid_activity_content(content)
+    assert not manager._tracked[eid].is_active
+
+    await manager.async_stop()
+
+
+async def test_log_collapses_consecutive_same_text(hass: HomeAssistant) -> None:
+    """Consecutive lines with identical text+level collapse to one, regardless of `at`.
+
+    A log tracks state *changes*: an entity re-reporting the same displayed state
+    (turn-on attribute churn, periodic re-reports, the restart re-seed whose
+    last_updated is regenerated) is not a new event and must not spam duplicates.
+    The first occurrence's timestamp is kept.
+    """
+    api = _mock_api()
+    config = _log_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    tracked = TrackedEntity(config=config)
+    hass.states.async_set("sensor.events", "on")
+    state = hass.states.get("sensor.events")
+
+    manager._record_log_sample(tracked, state)
+    assert len(tracked.log_buffer) == 1
+    first_at = tracked.log_buffer[0]["at"]
+
+    # A re-report with the SAME text but a fresh/older `at` is collapsed (covers
+    # both turn-on attribute churn and the cross-restart re-seed).
+    tracked.log_buffer[0] = {**tracked.log_buffer[0], "at": 1}
+    manager._record_log_sample(tracked, state)
+    assert len(tracked.log_buffer) == 1, "consecutive identical line was not collapsed"
+    assert tracked.log_buffer[0]["at"] == 1, "kept the first occurrence, not the re-report"
+    assert first_at != 1  # sanity: the re-report really did carry a different epoch
+
+    # A genuine change (distinct text) still appends.
+    hass.states.async_set("sensor.events", "off")
+    manager._record_log_sample(tracked, hass.states.get("sensor.events"))
+    assert len(tracked.log_buffer) == 2
+
+
+async def test_log_rehydration_collapses_persisted_duplicates(hass: HomeAssistant) -> None:
+    """Consecutive same-text lines persisted by older builds collapse on load."""
+    api = _mock_api()
+    config = _log_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    eid = "sensor.events"
+    hass.states.async_set(eid, "on")
+
+    # Newest-first persisted buffer with three duplicate "On" lines (the bug a
+    # pre-fix build wrote on every turn-on / restart).
+    persisted = [
+        {"text": "On", "at": 30},
+        {"text": "On", "at": 20},
+        {"text": "On", "at": 10},
+        {"text": "Off", "at": 5},
+    ]
+    with patch.object(manager, "_async_load_history", AsyncMock(return_value=({}, {eid: persisted}))):
+        await manager.async_start()
+
+    texts = [line["text"] for line in manager._tracked[eid].log_buffer]
+    # Three "On" collapse to one (keeping the earliest, at=30); "Off" kept; the
+    # current-state seed ("On") collapses into the head.
+    assert texts == ["On", "Off"]
+    assert manager._tracked[eid].log_buffer[0]["at"] == 30
 
     await manager.async_stop()

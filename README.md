@@ -37,7 +37,7 @@ The two surfaces are independent — separate config, managers, and caches — a
 ## Features
 
 - **Track any HA entity** as a PushWard Live Activity (Dynamic Island + Lock Screen)
-- **6 activity templates** — generic, countdown, alert, steps, gauge, timeline
+- **8 activity templates** — generic, countdown, alert, steps, gauge, timeline, board, log
 - **5 widget templates** — value, progress, gauge, status, stat_list (up to 6 entity rows)
 - **Two widget trigger modes** — `event` (state-change) or `poll` (10–3600 s interval)
 - **Account usage sensors** — notifications, Live Activity updates, widget updates, and emails consumed vs. plan limits, plus subscription tier
@@ -106,6 +106,8 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | `steps` | Multi-step process (e.g. build stages) |
 | `gauge` | Numeric value with a range (e.g. temperature, battery) |
 | `timeline` | Sparkline chart with labeled value series |
+| `board` | 1–4 tiles, each showing a value from a **separate** entity |
+| `log` | Newest-first list of log lines (up to 20), one per state change |
 
 **Step 2** configures the details (fields vary by template):
 
@@ -127,6 +129,8 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Series | Attribute→label mapping for a multi-series timeline |
 | Scale / Decimal Places / Smooth Lines / Thresholds | Timeline sparkline options |
 | Back-History Period | Minutes of history to seed the sparkline on start (0–1440) |
+| Board Tiles | `Label=entity_id[:attribute[:unit[:icon]]]`, comma-separated, max 4 (board template) |
+| Log Level Attribute | Attribute supplying each line's `info`/`warn`/`error` level (log template) |
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
 | State Labels | Custom state→label mapping (e.g. `on=Running, off=Stopped`) |
 | Completion Message | Text shown at end (default: "Complete") |
@@ -147,6 +151,24 @@ By default every value (remaining time, progress, subtitle, gauge value, current
 #### Timeline sparkline backfill
 
 **Back-History Period** seeds the sparkline when the activity starts. Because Home Assistant 2024.8 [removed light/climate attributes from the recorder](https://github.com/home-assistant/core/issues/123028), attribute-based history (e.g. a light's `brightness`) can't be rebuilt from the recorder. The integration keeps its own in-memory ring buffer (≤300 samples per entity), populated from live state changes and persisted to `.storage/pushward.history.<entry_id>` so it survives restarts. Practical notes: the buffer is empty right after install and fills as the tracked attribute changes; backfill resolution matches state-change frequency (no polling); for **numeric-state sensors** the recorder is still used as a fallback, so those backfill immediately.
+
+#### Board tiles (multi-entity)
+
+A **board** shows a compact grid of **1–4 tiles**, each reading a *separate* entity. The **anchor entity** (step 1) still owns the activity lifecycle through its start/end states; the tiles supply the displayed values, and a change to any tile entity refreshes the board while it is active. Configure tiles in the **Board Tiles** field as a comma-separated list:
+
+```
+Label=entity_id[:attribute[:unit[:icon]]]
+```
+
+- **Label** (required, ≤32 chars) and **entity_id** (required) are the minimum.
+- **attribute** (optional) reads that attribute instead of the entity state; leave the segment empty (`Label=entity::°C`) to skip it.
+- **unit** (optional, ≤8 chars) and **icon** (optional — an SF Symbol like `cpu.fill` or an MDI icon like `mdi:thermometer`) follow.
+
+Example: `Temp=sensor.living_room_temp:temperature:°C, Door=binary_sensor.front_door, CPU=sensor.cpu:::mdi:cpu-64`. Each tile **value** is rendered as text (so `Open`, `On`, and numbers all work) and capped at 16 chars. Tiles whose entity is unavailable are skipped.
+
+#### Log lines
+
+A **log** shows a newest-first list of up to **20 lines**. The integration appends one line on every state change of the tracked entity (the line **text** is the formatted state, honoring State Labels), accumulating a rolling buffer that is injected into each push and persisted across restarts in `.storage/pushward.history.<entry_id>`. Set the optional **Log Level Attribute** to an attribute holding `info`, `warn`, or `error` to tag each line's severity. (The server also keeps a longer scrollable backlog server-side; the integration never sends it.)
 
 ### Add a tracked widget
 
@@ -212,11 +234,11 @@ Create a new activity.
 
 Push a content update to an existing activity. There is **one action per template** —
 `update_activity_generic`, `update_activity_countdown`, `update_activity_steps`,
-`update_activity_alert`, `update_activity_gauge`, `update_activity_timeline` — so the UI
-shows only the fields that template supports (Home Assistant cannot hide service fields based
-on another field's value, so a single action with collapsed sections would always surface
-every template's fields). The template is implied by the action name; you no longer pass a
-`template` field.
+`update_activity_alert`, `update_activity_gauge`, `update_activity_timeline`,
+`update_activity_board`, `update_activity_log` — so the UI shows only the fields that template
+supports (Home Assistant cannot hide service fields based on another field's value, so a single
+action with collapsed sections would always surface every template's fields). The template is
+implied by the action name; you no longer pass a `template` field.
 
 **Common fields** — accepted by every `update_activity_*` action:
 
@@ -253,7 +275,19 @@ every template's fields). The template is implied by the action name; you no lon
 | `update_activity_alert` | `severity`, `fired_at` |
 | `update_activity_gauge` | `value`, `min_value`, `max_value`, `unit` |
 | `update_activity_timeline` | `value`, `unit`, `units`, `scale`, `decimals`, `smoothing`, `thresholds`, `history` |
+| `update_activity_board` | `tiles` |
+| `update_activity_log` | `lines` |
 | `update_activity_generic` | _(common fields only)_ |
+
+> **`board` / `log` use a lean schema.** They render no progress bar and no whole-activity
+> button slots, so `update_activity_board` and `update_activity_log` accept only the labels
+> (`state_text`, `subtitle`, `icon`), appearance (`completion_message`, the colors, `sound`,
+> `priority`), the whole-activity `tap_action`, and their template field (`tiles` / `lines`) —
+> **not** `progress`, `remaining_time`, `url`, `secondary_url`, `url_action`, or
+> `secondary_url_action` (board tap targets are per-tile via each tile's `url_action`).
+> `tiles` is a list of 1–4 objects `{ label, value, unit?, icon?, color?, trend?, url_action? }`
+> (`value` is a string ≤16 chars). `lines` is a list of 1–20 newest-first objects
+> `{ text, at?, level? }` where `level` is `info`/`warn`/`error`.
 
 > `duration` (integer seconds or a string like `"30m"` / `"1h30m"`) is the set-and-forget
 > alternative to `end_date`: the server re-anchors `start_date = now` and

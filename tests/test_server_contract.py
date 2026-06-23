@@ -12,6 +12,8 @@ import time
 
 import pytest
 
+from custom_components.pushward.const import LOG_LINE_TEXT_MAX
+
 from .server_contract import (
     PushWardContractError,
     assert_valid_activity_content,
@@ -77,6 +79,26 @@ def valid_timeline() -> dict:
     return {"template": "timeline", "progress": 0.0, "state": "x", "accent_color": "blue", "value": {"CPU": 50.0}}
 
 
+def valid_board() -> dict:
+    return {
+        "template": "board",
+        "progress": 0.0,
+        "state": "Status",
+        "accent_color": "blue",
+        "tiles": [{"label": "CPU", "value": "72", "unit": "%", "trend": "up"}],
+    }
+
+
+def valid_log() -> dict:
+    return {
+        "template": "log",
+        "progress": 0.0,
+        "state": "Log",
+        "accent_color": "blue",
+        "lines": [{"text": "Front door opened", "at": int(time.time()), "level": "info"}],
+    }
+
+
 def _mut(factory, **changes) -> dict:
     d = factory()
     d.update(changes)
@@ -95,8 +117,8 @@ def _rm(factory, *keys) -> dict:
 
 @pytest.mark.parametrize(
     "factory",
-    [valid_generic, valid_countdown, valid_steps, valid_alert, valid_gauge, valid_timeline],
-    ids=["generic", "countdown", "steps", "alert", "gauge", "timeline"],
+    [valid_generic, valid_countdown, valid_steps, valid_alert, valid_gauge, valid_timeline, valid_board, valid_log],
+    ids=["generic", "countdown", "steps", "alert", "gauge", "timeline", "board", "log"],
 )
 def test_valid_activity_payloads_pass(factory) -> None:
     assert_valid_activity_content(factory())
@@ -185,6 +207,45 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_generic, tap_action={"url": "https://x", "icon": "i" * 65}), id="tap_icon_long"),
     pytest.param(lambda: _mut(valid_generic, tap_action="homeassistant://x"), id="tap_action_not_dict"),
     pytest.param(lambda: ["not", "a", "dict"], id="content_not_dict"),
+    # board violations
+    pytest.param(lambda: _rm(valid_board, "tiles"), id="board_missing_tiles"),
+    pytest.param(lambda: _mut(valid_board, tiles=[]), id="board_empty_tiles"),
+    pytest.param(
+        lambda: _mut(valid_board, tiles=[{"label": f"t{i}", "value": "1"} for i in range(5)]), id="board_too_many_tiles"
+    ),
+    pytest.param(lambda: _mut(valid_board, tiles=[{"value": "1"}]), id="board_tile_missing_label"),
+    pytest.param(lambda: _mut(valid_board, tiles=[{"label": "x" * 33, "value": "1"}]), id="board_tile_label_too_long"),
+    pytest.param(lambda: _mut(valid_board, tiles=[{"label": "L"}]), id="board_tile_missing_value"),
+    pytest.param(lambda: _mut(valid_board, tiles=[{"label": "L", "value": 72}]), id="board_tile_value_not_string"),
+    pytest.param(lambda: _mut(valid_board, tiles=[{"label": "L", "value": "x" * 17}]), id="board_tile_value_too_long"),
+    pytest.param(
+        lambda: _mut(valid_board, tiles=[{"label": "L", "value": "1", "unit": "x" * 9}]), id="board_tile_unit_too_long"
+    ),
+    pytest.param(
+        lambda: _mut(valid_board, tiles=[{"label": "L", "value": "1", "icon": "x" * 129}]),
+        id="board_tile_icon_too_long",
+    ),
+    pytest.param(
+        lambda: _mut(valid_board, tiles=[{"label": "L", "value": "1", "color": "chartreuse"}]),
+        id="board_tile_bad_color",
+    ),
+    pytest.param(
+        lambda: _mut(valid_board, tiles=[{"label": "L", "value": "1", "trend": "sideways"}]), id="board_tile_bad_trend"
+    ),
+    pytest.param(
+        lambda: _mut(valid_board, tiles=[{"label": "L", "value": "1", "url_action": {"foreground": True}}]),
+        id="board_tile_url_action_missing_url",
+    ),
+    # log violations
+    pytest.param(lambda: _rm(valid_log, "lines"), id="log_missing_lines"),
+    pytest.param(lambda: _mut(valid_log, lines=[]), id="log_empty_lines"),
+    pytest.param(lambda: _mut(valid_log, lines=[{"text": f"line {i}"} for i in range(21)]), id="log_too_many_lines"),
+    pytest.param(lambda: _mut(valid_log, lines=[{"level": "info"}]), id="log_line_missing_text"),
+    pytest.param(lambda: _mut(valid_log, lines=[{"text": "x" * (LOG_LINE_TEXT_MAX + 1)}]), id="log_line_text_too_long"),
+    pytest.param(lambda: _mut(valid_log, lines=[{"text": "x", "level": "debug"}]), id="log_line_bad_level"),
+    pytest.param(lambda: _mut(valid_log, lines=[{"text": "x", "at": 0}]), id="log_line_at_non_positive"),
+    pytest.param(lambda: _mut(valid_log, lines=[{"text": "x", "at": 1.5}]), id="log_line_at_float"),
+    pytest.param(lambda: _mut(valid_log, log_backlog=[{"text": "x"}]), id="log_backlog_must_not_be_sent"),
 ]
 
 

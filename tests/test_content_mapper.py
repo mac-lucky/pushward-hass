@@ -15,10 +15,13 @@ from custom_components.pushward.const import (
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
+    CONF_ENTITY_ID,
     CONF_FIRED_AT_ATTRIBUTE,
     CONF_FIRED_AT_ENTITY,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_LABEL,
+    CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
@@ -42,6 +45,7 @@ from custom_components.pushward.const import (
     CONF_TEMPLATE,
     CONF_TEXT_COLOR,
     CONF_THRESHOLDS,
+    CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UNITS,
@@ -54,6 +58,7 @@ from custom_components.pushward.const import (
     validate_slug,
 )
 from custom_components.pushward.content_mapper import (
+    _build_log_line,
     build_tap_action,
     get_domain_defaults,
     map_completion_content,
@@ -63,6 +68,7 @@ from custom_components.pushward.content_mapper import (
 
 from .conftest import make_entity_config
 from .conftest import make_mock_state as _make_state
+from .server_contract import assert_valid_activity_content
 
 # --- sanitize_slug ---
 
@@ -2200,3 +2206,160 @@ def test_steps_progress_entity_suppresses_autoderive():
     content = map_content(primary, config, hass=_FakeHass({"sensor.dishwasher_progress": pct}))
 
     assert content["progress"] == 0.3  # from the entity, NOT the 0.5 auto-derive
+
+
+# --- board template -------------------------------------------------------
+
+
+def test_map_content_board_tiles():
+    """Board reads each tile's bound entity into a {label, value, unit} tile."""
+    primary = _make_state("on", {"friendly_name": "Home"}, "binary_sensor.home_status")
+    cpu = _make_state("72", {}, "sensor.cpu")
+    door = _make_state("open", {}, "binary_sensor.door")
+    config = {
+        CONF_TEMPLATE: "board",
+        CONF_TILES: [
+            {CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu", CONF_UNIT: "%"},
+            {CONF_LABEL: "Door", CONF_ENTITY_ID: "binary_sensor.door"},
+        ],
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.cpu": cpu, "binary_sensor.door": door}))
+
+    assert content["template"] == "board"
+    assert content["progress"] == 0.0
+    assert content["tiles"][0]["label"] == "CPU"
+    assert content["tiles"][0]["value"] == "72"
+    assert content["tiles"][0]["unit"] == "%"
+    assert content["tiles"][1]["label"] == "Door"
+    assert content["tiles"][1]["value"] == "open"
+    assert_valid_activity_content(content)
+
+
+def test_map_content_board_reads_tile_attribute():
+    """A tile with value_attribute reads that attribute, not the state."""
+    primary = _make_state("on", {}, "binary_sensor.home_status")
+    climate = _make_state("heat", {"temperature": 21.5}, "climate.living")
+    config = {
+        CONF_TEMPLATE: "board",
+        CONF_TILES: [{CONF_LABEL: "Set", CONF_ENTITY_ID: "climate.living", CONF_VALUE_ATTRIBUTE: "temperature"}],
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"climate.living": climate}))
+
+    assert content["tiles"][0]["value"] == "21.5"
+
+
+def test_map_content_board_skips_unavailable_tile():
+    """A tile whose entity is unavailable/unknown is skipped."""
+    primary = _make_state("on", {}, "binary_sensor.home_status")
+    cpu = _make_state("72", {}, "sensor.cpu")
+    dead = _make_state("unavailable", {}, "sensor.dead")
+    config = {
+        CONF_TEMPLATE: "board",
+        CONF_TILES: [
+            {CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu"},
+            {CONF_LABEL: "Dead", CONF_ENTITY_ID: "sensor.dead"},
+        ],
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.cpu": cpu, "sensor.dead": dead}))
+
+    assert len(content["tiles"]) == 1
+    assert content["tiles"][0]["label"] == "CPU"
+
+
+def test_map_content_board_truncates_value_to_cap():
+    """A long tile value is truncated to the 16-char server cap."""
+    primary = _make_state("on", {}, "binary_sensor.home_status")
+    long_sensor = _make_state("x" * 40, {}, "sensor.long")
+    config = {
+        CONF_TEMPLATE: "board",
+        CONF_TILES: [{CONF_LABEL: "Long", CONF_ENTITY_ID: "sensor.long"}],
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.long": long_sensor}))
+
+    assert len(content["tiles"][0]["value"]) == 16
+    assert_valid_activity_content(content)
+
+
+def test_map_completion_content_board_carries_tiles():
+    """Board completion carries the last rendered tiles (server requires ≥1)."""
+    config = {CONF_TEMPLATE: "board"}
+    last = {"template": "board", "tiles": [{"label": "CPU", "value": "72"}], "progress": 0.0}
+
+    content = map_completion_content(config, last_content=last)
+
+    assert content["tiles"] == [{"label": "CPU", "value": "72"}]
+    assert_valid_activity_content(content)
+
+
+# --- log template ---------------------------------------------------------
+
+
+def test_map_content_log_single_line():
+    """Log maps the current state into one line; progress is 0."""
+    state = _make_state("open", {"friendly_name": "Front Door"}, "binary_sensor.front_door")
+    config = {CONF_TEMPLATE: "log"}
+
+    content = map_content(state, config)
+
+    assert content["template"] == "log"
+    assert content["progress"] == 0.0
+    assert len(content["lines"]) == 1
+    assert content["lines"][0]["text"] == "Open"
+
+
+def test_map_content_log_uses_state_label():
+    """A custom state label is used as the log line text."""
+    state = _make_state("heat_pump", {}, "climate.living")
+    config = {CONF_TEMPLATE: "log", CONF_STATE_LABELS: {"heat_pump": "Heat Pump On"}}
+
+    content = map_content(state, config)
+
+    assert content["lines"][0]["text"] == "Heat Pump On"
+
+
+def test_build_log_line_level_from_attribute():
+    """The line level comes from CONF_LOG_LEVEL_ATTRIBUTE when valid."""
+    state = _make_state("triggered", {"sev": "warn"}, "sensor.event")
+    config = {CONF_TEMPLATE: "log", CONF_LOG_LEVEL_ATTRIBUTE: "sev"}
+
+    line = _build_log_line(state, config)
+
+    assert line["text"] == "Triggered"
+    assert line["level"] == "warn"
+
+
+def test_build_log_line_invalid_level_omitted():
+    """An attribute value outside info/warn/error is dropped, not sent."""
+    state = _make_state("x", {"sev": "debug"}, "sensor.event")
+    config = {CONF_TEMPLATE: "log", CONF_LOG_LEVEL_ATTRIBUTE: "sev"}
+
+    line = _build_log_line(state, config)
+
+    assert "level" not in line
+
+
+def test_build_log_line_at_from_last_updated():
+    """A real last_updated datetime becomes the line's at epoch."""
+    import datetime as _dt
+
+    state = _make_state("x", {}, "sensor.event")
+    state.last_updated = _dt.datetime(2026, 1, 1, tzinfo=_dt.UTC)
+
+    line = _build_log_line(state, {CONF_TEMPLATE: "log"})
+
+    assert line["at"] == int(state.last_updated.timestamp())
+
+
+def test_map_completion_content_log_carries_lines():
+    """Log completion carries the last rendered lines (server requires ≥1)."""
+    config = {CONF_TEMPLATE: "log"}
+    last = {"template": "log", "lines": [{"text": "Door opened"}], "progress": 0.0}
+
+    content = map_completion_content(config, last_content=last)
+
+    assert content["lines"] == [{"text": "Door opened"}]
+    assert_valid_activity_content(content)

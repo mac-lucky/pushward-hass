@@ -1097,6 +1097,155 @@ update_activity_timeline:
               max: 10
               mode: slider
 
+# board/log use a deliberately FLAT field layout (no collapsible `sections`) so the
+# only new translation strings live in en.json — avoiding the all-locale `sections`
+# requirement. Each service shows exactly the fields its template renders.
+update_activity_board:
+  fields:
+    slug:
+      required: true
+      example: "ha-status-board"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    tiles:
+      required: true
+      example: '[{"label": "CPU", "value": "72", "unit": "%", "trend": "up"}, {"label": "Door", "value": "Open", "icon": "door.left.hand.open"}]'
+      selector:
+        object:
+    state_text:
+      example: "Home Status"
+      selector:
+        text:
+    subtitle:
+      example: "Updated just now"
+      selector:
+        text:
+    icon:
+      example: "square.grid.2x2.fill"
+      selector:
+        text:
+    completion_message:
+      example: "All clear"
+      selector:
+        text:
+    accent_color:
+      example: "blue"
+      selector:
+        text:
+    background_color:
+      example: "#1a2b3c"
+      selector:
+        text:
+    text_color:
+      example: "#ffffff"
+      selector:
+        text:
+    tap_action:
+      example: '{"url": "homeassistant://navigate/lovelace/0"}'
+      selector:
+        object:
+    sound:
+      example: "chime"
+      selector:
+        select:
+          options:
+            - "default"
+            - "chime"
+            - "alert"
+            - "success"
+            - "warning"
+            - "bell"
+            - "ding"
+            - "buzz"
+            - "notification"
+    priority:
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 10
+          mode: slider
+
+update_activity_log:
+  fields:
+    slug:
+      required: true
+      example: "ha-event-log"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    lines:
+      required: true
+      example: '[{"text": "Front door opened", "level": "info"}, {"text": "Garage left open", "level": "warn"}]'
+      selector:
+        object:
+    state_text:
+      example: "Event Log"
+      selector:
+        text:
+    subtitle:
+      example: "5 events today"
+      selector:
+        text:
+    icon:
+      example: "list.bullet.rectangle"
+      selector:
+        text:
+    completion_message:
+      example: "Log closed"
+      selector:
+        text:
+    accent_color:
+      example: "blue"
+      selector:
+        text:
+    background_color:
+      example: "#1a2b3c"
+      selector:
+        text:
+    text_color:
+      example: "#ffffff"
+      selector:
+        text:
+    tap_action:
+      example: '{"url": "homeassistant://navigate/lovelace/0"}'
+      selector:
+        object:
+    sound:
+      example: "chime"
+      selector:
+        select:
+          options:
+            - "default"
+            - "chime"
+            - "alert"
+            - "success"
+            - "warning"
+            - "bell"
+            - "ding"
+            - "buzz"
+            - "notification"
+    priority:
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 10
+          mode: slider
+
 create_activity:
   name: Create Activity
   description: Create a new PushWard Live Activity.

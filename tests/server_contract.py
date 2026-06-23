@@ -28,6 +28,15 @@ import time
 from urllib.parse import urlparse
 
 from custom_components.pushward.const import (
+    BOARD_MAX_TILES,
+    BOARD_TILE_ICON_MAX,
+    BOARD_TILE_LABEL_MAX,
+    BOARD_TILE_UNIT_MAX,
+    BOARD_TILE_VALUE_MAX,
+    BOARD_TRENDS,
+    LOG_LEVELS,
+    LOG_LINE_TEXT_MAX,
+    LOG_MAX_LINES,
     MAX_LONG_TEXT_LEN,
     MAX_TAP_ACTION_ICON_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
@@ -189,6 +198,10 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
         _assert_gauge(content, where)
     elif template == "timeline":
         _assert_timeline(content, where)
+    elif template == "board":
+        _assert_board(content, where)
+    elif template == "log":
+        _assert_log(content, where)
 
 
 def _assert_countdown(content: dict, where: str) -> None:
@@ -327,6 +340,61 @@ def _assert_timeline(content: dict, where: str) -> None:
                 _fail(where, f"history[{key!r}][{i}].timestamp must not be in the future, got {ts}")
             if not _is_finite_number(p.get("value")):
                 _fail(where, f"history[{key!r}][{i}].value must be a finite number")
+
+
+def _assert_board(content: dict, where: str) -> None:
+    tiles = content.get("tiles")
+    if not isinstance(tiles, list) or not tiles:
+        _fail(where, f"board requires a non-empty tiles list, got {tiles!r}")
+    if len(tiles) > BOARD_MAX_TILES:
+        _fail(where, f"board supports at most {BOARD_MAX_TILES} tiles, got {len(tiles)}")
+    for i, tile in enumerate(tiles):
+        if not isinstance(tile, dict):
+            _fail(where, f"tiles[{i}] must be an object, got {type(tile).__name__}")
+        label = tile.get("label")
+        if not label or not str(label).strip():
+            _fail(where, f"tiles[{i}].label is required")
+        _check_len(label, BOARD_TILE_LABEL_MAX, f"tiles[{i}].label", where)
+        # value is a STRING field on the server (BoardTile.Value) — a JSON number/bool
+        # would fail to decode, so the contract requires a non-empty string.
+        value = tile.get("value")
+        if not isinstance(value, str):
+            _fail(where, f"tiles[{i}].value must be a string, got {type(value).__name__}")
+        if not value:
+            _fail(where, f"tiles[{i}].value is required")
+        _check_len(value, BOARD_TILE_VALUE_MAX, f"tiles[{i}].value", where)
+        _check_len(tile.get("unit"), BOARD_TILE_UNIT_MAX, f"tiles[{i}].unit", where)
+        _check_len(tile.get("icon"), BOARD_TILE_ICON_MAX, f"tiles[{i}].icon", where)
+        _check_color(tile.get("color"), f"tiles[{i}].color", where)
+        trend = tile.get("trend")
+        if trend not in (None, "") and trend not in BOARD_TRENDS:
+            _fail(where, f"tiles[{i}].trend must be one of {BOARD_TRENDS}, got {trend!r}")
+        _check_tap_action(tile.get("url_action"), f"tiles[{i}].url_action", where)
+
+
+def _assert_log(content: dict, where: str) -> None:
+    lines = content.get("lines")
+    if not isinstance(lines, list) or not lines:
+        _fail(where, f"log requires a non-empty lines list, got {lines!r}")
+    if len(lines) > LOG_MAX_LINES:
+        _fail(where, f"log supports at most {LOG_MAX_LINES} lines, got {len(lines)}")
+    for i, line in enumerate(lines):
+        if not isinstance(line, dict):
+            _fail(where, f"lines[{i}] must be an object, got {type(line).__name__}")
+        text = line.get("text")
+        if not text or not str(text).strip():
+            _fail(where, f"lines[{i}].text is required")
+        _check_len(text, LOG_LINE_TEXT_MAX, f"lines[{i}].text", where)
+        at = line.get("at")
+        if at is not None and (not _is_int(at) or at <= 0):
+            # at is a *int64 unix timestamp on the server — a non-int JSON fails decode.
+            _fail(where, f"lines[{i}].at must be a positive timestamp, got {at!r}")
+        level = line.get("level")
+        if level not in (None, "") and level not in LOG_LEVELS:
+            _fail(where, f"lines[{i}].level must be one of {LOG_LEVELS}, got {level!r}")
+    # log_backlog is server-owned — the integration must never send it.
+    if "log_backlog" in content:
+        _fail(where, "log must not send log_backlog (server-owned field)")
 
 
 def assert_valid_widget_content(content: dict, template: str | None = None, *, where: str = "widget") -> None:

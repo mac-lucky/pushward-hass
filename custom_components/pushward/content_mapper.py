@@ -21,6 +21,12 @@ from homeassistant.util.color import (
 from homeassistant.util.unit_conversion import DurationConverter
 
 from .const import (
+    BOARD_MAX_TILES,
+    BOARD_TILE_ICON_MAX,
+    BOARD_TILE_LABEL_MAX,
+    BOARD_TILE_UNIT_MAX,
+    BOARD_TILE_VALUE_MAX,
+    BOARD_TRENDS,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ALARM,
@@ -30,10 +36,13 @@ from .const import (
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
+    CONF_ENTITY_ID,
     CONF_FIRED_AT_ATTRIBUTE,
     CONF_FIRED_AT_ENTITY,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_LABEL,
+    CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PROGRESS_ATTRIBUTE,
@@ -59,6 +68,7 @@ from .const import (
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
+    CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UNITS,
@@ -76,6 +86,8 @@ from .const import (
     DEFAULT_TOTAL_STEPS,
     DEVICE_CLASS_ICONS,
     DOMAIN_DEFAULTS,
+    LOG_LEVELS,
+    LOG_LINE_TEXT_MAX,
     normalize_slug,
 )
 
@@ -250,10 +262,17 @@ def _resolve_device_class_icon(domain: str, device_class: str) -> str:
 
 
 def lookup_registry_icon(hass: HomeAssistant, entity_id: str | None) -> str | None:
-    """Return the entity registry's icon for entity_id, or None."""
+    """Return the entity registry's icon for entity_id, or None.
+
+    Defensive against a hass-like object without an entity registry (e.g. a test
+    stub) so per-tile board icon resolution never crashes the mapper.
+    """
     if not entity_id:
         return None
-    registry = er.async_get(hass)
+    try:
+        registry = er.async_get(hass)
+    except (AttributeError, KeyError):
+        return None
     entry = registry.async_get(entity_id)
     if entry is None:
         return None
@@ -291,6 +310,103 @@ def resolve_icon(state: State, config: dict, registry_icon: str | None = None) -
     return icon
 
 
+def _format_state_label(state: State, entity_config: dict) -> str:
+    """Format an entity state into a display label.
+
+    Uses a custom mapping from CONF_STATE_LABELS when one matches, else the raw
+    state with underscores spaced out and capitalized. Shared by the activity
+    ``state`` field and the log template's per-line text.
+    """
+    state_labels = entity_config.get(CONF_STATE_LABELS) or {}
+    if state.state in state_labels:
+        return state_labels[state.state]
+    return state.state.replace("_", " ").capitalize()
+
+
+def _state_epoch(state: State) -> int | None:
+    """Return ``state.last_updated`` as a unix-second int, or None if unavailable.
+
+    Defensive against mock/partial State objects (tests) whose ``last_updated`` is
+    not a real datetime — a bad value yields None so the optional ``at`` field is
+    simply omitted rather than crashing the mapper.
+    """
+    last_updated = getattr(state, "last_updated", None)
+    if last_updated is None:
+        return None
+    try:
+        return int(last_updated.timestamp())
+    except (TypeError, ValueError, AttributeError, OverflowError):
+        return None
+
+
+def _build_log_line(state: State, entity_config: dict) -> dict:
+    """Build a single LogLine dict from an entity state for the log template.
+
+    ``text`` is the formatted state label (capped at LOG_LINE_TEXT_MAX); ``at`` is
+    the state's last_updated epoch (omitted when not resolvable); ``level`` comes
+    from CONF_LOG_LEVEL_ATTRIBUTE when it resolves to a valid info/warn/error tag.
+    """
+    line: dict = {"text": _format_state_label(state, entity_config)[:LOG_LINE_TEXT_MAX]}
+    at = _state_epoch(state)
+    if at is not None and at > 0:
+        line["at"] = at
+    level_attr = entity_config.get(CONF_LOG_LEVEL_ATTRIBUTE)
+    if level_attr:
+        raw_level = state.attributes.get(level_attr)
+        if raw_level is not None:
+            level = str(raw_level).strip().lower()
+            if level in LOG_LEVELS:
+                line["level"] = level
+    return line
+
+
+def _build_board_tiles(entity_config: dict, hass: HomeAssistant | None) -> list[dict]:
+    """Build the board ``tiles`` list by reading each tile's bound entity.
+
+    Each configured tile is ``{label, entity_id, value_attribute?, unit?, icon?}``.
+    Tiles whose entity is missing/unavailable or whose value is empty are skipped
+    (mirrors the stat_list widget mapper). Returns at most BOARD_MAX_TILES tiles;
+    an empty list when ``hass`` is unavailable (the values can't be read).
+    """
+    if hass is None:
+        return []
+    tiles_out: list[dict] = []
+    for tile in entity_config.get(CONF_TILES) or []:
+        if not isinstance(tile, dict):
+            continue
+        entity_id = tile.get(CONF_ENTITY_ID)
+        label = str(tile.get(CONF_LABEL, "") or "").strip()
+        if not entity_id or not label:
+            continue
+        tile_state = hass.states.get(entity_id)
+        if tile_state is None or tile_state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            continue
+        attr = tile.get(CONF_VALUE_ATTRIBUTE)
+        raw = tile_state.attributes.get(attr) if attr else tile_state.state
+        if raw is None or str(raw) == "":
+            continue
+        out: dict = {
+            "label": label[:BOARD_TILE_LABEL_MAX],
+            "value": str(raw)[:BOARD_TILE_VALUE_MAX],
+        }
+        unit = tile.get(CONF_UNIT)
+        if unit:
+            out["unit"] = str(unit)[:BOARD_TILE_UNIT_MAX]
+        icon = resolve_icon(tile_state, tile, registry_icon=lookup_registry_icon(hass, entity_id))
+        if icon:
+            out["icon"] = icon[:BOARD_TILE_ICON_MAX]
+        color = color_to_str(tile.get(CONF_ACCENT_COLOR, "") or "")
+        if color:
+            out["color"] = color
+        trend = tile.get("trend")
+        if trend in BOARD_TRENDS:
+            out["trend"] = trend
+        tiles_out.append(out)
+        if len(tiles_out) >= BOARD_MAX_TILES:
+            break
+    return tiles_out
+
+
 def map_content(
     state: State,
     entity_config: dict,
@@ -305,11 +421,7 @@ def map_content(
     to the tracked entity.
     """
     # State label: use custom label if configured, else default formatting
-    state_labels = entity_config.get(CONF_STATE_LABELS) or {}
-    if state.state in state_labels:
-        state_text = state_labels[state.state]
-    else:
-        state_text = state.state.replace("_", " ").capitalize()
+    state_text = _format_state_label(state, entity_config)
 
     icon = resolve_icon(state, entity_config, registry_icon=registry_icon)
 
@@ -426,6 +538,17 @@ def map_content(
         if units:
             content["units"] = units
         content["progress"] = 0.0
+    elif template == "board":
+        tiles = _build_board_tiles(entity_config, hass)
+        if tiles:
+            content["tiles"] = tiles
+        # Board has no progress bar — the server requires the field in [0,1].
+        content["progress"] = 0.0
+    elif template == "log":
+        # The current state is one log line; the manager overrides this with the
+        # full ring buffer (newest-first) when one has accumulated.
+        content["lines"] = [_build_log_line(state, entity_config)]
+        content["progress"] = 0.0
 
     return content
 
@@ -474,6 +597,14 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         for key in _TIMELINE_CARRY_FIELDS:
             if last_content and key in last_content:
                 content[key] = last_content[key]
+    elif template == "board" and last_content and last_content.get("tiles"):
+        # The server requires ≥1 tile even on the ENDED frame — carry the last
+        # rendered tiles so the completion screen keeps the final values.
+        content["tiles"] = last_content["tiles"]
+    elif template == "log" and last_content and last_content.get("lines"):
+        # The server requires ≥1 line even on the ENDED frame — carry the last
+        # rendered lines (newest-first) so the log doesn't blank out on completion.
+        content["lines"] = last_content["lines"]
 
     if last_content:
         for key in _COMMON_CARRY_FIELDS:

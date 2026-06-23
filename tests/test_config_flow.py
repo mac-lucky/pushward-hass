@@ -16,6 +16,7 @@ from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import (
     _details_schema,
     _hex_to_rgb,
+    _parse_board_tiles,
     _parse_csv,
     _parse_entity_input,
     _parse_int_list,
@@ -24,11 +25,13 @@ from custom_components.pushward.config_flow import (
     _parse_widget_input,
     _parse_widget_stat_rows,
     _rgb_to_hex,
+    _serialize_board_tiles,
     _serialize_thresholds,
     _serialize_widget_stat_rows,
     _validate_integration_key,
 )
 from custom_components.pushward.const import (
+    BOARD_MAX_TILES,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
     CONF_ALARM,
@@ -47,6 +50,7 @@ from custom_components.pushward.const import (
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
+    CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
@@ -77,6 +81,7 @@ from custom_components.pushward.const import (
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
+    CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UNITS,
@@ -1489,6 +1494,20 @@ def test_details_schema_timeline_has_units() -> None:
     assert CONF_UNITS in keys
 
 
+def test_details_schema_board_has_tiles() -> None:
+    """Board template includes the tiles field."""
+    schema = _details_schema("binary_sensor.foo", "board", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_TILES in keys
+
+
+def test_details_schema_log_has_log_level_attribute() -> None:
+    """Log template includes the log_level_attribute field."""
+    schema = _details_schema("binary_sensor.foo", "log", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_LOG_LEVEL_ATTRIBUTE in keys
+
+
 # --- _parse_int_list tests ---
 
 
@@ -1852,3 +1871,71 @@ def test_parse_widget_input_empty_tap_action_defaults() -> None:
     assert result[CONF_TAP_ACTION_URL] == ""
     # Default foreground is True.
     assert result[CONF_TAP_ACTION_FOREGROUND] is True
+
+
+# --- Board tiles parsing & serialization ---
+
+
+def test_parse_board_tiles_basic() -> None:
+    """Parse 'label=entity[:attr[:unit]]' tiles into dicts."""
+    parsed = _parse_board_tiles("CPU=sensor.cpu:temperature:%, Door=binary_sensor.door")
+    assert parsed == [
+        {
+            CONF_LABEL: "CPU",
+            CONF_ENTITY_ID: "sensor.cpu",
+            CONF_VALUE_ATTRIBUTE: "temperature",
+            CONF_UNIT: "%",
+        },
+        {CONF_LABEL: "Door", CONF_ENTITY_ID: "binary_sensor.door"},
+    ]
+
+
+def test_parse_board_tiles_icon_with_colon() -> None:
+    """An MDI icon (containing a colon) survives the maxsplit-3 parse intact."""
+    parsed = _parse_board_tiles("CPU=sensor.cpu:::mdi:cpu-64")
+    assert len(parsed) == 1
+    assert parsed[0][CONF_ICON] == "mdi:cpu-64"
+
+
+def test_parse_board_tiles_caps_at_max() -> None:
+    """More than BOARD_MAX_TILES tiles are truncated to the cap."""
+    raw = ", ".join(f"Row{i}=sensor.s{i}" for i in range(6))
+    parsed = _parse_board_tiles(raw)
+    assert len(parsed) == BOARD_MAX_TILES
+
+
+def test_parse_board_tiles_empty() -> None:
+    """Empty string and non-string inputs return an empty list."""
+    assert _parse_board_tiles("") == []
+    assert _parse_board_tiles(None) == []
+
+
+def test_board_tiles_round_trip() -> None:
+    """parse → serialize → parse yields the same list (attr+unit+icon preserved)."""
+    raw = "CPU=sensor.cpu:temperature:%:mdi:cpu-64, Door=binary_sensor.door"
+    parsed = _parse_board_tiles(raw)
+    reparsed = _parse_board_tiles(_serialize_board_tiles(parsed))
+    assert reparsed == parsed
+
+
+# --- _parse_entity_input board/log fields ---
+
+
+def test_parse_entity_input_board_emits_tiles() -> None:
+    """A board template parses CONF_TILES into a list of tile dicts."""
+    result = _parse_entity_input(_base_user_input(**{CONF_TEMPLATE: "board", CONF_TILES: "CPU=sensor.cpu"}))
+    assert result[CONF_TILES] == [{CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu"}]
+
+
+def test_parse_entity_input_board_requires_tiles() -> None:
+    """A board template with no tiles raises tiles_required on the tiles field."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_entity_input(_base_user_input(**{CONF_TEMPLATE: "board"}))
+    assert exc.value.path == [CONF_TILES]
+    assert "tiles_required" in str(exc.value)
+
+
+def test_parse_entity_input_log_emits_level_attribute() -> None:
+    """A log template persists the log_level_attribute field."""
+    result = _parse_entity_input(_base_user_input(**{CONF_TEMPLATE: "log", CONF_LOG_LEVEL_ATTRIBUTE: "severity"}))
+    assert result[CONF_LOG_LEVEL_ATTRIBUTE] == "severity"

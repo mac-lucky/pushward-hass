@@ -30,11 +30,20 @@ from .api import (
 from .const import (
     ACTIVITY_STATE_ENDED,
     ACTIVITY_STATES,
+    BOARD_MAX_TILES,
+    BOARD_TILE_ICON_MAX,
+    BOARD_TILE_LABEL_MAX,
+    BOARD_TILE_UNIT_MAX,
+    BOARD_TILE_VALUE_MAX,
+    BOARD_TRENDS,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     CONF_SLUG,
     DEFAULT_PRIORITY,
     DOMAIN,
+    LOG_LEVELS,
+    LOG_LINE_TEXT_MAX,
+    LOG_MAX_LINES,
     MAX_TAP_ACTION_BODY_LEN,
     MAX_TAP_ACTION_ICON_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
@@ -199,6 +208,68 @@ _TIMELINE_TEMPLATE_FIELDS = {
     # as source of truth after the first update — see PrepareTimelineUpdate.
     vol.Optional("history"): dict,
 }
+# board: 1-BOARD_MAX_TILES tiles (RFC-7396 atomic replace). value is a STRING so
+# "Open"/"On"/numbers all render. url_action is per-tile (reuses the rich tap-action schema).
+_BOARD_TILE_SCHEMA = vol.All(
+    vol.Schema(
+        {
+            vol.Required("label"): vol.All(vol.Coerce(str), vol.Length(min=1, max=BOARD_TILE_LABEL_MAX)),
+            vol.Required("value"): vol.All(vol.Coerce(str), vol.Length(min=1, max=BOARD_TILE_VALUE_MAX)),
+            vol.Optional("unit"): vol.All(vol.Coerce(str), vol.Length(max=BOARD_TILE_UNIT_MAX)),
+            vol.Optional("icon"): vol.All(str, vol.Length(max=BOARD_TILE_ICON_MAX)),
+            vol.Optional("color"): str,  # named/hex; server ValidateColor is authoritative
+            vol.Optional("trend"): vol.In(BOARD_TRENDS),
+            vol.Optional("url_action"): _URL_ACTION_SCHEMA,
+        }
+    ),
+)
+_BOARD_TEMPLATE_FIELDS = {
+    vol.Optional("tiles"): vol.All([_BOARD_TILE_SCHEMA], vol.Length(min=1, max=BOARD_MAX_TILES)),
+}
+# log: 1-LOG_MAX_LINES lines (newest-first, atomic replace). level is info/warn/error
+# (a different set from alert's severity); log_backlog is server-owned and never sent.
+_LOG_LINE_SCHEMA = vol.Schema(
+    {
+        vol.Required("text"): vol.All(vol.Coerce(str), vol.Length(min=1, max=LOG_LINE_TEXT_MAX)),
+        # `at` is a positive unix timestamp server-side; reject 0/negative locally.
+        vol.Optional("at"): vol.All(vol.Coerce(int), vol.Range(min=1)),
+        vol.Optional("level"): vol.In(LOG_LEVELS),
+    }
+)
+_LOG_TEMPLATE_FIELDS = {
+    vol.Optional("lines"): vol.All([_LOG_LINE_SCHEMA], vol.Length(min=1, max=LOG_MAX_LINES)),
+}
+
+# Lean field groups for board/log: only the fields those templates actually render.
+# Board/log have no progress bar, no remaining_time, and no whole-activity button slots
+# (board uses per-tile url_action; log has no buttons) — so those are deliberately absent.
+_BOARD_LOG_LABEL_FIELDS = {
+    vol.Optional("state_text"): str,
+    vol.Optional("subtitle"): str,
+    vol.Optional("icon"): str,
+}
+_BOARD_LOG_APPEARANCE_FIELDS = {
+    vol.Optional("completion_message"): str,
+    vol.Optional("accent_color"): str,
+    vol.Optional("background_color"): str,
+    vol.Optional("text_color"): str,
+    vol.Optional("sound"): vol.In(SOUNDS),
+    vol.Optional("priority"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
+}
+_BOARD_LOG_ACTION_FIELDS = {vol.Optional("tap_action"): _TAP_ACTION_SCHEMA}  # whole-activity tap only
+
+
+def _board_log_schema(template_fields: dict) -> vol.Schema:
+    """Build a lean board/log update schema: only the fields those templates render."""
+    return vol.Schema(
+        {
+            **_UPDATE_TOPLEVEL_FIELDS,
+            **_BOARD_LOG_LABEL_FIELDS,
+            **_BOARD_LOG_APPEARANCE_FIELDS,
+            **_BOARD_LOG_ACTION_FIELDS,
+            **template_fields,
+        }
+    )
 
 
 def _update_template_schema(*template_fields: dict) -> vol.Schema:
@@ -221,6 +292,9 @@ _UPDATE_TEMPLATE_SCHEMAS = {
     "alert": _update_template_schema(_ALERT_TEMPLATE_FIELDS),
     "gauge": _update_template_schema(_GAUGE_TEMPLATE_FIELDS),
     "timeline": _update_template_schema(_TIMELINE_TEMPLATE_FIELDS),
+    # board/log use the lean schema (no progress / remaining_time / button slots).
+    "board": _board_log_schema(_BOARD_TEMPLATE_FIELDS),
+    "log": _board_log_schema(_LOG_TEMPLATE_FIELDS),
 }
 
 # The deprecated update_activity accepts every template's fields (plus an explicit
@@ -232,6 +306,8 @@ SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
     _ALERT_TEMPLATE_FIELDS,
     _GAUGE_TEMPLATE_FIELDS,
     _TIMELINE_TEMPLATE_FIELDS,
+    _BOARD_TEMPLATE_FIELDS,
+    _LOG_TEMPLATE_FIELDS,
 )
 
 SCHEMA_CREATE_ACTIVITY = vol.Schema(

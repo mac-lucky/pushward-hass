@@ -36,6 +36,7 @@ from homeassistant.helpers.selector import (
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     APP_STORE_URL,
+    BOARD_MAX_TILES,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
@@ -57,6 +58,7 @@ from .const import (
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
     CONF_LABEL_ATTRIBUTE,
+    CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
@@ -89,6 +91,7 @@ from .const import (
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
+    CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UNITS,
@@ -533,6 +536,25 @@ def _details_schema(
                 unit_of_measurement="minutes",
             )
         )
+    if template == "board":
+        # Tiles are configured as a structured string (mirrors widget stat_rows).
+        # Format: 'label=entity_id[:attribute[:unit[:icon]]]' comma-separated.
+        # The anchor entity (step 1) drives start/end; tiles read separate entities.
+        fields[
+            vol.Required(
+                CONF_TILES,
+                default=d.get(CONF_TILES, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+    if template == "log":
+        # Optional attribute on the tracked entity supplying each line's level
+        # (info/warn/error); the line text is the formatted state.
+        fields[
+            vol.Optional(
+                CONF_LOG_LEVEL_ATTRIBUTE,
+                description={"suggested_value": d.get(CONF_LOG_LEVEL_ATTRIBUTE, "")},
+            )
+        ] = attr_selector
 
     # --- Identity fields ---
     fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(str, vol.Length(max=MAX_SLUG_LEN))
@@ -776,6 +798,64 @@ def _coerce_gauge_range(user_input: dict, *, is_gauge: bool) -> tuple[float, flo
     return min_v, max_v
 
 
+def _parse_board_tiles(raw: object) -> list[dict]:
+    """Parse board tiles from a string ('label=entity_id[:attr[:unit[:icon]]], ...') or list.
+
+    Mirrors ``_parse_widget_stat_rows``. Capped at BOARD_MAX_TILES. Each parsed tile
+    is ``{label, entity_id, value_attribute?, unit?, icon?}``.
+    """
+    if isinstance(raw, list):
+        tiles = [t for t in raw if isinstance(t, dict) and t.get(CONF_ENTITY_ID) and t.get(CONF_LABEL)]
+        return tiles[:BOARD_MAX_TILES]
+    if not isinstance(raw, str) or not raw.strip():
+        return []
+    tiles = []
+    for entry in raw.split(","):
+        entry = entry.strip()
+        if "=" not in entry:
+            continue
+        label, rest = entry.split("=", 1)
+        label = label.strip()
+        # maxsplit=3 keeps the icon (4th field) intact even when it contains a
+        # colon, e.g. an "mdi:cpu" MDI icon — otherwise the prefix would be lost.
+        parts = [p.strip() for p in rest.split(":", 3)]
+        if not label or not parts or not parts[0]:
+            continue
+        tile: dict = {CONF_LABEL: label, CONF_ENTITY_ID: parts[0]}
+        if len(parts) > 1 and parts[1]:
+            tile[CONF_VALUE_ATTRIBUTE] = parts[1]
+        if len(parts) > 2 and parts[2]:
+            tile[CONF_UNIT] = parts[2]
+        if len(parts) > 3 and parts[3]:
+            tile[CONF_ICON] = parts[3]
+        tiles.append(tile)
+        if len(tiles) >= BOARD_MAX_TILES:
+            break
+    return tiles
+
+
+def _serialize_board_tiles(tiles: list[dict]) -> str:
+    """Serialize board tiles back to 'label=entity_id[:attr[:unit[:icon]]], ...' for editing."""
+    parts: list[str] = []
+    for tile in tiles or []:
+        label = tile.get(CONF_LABEL, "")
+        entity_id = tile.get(CONF_ENTITY_ID, "")
+        if not label or not entity_id:
+            continue
+        s = f"{label}={entity_id}"
+        attr = tile.get(CONF_VALUE_ATTRIBUTE) or ""
+        unit = tile.get(CONF_UNIT) or ""
+        icon = tile.get(CONF_ICON) or ""
+        if attr or unit or icon:
+            s += f":{attr}"
+        if unit or icon:
+            s += f":{unit}"
+        if icon:
+            s += f":{icon}"
+        parts.append(s)
+    return ", ".join(parts)
+
+
 def _parse_entity_input(user_input: dict) -> dict:
     """Normalize user input into an entity config dict."""
     entity_id = user_input[CONF_ENTITY_ID]
@@ -833,6 +913,11 @@ def _parse_entity_input(user_input: dict) -> dict:
     thresholds_raw = user_input.get(CONF_THRESHOLDS, "")
     thresholds = _parse_thresholds(thresholds_raw) if isinstance(thresholds_raw, str) else thresholds_raw or []
     history_period_raw = user_input.get(CONF_HISTORY_PERIOD, DEFAULT_HISTORY_PERIOD)
+
+    # Board tiles: a board needs at least one tile to render.
+    tiles = _parse_board_tiles(user_input.get(CONF_TILES, ""))
+    if user_input.get(CONF_TEMPLATE) == "board" and not tiles:
+        raise vol.Invalid("tiles_required", path=[CONF_TILES])
 
     return {
         CONF_ENTITY_ID: entity_id,
@@ -897,6 +982,8 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_BACKGROUND_COLOR_ATTRIBUTE: user_input.get(CONF_BACKGROUND_COLOR_ATTRIBUTE, ""),
         CONF_TEXT_COLOR: _rgb_to_hex(user_input.get(CONF_TEXT_COLOR)),
         CONF_TEXT_COLOR_ATTRIBUTE: user_input.get(CONF_TEXT_COLOR_ATTRIBUTE, ""),
+        CONF_TILES: tiles,
+        CONF_LOG_LEVEL_ATTRIBUTE: user_input.get(CONF_LOG_LEVEL_ATTRIBUTE, ""),
     }
 
 
@@ -1061,6 +1148,9 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             units = current.get(CONF_UNITS)
             if isinstance(units, dict):
                 current[CONF_UNITS] = _serialize_key_value_pairs(units)
+            tiles = current.get(CONF_TILES)
+            if isinstance(tiles, list):
+                current[CONF_TILES] = _serialize_board_tiles(tiles)
             self._details_defaults = current
             return await self.async_step_details()
 

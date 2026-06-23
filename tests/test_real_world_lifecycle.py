@@ -22,10 +22,15 @@ from custom_components.pushward.const import (
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_ICON,
+    CONF_LABEL,
+    CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_SLUG,
     CONF_START_STATES,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_TEMPLATE,
+    CONF_TILES,
+    CONF_UNIT,
 )
 
 from .conftest import (
@@ -360,4 +365,166 @@ async def test_unavailable_does_not_start_then_recovers(hass: HomeAssistant) -> 
     api.create_activity.assert_awaited_once()
     _assert_all_ongoing_valid(api)
 
+    await manager.async_stop()
+
+
+# ---------------------------------------------------------------------------
+# Board — multi-entity dashboard; a tile change refreshes via the companion path
+# ---------------------------------------------------------------------------
+
+
+async def test_home_status_board_lifecycle(hass: HomeAssistant) -> None:
+    """board: vacant → occupied (start) → a tile changes (companion refresh) → vacant (end).
+
+    The anchor (``binary_sensor.home_occupied``) owns start/end; the two tiles bind to
+    *separate* entities, so a change to a tile entity refreshes the board through the
+    real companion-subscription path while the anchor is unchanged. The two-phase end
+    must carry the last rendered tiles onto the ENDED frame (the server rejects a
+    tile-less board, even on completion).
+    """
+    api = make_activity_api()
+    config = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.home_occupied",
+            CONF_SLUG: "ha-home-status",
+            CONF_ACTIVITY_NAME: "Home Status",
+            CONF_ICON: "mdi:home-account",
+            CONF_TEMPLATE: "board",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_TILES: [
+                {CONF_LABEL: "Temperature", CONF_ENTITY_ID: "sensor.living_room_temperature", CONF_UNIT: "°C"},
+                {CONF_LABEL: "Front Door", CONF_ENTITY_ID: "binary_sensor.front_door"},
+            ],
+        }
+    )
+    manager = ActivityManager(hass, api, [config], make_mock_entry())
+
+    # Tile entities + the anchor (vacant) all exist before the manager starts.
+    hass.states.async_set(
+        "sensor.living_room_temperature",
+        "21.5",
+        {"friendly_name": "Living Room Temperature", "device_class": "temperature", "unit_of_measurement": "°C"},
+    )
+    hass.states.async_set(
+        "binary_sensor.front_door",
+        "closed",
+        {"friendly_name": "Front Door", "device_class": "door"},
+    )
+    hass.states.async_set("binary_sensor.home_occupied", "off", {"friendly_name": "Home Occupied"})
+    await manager.async_start()
+    api.create_activity.assert_not_called()
+
+    # Someone comes home → the board starts with a snapshot of both tiles.
+    hass.states.async_set("binary_sensor.home_occupied", "on", {"friendly_name": "Home Occupied"})
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
+    start = _ongoing(api)[0]
+    assert start["template"] == "board"
+    start_tiles = {tile["label"]: tile for tile in start["tiles"]}
+    assert start_tiles["Temperature"]["value"] == "21.5"
+    assert start_tiles["Front Door"]["value"] == "closed"
+
+    # A tile entity changes while the board is live → companion refresh (anchor unchanged).
+    await bump_state(
+        manager,
+        hass,
+        "binary_sensor.home_occupied",
+        "sensor.living_room_temperature",
+        "23.0",
+        {"friendly_name": "Living Room Temperature", "device_class": "temperature", "unit_of_measurement": "°C"},
+    )
+    refreshed = {tile["label"]: tile for tile in _ongoing(api)[-1]["tiles"]}
+    assert refreshed["Temperature"]["value"] == "23.0"
+
+    # Everyone leaves → two-phase end carries the last tiles onto the ENDED frame.
+    await end_activity_via_state(
+        manager, hass, "binary_sensor.home_occupied", "off", {"friendly_name": "Home Occupied"}
+    )
+
+    _assert_all_ongoing_valid(api)
+    _assert_ended_valid_completion(api)
+    ended = _ended(api)[-1]
+    assert ended["tiles"], "board ENDED frame must carry the last rendered tiles"
+    assert not manager._tracked["binary_sensor.home_occupied"].is_active
+    await manager.async_stop()
+
+
+# ---------------------------------------------------------------------------
+# Log — append-only event feed; lines accumulate newest-first across changes
+# ---------------------------------------------------------------------------
+
+
+async def test_front_door_activity_log_lifecycle(hass: HomeAssistant) -> None:
+    """log: idle → motion (start) → distinct events (each appends a line) → cleared (end).
+
+    Each state change prepends a newest-first line to the per-entity ring buffer, and
+    every pushed frame carries the *whole* accumulated buffer (not just the latest
+    line). The two-phase end carries the final lines onto the ENDED frame.
+    """
+    api = make_activity_api()
+    config = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "sensor.front_door_activity",
+            CONF_SLUG: "ha-front-door-log",
+            CONF_ACTIVITY_NAME: "Front Door Activity",
+            CONF_ICON: "mdi:door",
+            CONF_TEMPLATE: "log",
+            CONF_START_STATES: ["motion_detected"],
+            CONF_END_STATES: ["cleared"],
+            CONF_LOG_LEVEL_ATTRIBUTE: "level",
+        }
+    )
+    manager = ActivityManager(hass, api, [config], make_mock_entry())
+
+    hass.states.async_set(
+        "sensor.front_door_activity", "idle", {"friendly_name": "Front Door Activity", "level": "info"}
+    )
+    await manager.async_start()
+    api.create_activity.assert_not_called()
+
+    # First event starts the log.
+    hass.states.async_set(
+        "sensor.front_door_activity", "motion_detected", {"friendly_name": "Front Door Activity", "level": "info"}
+    )
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
+    assert _ongoing(api)[0]["lines"][0]["text"] == "Motion detected"
+
+    # Two more distinct events, each appended newest-first through the real send path.
+    await _send_now(
+        manager,
+        hass,
+        "sensor.front_door_activity",
+        "person_detected",
+        {"friendly_name": "Front Door Activity", "level": "warn"},
+    )
+    await _send_now(
+        manager,
+        hass,
+        "sensor.front_door_activity",
+        "package_delivered",
+        {"friendly_name": "Front Door Activity", "level": "info"},
+    )
+
+    latest = _ongoing(api)[-1]["lines"]
+    # Newest-first: the most recent event leads, older events follow.
+    assert [line["text"] for line in latest[:3]] == ["Package delivered", "Person detected", "Motion detected"]
+    # The level attribute rode onto its matching line.
+    assert latest[1]["level"] == "warn"
+
+    # The activity clears → two-phase end carries the accumulated lines.
+    await end_activity_via_state(
+        manager,
+        hass,
+        "sensor.front_door_activity",
+        "cleared",
+        {"friendly_name": "Front Door Activity", "level": "info"},
+    )
+
+    _assert_all_ongoing_valid(api)
+    _assert_ended_valid_completion(api)
+    ended = _ended(api)[-1]
+    assert ended["lines"], "log ENDED frame must carry the accumulated lines"
+    assert not manager._tracked["sensor.front_door_activity"].is_active
     await manager.async_stop()
