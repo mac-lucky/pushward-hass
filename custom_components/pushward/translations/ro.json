@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Deschideți URL-ul butonului secundar",
             "secondary_url_title": "Titlu buton secundar",
             "snooze_seconds": "Secunde amânare (iOS 26+)",
-            "fired_at_entity": "Entitate moment declanșare"
+            "fired_at_entity": "Entitate moment declanșare",
+            "log_columns": "Coloane jurnal"
           },
           "data_description": {
             "start_states": "Stările entității care pornesc Live Activity. Selectați din listă sau introduceți valori personalizate.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)).",
             "secondary_url_title": "Eticheta butonului secundar (maximum 64 de caractere).",
             "snooze_seconds": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Lăsați gol pentru valoarea implicită de 300s (5 min). Necesită Alarmă. Doar șablonul countdown.",
-            "fired_at_entity": "Citește momentul declanșării alertei dintr-o entitate separată. Lăsați gol pentru a folosi entitatea urmărită. Acceptă o marcă temporală Unix sau un senzor de marcă temporală ISO. Doar șablonul alert."
+            "fired_at_entity": "Citește momentul declanșării alertei dintr-o entitate separată. Lăsați gol pentru a folosi entitatea urmărită. Acceptă o marcă temporală Unix sau un senzor de marcă temporală ISO. Doar șablonul alert.",
+            "log_columns": "Valori suplimentare adăugate la fiecare linie de jurnal (max. 6), separate prin virgulă. Format: [Label=]source[|unit]. source = un atribut al acestei entități (brightness), starea altei entități (binary_sensor.door) sau un atribut al altei entități (sensor.temp:temperature). Exemplu: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Doar șablon jurnal."
           }
         },
         "reconfigure": {

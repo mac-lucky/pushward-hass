@@ -68,6 +68,13 @@ CONF_UNITS = "units"
 CONF_TILES = "tiles"
 # Log template: optional attribute supplying the per-line level (info/warn/error).
 CONF_LOG_LEVEL_ATTRIBUTE = "log_level_attribute"
+# Log template: optional extra columns composed into each line's text. A freeform
+# comma-separated string mirroring the board-tile format — each column is
+# `[Label=]source[|unit]`, where source is a bare attribute of the tracked entity
+# (`brightness`), another entity's state (`binary_sensor.door`), or another
+# entity's attribute (`sensor.temp:temperature`). Stored as a list of column dicts
+# ({label?, entity_id?, attribute?, unit?}); the config flow edits them as a string.
+CONF_LOG_COLUMNS = "log_columns"
 
 # Companion source entities — read a value from a SEPARATE entity instead of an
 # attribute of the tracked entity. Empty => use the tracked entity. When set,
@@ -211,6 +218,12 @@ BOARD_TRENDS = (WIDGET_TREND_UP, WIDGET_TREND_DOWN, WIDGET_TREND_FLAT)
 LOG_MAX_LINES = 20
 LOG_LINE_TEXT_MAX = 512
 LOG_LEVELS = ("info", "warn", "error")
+# Log column composition (client-side only — composed into the single `text`
+# string; no server contract change). At most LOG_MAX_COLUMNS columns per line,
+# each rendered value capped at LOG_COLUMN_VALUE_MAX and label at LOG_COLUMN_LABEL_MAX.
+LOG_MAX_COLUMNS = 6
+LOG_COLUMN_VALUE_MAX = 64
+LOG_COLUMN_LABEL_MAX = 32
 
 # Timeline scales
 SCALES = ["linear", "logarithmic"]

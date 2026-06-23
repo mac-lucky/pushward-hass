@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Ouvrir l'URL du bouton secondaire",
             "secondary_url_title": "Titre du bouton secondaire",
             "snooze_seconds": "Secondes de report (iOS 26+)",
-            "fired_at_entity": "Entité de déclenchement"
+            "fired_at_entity": "Entité de déclenchement",
+            "log_columns": "Colonnes de journal"
           },
           "data_description": {
             "start_states": "États de l'entité qui démarrent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Activé : l'appui ouvre l'URL. Désactivé : webhook silencieux (http(s) uniquement).",
             "secondary_url_title": "Libellé du bouton secondaire (64 caractères maximum).",
             "snooze_seconds": "Durée pendant laquelle le bouton Report d'iOS prolonge le countdown (60–3600). Laisser vide pour la valeur par défaut de 300s (5 min). Nécessite l'alarme. Modèle countdown uniquement.",
-            "fired_at_entity": "Lire l'heure de déclenchement de l'alert depuis une entité distincte. Laisser vide pour utiliser l'entité suivie. Accepte un horodatage Unix ou un capteur d'horodatage ISO. Modèle alert uniquement."
+            "fired_at_entity": "Lire l'heure de déclenchement de l'alert depuis une entité distincte. Laisser vide pour utiliser l'entité suivie. Accepte un horodatage Unix ou un capteur d'horodatage ISO. Modèle alert uniquement.",
+            "log_columns": "Valeurs supplémentaires ajoutées à chaque ligne de journal (max. 6), séparées par des virgules. Format : [Label=]source[|unit]. source = un attribut de cette entité (brightness), l'état d'une autre entité (binary_sensor.door) ou un attribut d'une autre entité (sensor.temp:temperature). Exemple : color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Modèle journal uniquement."
           }
         },
         "reconfigure": {

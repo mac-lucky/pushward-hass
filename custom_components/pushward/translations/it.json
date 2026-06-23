@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Apri URL pulsante secondario",
             "secondary_url_title": "Titolo pulsante secondario",
             "snooze_seconds": "Secondi di posticipo (iOS 26+)",
-            "fired_at_entity": "Entità ora di attivazione"
+            "fired_at_entity": "Entità ora di attivazione",
+            "log_columns": "Colonne del registro"
           },
           "data_description": {
             "start_states": "Stati dell'entità che avviano la Live Activity. Selezionare dall'elenco o digitare valori personalizzati.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Attivo: il tocco apre l'URL. Disattivo: webhook silenzioso (solo http(s)).",
             "secondary_url_title": "Etichetta del pulsante secondario (max 64 caratteri).",
             "snooze_seconds": "Di quanto il pulsante Posticipa di iOS estende il conto alla rovescia (60–3600). Lascia vuoto per il valore predefinito di 300s (5 min). Richiede una sveglia. Solo modello conto alla rovescia.",
-            "fired_at_entity": "Legge l'ora di attivazione dell'avviso da un'entità separata. Lascia vuoto per usare l'entità monitorata. Accetta un timestamp unix o un sensore con timestamp ISO. Solo modello avviso."
+            "fired_at_entity": "Legge l'ora di attivazione dell'avviso da un'entità separata. Lascia vuoto per usare l'entità monitorata. Accetta un timestamp unix o un sensore con timestamp ISO. Solo modello avviso.",
+            "log_columns": "Valori aggiuntivi aggiunti a ogni riga del registro (max 6), separati da virgole. Formato: [Label=]source[|unit]. source = un attributo di questa entità (brightness), lo stato di un'altra entità (binary_sensor.door) o un attributo di un'altra entità (sensor.temp:temperature). Esempio: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo modello registro."
           }
         },
         "reconfigure": {

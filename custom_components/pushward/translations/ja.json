@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "セカンダリボタンURLを開く",
             "secondary_url_title": "セカンダリボタンのタイトル",
             "snooze_seconds": "スヌーズ秒数（iOS 26+）",
-            "fired_at_entity": "発火時刻エンティティ"
+            "fired_at_entity": "発火時刻エンティティ",
+            "log_columns": "ログ列"
           },
           "data_description": {
             "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
             "secondary_url_title": "セカンダリボタンのラベル（最大 64 文字）。",
             "snooze_seconds": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
-            "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。"
+            "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。",
+            "log_columns": "各ログ行に追加される値（最大6個）、カンマ区切り。形式: [Label=]source[|unit]。source = このエンティティの属性 (brightness)、別のエンティティの状態 (binary_sensor.door)、または別のエンティティの属性 (sensor.temp:temperature)。例: color_temp_kelvin|K, brightness → 'On · 4000K · 153'。ログテンプレートのみ。"
           }
         },
         "reconfigure": {

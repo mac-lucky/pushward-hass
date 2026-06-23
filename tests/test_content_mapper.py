@@ -21,6 +21,7 @@ from custom_components.pushward.const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_LABEL,
+    CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
@@ -2362,4 +2363,102 @@ def test_map_completion_content_log_carries_lines():
     content = map_completion_content(config, last_content=last)
 
     assert content["lines"] == [{"text": "Door opened"}]
+    assert_valid_activity_content(content)
+
+
+# --- log_columns ----------------------------------------------------------
+
+
+def test_build_log_line_tracked_attribute_column():
+    """A bare-attribute column reads an attribute of the tracked entity, with a unit suffix."""
+    state = _make_state("on", {"color_temp_kelvin": 4000}, "light.lamp")
+    config = {CONF_TEMPLATE: "log", CONF_LOG_COLUMNS: [{"attribute": "color_temp_kelvin", CONF_UNIT: "K"}]}
+
+    line = _build_log_line(state, config)
+
+    assert line["text"] == "On · 4000K"
+
+
+def test_build_log_line_other_entity_state_and_attribute_columns():
+    """An entity-state column and an entity-attribute column resolve via hass."""
+    state = _make_state("on", {}, "light.lamp")
+    door = _make_state("open", {}, "binary_sensor.door")
+    temp = _make_state("21.5", {"temperature": 21.5}, "sensor.temp")
+    config = {
+        CONF_TEMPLATE: "log",
+        CONF_LOG_COLUMNS: [
+            {CONF_ENTITY_ID: "binary_sensor.door"},
+            {CONF_ENTITY_ID: "sensor.temp", "attribute": "temperature"},
+        ],
+    }
+
+    line = _build_log_line(state, config, _FakeHass({"binary_sensor.door": door, "sensor.temp": temp}))
+
+    assert line["text"] == "On · open · 21.5"
+
+
+def test_build_log_line_labeled_column():
+    """A column with a label renders 'Label: value'."""
+    state = _make_state("on", {}, "light.lamp")
+    door = _make_state("Open", {}, "binary_sensor.door")
+    config = {CONF_TEMPLATE: "log", CONF_LOG_COLUMNS: [{CONF_LABEL: "Door", CONF_ENTITY_ID: "binary_sensor.door"}]}
+
+    line = _build_log_line(state, config, _FakeHass({"binary_sensor.door": door}))
+
+    assert line["text"] == "On · Door: Open"
+
+
+def test_build_log_line_off_state_falls_back_to_bare_label():
+    """When every column resolves empty (lamp off → no brightness), text is just the state label."""
+    state = _make_state("off", {}, "light.lamp")
+    config = {CONF_TEMPLATE: "log", CONF_LOG_COLUMNS: [{"attribute": "brightness"}]}
+
+    line = _build_log_line(state, config)
+
+    assert line["text"] == "Off"
+
+
+def test_build_log_line_skips_missing_and_unavailable_columns():
+    """A missing attribute and an unavailable entity column are skipped; valid columns remain."""
+    state = _make_state("on", {"brightness": 153}, "light.lamp")
+    dead = _make_state("unavailable", {}, "sensor.dead")
+    config = {
+        CONF_TEMPLATE: "log",
+        CONF_LOG_COLUMNS: [
+            {CONF_ENTITY_ID: "sensor.dead"},
+            {"attribute": "missing_attr"},
+            {"attribute": "brightness"},
+        ],
+    }
+
+    line = _build_log_line(state, config, _FakeHass({"sensor.dead": dead}))
+
+    assert line["text"] == "On · 153"
+
+
+def test_build_log_line_entity_column_skipped_without_hass():
+    """Without hass, entity columns can't be read and are skipped; attribute columns still resolve."""
+    state = _make_state("on", {"brightness": 153}, "light.lamp")
+    config = {
+        CONF_TEMPLATE: "log",
+        CONF_LOG_COLUMNS: [{CONF_ENTITY_ID: "binary_sensor.door"}, {"attribute": "brightness"}],
+    }
+
+    line = _build_log_line(state, config)
+
+    assert line["text"] == "On · 153"
+
+
+def test_map_content_log_composes_columns():
+    """map_content passes hass through so the log line's text carries the columns."""
+    state = _make_state("on", {"color_temp_kelvin": 4000}, "light.lamp")
+    cpu = _make_state("72", {}, "sensor.cpu")
+    config = {
+        CONF_TEMPLATE: "log",
+        CONF_LOG_COLUMNS: [{"attribute": "color_temp_kelvin", CONF_UNIT: "K"}, {CONF_ENTITY_ID: "sensor.cpu"}],
+    }
+
+    content = map_content(state, config, hass=_FakeHass({"sensor.cpu": cpu}))
+
+    assert content["lines"][0]["text"] == "On · 4000K · 72"
     assert_valid_activity_content(content)

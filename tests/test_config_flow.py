@@ -20,12 +20,14 @@ from custom_components.pushward.config_flow import (
     _parse_csv,
     _parse_entity_input,
     _parse_int_list,
+    _parse_log_columns,
     _parse_state_labels,
     _parse_thresholds,
     _parse_widget_input,
     _parse_widget_stat_rows,
     _rgb_to_hex,
     _serialize_board_tiles,
+    _serialize_log_columns,
     _serialize_thresholds,
     _serialize_widget_stat_rows,
     _validate_integration_key,
@@ -50,6 +52,7 @@ from custom_components.pushward.const import (
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
+    CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
@@ -99,6 +102,7 @@ from custom_components.pushward.const import (
     DEFAULT_SERVER_URL,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
+    LOG_MAX_COLUMNS,
     SUBENTRY_TYPE_ENTITY,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_TEMPLATE_GAUGE,
@@ -1916,6 +1920,69 @@ def test_board_tiles_round_trip() -> None:
     parsed = _parse_board_tiles(raw)
     reparsed = _parse_board_tiles(_serialize_board_tiles(parsed))
     assert reparsed == parsed
+
+
+# --- _parse_log_columns / _serialize_log_columns ---
+
+
+def test_parse_log_columns_attribute() -> None:
+    """A bare word (no dot, no colon) is a tracked-entity attribute column."""
+    assert _parse_log_columns("brightness") == [{"attribute": "brightness"}]
+
+
+def test_parse_log_columns_entity_state() -> None:
+    """A source with a dot (no colon) is another entity's state column."""
+    assert _parse_log_columns("binary_sensor.door") == [{CONF_ENTITY_ID: "binary_sensor.door"}]
+
+
+def test_parse_log_columns_entity_attribute() -> None:
+    """An 'entity:attribute' source is another entity's attribute column."""
+    assert _parse_log_columns("sensor.temp:temperature") == [
+        {CONF_ENTITY_ID: "sensor.temp", "attribute": "temperature"}
+    ]
+
+
+def test_parse_log_columns_label_and_unit() -> None:
+    """'Label=source|unit' splits off both the label and the unit suffix."""
+    assert _parse_log_columns("Temp=sensor.temp:temperature|°C") == [
+        {CONF_LABEL: "Temp", CONF_ENTITY_ID: "sensor.temp", "attribute": "temperature", CONF_UNIT: "°C"}
+    ]
+
+
+def test_parse_log_columns_attribute_with_unit() -> None:
+    """A bare attribute can carry a unit suffix: 'color_temp_kelvin|K'."""
+    assert _parse_log_columns("color_temp_kelvin|K") == [{"attribute": "color_temp_kelvin", CONF_UNIT: "K"}]
+
+
+def test_parse_log_columns_caps_at_max() -> None:
+    """More than LOG_MAX_COLUMNS columns are truncated to the cap."""
+    raw = ", ".join(f"attr{i}" for i in range(LOG_MAX_COLUMNS + 3))
+    assert len(_parse_log_columns(raw)) == LOG_MAX_COLUMNS
+
+
+def test_parse_log_columns_empty() -> None:
+    """Empty string and non-string inputs return an empty list."""
+    assert _parse_log_columns("") == []
+    assert _parse_log_columns(None) == []
+
+
+def test_log_columns_round_trip() -> None:
+    """parse → serialize → parse yields the same list across every source kind."""
+    raw = "brightness, color_temp_kelvin|K, binary_sensor.door, sensor.temp:temperature, Door=binary_sensor.door"
+    parsed = _parse_log_columns(raw)
+    reparsed = _parse_log_columns(_serialize_log_columns(parsed))
+    assert reparsed == parsed
+
+
+def test_parse_entity_input_log_emits_columns() -> None:
+    """A log template parses CONF_LOG_COLUMNS into a list of column dicts."""
+    result = _parse_entity_input(
+        _base_user_input(**{CONF_TEMPLATE: "log", CONF_LOG_COLUMNS: "brightness, sensor.temp:temperature"})
+    )
+    assert result[CONF_LOG_COLUMNS] == [
+        {"attribute": "brightness"},
+        {CONF_ENTITY_ID: "sensor.temp", "attribute": "temperature"},
+    ]
 
 
 # --- _parse_entity_input board/log fields ---

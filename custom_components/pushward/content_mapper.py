@@ -42,6 +42,7 @@ from .const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_LABEL,
+    CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
@@ -86,6 +87,8 @@ from .const import (
     DEFAULT_TOTAL_STEPS,
     DEVICE_CLASS_ICONS,
     DOMAIN_DEFAULTS,
+    LOG_COLUMN_LABEL_MAX,
+    LOG_COLUMN_VALUE_MAX,
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     normalize_slug,
@@ -339,14 +342,68 @@ def _state_epoch(state: State) -> int | None:
         return None
 
 
-def _build_log_line(state: State, entity_config: dict) -> dict:
+def _resolve_log_columns(state: State, config: dict, hass: HomeAssistant | None) -> list[str]:
+    """Resolve CONF_LOG_COLUMNS into rendered column strings for one log line.
+
+    Each column is ``{label?, entity_id?, attribute?, unit?}``:
+      - no entity_id            → an attribute of the tracked (anchor) entity
+      - entity_id + attribute   → that attribute of the companion entity
+      - entity_id, no attribute → the companion entity's state
+
+    Columns whose source is missing/unavailable/unknown/empty are skipped (same
+    guard as ``_build_board_tiles``). When ``hass`` is None, companion-entity
+    columns are skipped (their values can't be read); bare-attribute columns of the
+    tracked entity still resolve. Each rendered column is the raw value capped at
+    LOG_COLUMN_VALUE_MAX, with ``unit`` appended as a literal suffix (no
+    conversion) and prefixed ``Label: `` when a label is set.
+    """
+    out: list[str] = []
+    for column in config.get(CONF_LOG_COLUMNS) or []:
+        if not isinstance(column, dict):
+            continue
+        entity_id = column.get(CONF_ENTITY_ID)
+        attr = column.get("attribute")
+        if entity_id:
+            if hass is None:
+                continue
+            source = hass.states.get(entity_id)
+            if source is None or source.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+                continue
+            raw = source.attributes.get(attr) if attr else source.state
+        else:
+            if not attr:
+                continue
+            raw = state.attributes.get(attr)
+        if raw is None or str(raw) == "":
+            continue
+        rendered = str(raw)[:LOG_COLUMN_VALUE_MAX]
+        unit = column.get(CONF_UNIT)
+        if unit:
+            rendered = f"{rendered}{unit}"
+        label = str(column.get(CONF_LABEL, "") or "").strip()
+        if label:
+            rendered = f"{label[:LOG_COLUMN_LABEL_MAX]}: {rendered}"
+        out.append(rendered)
+    return out
+
+
+def _build_log_line(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> dict:
     """Build a single LogLine dict from an entity state for the log template.
 
-    ``text`` is the formatted state label (capped at LOG_LINE_TEXT_MAX); ``at`` is
-    the state's last_updated epoch (omitted when not resolvable); ``level`` comes
-    from CONF_LOG_LEVEL_ATTRIBUTE when it resolves to a valid info/warn/error tag.
+    ``text`` is the formatted state label, optionally followed by ``" · "``-joined
+    extra columns (CONF_LOG_COLUMNS) composed from the tracked entity's attributes
+    and/or other entities (whole text capped at LOG_LINE_TEXT_MAX). When every
+    column resolves empty the text is just the state label (never a blank line).
+    ``at`` is the state's last_updated epoch (omitted when not resolvable);
+    ``level`` comes from CONF_LOG_LEVEL_ATTRIBUTE when it resolves to a valid
+    info/warn/error tag. ``hass`` is required only for columns sourced from other
+    entities; bare-attribute columns resolve without it (keeps 2-arg test calls).
     """
-    line: dict = {"text": _format_state_label(state, entity_config)[:LOG_LINE_TEXT_MAX]}
+    text = _format_state_label(state, entity_config)
+    columns = _resolve_log_columns(state, entity_config, hass)
+    if columns:
+        text = " · ".join([text, *columns])
+    line: dict = {"text": text[:LOG_LINE_TEXT_MAX]}
     at = _state_epoch(state)
     if at is not None and at > 0:
         line["at"] = at
@@ -547,7 +604,7 @@ def map_content(
     elif template == "log":
         # The current state is one log line; the manager overrides this with the
         # full ring buffer (newest-first) when one has accumulated.
-        content["lines"] = [_build_log_line(state, entity_config)]
+        content["lines"] = [_build_log_line(state, entity_config, hass)]
         content["progress"] = 0.0
 
     return content

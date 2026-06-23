@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Buksan ang Secondary Button URL",
             "secondary_url_title": "Title ng Pangalawang Button",
             "snooze_seconds": "Snooze na Segundo (iOS 26+)",
-            "fired_at_entity": "Entity ng Fired At"
+            "fired_at_entity": "Entity ng Fired At",
+            "log_columns": "Mga Column ng Log"
           },
           "data_description": {
             "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
             "secondary_url_title": "Label ng pangalawang button (max 64 na character).",
             "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
-            "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang."
+            "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang.",
+            "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6), pinaghihiwalay ng kuwit. Format: [Label=]source[|unit]. source = isang attribute ng entity na ito (brightness), ang estado ng ibang entity (binary_sensor.door), o isang attribute ng ibang entity (sensor.temp:temperature). Halimbawa: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Para lang sa log template."
           }
         },
         "reconfigure": {

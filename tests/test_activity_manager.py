@@ -22,6 +22,7 @@ from custom_components.pushward.const import (
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_LABEL,
+    CONF_LOG_COLUMNS,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SLUG,
@@ -1192,3 +1193,94 @@ async def test_log_rehydration_collapses_persisted_duplicates(hass: HomeAssistan
     assert manager._tracked[eid].log_buffer[0]["at"] == 30
 
     await manager.async_stop()
+
+
+def _log_columns_config(columns):
+    """Log config tracking a light, with the given log_columns."""
+    return _entity_config(
+        **{
+            CONF_ENTITY_ID: "light.lamp",
+            CONF_SLUG: "ha-lamp",
+            CONF_TEMPLATE: "log",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_LOG_COLUMNS: columns,
+        }
+    )
+
+
+async def test_log_columns_attribute_change_yields_distinct_line(hass: HomeAssistant) -> None:
+    """With an attribute column, a brightness-only change is a distinct line, not collapsed.
+
+    The state stays "on" (which would collapse to a single "On"), but the composed
+    text changes because the brightness column moved — so a new line is appended.
+    """
+    api = _mock_api()
+    config = _log_columns_config([{"attribute": "brightness"}])
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    eid = "light.lamp"
+    hass.states.async_set(eid, "on", {"brightness": 153})
+    await manager.async_start()
+    assert manager._tracked[eid].is_active
+
+    hass.states.async_set(eid, "on", {"brightness": 200})
+    await hass.async_block_till_done()
+
+    texts = [line["text"] for line in manager._tracked[eid].log_buffer]
+    assert texts == ["On · 200", "On · 153"]
+
+    await manager.async_stop()
+
+
+async def test_log_refreshes_on_column_entity_change(hass: HomeAssistant) -> None:
+    """A change to a column entity appends a freshly composed line via the companion path."""
+    api = _mock_api()
+    config = _log_columns_config([{CONF_ENTITY_ID: "sensor.cpu"}])
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("sensor.cpu", "42")
+    hass.states.async_set("light.lamp", "on")
+    await manager.async_start()
+    assert manager._tracked["light.lamp"].is_active
+
+    # The column entity is a companion (not a lifecycle driver).
+    assert "sensor.cpu" in _companion_entity_ids(config)
+
+    ongoing_before = len(activity_updates(api, "ongoing"))
+
+    # Drive a column change through the real companion subscription (cooldown reset).
+    await bump_state(manager, hass, "light.lamp", "sensor.cpu", "99", {})
+
+    ongoing_after = activity_updates(api, "ongoing")
+    assert len(ongoing_after) == ongoing_before + 1
+    texts = [line["text"] for line in ongoing_after[-1]["lines"]]
+    assert texts[0] == "On · 99"
+    assert_valid_activity_content(ongoing_after[-1])
+
+    await manager.async_stop()
+
+
+async def test_log_columns_collapse_when_composed_text_unchanged(hass: HomeAssistant) -> None:
+    """Collapse still holds when the composed text is unchanged (re-report of the same values)."""
+    api = _mock_api()
+    config = _log_columns_config([{"attribute": "brightness"}])
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    tracked = TrackedEntity(config=config)
+    hass.states.async_set("light.lamp", "on", {"brightness": 153})
+    state = hass.states.get("light.lamp")
+
+    manager._record_log_sample(tracked, state)
+    assert len(tracked.log_buffer) == 1
+    assert tracked.log_buffer[0]["text"] == "On · 153"
+
+    # Same state + same brightness → same composed text → collapsed.
+    manager._record_log_sample(tracked, state)
+    assert len(tracked.log_buffer) == 1
+
+    # A real brightness change makes the composed text distinct → appended.
+    hass.states.async_set("light.lamp", "on", {"brightness": 200})
+    manager._record_log_sample(tracked, hass.states.get("light.lamp"))
+    assert len(tracked.log_buffer) == 2
+    assert tracked.log_buffer[0]["text"] == "On · 200"

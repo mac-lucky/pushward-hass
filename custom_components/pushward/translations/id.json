@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Buka URL Tombol Sekunder",
             "secondary_url_title": "Judul Tombol Sekunder",
             "snooze_seconds": "Detik Tunda (iOS 26+)",
-            "fired_at_entity": "Entitas Waktu Terpicu"
+            "fired_at_entity": "Entitas Waktu Terpicu",
+            "log_columns": "Kolom Log"
           },
           "data_description": {
             "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
             "secondary_url_title": "Label tombol sekunder (maks 64 karakter).",
             "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
-            "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan."
+            "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan.",
+            "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log."
           }
         },
         "reconfigure": {

@@ -58,6 +58,7 @@ from .const import (
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
     CONF_LABEL_ATTRIBUTE,
+    CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
@@ -120,6 +121,7 @@ from .const import (
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
+    LOG_MAX_COLUMNS,
     MAX_LONG_TEXT_LEN,
     MAX_SLUG_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
@@ -547,6 +549,16 @@ def _details_schema(
             )
         ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
     if template == "log":
+        # Optional extra columns composed into each line's text. Freeform string
+        # mirroring the board-tile format: '[Label=]source[|unit]' comma-separated,
+        # where source is a tracked-entity attribute (brightness), another entity's
+        # state (binary_sensor.door), or another entity's attribute (sensor.t:temp).
+        fields[
+            vol.Optional(
+                CONF_LOG_COLUMNS,
+                default=d.get(CONF_LOG_COLUMNS, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
         # Optional attribute on the tracked entity supplying each line's level
         # (info/warn/error); the line text is the formatted state.
         fields[
@@ -856,6 +868,84 @@ def _serialize_board_tiles(tiles: list[dict]) -> str:
     return ", ".join(parts)
 
 
+def _parse_log_columns(raw: object) -> list[dict]:
+    """Parse log columns from a string ('[Label=]source[|unit], ...') or list.
+
+    Mirrors ``_parse_board_tiles``. Capped at LOG_MAX_COLUMNS. ``source`` disambiguates:
+      - ``brightness`` (no dot)           → an attribute of the tracked entity
+      - ``binary_sensor.door`` (has a dot) → another entity's state
+      - ``sensor.temp:temperature``        → another entity's attribute
+    ``|`` splits off an optional unit suffix; ``=`` splits off an optional label.
+    Each parsed column is ``{label?, entity_id?, attribute?, unit?}``.
+    """
+    if isinstance(raw, list):
+        cols = [c for c in raw if isinstance(c, dict) and (c.get(CONF_ENTITY_ID) or c.get("attribute"))]
+        return cols[:LOG_MAX_COLUMNS]
+    if not isinstance(raw, str) or not raw.strip():
+        return []
+    columns: list[dict] = []
+    for entry in raw.split(","):
+        entry = entry.strip()
+        if not entry:
+            continue
+        label = ""
+        if "=" in entry:
+            label, entry = (part.strip() for part in entry.split("=", 1))
+        unit = ""
+        if "|" in entry:
+            entry, unit = (part.strip() for part in entry.split("|", 1))
+        source = entry
+        if not source:
+            continue
+        column: dict = {}
+        if label:
+            column[CONF_LABEL] = label
+        if ":" in source:
+            entity_id, attr = (part.strip() for part in source.split(":", 1))
+            if not entity_id:
+                continue
+            column[CONF_ENTITY_ID] = entity_id
+            if attr:
+                column["attribute"] = attr
+        elif "." in source:
+            column[CONF_ENTITY_ID] = source
+        else:
+            column["attribute"] = source
+        if unit:
+            column[CONF_UNIT] = unit
+        columns.append(column)
+        if len(columns) >= LOG_MAX_COLUMNS:
+            break
+    return columns
+
+
+def _serialize_log_columns(columns: list[dict]) -> str:
+    """Serialize log columns back to '[Label=]source[|unit], ...' for editing."""
+    parts: list[str] = []
+    for column in columns or []:
+        if not isinstance(column, dict):
+            continue
+        entity_id = column.get(CONF_ENTITY_ID) or ""
+        attr = column.get("attribute") or ""
+        if entity_id and attr:
+            source = f"{entity_id}:{attr}"
+        elif entity_id:
+            source = entity_id
+        elif attr:
+            source = attr
+        else:
+            continue
+        s = source
+        label = column.get(CONF_LABEL) or ""
+        if label:
+            s = f"{label}={s}"
+        unit = column.get(CONF_UNIT) or ""
+        if unit:
+            s = f"{s}|{unit}"
+        parts.append(s)
+    return ", ".join(parts)
+
+
 def _parse_entity_input(user_input: dict) -> dict:
     """Normalize user input into an entity config dict."""
     entity_id = user_input[CONF_ENTITY_ID]
@@ -984,6 +1074,7 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_TEXT_COLOR_ATTRIBUTE: user_input.get(CONF_TEXT_COLOR_ATTRIBUTE, ""),
         CONF_TILES: tiles,
         CONF_LOG_LEVEL_ATTRIBUTE: user_input.get(CONF_LOG_LEVEL_ATTRIBUTE, ""),
+        CONF_LOG_COLUMNS: _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, "")),
     }
 
 
@@ -1151,6 +1242,9 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             tiles = current.get(CONF_TILES)
             if isinstance(tiles, list):
                 current[CONF_TILES] = _serialize_board_tiles(tiles)
+            log_columns = current.get(CONF_LOG_COLUMNS)
+            if isinstance(log_columns, list):
+                current[CONF_LOG_COLUMNS] = _serialize_log_columns(log_columns)
             self._details_defaults = current
             return await self.async_step_details()
 

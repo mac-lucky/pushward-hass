@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "打开次按钮 URL",
             "secondary_url_title": "次按钮标题",
             "snooze_seconds": "稍后提醒秒数（iOS 26+）",
-            "fired_at_entity": "触发时间实体"
+            "fired_at_entity": "触发时间实体",
+            "log_columns": "日志列"
           },
           "data_description": {
             "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
             "secondary_url_title": "次按钮标签（最多 64 个字符）。",
             "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
-            "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。"
+            "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。",
+            "log_columns": "追加到每条日志行的额外值（最多 6 个），以逗号分隔。格式：[Label=]source[|unit]。source = 此实体的属性 (brightness)、另一实体的状态 (binary_sensor.door) 或另一实体的属性 (sensor.temp:temperature)。示例：color_temp_kelvin|K, brightness → 'On · 4000K · 153'。仅限日志模板。"
           }
         },
         "reconfigure": {

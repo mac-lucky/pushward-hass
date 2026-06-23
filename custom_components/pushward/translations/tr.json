@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "İkincil Düğme URL'sini Aç",
             "secondary_url_title": "İkincil Düğme Başlığı",
             "snooze_seconds": "Erteleme Saniyeleri (iOS 26+)",
-            "fired_at_entity": "Tetiklenme Zamanı Varlığı"
+            "fired_at_entity": "Tetiklenme Zamanı Varlığı",
+            "log_columns": "Günlük Sütunları"
           },
           "data_description": {
             "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
             "secondary_url_title": "İkincil düğme etiketi (en fazla 64 karakter).",
             "snooze_seconds": "iOS Ertele düğmesinin geri sayımı ne kadar uzattığı (60–3600). 300s (5 dk) varsayılanı için boş bırakın. Alarm gerektirir. Yalnızca geri sayım şablonu.",
-            "fired_at_entity": "Uyarının tetiklenme zamanını ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir unix zaman damgası veya bir ISO zaman damgası sensörü kabul eder. Yalnızca uyarı şablonu."
+            "fired_at_entity": "Uyarının tetiklenme zamanını ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir unix zaman damgası veya bir ISO zaman damgası sensörü kabul eder. Yalnızca uyarı şablonu.",
+            "log_columns": "Her günlük satırına eklenen ek değerler (en fazla 6), virgülle ayrılır. Biçim: [Label=]source[|unit]. source = bu varlığın bir niteliği (brightness), başka bir varlığın durumu (binary_sensor.door) veya başka bir varlığın niteliği (sensor.temp:temperature). Örnek: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Yalnızca günlük şablonu."
           }
         },
         "reconfigure": {

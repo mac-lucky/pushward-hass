@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Secundaire-knop-URL openen",
             "secondary_url_title": "Titel secundaire knop",
             "snooze_seconds": "Snooze-seconden (iOS 26+)",
-            "fired_at_entity": "Geactiveerd-op-entiteit"
+            "fired_at_entity": "Geactiveerd-op-entiteit",
+            "log_columns": "Logkolommen"
           },
           "data_description": {
             "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
             "secondary_url_title": "Label van de secundaire knop (max. 64 tekens).",
             "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
-            "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon."
+            "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon.",
+            "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon."
           }
         },
         "reconfigure": {

@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Otwórz URL przycisku dodatkowego",
             "secondary_url_title": "Tytuł przycisku dodatkowego",
             "snooze_seconds": "Sekundy drzemki (iOS 26+)",
-            "fired_at_entity": "Encja czasu wyzwolenia"
+            "fired_at_entity": "Encja czasu wyzwolenia",
+            "log_columns": "Kolumny dziennika"
           },
           "data_description": {
             "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
             "secondary_url_title": "Etykieta przycisku dodatkowego (maks. 64 znaki).",
             "snooze_seconds": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
-            "fired_at_entity": "Odczytuj czas wyzwolenia alertu z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Akceptuje znacznik czasu Unix lub czujnik znacznika czasu ISO. Tylko szablon alertu."
+            "fired_at_entity": "Odczytuj czas wyzwolenia alertu z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Akceptuje znacznik czasu Unix lub czujnik znacznika czasu ISO. Tylko szablon alertu.",
+            "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6), oddzielone przecinkami. Format: [Label=]source[|unit]. source = atrybut tej encji (brightness), stan innej encji (binary_sensor.door) lub atrybut innej encji (sensor.temp:temperature). Przykład: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Tylko szablon dziennika."
           }
         },
         "reconfigure": {

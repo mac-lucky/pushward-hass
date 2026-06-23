@@ -35,6 +35,7 @@ from .const import (
     CONF_ENTITY_ID,
     CONF_FIRED_AT_ENTITY,
     CONF_HISTORY_PERIOD,
+    CONF_LOG_COLUMNS,
     CONF_PRIORITY,
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ENTITY,
@@ -89,11 +90,18 @@ def _companion_entity_ids(config: dict) -> list[str]:
 
     For board templates the per-tile entities are also companions: a change to any
     tile entity refreshes the board even though the anchor entity owns start/end.
+    For log templates the per-column entities (bare-attribute columns excepted) are
+    companions too: a change to any appends a freshly composed line.
     """
     ids = [eid for key in _COMPANION_ENTITY_KEYS if (eid := config.get(key))]
-    if config.get(CONF_TEMPLATE) == "board":
+    template = config.get(CONF_TEMPLATE)
+    if template == "board":
         for tile in config.get(CONF_TILES) or []:
             if isinstance(tile, dict) and (eid := tile.get(CONF_ENTITY_ID)):
+                ids.append(eid)
+    elif template == "log":
+        for column in config.get(CONF_LOG_COLUMNS) or []:
+            if isinstance(column, dict) and (eid := column.get(CONF_ENTITY_ID)):
                 ids.append(eid)
     return list(dict.fromkeys(ids))
 
@@ -400,12 +408,15 @@ class ActivityManager:
         if tracked is None:
             return
 
-        is_board = tracked.config.get(CONF_TEMPLATE) == "board"
+        template = tracked.config.get(CONF_TEMPLATE)
+        is_board = template == "board"
+        is_log = template == "log"
 
         if not tracked.is_active:
             # A board defers its start when no tile is renderable yet (every tile
             # entity unavailable, e.g. right after restart). Retry now that a tile
-            # changed, provided the anchor is still in a start state.
+            # changed, provided the anchor is still in a start state. Logs never
+            # defer — a log always has >=1 line from the tracked state.
             if is_board:
                 anchor = self._hass.states.get(entity_id)
                 if anchor is not None and anchor.state in tracked.config.get(CONF_START_STATES, []):
@@ -414,13 +425,20 @@ class ActivityManager:
 
         unavailable = new_state is None or new_state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN)
         # A timeline value-companion going unavailable carries no value to plot —
-        # ignore it. A board tile going unavailable IS a meaningful change (the
-        # tile must drop from the grid), so still refresh and let _build_board_tiles
+        # ignore it. A board tile or a log column going unavailable IS a meaningful
+        # change (the tile drops from the grid / the column drops from the composed
+        # line), so still refresh and let _build_board_tiles / _build_log_line
         # re-render without it.
-        if unavailable and not is_board:
+        if unavailable and not is_board and not is_log:
             return
 
-        if not unavailable:
+        if is_log:
+            # A log column entity changed — append a freshly composed line (built
+            # against the anchor's current state, reading the new column values).
+            anchor_state = self._hass.states.get(entity_id)
+            if anchor_state is not None:
+                self._record_log_sample(tracked, anchor_state)
+        elif not unavailable:
             primary_state = self._hass.states.get(entity_id)
             if primary_state is not None:
                 # Stamp with the companion's update time: the tracked entity is
@@ -465,7 +483,7 @@ class ActivityManager:
         """
         if tracked.config.get(CONF_TEMPLATE) != "log":
             return
-        line = _build_log_line(state, tracked.config)
+        line = _build_log_line(state, tracked.config, self._hass)
         if not line.get("text"):
             return
         if _same_log_line(tracked.log_buffer[0] if tracked.log_buffer else None, line):

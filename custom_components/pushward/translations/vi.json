@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Mở URL nút phụ",
             "secondary_url_title": "Tiêu đề nút phụ",
             "snooze_seconds": "Số giây hoãn (iOS 26+)",
-            "fired_at_entity": "Thực thể thời điểm kích hoạt"
+            "fired_at_entity": "Thực thể thời điểm kích hoạt",
+            "log_columns": "Cột nhật ký"
           },
           "data_description": {
             "start_states": "Trạng thái thực thể khởi động Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)).",
             "secondary_url_title": "Nhãn nút phụ (tối đa 64 ký tự).",
             "snooze_seconds": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Để trống để dùng mặc định 300s (5 phút). Yêu cầu Báo thức. Chỉ mẫu đếm ngược.",
-            "fired_at_entity": "Đọc thời điểm kích hoạt của cảnh báo từ một thực thể riêng. Để trống để dùng thực thể được theo dõi. Chấp nhận dấu thời gian unix hoặc cảm biến dấu thời gian ISO. Chỉ mẫu cảnh báo."
+            "fired_at_entity": "Đọc thời điểm kích hoạt của cảnh báo từ một thực thể riêng. Để trống để dùng thực thể được theo dõi. Chấp nhận dấu thời gian unix hoặc cảm biến dấu thời gian ISO. Chỉ mẫu cảnh báo.",
+            "log_columns": "Các giá trị bổ sung được thêm vào mỗi dòng nhật ký (tối đa 6), phân tách bằng dấu phẩy. Định dạng: [Label=]source[|unit]. source = một thuộc tính của thực thể này (brightness), trạng thái của thực thể khác (binary_sensor.door), hoặc một thuộc tính của thực thể khác (sensor.temp:temperature). Ví dụ: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Chỉ dành cho mẫu nhật ký."
           }
         },
         "reconfigure": {

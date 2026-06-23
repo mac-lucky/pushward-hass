@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Abrir la URL del botón secundario",
             "secondary_url_title": "Título del botón secundario",
             "snooze_seconds": "Segundos de posposición (iOS 26+)",
-            "fired_at_entity": "Entidad de hora de activación"
+            "fired_at_entity": "Entidad de hora de activación",
+            "log_columns": "Columnas de registro"
           },
           "data_description": {
             "start_states": "Estados de la entidad que inician la Live Activity. Seleccionar de la lista o introducir valores personalizados.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
             "secondary_url_title": "Etiqueta del botón secundario (máx. 64 caracteres).",
             "snooze_seconds": "Cuánto extiende la cuenta atrás el botón Posponer de iOS (60–3600). Déjalo vacío para el valor predeterminado de 300 s (5 min). Requiere alarma. Solo plantilla de cuenta atrás.",
-            "fired_at_entity": "Lee la hora de activación de la alerta de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Acepta una marca de tiempo Unix o un sensor de marca de tiempo ISO. Solo plantilla de alerta."
+            "fired_at_entity": "Lee la hora de activación de la alerta de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Acepta una marca de tiempo Unix o un sensor de marca de tiempo ISO. Solo plantilla de alerta.",
+            "log_columns": "Valores adicionales añadidos a cada línea de registro (máx. 6), separados por comas. Formato: [Label=]source[|unit]. source = un atributo de esta entidad (brightness), el estado de otra entidad (binary_sensor.door) o un atributo de otra entidad (sensor.temp:temperature). Ejemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo plantilla de registro."
           }
         },
         "reconfigure": {

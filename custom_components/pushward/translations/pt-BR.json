@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "Abrir URL do botão secundário",
             "secondary_url_title": "Título do botão secundário",
             "snooze_seconds": "Segundos de soneca (iOS 26+)",
-            "fired_at_entity": "Entidade de horário do disparo"
+            "fired_at_entity": "Entidade de horário do disparo",
+            "log_columns": "Colunas de registro"
           },
           "data_description": {
             "start_states": "Estados da entidade que iniciam a Live Activity. Selecione na lista ou digite valores personalizados.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "Ativado: o toque abre a URL. Desativado: webhook silencioso (apenas http(s)).",
             "secondary_url_title": "Rótulo do botão secundário (máx. 64 caracteres).",
             "snooze_seconds": "Por quanto tempo o botão Soneca do iOS estende a contagem regressiva (60–3600). Deixe vazio para o padrão de 300s (5 min). Requer Alarme. Apenas modelo de contagem regressiva.",
-            "fired_at_entity": "Lê o horário de disparo do alerta de uma entidade separada. Deixe vazio para usar a entidade monitorada. Aceita um timestamp unix ou um sensor de timestamp ISO. Apenas modelo de alerta."
+            "fired_at_entity": "Lê o horário de disparo do alerta de uma entidade separada. Deixe vazio para usar a entidade monitorada. Aceita um timestamp unix ou um sensor de timestamp ISO. Apenas modelo de alerta.",
+            "log_columns": "Valores adicionais anexados a cada linha de registro (máx. 6), separados por vírgulas. Formato: [Label=]source[|unit]. source = um atributo desta entidade (brightness), o estado de outra entidade (binary_sensor.door) ou um atributo de outra entidade (sensor.temp:temperature). Exemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Apenas modelo de registro."
           }
         },
         "reconfigure": {

@@ -1147,7 +1147,8 @@
             "secondary_url_foreground": "URL der sekundären Schaltfläche öffnen",
             "secondary_url_title": "Titel der sekundären Schaltfläche",
             "snooze_seconds": "Schlummersekunden (iOS 26+)",
-            "fired_at_entity": "Entität 'Ausgelöst um'"
+            "fired_at_entity": "Entität 'Ausgelöst um'",
+            "log_columns": "Protokollspalten"
           },
           "data_description": {
             "start_states": "Entitätszustände, die die Live Activity starten. Aus der Liste wählen oder eigene Werte eingeben.",
@@ -1205,7 +1206,8 @@
             "secondary_url_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)).",
             "secondary_url_title": "Beschriftung der sekundären Schaltfläche (max. 64 Zeichen).",
             "snooze_seconds": "Wie lange die iOS-Schlummern-Schaltfläche den Countdown verlängert (60–3600). Leer lassen für den Standardwert 300 s (5 Min.). Erfordert Alarm. Nur für die Vorlage 'countdown'.",
-            "fired_at_entity": "Die Auslösezeit des Alerts aus einer separaten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden. Akzeptiert einen Unix-Zeitstempel oder einen ISO-Zeitstempel-Sensor. Nur für die Vorlage 'alert'."
+            "fired_at_entity": "Die Auslösezeit des Alerts aus einer separaten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden. Akzeptiert einen Unix-Zeitstempel oder einen ISO-Zeitstempel-Sensor. Nur für die Vorlage 'alert'.",
+            "log_columns": "Zusätzliche Werte, die an jede Protokollzeile angehängt werden (max. 6), durch Kommas getrennt. Format: [Label=]source[|unit]. source = ein Attribut dieser Entität (brightness), der Zustand einer anderen Entität (binary_sensor.door) oder ein Attribut einer anderen Entität (sensor.temp:temperature). Beispiel: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Nur Log-Vorlage."
           }
         },
         "reconfigure": {

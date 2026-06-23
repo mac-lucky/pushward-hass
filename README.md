@@ -130,6 +130,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Scale / Decimal Places / Smooth Lines / Thresholds | Timeline sparkline options |
 | Back-History Period | Minutes of history to seed the sparkline on start (0–1440) |
 | Board Tiles | `Label=entity_id[:attribute[:unit[:icon]]]`, comma-separated, max 4 (board template) |
+| Log Columns | `[Label=]source[\|unit]`, comma-separated, max 6 — extra values appended to each log line (log template) |
 | Log Level Attribute | Attribute supplying each line's `info`/`warn`/`error` level (log template) |
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
 | State Labels | Custom state→label mapping (e.g. `on=Running, off=Stopped`) |
@@ -169,6 +170,20 @@ Example: `Temp=sensor.living_room_temp:temperature:°C, Door=binary_sensor.front
 #### Log lines
 
 A **log** shows a newest-first list of up to **20 lines**. The integration appends one line on every state change of the tracked entity (the line **text** is the formatted state, honoring State Labels), accumulating a rolling buffer that is injected into each push and persisted across restarts in `.storage/pushward.history.<entry_id>`. Set the optional **Log Level Attribute** to an attribute holding `info`, `warn`, or `error` to tag each line's severity. (The server also keeps a longer scrollable backlog server-side; the integration never sends it.)
+
+Consecutive lines with identical text are collapsed, so attribute-only churn (a light's brightness settling while its state stays `on`) would otherwise show only a bare `On`. Use **Log Columns** to append extra values to each line so it carries *what* changed — attributes of the tracked entity and/or values from other entities. Configure it as a comma-separated list (max 6 columns):
+
+```
+[Label=]source[|unit]
+```
+
+- **source** is one of: a bare attribute of the tracked entity (`brightness`), another entity's state (`binary_sensor.door`), or another entity's attribute (`sensor.temp:temperature`).
+- **Label** (optional, before `=`) renders the column as `Label: value`.
+- **unit** (optional, after `|`) is appended to the value as a literal suffix (no conversion).
+
+Each line's text is the state label followed by ` · ` and each resolved column. Values are raw Home Assistant values (e.g. `brightness` is 0–255). Columns whose source is missing or unavailable are skipped; if every column resolves empty (e.g. the lamp is off so `brightness` is absent) the line falls back to just the state label. Other-entity columns are tracked as companions, so a change in any one appends a new composed line while the tracked entity still owns start/end.
+
+Example for a lamp — `color_temp_kelvin|K, brightness` renders lines like `On · 4000K · 153`, and a brightness change now produces a distinct line instead of collapsing into the previous `On`.
 
 ### Add a tracked widget
 
