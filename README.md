@@ -215,6 +215,8 @@ A two-step flow mirroring entities. **Step 1** picks the entity, a widget templa
 | Trigger Mode | `event` (state-change) or `poll` |
 | Poll Interval | Seconds between re-evaluations in poll mode (10–3600, default 60) |
 
+How many `stat_list` rows are visible depends on the widget size. By default a medium or large Home Screen widget shows all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3, packing in up to 6 when every value is very short (for example a single status glyph). You can change Row Density per widget in the PushWard iOS app: Compact packs two columns to show up to 6 rows on any size (labels may truncate on the small placements), and Comfortable keeps a single column with larger rows. To see all 6 rows with full labels, use a medium or large widget, or set Compact.
+
 ## Account sensors
 
 Each config entry registers **5 sensors** under one service device named **PushWard**, fed by a coordinator that polls `GET /auth/me` every **15 minutes**. They report your account's own consumption against its plan limits (these sensors stay *unavailable* on older servers that don't return usage to integration keys):

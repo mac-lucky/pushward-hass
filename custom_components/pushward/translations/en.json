@@ -1445,7 +1445,7 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "severity": "Status severity (info, warning, critical, success).",
-            "stat_rows": "Up to 6 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
+            "stat_rows": "Up to 6 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`. By default medium and large Home Screen widgets show all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3 (both show up to 6 when every value is very short, like a single status glyph). Override this per widget in the PushWard app under Row Density (Auto, Compact, Comfortable).",
             "label": "Static label shown on the widget. Leave empty to derive from the entity.",
             "label_attribute": "Entity attribute used as the label. Overrides the static label.",
             "subtitle_attribute": "Entity attribute shown as the widget subtitle.",
