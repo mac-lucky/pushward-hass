@@ -87,6 +87,10 @@
           "name": "Severity",
           "description": "Alert severity level."
         },
+        "severity_label": {
+          "name": "Severity Label",
+          "description": "Override the Info/Warning/Critical badge text. Alert template only."
+        },
         "value": {
           "name": "Value",
           "description": "Gauge: numeric value. Timeline: labeled values object (e.g. Temp=22.5)."
@@ -558,6 +562,10 @@
         "severity": {
           "name": "Severity",
           "description": "Alert severity level."
+        },
+        "severity_label": {
+          "name": "Severity Label",
+          "description": "Override the Info/Warning/Critical badge text. Alert template only."
         },
         "state_text": {
           "name": "State Text",
@@ -1250,6 +1258,7 @@
             "current_step_entity": "Current Step Entity",
             "current_step_attribute": "Current Step Attribute",
             "severity": "Severity",
+            "severity_label": "Severity Label",
             "value_entity": "Value Entity",
             "value_attribute": "Value Attribute",
             "min_value": "Minimum Value",
@@ -1311,6 +1320,7 @@
             "current_step_entity": "Read the current step from a separate entity. Leave empty to use the tracked entity.",
             "current_step_attribute": "Attribute holding the current step as an integer (on the source entity, or the tracked entity if no source is set).",
             "severity": "Alert severity level.",
+            "severity_label": "Override the Info/Warning/Critical badge text shown on the alert. Leave empty to use the severity name. Max 32 characters. Alert template only.",
             "value_entity": "Read the gauge value from a separate entity. Leave empty to use the tracked entity. Uses the source entity's state unless an attribute is set.",
             "value_attribute": "Attribute holding the current gauge value as a number (on the source entity, or the tracked entity if no source is set). Leave empty to use the entity's state.",
             "min_value": "Minimum value for the gauge range.",
@@ -1342,7 +1352,7 @@
             "secondary_url": "Secondary button URL. Steps and alert templates only.",
             "secondary_url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
             "secondary_url_title": "Secondary button label (max 64 characters).",
-            "ended_ttl": "Seconds after activity ends before it is auto-deleted from the server. Leave empty to keep indefinitely. Example: 300",
+            "ended_ttl": "Seconds after the activity ends before the server auto-deletes it. This also controls how soon the ended card leaves the iPhone Lock Screen (iOS caps it at 4 hours regardless). Leave empty to keep indefinitely. Example: 300",
             "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800",
             "sound": "Sound played on every update for this entity. Leave empty to use no override.",
             "background_color": "Background color for the Live Activity. Leave empty for default.",

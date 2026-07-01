@@ -74,6 +74,7 @@ from .const import (
     CONF_SERIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
+    CONF_SEVERITY_LABEL,
     CONF_SLUG,
     CONF_SMOOTHING,
     CONF_SNOOZE_SECONDS,
@@ -437,6 +438,12 @@ def _details_schema(
                 mode=SelectSelectorMode.DROPDOWN,
             )
         )
+        fields[
+            vol.Optional(
+                CONF_SEVERITY_LABEL,
+                default=d.get(CONF_SEVERITY_LABEL, ""),
+            )
+        ] = TextSelector()
         fields[_entity_source_key(CONF_FIRED_AT_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
@@ -1032,6 +1039,7 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
         CONF_CURRENT_STEP_ENTITY: user_input.get(CONF_CURRENT_STEP_ENTITY, ""),
         CONF_SEVERITY: user_input.get(CONF_SEVERITY, DEFAULT_SEVERITY),
+        CONF_SEVERITY_LABEL: user_input.get(CONF_SEVERITY_LABEL, ""),
         CONF_VALUE_ATTRIBUTE: user_input.get(CONF_VALUE_ATTRIBUTE, ""),
         CONF_VALUE_ENTITY: user_input.get(CONF_VALUE_ENTITY, ""),
         CONF_MIN_VALUE: min_v,

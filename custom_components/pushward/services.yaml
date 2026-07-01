@@ -156,6 +156,12 @@ update_activity:
                 - "critical"
                 - "warning"
                 - "info"
+        severity_label:
+          name: Severity Label
+          description: Override the Info/Warning/Critical badge text. Alert template only.
+          example: "Page 1"
+          selector:
+            text:
         fired_at:
           name: Fired At
           description: Unix timestamp when the alert was triggered. Alert template only.
@@ -722,6 +728,10 @@ update_activity_alert:
             - "critical"
             - "warning"
             - "info"
+    severity_label:
+      example: "Page 1"
+      selector:
+        text:
     labels:
       collapsed: true
       fields:

@@ -35,6 +35,7 @@ from custom_components.pushward.const import (
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
     CONF_SEVERITY,
+    CONF_SEVERITY_LABEL,
     CONF_SMOOTHING,
     CONF_STATE_LABELS,
     CONF_STEP_LABELS,
@@ -457,6 +458,33 @@ def test_map_completion_content_alert():
 
     assert content["severity"] == "warning"
     assert content["state"] == "Complete"
+
+
+def test_map_content_alert_severity_label_override():
+    state = _make_state("firing", {"friendly_name": "CPU Alert"})
+    config = {
+        CONF_TEMPLATE: "alert",
+        CONF_ICON: "exclamationmark.triangle",
+        CONF_SEVERITY: "critical",
+        CONF_SEVERITY_LABEL: "Page 1",
+    }
+
+    live = map_content(state, config)
+    completion = map_completion_content(config)
+
+    # The custom badge text overrides the severity name on both the live and
+    # resolved (completion) cards.
+    assert live["severity_label"] == "Page 1"
+    assert completion["severity_label"] == "Page 1"
+
+
+def test_map_content_alert_no_severity_label_by_default():
+    state = _make_state("firing", {"friendly_name": "CPU Alert"})
+    config = {CONF_TEMPLATE: "alert", CONF_SEVERITY: "info"}
+
+    content = map_content(state, config)
+
+    assert "severity_label" not in content
 
 
 # --- Feature 1: subtitle attribute ---

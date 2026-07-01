@@ -44,6 +44,7 @@ from .const import (
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
+    MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_BODY_LEN,
     MAX_TAP_ACTION_ICON_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
@@ -187,6 +188,8 @@ _STEPS_TEMPLATE_FIELDS = {
 }
 _ALERT_TEMPLATE_FIELDS = {
     vol.Optional("severity"): vol.In(SEVERITIES),
+    # Optional override for the Info/Warning/Critical badge text.
+    vol.Optional("severity_label"): vol.All(str, vol.Length(max=MAX_SEVERITY_LABEL_LEN)),
     vol.Optional("fired_at"): vol.Coerce(int),
 }
 _GAUGE_TEMPLATE_FIELDS = {

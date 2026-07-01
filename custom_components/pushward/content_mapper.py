@@ -56,6 +56,7 @@ from .const import (
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
     CONF_SEVERITY,
+    CONF_SEVERITY_LABEL,
     CONF_SMOOTHING,
     CONF_SNOOZE_SECONDS,
     CONF_STATE_LABELS,
@@ -556,6 +557,8 @@ def map_content(
             content["step_rows"] = [max(1, min(10, int(r))) for r in step_rows]
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
+        if label := entity_config.get(CONF_SEVERITY_LABEL):
+            content["severity_label"] = label
         raw_fired_at, _ = _resolve_raw(state, entity_config, CONF_FIRED_AT_ENTITY, CONF_FIRED_AT_ATTRIBUTE, hass)
         if raw_fired_at is not _NO_VALUE:
             fired_at = _coerce_epoch(raw_fired_at)
@@ -641,6 +644,8 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         content["progress"] = 1.0
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
+        if label := entity_config.get(CONF_SEVERITY_LABEL):
+            content["severity_label"] = label
     elif template == "gauge":
         _, max_val = _gauge_base_fields(content, entity_config)
         if last_content and "value" in last_content:

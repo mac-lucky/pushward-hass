@@ -38,6 +38,7 @@ from custom_components.pushward.const import (
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
     MAX_LONG_TEXT_LEN,
+    MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_ICON_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_LEN,
@@ -254,6 +255,7 @@ def _assert_alert(content: dict, where: str) -> None:
     severity = content.get("severity")
     if severity not in SEVERITIES:
         _fail(where, f"alert severity must be one of {SEVERITIES}, got {severity!r}")
+    _check_len(content.get("severity_label"), MAX_SEVERITY_LABEL_LEN, "severity_label", where)
     fired_at = content.get("fired_at")
     if fired_at is not None:
         if not _is_int(fired_at) or fired_at <= 0:
