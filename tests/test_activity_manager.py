@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import asyncio
+import time
 from datetime import timedelta
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from homeassistant.core import HomeAssistant
@@ -21,6 +23,7 @@ from custom_components.pushward.const import (
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
+    CONF_HISTORY_PERIOD,
     CONF_LABEL,
     CONF_LOG_COLUMNS,
     CONF_PROGRESS_ATTRIBUTE,
@@ -1284,3 +1287,123 @@ async def test_log_columns_collapse_when_composed_text_unchanged(hass: HomeAssis
     manager._record_log_sample(tracked, hass.states.get("light.lamp"))
     assert len(tracked.log_buffer) == 2
     assert tracked.log_buffer[0]["text"] == "On · 200"
+
+
+# ---------------------------------------------------------------------------
+# Timeline history backfill (recorder seed)
+# ---------------------------------------------------------------------------
+
+
+def _timeline_numeric_config(**overrides):
+    """Timeline config for a plain numeric sensor (recorder-eligible backfill)."""
+    return _entity_config(
+        **{
+            CONF_ENTITY_ID: "sensor.power",
+            CONF_SLUG: "ha-power",
+            CONF_TEMPLATE: "timeline",
+            CONF_START_STATES: [],
+            CONF_END_STATES: [],
+            CONF_HISTORY_PERIOD: 30,
+            **overrides,
+        }
+    )
+
+
+def _recorder_state(value: str, ts: int):
+    """A minimal recorder row with a real ``last_updated`` datetime."""
+    return SimpleNamespace(state=value, last_updated=dt_util.utc_from_timestamp(ts))
+
+
+async def test_seed_timeline_recorder_labels_match_live_series(hass: HomeAssistant) -> None:
+    """Recorder-seeded points land in the same series label as live values (the
+    tracked entity's friendly name), not under the raw entity_id."""
+    api = _mock_api()
+    config = _timeline_numeric_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"friendly_name": "Grid Power"})
+    await manager.async_start()
+
+    now = int(time.time())
+    manager._recorder_history_fallback = AsyncMock(
+        return_value=[{"timestamp": now - 600, "value": 40.0}, {"timestamp": now - 300, "value": 41.0}]
+    )
+    history = await manager._seed_timeline_history("sensor.power", config, {})
+
+    assert history is not None
+    assert set(history) == {"Grid Power"}
+    assert "sensor.power" not in history
+
+    await manager.async_stop()
+
+
+async def test_seed_timeline_recorder_queries_value_entity(hass: HomeAssistant) -> None:
+    """With a value entity configured, the recorder is queried for THAT entity,
+    while points still land in the tracked entity's series label."""
+    api = _mock_api()
+    config = _timeline_numeric_config(
+        **{CONF_ENTITY_ID: "sensor.meter", CONF_SLUG: "ha-meter", CONF_VALUE_ENTITY: "sensor.power_raw"}
+    )
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    hass.states.async_set("sensor.meter", "reading", {"friendly_name": "Meter"})
+    hass.states.async_set("sensor.power_raw", "42.0")
+    await manager.async_start()
+
+    recorder = AsyncMock(return_value=[{"timestamp": int(time.time()) - 300, "value": 40.0}])
+    manager._recorder_history_fallback = recorder
+    history = await manager._seed_timeline_history("sensor.meter", config, {})
+
+    recorder.assert_awaited_once()
+    assert recorder.await_args.args[0] == "sensor.power_raw"
+    assert set(history) == {"Meter"}
+
+    await manager.async_stop()
+
+
+async def test_seed_timeline_merges_buffer_and_recorder(hass: HomeAssistant) -> None:
+    """The recorder is not skipped when the buffer already has a point: both
+    sources' points appear, deduped and sorted by timestamp."""
+    api = _mock_api()
+    config = _timeline_numeric_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"friendly_name": "Grid Power"})
+    await manager.async_start()
+
+    tracked = manager._tracked["sensor.power"]
+    buffer_ts = tracked.history_buffer[-1][0]
+    manager._recorder_history_fallback = AsyncMock(
+        return_value=[
+            {"timestamp": buffer_ts - 600, "value": 40.0},
+            {"timestamp": buffer_ts - 300, "value": 41.0},
+        ]
+    )
+    history = await manager._seed_timeline_history("sensor.power", config, {})
+
+    timestamps = [p["timestamp"] for p in history["Grid Power"]]
+    assert timestamps == sorted(timestamps)
+    assert {buffer_ts, buffer_ts - 600, buffer_ts - 300} <= set(timestamps)
+
+    await manager.async_stop()
+
+
+async def test_recorder_history_fallback_returns_points_for_entity(hass: HomeAssistant) -> None:
+    """The recorder fallback returns ascending {timestamp, value} points for the
+    entity it is asked about, skipping unavailable / non-numeric rows."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+
+    t0 = int(time.time()) - 600
+    rows = [
+        _recorder_state("40.0", t0),
+        _recorder_state("unavailable", t0 + 60),
+        _recorder_state("not-a-number", t0 + 120),
+        _recorder_state("41.5", t0 + 180),
+    ]
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(return_value={"sensor.power_raw": rows})
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        points = await manager._recorder_history_fallback("sensor.power_raw", 30)
+
+    assert points == [
+        {"timestamp": t0, "value": 40.0},
+        {"timestamp": t0 + 180, "value": 41.5},
+    ]

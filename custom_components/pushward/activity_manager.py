@@ -597,8 +597,23 @@ class ActivityManager:
                 for label, v in values.items():
                     history.setdefault(label, []).append({"timestamp": ts, "value": v})
 
-        if not history and not (config.get(CONF_SERIES) or config.get(CONF_VALUE_ATTRIBUTE)):
-            history = await self._recorder_history_fallback(entity_id, period_minutes)
+        # Numeric-state timelines can also seed from the recorder (HA 2024.8+
+        # strips attributes, so series / value_attribute configs can't). Merge
+        # the recorder's points into the buffer's by timestamp instead of only
+        # falling back when the buffer is empty: the buffer always holds the
+        # start-time sample here, so an either/or gate would never consult the
+        # recorder. Points must land in the same series label as live values
+        # (the tracked entity's friendly name) even when the value comes from a
+        # separate value entity.
+        if not (config.get(CONF_SERIES) or config.get(CONF_VALUE_ATTRIBUTE)):
+            recorder_entity_id = config.get(CONF_VALUE_ENTITY) or entity_id
+            tracked_state = self._hass.states.get(entity_id)
+            label = tracked_state.attributes.get("friendly_name", entity_id) if tracked_state else entity_id
+            recorder_points = await self._recorder_history_fallback(recorder_entity_id, period_minutes)
+            if recorder_points:
+                by_ts = {p["timestamp"]: p for p in recorder_points}
+                by_ts.update({p["timestamp"]: p for p in history.get(label, [])})
+                history[label] = [by_ts[ts] for ts in sorted(by_ts)]
 
         for key in history:
             if len(history[key]) > _HISTORY_BUFFER_MAX:
@@ -615,12 +630,19 @@ class ActivityManager:
 
         return history if history else None
 
-    async def _recorder_history_fallback(self, entity_id: str, period_minutes: int) -> dict[str, list[dict]]:
-        """Pull numeric primary-state history from the recorder (sensors etc.)."""
+    async def _recorder_history_fallback(self, entity_id: str, period_minutes: int) -> list[dict]:
+        """Pull a numeric entity's primary-state history from the recorder as timeline points.
+
+        ``entity_id`` is the entity whose state carries the value (the configured
+        value entity when one is set, else the tracked entity). Only numeric-state
+        entities can seed this way; HA 2024.8+ strips attributes from the recorder,
+        so attribute / multi-series timelines rely on the live ring buffer. Points
+        come back ascending as ``{timestamp, value}`` and the caller labels them.
+        """
         try:
             from homeassistant.components.recorder.history import get_significant_states
         except ImportError:
-            return {}
+            return []
 
         from homeassistant.helpers.recorder import get_instance
         from homeassistant.util import dt as dt_util
@@ -641,19 +663,15 @@ class ActivityManager:
             )
         except Exception:
             _LOGGER.debug("Failed to query recorder for %s", entity_id, exc_info=True)
-            return {}
+            return []
 
-        entity_states = states.get(entity_id, [])
-        label = entity_id
-        history: dict[str, list[dict]] = {}
-        for state_obj in entity_states:
+        points: list[dict] = []
+        for state_obj in states.get(entity_id, []):
             if state_obj.state in ("unavailable", "unknown"):
                 continue
             with contextlib.suppress(ValueError, TypeError):
-                history.setdefault(label, []).append(
-                    {"timestamp": int(state_obj.last_updated.timestamp()), "value": float(state_obj.state)}
-                )
-        return history
+                points.append({"timestamp": int(state_obj.last_updated.timestamp()), "value": float(state_obj.state)})
+        return points
 
     @callback
     def _schedule_throttled_update(self, entity_id: str) -> None:
