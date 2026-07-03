@@ -42,6 +42,7 @@ from custom_components.pushward.const import (
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SERIES,
+    CONF_SERIES_ENTITIES,
     CONF_SEVERITY,
     CONF_SLUG,
     CONF_START_STATES,
@@ -381,6 +382,39 @@ def test_climate_timeline_current_vs_target() -> None:
     assert content["template"] == "timeline"
     assert content["value"] == {"Current": 20.5, "Target": 24.0}
     assert content["unit"] == "°C"
+    assert_valid_activity_content(content)
+
+
+async def test_air_quality_timeline_three_entities(hass: HomeAssistant) -> None:
+    """Three separate PM2.5 sensors bound as one multi-entity timeline (Alex's use case).
+
+    Units auto-default from each sensor's unit_of_measurement and land only under
+    labels that produced a value, satisfying the server's units-subset-of-values rule.
+    """
+    hass.states.async_set("sensor.bedroom_pm25", "12.5", {"unit_of_measurement": "ppm"})
+    hass.states.async_set("sensor.office_pm25", "8.0", {"unit_of_measurement": "ppm"})
+    hass.states.async_set("sensor.living_room_pm25", "21.0", {"unit_of_measurement": "ppm"})
+
+    config = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.air_quality_monitor",
+            CONF_SLUG: "ha-air-quality",
+            CONF_ACTIVITY_NAME: "Air Quality",
+            CONF_ICON: "mdi:air-filter",
+            CONF_TEMPLATE: "timeline",
+            CONF_SERIES_ENTITIES: [
+                {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+                {CONF_LABEL: "Office", CONF_ENTITY_ID: "sensor.office_pm25"},
+                {CONF_LABEL: "Living Room", CONF_ENTITY_ID: "sensor.living_room_pm25"},
+            ],
+        }
+    )
+    state = make_mock_state("on", {"friendly_name": "Air Quality"}, "binary_sensor.air_quality_monitor")
+
+    content = map_content(state, config, hass=hass)
+    assert content["template"] == "timeline"
+    assert content["value"] == {"Bedroom": 12.5, "Office": 8.0, "Living Room": 21.0}
+    assert content["units"] == {"Bedroom": "ppm", "Office": "ppm", "Living Room": "ppm"}
     assert_valid_activity_content(content)
 
 

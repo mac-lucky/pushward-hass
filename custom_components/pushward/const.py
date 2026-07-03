@@ -50,6 +50,12 @@ CONF_MIN_VALUE = "min_value"
 CONF_MAX_VALUE = "max_value"
 CONF_UNIT = "unit"
 CONF_SERIES = "series"
+# Timeline template: bind SEPARATE entities as named series (each its own line),
+# alongside or instead of the CONF_SERIES attribute map. Stored as a list of
+# series dicts ({label, entity_id, attribute?}) with the label frozen at config
+# time (the server merges series by label); the config flow edits them as a
+# comma-separated `[Label=]entity_id[:attribute]` string (mirrors board tiles).
+CONF_SERIES_ENTITIES = "series_entities"
 CONF_SCALE = "scale"
 CONF_DECIMALS = "decimals"
 CONF_SMOOTHING = "smoothing"
@@ -227,6 +233,12 @@ LOG_LEVELS = ("info", "warn", "error")
 LOG_MAX_COLUMNS = 6
 LOG_COLUMN_VALUE_MAX = 64
 LOG_COLUMN_LABEL_MAX = 32
+
+# Timeline template caps (mirror pushward-server/internal/model/activity.go).
+# A timeline carries 1-TIMELINE_MAX_SERIES named series, merged by label per
+# RFC 7396; each label (a value-map key) is capped at TIMELINE_SERIES_LABEL_MAX runes.
+TIMELINE_MAX_SERIES = 10
+TIMELINE_SERIES_LABEL_MAX = 32
 
 # Timeline scales
 SCALES = ["linear", "logarithmic"]

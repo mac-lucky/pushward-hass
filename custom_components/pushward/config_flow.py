@@ -72,6 +72,7 @@ from .const import (
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
+    CONF_SERIES_ENTITIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
     CONF_SEVERITY_LABEL,
@@ -138,6 +139,8 @@ from .const import (
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
+    TIMELINE_MAX_SERIES,
+    TIMELINE_SERIES_LABEL_MAX,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
     WARNING_THRESHOLD_MAX,
@@ -482,6 +485,14 @@ def _details_schema(
             vol.Optional(
                 CONF_SERIES,
                 default=d.get(CONF_SERIES, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # Bind separate entities as named series (mirrors the board-tile string).
+        # Format: '[Label=]entity_id[:attribute]' comma-separated.
+        fields[
+            vol.Optional(
+                CONF_SERIES_ENTITIES,
+                default=d.get(CONF_SERIES_ENTITIES, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
         fields[
@@ -953,7 +964,128 @@ def _serialize_log_columns(columns: list[dict]) -> str:
     return ", ".join(parts)
 
 
-def _parse_entity_input(user_input: dict) -> dict:
+def _parse_series_entities(raw: object) -> list[dict]:
+    """Parse timeline series entities from a string ('[Label=]entity_id[:attribute], ...') or list.
+
+    Mirrors ``_parse_board_tiles``. Each series binds a separate entity as a line:
+    the entity's state, or one of its attributes ('entity_id:attribute'). ``source``
+    must be an entity_id (contains a dot); a bare word is not a series and is
+    skipped. The optional label is left raw here and frozen later by
+    ``_resolve_series_entity_labels``. Capped at TIMELINE_MAX_SERIES. Each parsed
+    series is ``{label?, entity_id, attribute?}``.
+    """
+    if isinstance(raw, list):
+        series = [s for s in raw if isinstance(s, dict) and s.get(CONF_ENTITY_ID)]
+        return series[:TIMELINE_MAX_SERIES]
+    if not isinstance(raw, str) or not raw.strip():
+        return []
+    result: list[dict] = []
+    for entry in raw.split(","):
+        entry = entry.strip()
+        if not entry:
+            continue
+        label = ""
+        if "=" in entry:
+            label, entry = (part.strip() for part in entry.split("=", 1))
+        source = entry
+        if not source:
+            continue
+        series: dict = {}
+        if ":" in source:
+            entity_id, attr = (part.strip() for part in source.split(":", 1))
+            if not entity_id or "." not in entity_id:
+                continue
+            series[CONF_ENTITY_ID] = entity_id
+            if attr:
+                series["attribute"] = attr
+        elif "." in source:
+            series[CONF_ENTITY_ID] = source
+        else:
+            continue
+        if label:
+            series[CONF_LABEL] = label
+        result.append(series)
+        if len(result) >= TIMELINE_MAX_SERIES:
+            break
+    return result
+
+
+def _serialize_series_entities(series_entities: list[dict]) -> str:
+    """Serialize timeline series entities back to '[Label=]entity_id[:attribute], ...' for editing."""
+    parts: list[str] = []
+    for series in series_entities or []:
+        if not isinstance(series, dict):
+            continue
+        entity_id = series.get(CONF_ENTITY_ID) or ""
+        if not entity_id:
+            continue
+        source = entity_id
+        attr = series.get("attribute") or ""
+        if attr:
+            source = f"{entity_id}:{attr}"
+        label = series.get(CONF_LABEL) or ""
+        parts.append(f"{label}={source}" if label else source)
+    return ", ".join(parts)
+
+
+def _entity_friendly_name(hass: HomeAssistant | None, entity_id: str) -> str:
+    """Return an entity's friendly name, falling back to the entity_id."""
+    if hass is not None:
+        state = hass.states.get(entity_id)
+        if state is not None:
+            name = state.attributes.get("friendly_name")
+            if name:
+                return str(name)
+    return entity_id
+
+
+def _dedupe_label(label: str, used: set[str]) -> str:
+    """Return ``label`` (or ``label 2``/``label 3``/...) not already in ``used``.
+
+    The base is re-truncated to make room for the suffix so the result never
+    exceeds TIMELINE_SERIES_LABEL_MAX.
+    """
+    candidate = label
+    n = 1
+    while candidate in used:
+        n += 1
+        suffix = f" {n}"
+        candidate = f"{label[: TIMELINE_SERIES_LABEL_MAX - len(suffix)]}{suffix}"
+    return candidate
+
+
+def _resolve_series_entity_labels(series_entities: list[dict], hass: HomeAssistant | None) -> list[dict]:
+    """Freeze each timeline series-entity's label at config time.
+
+    A label given in the config is used as-is; an unlabeled series defaults to the
+    source entity's friendly name, with the attribute name appended when it reads
+    an attribute (so two attributes of one entity don't collide). Labels are
+    truncated to TIMELINE_SERIES_LABEL_MAX and de-duplicated with a numeric suffix.
+    Freezing matters because the server merges timeline series by label (RFC 7396):
+    a render-time friendly-name change would strand the old series as a flat line.
+    """
+    resolved: list[dict] = []
+    used: set[str] = set()
+    for series in series_entities:
+        entity_id = series.get(CONF_ENTITY_ID)
+        if not entity_id:
+            continue
+        attr = series.get("attribute")
+        label = (series.get(CONF_LABEL) or "").strip()
+        if not label:
+            label = _entity_friendly_name(hass, entity_id)
+            if attr:
+                label = f"{label} {attr}"
+        label = _dedupe_label(label[:TIMELINE_SERIES_LABEL_MAX], used)
+        used.add(label)
+        out: dict = {CONF_LABEL: label, CONF_ENTITY_ID: entity_id}
+        if attr:
+            out["attribute"] = attr
+        resolved.append(out)
+    return resolved
+
+
+def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> dict:
     """Normalize user input into an entity config dict."""
     entity_id = user_input[CONF_ENTITY_ID]
     raw_slug = user_input.get(CONF_SLUG, "").strip()
@@ -1007,6 +1139,11 @@ def _parse_entity_input(user_input: dict) -> dict:
     # Parse timeline fields
     series_raw = user_input.get(CONF_SERIES, "")
     series = _parse_state_labels(series_raw) if isinstance(series_raw, str) else series_raw or {}
+    series_entities = _resolve_series_entity_labels(
+        _parse_series_entities(user_input.get(CONF_SERIES_ENTITIES, "")), hass
+    )
+    if len(series) + len(series_entities) > TIMELINE_MAX_SERIES:
+        raise vol.Invalid("too_many_series", path=[CONF_SERIES_ENTITIES])
     thresholds_raw = user_input.get(CONF_THRESHOLDS, "")
     thresholds = _parse_thresholds(thresholds_raw) if isinstance(thresholds_raw, str) else thresholds_raw or []
     history_period_raw = user_input.get(CONF_HISTORY_PERIOD, DEFAULT_HISTORY_PERIOD)
@@ -1058,6 +1195,7 @@ def _parse_entity_input(user_input: dict) -> dict:
         CONF_ENDED_TTL: int(ended_ttl) if ended_ttl is not None else None,
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
         CONF_SERIES: series,
+        CONF_SERIES_ENTITIES: series_entities,
         CONF_SCALE: user_input.get(CONF_SCALE, DEFAULT_SCALE),
         CONF_DECIMALS: user_input.get(CONF_DECIMALS, DEFAULT_DECIMALS),
         CONF_SMOOTHING: user_input.get(CONF_SMOOTHING, False),
@@ -1235,6 +1373,9 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             series = current.get(CONF_SERIES)
             if isinstance(series, dict):
                 current[CONF_SERIES] = _serialize_key_value_pairs(series)
+            series_entities = current.get(CONF_SERIES_ENTITIES)
+            if isinstance(series_entities, list):
+                current[CONF_SERIES_ENTITIES] = _serialize_series_entities(series_entities)
             thresholds = current.get(CONF_THRESHOLDS)
             if isinstance(thresholds, list):
                 current[CONF_THRESHOLDS] = _serialize_thresholds(thresholds)
@@ -1271,7 +1412,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         if user_input is not None:
             merged = {**self._step1_input, **user_input}
             try:
-                entity_cfg = _parse_entity_input(merged)
+                entity_cfg = _parse_entity_input(merged, hass=self.hass)
             except vol.Invalid as exc:
                 for field in exc.path:
                     errors[field] = str(exc.msg)

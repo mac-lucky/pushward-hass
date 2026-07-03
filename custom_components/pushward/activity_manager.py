@@ -39,7 +39,7 @@ from .const import (
     CONF_PRIORITY,
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ENTITY,
-    CONF_SERIES,
+    CONF_SERIES_ENTITIES,
     CONF_SLUG,
     CONF_SOUND,
     CONF_STALE_TTL,
@@ -48,7 +48,6 @@ from .const import (
     CONF_TEMPLATE,
     CONF_TILES,
     CONF_UPDATE_INTERVAL,
-    CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_ENTITY,
     END_DELAY_SECONDS,
     LOG_MAX_LINES,
@@ -56,6 +55,7 @@ from .const import (
 from .content_mapper import (
     _build_log_line,
     _get_timeline_values,
+    _timeline_recorder_sources,
     lookup_registry_icon,
     map_completion_content,
     map_content,
@@ -91,7 +91,9 @@ def _companion_entity_ids(config: dict) -> list[str]:
     For board templates the per-tile entities are also companions: a change to any
     tile entity refreshes the board even though the anchor entity owns start/end.
     For log templates the per-column entities (bare-attribute columns excepted) are
-    companions too: a change to any appends a freshly composed line.
+    companions too: a change to any appends a freshly composed line. For timeline
+    templates the per-series entities are companions: a change to any re-samples
+    the sparkline.
     """
     ids = [eid for key in _COMPANION_ENTITY_KEYS if (eid := config.get(key))]
     template = config.get(CONF_TEMPLATE)
@@ -102,6 +104,10 @@ def _companion_entity_ids(config: dict) -> list[str]:
     elif template == "log":
         for column in config.get(CONF_LOG_COLUMNS) or []:
             if isinstance(column, dict) and (eid := column.get(CONF_ENTITY_ID)):
+                ids.append(eid)
+    elif template == "timeline":
+        for series in config.get(CONF_SERIES_ENTITIES) or []:
+            if isinstance(series, dict) and (eid := series.get(CONF_ENTITY_ID)):
                 ids.append(eid)
     return list(dict.fromkeys(ids))
 
@@ -576,11 +582,12 @@ class ActivityManager:
         """Build back-history for the timeline sparkline.
 
         Primary source is the in-memory ring buffer, populated on every state
-        change. HA 2024.8+ strips attributes like ``brightness`` from the
-        recorder DB, so a recorder query cannot rebuild attribute history —
-        only state history. We fall back to the recorder only for entities
-        whose primary state is the numeric value (no series, no value
-        attribute), e.g. plain numeric sensors.
+        change (the only source for attribute-based series, since HA 2024.8+
+        strips attributes like ``brightness`` from the recorder). State-sourced
+        series - plain numeric sensors, a value entity, or per-entity series read
+        as a state - also seed from the recorder in one batched query, merged into
+        the buffer's points by timestamp so both sources contribute to the same
+        series label.
         """
         period_minutes = config.get(CONF_HISTORY_PERIOD, 0)
         if not period_minutes:
@@ -597,21 +604,15 @@ class ActivityManager:
                 for label, v in values.items():
                     history.setdefault(label, []).append({"timestamp": ts, "value": v})
 
-        # Numeric-state timelines can also seed from the recorder (HA 2024.8+
-        # strips attributes, so series / value_attribute configs can't). Merge
-        # the recorder's points into the buffer's by timestamp instead of only
-        # falling back when the buffer is empty: the buffer always holds the
-        # start-time sample here, so an either/or gate would never consult the
-        # recorder. Points must land in the same series label as live values
-        # (the tracked entity's friendly name) even when the value comes from a
-        # separate value entity.
-        if not (config.get(CONF_SERIES) or config.get(CONF_VALUE_ATTRIBUTE)):
-            recorder_entity_id = config.get(CONF_VALUE_ENTITY) or entity_id
-            tracked_state = self._hass.states.get(entity_id)
-            label = tracked_state.attributes.get("friendly_name", entity_id) if tracked_state else entity_id
-            recorder_points = await self._recorder_history_fallback(recorder_entity_id, period_minutes)
-            if recorder_points:
-                by_ts = {p["timestamp"]: p for p in recorder_points}
+        tracked_state = self._hass.states.get(entity_id)
+        sources = _timeline_recorder_sources(tracked_state, config) if tracked_state is not None else {}
+        if sources:
+            recorder = await self._recorder_states(list(dict.fromkeys(sources.values())), period_minutes)
+            for label, source_id in sources.items():
+                points = recorder.get(source_id)
+                if not points:
+                    continue
+                by_ts = {p["timestamp"]: p for p in points}
                 by_ts.update({p["timestamp"]: p for p in history.get(label, [])})
                 history[label] = [by_ts[ts] for ts in sorted(by_ts)]
 
@@ -630,19 +631,21 @@ class ActivityManager:
 
         return history if history else None
 
-    async def _recorder_history_fallback(self, entity_id: str, period_minutes: int) -> list[dict]:
-        """Pull a numeric entity's primary-state history from the recorder as timeline points.
+    async def _recorder_states(self, entity_ids: list[str], period_minutes: int) -> dict[str, list[dict]]:
+        """Batch-query the recorder for several entities' numeric state history.
 
-        ``entity_id`` is the entity whose state carries the value (the configured
-        value entity when one is set, else the tracked entity). Only numeric-state
-        entities can seed this way; HA 2024.8+ strips attributes from the recorder,
-        so attribute / multi-series timelines rely on the live ring buffer. Points
-        come back ascending as ``{timestamp, value}`` and the caller labels them.
+        Returns ``{entity_id: [{timestamp, value}, ...]}`` (ascending) with one
+        entry per entity that yielded parseable numeric points. Only numeric-state
+        entities seed this way; HA 2024.8+ strips attributes from the recorder, so
+        attribute-sourced series fall back to the live ring buffer.
         """
+        if not entity_ids:
+            return {}
+
         try:
             from homeassistant.components.recorder.history import get_significant_states
         except ImportError:
-            return []
+            return {}
 
         from homeassistant.helpers.recorder import get_instance
         from homeassistant.util import dt as dt_util
@@ -657,21 +660,27 @@ class ActivityManager:
                     self._hass,
                     start,
                     now,
-                    [entity_id],
+                    list(entity_ids),
                     significant_changes_only=False,
                 )
             )
         except Exception:
-            _LOGGER.debug("Failed to query recorder for %s", entity_id, exc_info=True)
-            return []
+            _LOGGER.debug("Failed to query recorder for %s", entity_ids, exc_info=True)
+            return {}
 
-        points: list[dict] = []
-        for state_obj in states.get(entity_id, []):
-            if state_obj.state in ("unavailable", "unknown"):
-                continue
-            with contextlib.suppress(ValueError, TypeError):
-                points.append({"timestamp": int(state_obj.last_updated.timestamp()), "value": float(state_obj.state)})
-        return points
+        result: dict[str, list[dict]] = {}
+        for entity_id in entity_ids:
+            points: list[dict] = []
+            for state_obj in states.get(entity_id, []):
+                if state_obj.state in ("unavailable", "unknown"):
+                    continue
+                with contextlib.suppress(ValueError, TypeError):
+                    points.append(
+                        {"timestamp": int(state_obj.last_updated.timestamp()), "value": float(state_obj.state)}
+                    )
+            if points:
+                result[entity_id] = points
+        return result
 
     @callback
     def _schedule_throttled_update(self, entity_id: str) -> None:

@@ -21,13 +21,16 @@ from custom_components.pushward.config_flow import (
     _parse_entity_input,
     _parse_int_list,
     _parse_log_columns,
+    _parse_series_entities,
     _parse_state_labels,
     _parse_thresholds,
     _parse_widget_input,
     _parse_widget_stat_rows,
+    _resolve_series_entity_labels,
     _rgb_to_hex,
     _serialize_board_tiles,
     _serialize_log_columns,
+    _serialize_series_entities,
     _serialize_thresholds,
     _serialize_widget_stat_rows,
     _validate_integration_key,
@@ -66,6 +69,7 @@ from custom_components.pushward.const import (
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
+    CONF_SERIES_ENTITIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
     CONF_SLUG,
@@ -104,6 +108,8 @@ from custom_components.pushward.const import (
     DOMAIN,
     LOG_MAX_COLUMNS,
     SUBENTRY_TYPE_ENTITY,
+    TIMELINE_MAX_SERIES,
+    TIMELINE_SERIES_LABEL_MAX,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -113,7 +119,7 @@ from custom_components.pushward.const import (
     validate_url,
 )
 
-from .conftest import make_entity_config
+from .conftest import make_entity_config, make_mock_state
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -1449,6 +1455,40 @@ async def test_subentry_timeline_template(hass: HomeAssistant) -> None:
     assert subentry_data[CONF_HISTORY_PERIOD] == 6
 
 
+async def test_subentry_timeline_series_entities(hass: HomeAssistant) -> None:
+    """A timeline subentry binds separate entities as series, freezing labels at save time."""
+    hass.states.async_set("sensor.bedroom_pm25", "12", {"friendly_name": "Bedroom Air"})
+    hass.states.async_set("sensor.office_pm25", "8")
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_ENTITY_ID: "binary_sensor.air", CONF_TEMPLATE: "timeline"}),
+    )
+    assert result["step_id"] == "details"
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input(
+            "timeline",
+            **{CONF_SERIES_ENTITIES: "sensor.bedroom_pm25, Office=sensor.office_pm25"},
+        ),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+    data = next(iter(entry.subentries.values())).data
+    # Unlabeled series defaults to the entity friendly name; explicit label kept.
+    assert data[CONF_SERIES_ENTITIES] == [
+        {CONF_LABEL: "Bedroom Air", CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+        {CONF_LABEL: "Office", CONF_ENTITY_ID: "sensor.office_pm25"},
+    ]
+
+
 # --- _details_schema new field tests ---
 
 
@@ -1983,6 +2023,121 @@ def test_parse_entity_input_log_emits_columns() -> None:
         {"attribute": "brightness"},
         {CONF_ENTITY_ID: "sensor.temp", "attribute": "temperature"},
     ]
+
+
+# --- _parse_series_entities / _serialize_series_entities / labels ---
+
+
+def test_parse_series_entities_state_and_attribute() -> None:
+    """State source and 'entity:attribute' source parse into series dicts."""
+    parsed = _parse_series_entities("Bedroom=sensor.bedroom_pm25, climate.hvac:current_temperature")
+    assert parsed == [
+        {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+        {CONF_ENTITY_ID: "climate.hvac", "attribute": "current_temperature"},
+    ]
+
+
+def test_parse_series_entities_skips_bare_word() -> None:
+    """A bare word (no dot) is not an entity_id, so it is skipped."""
+    assert _parse_series_entities("brightness") == []
+
+
+def test_parse_series_entities_caps_at_max() -> None:
+    """More than TIMELINE_MAX_SERIES series entities are truncated to the cap."""
+    raw = ", ".join(f"sensor.s{i}" for i in range(TIMELINE_MAX_SERIES + 4))
+    assert len(_parse_series_entities(raw)) == TIMELINE_MAX_SERIES
+
+
+def test_parse_series_entities_empty() -> None:
+    """Empty string and non-string inputs return an empty list."""
+    assert _parse_series_entities("") == []
+    assert _parse_series_entities(None) == []
+
+
+def test_series_entities_round_trip() -> None:
+    """parse (labels frozen) then serialize then parse is stable."""
+    raw = "Bedroom=sensor.bedroom, Set=climate.hvac:temperature, sensor.plain"
+    resolved = _resolve_series_entity_labels(_parse_series_entities(raw), None)
+    reparsed = _parse_series_entities(_serialize_series_entities(resolved))
+    assert reparsed == resolved
+
+
+def test_resolve_series_labels_defaults_to_friendly_name() -> None:
+    """An unlabeled series defaults to the source entity's friendly name."""
+
+    class _Hass:
+        class states:
+            @staticmethod
+            def get(entity_id):
+                return make_mock_state("12", {"friendly_name": "Bedroom Air"}, entity_id)
+
+    resolved = _resolve_series_entity_labels([{CONF_ENTITY_ID: "sensor.bedroom_pm25"}], _Hass())
+    assert resolved == [{CONF_LABEL: "Bedroom Air", CONF_ENTITY_ID: "sensor.bedroom_pm25"}]
+
+
+def test_resolve_series_labels_attribute_suffix_and_dedupe() -> None:
+    """Two attributes of one entity default to distinct labels (attr suffix + dedupe)."""
+
+    class _Hass:
+        class states:
+            @staticmethod
+            def get(entity_id):
+                return make_mock_state("heat", {"friendly_name": "HVAC"}, entity_id)
+
+    resolved = _resolve_series_entity_labels(
+        [
+            {CONF_ENTITY_ID: "climate.hvac", "attribute": "current_temperature"},
+            {CONF_ENTITY_ID: "climate.hvac", "attribute": "target_temperature"},
+        ],
+        _Hass(),
+    )
+    labels = [s[CONF_LABEL] for s in resolved]
+    assert labels == ["HVAC current_temperature", "HVAC target_temperature"]
+
+
+def test_resolve_series_labels_duplicate_gets_numeric_suffix() -> None:
+    """Two identical explicit labels are de-duplicated with a numeric suffix."""
+    resolved = _resolve_series_entity_labels(
+        [
+            {CONF_LABEL: "Air", CONF_ENTITY_ID: "sensor.a"},
+            {CONF_LABEL: "Air", CONF_ENTITY_ID: "sensor.b"},
+        ],
+        None,
+    )
+    assert [s[CONF_LABEL] for s in resolved] == ["Air", "Air 2"]
+
+
+def test_resolve_series_labels_truncated_to_cap() -> None:
+    """A long label is truncated to TIMELINE_SERIES_LABEL_MAX."""
+    resolved = _resolve_series_entity_labels([{CONF_LABEL: "X" * 60, CONF_ENTITY_ID: "sensor.a"}], None)
+    assert len(resolved[0][CONF_LABEL]) == TIMELINE_SERIES_LABEL_MAX
+
+
+def test_parse_entity_input_series_entities_persisted() -> None:
+    """A timeline parses CONF_SERIES_ENTITIES into a resolved list (labels frozen)."""
+    result = _parse_entity_input(
+        _base_user_input(**{CONF_TEMPLATE: "timeline", CONF_SERIES_ENTITIES: "Bedroom=sensor.bedroom_pm25"})
+    )
+    assert result[CONF_SERIES_ENTITIES] == [{CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"}]
+
+
+def test_parse_entity_input_too_many_series() -> None:
+    """The attribute map plus series entities may not exceed TIMELINE_MAX_SERIES."""
+    series = ", ".join(f"a{i}=L{i}" for i in range(6))
+    entities = ", ".join(f"L{i}=sensor.s{i}" for i in range(6))
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_entity_input(
+            _base_user_input(**{CONF_TEMPLATE: "timeline", CONF_SERIES: series, CONF_SERIES_ENTITIES: entities})
+        )
+    assert exc.value.path == [CONF_SERIES_ENTITIES]
+    assert "too_many_series" in str(exc.value)
+
+
+def test_details_schema_timeline_has_series_entities() -> None:
+    """Timeline template includes the series_entities field."""
+    schema = _details_schema("sensor.temp", "timeline", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_SERIES_ENTITIES in keys
 
 
 # --- _parse_entity_input board/log fields ---

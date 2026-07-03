@@ -105,7 +105,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | `alert` | Severity-based notification (critical/warning/info) |
 | `steps` | Multi-step process (e.g. build stages) |
 | `gauge` | Numeric value with a range (e.g. temperature, battery) |
-| `timeline` | Sparkline chart with labeled value series |
+| `timeline` | Sparkline chart, up to 10 named series from attributes or separate entities |
 | `board` | 1–4 tiles, each showing a value from a **separate** entity |
 | `log` | Newest-first list of log lines (up to 20), one per state change |
 
@@ -126,7 +126,8 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Value Entity / Attribute | Numeric value (gauge/timeline), optionally from a separate entity |
 | Min / Max Value | Gauge range bounds (default: 0–100) |
 | Unit | Display unit (e.g. °C, %) |
-| Series | Attribute→label mapping for a multi-series timeline |
+| Series | Attribute->label mapping for a multi-series timeline |
+| Series Entities | `[Label=]entity_id[:attribute]`, comma-separated, max 10 total - bind separate entities as timeline lines |
 | Scale / Decimal Places / Smooth Lines / Thresholds | Timeline sparkline options |
 | Back-History Period | Minutes of history to seed the sparkline on start (0–1440) |
 | Board Tiles | `Label=entity_id[:attribute[:unit[:icon]]]`, comma-separated, max 4 (board template) |
@@ -149,9 +150,30 @@ By default every value (remaining time, progress, subtitle, gauge value, current
 
 **Smart time parsing** — the remaining-time source accepts a `timestamp`/finish-time sensor (anchors the end date directly, no drift), a `duration` sensor with a unit (`s`/`min`/`h`/`d`), an `H:MM:SS`/`MM:SS` string, or a plain number of seconds.
 
+#### Multi-entity timeline series
+
+A **timeline** can plot up to **10 named series** on one chart, each its own line, color, and unit. There are two ways to supply them, and they combine:
+
+- **Series** maps attributes of the tracked entity to labels (`current_temperature=Indoor, target_temperature=Set`).
+- **Series Entities** binds *separate* entities as lines, so values from unrelated sensors share one chart (a PM2.5 sensor per room, solar arrays, etc.). Configure it as a comma-separated list:
+
+```
+[Label=]entity_id[:attribute]
+```
+
+- **entity_id** (required) reads that entity's state; append `:attribute` to read one of its attributes instead.
+- **Label** (optional, before `=`) names the line. Left off, it defaults to the entity's friendly name (with the attribute name appended for attribute sources so two attributes of one entity stay distinct). Labels are frozen when you save (the server merges series by label), truncated to 32 chars, and de-duplicated with a numeric suffix.
+
+Example: `sensor.bedroom_pm25, Office=sensor.office_pm25, sensor.living_room_pm25`. Each series entity is tracked as a companion, so a change to any one re-samples the chart while the anchor entity owns start/end. Units auto-default from each state-sourced entity's `unit_of_measurement`; the **Per-Series Units** field overrides them. Numeric attributes in the 0-255 range (e.g. `brightness`) are rescaled to 0-100. The 10-line cap covers Series and Series Entities combined; the server and iOS app already render multi-series timelines, so this is a Home Assistant configuration option only.
+
 #### Timeline sparkline backfill
 
-**Back-History Period** seeds the sparkline when the activity starts. Because Home Assistant 2024.8 [removed light/climate attributes from the recorder](https://github.com/home-assistant/core/issues/123028), attribute-based history (e.g. a light's `brightness`) can't be rebuilt from the recorder. The integration keeps its own in-memory ring buffer (≤300 samples per entity), populated from live state changes and persisted to `.storage/pushward.history.<entry_id>` so it survives restarts. Practical notes: the buffer is empty right after install and fills as the tracked attribute changes; backfill resolution matches state-change frequency (no polling); for **numeric-state sensors** the recorder is still used as a fallback, so those backfill immediately.
+**Back-History Period** seeds the sparkline when the activity starts. What can be seeded depends on where each series reads its value:
+
+- **State-sourced series** (a plain numeric sensor, a value entity, or a series entity read as a state) backfill from Home Assistant's recorder in one batched query, so they fill in immediately on start.
+- **Attribute-based series** (Series attribute maps, a value attribute, or a series entity read as an attribute) cannot use the recorder: Home Assistant 2024.8 [removed most attributes from the recorder](https://github.com/home-assistant/core/issues/123028). These fill only from samples the integration collects live while it runs.
+
+For attribute-based history the integration keeps its own in-memory ring buffer (max 300 samples per entity), populated from live state changes and persisted to `.storage/pushward.history.<entry_id>` so it survives restarts. That buffer is empty right after install and fills as the tracked attribute changes, at state-change resolution (no polling). Recorder points and buffered points are merged by timestamp into the same series, so a numeric sensor gets both its recorded past and any live samples. If your value lives in an attribute and you want recorder backfill, expose it as a template sensor's state.
 
 #### Board tiles (multi-entity)
 

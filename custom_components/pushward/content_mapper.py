@@ -55,6 +55,7 @@ from .const import (
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
+    CONF_SERIES_ENTITIES,
     CONF_SEVERITY,
     CONF_SEVERITY_LABEL,
     CONF_SMOOTHING,
@@ -594,7 +595,7 @@ def map_content(
         thresholds = entity_config.get(CONF_THRESHOLDS, [])
         if thresholds:
             content["thresholds"] = thresholds
-        units = entity_config.get(CONF_UNITS) or {}
+        units = _get_timeline_units(entity_config, values, hass)
         if units:
             content["units"] = units
         content["progress"] = 0.0
@@ -893,26 +894,49 @@ def _coerce_scaled_value(raw: object, attr_name: str | None) -> float | None:
 
 
 def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> dict[str, float]:
-    """Extract labeled value map for timeline template.
+    """Extract the labeled value map for a timeline template.
 
-    Multi-series: reads from CONF_SERIES attribute->label mapping on the tracked
-    entity. Single-series: CONF_VALUE_ENTITY/CONF_VALUE_ATTRIBUTE, or the tracked
-    entity's state, labeled with the tracked entity's friendly_name.
+    Series come from two sources that can be combined: CONF_SERIES maps attributes
+    of the tracked entity to labels, and CONF_SERIES_ENTITIES binds separate
+    entities (each an entity's state, or one of its attributes) as named lines.
+    When neither is configured it falls back to a single series read from
+    CONF_VALUE_ENTITY/CONF_VALUE_ATTRIBUTE (or the tracked entity's state),
+    labelled with the tracked entity's friendly_name. Non-numeric or unavailable
+    sources are skipped, dropping only that series' key.
     """
-    series_map = entity_config.get(CONF_SERIES) or {}
-    if series_map:
-        values: dict[str, float] = {}
-        for attr_name, label in series_map.items():
-            raw = state.attributes.get(attr_name)
-            if raw is not None:
-                try:
-                    values[label] = _rescale_attr(float(raw), attr_name)
-                except (ValueError, TypeError):
-                    _LOGGER.debug(
-                        "Could not parse timeline series attribute %s for %s",
-                        attr_name,
-                        state.entity_id,
-                    )
+    values: dict[str, float] = {}
+
+    for attr_name, label in (entity_config.get(CONF_SERIES) or {}).items():
+        raw = state.attributes.get(attr_name)
+        if raw is None:
+            continue
+        coerced = _coerce_scaled_value(raw, attr_name)
+        if coerced is None:
+            _LOGGER.debug("Could not parse timeline series attribute %s for %s", attr_name, state.entity_id)
+            continue
+        values[label] = coerced
+
+    for series in entity_config.get(CONF_SERIES_ENTITIES) or []:
+        if not isinstance(series, dict):
+            continue
+        label = series.get(CONF_LABEL)
+        entity_id = series.get(CONF_ENTITY_ID)
+        if not label or not entity_id or hass is None:
+            continue
+        source = hass.states.get(entity_id)
+        if source is None or source.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            continue
+        attr = series.get("attribute")
+        raw = source.attributes.get(attr) if attr else source.state
+        if raw is None:
+            continue
+        coerced = _coerce_scaled_value(raw, attr)
+        if coerced is None:
+            _LOGGER.debug("Could not parse timeline series entity %s for %s", entity_id, state.entity_id)
+            continue
+        values[label] = coerced
+
+    if entity_config.get(CONF_SERIES) or entity_config.get(CONF_SERIES_ENTITIES):
         return values
 
     # Single series: keep the label anchored to the tracked entity so samples
@@ -928,6 +952,63 @@ def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant 
         _LOGGER.debug("Could not parse timeline value for %s", state.entity_id)
         return {}
     return {label: value}
+
+
+def _get_timeline_units(
+    entity_config: dict, values: dict[str, float], hass: HomeAssistant | None = None
+) -> dict[str, str]:
+    """Build the per-series unit map for a timeline.
+
+    Auto-defaults each state-sourced series entity's unit from its source entity's
+    ``unit_of_measurement`` (an attribute value has no standalone unit, so
+    attribute-sourced series are skipped), overlays the explicit CONF_UNITS map,
+    then keeps only labels present in ``values`` (the server requires the units
+    keys to be a subset of the value keys).
+    """
+    units: dict[str, str] = {}
+    if hass is not None:
+        for series in entity_config.get(CONF_SERIES_ENTITIES) or []:
+            if not isinstance(series, dict) or series.get("attribute"):
+                continue
+            label = series.get(CONF_LABEL)
+            entity_id = series.get(CONF_ENTITY_ID)
+            if not label or not entity_id:
+                continue
+            source = hass.states.get(entity_id)
+            if source is None:
+                continue
+            uom = source.attributes.get("unit_of_measurement")
+            if uom:
+                units[label] = str(uom)
+    units.update(entity_config.get(CONF_UNITS) or {})
+    return {label: unit for label, unit in units.items() if label in values}
+
+
+def _timeline_recorder_sources(state: State, entity_config: dict) -> dict[str, str]:
+    """Map each recorder-eligible timeline series label to its source entity_id.
+
+    Only state-sourced series can be seeded from the recorder: series entities
+    read as a state (no attribute), and the single-series fallback (the value
+    entity when set, else the tracked entity, and only when it reads a state).
+    Attribute-sourced series are excluded because HA 2024.8+ strips attributes
+    from the recorder (those seed from the live ring buffer instead). The labels
+    match ``_get_timeline_values`` so seeded points join the live series.
+    """
+    sources: dict[str, str] = {}
+    series_entities = entity_config.get(CONF_SERIES_ENTITIES) or []
+    for series in series_entities:
+        if not isinstance(series, dict) or series.get("attribute"):
+            continue
+        label = series.get(CONF_LABEL)
+        entity_id = series.get(CONF_ENTITY_ID)
+        if label and entity_id:
+            sources[label] = entity_id
+
+    if not entity_config.get(CONF_SERIES) and not series_entities and not entity_config.get(CONF_VALUE_ATTRIBUTE):
+        label = state.attributes.get("friendly_name", state.entity_id)
+        sources[label] = entity_config.get(CONF_VALUE_ENTITY) or state.entity_id
+
+    return sources
 
 
 def _get_gauge_value(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> float:

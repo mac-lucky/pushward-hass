@@ -51,6 +51,8 @@ from custom_components.pushward.const import (
     SNOOZE_SECONDS_MIN,
     SOUNDS,
     TEMPLATES,
+    TIMELINE_MAX_SERIES,
+    TIMELINE_SERIES_LABEL_MAX,
     TOTAL_STEPS_MAX,
     WARNING_THRESHOLD_MAX,
     WIDGET_LABEL_MAX,
@@ -79,10 +81,12 @@ STEP_ROW_MIN = 1
 STEP_ROW_MAX = 10
 THRESHOLD_LABEL_MAX = 12
 THRESHOLDS_MAX = 5
-TIMELINE_VALUE_KEY_MAX = 32
 TIMELINE_DECIMALS_MIN = 0
 TIMELINE_DECIMALS_MAX = 10
-MAX_TIMELINE_SERIES = 10
+# Promoted to const.py (single source of truth); aliased here for the assertions
+# below, which read as the server-contract names.
+TIMELINE_VALUE_KEY_MAX = TIMELINE_SERIES_LABEL_MAX
+MAX_TIMELINE_SERIES = TIMELINE_MAX_SERIES
 # Countdowns may be scheduled up to ~5 years out; the extra 30 h is slack for leap
 # days / timezone offsets so a legitimately-far countdown isn't wrongly rejected.
 # "Historical" timestamps (fired_at / history points) may drift at most a few

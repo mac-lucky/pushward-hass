@@ -28,6 +28,7 @@ from custom_components.pushward.const import (
     CONF_LOG_COLUMNS,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_SERIES_ENTITIES,
     CONF_SLUG,
     CONF_SOUND,
     CONF_STALE_TTL,
@@ -1324,8 +1325,10 @@ async def test_seed_timeline_recorder_labels_match_live_series(hass: HomeAssista
     await manager.async_start()
 
     now = int(time.time())
-    manager._recorder_history_fallback = AsyncMock(
-        return_value=[{"timestamp": now - 600, "value": 40.0}, {"timestamp": now - 300, "value": 41.0}]
+    manager._recorder_states = AsyncMock(
+        return_value={
+            "sensor.power": [{"timestamp": now - 600, "value": 40.0}, {"timestamp": now - 300, "value": 41.0}]
+        }
     )
     history = await manager._seed_timeline_history("sensor.power", config, {})
 
@@ -1348,12 +1351,12 @@ async def test_seed_timeline_recorder_queries_value_entity(hass: HomeAssistant) 
     hass.states.async_set("sensor.power_raw", "42.0")
     await manager.async_start()
 
-    recorder = AsyncMock(return_value=[{"timestamp": int(time.time()) - 300, "value": 40.0}])
-    manager._recorder_history_fallback = recorder
+    recorder = AsyncMock(return_value={"sensor.power_raw": [{"timestamp": int(time.time()) - 300, "value": 40.0}]})
+    manager._recorder_states = recorder
     history = await manager._seed_timeline_history("sensor.meter", config, {})
 
     recorder.assert_awaited_once()
-    assert recorder.await_args.args[0] == "sensor.power_raw"
+    assert recorder.await_args.args[0] == ["sensor.power_raw"]
     assert set(history) == {"Meter"}
 
     await manager.async_stop()
@@ -1370,11 +1373,13 @@ async def test_seed_timeline_merges_buffer_and_recorder(hass: HomeAssistant) -> 
 
     tracked = manager._tracked["sensor.power"]
     buffer_ts = tracked.history_buffer[-1][0]
-    manager._recorder_history_fallback = AsyncMock(
-        return_value=[
-            {"timestamp": buffer_ts - 600, "value": 40.0},
-            {"timestamp": buffer_ts - 300, "value": 41.0},
-        ]
+    manager._recorder_states = AsyncMock(
+        return_value={
+            "sensor.power": [
+                {"timestamp": buffer_ts - 600, "value": 40.0},
+                {"timestamp": buffer_ts - 300, "value": 41.0},
+            ]
+        }
     )
     history = await manager._seed_timeline_history("sensor.power", config, {})
 
@@ -1385,25 +1390,109 @@ async def test_seed_timeline_merges_buffer_and_recorder(hass: HomeAssistant) -> 
     await manager.async_stop()
 
 
-async def test_recorder_history_fallback_returns_points_for_entity(hass: HomeAssistant) -> None:
-    """The recorder fallback returns ascending {timestamp, value} points for the
-    entity it is asked about, skipping unavailable / non-numeric rows."""
+async def test_seed_timeline_series_entities_batched_and_labeled(hass: HomeAssistant) -> None:
+    """Per-entity series seed from ONE batched recorder query, each entity's
+    points landing under that series' frozen label."""
+    api = _mock_api()
+    config = _timeline_numeric_config(
+        **{
+            CONF_SERIES_ENTITIES: [
+                {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+                {CONF_LABEL: "Office", CONF_ENTITY_ID: "sensor.office_pm25"},
+            ],
+        }
+    )
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    hass.states.async_set("sensor.power", "0", {"friendly_name": "Anchor"})
+    hass.states.async_set("sensor.bedroom_pm25", "12")
+    hass.states.async_set("sensor.office_pm25", "8")
+    await manager.async_start()
+
+    now = int(time.time())
+    recorder = AsyncMock(
+        return_value={
+            "sensor.bedroom_pm25": [{"timestamp": now - 300, "value": 11.0}],
+            "sensor.office_pm25": [{"timestamp": now - 300, "value": 7.0}],
+        }
+    )
+    manager._recorder_states = recorder
+    history = await manager._seed_timeline_history("sensor.power", config, {})
+
+    recorder.assert_awaited_once()
+    # Anchor's own state is NOT recorder-seeded, only the two series entities.
+    assert set(recorder.await_args.args[0]) == {"sensor.bedroom_pm25", "sensor.office_pm25"}
+    assert {"Bedroom", "Office"} <= set(history)
+    assert any(p["value"] == 11.0 for p in history["Bedroom"])
+    assert any(p["value"] == 7.0 for p in history["Office"])
+
+    await manager.async_stop()
+
+
+async def test_recorder_states_returns_points_per_entity(hass: HomeAssistant) -> None:
+    """The batched recorder query returns ascending {timestamp, value} points
+    per entity, skipping unavailable / non-numeric rows."""
     api = _mock_api()
     manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
 
     t0 = int(time.time()) - 600
-    rows = [
-        _recorder_state("40.0", t0),
-        _recorder_state("unavailable", t0 + 60),
-        _recorder_state("not-a-number", t0 + 120),
-        _recorder_state("41.5", t0 + 180),
-    ]
+    rows = {
+        "sensor.a": [
+            _recorder_state("40.0", t0),
+            _recorder_state("unavailable", t0 + 60),
+            _recorder_state("not-a-number", t0 + 120),
+            _recorder_state("41.5", t0 + 180),
+        ],
+        "sensor.b": [_recorder_state("unknown", t0)],
+    }
     instance = MagicMock()
-    instance.async_add_executor_job = AsyncMock(return_value={"sensor.power_raw": rows})
+    instance.async_add_executor_job = AsyncMock(return_value=rows)
     with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
-        points = await manager._recorder_history_fallback("sensor.power_raw", 30)
+        result = await manager._recorder_states(["sensor.a", "sensor.b"], 30)
 
-    assert points == [
-        {"timestamp": t0, "value": 40.0},
-        {"timestamp": t0 + 180, "value": 41.5},
-    ]
+    # sensor.b yields no parseable points, so it is absent from the result map.
+    assert result == {"sensor.a": [{"timestamp": t0, "value": 40.0}, {"timestamp": t0 + 180, "value": 41.5}]}
+
+
+async def test_recorder_states_empty_for_no_entities(hass: HomeAssistant) -> None:
+    """No recorder-eligible entities means no recorder query at all."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+    assert await manager._recorder_states([], 30) == {}
+
+
+async def test_timeline_series_entity_subscribed_and_refreshes(hass: HomeAssistant) -> None:
+    """A timeline series entity is a companion: subscribed, and a change re-samples
+    the sparkline for its own series label."""
+    api = _mock_api()
+    config = _entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.air",
+            CONF_SLUG: "ha-air",
+            CONF_TEMPLATE: "timeline",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_UPDATE_INTERVAL: 0,
+            CONF_SERIES_ENTITIES: [{CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"}],
+        }
+    )
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("sensor.bedroom_pm25", "12")
+    hass.states.async_set("binary_sensor.air", "off")
+    await manager.async_start()
+
+    assert "sensor.bedroom_pm25" in _companion_entity_ids(config)
+
+    hass.states.async_set("binary_sensor.air", "on")
+    await hass.async_block_till_done()
+    ongoing_before = len(activity_updates(api, "ongoing"))
+    assert activity_updates(api, "ongoing")[-1]["value"] == {"Bedroom": 12.0}
+
+    await bump_state(manager, hass, "binary_sensor.air", "sensor.bedroom_pm25", "20", {})
+
+    ongoing_after = activity_updates(api, "ongoing")
+    assert len(ongoing_after) == ongoing_before + 1
+    assert ongoing_after[-1]["value"] == {"Bedroom": 20.0}
+    assert_valid_activity_content(ongoing_after[-1])
+
+    await manager.async_stop()

@@ -34,6 +34,7 @@ from custom_components.pushward.const import (
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
+    CONF_SERIES_ENTITIES,
     CONF_SEVERITY,
     CONF_SEVERITY_LABEL,
     CONF_SMOOTHING,
@@ -61,6 +62,9 @@ from custom_components.pushward.const import (
 )
 from custom_components.pushward.content_mapper import (
     _build_log_line,
+    _get_timeline_units,
+    _get_timeline_values,
+    _timeline_recorder_sources,
     build_tap_action,
     get_domain_defaults,
     map_completion_content,
@@ -2202,6 +2206,230 @@ def test_companion_timeline_value_from_entity():
     content = map_content(primary, config, hass=_FakeHass({"sensor.robot_metric": metric}))
 
     assert content["value"] == {"Robot": 42.0}
+
+
+# --- timeline series entities (multi-entity) -------------------------------
+
+
+def test_timeline_series_entities_multi():
+    """Each series entity becomes its own labelled line, read from that entity's state."""
+    anchor = _make_state("on", {"friendly_name": "Air"}, "binary_sensor.air")
+    bedroom = _make_state("12.5", {}, "sensor.bedroom_pm25")
+    office = _make_state("8.0", {}, "sensor.office_pm25")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [
+            {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+            {CONF_LABEL: "Office", CONF_ENTITY_ID: "sensor.office_pm25"},
+        ],
+    }
+
+    content = map_content(
+        anchor,
+        config,
+        hass=_FakeHass({"sensor.bedroom_pm25": bedroom, "sensor.office_pm25": office}),
+    )
+
+    assert content["value"] == {"Bedroom": 12.5, "Office": 8.0}
+    assert_valid_activity_content(content)
+
+
+def test_timeline_series_entity_attribute_and_rescale():
+    """A series entity can read an attribute, with 0-255 attrs rescaled to 0-100."""
+    anchor = _make_state("on", {"friendly_name": "Room"}, "binary_sensor.room")
+    lamp = _make_state("on", {"brightness": 255}, "light.lamp")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [{CONF_LABEL: "Lamp", CONF_ENTITY_ID: "light.lamp", "attribute": "brightness"}],
+    }
+
+    content = map_content(anchor, config, hass=_FakeHass({"light.lamp": lamp}))
+
+    assert content["value"] == {"Lamp": 100}
+
+
+def test_timeline_series_entities_combine_with_attribute_series():
+    """CONF_SERIES (attribute map) and series entities coexist on one timeline."""
+    anchor = _make_state("heating", {"friendly_name": "HVAC", "current_temperature": 20.5}, "climate.hvac")
+    outdoor = _make_state("11.0", {}, "sensor.outdoor")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES: {"current_temperature": "Indoor"},
+        CONF_SERIES_ENTITIES: [{CONF_LABEL: "Outdoor", CONF_ENTITY_ID: "sensor.outdoor"}],
+    }
+
+    content = map_content(anchor, config, hass=_FakeHass({"sensor.outdoor": outdoor}))
+
+    assert content["value"] == {"Indoor": 20.5, "Outdoor": 11.0}
+
+
+def test_timeline_series_entity_unavailable_key_omitted():
+    """An unavailable series entity drops only its own key (RFC-7396 keeps last value)."""
+    anchor = _make_state("on", {"friendly_name": "Air"}, "binary_sensor.air")
+    bedroom = _make_state("12.5", {}, "sensor.bedroom_pm25")
+    office = _make_state("unavailable", {}, "sensor.office_pm25")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [
+            {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+            {CONF_LABEL: "Office", CONF_ENTITY_ID: "sensor.office_pm25"},
+        ],
+    }
+
+    content = map_content(
+        anchor,
+        config,
+        hass=_FakeHass({"sensor.bedroom_pm25": bedroom, "sensor.office_pm25": office}),
+    )
+
+    assert content["value"] == {"Bedroom": 12.5}
+    assert "Office" not in content["value"]
+
+
+def test_timeline_series_entity_non_numeric_skipped():
+    """A non-numeric series entity value is skipped, not coerced to garbage."""
+    anchor = _make_state("on", {"friendly_name": "Air"}, "binary_sensor.air")
+    text = _make_state("open", {}, "binary_sensor.door")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [{CONF_LABEL: "Door", CONF_ENTITY_ID: "binary_sensor.door"}],
+    }
+
+    content = map_content(anchor, config, hass=_FakeHass({"binary_sensor.door": text}))
+
+    assert "value" not in content
+
+
+def test_timeline_single_series_regression_without_series_entities():
+    """With no series map and no series entities, the single-series fallback is unchanged."""
+    state = _make_state("22.5", {"friendly_name": "Living Room Temp"})
+    config = {CONF_TEMPLATE: "timeline"}
+
+    content = map_content(state, config)
+
+    assert content["value"] == {"Living Room Temp": 22.5}
+
+
+# --- _get_timeline_units ----------------------------------------------------
+
+
+def test_timeline_units_auto_default_from_uom():
+    """A state-sourced series entity's unit auto-defaults from its unit_of_measurement."""
+    anchor = _make_state("on", {"friendly_name": "Air"}, "binary_sensor.air")
+    bedroom = _make_state("12.5", {"unit_of_measurement": "ppm"}, "sensor.bedroom_pm25")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [{CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"}],
+    }
+    hass = _FakeHass({"sensor.bedroom_pm25": bedroom})
+
+    values = _get_timeline_values(anchor, config, hass)
+    units = _get_timeline_units(config, values, hass)
+
+    assert units == {"Bedroom": "ppm"}
+
+
+def test_timeline_units_explicit_overrides_auto():
+    """An explicit CONF_UNITS entry overrides the auto-defaulted unit."""
+    anchor = _make_state("on", {"friendly_name": "Air"}, "binary_sensor.air")
+    bedroom = _make_state("12.5", {"unit_of_measurement": "ppm"}, "sensor.bedroom_pm25")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [{CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"}],
+        CONF_UNITS: {"Bedroom": "PM"},
+    }
+    hass = _FakeHass({"sensor.bedroom_pm25": bedroom})
+
+    values = _get_timeline_values(anchor, config, hass)
+    units = _get_timeline_units(config, values, hass)
+
+    assert units == {"Bedroom": "PM"}
+
+
+def test_timeline_units_filtered_to_value_keys():
+    """Units for labels not present in values are dropped (server: units keys subset of value keys)."""
+    anchor = _make_state("on", {"friendly_name": "Air"}, "binary_sensor.air")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES: {"current_temperature": "Indoor"},
+        CONF_UNITS: {"Indoor": "°C", "Ghost": "°C"},
+    }
+
+    values = _get_timeline_values(anchor, config)
+    units = _get_timeline_units(config, values, None)
+
+    assert "Ghost" not in units
+
+
+def test_timeline_units_attribute_series_no_auto_unit():
+    """An attribute-sourced series entity contributes no auto unit (attributes have no uom)."""
+    anchor = _make_state("on", {"friendly_name": "Room"}, "binary_sensor.room")
+    lamp = _make_state("on", {"brightness": 128, "unit_of_measurement": "lx"}, "light.lamp")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [{CONF_LABEL: "Lamp", CONF_ENTITY_ID: "light.lamp", "attribute": "brightness"}],
+    }
+    hass = _FakeHass({"light.lamp": lamp})
+
+    values = _get_timeline_values(anchor, config, hass)
+    units = _get_timeline_units(config, values, hass)
+
+    assert units == {}
+
+
+# --- _timeline_recorder_sources --------------------------------------------
+
+
+def test_recorder_sources_state_series_only():
+    """Only state-sourced series entities map to a recorder source; attribute ones don't."""
+    state = _make_state("on", {"friendly_name": "Air"}, "binary_sensor.air")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES_ENTITIES: [
+            {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+            {CONF_LABEL: "Lamp", CONF_ENTITY_ID: "light.lamp", "attribute": "brightness"},
+        ],
+    }
+
+    sources = _timeline_recorder_sources(state, config)
+
+    assert sources == {"Bedroom": "sensor.bedroom_pm25"}
+
+
+def test_recorder_sources_single_series_value_entity():
+    """The single-series fallback maps the friendly-name label to the value entity."""
+    state = _make_state("on", {"friendly_name": "Meter"}, "sensor.meter")
+    config = {CONF_TEMPLATE: "timeline", CONF_VALUE_ENTITY: "sensor.power_raw"}
+
+    sources = _timeline_recorder_sources(state, config)
+
+    assert sources == {"Meter": "sensor.power_raw"}
+
+
+def test_recorder_sources_single_series_tracked_entity():
+    """With no value entity, the single-series fallback maps to the tracked entity itself."""
+    state = _make_state("22.5", {"friendly_name": "Room Temp"}, "sensor.room_temp")
+    config = {CONF_TEMPLATE: "timeline"}
+
+    sources = _timeline_recorder_sources(state, config)
+
+    assert sources == {"Room Temp": "sensor.room_temp"}
+
+
+def test_recorder_sources_excludes_attribute_single_series():
+    """A value_attribute single-series has no recorder source (attributes are stripped)."""
+    state = _make_state("on", {"friendly_name": "Lamp"}, "light.lamp")
+    config = {CONF_TEMPLATE: "timeline", CONF_VALUE_ATTRIBUTE: "brightness"}
+
+    assert _timeline_recorder_sources(state, config) == {}
+
+
+def test_recorder_sources_excludes_attribute_map_single():
+    """When CONF_SERIES (attribute map) is set, the single-series fallback is not added."""
+    state = _make_state("heating", {"friendly_name": "HVAC"}, "climate.hvac")
+    config = {CONF_TEMPLATE: "timeline", CONF_SERIES: {"current_temperature": "Indoor"}}
+
+    assert _timeline_recorder_sources(state, config) == {}
 
 
 def test_companion_gauge_value_attribute_rescaled():

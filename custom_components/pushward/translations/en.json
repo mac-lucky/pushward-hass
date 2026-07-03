@@ -1265,6 +1265,7 @@
             "max_value": "Maximum Value",
             "unit": "Unit",
             "series": "Series",
+            "series_entities": "Series Entities",
             "scale": "Scale",
             "decimals": "Decimal Places",
             "smoothing": "Smooth Lines",
@@ -1327,11 +1328,12 @@
             "max_value": "Maximum value for the gauge range.",
             "unit": "Display unit shown next to the value (e.g. °C, %, kW). Max 32 characters.",
             "series": "Map entity attributes to named series. Format: attribute=Label, attribute2=Label2. Leave empty to use the entity's state as a single series.",
+            "series_entities": "Bind separate entities as named lines on one chart (e.g. a PM2.5 sensor per room). Format: [Label=]entity_id[:attribute], comma-separated. The label defaults to the entity's friendly name; read an attribute with entity_id:attribute. Combines with Series; up to 10 lines total.",
             "scale": "Y-axis scale mode for the sparkline chart.",
             "decimals": "Number of decimal places shown for values (0–10).",
             "smoothing": "Enable curve interpolation between data points for a smoother sparkline.",
             "thresholds": "Horizontal reference lines on the sparkline. Format: value:color:label. Example: 25:red:Hot, 18:blue:Cold. Max 5.",
-            "history_period": "Minutes of past data to seed the sparkline from Home Assistant's recorder. Set to 0 to start with no history.",
+            "history_period": "Minutes of past data to seed the sparkline when the activity starts. Numeric-state entities (plain sensors, value entities, and state-sourced series entities) backfill from Home Assistant's recorder; attribute-based series fill only from samples collected while the integration runs, because Home Assistant stopped recording most attributes in 2024.8. Set to 0 to start with no history.",
             "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
             "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
             "icon": "Override icon. Leave empty to use the entity’s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",
@@ -1387,7 +1389,8 @@
         "invalid_url": "URL must include a valid scheme. Use http(s):// or a custom app scheme like homeassistant://.",
         "silent_requires_http": "Silent webhook (foreground off) requires an http:// or https:// URL.",
         "invalid_gauge_range": "Minimum value must be less than maximum value.",
-        "tiles_required": "At least one tile is required for the board template."
+        "tiles_required": "At least one tile is required for the board template.",
+        "too_many_series": "A timeline supports at most 10 series in total (series attributes plus series entities)."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",
