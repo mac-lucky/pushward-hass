@@ -25,6 +25,7 @@ from custom_components.pushward.const import (
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_PRIMARY_SERIES,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
@@ -1365,6 +1366,85 @@ def test_map_content_timeline_multi_series():
 
     assert content["value"] == {"Current": 20.5, "Target": 22.0}
     assert content["unit"] == "\u00b0C"
+
+
+def test_map_content_timeline_primary_series_single_fallback():
+    """Single-series timelines mark the tracked entity's series as primary."""
+    state = _make_state("22.5", {"friendly_name": "Living Room Temp"})
+    config = {CONF_TEMPLATE: "timeline", CONF_ICON: "mdi:thermometer"}
+
+    content = map_content(state, config)
+
+    assert content["primary_series"] == "Living Room Temp"
+
+
+def test_map_content_timeline_primary_series_first_attribute_series():
+    """With attribute series configured, the first label is primary."""
+    state = _make_state(
+        "heating",
+        {"friendly_name": "HVAC", "current_temperature": 20.5, "target_temperature": 22.0},
+    )
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermostat",
+        CONF_SERIES: {"current_temperature": "Current", "target_temperature": "Target"},
+    }
+
+    content = map_content(state, config)
+
+    assert content["primary_series"] == "Current"
+
+
+def test_map_content_timeline_primary_series_explicit_override():
+    """An explicit primary series config wins over the auto pick."""
+    state = _make_state(
+        "heating",
+        {"friendly_name": "HVAC", "current_temperature": 20.5, "target_temperature": 22.0},
+    )
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:thermostat",
+        CONF_SERIES: {"current_temperature": "Current", "target_temperature": "Target"},
+        CONF_PRIMARY_SERIES: "Target",
+    }
+
+    content = map_content(state, config)
+
+    assert content["primary_series"] == "Target"
+
+
+def test_map_content_timeline_primary_series_first_series_entity():
+    """With only series entities configured, the first label is primary."""
+    anchor = _make_state("42", {"friendly_name": "Air Monitor"})
+    aqi = _make_state("42", {}, "sensor.aqi")
+    temp = _make_state("21.5", {}, "sensor.temp")
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_ICON: "mdi:air-filter",
+        CONF_SERIES_ENTITIES: [
+            {CONF_LABEL: "Air Quality", CONF_ENTITY_ID: "sensor.aqi"},
+            {CONF_LABEL: "Temperature", CONF_ENTITY_ID: "sensor.temp"},
+        ],
+    }
+
+    content = map_content(
+        anchor,
+        config,
+        hass=_FakeHass({"sensor.aqi": aqi, "sensor.temp": temp}),
+    )
+
+    assert content["primary_series"] == "Air Quality"
+
+
+def test_map_content_timeline_primary_series_long_label_omitted():
+    """Labels over the server's 32-char key cap are not sent as primary."""
+    long_name = "x" * 33
+    state = _make_state("22.5", {"friendly_name": long_name})
+    config = {CONF_TEMPLATE: "timeline", CONF_ICON: "mdi:thermometer"}
+
+    content = map_content(state, config)
+
+    assert "primary_series" not in content
 
 
 def test_map_content_timeline_multi_series_partial():

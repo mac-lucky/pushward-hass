@@ -56,6 +56,10 @@ CONF_SERIES = "series"
 # time (the server merges series by label); the config flow edits them as a
 # comma-separated `[Label=]entity_id[:attribute]` string (mirrors board tiles).
 CONF_SERIES_ENTITIES = "series_entities"
+# Timeline template: label of the series whose value drives the headline number
+# and the compact high/low range on iOS. Empty = auto (the tracked entity's own
+# series when one exists, else the first configured series entity).
+CONF_PRIMARY_SERIES = "primary_series"
 CONF_SCALE = "scale"
 CONF_DECIMALS = "decimals"
 CONF_SMOOTHING = "smoothing"

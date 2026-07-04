@@ -46,6 +46,7 @@ from .const import (
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_PRIMARY_SERIES,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
@@ -598,6 +599,9 @@ def map_content(
         units = _get_timeline_units(entity_config, values, hass)
         if units:
             content["units"] = units
+        primary = _get_timeline_primary(state, entity_config)
+        if primary and len(primary) <= 32:
+            content["primary_series"] = primary
         content["progress"] = 0.0
     elif template == "board":
         tiles = _build_board_tiles(entity_config, hass)
@@ -952,6 +956,26 @@ def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant 
         _LOGGER.debug("Could not parse timeline value for %s", state.entity_id)
         return {}
     return {label: value}
+
+
+def _get_timeline_primary(state: State, entity_config: dict) -> str | None:
+    """Pick the primary series label for a timeline template.
+
+    An explicit CONF_PRIMARY_SERIES wins. Otherwise the tracked entity's own
+    series takes precedence: the first CONF_SERIES attribute label when any is
+    configured, then the first CONF_SERIES_ENTITIES label, and finally the
+    tracked entity's friendly name (the single-series fallback label used by
+    _get_timeline_values).
+    """
+    explicit = (entity_config.get(CONF_PRIMARY_SERIES) or "").strip()
+    if explicit:
+        return explicit
+    for label in (entity_config.get(CONF_SERIES) or {}).values():
+        return label
+    for series in entity_config.get(CONF_SERIES_ENTITIES) or []:
+        if isinstance(series, dict) and series.get(CONF_LABEL):
+            return series[CONF_LABEL]
+    return state.attributes.get("friendly_name", state.entity_id)
 
 
 def _get_timeline_units(

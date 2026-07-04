@@ -62,6 +62,7 @@ from .const import (
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_PRIMARY_SERIES,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
@@ -501,6 +502,12 @@ def _details_schema(
                 default=d.get(CONF_UNITS, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_PRIMARY_SERIES,
+                default=d.get(CONF_PRIMARY_SERIES, ""),
+            )
+        ] = vol.All(str, vol.Length(max=32))
         fields[_entity_source_key(CONF_VALUE_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
@@ -1196,6 +1203,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
         CONF_SERIES: series,
         CONF_SERIES_ENTITIES: series_entities,
+        CONF_PRIMARY_SERIES: (user_input.get(CONF_PRIMARY_SERIES) or "").strip(),
         CONF_SCALE: user_input.get(CONF_SCALE, DEFAULT_SCALE),
         CONF_DECIMALS: user_input.get(CONF_DECIMALS, DEFAULT_DECIMALS),
         CONF_SMOOTHING: user_input.get(CONF_SMOOTHING, False),

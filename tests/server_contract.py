@@ -301,6 +301,12 @@ def _assert_timeline(content: dict, where: str) -> None:
         if not _is_finite_number(v):
             _fail(where, f"timeline values[{key!r}] must be a finite number, got {v!r}")
 
+    primary = content.get("primary_series")
+    if primary is not None:
+        if not isinstance(primary, str):
+            _fail(where, f"timeline primary_series must be a string, got {type(primary).__name__}")
+        _check_len(primary, TIMELINE_VALUE_KEY_MAX, "primary_series", where)
+
     scale = content.get("scale")
     if scale not in (None, "") and scale not in SCALES:
         _fail(where, f"timeline scale must be one of {SCALES}, got {scale!r}")

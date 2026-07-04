@@ -128,6 +128,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Unit | Display unit (e.g. °C, %) |
 | Series | Attribute->label mapping for a multi-series timeline |
 | Series Entities | `[Label=]entity_id[:attribute]`, comma-separated, max 10 total - bind separate entities as timeline lines |
+| Primary Series | Label of the series shown as the headline value and used for the compact high/low range; empty = the tracked entity's own series (or the first configured one) |
 | Scale / Decimal Places / Smooth Lines / Thresholds | Timeline sparkline options |
 | Back-History Period | Minutes of history to seed the sparkline on start (0–1440) |
 | Board Tiles | `Label=entity_id[:attribute[:unit[:icon]]]`, comma-separated, max 4 (board template) |
