@@ -803,6 +803,10 @@
           "name": "Units Map",
           "description": "Per-series unit labels. Keys must match value dict keys. Timeline template only."
         },
+        "primary_series": {
+          "name": "Primary Series",
+          "description": "Label of the series shown as the headline value and used for the compact high/low range. Leave empty to keep the auto-picked series. Max 32 characters. Timeline template only."
+        },
         "scale": {
           "name": "Scale",
           "description": "Y-axis scale mode (linear or logarithmic). Timeline template only."
@@ -1254,6 +1258,7 @@
             "progress_attribute": "Progress Attribute",
             "remaining_time_entity": "Remaining Time Entity",
             "remaining_time_attribute": "Remaining Time Attribute",
+            "live_progress": "Live Progress ETA",
             "total_steps": "Total Steps",
             "current_step_entity": "Current Step Entity",
             "current_step_attribute": "Current Step Attribute",
@@ -1318,6 +1323,7 @@
             "progress_attribute": "Attribute holding a 0–100 progress value (on the source entity, or the tracked entity if no source is set). Example: percentage",
             "remaining_time_entity": "Read remaining time from a separate entity (e.g. a washer's time sensor). Leave empty to use the tracked entity. Auto-parses a timestamp (finish-time) sensor, a duration sensor with units, an H:MM:SS string, or plain seconds.",
             "remaining_time_attribute": "Attribute holding remaining time (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state. Example: remaining",
+            "live_progress": "Fill the progress bar smoothly and count down an ETA to the finish time on the device, using the remaining-time source above. Needs a remaining-time entity or attribute. Generic template only.",
             "total_steps": "Total number of steps.",
             "current_step_entity": "Read the current step from a separate entity. Leave empty to use the tracked entity.",
             "current_step_attribute": "Attribute holding the current step as an integer (on the source entity, or the tracked entity if no source is set).",

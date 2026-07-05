@@ -42,6 +42,7 @@ from .const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_LABEL,
+    CONF_LIVE_PROGRESS,
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
@@ -614,6 +615,16 @@ def map_content(
         # full ring buffer (newest-first) when one has accumulated.
         content["lines"] = [_build_log_line(state, entity_config, hass)]
         content["progress"] = 0.0
+    elif template == "generic" and entity_config.get(CONF_LIVE_PROGRESS):
+        # Opt-in: hand the end time to iOS so it interpolates the progress bar to
+        # 1.0 by end_date and shows a counting-down ETA. A timestamp source gives
+        # an absolute end; otherwise derive it from the remaining seconds. Emit
+        # only for a future end (a past/absent end wouldn't animate).
+        if absolute_end is not None or remaining is not None:
+            end = absolute_end if absolute_end is not None else now + remaining
+            if end > now:
+                content["live_progress"] = True
+                content["end_date"] = end
 
     return content
 
@@ -672,6 +683,10 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         # The server requires ≥1 line even on the ENDED frame — carry the last
         # rendered lines (newest-first) so the log doesn't blank out on completion.
         content["lines"] = last_content["lines"]
+    elif template == "generic" and last_content and last_content.get("live_progress"):
+        # The activity is done, so stop the opt-in ETA interpolation. Without this
+        # it keeps counting toward a now-past end_date on the completion frame.
+        content["live_progress"] = False
 
     if last_content:
         for key in _COMMON_CARRY_FIELDS:

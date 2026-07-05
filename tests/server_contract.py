@@ -193,7 +193,9 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     for field in ("tap_action", "url_action", "secondary_url_action"):
         _check_tap_action(content.get(field), field, where)
 
-    if template == "countdown":
+    if template == "generic":
+        _assert_generic(content, where)
+    elif template == "countdown":
         _assert_countdown(content, where)
     elif template == "steps":
         _assert_steps(content, where)
@@ -207,6 +209,22 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
         _assert_board(content, where)
     elif template == "log":
         _assert_log(content, where)
+
+
+def _assert_generic(content: dict, where: str) -> None:
+    # live_progress is a generic-only opt-in that pairs with a future end_date so
+    # iOS interpolates the bar to 1.0 and counts down an ETA.
+    live_progress = content.get("live_progress")
+    if live_progress is not None and not isinstance(live_progress, bool):
+        _fail(where, f"live_progress must be a bool, got {live_progress!r}")
+    end_date = content.get("end_date")
+    if end_date is not None:
+        if not _is_int(end_date) or end_date <= 0:
+            _fail(where, f"generic end_date must be a positive timestamp, got {end_date!r}")
+        if end_date > _now() + MAX_FUTURE_OFFSET:
+            _fail(where, f"generic end_date must be within 5 years of now, got {end_date}")
+    if live_progress and (not _is_int(end_date) or end_date <= _now()):
+        _fail(where, f"live_progress requires a future end_date, got {end_date!r}")
 
 
 def _assert_countdown(content: dict, where: str) -> None:

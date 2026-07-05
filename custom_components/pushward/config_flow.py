@@ -58,6 +58,7 @@ from .const import (
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
     CONF_LABEL_ATTRIBUTE,
+    CONF_LIVE_PROGRESS,
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
@@ -404,6 +405,15 @@ def _details_schema(
                 description={"suggested_value": d.get(CONF_REMAINING_TIME_ATTR, "")},
             )
         ] = attr_selector
+    if template == "generic":
+        # Only meaningful with a remaining-time source above: interpolate the bar
+        # to full and count down an ETA. Server accepts live_progress on generic only.
+        fields[
+            vol.Optional(
+                CONF_LIVE_PROGRESS,
+                default=d.get(CONF_LIVE_PROGRESS, False),
+            )
+        ] = BooleanSelector()
     if template == "steps":
         fields[
             vol.Optional(
@@ -1175,6 +1185,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_PROGRESS_ENTITY: user_input.get(CONF_PROGRESS_ENTITY, ""),
         CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
         CONF_REMAINING_TIME_ENTITY: user_input.get(CONF_REMAINING_TIME_ENTITY, ""),
+        CONF_LIVE_PROGRESS: bool(user_input.get(CONF_LIVE_PROGRESS, False)),
         CONF_SUBTITLE_ATTRIBUTE: user_input.get(CONF_SUBTITLE_ATTRIBUTE, ""),
         CONF_SUBTITLE_ENTITY: user_input.get(CONF_SUBTITLE_ENTITY, ""),
         CONF_STATE_LABELS: _parse_state_labels(user_input.get(CONF_STATE_LABELS, "")),

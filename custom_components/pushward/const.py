@@ -25,6 +25,9 @@ CONF_END_STATES = "end_states"
 CONF_UPDATE_INTERVAL = "update_interval"
 CONF_PROGRESS_ATTRIBUTE = "progress_attribute"
 CONF_REMAINING_TIME_ATTR = "remaining_time_attribute"
+# Generic template opt-in: with a remaining-time source, interpolate the progress
+# bar toward 1.0 by end_date and show a counting-down ETA (server field live_progress).
+CONF_LIVE_PROGRESS = "live_progress"
 CONF_ACCENT_COLOR = "accent_color"
 CONF_TOTAL_STEPS = "total_steps"
 CONF_CURRENT_STEP_ATTR = "current_step_attribute"

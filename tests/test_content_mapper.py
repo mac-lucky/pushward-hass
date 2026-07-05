@@ -1,5 +1,6 @@
 """Tests for the PushWard content mapper."""
 
+import time
 from unittest.mock import patch
 
 import pytest
@@ -21,6 +22,7 @@ from custom_components.pushward.const import (
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_LABEL,
+    CONF_LIVE_PROGRESS,
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
@@ -251,6 +253,58 @@ def test_map_content_with_accent_color():
     assert content["accent_color"] == "red"
 
 
+# --- generic live_progress ---
+
+
+def test_map_content_generic_live_progress_on():
+    state = _make_state("on", {"friendly_name": "Dishwasher", "remaining": 3600}, entity_id="switch.dishwasher")
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "washer",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+        CONF_LIVE_PROGRESS: True,
+    }
+
+    now = int(time.time())
+    content = map_content(state, config)
+
+    assert content["live_progress"] is True
+    assert content["remaining_time"] == 3600
+    # end_date = the mapper's own clock read + remaining, so it lands within a
+    # second or two of now + 3600.
+    assert abs(content["end_date"] - (now + 3600)) <= 2
+    assert_valid_activity_content(content)
+
+
+def test_map_content_generic_live_progress_off_omits_fields():
+    state = _make_state("on", {"friendly_name": "Dishwasher", "remaining": 3600}, entity_id="switch.dishwasher")
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "washer",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+        CONF_LIVE_PROGRESS: False,
+    }
+
+    content = map_content(state, config)
+
+    assert "live_progress" not in content
+    assert "end_date" not in content
+    assert content["remaining_time"] == 3600
+    assert_valid_activity_content(content)
+
+
+def test_map_content_generic_live_progress_no_remaining_source_omitted():
+    state = _make_state("on", {"friendly_name": "Dishwasher"}, entity_id="switch.dishwasher")
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_LIVE_PROGRESS: True}
+
+    content = map_content(state, config)
+
+    # No remaining-time source -> no derivable end -> nothing emitted.
+    assert "live_progress" not in content
+    assert "end_date" not in content
+    assert_valid_activity_content(content)
+
+
 # --- map_completion_content ---
 
 
@@ -278,6 +332,25 @@ def test_map_completion_content_preserves_last():
     assert content["state"] == "Complete"
     assert content["icon"] == "checkmark.circle.fill"
     assert content["accent_color"] == "green"
+
+
+def test_map_completion_content_generic_stops_live_progress():
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer"}
+    last = {"template": "generic", "progress": 0.4, "live_progress": True, "end_date": int(time.time()) + 3600}
+
+    content = map_completion_content(config, last_content=last)
+
+    # Completion must switch interpolation off so the done card stops counting down.
+    assert content["live_progress"] is False
+    assert_valid_activity_content(content)
+
+
+def test_map_completion_content_generic_without_live_progress_stays_absent():
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer"}
+
+    content = map_completion_content(config, last_content={"template": "generic", "progress": 0.5})
+
+    assert "live_progress" not in content
 
 
 # --- get_domain_defaults ---

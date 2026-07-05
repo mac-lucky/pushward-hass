@@ -745,7 +745,7 @@ async def test_update_activity_gauge_rejects_dict_value(hass: HomeAssistant) -> 
 
 
 async def test_update_activity_timeline_forwards_fields(hass: HomeAssistant) -> None:
-    """Timeline-specific fields (units, scale, decimals, smoothing, thresholds) are forwarded."""
+    """Timeline-specific fields (units, primary_series, scale, decimals, smoothing, thresholds) are forwarded."""
     api = _mock_api()
     await _setup_entry(hass, api)
 
@@ -755,8 +755,9 @@ async def test_update_activity_timeline_forwards_fields(hass: HomeAssistant) -> 
         {
             "slug": "t",
             "state": "ongoing",
-            "value": {"Temp": 22.5},
+            "value": {"Temp": 22.5, "Humidity": 40},
             "units": {"Temp": "°C"},
+            "primary_series": "Humidity",
             "scale": "linear",
             "decimals": 2,
             "smoothing": True,
@@ -768,6 +769,7 @@ async def test_update_activity_timeline_forwards_fields(hass: HomeAssistant) -> 
     content = api.update_activity.call_args[0][2]
     assert content["template"] == "timeline"
     assert content["units"] == {"Temp": "°C"}
+    assert content["primary_series"] == "Humidity"
     assert content["scale"] == "linear"
     assert content["decimals"] == 2
     assert content["smoothing"] is True

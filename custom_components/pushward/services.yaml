@@ -1014,6 +1014,10 @@ update_activity_timeline:
         units:
           selector:
             object:
+        primary_series:
+          example: "CPU"
+          selector:
+            text:
         scale:
           example: "linear"
           selector:

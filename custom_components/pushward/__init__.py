@@ -203,6 +203,8 @@ _TIMELINE_TEMPLATE_FIELDS = {
     vol.Optional("value"): vol.Any(vol.Coerce(float), dict),
     vol.Optional("unit"): str,
     vol.Optional("units"): dict,
+    # Override the headline series (else the mapper auto-picks it). Server caps it at 32.
+    vol.Optional("primary_series"): vol.All(str, vol.Length(max=32)),
     vol.Optional("scale"): vol.In(SCALES),
     vol.Optional("decimals"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
     vol.Optional("smoothing"): bool,
