@@ -4,6 +4,7 @@ import pytest
 
 from custom_components.pushward.api import (
     PushWardForbiddenError,
+    PushWardNotFoundError,
     PushWardWidgetPermissionError,
 )
 
@@ -63,6 +64,17 @@ async def test_patch_widget_sends_merge_body():
     assert method == "PATCH"
     assert url.endswith("/widgets/ha-users")
     assert session.request.call_args[1]["json"] == {"content": {"value": 43.0}}
+
+
+async def test_patch_widget_404_raises_not_found():
+    """A PATCH against a missing widget raises the typed 404 error for recovery."""
+    resp = _mock_response(404, text="widget not found")
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardNotFoundError) as ex:
+        await client.patch_widget("ha-users", {"content": {"value": 43.0}})
+    assert ex.value.status_code == 404
 
 
 async def test_delete_widget_treats_404_as_success():

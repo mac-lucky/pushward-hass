@@ -11,6 +11,7 @@ from homeassistant.core import HomeAssistant
 from custom_components.pushward.api import (
     PushWardApiError,
     PushWardAuthError,
+    PushWardNotFoundError,
     PushWardWidgetPermissionError,
 )
 from custom_components.pushward.const import (
@@ -160,6 +161,32 @@ async def test_state_change_patches_only_when_changed(hass: HomeAssistant) -> No
     hass.states.async_set("sensor.users", "43")
     await hass.async_block_till_done()
     api.patch_widget.assert_not_called()
+
+    await manager.async_stop()
+
+
+async def test_patch_404_recreates_widget(hass: HomeAssistant) -> None:
+    """A PATCH that 404s (widget gone server-side) self-heals via a recreate POST."""
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()  # initial create
+    assert api.create_widget.await_count == 1
+
+    # Server has since lost the widget; the next PATCH 404s.
+    api.reset_mock()
+    api.patch_widget = AsyncMock(side_effect=PushWardNotFoundError("widget not found", status_code=404))
+
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+
+    # PATCH was attempted once, then recovered by re-POSTing the fresh content.
+    assert api.patch_widget.await_count == 1
+    api.create_widget.assert_awaited_once()
+    assert api.create_widget.call_args.kwargs["content"]["value"] == 43.0
+    assert manager._tracked["ha-users"].created is True
 
     await manager.async_stop()
 

@@ -35,6 +35,7 @@ from .api import (
     PushWardApiError,
     PushWardAuthError,
     PushWardForbiddenError,
+    PushWardNotFoundError,
     PushWardWidgetPermissionError,
 )
 from .const import (
@@ -295,6 +296,22 @@ class WidgetManager:
 
     # ----- core send -----
 
+    async def _create_widget(self, tracked: TrackedWidget, content: dict) -> None:
+        """POST /widgets (create-or-upsert) and mark the widget as created.
+
+        Shared by the initial sync, the deferred-create branch, and the 404
+        recovery path so the name/push_throttle resolution lives in one place.
+        """
+        cfg = tracked.config
+        await self._api.create_widget(
+            slug=cfg[CONF_SLUG],
+            name=widget_name_from_config(cfg, self._hass),
+            template=cfg[CONF_WIDGET_TEMPLATE],
+            content=content,
+            push_throttle=self._compute_push_throttle(cfg),
+        )
+        tracked.created = True
+
     async def _initial_sync(self, tracked: TrackedWidget) -> None:
         """POST /widgets once on setup so server config matches HA on every restart."""
         cfg = tracked.config
@@ -321,18 +338,8 @@ class WidgetManager:
             )
             return
 
-        name = widget_name_from_config(cfg, self._hass)
-        push_throttle = self._compute_push_throttle(cfg)
-
         async with self._api_error_guard(slug, "creating"):
-            await self._api.create_widget(
-                slug=slug,
-                name=name,
-                template=template,
-                content=content,
-                push_throttle=push_throttle,
-            )
-            tracked.created = True
+            await self._create_widget(tracked, content)
             tracked.last_content = content
             self._clear_forbidden_notification(slug)
             self._schedule_cache_save()
@@ -360,22 +367,20 @@ class WidgetManager:
         async with self._api_error_guard(slug, "updating"):
             if not tracked.created:
                 # First successful render after a deferred initial POST.
-                name = widget_name_from_config(cfg, self._hass)
-                push_throttle = self._compute_push_throttle(cfg)
-                await self._api.create_widget(
-                    slug=slug,
-                    name=name,
-                    template=template,
-                    content=content,
-                    push_throttle=push_throttle,
-                )
-                tracked.created = True
+                await self._create_widget(tracked, content)
             else:
                 patch_body: dict = {"content": content}
                 push_throttle = self._compute_push_throttle(cfg)
                 if push_throttle is not None:
                     patch_body["push_throttle"] = push_throttle
-                await self._api.patch_widget(slug, patch_body)
+                try:
+                    await self._api.patch_widget(slug, patch_body)
+                except PushWardNotFoundError:
+                    # The server has no row for this slug (deleted out-of-band, or our
+                    # cached created=True outlived the server state). Reconcile by
+                    # recreating it so updates self-heal instead of 404ing forever.
+                    _LOGGER.info("Widget %s missing server-side on update; recreating", slug)
+                    await self._create_widget(tracked, content)
 
             tracked.last_content = content
             self._clear_forbidden_notification(slug)

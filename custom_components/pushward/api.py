@@ -29,6 +29,15 @@ class PushWardAuthError(PushWardApiError):
     """PushWard authentication error — 401, bad/expired integration key."""
 
 
+class PushWardNotFoundError(PushWardApiError):
+    """PushWard 404 - the targeted resource does not exist server-side.
+
+    Raised for a PATCH/GET against a slug the server has no row for (e.g. a
+    widget that was never created, or was deleted). Callers that opt into
+    404 tolerance (allow_404) never see this; others can catch it to recreate
+    the resource. Subclasses PushWardApiError so existing handlers still work."""
+
+
 class PushWardForbiddenError(PushWardApiError):
     """PushWard 403 — server-side policy rejection (subscription lapsed,
     slug scope, shared-activity, etc.). Not an auth failure — do not reauth."""
@@ -347,10 +356,13 @@ class PushWardApiClient:
                         # Other 4xx — don't retry
                         if 400 <= resp.status < 500:
                             _, detail, raw = await self._parse_problem(resp)
-                            raise PushWardApiError(
-                                f"{method} {path} failed ({resp.status}): {self._truncate(detail or raw)}",
-                                status_code=resp.status,
-                            )
+                            message = f"{method} {path} failed ({resp.status}): {self._truncate(detail or raw)}"
+                            # A 404 that reached here means the caller didn't opt into
+                            # allow_404, so a missing resource is a typed error the caller
+                            # can catch to recreate it (e.g. widget PATCH -> recreate).
+                            if resp.status == HTTPStatus.NOT_FOUND:
+                                raise PushWardNotFoundError(message, status_code=resp.status)
+                            raise PushWardApiError(message, status_code=resp.status)
 
                         # 5xx — retry
                         last_error = PushWardApiError(
