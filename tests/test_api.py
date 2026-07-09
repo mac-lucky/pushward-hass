@@ -2,18 +2,26 @@
 
 import asyncio
 import json
+from datetime import UTC, datetime, timedelta
+from email.utils import format_datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 import pytest
 
 from custom_components.pushward.api import (
+    PushWardApiClient,
     PushWardApiError,
     PushWardAuthError,
     PushWardEmailPermissionError,
     PushWardForbiddenError,
 )
-from custom_components.pushward.const import MAX_CONCURRENT_REQUESTS
+from custom_components.pushward.const import (
+    MAX_CONCURRENT_REQUESTS,
+    MAX_RETRIES,
+    RETRY_BASE_DELAY,
+    RETRY_MAX_DELAY,
+)
 
 from .conftest import make_api_client as _make_client
 from .conftest import make_mock_response as _mock_response
@@ -388,6 +396,58 @@ async def test_4xx_error_body_truncated_in_exception(mock_sleep):
     assert "…" in msg
     assert "x" * 200 in msg
     assert "x" * 201 not in msg
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_all_429_exhaustion_raises_api_error(mock_sleep):
+    """Exhausting every retry on 429 raises a typed error, not TypeError from `raise None`."""
+    session = _make_session(*[_mock_response(429) for _ in range(MAX_RETRIES)])
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError, match="429") as excinfo:
+        await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
+
+    assert excinfo.value.status_code == 429
+    assert session.request.call_count == MAX_RETRIES
+    # No wasted sleep after the final attempt.
+    assert mock_sleep.await_count == MAX_RETRIES - 1
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_all_5xx_exhaustion_raises_api_error(mock_sleep):
+    session = _make_session(*[_mock_response(500, text="boom") for _ in range(MAX_RETRIES)])
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError, match="500") as excinfo:
+        await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
+
+    assert excinfo.value.status_code == 500
+    assert session.request.call_count == MAX_RETRIES
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_retry_after_http_date(mock_sleep):
+    """Retry-After in HTTP-date form is honored as a relative delay."""
+    header = format_datetime(datetime.now(UTC) + timedelta(seconds=5), usegmt=True)
+    session = _make_session(
+        _mock_response(429, headers={"Retry-After": header}),
+        _mock_response(200),
+    )
+    client = _make_client(session)
+
+    await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
+
+    delay = mock_sleep.call_args_list[0].args[0]
+    assert 0 < delay <= 5
+
+
+def test_backoff_delay_jitter_bounds():
+    """Backoff stays within [base/2, base] so retries never sync in lockstep."""
+    for attempt in range(6):
+        base = min(RETRY_BASE_DELAY * (2**attempt), RETRY_MAX_DELAY)
+        for _ in range(50):
+            delay = PushWardApiClient._backoff_delay(attempt)
+            assert base * 0.5 <= delay <= base
 
 
 async def test_4xx_problem_detail_surfaced():

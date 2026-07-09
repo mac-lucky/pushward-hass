@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import random
 import time
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
@@ -75,10 +76,7 @@ class PushWardApiClient:
         self._base_url = base_url.rstrip("/")
         self._integration_key = integration_key
         self._request_semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
-
-    @property
-    def _headers(self) -> dict[str, str]:
-        return {"Authorization": f"Bearer {self._integration_key}"}
+        self._headers = {"Authorization": f"Bearer {self._integration_key}"}
 
     async def validate_connection(self) -> bool:
         """Validate the connection and integration key via GET /auth/me."""
@@ -346,11 +344,16 @@ class PushWardApiClient:
                             )
 
                         if resp.status == HTTPStatus.TOO_MANY_REQUESTS:
-                            delay = self._parse_retry_after(resp.headers.get("Retry-After", ""))
-                            if delay <= 0:
-                                delay = self._backoff_delay(attempt)
-                            _LOGGER.debug("Rate limited, retrying in %.1fs", delay)
-                            await asyncio.sleep(delay)
+                            last_error = PushWardApiError(
+                                f"{method} {path} rate limited (429)",
+                                status_code=resp.status,
+                            )
+                            if attempt < MAX_RETRIES - 1:
+                                delay = self._parse_retry_after(resp.headers.get("Retry-After", ""))
+                                if delay <= 0:
+                                    delay = self._backoff_delay(attempt)
+                                _LOGGER.debug("Rate limited, retrying in %.1fs", delay)
+                                await asyncio.sleep(delay)
                             continue
 
                         # Other 4xx — don't retry
@@ -384,11 +387,15 @@ class PushWardApiClient:
                     )
                     await asyncio.sleep(delay)
 
-            raise last_error  # type: ignore[misc]
+            if last_error is None:
+                last_error = PushWardApiError(f"{method} {path} failed after {MAX_RETRIES} attempts")
+            raise last_error
 
     @staticmethod
     def _backoff_delay(attempt: int) -> float:
-        return min(RETRY_BASE_DELAY * (2**attempt), RETRY_MAX_DELAY)
+        delay = min(RETRY_BASE_DELAY * (2**attempt), RETRY_MAX_DELAY)
+        # Jitter so many clients rate-limited together do not retry in lockstep.
+        return delay * (0.5 + random.random() * 0.5)
 
     @staticmethod
     def _parse_retry_after(header: str) -> float:
