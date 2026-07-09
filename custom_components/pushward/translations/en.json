@@ -1323,7 +1323,7 @@
             "progress_attribute": "Attribute holding a 0–100 progress value (on the source entity, or the tracked entity if no source is set). Example: percentage",
             "remaining_time_entity": "Read remaining time from a separate entity (e.g. a washer's time sensor). Leave empty to use the tracked entity. Auto-parses a timestamp (finish-time) sensor, a duration sensor with units, an H:MM:SS string, or plain seconds.",
             "remaining_time_attribute": "Attribute holding remaining time (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state. Example: remaining",
-            "live_progress": "Fill the progress bar smoothly and count down an ETA to the finish time on the device, using the remaining-time source above. Needs a remaining-time entity or attribute. Generic template only.",
+            "live_progress": "Fill the progress bar smoothly and count down an ETA to the finish time on the device, using the remaining-time source above. Needs a remaining-time entity or attribute. On the steps template it fills the current step rather than the whole run.",
             "total_steps": "Total number of steps.",
             "current_step_entity": "Read the current step from a separate entity. Leave empty to use the tracked entity.",
             "current_step_attribute": "Attribute holding the current step as an integer (on the source entity, or the tracked entity if no source is set).",

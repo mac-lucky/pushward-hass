@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import math
 import re
 import time
 from urllib.parse import urlparse
@@ -91,6 +92,7 @@ from .const import (
     DEFAULT_TOTAL_STEPS,
     DEVICE_CLASS_ICONS,
     DOMAIN_DEFAULTS,
+    LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_COLUMN_VALUE_MAX,
     LOG_LEVELS,
@@ -468,18 +470,91 @@ def _build_board_tiles(entity_config: dict, hass: HomeAssistant | None) -> list[
     return tiles_out
 
 
+def _resolve_live_end(now: int, remaining: int | None, absolute_end: int | None) -> int | None:
+    """Resolve the epoch live_progress animates toward, or None when nothing can.
+
+    A timestamp source pins an absolute end so it doesn't drift as the clock ticks;
+    otherwise derive it from the remaining seconds against the shared ``now``. A past
+    or absent end wouldn't animate.
+    """
+    if absolute_end is None and remaining is None:
+        return None
+    end = absolute_end if absolute_end is not None else now + remaining
+    return end if end > now else None
+
+
+def _apply_steps_live_progress(
+    content: dict,
+    last_content: dict | None,
+    *,
+    now: int,
+    remaining: int | None,
+    absolute_end: int | None,
+) -> None:
+    """Anchor the steps live_progress animation to the current step's window.
+
+    On steps, end_date is the end of the *current* step and the bar fills across
+    start_date..end_date. HA only knows how much time is left, so the step's
+    start has to be remembered: it is the moment current_step last changed. Carry
+    the previous frame's start_date forward while the step number holds, and
+    restamp it to now when the step advances.
+
+    Without the carry-forward a fresh start_date=now would ship on every update
+    and the bar would snap back to empty on each push.
+
+    The caller sets live_progress False first, so an early return here clears a
+    previously-armed animation rather than leaving it running under merge-patch.
+    """
+    end = _resolve_live_end(now, remaining, absolute_end)
+    if end is None:
+        return
+
+    prev = last_content or {}
+    same_step = prev.get("current_step") == content.get("current_step")
+
+    # A relative source re-derives end_date against the wall clock on every frame,
+    # so an unmoved deadline still emits a moving end_date. The server treats that
+    # as a structural change: a high-priority push that skips update coalescing.
+    # Keep the deadline already shipped until the source genuinely re-estimates.
+    prev_end = prev.get("end_date")
+    if (
+        absolute_end is None
+        and same_step
+        and type(prev_end) is int
+        and prev_end > now
+        and remaining == prev.get("remaining_time")
+    ):
+        end = prev_end
+
+    prev_start = prev.get("start_date")
+    start = prev_start if same_step and type(prev_start) is int else now
+    # time.time() is not monotonic: an NTP correction or a restored snapshot can
+    # move the clock behind the carried anchor and invert the window.
+    if start >= end:
+        start = now
+
+    content["live_progress"] = True
+    content["start_date"] = start
+    content["end_date"] = end
+
+
 def map_content(
     state: State,
     entity_config: dict,
     *,
     registry_icon: str | None = None,
     hass: HomeAssistant | None = None,
+    last_content: dict | None = None,
 ) -> dict:
     """Map HA state + attributes to a PushWard content dict.
 
     ``hass`` is required only when a value field is configured to read from a
     separate companion entity (CONF_*_ENTITY); without it those fields fall back
     to the tracked entity.
+
+    ``last_content`` is the previously sent frame. It is only read by the steps
+    template's live_progress anchor, which has to know when the current step
+    began; see ``_apply_steps_live_progress``.
     """
     # State label: use custom label if configured, else default formatting
     state_text = _format_state_label(state, entity_config)
@@ -558,6 +633,13 @@ def map_content(
         step_rows = entity_config.get(CONF_STEP_ROWS) or []
         if len(step_rows) == total:
             content["step_rows"] = [max(1, min(10, int(r))) for r in step_rows]
+        if entity_config.get(CONF_LIVE_PROGRESS):
+            # Updates are merge-patches: an omitted key preserves a prior
+            # live_progress=true against a now-expired end_date, leaving the bar
+            # animating toward a deadline that has passed. Clear it first; the
+            # anchor overwrites with True whenever it can derive a window.
+            content["live_progress"] = False
+            _apply_steps_live_progress(content, last_content, now=now, remaining=remaining, absolute_end=absolute_end)
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
         if label := entity_config.get(CONF_SEVERITY_LABEL):
@@ -617,14 +699,12 @@ def map_content(
         content["progress"] = 0.0
     elif template == "generic" and entity_config.get(CONF_LIVE_PROGRESS):
         # Opt-in: hand the end time to iOS so it interpolates the progress bar to
-        # 1.0 by end_date and shows a counting-down ETA. A timestamp source gives
-        # an absolute end; otherwise derive it from the remaining seconds. Emit
-        # only for a future end (a past/absent end wouldn't animate).
-        if absolute_end is not None or remaining is not None:
-            end = absolute_end if absolute_end is not None else now + remaining
-            if end > now:
-                content["live_progress"] = True
-                content["end_date"] = end
+        # 1.0 by end_date and shows a counting-down ETA. False first, for the same
+        # merge-patch reason as the steps branch above.
+        content["live_progress"] = False
+        if (end := _resolve_live_end(now, remaining, absolute_end)) is not None:
+            content["live_progress"] = True
+            content["end_date"] = end
 
     return content
 
@@ -683,9 +763,15 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         # The server requires ≥1 line even on the ENDED frame — carry the last
         # rendered lines (newest-first) so the log doesn't blank out on completion.
         content["lines"] = last_content["lines"]
-    elif template == "generic" and last_content and last_content.get("live_progress"):
-        # The activity is done, so stop the opt-in ETA interpolation. Without this
-        # it keeps counting toward a now-past end_date on the completion frame.
+
+    # The activity is done, so stop the opt-in ETA interpolation. Without this the
+    # completion card keeps filling toward a deadline that no longer means anything.
+    # Gate on the opt-in rather than on last_content: a frame whose remaining-time
+    # source went away omits live_progress, so the last frame is not a reliable
+    # record of whether the server still has it armed.
+    if template in LIVE_PROGRESS_TEMPLATES and (
+        entity_config.get(CONF_LIVE_PROGRESS) or (last_content and last_content.get("live_progress"))
+    ):
         content["live_progress"] = False
 
     if last_content:
@@ -847,13 +933,19 @@ def _coerce_remaining_seconds(
         value = float(raw)  # type: ignore[arg-type]
     except (ValueError, TypeError):
         return None, None
+    # float() accepts "nan"/"inf"; int() then raises ValueError/OverflowError, and
+    # map_content is called outside any error guard.
+    if not math.isfinite(value):
+        return None, None
 
     unit = source.attributes.get("unit_of_measurement") if source is not None else None
     if device_class == "duration" and unit:
         # Unknown/unsupported unit → treat the raw number as seconds.
         with contextlib.suppress(HomeAssistantError):
             value = DurationConverter.convert(value, str(unit), UnitOfTime.SECONDS)
-    return int(value), None
+    # An overrun estimate can report negative seconds; the server rejects those
+    # (remaining_time must be non-negative) and the activity would freeze.
+    return max(0, int(value)), None
 
 
 def _get_progress(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> float:

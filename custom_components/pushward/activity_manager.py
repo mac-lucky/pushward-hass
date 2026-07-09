@@ -528,6 +528,10 @@ class ActivityManager:
                 return
 
             tracked.registry_icon = self._get_registry_icon(entity_id)
+            # Deliberately no last_content: a (re)start must open a fresh
+            # live_progress window. Carrying the prior run's frame would resume its
+            # step clock, so a restart on the same step number would render the bar
+            # already part-filled. See content_mapper._apply_steps_live_progress.
             content = map_content(current_state, config, registry_icon=tracked.registry_icon, hass=self._hass)
 
             # A board needs >=1 renderable tile. If every tile entity is still
@@ -710,7 +714,13 @@ class ActivityManager:
         if current_state is None:
             return
 
-        content = map_content(current_state, tracked.config, registry_icon=tracked.registry_icon, hass=self._hass)
+        content = map_content(
+            current_state,
+            tracked.config,
+            registry_icon=tracked.registry_icon,
+            hass=self._hass,
+            last_content=tracked.last_content,
+        )
         # Inject the full log buffer before the dedup check so a new line counts as a change.
         self._apply_log_lines(tracked, content)
         # A board whose tile entities are all unavailable renders no tiles; the
@@ -745,6 +755,12 @@ class ActivityManager:
         tracked = self._tracked[entity_id]
         if tracked.end_task and not tracked.end_task.done():
             tracked.end_task.cancel()
+        # A flush armed just before the end would fire during the completion sleep
+        # and push live content back over the completion card -- re-arming a
+        # live_progress window moments before the end push clears it.
+        if tracked.flush_unsub:
+            tracked.flush_unsub()
+            tracked.flush_unsub = None
         tracked.end_task = self._hass.async_create_task(self._async_end_activity(entity_id))
 
     async def _async_end_activity(self, entity_id: str) -> None:

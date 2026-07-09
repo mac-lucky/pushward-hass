@@ -125,6 +125,7 @@ from .const import (
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
+    LIVE_PROGRESS_TEMPLATES,
     LOG_MAX_COLUMNS,
     MAX_LONG_TEXT_LEN,
     MAX_SLUG_LEN,
@@ -397,7 +398,9 @@ def _details_schema(
                 description={"suggested_value": d.get(CONF_PROGRESS_ATTRIBUTE, "")},
             )
         ] = attr_selector
-    if template in ("generic", "countdown"):
+    # live_progress derives its window from the remaining-time source, so every
+    # template offering the toggle below must offer the source here too.
+    if template == "countdown" or template in LIVE_PROGRESS_TEMPLATES:
         fields[_entity_source_key(CONF_REMAINING_TIME_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
@@ -405,9 +408,10 @@ def _details_schema(
                 description={"suggested_value": d.get(CONF_REMAINING_TIME_ATTR, "")},
             )
         ] = attr_selector
-    if template == "generic":
-        # Only meaningful with a remaining-time source above: interpolate the bar
-        # to full and count down an ETA. Server accepts live_progress on generic only.
+    if template in LIVE_PROGRESS_TEMPLATES:
+        # Interpolate the bar to full and count down an ETA on the device. On steps
+        # the remaining time is read as the time left in the current step, so the
+        # bar fills that step rather than the whole run.
         fields[
             vol.Optional(
                 CONF_LIVE_PROGRESS,

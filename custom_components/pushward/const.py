@@ -25,8 +25,13 @@ CONF_END_STATES = "end_states"
 CONF_UPDATE_INTERVAL = "update_interval"
 CONF_PROGRESS_ATTRIBUTE = "progress_attribute"
 CONF_REMAINING_TIME_ATTR = "remaining_time_attribute"
-# Generic template opt-in: with a remaining-time source, interpolate the progress
-# bar toward 1.0 by end_date and show a counting-down ETA (server field live_progress).
+# Templates the server accepts live_progress on (pushward-server Content.Validate).
+# Both derive the window from a remaining-time source, so the config flow must offer
+# one for every template listed here.
+LIVE_PROGRESS_TEMPLATES = ("generic", "steps")
+# Opt-in for the templates above: with a remaining-time source, interpolate the
+# progress bar toward 1.0 by end_date and show a counting-down ETA (server field
+# live_progress). On steps it fills the current step, not the whole run.
 CONF_LIVE_PROGRESS = "live_progress"
 CONF_ACCENT_COLOR = "accent_color"
 CONF_TOTAL_STEPS = "total_steps"

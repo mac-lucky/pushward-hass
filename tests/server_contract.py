@@ -94,6 +94,10 @@ MAX_TIMELINE_SERIES = TIMELINE_MAX_SERIES
 MAX_FUTURE_OFFSET = 5 * 365 * 24 * 3600 + 30 * 3600
 MAX_CLOCK_SKEW = 5 * 60
 
+# Restated rather than imported from const.py: this module deliberately re-states
+# the public REST contract from the outside, not the integration's own view of it.
+LIVE_PROGRESS_TEMPLATES = ("generic", "steps")
+
 _HTTP_SCHEMES = ("http", "https")
 _TRENDS = ("", WIDGET_TREND_UP, WIDGET_TREND_DOWN, WIDGET_TREND_FLAT)
 
@@ -193,6 +197,13 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     for field in ("tap_action", "url_action", "secondary_url_action"):
         _check_tap_action(content.get(field), field, where)
 
+    # Mirrors the server's Content.Validate() allowlist. Checked before the
+    # per-template dispatch, since the per-template asserts only run for the two
+    # templates that accept it -- a mapper leaking live_progress onto alert or
+    # countdown would otherwise pass here and 422 in production.
+    if content.get("live_progress") and template not in LIVE_PROGRESS_TEMPLATES:
+        _fail(where, f"live_progress is only supported by {sorted(LIVE_PROGRESS_TEMPLATES)}, got {template!r}")
+
     if template == "generic":
         _assert_generic(content, where)
     elif template == "countdown":
@@ -211,20 +222,29 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
         _assert_log(content, where)
 
 
-def _assert_generic(content: dict, where: str) -> None:
-    # live_progress is a generic-only opt-in that pairs with a future end_date so
-    # iOS interpolates the bar to 1.0 and counts down an ETA.
+def _assert_live_progress(content: dict, where: str, template: str) -> None:
+    """live_progress is a generic/steps opt-in pairing with a future end_date.
+
+    Generic fills the whole bar to 1.0 by end_date; steps fills the current step
+    across start_date..end_date. Deliberately at least as strict as the server: it
+    also requires end_date to be in the *future*, where the server accepts any
+    positive timestamp within five years.
+    """
     live_progress = content.get("live_progress")
     if live_progress is not None and not isinstance(live_progress, bool):
         _fail(where, f"live_progress must be a bool, got {live_progress!r}")
     end_date = content.get("end_date")
     if end_date is not None:
         if not _is_int(end_date) or end_date <= 0:
-            _fail(where, f"generic end_date must be a positive timestamp, got {end_date!r}")
+            _fail(where, f"{template} end_date must be a positive timestamp, got {end_date!r}")
         if end_date > _now() + MAX_FUTURE_OFFSET:
-            _fail(where, f"generic end_date must be within 5 years of now, got {end_date}")
+            _fail(where, f"{template} end_date must be within 5 years of now, got {end_date}")
     if live_progress and (not _is_int(end_date) or end_date <= _now()):
         _fail(where, f"live_progress requires a future end_date, got {end_date!r}")
+
+
+def _assert_generic(content: dict, where: str) -> None:
+    _assert_live_progress(content, where, "generic")
 
 
 def _assert_countdown(content: dict, where: str) -> None:
@@ -271,6 +291,14 @@ def _assert_steps(content: dict, where: str) -> None:
             _fail(where, f"step_labels length ({len(labels)}) must equal total_steps ({total})")
         for i, label in enumerate(labels):
             _check_len(label, STEP_LABEL_MAX, f"step_labels[{i}]", where)
+    _assert_live_progress(content, where, "steps")
+    # The animated window must be a real forward range, else iOS renders nothing.
+    start_date = content.get("start_date")
+    if content.get("live_progress"):
+        if not _is_int(start_date) or start_date <= 0:
+            _fail(where, f"steps live_progress requires a positive start_date, got {start_date!r}")
+        if start_date >= content["end_date"]:
+            _fail(where, f"steps start_date ({start_date}) must precede end_date ({content['end_date']})")
 
 
 def _assert_alert(content: dict, where: str) -> None:

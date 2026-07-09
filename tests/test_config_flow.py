@@ -55,6 +55,7 @@ from custom_components.pushward.const import (
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
+    CONF_LIVE_PROGRESS,
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
@@ -106,6 +107,7 @@ from custom_components.pushward.const import (
     DEFAULT_SERVER_URL,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
+    LIVE_PROGRESS_TEMPLATES,
     LOG_MAX_COLUMNS,
     SUBENTRY_TYPE_ENTITY,
     TIMELINE_MAX_SERIES,
@@ -684,8 +686,20 @@ async def test_subentry_steps_shows_steps_fields(hass: HomeAssistant) -> None:
     assert CONF_TOTAL_STEPS in schema_keys
     assert CONF_CURRENT_STEP_ATTR in schema_keys
     assert CONF_PROGRESS_ATTRIBUTE in schema_keys
-    assert CONF_REMAINING_TIME_ATTR not in schema_keys
+    # live_progress animates the current step across start_date..end_date, which is
+    # only derivable from a remaining-time source -- so steps must offer one.
+    assert CONF_LIVE_PROGRESS in schema_keys
+    assert CONF_REMAINING_TIME_ATTR in schema_keys
     assert CONF_SEVERITY not in schema_keys
+
+
+@pytest.mark.parametrize("template", LIVE_PROGRESS_TEMPLATES)
+def test_live_progress_templates_also_offer_a_remaining_time_source(template: str) -> None:
+    """A live_progress toggle without a remaining-time source can never fire."""
+    schema_keys = {str(k) for k in _details_schema("binary_sensor.washer", template, {}).schema}
+    assert CONF_LIVE_PROGRESS in schema_keys
+    assert CONF_REMAINING_TIME_ATTR in schema_keys
+    assert CONF_REMAINING_TIME_ENTITY in schema_keys
 
 
 async def test_subentry_alert_shows_severity(hass: HomeAssistant) -> None:

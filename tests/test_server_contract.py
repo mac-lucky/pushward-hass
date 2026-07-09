@@ -246,6 +246,28 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_log, lines=[{"text": "x", "at": 0}]), id="log_line_at_non_positive"),
     pytest.param(lambda: _mut(valid_log, lines=[{"text": "x", "at": 1.5}]), id="log_line_at_float"),
     pytest.param(lambda: _mut(valid_log, log_backlog=[{"text": "x"}]), id="log_backlog_must_not_be_sent"),
+    # live_progress: until these landed, _assert_live_progress had never rejected
+    # anything -- it could have returned unconditionally and the suite stayed green.
+    pytest.param(lambda: _mut(valid_generic, live_progress=True), id="generic_lp_missing_end_date"),
+    pytest.param(
+        lambda: _mut(valid_generic, live_progress=True, end_date=int(time.time()) - 10), id="generic_lp_past_end"
+    ),
+    pytest.param(lambda: _mut(valid_generic, live_progress=1), id="lp_not_a_bool"),
+    pytest.param(lambda: _mut(valid_countdown, live_progress=True), id="lp_on_unsupported_template"),
+    pytest.param(
+        lambda: _mut(valid_steps, live_progress=True, end_date=int(time.time()) + 600),
+        id="steps_lp_missing_start_date",
+    ),
+    pytest.param(
+        lambda: _mut(
+            valid_steps, live_progress=True, start_date=int(time.time()) + 700, end_date=int(time.time()) + 600
+        ),
+        id="steps_lp_start_after_end",
+    ),
+    pytest.param(
+        lambda: _mut(valid_steps, live_progress=True, start_date=int(time.time()) - 60, end_date=int(time.time()) - 10),
+        id="steps_lp_past_end",
+    ),
 ]
 
 
@@ -253,6 +275,14 @@ _ACTIVITY_INVALID = [
 def test_invalid_activity_payloads_rejected(builder) -> None:
     with pytest.raises(PushWardContractError):
         assert_valid_activity_content(builder())
+
+
+def test_valid_live_progress_payloads_pass() -> None:
+    now = int(time.time())
+    assert_valid_activity_content(_mut(valid_generic, live_progress=True, end_date=now + 600))
+    assert_valid_activity_content(_mut(valid_steps, live_progress=True, start_date=now, end_date=now + 600))
+    # Explicitly off needs no window: that is how a mid-run update stops the animation.
+    assert_valid_activity_content(_mut(valid_steps, live_progress=False))
 
 
 # --- widgets: valid payloads pass ------------------------------------------

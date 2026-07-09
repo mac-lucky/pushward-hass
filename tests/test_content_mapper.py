@@ -293,15 +293,193 @@ def test_map_content_generic_live_progress_off_omits_fields():
     assert_valid_activity_content(content)
 
 
-def test_map_content_generic_live_progress_no_remaining_source_omitted():
+def test_map_content_generic_live_progress_no_remaining_source_clears_it():
     state = _make_state("on", {"friendly_name": "Dishwasher"}, entity_id="switch.dishwasher")
     config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_LIVE_PROGRESS: True}
 
     content = map_content(state, config)
 
-    # No remaining-time source -> no derivable end -> nothing emitted.
-    assert "live_progress" not in content
+    # No derivable end. Updates are merge-patches, so omitting the key would leave a
+    # previously-armed animation running against a stale end_date; clear it instead.
+    assert content["live_progress"] is False
     assert "end_date" not in content
+    assert_valid_activity_content(content)
+
+
+# --- steps live_progress ---
+
+
+def _steps_live_config() -> dict:
+    return {
+        CONF_TEMPLATE: "steps",
+        CONF_ICON: "washer",
+        CONF_TOTAL_STEPS: 4,
+        CONF_CURRENT_STEP_ATTR: "step",
+        CONF_REMAINING_TIME_ATTR: "remaining",
+        CONF_LIVE_PROGRESS: True,
+    }
+
+
+def _steps_state(step: int, remaining: int = 5400):
+    return _make_state(
+        "on",
+        {"friendly_name": "Dishwasher", "step": step, "remaining": remaining},
+        entity_id="switch.dishwasher",
+    )
+
+
+def test_map_content_steps_live_progress_on():
+    now = int(time.time())
+    content = map_content(_steps_state(2), _steps_live_config())
+
+    assert content["live_progress"] is True
+    assert content["current_step"] == 2
+    # The step just started, so its window opens now and closes at now + remaining.
+    assert abs(content["start_date"] - now) <= 2
+    assert abs(content["end_date"] - (now + 5400)) <= 2
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_carries_start_date_within_a_step():
+    """The bar must not snap back to empty on every push."""
+    now = int(time.time())
+    last = {"current_step": 2, "start_date": now - 1200, "end_date": now + 4200}
+
+    content = map_content(_steps_state(2, remaining=4200), _steps_live_config(), last_content=last)
+
+    assert content["start_date"] == now - 1200
+    assert abs(content["end_date"] - (now + 4200)) <= 2
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_restamps_start_on_step_advance():
+    now = int(time.time())
+    last = {"current_step": 2, "start_date": now - 1200, "end_date": now + 4200}
+
+    content = map_content(_steps_state(3, remaining=900), _steps_live_config(), last_content=last)
+
+    assert content["current_step"] == 3
+    assert abs(content["start_date"] - now) <= 2
+    assert abs(content["end_date"] - (now + 900)) <= 2
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_off_omits_fields():
+    config = _steps_live_config() | {CONF_LIVE_PROGRESS: False}
+
+    content = map_content(_steps_state(2), config)
+
+    assert "live_progress" not in content
+    assert "start_date" not in content
+    assert "end_date" not in content
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_no_remaining_source_clears_it():
+    config = _steps_live_config()
+    del config[CONF_REMAINING_TIME_ATTR]
+    state = _make_state("on", {"friendly_name": "Dishwasher", "step": 2}, entity_id="switch.dishwasher")
+
+    content = map_content(state, config)
+
+    assert content["live_progress"] is False
+    assert "end_date" not in content
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_past_end_clears_it():
+    """A stalled step must stop animating, not keep filling toward a passed deadline.
+
+    Merge-patch means an omitted key preserves the server's prior live_progress=true.
+    """
+    content = map_content(_steps_state(2, remaining=0), _steps_live_config())
+
+    assert content["live_progress"] is False
+    assert "end_date" not in content
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_pins_end_date_when_remaining_unchanged():
+    """end_date = now + remaining drifts with the wall clock even when the deadline hasn't moved.
+
+    The server treats an end_date change as structural: a high-priority push that skips
+    coalescing. Pin the shipped deadline until the source genuinely re-estimates.
+    """
+    now = int(time.time())
+    last = {
+        "current_step": 2,
+        "remaining_time": 5400,
+        "start_date": now - 1200,
+        "end_date": now - 1200 + 5400,
+    }
+
+    content = map_content(_steps_state(2, remaining=5400), _steps_live_config(), last_content=last)
+
+    assert content["end_date"] == last["end_date"]
+    assert content["start_date"] == last["start_date"]
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_moves_end_date_when_remaining_re_estimates():
+    now = int(time.time())
+    last = {"current_step": 2, "remaining_time": 5400, "start_date": now - 1200, "end_date": now + 4200}
+
+    content = map_content(_steps_state(2, remaining=600), _steps_live_config(), last_content=last)
+
+    assert abs(content["end_date"] - (now + 600)) <= 2
+    assert content["start_date"] == last["start_date"]
+    assert_valid_activity_content(content)
+
+
+def test_map_content_steps_live_progress_resets_inverted_carried_start():
+    """A backward clock step (NTP, restored snapshot) can invert the carried window.
+
+    remaining_time differs from the new remaining, so the end_date pin does not
+    apply and the recomputed end lands before the carried start.
+    """
+    now = int(time.time())
+    last = {"current_step": 2, "remaining_time": 4200, "start_date": now + 600, "end_date": now + 4200}
+
+    content = map_content(_steps_state(2, remaining=60), _steps_live_config(), last_content=last)
+
+    assert abs(content["start_date"] - now) <= 2
+    assert content["start_date"] < content["end_date"]
+    assert_valid_activity_content(content)
+
+
+def test_map_completion_content_steps_clears_live_progress():
+    now = int(time.time())
+    last = {"live_progress": True, "current_step": 4, "start_date": now - 60, "end_date": now + 60}
+
+    content = map_completion_content(_steps_live_config(), last)
+
+    # Merge-patch would otherwise leave the last step's ETA counting on the end card.
+    assert content["live_progress"] is False
+    assert content["current_step"] == 4
+    # The flag is enough; re-sending the window would be noise.
+    assert "start_date" not in content
+    assert "end_date" not in content
+    assert_valid_activity_content(content)
+
+
+def test_map_completion_content_steps_clears_live_progress_when_last_frame_lost_the_key():
+    """The last frame is not a reliable record of what the server still has armed.
+
+    A frame whose remaining-time source vanished omits live_progress, so gating the
+    clear on last_content would skip it and the completion card would keep counting.
+    """
+    content = map_completion_content(_steps_live_config(), {"current_step": 3, "progress": 0.75})
+
+    assert content["live_progress"] is False
+    assert_valid_activity_content(content)
+
+
+def test_map_completion_content_steps_without_opt_in_stays_absent():
+    config = _steps_live_config() | {CONF_LIVE_PROGRESS: False}
+
+    content = map_completion_content(config, {"current_step": 3, "progress": 0.75})
+
+    assert "live_progress" not in content
     assert_valid_activity_content(content)
 
 
