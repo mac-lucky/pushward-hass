@@ -9,7 +9,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.data_entry_flow import FlowResultType, InvalidData
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
@@ -73,6 +73,7 @@ from custom_components.pushward.const import (
     CONF_SERIES_ENTITIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
+    CONF_SEVERITY_LABEL,
     CONF_SLUG,
     CONF_SMOOTHING,
     CONF_SOUND,
@@ -109,7 +110,9 @@ from custom_components.pushward.const import (
     DOMAIN,
     LIVE_PROGRESS_TEMPLATES,
     LOG_MAX_COLUMNS,
+    MAX_SEVERITY_LABEL_LEN,
     SUBENTRY_TYPE_ENTITY,
+    SUBENTRY_TYPE_WIDGET,
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
     WIDGET_MAX_STAT_ROWS,
@@ -2175,3 +2178,156 @@ def test_parse_entity_input_log_emits_level_attribute() -> None:
     """A log template persists the log_level_attribute field."""
     result = _parse_entity_input(_base_user_input(**{CONF_TEMPLATE: "log", CONF_LOG_LEVEL_ATTRIBUTE: "severity"}))
     assert result[CONF_LOG_LEVEL_ATTRIBUTE] == "severity"
+
+
+# --- details step: input preserved on validation error ---
+
+
+def _suggested_values(result) -> dict:
+    """Map schema field name -> suggested_value from a re-shown form."""
+    return {
+        str(key): (key.description or {}).get("suggested_value")
+        for key in result["data_schema"].schema
+        if hasattr(key, "description")
+    }
+
+
+async def test_details_error_preserves_user_input(hass: HomeAssistant) -> None:
+    """A validation error re-shows the details form pre-filled with the submission."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "gauge"}),
+    )
+    assert result["step_id"] == "details"
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input(
+            "gauge",
+            **{
+                CONF_MIN_VALUE: 100.0,
+                CONF_MAX_VALUE: 50.0,
+                CONF_ACTIVITY_NAME: "My Gauge Activity",
+            },
+        ),
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert CONF_MIN_VALUE in result["errors"]
+
+    suggested = _suggested_values(result)
+    assert suggested[CONF_ACTIVITY_NAME] == "My Gauge Activity"
+    assert suggested[CONF_MIN_VALUE] == 100.0
+    assert suggested[CONF_MAX_VALUE] == 50.0
+
+
+async def test_widget_details_error_preserves_user_input(hass: HomeAssistant) -> None:
+    """The widget details form also re-fills the submission on validation error."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set("sensor.users", "42")
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_ENTITY_ID: "sensor.users",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+            CONF_SLUG: "ha-stats",
+        },
+    )
+    assert result["step_id"] == "details"
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_STAT_ROWS: "", CONF_WIDGET_NAME: "My Stat Board"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert CONF_STAT_ROWS in result["errors"]
+
+    suggested = _suggested_values(result)
+    assert suggested[CONF_WIDGET_NAME] == "My Stat Board"
+
+
+# --- severity_label length cap ---
+
+
+async def test_severity_label_over_cap_rejected(hass: HomeAssistant) -> None:
+    """A severity_label longer than the server cap fails schema validation inline."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "alert"}),
+    )
+    assert result["step_id"] == "details"
+
+    with pytest.raises(InvalidData):
+        await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input=_mock_details_input("alert", **{CONF_SEVERITY_LABEL: "x" * (MAX_SEVERITY_LABEL_LEN + 1)}),
+        )
+
+    # A label at the cap goes through and is stored intact.
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("alert", **{CONF_SEVERITY_LABEL: "y" * MAX_SEVERITY_LABEL_LEN}),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_SEVERITY_LABEL] == "y" * MAX_SEVERITY_LABEL_LEN
+
+
+# --- NumberSelector fields stored as int ---
+
+
+async def test_number_fields_stored_as_int(hass: HomeAssistant) -> None:
+    """NumberSelector floats are coerced back to int in the stored config."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={
+            CONF_TOTAL_STEPS: 5.0,
+            CONF_PRIORITY: 3.0,
+            CONF_UPDATE_INTERVAL: 10.0,
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    for key, expected in ((CONF_TOTAL_STEPS, 5), (CONF_PRIORITY, 3), (CONF_UPDATE_INTERVAL, 10)):
+        assert data[key] == expected
+        assert isinstance(data[key], int), key
+
+
+async def test_decimals_stored_as_int(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_DECIMALS: 2.0, CONF_VALUE_ATTRIBUTE: "temperature"},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    assert data[CONF_DECIMALS] == 2
+    assert isinstance(data[CONF_DECIMALS], int)

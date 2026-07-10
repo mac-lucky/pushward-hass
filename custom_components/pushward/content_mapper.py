@@ -97,6 +97,7 @@ from .const import (
     LOG_COLUMN_VALUE_MAX,
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
+    MAX_SEVERITY_LABEL_LEN,
     normalize_slug,
 )
 
@@ -643,7 +644,8 @@ def map_content(
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
         if label := entity_config.get(CONF_SEVERITY_LABEL):
-            content["severity_label"] = label
+            # Truncate so a pre-cap stored config cannot 400 every push.
+            content["severity_label"] = label[:MAX_SEVERITY_LABEL_LEN]
         raw_fired_at, _ = _resolve_raw(state, entity_config, CONF_FIRED_AT_ENTITY, CONF_FIRED_AT_ATTRIBUTE, hass)
         if raw_fired_at is not _NO_VALUE:
             fired_at = _coerce_epoch(raw_fired_at)
@@ -741,7 +743,7 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
     elif template == "alert":
         content["severity"] = entity_config.get(CONF_SEVERITY, DEFAULT_SEVERITY)
         if label := entity_config.get(CONF_SEVERITY_LABEL):
-            content["severity_label"] = label
+            content["severity_label"] = label[:MAX_SEVERITY_LABEL_LEN]
     elif template == "gauge":
         _, max_val = _gauge_base_fields(content, entity_config)
         if last_content and "value" in last_content:

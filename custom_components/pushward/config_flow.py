@@ -128,6 +128,7 @@ from .const import (
     LIVE_PROGRESS_TEMPLATES,
     LOG_MAX_COLUMNS,
     MAX_LONG_TEXT_LEN,
+    MAX_SEVERITY_LABEL_LEN,
     MAX_SLUG_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_LEN,
@@ -424,7 +425,7 @@ def _details_schema(
                 CONF_TOTAL_STEPS,
                 default=d.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
             )
-        ] = vol.All(vol.Coerce(int), vol.Range(min=1, max=TOTAL_STEPS_MAX))
+        ] = NumberSelector(NumberSelectorConfig(min=1, max=TOTAL_STEPS_MAX, mode=NumberSelectorMode.BOX))
         fields[_entity_source_key(CONF_CURRENT_STEP_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
@@ -461,7 +462,7 @@ def _details_schema(
                 CONF_SEVERITY_LABEL,
                 default=d.get(CONF_SEVERITY_LABEL, ""),
             )
-        ] = TextSelector()
+        ] = vol.All(str, vol.Length(max=MAX_SEVERITY_LABEL_LEN))
         fields[_entity_source_key(CONF_FIRED_AT_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
@@ -551,7 +552,7 @@ def _details_schema(
                 CONF_DECIMALS,
                 default=d.get(CONF_DECIMALS, DEFAULT_DECIMALS),
             )
-        ] = vol.All(vol.Coerce(int), vol.Range(min=0, max=10))
+        ] = NumberSelector(NumberSelectorConfig(min=0, max=10, mode=NumberSelectorMode.BOX))
         fields[
             vol.Optional(
                 CONF_SMOOTHING,
@@ -632,7 +633,7 @@ def _details_schema(
             CONF_PRIORITY,
             default=d.get(CONF_PRIORITY, DEFAULT_PRIORITY),
         )
-    ] = vol.All(vol.Coerce(int), vol.Range(min=PRIORITY_MIN, max=PRIORITY_MAX))
+    ] = NumberSelector(NumberSelectorConfig(min=PRIORITY_MIN, max=PRIORITY_MAX, mode=NumberSelectorMode.SLIDER))
     fields[
         vol.Optional(
             CONF_SOUND,
@@ -649,7 +650,9 @@ def _details_schema(
             CONF_UPDATE_INTERVAL,
             default=d.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
         )
-    ] = vol.All(vol.Coerce(int), vol.Range(min=UPDATE_INTERVAL_MIN))
+    ] = NumberSelector(
+        NumberSelectorConfig(min=UPDATE_INTERVAL_MIN, mode=NumberSelectorMode.BOX, unit_of_measurement="seconds")
+    )
 
     # --- Optional fields ---
     fields[_entity_source_key(CONF_SUBTITLE_ENTITY, d)] = entity_selector
@@ -1180,11 +1183,11 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_ACTIVITY_NAME: user_input.get(CONF_ACTIVITY_NAME, "") or entity_id,
         CONF_ICON: user_input.get(CONF_ICON, ""),
         CONF_ICON_ATTRIBUTE: user_input.get(CONF_ICON_ATTRIBUTE, ""),
-        CONF_PRIORITY: user_input.get(CONF_PRIORITY, DEFAULT_PRIORITY),
+        CONF_PRIORITY: int(user_input.get(CONF_PRIORITY, DEFAULT_PRIORITY)),
         CONF_TEMPLATE: user_input.get(CONF_TEMPLATE, "generic"),
         CONF_START_STATES: start_states or defaults.get("start_states", []),
         CONF_END_STATES: end_states or defaults.get("end_states", []),
-        CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+        CONF_UPDATE_INTERVAL: int(user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)),
         CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
         CONF_PROGRESS_ENTITY: user_input.get(CONF_PROGRESS_ENTITY, ""),
         CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
@@ -1194,7 +1197,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_SUBTITLE_ENTITY: user_input.get(CONF_SUBTITLE_ENTITY, ""),
         CONF_STATE_LABELS: _parse_state_labels(user_input.get(CONF_STATE_LABELS, "")),
         CONF_COMPLETION_MESSAGE: user_input.get(CONF_COMPLETION_MESSAGE, ""),
-        CONF_TOTAL_STEPS: user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS),
+        CONF_TOTAL_STEPS: int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)),
         CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
         CONF_CURRENT_STEP_ENTITY: user_input.get(CONF_CURRENT_STEP_ENTITY, ""),
         CONF_SEVERITY: user_input.get(CONF_SEVERITY, DEFAULT_SEVERITY),
@@ -1220,7 +1223,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_SERIES_ENTITIES: series_entities,
         CONF_PRIMARY_SERIES: (user_input.get(CONF_PRIMARY_SERIES) or "").strip(),
         CONF_SCALE: user_input.get(CONF_SCALE, DEFAULT_SCALE),
-        CONF_DECIMALS: user_input.get(CONF_DECIMALS, DEFAULT_DECIMALS),
+        CONF_DECIMALS: int(user_input.get(CONF_DECIMALS, DEFAULT_DECIMALS)),
         CONF_SMOOTHING: user_input.get(CONF_SMOOTHING, False),
         CONF_THRESHOLDS: thresholds,
         CONF_HISTORY_PERIOD: int(history_period_raw) if history_period_raw is not None else DEFAULT_HISTORY_PERIOD,
@@ -1456,9 +1459,13 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
                 )
 
         defaults = self._details_defaults if self._is_reconfigure else None
+        schema = _details_schema(entity_id, template, defaults=defaults, hass=self.hass)
+        if errors and user_input is not None:
+            # Re-fill the form with what the user just submitted instead of dropping it.
+            schema = self.add_suggested_values_to_schema(schema, user_input)
         return self.async_show_form(
             step_id="details",
-            data_schema=_details_schema(entity_id, template, defaults=defaults, hass=self.hass),
+            data_schema=schema,
             errors=errors,
         )
 
@@ -1817,9 +1824,13 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                 )
 
         defaults = self._details_defaults if self._is_reconfigure else None
+        schema = _widget_details_schema(entity_id, template, defaults=defaults)
+        if errors and user_input is not None:
+            # Re-fill the form with what the user just submitted instead of dropping it.
+            schema = self.add_suggested_values_to_schema(schema, user_input)
         return self.async_show_form(
             step_id="details",
-            data_schema=_widget_details_schema(entity_id, template, defaults=defaults),
+            data_schema=schema,
             errors=errors,
         )
 

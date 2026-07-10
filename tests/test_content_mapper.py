@@ -60,6 +60,7 @@ from custom_components.pushward.const import (
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
+    MAX_SEVERITY_LABEL_LEN,
     normalize_slug,
     validate_slug,
 )
@@ -741,6 +742,22 @@ def test_map_content_alert_no_severity_label_by_default():
     content = map_content(state, config)
 
     assert "severity_label" not in content
+
+
+def test_map_content_alert_severity_label_truncated_to_cap():
+    """A pre-cap stored config with an over-long label must not 400 every push."""
+    state = _make_state("firing", {"friendly_name": "CPU Alert"})
+    config = {
+        CONF_TEMPLATE: "alert",
+        CONF_SEVERITY: "warning",
+        CONF_SEVERITY_LABEL: "x" * (MAX_SEVERITY_LABEL_LEN + 10),
+    }
+
+    live = map_content(state, config)
+    completion = map_completion_content(config)
+
+    assert live["severity_label"] == "x" * MAX_SEVERITY_LABEL_LEN
+    assert completion["severity_label"] == "x" * MAX_SEVERITY_LABEL_LEN
 
 
 # --- Feature 1: subtitle attribute ---
