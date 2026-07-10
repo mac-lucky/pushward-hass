@@ -10,7 +10,7 @@
   "config_flow": true,
   "documentation": "https://github.com/mac-lucky/pushward-hass",
   "integration_type": "service",
-  "iot_class": "cloud_push",
+  "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/mac-lucky/pushward-hass/issues",
   "requirements": [],
   "version": "0.34.1"
