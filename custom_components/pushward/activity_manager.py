@@ -11,7 +11,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from functools import partial
-from typing import Literal
+from typing import Any, Literal
 
 import aiohttp
 from homeassistant.components import persistent_notification
@@ -150,6 +150,10 @@ class TrackedEntity:
     companion_unsubs: list[Callable] = field(default_factory=list)
     flush_unsub: Callable | None = None
     end_task: asyncio.Task | None = field(default=None, repr=False)
+    # At most one _send_update task runs per entity; changes landing while one
+    # is in flight set update_pending so the newest state is re-sent afterwards.
+    pending_task: asyncio.Task | None = field(default=None, repr=False)
+    update_pending: bool = False
     generation: int = 0
     last_sent_at: float = 0.0
     # (ts_seconds, {label: value}) — sampled on every state change. HA 2024.8+
@@ -177,6 +181,8 @@ class ActivityManager:
         self._entry = entry
         self._tracked: dict[str, TrackedEntity] = {}
         self._reauth_triggered = False
+        # Slugs currently in a push-failure streak: WARN once on entry, DEBUG after.
+        self._failed_slugs: set[str] = set()
         # History ring buffers are persisted so that sparklines survive restarts
         # (HA 2024.8+ no longer stores light attributes in the recorder DB, so
         # we cannot reconstruct history from HA itself).
@@ -192,6 +198,14 @@ class ActivityManager:
             _LOGGER.warning("PushWard auth failed — triggering reauthentication")
             self._entry.async_start_reauth(self._hass)
 
+    def _log_push_failure(self, slug: str, msg: str, *args: Any, exc_info: bool = False) -> None:
+        """WARN on entering the failure state per slug; DEBUG while it persists."""
+        if slug in self._failed_slugs:
+            _LOGGER.debug(msg, *args, exc_info=exc_info)
+        else:
+            self._failed_slugs.add(slug)
+            _LOGGER.warning(msg, *args, exc_info=exc_info)
+
     @contextlib.asynccontextmanager
     async def _api_error_guard(self, slug: str, context: Literal["starting", "updating", "ending"]):
         """Translate PushWard API/network errors to user-facing notifications or reauth."""
@@ -206,7 +220,7 @@ class ActivityManager:
                 title=f"PushWard — {slug}",
                 notification_id=_forbidden_notification_id(slug),
             )
-            _LOGGER.warning("PushWard 403 while %s %s: %s", context, slug, err)
+            self._log_push_failure(slug, "PushWard 403 while %s %s: %s", context, slug, err)
         except PushWardApiError as err:
             if err.status_code == 409:
                 persistent_notification.async_create(
@@ -215,16 +229,19 @@ class ActivityManager:
                     title="PushWard — Activity Limit",
                     notification_id=_ACTIVITY_LIMIT_NOTIFICATION_ID,
                 )
-                _LOGGER.warning("Activity limit reached while %s %s", context, slug)
+                self._log_push_failure(slug, "Activity limit reached while %s %s", context, slug)
             else:
-                _LOGGER.warning("PushWard API error while %s %s: %s", context, slug, err)
+                self._log_push_failure(slug, "PushWard API error while %s %s: %s", context, slug, err)
         except aiohttp.ClientError:
-            _LOGGER.warning("PushWard network error while %s %s", context, slug, exc_info=True)
+            self._log_push_failure(slug, "PushWard network error while %s %s", context, slug, exc_info=True)
 
     @callback
     def _clear_forbidden_notification(self, slug: str) -> None:
         """Dismiss the forbidden-notification (if any) after a successful call."""
         persistent_notification.async_dismiss(self._hass, _forbidden_notification_id(slug))
+        if slug in self._failed_slugs:
+            self._failed_slugs.discard(slug)
+            _LOGGER.info("PushWard %s: pushes succeeding again", slug)
 
     async def async_start(self) -> None:
         """Subscribe to state changes and resume any active entities."""
@@ -275,6 +292,16 @@ class ActivityManager:
             # Resume if entity is currently in a start state (HA restart)
             if current and current.state in entity_cfg.get(CONF_START_STATES, []):
                 await self._start_activity(entity_id)
+
+        # Prune buffers persisted for entities whose subentry was removed;
+        # otherwise they linger in .storage until an unrelated debounced save.
+        stale = (set(persisted) | set(persisted_logs)) - set(self._tracked)
+        if stale:
+            _LOGGER.debug("Pruning persisted history for removed entities: %s", sorted(stale))
+            try:
+                await self._history_store.async_save(self._serialize_history())
+            except Exception:
+                _LOGGER.debug("Failed to prune persisted history", exc_info=True)
 
     async def _async_load_history(
         self,
@@ -347,6 +374,9 @@ class ActivityManager:
         for _entity_id, tracked in self._tracked.items():
             if tracked.end_task and not tracked.end_task.done():
                 tracked.end_task.cancel()
+
+            if tracked.pending_task and not tracked.pending_task.done():
+                tracked.pending_task.cancel()
 
             if tracked.flush_unsub:
                 tracked.flush_unsub()
@@ -690,12 +720,17 @@ class ActivityManager:
     def _schedule_throttled_update(self, entity_id: str) -> None:
         """Rate-limited update: send immediately if cooldown expired, else schedule."""
         tracked = self._tracked[entity_id]
+        if tracked.pending_task is not None and not tracked.pending_task.done():
+            # A send is in flight; mark dirty so the newest state goes out after.
+            tracked.update_pending = True
+            return
+
         interval = tracked.config.get(CONF_UPDATE_INTERVAL, 5)
         now = time.monotonic()
         elapsed = now - tracked.last_sent_at
 
         if elapsed >= interval:
-            self._hass.async_create_task(self._send_update(entity_id))
+            self._spawn_send(entity_id, tracked)
         elif tracked.flush_unsub is None:
             delay = interval - elapsed
             tracked.flush_unsub = async_call_later(
@@ -703,6 +738,24 @@ class ActivityManager:
                 delay,
                 partial(self._flush_update, entity_id),
             )
+
+    @callback
+    def _spawn_send(self, entity_id: str, tracked: TrackedEntity) -> None:
+        """Run _send_update as the entity's single in-flight task."""
+        task = self._hass.async_create_task(self._send_update(entity_id))
+        tracked.pending_task = task
+        task.add_done_callback(partial(self._on_send_done, entity_id))
+
+    def _on_send_done(self, entity_id: str, task: asyncio.Task) -> None:
+        tracked = self._tracked.get(entity_id)
+        if tracked is None or tracked.pending_task is not task:
+            return
+        tracked.pending_task = None
+        resend = tracked.update_pending and not task.cancelled() and tracked.is_active
+        tracked.update_pending = False
+        if resend:
+            # Re-enter the throttle so the trailing send still honors the cooldown.
+            self._schedule_throttled_update(entity_id)
 
     async def _send_update(self, entity_id: str) -> None:
         """Send the latest content to PushWard."""
@@ -746,8 +799,12 @@ class ActivityManager:
         if tracked is None:
             return
         tracked.flush_unsub = None
-        if tracked.is_active:
-            self._hass.async_create_task(self._send_update(entity_id))
+        if not tracked.is_active:
+            return
+        if tracked.pending_task is not None and not tracked.pending_task.done():
+            tracked.update_pending = True
+            return
+        self._spawn_send(entity_id, tracked)
 
     @callback
     def _schedule_end(self, entity_id: str) -> None:
@@ -761,6 +818,11 @@ class ActivityManager:
         if tracked.flush_unsub:
             tracked.flush_unsub()
             tracked.flush_unsub = None
+        # An in-flight update task is the same hazard as an armed flush.
+        if tracked.pending_task and not tracked.pending_task.done():
+            tracked.pending_task.cancel()
+            tracked.pending_task = None
+        tracked.update_pending = False
         tracked.end_task = self._hass.async_create_task(self._async_end_activity(entity_id))
 
     async def _async_end_activity(self, entity_id: str) -> None:

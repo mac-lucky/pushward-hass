@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from datetime import timedelta
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
@@ -1199,6 +1201,33 @@ async def test_log_rehydration_collapses_persisted_duplicates(hass: HomeAssistan
     await manager.async_stop()
 
 
+async def test_stale_persisted_history_pruned_on_start(hass: HomeAssistant) -> None:
+    """Buffers persisted for removed subentries are pruned by a save at startup."""
+    api = _mock_api()
+    config = _log_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    eid = "sensor.events"
+    hass.states.async_set(eid, "on")
+
+    persisted_logs = {
+        eid: [{"text": "On", "at": 10}],
+        "sensor.removed": [{"text": "Gone", "at": 5}],
+    }
+    save_mock = AsyncMock()
+    with (
+        patch.object(manager, "_async_load_history", AsyncMock(return_value=({}, persisted_logs))),
+        patch.object(manager._history_store, "async_save", save_mock),
+    ):
+        await manager.async_start()
+
+    save_mock.assert_awaited_once()
+    payload = save_mock.await_args.args[0]
+    for section in payload.values():
+        assert "sensor.removed" not in section
+
+    await manager.async_stop()
+
+
 def _log_columns_config(columns):
     """Log config tracking a light, with the given log_columns."""
     return _entity_config(
@@ -1494,5 +1523,156 @@ async def test_timeline_series_entity_subscribed_and_refreshes(hass: HomeAssista
     assert len(ongoing_after) == ongoing_before + 1
     assert ongoing_after[-1]["value"] == {"Bedroom": 20.0}
     assert_valid_activity_content(ongoing_after[-1])
+
+    await manager.async_stop()
+
+
+# --- burst coalescing ---
+
+
+async def test_burst_coalesces_to_one_inflight_send(hass: HomeAssistant) -> None:
+    """Rapid state changes during an in-flight send collapse to one trailing re-send."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off", {"progress": 0})
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 0})
+    await hass.async_block_till_done()
+    assert manager._tracked["binary_sensor.washer"].is_active
+    api.update_activity.reset_mock()
+
+    gate = asyncio.Event()
+
+    async def _gated(*_a, **_k):
+        await gate.wait()
+
+    api.update_activity.side_effect = _gated
+
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
+    await asyncio.sleep(0)  # let the first send task start and block on the gate
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 20})
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 30})
+    await asyncio.sleep(0)
+    assert api.update_activity.await_count == 1
+
+    api.update_activity.side_effect = None
+    gate.set()
+    await hass.async_block_till_done()
+
+    # One gated send plus one trailing re-send carrying the newest value.
+    assert api.update_activity.await_count == 2
+    assert activity_updates(api, "ongoing")[-1]["progress"] == 0.3
+
+    await manager.async_stop()
+
+
+async def test_end_cancels_inflight_send(hass: HomeAssistant) -> None:
+    """An end state cancels the in-flight update so it cannot overpaint the completion card."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off", {"progress": 0})
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 0})
+    await hass.async_block_till_done()
+    api.update_activity.reset_mock()
+
+    gate = asyncio.Event()
+
+    async def _gated(*_a, **_k):
+        await gate.wait()
+
+    api.update_activity.side_effect = _gated
+
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
+    await asyncio.sleep(0)
+    tracked = manager._tracked["binary_sensor.washer"]
+    inflight = tracked.pending_task
+    assert inflight is not None and not inflight.done()
+
+    api.update_activity.side_effect = None
+    await end_activity_via_state(manager, hass, "binary_sensor.washer", "off", {"progress": 100})
+
+    assert inflight.cancelled()
+    calls = api.update_activity.call_args_list
+    # Gated call was recorded before cancellation; only completion + ENDED follow.
+    assert len(calls) == 3
+    assert calls[-2][0][1] == "ongoing"
+    assert calls[-1][0][1] == "ended"
+
+    await manager.async_stop()
+
+
+async def test_trailing_resend_respects_cooldown(hass: HomeAssistant) -> None:
+    """A trailing re-send inside the cooldown arms the flush timer instead of firing."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 300, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off", {"progress": 0})
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 0})
+    await hass.async_block_till_done()
+    api.update_activity.reset_mock()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    gate = asyncio.Event()
+
+    async def _gated(*_a, **_k):
+        await gate.wait()
+
+    api.update_activity.side_effect = _gated
+
+    tracked.last_sent_at = 0.0  # cooldown elapsed: first change sends immediately
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
+    await asyncio.sleep(0)
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 20})
+
+    api.update_activity.side_effect = None
+    gate.set()
+    await hass.async_block_till_done()
+
+    # The gated send completed; the dirty flag re-entered the throttle and,
+    # being inside the fresh cooldown, armed the flush timer instead.
+    assert api.update_activity.await_count == 1
+    assert tracked.flush_unsub is not None
+
+    await manager.async_stop()
+
+
+async def test_push_failure_warns_once_per_streak(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Repeated push failures WARN once, then DEBUG; recovery logs INFO and re-arms."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off", {"progress": 0})
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 0})
+    await hass.async_block_till_done()
+
+    def _warnings() -> list[str]:
+        messages = [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING]
+        return [m for m in messages if "ha-washer" in m]
+
+    api.update_activity.side_effect = PushWardApiError("boom")
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
+    await hass.async_block_till_done()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 20})
+    await hass.async_block_till_done()
+    assert len(_warnings()) == 1
+
+    api.update_activity.side_effect = None
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 30})
+    await hass.async_block_till_done()
+    assert any("succeeding again" in r.getMessage() for r in caplog.records if r.levelno == logging.INFO)
+
+    api.update_activity.side_effect = PushWardApiError("boom")
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 40})
+    await hass.async_block_till_done()
+    assert len(_warnings()) == 2
 
     await manager.async_stop()
