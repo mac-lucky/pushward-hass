@@ -57,7 +57,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "remaining_time": {
           "name": "Remaining Time",
@@ -257,7 +257,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",
@@ -365,7 +365,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",
@@ -493,7 +493,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",
@@ -601,7 +601,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",
@@ -705,7 +705,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",
@@ -829,7 +829,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",
@@ -929,7 +929,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",
@@ -987,7 +987,7 @@
         },
         "accent_color": {
           "name": "Accent Color",
-          "description": "Accent color name for the activity."
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
         },
         "background_color": {
           "name": "Background Color",

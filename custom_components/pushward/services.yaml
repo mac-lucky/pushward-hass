@@ -277,7 +277,7 @@ update_activity:
       fields:
         accent_color:
           name: Accent Color
-          description: Accent color name for the activity.
+          description: Accent color for the activity. Hex (#RRGGBB) or named color.
           example: "blue"
           selector:
             text:
