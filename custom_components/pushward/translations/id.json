@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Notifikasi terpakai"
+      },
+      "live_activity_updates_used": {
+        "name": "Pembaruan Live Activity terpakai"
+      },
+      "widget_updates_used": {
+        "name": "Pembaruan widget terpakai"
+      },
+      "emails_used": {
+        "name": "Email terpakai"
+      },
+      "subscription_tier": {
+        "name": "Tingkat langganan",
+        "state": {
+          "free": "Gratis",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "Perbarui Aktivitas (deprecated)",
@@ -34,7 +57,7 @@
         },
         "accent_color": {
           "name": "Warna Aksen",
-          "description": "Nama warna aksen untuk aktivitas."
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
         },
         "remaining_time": {
           "name": "Waktu Tersisa",
@@ -63,6 +86,10 @@
         "severity": {
           "name": "Tingkat Keparahan",
           "description": "Tingkat keparahan alert."
+        },
+        "severity_label": {
+          "name": "Label Tingkat Keparahan",
+          "description": "Timpa teks lencana Info/Warning/Critical. Hanya templat alert."
         },
         "value": {
           "name": "Nilai",
@@ -124,6 +151,10 @@
           "name": "Alarm",
           "description": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya berfungsi di iOS 26+."
         },
+        "snooze_seconds": {
+          "name": "Detik Tunda",
+          "description": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Default 300 (5 mnt). Memerlukan alarm (iOS 26+, hanya templat hitung mundur)."
+        },
         "step_labels": {
           "name": "Label Langkah",
           "description": "Daftar terurut label langkah. Panjang harus sama dengan total_steps. Hanya templat steps."
@@ -139,10 +170,6 @@
         "units": {
           "name": "Satuan",
           "description": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
-        },
-        "snooze_seconds": {
-          "name": "Detik Tunda",
-          "description": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Default 300 (5 mnt). Memerlukan alarm (iOS 26+, hanya templat hitung mundur)."
         },
         "duration": {
           "name": "Durasi",
@@ -230,7 +257,7 @@
         },
         "accent_color": {
           "name": "Warna Aksen",
-          "description": "Nama warna aksen untuk aktivitas."
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
         },
         "background_color": {
           "name": "Warna Latar",
@@ -338,7 +365,7 @@
         },
         "accent_color": {
           "name": "Warna Aksen",
-          "description": "Nama warna aksen untuk aktivitas."
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
         },
         "background_color": {
           "name": "Warna Latar",
@@ -466,7 +493,7 @@
         },
         "accent_color": {
           "name": "Warna Aksen",
-          "description": "Nama warna aksen untuk aktivitas."
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
         },
         "background_color": {
           "name": "Warna Latar",
@@ -536,6 +563,10 @@
           "name": "Tingkat Keparahan",
           "description": "Tingkat keparahan alert."
         },
+        "severity_label": {
+          "name": "Label Tingkat Keparahan",
+          "description": "Timpa teks lencana Info/Warning/Critical. Hanya templat alert."
+        },
         "state_text": {
           "name": "Teks Status",
           "description": "Teks yang ditampilkan sebagai status aktivitas."
@@ -570,7 +601,7 @@
         },
         "accent_color": {
           "name": "Warna Aksen",
-          "description": "Nama warna aksen untuk aktivitas."
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
         },
         "background_color": {
           "name": "Warna Latar",
@@ -674,7 +705,7 @@
         },
         "accent_color": {
           "name": "Warna Aksen",
-          "description": "Nama warna aksen untuk aktivitas."
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
         },
         "background_color": {
           "name": "Warna Latar",
@@ -772,6 +803,10 @@
           "name": "Satuan",
           "description": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%"
         },
+        "primary_series": {
+          "name": "Seri Utama",
+          "description": "Label seri yang ditampilkan sebagai nilai utama dan digunakan untuk rentang tinggi/rendah ringkas. Kosongkan untuk mempertahankan seri yang dipilih otomatis. Maks 32 karakter. Hanya templat timeline."
+        },
         "scale": {
           "name": "Skala",
           "description": "Mode skala sumbu Y (linear atau logaritmik). Hanya untuk templat timeline."
@@ -794,7 +829,7 @@
         },
         "accent_color": {
           "name": "Warna Aksen",
-          "description": "Nama warna aksen untuk aktivitas."
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
         },
         "background_color": {
           "name": "Warna Latar",
@@ -860,6 +895,122 @@
         }
       }
     },
+    "update_activity_board": {
+      "name": "Perbarui Aktivitas (Board)",
+      "description": "Perbarui PushWard board Live Activity (1–4 ubin).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "tiles": {
+          "name": "Ubin",
+          "description": "Daftar 1–4 ubin. Masing-masing: label (wajib, ≤32), value (string wajib, ≤16), dan opsional unit (≤8), icon (SF Symbol atau mdi:), color (nama warna atau hex), trend (up/down/flat), objek url_action."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya square.grid.2x2.fill, mdi:view-dashboard)."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body. (Ketukan per ubin ada di url_action masing-masing ubin.)"
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Override Prioritas",
+          "description": "Prioritas per pembaruan (0-10). Hanya menimpa prioritas yang dikonfigurasi pada aktivitas untuk push ini."
+        }
+      }
+    },
+    "update_activity_log": {
+      "name": "Perbarui Aktivitas (Log)",
+      "description": "Perbarui PushWard log Live Activity (1–20 baris, terbaru-lebih-dulu).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "lines": {
+          "name": "Baris Log",
+          "description": "Daftar 1–20 baris log terbaru-lebih-dulu. Masing-masing: text (wajib, ≤512), dan opsional at (unix timestamp) serta level (info/warn/error)."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya list.bullet.rectangle, mdi:format-list-bulleted)."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Override Prioritas",
+          "description": "Prioritas per pembaruan (0-10). Hanya menimpa prioritas yang dikonfigurasi pada aktivitas untuk push ini."
+        }
+      }
+    },
     "create_activity": {
       "name": "Buat Aktivitas",
       "description": "Buat PushWard Live Activity baru.",
@@ -910,6 +1061,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "Segarkan Widget",
+      "description": "Paksa segarkan widget PushWard yang dilacak. Melewati cache diff dalam memori sehingga widget dirender ulang dan dikirim ke iOS meski nilainya tidak berubah.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Pengidentifikasi slug widget. Slug atau entity_id harus diberikan."
+        },
+        "entity_id": {
+          "name": "Entitas",
+          "description": "Entitas HA yang terikat ke widget. Slug atau entity_id harus diberikan."
+        }
+      }
+    },
     "send_notification": {
       "name": "Kirim Notifikasi",
       "description": "Kirim notifikasi push melalui PushWard.",
@@ -929,6 +1094,10 @@
         "level": {
           "name": "Tingkat",
           "description": "Tingkat interupsi iOS. Mengontrol cara notifikasi dikirimkan."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Volume suara untuk alert critical (0.0-1.0). Hanya digunakan saat level adalah critical."
         },
         "thread_id": {
           "name": "ID Thread",
@@ -958,6 +1127,10 @@
           "name": "URL",
           "description": "URL yang dibuka saat mengetuk notifikasi. Memerlukan HTTPS."
         },
+        "media": {
+          "name": "Media",
+          "description": "Lampiran media sebagai objek dengan `url` (HTTPS) dan `type` (image, video, atau audio)."
+        },
         "icon_url": {
           "name": "URL Ikon",
           "description": "URL ikon notifikasi. Memerlukan HTTPS."
@@ -966,27 +1139,9 @@
           "name": "Metadata",
           "description": "Metadata pasangan kunci-nilai tambahan yang dikirim bersama notifikasi."
         },
-        "media": {
-          "name": "Media",
-          "description": "Lampiran media sebagai objek dengan `url` (HTTPS) dan `type` (image, video, atau audio)."
-        },
         "actions": {
           "name": "Aksi",
           "description": "Daftar tombol aksi. Setiap aksi adalah objek dengan id, title, serta url, foreground, destructive, authentication_required, dan icon opsional. Untuk url http(s) Anda juga dapat mengirim webhook senyap dengan method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, dan body."
-        }
-      }
-    },
-    "widget_refresh": {
-      "name": "Segarkan Widget",
-      "description": "Paksa segarkan widget PushWard yang dilacak. Melewati cache diff dalam memori sehingga widget dirender ulang dan dikirim ke iOS meski nilainya tidak berubah.",
-      "fields": {
-        "slug": {
-          "name": "Slug",
-          "description": "Pengidentifikasi slug widget. Slug atau entity_id harus diberikan."
-        },
-        "entity_id": {
-          "name": "Entitas",
-          "description": "Entitas HA yang terikat ke widget. Slug atau entity_id harus diberikan."
         }
       }
     },
@@ -1027,14 +1182,19 @@
       }
     }
   },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Tidak ada widget PushWard yang cocok dengan slug={slug} entity_id={entity_id}."
+    }
+  },
   "config": {
     "step": {
       "user": {
         "title": "Hubungkan ke PushWard",
+        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Dapatkan aplikasi PushWard iOS dari App Store: {app_store_url}",
         "data": {
           "integration_key": "Kunci Integrasi"
         },
-        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Dapatkan aplikasi PushWard iOS dari App Store: {app_store_url}",
         "data_description": {
           "integration_key": "Buka aplikasi PushWard iOS (App Store: {app_store_url}) → Pengaturan → Kunci Integrasi. Anda dapat menempelkan kunci default, atau membuat kunci baru dengan cakupan 'ha-*'."
         }
@@ -1094,16 +1254,24 @@
           "data": {
             "start_states": "Status Awal",
             "end_states": "Status Akhir",
+            "progress_entity": "Entitas Kemajuan",
             "progress_attribute": "Atribut Kemajuan",
+            "remaining_time_entity": "Entitas Waktu Tersisa",
             "remaining_time_attribute": "Atribut Waktu Tersisa",
+            "live_progress": "ETA Kemajuan Live",
             "total_steps": "Total Langkah",
+            "current_step_entity": "Entitas Langkah Saat Ini",
             "current_step_attribute": "Atribut Langkah Saat Ini",
             "severity": "Tingkat Keparahan",
+            "severity_label": "Label Tingkat Keparahan",
+            "value_entity": "Entitas Nilai",
             "value_attribute": "Atribut Nilai",
             "min_value": "Nilai Minimum",
             "max_value": "Nilai Maksimum",
             "unit": "Satuan",
             "series": "Seri",
+            "series_entities": "Entitas Seri",
+            "primary_series": "Seri Utama",
             "scale": "Skala",
             "decimals": "Angka Desimal",
             "smoothing": "Garis Halus",
@@ -1115,13 +1283,20 @@
             "icon_attribute": "Atribut Ikon",
             "priority": "Prioritas (0-10)",
             "update_interval": "Interval Pembaruan Min. (detik)",
+            "subtitle_entity": "Entitas Subjudul",
             "subtitle_attribute": "Atribut Subjudul",
             "state_labels": "Label Status",
             "completion_message": "Pesan Penyelesaian",
             "accent_color": "Warna Aksen",
             "accent_color_attribute": "Atribut Warna Aksen",
+            "tap_action_url": "URL Aksi Ketuk",
+            "tap_action_foreground": "Buka URL Aksi Ketuk",
             "url": "URL",
+            "url_foreground": "Buka URL Tombol Utama",
+            "url_title": "Judul Tombol Utama",
             "secondary_url": "URL Sekunder",
+            "secondary_url_foreground": "Buka URL Tombol Sekunder",
+            "secondary_url_title": "Judul Tombol Sekunder",
             "ended_ttl": "Hapus Otomatis Setelah Berakhir (detik)",
             "stale_ttl": "Akhiri Otomatis Setelah Tidak Aktif (detik)",
             "sound": "Suara",
@@ -1131,38 +1306,37 @@
             "text_color_attribute": "Atribut Warna Teks",
             "warning_threshold": "Ambang Peringatan",
             "alarm": "Alarm",
+            "snooze_seconds": "Detik Tunda (iOS 26+)",
             "step_labels": "Label Langkah",
             "step_rows": "Baris Langkah",
+            "fired_at_entity": "Entitas Waktu Terpicu",
             "fired_at_attribute": "Atribut Waktu Dipicu",
             "units": "Satuan",
-            "progress_entity": "Entitas Kemajuan",
-            "remaining_time_entity": "Entitas Waktu Tersisa",
-            "current_step_entity": "Entitas Langkah Saat Ini",
-            "value_entity": "Entitas Nilai",
-            "subtitle_entity": "Entitas Subjudul",
-            "tap_action_url": "URL Aksi Ketuk",
-            "tap_action_foreground": "Buka URL Aksi Ketuk",
-            "url_foreground": "Buka URL Tombol Utama",
-            "url_title": "Judul Tombol Utama",
-            "secondary_url_foreground": "Buka URL Tombol Sekunder",
-            "secondary_url_title": "Judul Tombol Sekunder",
-            "snooze_seconds": "Detik Tunda (iOS 26+)",
-            "fired_at_entity": "Entitas Waktu Terpicu",
-            "log_columns": "Kolom Log"
+            "tiles": "Ubin board",
+            "log_columns": "Kolom Log",
+            "log_level_attribute": "Atribut Tingkat Log"
           },
           "data_description": {
             "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
             "end_states": "Status entitas yang mengakhiri Live Activity. Pilih dari daftar atau ketik nilai kustom.",
+            "progress_entity": "Baca kemajuan dari entitas terpisah alih-alih entitas yang dilacak. Biarkan kosong untuk menggunakan entitas yang dilacak. Jika kolom atribut disetel, baca atribut tersebut dari entitas ini; jika tidak, statusnya.",
             "progress_attribute": "Atribut entitas yang menyimpan nilai kemajuan 0–100. Contoh: percentage",
+            "remaining_time_entity": "Baca waktu tersisa dari entitas terpisah (mis. sensor waktu mesin cuci). Biarkan kosong untuk menggunakan entitas yang dilacak. Mengurai otomatis sensor stempel waktu (waktu selesai), sensor durasi dengan satuan, string H:MM:SS, atau detik biasa.",
             "remaining_time_attribute": "Atribut entitas yang menyimpan waktu tersisa dalam detik. Contoh: remaining",
+            "live_progress": "Isi bilah kemajuan secara mulus dan hitung mundur ETA ke waktu selesai di perangkat, menggunakan sumber waktu tersisa di atas. Memerlukan entitas atau atribut waktu tersisa. Pada templat steps, ini mengisi langkah saat ini, bukan keseluruhan proses.",
             "total_steps": "Total jumlah steps.",
+            "current_step_entity": "Baca langkah saat ini dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak.",
             "current_step_attribute": "Atribut entitas yang menyimpan langkah saat ini sebagai bilangan bulat.",
             "severity": "Tingkat keparahan alert.",
+            "severity_label": "Timpa teks lencana Info/Warning/Critical yang ditampilkan pada alert. Kosongkan untuk menggunakan nama tingkat keparahan. Maks 32 karakter. Hanya templat alert.",
+            "value_entity": "Baca nilai gauge dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
             "value_attribute": "Atribut entitas yang menyimpan nilai gauge saat ini sebagai angka. Kosongkan untuk menggunakan status entitas.",
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "unit": "Satuan tampilan yang ditampilkan di sebelah nilai (misalnya °C, %, kW). Maks 32 karakter.",
             "series": "Petakan atribut entitas ke seri bernama. Format: attribute=Label, attribute2=Label2. Kosongkan untuk menggunakan status entitas sebagai satu seri.",
+            "series_entities": "Ikat entitas terpisah sebagai garis bernama pada satu chart (misalnya satu sensor PM2.5 per ruangan). Format: [Label=]entity_id[:attribute], dipisah koma. Label secara default menggunakan nama ramah entitas; baca atribut dengan entity_id:attribute. Dapat digabung dengan Seri; total maksimal 10 garis.",
+            "primary_series": "Label seri yang ditampilkan sebagai nilai utama dan digunakan untuk rentang tinggi/rendah ringkas. Kosongkan untuk menggunakan seri milik entitas yang dilacak sendiri (atau seri pertama yang dikonfigurasi).",
             "scale": "Mode skala sumbu Y untuk grafik sparkline.",
             "decimals": "Jumlah angka desimal yang ditampilkan untuk nilai (0–10).",
             "smoothing": "Aktifkan interpolasi kurva antar titik data untuk sparkline yang lebih halus.",
@@ -1174,13 +1348,20 @@
             "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis dan ikon entitas saat diatur.",
             "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
             "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
+            "subtitle_entity": "Tampilkan subjudul dari entitas terpisah (mis. sensor program/mode). Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
             "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul. Kosongkan untuk menggunakan nama ramah entitas.",
             "state_labels": "Teks tampilan kustom untuk status. Format: state=Label, state2=Label 2. Contoh: heating=Sedang Memanaskan, idle=Siaga",
             "completion_message": "Teks yang ditampilkan saat aktivitas berakhir. Kosongkan untuk 'Selesai'. Contoh: Cucian Selesai",
             "accent_color": "Warna aksen untuk Live Activity. Kosongkan untuk biru default.",
             "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis. Menggantikan warna statis. Mendukung RGB, HS, XY, Kelvin, nama warna, dan hex.",
+            "tap_action_url": "URL opsional yang dibuka saat mengetuk latar Live Activity. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0 (membuka aplikasi itu).",
+            "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang tanpa meninggalkan Layar Kunci.",
             "url": "Tautan yang dibuka saat menekan Live Activity. Harus dimulai dengan http:// atau https://. Hanya untuk templat steps dan alert.",
+            "url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+            "url_title": "Label tombol utama (maks 64 karakter).",
             "secondary_url": "Tautan sekunder untuk Live Activity. Hanya untuk templat steps dan alert.",
+            "secondary_url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+            "secondary_url_title": "Label tombol sekunder (maks 64 karakter).",
             "ended_ttl": "Detik setelah aktivitas berakhir sebelum dihapus otomatis dari server. Kosongkan untuk menyimpan tanpa batas. Contoh: 300",
             "stale_ttl": "Detik tidak aktif sebelum server mengakhiri aktivitas secara otomatis. Kosongkan untuk menonaktifkan. Contoh: 1800",
             "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
@@ -1190,24 +1371,15 @@
             "text_color_attribute": "Atribut entitas untuk warna teks dinamis. Menggantikan warna teks statis.",
             "warning_threshold": "Saat nilai mencapai atau melebihi ini, pewarnaan peringatan dipicu. Templat gauge dan timeline.",
             "alarm": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya untuk iOS 26+.",
+            "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
             "step_labels": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah.",
             "step_rows": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps.",
+            "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan.",
             "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
             "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%",
-            "progress_entity": "Baca kemajuan dari entitas terpisah alih-alih entitas yang dilacak. Biarkan kosong untuk menggunakan entitas yang dilacak. Jika kolom atribut disetel, baca atribut tersebut dari entitas ini; jika tidak, statusnya.",
-            "remaining_time_entity": "Baca waktu tersisa dari entitas terpisah (mis. sensor waktu mesin cuci). Biarkan kosong untuk menggunakan entitas yang dilacak. Mengurai otomatis sensor stempel waktu (waktu selesai), sensor durasi dengan satuan, string H:MM:SS, atau detik biasa.",
-            "current_step_entity": "Baca langkah saat ini dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak.",
-            "value_entity": "Baca nilai gauge dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
-            "subtitle_entity": "Tampilkan subjudul dari entitas terpisah (mis. sensor program/mode). Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
-            "tap_action_url": "URL opsional yang dibuka saat mengetuk latar Live Activity. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0 (membuka aplikasi itu).",
-            "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang tanpa meninggalkan Layar Kunci.",
-            "url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
-            "url_title": "Label tombol utama (maks 64 karakter).",
-            "secondary_url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
-            "secondary_url_title": "Label tombol sekunder (maks 64 karakter).",
-            "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
-            "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan.",
-            "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log."
+            "tiles": "Ubin board (1–4), masing-masing membaca entitas terpisah. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opsional). Contoh: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Hanya templat board.",
+            "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log.",
+            "log_level_attribute": "Atribut yang menyediakan level (info/warn/error) untuk setiap baris log. Kosongkan jika tidak ingin ada tag level. Hanya templat log."
           }
         },
         "reconfigure": {
@@ -1223,8 +1395,10 @@
       },
       "error": {
         "invalid_url": "URL harus menggunakan skema http:// atau https://.",
+        "silent_requires_http": "Webhook senyap (foreground nonaktif) memerlukan URL http:// atau https://.",
         "invalid_gauge_range": "Nilai minimum harus lebih kecil dari nilai maksimum.",
-        "silent_requires_http": "Webhook senyap (foreground nonaktif) memerlukan URL http:// atau https://."
+        "tiles_required": "Minimal satu ubin diperlukan untuk templat board.",
+        "too_many_series": "Sebuah timeline mendukung maksimal 10 seri secara total (atribut seri ditambah entitas seri)."
       },
       "abort": {
         "already_configured": "Entitas ini sudah dilacak.",
@@ -1319,34 +1493,6 @@
         "already_configured": "Widget dengan slug ini sudah ada.",
         "reconfigure_successful": "Konfigurasi widget diperbarui."
       }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "notifications_used": {
-        "name": "Notifikasi terpakai"
-      },
-      "live_activity_updates_used": {
-        "name": "Pembaruan Live Activity terpakai"
-      },
-      "widget_updates_used": {
-        "name": "Pembaruan widget terpakai"
-      },
-      "emails_used": {
-        "name": "Email terpakai"
-      },
-      "subscription_tier": {
-        "name": "Tingkat langganan",
-        "state": {
-          "free": "Gratis",
-          "premium": "Premium"
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "widget_not_found": {
-      "message": "Tidak ada widget PushWard yang cocok dengan slug={slug} entity_id={entity_id}."
     }
   },
   "issues": {

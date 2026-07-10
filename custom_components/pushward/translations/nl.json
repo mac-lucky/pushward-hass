@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Gebruikte meldingen"
+      },
+      "live_activity_updates_used": {
+        "name": "Gebruikte Live Activity-updates"
+      },
+      "widget_updates_used": {
+        "name": "Gebruikte widget-updates"
+      },
+      "emails_used": {
+        "name": "Gebruikte e-mails"
+      },
+      "subscription_tier": {
+        "name": "Abonnementsniveau",
+        "state": {
+          "free": "Gratis",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "Activiteit bijwerken (deprecated)",
@@ -34,7 +57,7 @@
         },
         "accent_color": {
           "name": "Accentkleur",
-          "description": "Accentkleurnaam voor de activiteit."
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
         },
         "remaining_time": {
           "name": "Resterende tijd",
@@ -63,6 +86,10 @@
         "severity": {
           "name": "Ernst",
           "description": "alert-ernstniveau."
+        },
+        "severity_label": {
+          "name": "Ernstlabel",
+          "description": "Overschrijf de Info/Warning/Critical-badgetekst. Alleen voor het sjabloon alert."
         },
         "value": {
           "name": "Waarde",
@@ -124,6 +151,10 @@
           "name": "Alarm",
           "description": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+, alleen voor het sjabloon countdown)."
         },
+        "snooze_seconds": {
+          "name": "Snooze-seconden",
+          "description": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Standaard 300 (5 min). Vereist alarm (alleen iOS 26+, aftelsjabloon)."
+        },
         "step_labels": {
           "name": "Staplabels",
           "description": "Geordende lijst met staplabels. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
@@ -139,10 +170,6 @@
         "units": {
           "name": "Eenhedenkaart",
           "description": "Eenheidslabels per reeks. Sleutels moeten overeenkomen met de sleutels van het value dict. Alleen voor het sjabloon timeline."
-        },
-        "snooze_seconds": {
-          "name": "Snooze-seconden",
-          "description": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Standaard 300 (5 min). Vereist alarm (alleen iOS 26+, aftelsjabloon)."
         },
         "duration": {
           "name": "Duur",
@@ -230,7 +257,7 @@
         },
         "accent_color": {
           "name": "Accentkleur",
-          "description": "Accentkleurnaam voor de activiteit."
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
         },
         "background_color": {
           "name": "Achtergrondkleur",
@@ -338,7 +365,7 @@
         },
         "accent_color": {
           "name": "Accentkleur",
-          "description": "Accentkleurnaam voor de activiteit."
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
         },
         "background_color": {
           "name": "Achtergrondkleur",
@@ -466,7 +493,7 @@
         },
         "accent_color": {
           "name": "Accentkleur",
-          "description": "Accentkleurnaam voor de activiteit."
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
         },
         "background_color": {
           "name": "Achtergrondkleur",
@@ -536,6 +563,10 @@
           "name": "Ernst",
           "description": "alert-ernstniveau."
         },
+        "severity_label": {
+          "name": "Ernstlabel",
+          "description": "Overschrijf de Info/Warning/Critical-badgetekst. Alleen voor het sjabloon alert."
+        },
         "state_text": {
           "name": "Statustekst",
           "description": "Tekst die wordt weergegeven als activiteitsstatus."
@@ -570,7 +601,7 @@
         },
         "accent_color": {
           "name": "Accentkleur",
-          "description": "Accentkleurnaam voor de activiteit."
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
         },
         "background_color": {
           "name": "Achtergrondkleur",
@@ -674,7 +705,7 @@
         },
         "accent_color": {
           "name": "Accentkleur",
-          "description": "Accentkleurnaam voor de activiteit."
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
         },
         "background_color": {
           "name": "Achtergrondkleur",
@@ -772,6 +803,10 @@
           "name": "Eenhedenkaart",
           "description": "Eenheidslabels per reeks. Sleutels moeten overeenkomen met de sleutels van het value dict. Alleen voor het sjabloon timeline."
         },
+        "primary_series": {
+          "name": "Primaire reeks",
+          "description": "Label van de reeks die als hoofdwaarde wordt getoond en gebruikt voor het compacte hoog/laag-bereik. Laat leeg om de automatisch gekozen reeks te behouden. Max. 32 tekens. Alleen voor het sjabloon timeline."
+        },
         "scale": {
           "name": "Schaal",
           "description": "Y-as schaalmodus (lineair of logaritmisch). Alleen voor het sjabloon timeline."
@@ -794,7 +829,7 @@
         },
         "accent_color": {
           "name": "Accentkleur",
-          "description": "Accentkleurnaam voor de activiteit."
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
         },
         "background_color": {
           "name": "Achtergrondkleur",
@@ -860,6 +895,122 @@
         }
       }
     },
+    "update_activity_board": {
+      "name": "Activiteit bijwerken (Board)",
+      "description": "Werk een PushWard board Live Activity bij (1–4 tegels).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "tiles": {
+          "name": "Tegels",
+          "description": "Lijst van 1–4 tegels. Elk: label (verplicht, ≤32), value (verplichte tekenreeks, ≤16), en optioneel unit (≤8), icon (SF Symbol of mdi:), color (naam of hex), trend (up/down/flat), url_action-object."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. square.grid.2x2.fill, mdi:view-dashboard)."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body. (Tikacties per tegel gaan in de url_action van elke tegel.)"
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0-10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      }
+    },
+    "update_activity_log": {
+      "name": "Activiteit bijwerken (Log)",
+      "description": "Werk een PushWard log Live Activity bij (1–20 regels, nieuwste eerst).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "lines": {
+          "name": "Regels",
+          "description": "Lijst van 1–20 logregels, nieuwste eerst. Elk: text (verplicht, ≤512), en optioneel at (unix-tijdstempel) en level (info/warn/error)."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. list.bullet.rectangle, mdi:format-list-bulleted)."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0-10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activiteit aanmaken",
       "description": "Maak een nieuwe PushWard Live Activity aan.",
@@ -910,6 +1061,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "Widget vernieuwen",
+      "description": "Forceer het vernieuwen van een gevolgde PushWard-widget. Omzeilt de in-memory diff-cache zodat de widget opnieuw wordt gerenderd en naar iOS wordt gepusht, zelfs als de waarde niet is veranderd.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificatie van de widget. Geef óf slug óf entity_id op."
+        },
+        "entity_id": {
+          "name": "Entiteit",
+          "description": "HA-entiteit gekoppeld aan de widget. Geef óf slug óf entity_id op."
+        }
+      }
+    },
     "send_notification": {
       "name": "Melding verzenden",
       "description": "Verstuur een pushmelding via PushWard.",
@@ -929,6 +1094,10 @@
         "level": {
           "name": "Niveau",
           "description": "iOS-onderbrekingsniveau. Bepaalt hoe de melding wordt afgeleverd."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Geluidsvolume voor kritieke alerts (0.0-1.0). Alleen gebruikt wanneer level critical is."
         },
         "thread_id": {
           "name": "Thread-ID",
@@ -958,6 +1127,10 @@
           "name": "URL",
           "description": "URL die wordt geopend wanneer op de melding wordt getikt."
         },
+        "media": {
+          "name": "Media",
+          "description": "Mediabijlage als object met `url` (HTTPS) en `type` (image, video of audio)."
+        },
         "icon_url": {
           "name": "Pictogram-URL",
           "description": "HTTPS-URL van een aangepast pictogram per melding."
@@ -966,27 +1139,9 @@
           "name": "Metagegevens",
           "description": "Sleutel-waardeparen van aanvullende metagegevens gekoppeld aan de melding."
         },
-        "media": {
-          "name": "Media",
-          "description": "Mediabijlage als object met `url` (HTTPS) en `type` (image, video of audio)."
-        },
         "actions": {
           "name": "Acties",
           "description": "Lijst met actieknoppen. Elke actie is een object met id, title, optionele url, foreground, destructive, authentication_required en icon. Voor een http(s)-url kun je ook een stille webhook versturen met method (GET/POST/PUT/PATCH/DELETE/HEAD), headers en body."
-        }
-      }
-    },
-    "widget_refresh": {
-      "name": "Widget vernieuwen",
-      "description": "Forceer het vernieuwen van een gevolgde PushWard-widget. Omzeilt de in-memory diff-cache zodat de widget opnieuw wordt gerenderd en naar iOS wordt gepusht, zelfs als de waarde niet is veranderd.",
-      "fields": {
-        "slug": {
-          "name": "Slug",
-          "description": "Slug-identificatie van de widget. Geef óf slug óf entity_id op."
-        },
-        "entity_id": {
-          "name": "Entiteit",
-          "description": "HA-entiteit gekoppeld aan de widget. Geef óf slug óf entity_id op."
         }
       }
     },
@@ -1027,14 +1182,19 @@
       }
     }
   },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Geen PushWard-widget komt overeen met slug={slug} entity_id={entity_id}."
+    }
+  },
   "config": {
     "step": {
       "user": {
         "title": "Verbinding maken met PushWard",
+        "description": "Voer je PushWard-integratiesleutel in om te beginnen. Download de PushWard iOS-app uit de App Store: {app_store_url}",
         "data": {
           "integration_key": "Integratiesleutel"
         },
-        "description": "Voer je PushWard-integratiesleutel in om te beginnen. Download de PushWard iOS-app uit de App Store: {app_store_url}",
         "data_description": {
           "integration_key": "Open de PushWard iOS-app (App Store: {app_store_url}) → Instellingen → Integratiesleutels. Je kunt de standaardsleutel plakken of een nieuwe aanmaken met scope 'ha-*'."
         }
@@ -1094,16 +1254,24 @@
           "data": {
             "start_states": "Startstatussen",
             "end_states": "Eindstatussen",
+            "progress_entity": "Voortgangsentiteit",
             "progress_attribute": "Voortgangsattribuut",
+            "remaining_time_entity": "Resterende-tijd-entiteit",
             "remaining_time_attribute": "Attribuut resterende tijd",
+            "live_progress": "Live voortgang-ETA",
             "total_steps": "Totaal aantal steps",
+            "current_step_entity": "Huidige-stap-entiteit",
             "current_step_attribute": "Attribuut huidige stap",
             "severity": "Ernst",
+            "severity_label": "Ernstlabel",
+            "value_entity": "Waarde-entiteit",
             "value_attribute": "Waardeattribuut",
             "min_value": "Minimumwaarde",
             "max_value": "Maximumwaarde",
             "unit": "Eenheid",
             "series": "Reeksen",
+            "series_entities": "Reeksentiteiten",
+            "primary_series": "Primaire reeks",
             "scale": "Schaal",
             "decimals": "Decimalen",
             "smoothing": "Vloeiende lijnen",
@@ -1115,13 +1283,20 @@
             "icon_attribute": "Pictogramattribuut",
             "priority": "Prioriteit (0-10)",
             "update_interval": "Min. bijwerkinterval (seconden)",
+            "subtitle_entity": "Ondertitel-entiteit",
             "subtitle_attribute": "Ondertitelattribuut",
             "state_labels": "Statuslabels",
             "completion_message": "Voltooiingsbericht",
             "accent_color": "Accentkleur",
             "accent_color_attribute": "Accentkleurattribuut",
+            "tap_action_url": "Tikactie-URL",
+            "tap_action_foreground": "Tikactie-URL openen",
             "url": "URL",
+            "url_foreground": "Primaire-knop-URL openen",
+            "url_title": "Titel primaire knop",
             "secondary_url": "Secundaire URL",
+            "secondary_url_foreground": "Secundaire-knop-URL openen",
+            "secondary_url_title": "Titel secundaire knop",
             "ended_ttl": "Automatisch verwijderen na beëindigen (seconden)",
             "stale_ttl": "Automatisch beëindigen na inactiviteit (seconden)",
             "sound": "Geluid",
@@ -1131,38 +1306,37 @@
             "text_color_attribute": "Tekstkleurattribuut",
             "warning_threshold": "Waarschuwingsdrempel (seconden)",
             "alarm": "Alarm (iOS 26+)",
+            "snooze_seconds": "Snooze-seconden (iOS 26+)",
             "step_labels": "Staplabels",
             "step_rows": "Stap-rijhoogten",
+            "fired_at_entity": "Geactiveerd-op-entiteit",
             "fired_at_attribute": "Attribuut activeringstijd",
             "units": "Eenheden per reeks",
-            "progress_entity": "Voortgangsentiteit",
-            "remaining_time_entity": "Resterende-tijd-entiteit",
-            "current_step_entity": "Huidige-stap-entiteit",
-            "value_entity": "Waarde-entiteit",
-            "subtitle_entity": "Ondertitel-entiteit",
-            "tap_action_url": "Tikactie-URL",
-            "tap_action_foreground": "Tikactie-URL openen",
-            "url_foreground": "Primaire-knop-URL openen",
-            "url_title": "Titel primaire knop",
-            "secondary_url_foreground": "Secundaire-knop-URL openen",
-            "secondary_url_title": "Titel secundaire knop",
-            "snooze_seconds": "Snooze-seconden (iOS 26+)",
-            "fired_at_entity": "Geactiveerd-op-entiteit",
-            "log_columns": "Logkolommen"
+            "tiles": "Bordtegels",
+            "log_columns": "Logkolommen",
+            "log_level_attribute": "Logniveau-attribuut"
           },
           "data_description": {
             "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
             "end_states": "Entiteitsstatussen die de Live Activity beëindigen. Selecteer uit de lijst of typ aangepaste waarden.",
+            "progress_entity": "Lees de voortgang van een aparte entiteit in plaats van de gevolgde entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Als het attribuutveld is ingesteld, leest het dat attribuut van deze entiteit; anders de status.",
             "progress_attribute": "Entiteitsattribuut met een voortgangswaarde van 0–100. Voorbeeld: percentage",
+            "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
             "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
+            "live_progress": "Vul de voortgangsbalk vloeiend en tel een ETA af naar de eindtijd op het apparaat, met behulp van de bovenstaande bron voor resterende tijd. Vereist een entiteit of attribuut voor resterende tijd. Bij het sjabloon steps vult dit de huidige stap in plaats van de hele run.",
             "total_steps": "Totaal aantal steps.",
+            "current_step_entity": "Lees de huidige stap van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken.",
             "current_step_attribute": "Entiteitsattribuut met de huidige stap als geheel getal.",
             "severity": "alert-ernstniveau.",
+            "severity_label": "Overschrijf de Info/Warning/Critical-badgetekst die op de alert wordt getoond. Laat leeg om de ernstnaam te gebruiken. Max. 32 tekens. Alleen voor het sjabloon alert.",
+            "value_entity": "Lees de meterwaarde van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
             "value_attribute": "Entiteitsattribuut met de huidige gauge-waarde als getal. Laat leeg om de entiteitsstatus te gebruiken.",
             "min_value": "Minimumwaarde voor het gauge-bereik.",
             "max_value": "Maximumwaarde voor het gauge-bereik.",
             "unit": "Weergave-eenheid naast de waarde (bijv. °C, %, kW). Max. 32 tekens.",
             "series": "Koppel entiteitsattributen aan benoemde reeksen. Indeling: attribuut=Label, attribuut2=Label2. Laat leeg om de entiteitsstatus als enkelvoudige reeks te gebruiken.",
+            "series_entities": "Koppel aparte entiteiten als benoemde lijnen in één grafiek (bijv. een PM2.5-sensor per kamer). Indeling: [Label=]entity_id[:attribute], kommagescheiden. Het label is standaard de vriendelijke naam van de entiteit; lees een attribuut met entity_id:attribute. Combineert met Reeksen; maximaal 10 lijnen in totaal.",
+            "primary_series": "Label van de reeks die als hoofdwaarde wordt getoond en gebruikt voor het compacte hoog/laag-bereik. Laat leeg om de eigen reeks van de gevolgde entiteit te gebruiken (of de eerst geconfigureerde reeks).",
             "scale": "Y-as schaalmodus voor het sparkline-diagram.",
             "decimals": "Aantal decimalen voor de waardeweergave (0–10).",
             "smoothing": "Schakel curve-interpolatie in tussen gegevenspunten voor een vloeiendere sparkline.",
@@ -1174,13 +1348,20 @@
             "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Heeft voorrang op statisch pictogram en entiteitspictogram wanneer ingesteld.",
             "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
             "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
+            "subtitle_entity": "Toon de ondertitel van een aparte entiteit (bijv. een programma-/modussensor). Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
             "subtitle_attribute": "Entiteitsattribuut als ondertitel. Laat leeg om de vriendelijke naam van de entiteit te gebruiken.",
             "state_labels": "Aangepaste weergavetekst voor statussen. Indeling: status=Label, status2=Label 2. Voorbeeld: heating=Bezig met opwarmen, idle=Stand-by",
             "completion_message": "Tekst bij het beëindigen van de activiteit. Laat leeg voor 'Voltooid'. Voorbeeld: Was klaar",
             "accent_color": "Accentkleur voor de Live Activity. Laat leeg voor standaard blauw.",
             "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
+            "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de achtergrond van de Live Activity. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0 (opent die app).",
+            "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST zonder het toegangsscherm te verlaten.",
             "url": "Link die wordt geopend bij het tikken op de Live Activity. Moet beginnen met http:// of https://. Alleen voor sjablonen steps en alert.",
+            "url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+            "url_title": "Label van de primaire knop (max. 64 tekens).",
             "secondary_url": "Secundaire link voor de Live Activity. Alleen voor sjablonen steps en alert.",
+            "secondary_url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+            "secondary_url_title": "Label van de secundaire knop (max. 64 tekens).",
             "ended_ttl": "Seconden na het beëindigen van de activiteit voordat deze automatisch van de server wordt verwijderd. Laat leeg om onbeperkt te bewaren. Voorbeeld: 300",
             "stale_ttl": "Seconden inactiviteit voordat de server de activiteit automatisch beëindigt. Laat leeg om uit te schakelen. Voorbeeld: 1800",
             "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
@@ -1190,24 +1371,15 @@
             "text_color_attribute": "Entiteitsattribuut voor dynamische tekstkleur. Heeft voorrang op statische kleur.",
             "warning_threshold": "Seconden vóór het einde van de countdown waarop de server een waarschuwingspush verzendt. Laat leeg om uit te schakelen. Alleen voor het sjabloon countdown.",
             "alarm": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+). Alleen voor het sjabloon countdown.",
+            "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
             "step_labels": "Labels voor elke stap. Indeling: 1=Eerste Stap, 2=Tweede Stap. Moet stappen 1..total_steps omvatten. Alleen voor het sjabloon steps.",
             "step_rows": "Rijhoogte (1–10) voor elke stap, kommagescheiden. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
+            "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon.",
             "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
             "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline.",
-            "progress_entity": "Lees de voortgang van een aparte entiteit in plaats van de gevolgde entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Als het attribuutveld is ingesteld, leest het dat attribuut van deze entiteit; anders de status.",
-            "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
-            "current_step_entity": "Lees de huidige stap van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken.",
-            "value_entity": "Lees de meterwaarde van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
-            "subtitle_entity": "Toon de ondertitel van een aparte entiteit (bijv. een programma-/modussensor). Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
-            "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de achtergrond van de Live Activity. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0 (opent die app).",
-            "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST zonder het toegangsscherm te verlaten.",
-            "url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
-            "url_title": "Label van de primaire knop (max. 64 tekens).",
-            "secondary_url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
-            "secondary_url_title": "Label van de secundaire knop (max. 64 tekens).",
-            "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
-            "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon.",
-            "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon."
+            "tiles": "Bordtegels (1–4), elk gekoppeld aan een aparte entiteit. Indeling: Label=entity_id:attribute:unit:icon (attribute, unit, icon optioneel). Voorbeeld: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Alleen voor het sjabloon board.",
+            "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon.",
+            "log_level_attribute": "Attribuut dat het niveau van elke logregel levert (info/warn/error). Laat leeg voor geen niveaulabel. Alleen voor het sjabloon log."
           }
         },
         "reconfigure": {
@@ -1223,8 +1395,10 @@
       },
       "error": {
         "invalid_url": "URL moet het schema http:// of https:// gebruiken.",
+        "silent_requires_http": "Stille webhook (foreground uit) vereist een http:// of https://-URL.",
         "invalid_gauge_range": "De minimumwaarde moet kleiner zijn dan de maximumwaarde.",
-        "silent_requires_http": "Stille webhook (foreground uit) vereist een http:// of https://-URL."
+        "tiles_required": "Voor het board-sjabloon is minimaal één tegel vereist.",
+        "too_many_series": "Een timeline ondersteunt in totaal maximaal 10 reeksen (reeksattributen plus reeksentiteiten)."
       },
       "abort": {
         "already_configured": "Deze entiteit wordt al gevolgd.",
@@ -1319,34 +1493,6 @@
         "already_configured": "Er bestaat al een widget met deze slug.",
         "reconfigure_successful": "Widgetconfiguratie bijgewerkt."
       }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "notifications_used": {
-        "name": "Gebruikte meldingen"
-      },
-      "live_activity_updates_used": {
-        "name": "Gebruikte Live Activity-updates"
-      },
-      "widget_updates_used": {
-        "name": "Gebruikte widget-updates"
-      },
-      "emails_used": {
-        "name": "Gebruikte e-mails"
-      },
-      "subscription_tier": {
-        "name": "Abonnementsniveau",
-        "state": {
-          "free": "Gratis",
-          "premium": "Premium"
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "widget_not_found": {
-      "message": "Geen PushWard-widget komt overeen met slug={slug} entity_id={entity_id}."
     }
   },
   "issues": {

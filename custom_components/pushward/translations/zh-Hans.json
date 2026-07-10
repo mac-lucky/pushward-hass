@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "已用通知数"
+      },
+      "live_activity_updates_used": {
+        "name": "已用 Live Activity 更新数"
+      },
+      "widget_updates_used": {
+        "name": "已用小组件更新数"
+      },
+      "emails_used": {
+        "name": "已用邮件数"
+      },
+      "subscription_tier": {
+        "name": "订阅等级",
+        "state": {
+          "free": "免费",
+          "premium": "高级"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "更新活动 (deprecated)",
@@ -34,7 +57,7 @@
         },
         "accent_color": {
           "name": "强调色",
-          "description": "活动的强调色名称。"
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
         },
         "remaining_time": {
           "name": "剩余时间",
@@ -63,6 +86,10 @@
         "severity": {
           "name": "严重程度",
           "description": "alert 严重程度级别。"
+        },
+        "severity_label": {
+          "name": "严重程度标签",
+          "description": "覆盖 Info/Warning/Critical 徽章文本。仅适用于 alert 模板。"
         },
         "value": {
           "name": "值",
@@ -124,6 +151,10 @@
           "name": "闹钟",
           "description": "在倒计时到期时触发 AlarmKit 闹钟（iOS 26+，仅适用于 countdown 模板）。"
         },
+        "snooze_seconds": {
+          "name": "稍后提醒秒数",
+          "description": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。默认为 300（5 分钟）。需要启用闹钟（仅限 iOS 26+，countdown 模板）。"
+        },
         "step_labels": {
           "name": "步骤标签",
           "description": "步骤标签的有序列表。长度必须等于 total_steps。仅适用于 steps 模板。"
@@ -139,10 +170,6 @@
         "units": {
           "name": "单位映射",
           "description": "每个系列的单位标签。键必须与 value dict 的键匹配。仅适用于 timeline 模板。"
-        },
-        "snooze_seconds": {
-          "name": "稍后提醒秒数",
-          "description": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。默认为 300（5 分钟）。需要启用闹钟（仅限 iOS 26+，countdown 模板）。"
         },
         "duration": {
           "name": "时长",
@@ -230,7 +257,7 @@
         },
         "accent_color": {
           "name": "强调色",
-          "description": "活动的强调色名称。"
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
         },
         "background_color": {
           "name": "背景颜色",
@@ -338,7 +365,7 @@
         },
         "accent_color": {
           "name": "强调色",
-          "description": "活动的强调色名称。"
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
         },
         "background_color": {
           "name": "背景颜色",
@@ -466,7 +493,7 @@
         },
         "accent_color": {
           "name": "强调色",
-          "description": "活动的强调色名称。"
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
         },
         "background_color": {
           "name": "背景颜色",
@@ -536,6 +563,10 @@
           "name": "严重程度",
           "description": "alert 严重程度级别。"
         },
+        "severity_label": {
+          "name": "严重程度标签",
+          "description": "覆盖 Info/Warning/Critical 徽章文本。仅适用于 alert 模板。"
+        },
         "state_text": {
           "name": "状态文本",
           "description": "显示为活动状态的文本。"
@@ -570,7 +601,7 @@
         },
         "accent_color": {
           "name": "强调色",
-          "description": "活动的强调色名称。"
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
         },
         "background_color": {
           "name": "背景颜色",
@@ -674,7 +705,7 @@
         },
         "accent_color": {
           "name": "强调色",
-          "description": "活动的强调色名称。"
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
         },
         "background_color": {
           "name": "背景颜色",
@@ -772,6 +803,10 @@
           "name": "单位映射",
           "description": "每个系列的单位标签。键必须与 value dict 的键匹配。仅适用于 timeline 模板。"
         },
+        "primary_series": {
+          "name": "主系列",
+          "description": "作为标题值显示、并用于精简高/低范围的系列标签。留空则保留自动选择的系列。最多 32 个字符。仅适用于 timeline 模板。"
+        },
         "scale": {
           "name": "刻度",
           "description": "Y 轴刻度模式（线性或对数）。仅适用于 timeline 模板。"
@@ -794,7 +829,7 @@
         },
         "accent_color": {
           "name": "强调色",
-          "description": "活动的强调色名称。"
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
         },
         "background_color": {
           "name": "背景颜色",
@@ -860,6 +895,122 @@
         }
       }
     },
+    "update_activity_board": {
+      "name": "更新活动 (Board)",
+      "description": "更新一个 PushWard board Live Activity（1-4 个磁贴）。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "tiles": {
+          "name": "磁贴",
+          "description": "1-4 个磁贴的列表。每个：label（必需，≤32）、value（必需字符串，≤16），以及可选的 unit（≤8）、icon（SF Symbol 或 mdi:）、color（颜色名称或十六进制）、trend（up/down/flat）、url_action 对象。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 square.grid.2x2.fill、mdi:view-dashboard）。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。（每个磁贴的点击操作请在各自的 url_action 中设置。）"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      }
+    },
+    "update_activity_log": {
+      "name": "更新活动 (Log)",
+      "description": "更新一个 PushWard log Live Activity（1-20 行、最新在前）。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "lines": {
+          "name": "日志行",
+          "description": "按最新在前排列的 1-20 行日志的列表。每行：text（必需，≤512），以及可选的 at（unix 时间戳）和 level（info/warn/error）。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 list.bullet.rectangle、mdi:format-list-bulleted）。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        }
+      }
+    },
     "create_activity": {
       "name": "创建活动",
       "description": "创建新的 PushWard Live Activity。",
@@ -910,6 +1061,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "刷新小组件",
+      "description": "强制刷新已追踪的 PushWard 小组件。绕过内存中的差异缓存，即使值未改变也会重新渲染小组件并推送到 iOS。",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "小组件 slug 标识符。必须提供 slug 或 entity_id 之一。"
+        },
+        "entity_id": {
+          "name": "实体",
+          "description": "绑定到小组件的 HA 实体。必须提供 slug 或 entity_id 之一。"
+        }
+      }
+    },
     "send_notification": {
       "name": "发送通知",
       "description": "通过 PushWard 发送推送通知。",
@@ -929,6 +1094,10 @@
         "level": {
           "name": "级别",
           "description": "iOS 打扰级别，控制通知的发送方式。"
+        },
+        "volume": {
+          "name": "音量",
+          "description": "critical 级别通知的音量（0.0-1.0）。仅在 level 为 critical 时使用。"
         },
         "thread_id": {
           "name": "线程 ID",
@@ -958,6 +1127,10 @@
           "name": "URL",
           "description": "点击通知时打开的 URL。"
         },
+        "media": {
+          "name": "媒体",
+          "description": "媒体附件，为一个包含 `url`（HTTPS）和 `type`（image、video 或 audio）的对象。"
+        },
         "icon_url": {
           "name": "图标 URL",
           "description": "每条通知自定义图标的 HTTPS URL。"
@@ -966,27 +1139,9 @@
           "name": "元数据",
           "description": "附加到通知的额外元数据键值对。"
         },
-        "media": {
-          "name": "媒体",
-          "description": "媒体附件，为一个包含 `url`（HTTPS）和 `type`（image、video 或 audio）的对象。"
-        },
         "actions": {
           "name": "动作",
           "description": "动作按钮列表。每个动作是一个对象，包含 id、title、可选的 url、foreground、destructive、authentication_required 和 icon。对于 http(s) URL，还可通过 method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers 和 body 发送静默 webhook。"
-        }
-      }
-    },
-    "widget_refresh": {
-      "name": "刷新小组件",
-      "description": "强制刷新已追踪的 PushWard 小组件。绕过内存中的差异缓存，即使值未改变也会重新渲染小组件并推送到 iOS。",
-      "fields": {
-        "slug": {
-          "name": "Slug",
-          "description": "小组件 slug 标识符。必须提供 slug 或 entity_id 之一。"
-        },
-        "entity_id": {
-          "name": "实体",
-          "description": "绑定到小组件的 HA 实体。必须提供 slug 或 entity_id 之一。"
         }
       }
     },
@@ -1027,14 +1182,19 @@
       }
     }
   },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "没有与 slug={slug} entity_id={entity_id} 匹配的 PushWard 小组件。"
+    }
+  },
   "config": {
     "step": {
       "user": {
         "title": "连接到 PushWard",
+        "description": "输入你的 PushWard 集成密钥以开始使用。可从 App Store 获取 PushWard iOS 应用：{app_store_url}",
         "data": {
           "integration_key": "集成密钥"
         },
-        "description": "输入你的 PushWard 集成密钥以开始使用。可从 App Store 获取 PushWard iOS 应用：{app_store_url}",
         "data_description": {
           "integration_key": "打开 PushWard iOS 应用（App Store：{app_store_url}）→ 设置 → 集成密钥。你可以粘贴默认密钥，或创建一个作用域为 'ha-*' 的新密钥。"
         }
@@ -1094,16 +1254,24 @@
           "data": {
             "start_states": "开始状态",
             "end_states": "结束状态",
+            "progress_entity": "进度实体",
             "progress_attribute": "进度属性",
+            "remaining_time_entity": "剩余时间实体",
             "remaining_time_attribute": "剩余时间属性",
+            "live_progress": "实时进度 ETA",
             "total_steps": "总 steps 数",
+            "current_step_entity": "当前步骤实体",
             "current_step_attribute": "当前步骤属性",
             "severity": "严重程度",
+            "severity_label": "严重程度标签",
+            "value_entity": "数值实体",
             "value_attribute": "值属性",
             "min_value": "最小值",
             "max_value": "最大值",
             "unit": "单位",
             "series": "系列",
+            "series_entities": "系列实体",
+            "primary_series": "主系列",
             "scale": "刻度",
             "decimals": "小数位数",
             "smoothing": "平滑曲线",
@@ -1115,13 +1283,20 @@
             "icon_attribute": "图标属性",
             "priority": "优先级（0-10）",
             "update_interval": "最小更新间隔（秒）",
+            "subtitle_entity": "副标题实体",
             "subtitle_attribute": "副标题属性",
             "state_labels": "状态标签",
             "completion_message": "完成消息",
             "accent_color": "强调色",
             "accent_color_attribute": "强调色属性",
+            "tap_action_url": "点击动作 URL",
+            "tap_action_foreground": "打开点击动作 URL",
             "url": "URL",
+            "url_foreground": "打开主按钮 URL",
+            "url_title": "主按钮标题",
             "secondary_url": "次要 URL",
+            "secondary_url_foreground": "打开次按钮 URL",
+            "secondary_url_title": "次按钮标题",
             "ended_ttl": "结束后自动删除（秒）",
             "stale_ttl": "空闲后自动结束（秒）",
             "sound": "声音",
@@ -1131,38 +1306,37 @@
             "text_color_attribute": "文字颜色属性",
             "warning_threshold": "警告阈值（秒）",
             "alarm": "闹钟（iOS 26+）",
+            "snooze_seconds": "稍后提醒秒数（iOS 26+）",
             "step_labels": "步骤标签",
             "step_rows": "步骤行高",
+            "fired_at_entity": "触发时间实体",
             "fired_at_attribute": "触发时间属性",
             "units": "每系列单位",
-            "progress_entity": "进度实体",
-            "remaining_time_entity": "剩余时间实体",
-            "current_step_entity": "当前步骤实体",
-            "value_entity": "数值实体",
-            "subtitle_entity": "副标题实体",
-            "tap_action_url": "点击动作 URL",
-            "tap_action_foreground": "打开点击动作 URL",
-            "url_foreground": "打开主按钮 URL",
-            "url_title": "主按钮标题",
-            "secondary_url_foreground": "打开次按钮 URL",
-            "secondary_url_title": "次按钮标题",
-            "snooze_seconds": "稍后提醒秒数（iOS 26+）",
-            "fired_at_entity": "触发时间实体",
-            "log_columns": "日志列"
+            "tiles": "board 磁贴",
+            "log_columns": "日志列",
+            "log_level_attribute": "日志级别属性"
           },
           "data_description": {
             "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
             "end_states": "结束 Live Activity 的实体状态。从列表中选择或输入自定义值。",
+            "progress_entity": "从单独的实体（而非被追踪实体）读取进度。留空则使用被追踪实体。若设置了属性字段，则读取此实体的该属性；否则读取其状态。",
             "progress_attribute": "持有 0–100 进度值的实体属性。示例：percentage",
+            "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
             "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
+            "live_progress": "使用上面的剩余时间来源，平滑填充进度条，并在设备上倒计时显示到完成时间的 ETA。需要一个剩余时间实体或属性。在 steps 模板中，它填充的是当前步骤而不是整个流程。",
             "total_steps": "steps 总数。",
+            "current_step_entity": "从单独的实体读取当前步骤。留空则使用被追踪实体。",
             "current_step_attribute": "以整数形式持有当前步骤的实体属性。",
             "severity": "alert 严重程度级别。",
+            "severity_label": "覆盖 alert 上显示的 Info/Warning/Critical 徽章文本。留空则使用严重程度名称。最多 32 个字符。仅适用于 alert 模板。",
+            "value_entity": "从单独的实体读取 gauge 数值。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
             "value_attribute": "以数字形式持有当前 gauge 值的实体属性。留空则使用实体的状态值。",
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "unit": "值旁边显示的单位（例如 °C、%、kW）。最多 32 个字符。",
             "series": "将实体属性映射到命名系列。格式：attribute=标签, attribute2=标签2。留空则将实体状态用作单一系列。",
+            "series_entities": "将独立的实体绑定为同一图表上的命名线条（例如每个房间一个 PM2.5 传感器）。格式：[Label=]entity_id[:attribute]，以逗号分隔。标签默认使用实体的友好名称；可通过 entity_id:attribute 读取属性。可与系列组合使用；总计最多 10 条线。",
+            "primary_series": "作为标题值显示、并用于精简高/低范围的系列标签。留空则使用被追踪实体自身的系列（或第一个已配置的系列）。",
             "scale": "迷你图的 Y 轴刻度模式。",
             "decimals": "值显示的小数位数（0–10）。",
             "smoothing": "启用数据点之间的曲线插值，使迷你图更平滑。",
@@ -1174,13 +1348,20 @@
             "icon_attribute": "动态图标的实体属性。设置后将覆盖静态图标和实体图标。",
             "priority": "当设备达到上限时，优先级较高的活动会保留更长时间（0 = 最低，10 = 最高）。",
             "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
+            "subtitle_entity": "从单独的实体（例如程序/模式传感器）显示副标题。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
             "subtitle_attribute": "用作副标题的实体属性。留空则使用实体的友好名称。",
             "state_labels": "状态的自定义显示文本。格式：state=标签, state2=标签2。示例：heating=加热中, idle=待机",
             "completion_message": "活动结束时显示的文本。留空则显示\"完成\"。示例：洗涤完毕",
             "accent_color": "Live Activity 的强调色。留空则使用默认蓝色。",
             "accent_color_attribute": "动态强调色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
+            "tap_action_url": "点击 Live Activity 背景时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0（打开对应应用）。",
+            "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST，无需离开锁屏。",
             "url": "点击 Live Activity 时打开的链接。必须以 http:// 或 https:// 开头。仅适用于 steps 和 alert 模板。",
+            "url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+            "url_title": "主按钮标签（最多 64 个字符）。",
             "secondary_url": "Live Activity 的次要链接。仅适用于 steps 和 alert 模板。",
+            "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+            "secondary_url_title": "次按钮标签（最多 64 个字符）。",
             "ended_ttl": "活动结束后从服务器自动删除前等待的秒数。留空则永久保留。示例：300",
             "stale_ttl": "服务器自动结束活动前的空闲秒数。留空则禁用。示例：1800",
             "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
@@ -1190,24 +1371,15 @@
             "text_color_attribute": "动态文字颜色的实体属性。覆盖静态颜色。",
             "warning_threshold": "倒计时结束前服务器发送警告推送的秒数。留空则禁用。仅适用于 countdown 模板。",
             "alarm": "倒计时到期时触发 AlarmKit 闹钟（iOS 26+）。仅适用于 countdown 模板。",
+            "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
             "step_labels": "每个步骤的标签。格式：1=第一步, 2=第二步。必须覆盖步骤 1..total_steps。仅适用于 steps 模板。",
             "step_rows": "每个步骤的行高（1–10），以逗号分隔。必须有 total_steps 个条目。仅适用于 steps 模板。",
+            "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。",
             "fired_at_attribute": "持有告警触发时 Unix 时间戳的实体属性。仅适用于 alert 模板。",
             "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。",
-            "progress_entity": "从单独的实体（而非被追踪实体）读取进度。留空则使用被追踪实体。若设置了属性字段，则读取此实体的该属性；否则读取其状态。",
-            "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
-            "current_step_entity": "从单独的实体读取当前步骤。留空则使用被追踪实体。",
-            "value_entity": "从单独的实体读取 gauge 数值。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
-            "subtitle_entity": "从单独的实体（例如程序/模式传感器）显示副标题。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
-            "tap_action_url": "点击 Live Activity 背景时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0（打开对应应用）。",
-            "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST，无需离开锁屏。",
-            "url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
-            "url_title": "主按钮标签（最多 64 个字符）。",
-            "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
-            "secondary_url_title": "次按钮标签（最多 64 个字符）。",
-            "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
-            "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。",
-            "log_columns": "追加到每条日志行的额外值（最多 6 个），以逗号分隔。格式：[Label=]source[|unit]。source = 此实体的属性 (brightness)、另一实体的状态 (binary_sensor.door) 或另一实体的属性 (sensor.temp:temperature)。示例：color_temp_kelvin|K, brightness → 'On · 4000K · 153'。仅限日志模板。"
+            "tiles": "board 磁贴（1-4 个），每个读取一个独立实体。格式：Label=entity_id:attribute:unit:icon（attribute、unit、icon 可选）。示例：Temp=sensor.kitchen::°C, Door=binary_sensor.front_door。仅适用于 board 模板。",
+            "log_columns": "追加到每条日志行的额外值（最多 6 个），以逗号分隔。格式：[Label=]source[|unit]。source = 此实体的属性 (brightness)、另一实体的状态 (binary_sensor.door) 或另一实体的属性 (sensor.temp:temperature)。示例：color_temp_kelvin|K, brightness → 'On · 4000K · 153'。仅限日志模板。",
+            "log_level_attribute": "提供每条日志行级别（info/warn/error）的实体属性。留空则不显示级别标签。仅适用于 log 模板。"
           }
         },
         "reconfigure": {
@@ -1223,8 +1395,10 @@
       },
       "error": {
         "invalid_url": "URL 必须使用 http:// 或 https:// 协议。",
+        "silent_requires_http": "静默 webhook（关闭 foreground）需要 http:// 或 https:// URL。",
         "invalid_gauge_range": "最小值必须小于最大值。",
-        "silent_requires_http": "静默 webhook（关闭 foreground）需要 http:// 或 https:// URL。"
+        "tiles_required": "board 模板至少需要一个磁贴。",
+        "too_many_series": "timeline 总共最多支持 10 个系列（系列属性加系列实体）。"
       },
       "abort": {
         "already_configured": "此实体已被追踪。",
@@ -1319,34 +1493,6 @@
         "already_configured": "已存在使用此 slug 的小组件。",
         "reconfigure_successful": "小组件配置已更新。"
       }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "notifications_used": {
-        "name": "已用通知数"
-      },
-      "live_activity_updates_used": {
-        "name": "已用 Live Activity 更新数"
-      },
-      "widget_updates_used": {
-        "name": "已用小组件更新数"
-      },
-      "emails_used": {
-        "name": "已用邮件数"
-      },
-      "subscription_tier": {
-        "name": "订阅等级",
-        "state": {
-          "free": "免费",
-          "premium": "高级"
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "widget_not_found": {
-      "message": "没有与 slug={slug} entity_id={entity_id} 匹配的 PushWard 小组件。"
     }
   },
   "issues": {

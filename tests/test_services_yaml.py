@@ -135,3 +135,32 @@ def test_sections_have_matching_translations_in_every_locale() -> None:
             assert locale_sections == section_keys, (
                 f"{locale_file.name}: {name} sections {sorted(locale_sections)} != services.yaml {sorted(section_keys)}"
             )
+
+
+def _flatten_keys(node: dict, prefix: str = "") -> set[str]:
+    keys: set[str] = set()
+    for key, val in node.items():
+        path = f"{prefix}.{key}" if prefix else key
+        if isinstance(val, dict):
+            keys |= _flatten_keys(val, path)
+        else:
+            keys.add(path)
+    return keys
+
+
+def test_every_locale_carries_every_en_key() -> None:
+    """Every locale must carry exactly the en.json key set.
+
+    HA silently falls back to English for missing custom-integration keys, so a
+    locale drifting behind en.json ships untranslated UI without any CI signal.
+    Extra keys are stale leftovers from removed features and are equally wrong.
+    """
+    en_keys = _flatten_keys(json.loads((_TRANSLATIONS / "en.json").read_text()))
+    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
+        if locale_file.name == "en.json":
+            continue
+        keys = _flatten_keys(json.loads(locale_file.read_text()))
+        missing = sorted(en_keys - keys)
+        extra = sorted(keys - en_keys)
+        assert not missing, f"{locale_file.name}: missing {missing[:8]} (+{max(0, len(missing) - 8)} more)"
+        assert not extra, f"{locale_file.name}: stale keys {extra[:8]} (+{max(0, len(extra) - 8)} more)"

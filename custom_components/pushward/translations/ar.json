@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "الإشعارات المستخدمة"
+      },
+      "live_activity_updates_used": {
+        "name": "تحديثات النشاط المباشر المستخدمة"
+      },
+      "widget_updates_used": {
+        "name": "تحديثات الأداة المستخدمة"
+      },
+      "emails_used": {
+        "name": "رسائل البريد الإلكتروني المستخدمة"
+      },
+      "subscription_tier": {
+        "name": "مستوى الاشتراك",
+        "state": {
+          "free": "مجاني",
+          "premium": "مميز"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "تحديث النشاط (deprecated)",
@@ -34,7 +57,7 @@
         },
         "accent_color": {
           "name": "لون التمييز",
-          "description": "اسم لون التمييز للنشاط."
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
         },
         "remaining_time": {
           "name": "الوقت المتبقي",
@@ -63,6 +86,10 @@
         "severity": {
           "name": "مستوى الخطورة",
           "description": "مستوى خطورة Alert."
+        },
+        "severity_label": {
+          "name": "تسمية مستوى الخطورة",
+          "description": "يتجاوز نص شارة Info/Warning/Critical. قالب alert فقط."
         },
         "value": {
           "name": "القيمة",
@@ -124,6 +151,10 @@
           "name": "تنبيه",
           "description": "تشغيل تنبيه AlarmKit عند انتهاء countdown (iOS 26+، قالب countdown فقط)."
         },
+        "snooze_seconds": {
+          "name": "ثواني الغفوة",
+          "description": "المدة التي يطيلها زر الغفوة في iOS للعد التنازلي (60–3600). القيمة الافتراضية 300 (5 دقائق). يتطلب منبهًا (iOS 26+، قالب العد التنازلي فقط)."
+        },
         "step_labels": {
           "name": "تسميات الخطوات",
           "description": "قائمة مرتبة من تسميات الخطوات. يجب أن يساوي طولها total_steps. قالب steps فقط."
@@ -139,10 +170,6 @@
         "units": {
           "name": "خريطة الوحدات",
           "description": "تسميات وحدات لكل سلسلة. يجب أن تتطابق المفاتيح مع مفاتيح value dict. قالب timeline فقط."
-        },
-        "snooze_seconds": {
-          "name": "ثواني الغفوة",
-          "description": "المدة التي يطيلها زر الغفوة في iOS للعد التنازلي (60–3600). القيمة الافتراضية 300 (5 دقائق). يتطلب منبهًا (iOS 26+، قالب العد التنازلي فقط)."
         },
         "duration": {
           "name": "المدة",
@@ -230,7 +257,7 @@
         },
         "accent_color": {
           "name": "لون التمييز",
-          "description": "اسم لون التمييز للنشاط."
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
         },
         "background_color": {
           "name": "لون الخلفية",
@@ -338,7 +365,7 @@
         },
         "accent_color": {
           "name": "لون التمييز",
-          "description": "اسم لون التمييز للنشاط."
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
         },
         "background_color": {
           "name": "لون الخلفية",
@@ -466,7 +493,7 @@
         },
         "accent_color": {
           "name": "لون التمييز",
-          "description": "اسم لون التمييز للنشاط."
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
         },
         "background_color": {
           "name": "لون الخلفية",
@@ -536,6 +563,10 @@
           "name": "مستوى الخطورة",
           "description": "مستوى خطورة Alert."
         },
+        "severity_label": {
+          "name": "تسمية مستوى الخطورة",
+          "description": "يتجاوز نص شارة Info/Warning/Critical. قالب alert فقط."
+        },
         "state_text": {
           "name": "نص الحالة",
           "description": "النص الظاهر بوصفه حالة النشاط."
@@ -570,7 +601,7 @@
         },
         "accent_color": {
           "name": "لون التمييز",
-          "description": "اسم لون التمييز للنشاط."
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
         },
         "background_color": {
           "name": "لون الخلفية",
@@ -674,7 +705,7 @@
         },
         "accent_color": {
           "name": "لون التمييز",
-          "description": "اسم لون التمييز للنشاط."
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
         },
         "background_color": {
           "name": "لون الخلفية",
@@ -772,6 +803,10 @@
           "name": "خريطة الوحدات",
           "description": "تسميات وحدات لكل سلسلة. يجب أن تتطابق المفاتيح مع مفاتيح value dict. قالب timeline فقط."
         },
+        "primary_series": {
+          "name": "السلسلة الأساسية",
+          "description": "تسمية السلسلة المعروضة كقيمة رئيسية والمستخدمة لنطاق الحد الأقصى/الأدنى المصغّر. اتركها فارغة للاحتفاظ بالسلسلة المختارة تلقائيًا. الحد الأقصى 32 حرفًا. قالب timeline فقط."
+        },
         "scale": {
           "name": "المقياس",
           "description": "وضع مقياس المحور الصادي (خطي أو لوغاريتمي). قالب timeline فقط."
@@ -794,7 +829,7 @@
         },
         "accent_color": {
           "name": "لون التمييز",
-          "description": "اسم لون التمييز للنشاط."
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
         },
         "background_color": {
           "name": "لون الخلفية",
@@ -860,6 +895,122 @@
         }
       }
     },
+    "update_activity_board": {
+      "name": "تحديث النشاط (Board)",
+      "description": "تحديث Live Activity من نوع board في PushWard (1–4 بلاطات).",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "tiles": {
+          "name": "البلاطات",
+          "description": "قائمة من 1 إلى 4 بلاطات. كل بلاطة: label (مطلوب، ≤32)، value (نص مطلوب، ≤16)، مع unit الاختياري (≤8)، icon (SF Symbol أو mdi:)، color (اسم أو hex)، trend (up/down/flat)، وكائن url_action."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: square.grid.2x2.fill، mdi:view-dashboard)."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body. (تُحدَّد نقرات كل بلاطة على حدة ضمن url_action الخاص بها.)"
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      }
+    },
+    "update_activity_log": {
+      "name": "تحديث النشاط (Log)",
+      "description": "تحديث Live Activity من نوع log في PushWard (1–20 سطرًا، الأحدث أولاً).",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "lines": {
+          "name": "الأسطر",
+          "description": "قائمة من 1 إلى 20 سطرًا من السجل، الأحدث أولاً. كل سطر: text (مطلوب، ≤512)، مع at الاختياري (طابع زمني unix) وlevel (info/warn/error)."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: list.bullet.rectangle، mdi:format-list-bulleted)."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        }
+      }
+    },
     "create_activity": {
       "name": "إنشاء نشاط",
       "description": "إنشاء Live Activity جديد في PushWard.",
@@ -910,6 +1061,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "تحديث الأداة",
+      "description": "فرض تحديث أداة PushWard متتبَّعة. يتجاوز ذاكرة التخزين المؤقت للفروقات في الذاكرة بحيث يُعاد عرض الأداة ودفعها إلى iOS حتى عندما لا تتغير القيمة.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف النصي",
+          "description": "معرّف slug للأداة. يجب توفير slug أو entity_id."
+        },
+        "entity_id": {
+          "name": "الكيان",
+          "description": "كيان HA المرتبط بالأداة. يجب توفير slug أو entity_id."
+        }
+      }
+    },
     "send_notification": {
       "name": "إرسال إشعار",
       "description": "إرسال إشعار فوري عبر PushWard.",
@@ -929,6 +1094,10 @@
         "level": {
           "name": "المستوى",
           "description": "مستوى المقاطعة في iOS. يتحكم في كيفية تسليم الإشعار."
+        },
+        "volume": {
+          "name": "مستوى الصوت",
+          "description": "مستوى صوت للتنبيهات الحرجة (0.0-1.0). يُستخدم فقط عندما تكون level بقيمة critical."
         },
         "thread_id": {
           "name": "معرّف الخيط",
@@ -958,6 +1127,10 @@
           "name": "الرابط",
           "description": "الرابط الذي يُفتح عند النقر على الإشعار."
         },
+        "media": {
+          "name": "الوسائط",
+          "description": "مرفق وسائط ككائن يحتوي على `url` (HTTPS) و`type` (image أو video أو audio)."
+        },
         "icon_url": {
           "name": "رابط الأيقونة",
           "description": "رابط HTTPS لأيقونة مخصصة لكل إشعار."
@@ -966,27 +1139,9 @@
           "name": "البيانات التعريفية",
           "description": "أزواج مفتاح-قيمة من بيانات تعريفية إضافية مرفقة بالإشعار."
         },
-        "media": {
-          "name": "الوسائط",
-          "description": "مرفق وسائط ككائن يحتوي على `url` (HTTPS) و`type` (image أو video أو audio)."
-        },
         "actions": {
           "name": "الإجراءات",
           "description": "قائمة بأزرار الإجراءات. كل إجراء هو كائن يحتوي على id وtitle، وurl وforeground وdestructive وauthentication_required وicon اختيارية. بالنسبة لعنوان http(s) يمكنك أيضًا إرسال خطاف ويب صامت باستخدام method (GET/POST/PUT/PATCH/DELETE/HEAD) وheaders وbody."
-        }
-      }
-    },
-    "widget_refresh": {
-      "name": "تحديث الأداة",
-      "description": "فرض تحديث أداة PushWard متتبَّعة. يتجاوز ذاكرة التخزين المؤقت للفروقات في الذاكرة بحيث يُعاد عرض الأداة ودفعها إلى iOS حتى عندما لا تتغير القيمة.",
-      "fields": {
-        "slug": {
-          "name": "المعرّف النصي",
-          "description": "معرّف slug للأداة. يجب توفير slug أو entity_id."
-        },
-        "entity_id": {
-          "name": "الكيان",
-          "description": "كيان HA المرتبط بالأداة. يجب توفير slug أو entity_id."
         }
       }
     },
@@ -1027,14 +1182,19 @@
       }
     }
   },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "لا توجد أداة PushWard تطابق slug={slug} entity_id={entity_id}."
+    }
+  },
   "config": {
     "step": {
       "user": {
         "title": "الاتصال بـ PushWard",
+        "description": "أدخل مفتاح تكامل PushWard للبدء. احصل على تطبيق PushWard لنظام iOS من App Store: {app_store_url}",
         "data": {
           "integration_key": "مفتاح التكامل"
         },
-        "description": "أدخل مفتاح تكامل PushWard للبدء. احصل على تطبيق PushWard لنظام iOS من App Store: {app_store_url}",
         "data_description": {
           "integration_key": "افتح تطبيق PushWard على iOS (App Store: {app_store_url}) ← الإعدادات ← مفاتيح التكامل. يمكنك لصق المفتاح الافتراضي، أو إنشاء مفتاح جديد بالنطاق 'ha-*'."
         }
@@ -1094,16 +1254,24 @@
           "data": {
             "start_states": "حالات البدء",
             "end_states": "حالات الإنهاء",
+            "progress_entity": "كيان التقدّم",
             "progress_attribute": "سمة التقدم",
+            "remaining_time_entity": "كيان الوقت المتبقي",
             "remaining_time_attribute": "سمة الوقت المتبقي",
+            "live_progress": "الوقت المتوقع للتقدم الحي (ETA)",
             "total_steps": "إجمالي Steps",
+            "current_step_entity": "كيان الخطوة الحالية",
             "current_step_attribute": "سمة الخطوة الحالية",
             "severity": "مستوى الخطورة",
+            "severity_label": "تسمية مستوى الخطورة",
+            "value_entity": "كيان القيمة",
             "value_attribute": "سمة القيمة",
             "min_value": "الحد الأدنى للقيمة",
             "max_value": "الحد الأقصى للقيمة",
             "unit": "الوحدة",
             "series": "السلاسل",
+            "series_entities": "كيانات السلاسل",
+            "primary_series": "السلسلة الأساسية",
             "scale": "المقياس",
             "decimals": "المنازل العشرية",
             "smoothing": "تنعيم الخطوط",
@@ -1115,13 +1283,20 @@
             "icon_attribute": "سمة الأيقونة",
             "priority": "الأولوية (0-10)",
             "update_interval": "الحد الأدنى لفترة التحديث (ثانية)",
+            "subtitle_entity": "كيان العنوان الفرعي",
             "subtitle_attribute": "سمة العنوان الفرعي",
             "state_labels": "تسميات الحالات",
             "completion_message": "رسالة الاكتمال",
             "accent_color": "لون التمييز",
             "accent_color_attribute": "سمة لون التمييز",
+            "tap_action_url": "عنوان URL لإجراء النقر",
+            "tap_action_foreground": "فتح عنوان URL لإجراء النقر",
             "url": "الرابط",
+            "url_foreground": "فتح عنوان URL للزر الأساسي",
+            "url_title": "عنوان الزر الأساسي",
             "secondary_url": "الرابط الثانوي",
+            "secondary_url_foreground": "فتح عنوان URL للزر الثانوي",
+            "secondary_url_title": "عنوان الزر الثانوي",
             "ended_ttl": "حذف تلقائي بعد الإنهاء (ثانية)",
             "stale_ttl": "إنهاء تلقائي بعد الخمول (ثانية)",
             "sound": "الصوت",
@@ -1131,38 +1306,37 @@
             "text_color_attribute": "سمة لون النص",
             "warning_threshold": "عتبة التحذير (ثانية)",
             "alarm": "تنبيه (iOS 26+)",
+            "snooze_seconds": "ثواني الغفوة (iOS 26+)",
             "step_labels": "تسميات الخطوات",
             "step_rows": "ارتفاعات صفوف الخطوات",
+            "fired_at_entity": "كيان وقت الإطلاق",
             "fired_at_attribute": "سمة وقت التفعيل",
             "units": "وحدات لكل سلسلة",
-            "progress_entity": "كيان التقدّم",
-            "remaining_time_entity": "كيان الوقت المتبقي",
-            "current_step_entity": "كيان الخطوة الحالية",
-            "value_entity": "كيان القيمة",
-            "subtitle_entity": "كيان العنوان الفرعي",
-            "tap_action_url": "عنوان URL لإجراء النقر",
-            "tap_action_foreground": "فتح عنوان URL لإجراء النقر",
-            "url_foreground": "فتح عنوان URL للزر الأساسي",
-            "url_title": "عنوان الزر الأساسي",
-            "secondary_url_foreground": "فتح عنوان URL للزر الثانوي",
-            "secondary_url_title": "عنوان الزر الثانوي",
-            "snooze_seconds": "ثواني الغفوة (iOS 26+)",
-            "fired_at_entity": "كيان وقت الإطلاق",
-            "log_columns": "أعمدة السجل"
+            "tiles": "بلاطات board",
+            "log_columns": "أعمدة السجل",
+            "log_level_attribute": "خاصية مستوى السجل"
           },
           "data_description": {
             "start_states": "حالات الكيان التي تبدأ Live Activity. اختر من القائمة أو أدخل قيماً مخصصة.",
             "end_states": "حالات الكيان التي تنهي Live Activity. اختر من القائمة أو أدخل قيماً مخصصة.",
+            "progress_entity": "اقرأ التقدّم من كيان منفصل بدلًا من الكيان المتتبَّع. اتركه فارغًا لاستخدام الكيان المتتبَّع. عند ضبط حقل السمة، يقرأ تلك السمة من هذا الكيان؛ وإلا فحالته.",
             "progress_attribute": "سمة الكيان التي تحمل قيمة تقدم من 0 إلى 100. مثال: percentage",
+            "remaining_time_entity": "اقرأ الوقت المتبقي من كيان منفصل (مثل مستشعر الوقت في الغسالة). اتركه فارغًا لاستخدام الكيان المتتبَّع. يحلّل تلقائيًا مستشعر طابع زمني (وقت الانتهاء)، أو مستشعر مدة بوحدات، أو سلسلة بصيغة H:MM:SS، أو ثوانٍ عادية.",
             "remaining_time_attribute": "سمة الكيان التي تحمل الوقت المتبقي بالثواني. مثال: remaining",
+            "live_progress": "يملأ شريط التقدم بسلاسة ويعرض عدًا تنازليًا للوقت المتوقع للوصول (ETA) حتى وقت الانتهاء على الجهاز، باستخدام مصدر الوقت المتبقي أعلاه. يتطلب كيانًا أو خاصية للوقت المتبقي. في قالب steps، يملأ الخطوة الحالية فقط بدلاً من العملية بأكملها.",
             "total_steps": "العدد الإجمالي لـ steps.",
+            "current_step_entity": "اقرأ الخطوة الحالية من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع.",
             "current_step_attribute": "سمة الكيان التي تحمل الخطوة الحالية كعدد صحيح.",
             "severity": "مستوى خطورة Alert.",
+            "severity_label": "يتجاوز نص شارة Info/Warning/Critical الظاهرة على alert. اتركه فارغًا لاستخدام اسم مستوى الخطورة. الحد الأقصى 32 حرفًا. قالب alert فقط.",
+            "value_entity": "اقرأ قيمة المقياس من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع. يستخدم حالة الكيان المصدر ما لم تُضبط سمة.",
             "value_attribute": "سمة الكيان التي تحمل قيمة gauge الحالية كرقم. اتركها فارغة لاستخدام حالة الكيان.",
             "min_value": "الحد الأدنى لنطاق gauge.",
             "max_value": "الحد الأقصى لنطاق gauge.",
             "unit": "وحدة العرض الظاهرة بجانب القيمة (مثال: °C، %، kW). الحد الأقصى 32 حرفاً.",
             "series": "ربط سمات الكيان بسلاسل مسماة. الصيغة: attribute=Label, attribute2=Label2. اتركها فارغة لاستخدام حالة الكيان كسلسلة واحدة.",
+            "series_entities": "يربط كيانات منفصلة كخطوط مسمّاة في رسم بياني واحد (مثال: حساس PM2.5 لكل غرفة). التنسيق: [التسمية=]entity_id[:الخاصية]، مفصولة بفواصل. تكون التسمية افتراضيًا الاسم الودود للكيان؛ لقراءة خاصية استخدم entity_id:الخاصية. يُدمَج مع حقل السلاسل؛ حتى 10 خطوط إجمالاً.",
+            "primary_series": "تسمية السلسلة المعروضة كقيمة رئيسية والمستخدمة لنطاق الحد الأقصى/الأدنى المصغّر. اتركها فارغة لاستخدام سلسلة الكيان المتتبَّع نفسه (أو أول سلسلة مُهيَّأة).",
             "scale": "وضع مقياس المحور الصادي لمخطط sparkline.",
             "decimals": "عدد المنازل العشرية المعروضة للقيم (0–10).",
             "smoothing": "تفعيل الاستيفاء المنحني بين نقاط البيانات للحصول على sparkline أكثر سلاسة.",
@@ -1174,13 +1348,20 @@
             "icon_attribute": "سمة الكيان للأيقونة الديناميكية. تتجاوز الأيقونة الثابتة وأيقونة الكيان عند تعيينها.",
             "priority": "الأنشطة ذات الأولوية الأعلى تُحتفظ بها لفترة أطول عند الوصول للحد الأقصى للجهاز (0 = أدنى، 10 = أعلى).",
             "update_interval": "الحد الأدنى بالثواني بين التحديثات. يتم تقليص التغييرات المتسارعة.",
+            "subtitle_entity": "اعرض العنوان الفرعي من كيان منفصل (مثل مستشعر البرنامج/الوضع). اتركه فارغًا لاستخدام الكيان المتتبَّع. يستخدم حالة الكيان المصدر ما لم تُضبط سمة.",
             "subtitle_attribute": "سمة الكيان لعرضها كعنوان فرعي. اتركها فارغة لاستخدام الاسم الودي للكيان.",
             "state_labels": "نص عرض مخصص للحالات. الصيغة: state=Label, state2=Label 2. مثال: heating=Heating Up, idle=Standby",
             "completion_message": "النص الظاهر عند إنهاء النشاط. اتركه فارغاً لـ 'Complete'. مثال: Wash Done",
             "accent_color": "لون التمييز لـ Live Activity. اتركه فارغاً للون الأزرق الافتراضي.",
             "accent_color_attribute": "سمة الكيان للون التمييز الديناميكي. يتجاوز اللون الثابت. يدعم RGB وHS وXY وKelvin والألوان المسماة والـ hex.",
+            "tap_action_url": "عنوان URL اختياري يُفتح عند النقر على خلفية النشاط المباشر. يدعم http(s) (يفتح Safari) أو مخططات مخصصة مثل homeassistant://navigate/lovelace/0 (يفتح ذلك التطبيق).",
+            "tap_action_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط) — يُطلق طلب POST في الخلفية دون مغادرة شاشة القفل.",
             "url": "الرابط الذي يُفتح عند النقر على Live Activity. يجب أن يبدأ بـ http:// أو https://. لقوالب steps و alert فقط.",
+            "url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
+            "url_title": "تسمية الزر الأساسي (64 حرفًا كحد أقصى).",
             "secondary_url": "الرابط الثانوي لـ Live Activity. لقوالب steps و alert فقط.",
+            "secondary_url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
+            "secondary_url_title": "تسمية الزر الثانوي (64 حرفًا كحد أقصى).",
             "ended_ttl": "الثواني بعد إنهاء النشاط قبل حذفه تلقائياً من الخادم. اتركه فارغاً للاحتفاظ به بصورة دائمة. مثال: 300",
             "stale_ttl": "ثواني الخمول قبل أن ينهي الخادم النشاط تلقائياً. اتركه فارغاً لتعطيل هذه الميزة. مثال: 1800",
             "sound": "الصوت الذي يُشغَّل عند كل تحديث لهذا الكيان. اتركه فارغاً لعدم تجاوز أي صوت.",
@@ -1190,24 +1371,15 @@
             "text_color_attribute": "سمة الكيان للون النص الديناميكي. يتجاوز اللون الثابت.",
             "warning_threshold": "الثواني قبل انتهاء countdown التي يرسل فيها الخادم push تحذيرياً. اتركه فارغاً لتعطيله. قالب countdown فقط.",
             "alarm": "تشغيل تنبيه AlarmKit عند انتهاء countdown (iOS 26+). قالب countdown فقط.",
+            "snooze_seconds": "المدة التي يطيلها زر الغفوة في iOS للعد التنازلي (60–3600). اتركه فارغًا للقيمة الافتراضية 300 ثانية (5 دقائق). يتطلب منبهًا. قالب العد التنازلي فقط.",
             "step_labels": "تسميات كل خطوة. الصيغة: 1=الخطوة الأولى، 2=الخطوة الثانية. يجب أن تغطي الخطوات 1..total_steps. قالب steps فقط.",
             "step_rows": "ارتفاع الصف (1–10) لكل خطوة، مفصولة بفواصل. يجب أن تحتوي على total_steps إدخالات. قالب steps فقط.",
+            "fired_at_entity": "اقرأ وقت إطلاق التنبيه من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع. يقبل طابعًا زمنيًا بصيغة unix أو مستشعر طابع زمني بصيغة ISO. قالب التنبيه فقط.",
             "fired_at_attribute": "سمة الكيان التي تحمل الطابع الزمني Unix لتفعيل Alert. قالب alert فقط.",
             "units": "تسميات وحدات لكل سلسلة. الصيغة: تسميةالسلسلة=وحدة، درجةالحرارة=°C، رطوبة=%. قالب timeline فقط.",
-            "progress_entity": "اقرأ التقدّم من كيان منفصل بدلًا من الكيان المتتبَّع. اتركه فارغًا لاستخدام الكيان المتتبَّع. عند ضبط حقل السمة، يقرأ تلك السمة من هذا الكيان؛ وإلا فحالته.",
-            "remaining_time_entity": "اقرأ الوقت المتبقي من كيان منفصل (مثل مستشعر الوقت في الغسالة). اتركه فارغًا لاستخدام الكيان المتتبَّع. يحلّل تلقائيًا مستشعر طابع زمني (وقت الانتهاء)، أو مستشعر مدة بوحدات، أو سلسلة بصيغة H:MM:SS، أو ثوانٍ عادية.",
-            "current_step_entity": "اقرأ الخطوة الحالية من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع.",
-            "value_entity": "اقرأ قيمة المقياس من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع. يستخدم حالة الكيان المصدر ما لم تُضبط سمة.",
-            "subtitle_entity": "اعرض العنوان الفرعي من كيان منفصل (مثل مستشعر البرنامج/الوضع). اتركه فارغًا لاستخدام الكيان المتتبَّع. يستخدم حالة الكيان المصدر ما لم تُضبط سمة.",
-            "tap_action_url": "عنوان URL اختياري يُفتح عند النقر على خلفية النشاط المباشر. يدعم http(s) (يفتح Safari) أو مخططات مخصصة مثل homeassistant://navigate/lovelace/0 (يفتح ذلك التطبيق).",
-            "tap_action_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط) — يُطلق طلب POST في الخلفية دون مغادرة شاشة القفل.",
-            "url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
-            "url_title": "تسمية الزر الأساسي (64 حرفًا كحد أقصى).",
-            "secondary_url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
-            "secondary_url_title": "تسمية الزر الثانوي (64 حرفًا كحد أقصى).",
-            "snooze_seconds": "المدة التي يطيلها زر الغفوة في iOS للعد التنازلي (60–3600). اتركه فارغًا للقيمة الافتراضية 300 ثانية (5 دقائق). يتطلب منبهًا. قالب العد التنازلي فقط.",
-            "fired_at_entity": "اقرأ وقت إطلاق التنبيه من كيان منفصل. اتركه فارغًا لاستخدام الكيان المتتبَّع. يقبل طابعًا زمنيًا بصيغة unix أو مستشعر طابع زمني بصيغة ISO. قالب التنبيه فقط.",
-            "log_columns": "قيم إضافية تُضاف إلى كل سطر سجل (6 كحد أقصى)، مفصولة بفواصل. الصيغة: [Label=]source[|unit]. source = سمة لهذا الكيان (brightness)، أو حالة كيان آخر (binary_sensor.door)، أو سمة كيان آخر (sensor.temp:temperature). مثال: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. قالب السجل فقط."
+            "tiles": "بلاطات board (1–4)، تقرأ كل واحدة كيانًا منفصلاً. التنسيق: التسمية=entity_id:الخاصية:الوحدة:الأيقونة (الخاصية والوحدة والأيقونة اختيارية). مثال: Temp=sensor.kitchen::°C، Door=binary_sensor.front_door. قالب board فقط.",
+            "log_columns": "قيم إضافية تُضاف إلى كل سطر سجل (6 كحد أقصى)، مفصولة بفواصل. الصيغة: [Label=]source[|unit]. source = سمة لهذا الكيان (brightness)، أو حالة كيان آخر (binary_sensor.door)، أو سمة كيان آخر (sensor.temp:temperature). مثال: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. قالب السجل فقط.",
+            "log_level_attribute": "الخاصية التي توفر مستوى كل سطر في السجل (info/warn/error). اتركها فارغة لعدم إضافة وسم المستوى. قالب log فقط."
           }
         },
         "reconfigure": {
@@ -1223,8 +1395,10 @@
       },
       "error": {
         "invalid_url": "يجب أن يستخدم الرابط نظام http:// أو https://.",
+        "silent_requires_http": "يتطلب خطاف الويب الصامت (إيقاف foreground) عنوان URL بصيغة http:// أو https://.",
         "invalid_gauge_range": "يجب أن يكون الحد الأدنى للقيمة أصغر من الحد الأقصى.",
-        "silent_requires_http": "يتطلب خطاف الويب الصامت (إيقاف foreground) عنوان URL بصيغة http:// أو https://."
+        "tiles_required": "يلزم وجود بلاطة واحدة على الأقل لقالب board.",
+        "too_many_series": "يدعم قالب timeline ما لا يزيد عن 10 سلاسل إجمالاً (خصائص السلاسل بالإضافة إلى كيانات السلاسل)."
       },
       "abort": {
         "already_configured": "هذا الكيان مُتتبَّع بالفعل.",
@@ -1319,34 +1493,6 @@
         "already_configured": "توجد بالفعل أداة بهذا الـ slug.",
         "reconfigure_successful": "تم تحديث إعداد الأداة."
       }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "notifications_used": {
-        "name": "الإشعارات المستخدمة"
-      },
-      "live_activity_updates_used": {
-        "name": "تحديثات النشاط المباشر المستخدمة"
-      },
-      "widget_updates_used": {
-        "name": "تحديثات الأداة المستخدمة"
-      },
-      "emails_used": {
-        "name": "رسائل البريد الإلكتروني المستخدمة"
-      },
-      "subscription_tier": {
-        "name": "مستوى الاشتراك",
-        "state": {
-          "free": "مجاني",
-          "premium": "مميز"
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "widget_not_found": {
-      "message": "لا توجد أداة PushWard تطابق slug={slug} entity_id={entity_id}."
     }
   },
   "issues": {

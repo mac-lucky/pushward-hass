@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "ఉపయోగించిన నోటిఫికేషన్లు"
+      },
+      "live_activity_updates_used": {
+        "name": "ఉపయోగించిన Live Activity అప్‌డేట్లు"
+      },
+      "widget_updates_used": {
+        "name": "ఉపయోగించిన విడ్జెట్ అప్‌డేట్లు"
+      },
+      "emails_used": {
+        "name": "ఉపయోగించిన ఇమెయిల్‌లు"
+      },
+      "subscription_tier": {
+        "name": "సబ్‌స్క్రిప్షన్ స్థాయి",
+        "state": {
+          "free": "ఉచితం",
+          "premium": "ప్రీమియం"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "Activity అప్‌డేట్ చేయి (deprecated)",
@@ -34,7 +57,7 @@
         },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
-          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
         },
         "remaining_time": {
           "name": "మిగిలిన సమయం",
@@ -63,6 +86,10 @@
         "severity": {
           "name": "తీవ్రత",
           "description": "alert తీవ్రత స్థాయి."
+        },
+        "severity_label": {
+          "name": "తీవ్రత లేబుల్",
+          "description": "Info/Warning/Critical బ్యాడ్జ్ టెక్స్ట్‌ను భర్తీ చేయండి. Alert టెంప్లేట్ మాత్రమే."
         },
         "value": {
           "name": "విలువ",
@@ -124,6 +151,10 @@
           "name": "అలారం",
           "description": "హెచ్చరిక థ్రెషోల్డ్ మించినప్పుడు AlarmKit అలారంను ట్రిగ్గర్ చేస్తుంది. iOS 26+ పై మాత్రమే పనిచేస్తుంది."
         },
+        "snooze_seconds": {
+          "name": "Snooze Seconds",
+          "description": "iOS Snooze బటన్ కౌంట్‌డౌన్‌ను ఎంత పొడిగిస్తుందో (60–3600). డిఫాల్ట్ 300 (5 నిమి). అలారం అవసరం (iOS 26+, countdown టెంప్లేట్ మాత్రమే)."
+        },
         "step_labels": {
           "name": "స్టెప్ లేబుళ్ళు",
           "description": "స్టెప్ లేబుళ్ళ క్రమబద్ధ జాబితా. పొడవు total_steps కి సమానంగా ఉండాలి. steps టెంప్లేట్ మాత్రమే."
@@ -139,10 +170,6 @@
         "units": {
           "name": "యూనిట్లు",
           "description": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%"
-        },
-        "snooze_seconds": {
-          "name": "Snooze Seconds",
-          "description": "iOS Snooze బటన్ కౌంట్‌డౌన్‌ను ఎంత పొడిగిస్తుందో (60–3600). డిఫాల్ట్ 300 (5 నిమి). అలారం అవసరం (iOS 26+, countdown టెంప్లేట్ మాత్రమే)."
         },
         "duration": {
           "name": "వ్యవధి",
@@ -230,7 +257,7 @@
         },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
-          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
         },
         "background_color": {
           "name": "నేపథ్య రంగు",
@@ -338,7 +365,7 @@
         },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
-          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
         },
         "background_color": {
           "name": "నేపథ్య రంగు",
@@ -466,7 +493,7 @@
         },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
-          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
         },
         "background_color": {
           "name": "నేపథ్య రంగు",
@@ -536,6 +563,10 @@
           "name": "తీవ్రత",
           "description": "alert తీవ్రత స్థాయి."
         },
+        "severity_label": {
+          "name": "తీవ్రత లేబుల్",
+          "description": "Info/Warning/Critical బ్యాడ్జ్ టెక్స్ట్‌ను భర్తీ చేయండి. Alert టెంప్లేట్ మాత్రమే."
+        },
         "state_text": {
           "name": "స్థితి టెక్స్ట్",
           "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
@@ -570,7 +601,7 @@
         },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
-          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
         },
         "background_color": {
           "name": "నేపథ్య రంగు",
@@ -674,7 +705,7 @@
         },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
-          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
         },
         "background_color": {
           "name": "నేపథ్య రంగు",
@@ -772,6 +803,10 @@
           "name": "యూనిట్లు",
           "description": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%"
         },
+        "primary_series": {
+          "name": "ప్రాథమిక శ్రేణి",
+          "description": "శీర్షిక విలువగా చూపబడే మరియు కాంపాక్ట్ గరిష్ట/కనిష్ట శ్రేణి కోసం ఉపయోగించే శ్రేణి లేబుల్. స్వయంచాలకంగా ఎంచుకున్న శ్రేణిని ఉంచడానికి ఖాళీగా వదలండి. గరిష్టంగా 32 అక్షరాలు. Timeline టెంప్లేట్ మాత్రమే."
+        },
         "scale": {
           "name": "స్కేల్",
           "description": "Y-అక్షం స్కేల్ మోడ్ (linear లేదా logarithmic). Timeline టెంప్లేట్ మాత్రమే."
@@ -794,7 +829,7 @@
         },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
-          "description": "Activity కోసం యాక్సెంట్ రంగు పేరు."
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
         },
         "background_color": {
           "name": "నేపథ్య రంగు",
@@ -860,6 +895,122 @@
         }
       }
     },
+    "update_activity_board": {
+      "name": "Activity అప్‌డేట్ చేయి (Board)",
+      "description": "PushWard బోర్డ్ Live Activity ను అప్‌డేట్ చేయండి (1–4 టైల్‌లు).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "tiles": {
+          "name": "టైల్‌లు",
+          "description": "1–4 టైల్‌ల జాబితా. ప్రతి ఒక్కటి: label (అవసరం, ≤32), value (అవసరమైన స్ట్రింగ్, ≤16), మరియు ఐచ్ఛిక unit (≤8), icon (SF Symbol లేదా mdi:), color (పేరున్న లేదా hex), trend (up/down/flat), url_action ఆబ్జెక్ట్."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. square.grid.2x2.fill, mdi:view-dashboard)."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity కోసం నేపథ్య రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity కోసం టెక్స్ట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook. (ప్రతి-టైల్ ట్యాప్‌లు ఆ టైల్ యొక్క url_action లో వెళ్తాయి.)"
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం పరికరంలో ప్లే చేయబడే నోటిఫికేషన్ సౌండ్."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత ఓవర్‌రైడ్",
+          "description": "ప్రతి-నవీకరణ ప్రాధాన్యత (0-10). ఈ పుష్ కోసం మాత్రమే activity యొక్క కాన్ఫిగర్ చేసిన ప్రాధాన్యతను ఓవర్‌రైడ్ చేస్తుంది."
+        }
+      }
+    },
+    "update_activity_log": {
+      "name": "Activity అప్‌డేట్ చేయి (Log)",
+      "description": "PushWard లాగ్ Live Activity ను అప్‌డేట్ చేయండి (1–20 కొత్తవి-మొదట లైన్‌లు).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "lines": {
+          "name": "లైన్‌లు",
+          "description": "1–20 కొత్తవి-మొదట లాగ్ లైన్‌ల జాబితా. ప్రతి ఒక్కటి: text (అవసరం, ≤512), మరియు ఐచ్ఛిక at (Unix టైమ్‌స్టాంప్) మరియు level (info/warn/error)."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. list.bullet.rectangle, mdi:format-list-bulleted)."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity కోసం నేపథ్య రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity కోసం టెక్స్ట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం పరికరంలో ప్లే చేయబడే నోటిఫికేషన్ సౌండ్."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత ఓవర్‌రైడ్",
+          "description": "ప్రతి-నవీకరణ ప్రాధాన్యత (0-10). ఈ పుష్ కోసం మాత్రమే activity యొక్క కాన్ఫిగర్ చేసిన ప్రాధాన్యతను ఓవర్‌రైడ్ చేస్తుంది."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activity సృష్టించు",
       "description": "కొత్త PushWard Live Activity సృష్టించండి.",
@@ -910,6 +1061,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "విడ్జెట్ రిఫ్రెష్ చేయి",
+      "description": "ట్రాక్ చేయబడిన PushWard విడ్జెట్‌ను బలవంతంగా రిఫ్రెష్ చేయండి. ఇన్-మెమరీ డిఫ్ కాష్‌ను దాటవేస్తుంది, తద్వారా విలువ మారకపోయినా కూడా విడ్జెట్ తిరిగి రెండర్ అయి iOS కు పంపబడుతుంది.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "విడ్జెట్ slug గుర్తింపు. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
+        },
+        "entity_id": {
+          "name": "ఎంటిటీ",
+          "description": "విడ్జెట్‌కు బంధించబడిన HA ఎంటిటీ. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
+        }
+      }
+    },
     "send_notification": {
       "name": "నోటిఫికేషన్ పంపు",
       "description": "PushWard ద్వారా పుష్ నోటిఫికేషన్ పంపండి.",
@@ -929,6 +1094,10 @@
         "level": {
           "name": "స్థాయి",
           "description": "iOS అంతరాయ స్థాయి. నోటిఫికేషన్ ఎలా డెలివరీ అవుతుందో నియంత్రిస్తుంది."
+        },
+        "volume": {
+          "name": "వాల్యూమ్",
+          "description": "critical అలర్ట్‌ల కోసం సౌండ్ వాల్యూమ్ (0.0-1.0). level critical ఉన్నప్పుడు మాత్రమే ఉపయోగించబడుతుంది."
         },
         "thread_id": {
           "name": "Thread ID",
@@ -958,6 +1127,10 @@
           "name": "URL",
           "description": "నోటిఫికేషన్ నొక్కినప్పుడు తెరవబడే URL. HTTPS అవసరం."
         },
+        "media": {
+          "name": "మీడియా",
+          "description": "`url` (HTTPS) మరియు `type` (image, video, లేదా audio) తో మీడియా జోడింపు ఆబ్జెక్ట్."
+        },
         "icon_url": {
           "name": "చిహ్నం URL",
           "description": "నోటిఫికేషన్ చిహ్నం కోసం URL. HTTPS అవసరం."
@@ -966,27 +1139,9 @@
           "name": "మెటాడేటా",
           "description": "నోటిఫికేషన్‌తో పంపబడే అదనపు కీ-విలువ జంట మెటాడేటా."
         },
-        "media": {
-          "name": "మీడియా",
-          "description": "`url` (HTTPS) మరియు `type` (image, video, లేదా audio) తో మీడియా జోడింపు ఆబ్జెక్ట్."
-        },
         "actions": {
           "name": "చర్యలు",
           "description": "చర్య బటన్‌ల జాబితా. ప్రతి చర్య id, title, ఐచ్ఛిక url, foreground, destructive, authentication_required, మరియు icon తో ఆబ్జెక్ట్. http(s) url కోసం మీరు method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, మరియు body తో నిశ్శబ్ద webhook కూడా పంపవచ్చు."
-        }
-      }
-    },
-    "widget_refresh": {
-      "name": "విడ్జెట్ రిఫ్రెష్ చేయి",
-      "description": "ట్రాక్ చేయబడిన PushWard విడ్జెట్‌ను బలవంతంగా రిఫ్రెష్ చేయండి. ఇన్-మెమరీ డిఫ్ కాష్‌ను దాటవేస్తుంది, తద్వారా విలువ మారకపోయినా కూడా విడ్జెట్ తిరిగి రెండర్ అయి iOS కు పంపబడుతుంది.",
-      "fields": {
-        "slug": {
-          "name": "Slug",
-          "description": "విడ్జెట్ slug గుర్తింపు. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
-        },
-        "entity_id": {
-          "name": "ఎంటిటీ",
-          "description": "విడ్జెట్‌కు బంధించబడిన HA ఎంటిటీ. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
         }
       }
     },
@@ -1027,14 +1182,19 @@
       }
     }
   },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "slug={slug} entity_id={entity_id} కు సరిపోలే PushWard విడ్జెట్ లేదు."
+    }
+  },
   "config": {
     "step": {
       "user": {
         "title": "PushWard కు కనెక్ట్ అవ్వండి",
+        "description": "ప్రారంభించడానికి మీ PushWard ఇంటిగ్రేషన్ కీని నమోదు చేయండి. App Store నుండి PushWard iOS యాప్‌ను పొందండి: {app_store_url}",
         "data": {
           "integration_key": "ఇంటిగ్రేషన్ కీ"
         },
-        "description": "ప్రారంభించడానికి మీ PushWard ఇంటిగ్రేషన్ కీని నమోదు చేయండి. App Store నుండి PushWard iOS యాప్‌ను పొందండి: {app_store_url}",
         "data_description": {
           "integration_key": "PushWard iOS యాప్‌ను తెరవండి (App Store: {app_store_url}) → Settings → Integration Keys. మీరు డిఫాల్ట్ కీని అతికించవచ్చు, లేదా 'ha-*' స్కోప్‌తో కొత్తది సృష్టించవచ్చు."
         }
@@ -1094,16 +1254,24 @@
           "data": {
             "start_states": "ప్రారంభ స్థితులు",
             "end_states": "ముగింపు స్థితులు",
+            "progress_entity": "పురోగతి ఎంటిటీ",
             "progress_attribute": "పురోగతి ఆట్రిబ్యూట్",
+            "remaining_time_entity": "మిగిలిన సమయం ఎంటిటీ",
             "remaining_time_attribute": "మిగిలిన సమయం ఆట్రిబ్యూట్",
+            "live_progress": "Live Progress ETA",
             "total_steps": "మొత్తం steps",
+            "current_step_entity": "ప్రస్తుత దశ ఎంటిటీ",
             "current_step_attribute": "ప్రస్తుత దశ ఆట్రిబ్యూట్",
             "severity": "తీవ్రత",
+            "severity_label": "తీవ్రత లేబుల్",
+            "value_entity": "విలువ ఎంటిటీ",
             "value_attribute": "విలువ ఆట్రిబ్యూట్",
             "min_value": "కనిష్ట విలువ",
             "max_value": "గరిష్ట విలువ",
             "unit": "యూనిట్",
             "series": "శ్రేణి",
+            "series_entities": "శ్రేణి ఎంటిటీలు",
+            "primary_series": "ప్రాథమిక శ్రేణి",
             "scale": "స్కేల్",
             "decimals": "దశాంశ స్థానాలు",
             "smoothing": "మృదువైన రేఖలు",
@@ -1115,13 +1283,20 @@
             "icon_attribute": "చిహ్నం ఆట్రిబ్యూట్",
             "priority": "ప్రాధాన్యత (0-10)",
             "update_interval": "కనీస అప్‌డేట్ వ్యవధి (సెకన్లు)",
+            "subtitle_entity": "ఉప శీర్షిక ఎంటిటీ",
             "subtitle_attribute": "ఉప శీర్షిక ఆట్రిబ్యూట్",
             "state_labels": "స్థితి లేబుళ్ళు",
             "completion_message": "పూర్తి సందేశం",
             "accent_color": "యాక్సెంట్ రంగు",
             "accent_color_attribute": "యాక్సెంట్ రంగు ఆట్రిబ్యూట్",
+            "tap_action_url": "ట్యాప్ చర్య URL",
+            "tap_action_foreground": "ట్యాప్ చర్య URL తెరువు",
             "url": "URL",
+            "url_foreground": "ప్రాథమిక బటన్ URL తెరువు",
+            "url_title": "ప్రాథమిక బటన్ శీర్షిక",
             "secondary_url": "ద్వితీయ URL",
+            "secondary_url_foreground": "ద్వితీయ బటన్ URL తెరువు",
+            "secondary_url_title": "ద్వితీయ బటన్ శీర్షిక",
             "ended_ttl": "ముగింపు తర్వాత స్వయంచాలకంగా తొలగించు (సెకన్లు)",
             "stale_ttl": "నిష్క్రియంగా ఉన్న తర్వాత స్వయంచాలకంగా ముగించు (సెకన్లు)",
             "sound": "సౌండ్",
@@ -1131,38 +1306,37 @@
             "text_color_attribute": "టెక్స్ట్ రంగు ఆట్రిబ్యూట్",
             "warning_threshold": "హెచ్చరిక థ్రెషోల్డ్",
             "alarm": "అలారం",
+            "snooze_seconds": "Snooze Seconds (iOS 26+)",
             "step_labels": "స్టెప్ లేబుళ్ళు",
             "step_rows": "స్టెప్ వరుసలు",
+            "fired_at_entity": "ట్రిగ్గర్ సమయం ఎంటిటీ",
             "fired_at_attribute": "ట్రిగ్గర్ సమయం ఆట్రిబ్యూట్",
             "units": "యూనిట్లు",
-            "progress_entity": "పురోగతి ఎంటిటీ",
-            "remaining_time_entity": "మిగిలిన సమయం ఎంటిటీ",
-            "current_step_entity": "ప్రస్తుత దశ ఎంటిటీ",
-            "value_entity": "విలువ ఎంటిటీ",
-            "subtitle_entity": "ఉప శీర్షిక ఎంటిటీ",
-            "tap_action_url": "ట్యాప్ చర్య URL",
-            "tap_action_foreground": "ట్యాప్ చర్య URL తెరువు",
-            "url_foreground": "ప్రాథమిక బటన్ URL తెరువు",
-            "url_title": "ప్రాథమిక బటన్ శీర్షిక",
-            "secondary_url_foreground": "ద్వితీయ బటన్ URL తెరువు",
-            "secondary_url_title": "ద్వితీయ బటన్ శీర్షిక",
-            "snooze_seconds": "Snooze Seconds (iOS 26+)",
-            "fired_at_entity": "ట్రిగ్గర్ సమయం ఎంటిటీ",
-            "log_columns": "లాగ్ నిలువు వరుసలు"
+            "tiles": "బోర్డ్ టైల్‌లు",
+            "log_columns": "లాగ్ నిలువు వరుసలు",
+            "log_level_attribute": "లాగ్ స్థాయి ఆట్రిబ్యూట్"
           },
           "data_description": {
             "start_states": "Live Activity ప్రారంభించే ఎంటిటీ స్థితులు. జాబితా నుండి ఎంచుకోండి లేదా అనుకూల విలువలు టైప్ చేయండి.",
             "end_states": "Live Activity ముగించే ఎంటిటీ స్థితులు. జాబితా నుండి ఎంచుకోండి లేదా అనుకూల విలువలు టైప్ చేయండి.",
+            "progress_entity": "ట్రాక్ చేయబడిన ఎంటిటీకి బదులుగా వేరే ఎంటిటీ నుండి పురోగతిని చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ ఫీల్డ్ సెట్ చేస్తే, ఈ ఎంటిటీ యొక్క ఆ ఆట్రిబ్యూట్‌ను చదువుతుంది; లేకపోతే దాని స్థితిని.",
             "progress_attribute": "0–100 పురోగతి విలువను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. ఉదాహరణ: percentage",
+            "remaining_time_entity": "వేరే ఎంటిటీ నుండి మిగిలిన సమయాన్ని చదవండి (ఉదా. వాషర్ యొక్క సమయ సెన్సార్). ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. టైమ్‌స్టాంప్ (ముగింపు-సమయం) సెన్సార్, యూనిట్‌లతో వ్యవధి సెన్సార్, H:MM:SS స్ట్రింగ్, లేదా సాదా సెకన్లను స్వయంచాలకంగా అన్వయిస్తుంది.",
             "remaining_time_attribute": "సెకన్లలో మిగిలిన సమయాన్ని కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. ఉదాహరణ: remaining",
+            "live_progress": "పురోగతి బార్‌ను సాఫీగా నింపి, పైన ఉన్న మిగిలిన-సమయం మూలాన్ని ఉపయోగించి పరికరంపై ముగింపు సమయానికి ఒక ETA ను కౌంట్‌డౌన్ చేస్తుంది. మిగిలిన-సమయం ఎంటిటీ లేదా ఆట్రిబ్యూట్ అవసరం. steps టెంప్లేట్‌లో ఇది మొత్తం రన్ కాకుండా ప్రస్తుత దశను నింపుతుంది.",
             "total_steps": "మొత్తం steps సంఖ్య.",
+            "current_step_entity": "వేరే ఎంటిటీ నుండి ప్రస్తుత దశను చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి.",
             "current_step_attribute": "పూర్ణాంకంగా ప్రస్తుత దశను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్.",
             "severity": "alert తీవ్రత స్థాయి.",
+            "severity_label": "ఈ alert పై చూపబడే Info/Warning/Critical బ్యాడ్జ్ టెక్స్ట్‌ను భర్తీ చేయండి. తీవ్రత పేరు ఉపయోగించడానికి ఖాళీగా వదలండి. గరిష్టంగా 32 అక్షరాలు. Alert టెంప్లేట్ మాత్రమే.",
+            "value_entity": "వేరే ఎంటిటీ నుండి gauge విలువను చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ సెట్ చేయకపోతే మూల ఎంటిటీ యొక్క స్థితిని ఉపయోగిస్తుంది.",
             "value_attribute": "సంఖ్యగా ప్రస్తుత gauge విలువను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. ఎంటిటీ స్థితిని ఉపయోగించడానికి ఖాళీగా వదలండి.",
             "min_value": "gauge పరిధి కోసం కనిష్ట విలువ.",
             "max_value": "gauge పరిధి కోసం గరిష్ట విలువ.",
             "unit": "విలువ పక్కన చూపబడే యూనిట్ (ఉదా. °C, %, kW). గరిష్టంగా 32 అక్షరాలు.",
             "series": "ఎంటిటీ ఆట్రిబ్యూట్‌లను పేరున్న శ్రేణులకు మ్యాప్ చేయండి. ఆకృతి: attribute=Label, attribute2=Label2. ఒకే శ్రేణిగా ఎంటిటీ స్థితిని ఉపయోగించడానికి ఖాళీగా వదలండి.",
+            "series_entities": "ఒకే చార్ట్‌పై వేర్వేరు ఎంటిటీలను పేరున్న లైన్‌లుగా బంధించండి (ఉదా. ప్రతి గదికి ఒక PM2.5 సెన్సార్). ఆకృతి: [Label=]entity_id[:attribute], కామాతో వేరు చేయబడినవి. లేబుల్ డిఫాల్ట్‌గా ఎంటిటీ యొక్క స్నేహపూర్వక పేరుకు ఉంటుంది; entity_id:attribute తో ఆట్రిబ్యూట్‌ను చదవండి. శ్రేణితో కలుస్తుంది; మొత్తం 10 లైన్‌ల వరకు.",
+            "primary_series": "శీర్షిక విలువగా చూపబడే మరియు కాంపాక్ట్ గరిష్ట/కనిష్ట శ్రేణి కోసం ఉపయోగించే శ్రేణి లేబుల్. ట్రాక్ చేయబడిన ఎంటిటీ యొక్క స్వంత శ్రేణిని (లేదా మొదటి కాన్ఫిగర్ చేసిన శ్రేణిని) ఉపయోగించడానికి ఖాళీగా వదలండి.",
             "scale": "స్పార్క్‌లైన్ చార్ట్ కోసం Y-అక్షం స్కేల్ మోడ్.",
             "decimals": "విలువలకు చూపబడే దశాంశ స్థానాల సంఖ్య (0–10).",
             "smoothing": "మృదువైన స్పార్క్‌లైన్ కోసం డేటా పాయింట్ల మధ్య వక్ర ఇంటర్‌పోలేషన్ ప్రారంభించండి.",
@@ -1174,13 +1348,20 @@
             "icon_attribute": "డైనమిక్ చిహ్నం కోసం ఎంటిటీ ఆట్రిబ్యూట్. సెట్ అయినప్పుడు స్థిర చిహ్నం మరియు ఎంటిటీ చిహ్నాన్ని భర్తీ చేస్తుంది.",
             "priority": "పరికర పరిమితి చేరినప్పుడు అధిక ప్రాధాన్యత activities ఎక్కువ సేపు ఉంచబడతాయి (0 = అత్యల్పం, 10 = అత్యధికం).",
             "update_interval": "అప్‌డేట్‌ల మధ్య కనీస సెకన్లు. వేగవంతమైన స్థితి మార్పులు థ్రాటిల్ చేయబడతాయి.",
+            "subtitle_entity": "వేరే ఎంటిటీ నుండి ఉప శీర్షికను చూపండి (ఉదా. ప్రోగ్రామ్/మోడ్ సెన్సార్). ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ సెట్ చేయకపోతే మూల ఎంటిటీ యొక్క స్థితిని ఉపయోగిస్తుంది.",
             "subtitle_attribute": "ఉప శీర్షికగా చూపడానికి ఎంటిటీ ఆట్రిబ్యూట్. ఎంటిటీ స్నేహపూర్వక పేరు ఉపయోగించడానికి ఖాళీగా వదలండి.",
             "state_labels": "స్థితులకు అనుకూల ప్రదర్శన టెక్స్ట్. ఆకృతి: state=Label, state2=Label 2. ఉదాహరణ: heating=Heating Up, idle=Standby",
             "completion_message": "Activity ముగించినప్పుడు చూపబడే టెక్స్ట్. 'Complete' కోసం ఖాళీగా వదలండి. ఉదాహరణ: Wash Done",
             "accent_color": "Live Activity కోసం యాక్సెంట్ రంగు. డిఫాల్ట్ నీలం కోసం ఖాళీగా వదలండి.",
             "accent_color_attribute": "డైనమిక్ యాక్సెంట్ రంగు కోసం ఎంటిటీ ఆట్రిబ్యూట్. స్థిర రంగును భర్తీ చేస్తుంది. RGB, HS, XY, Kelvin, పేరున్న రంగులు మరియు hex మద్దతు ఉంది.",
+            "tap_action_url": "Live Activity నేపథ్యాన్ని నొక్కినప్పుడు తెరిచే ఐచ్ఛిక URL. http(s) (Safari తెరుస్తుంది) లేదా homeassistant://navigate/lovelace/0 వంటి అనుకూల స్కీమ్‌లకు (ఆ యాప్‌ను తెరుస్తుంది) మద్దతు ఇస్తుంది.",
+            "tap_action_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే) — Lock Screen ను వదలకుండా నేపథ్యంలో POST ను ఫైర్ చేస్తుంది.",
             "url": "Live Activity నొక్కినప్పుడు తెరవబడే లింక్. http:// లేదా https:// తో ప్రారంభించాలి. Steps మరియు alert టెంప్లేట్‌లు మాత్రమే.",
+            "url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
+            "url_title": "ప్రాథమిక బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు).",
             "secondary_url": "Live Activity కోసం ద్వితీయ లింక్. Steps మరియు alert టెంప్లేట్‌లు మాత్రమే.",
+            "secondary_url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
+            "secondary_url_title": "ద్వితీయ బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు).",
             "ended_ttl": "Activity ముగించిన తర్వాత సర్వర్ నుండి స్వయంచాలకంగా తొలగించబడే ముందు సెకన్లు. అనంతంగా ఉంచడానికి ఖాళీగా వదలండి. ఉదాహరణ: 300",
             "stale_ttl": "సర్వర్ activity ని స్వయంచాలకంగా ముగించే ముందు నిష్క్రియ సెకన్లు. నిలిపివేయడానికి ఖాళీగా వదలండి. ఉదాహరణ: 1800",
             "sound": "ఈ అప్‌డేట్ కోసం నోటిఫికేషన్ సౌండ్ పేరు. iOS సిస్టమ్ సౌండ్ ఉపయోగించడానికి ఖాళీగా వదలండి.",
@@ -1190,24 +1371,15 @@
             "text_color_attribute": "డైనమిక్ టెక్స్ట్ రంగు కోసం ఎంటిటీ ఆట్రిబ్యూట్. స్థిర టెక్స్ట్ రంగును భర్తీ చేస్తుంది.",
             "warning_threshold": "విలువ ఈ స్థాయికి చేరినప్పుడు లేదా మించినప్పుడు హెచ్చరిక రంగు ట్రిగ్గర్ అవుతుంది. gauge మరియు timeline టెంప్లేట్‌లు.",
             "alarm": "హెచ్చరిక థ్రెషోల్డ్ మించినప్పుడు AlarmKit అలారంను ట్రిగ్గర్ చేస్తుంది. iOS 26+ మాత్రమే.",
+            "snooze_seconds": "iOS Snooze బటన్ కౌంట్‌డౌన్‌ను ఎంత పొడిగిస్తుందో (60–3600). 300s (5 నిమి) డిఫాల్ట్ కోసం ఖాళీగా వదలండి. అలారం అవసరం. Countdown టెంప్లేట్ మాత్రమే.",
             "step_labels": "steps టెంప్లేట్ స్టెప్‌లకు అనుకూల లేబుళ్ళు. ఆకృతి: 1=లేబుల్, 2=లేబుల్. ఖాళీగా వదిలితే స్టెప్ నంబర్లు ఉపయోగించబడతాయి.",
             "step_rows": "steps టెంప్లేట్‌లో ఒక వరుసలో చూపించే స్టెప్‌ల సంఖ్య.",
+            "fired_at_entity": "వేరే ఎంటిటీ నుండి alert యొక్క ట్రిగ్గర్-సమయాన్ని చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. unix టైమ్‌స్టాంప్ లేదా ISO టైమ్‌స్టాంప్ సెన్సార్‌ను అంగీకరిస్తుంది. Alert టెంప్లేట్ మాత్రమే.",
             "fired_at_attribute": "ట్రిగ్గర్ Unix టైమ్‌స్టాంప్‌ను కలిగి ఉన్న ఎంటిటీ ఆట్రిబ్యూట్. సాపేక్ష సమయం ప్రదర్శన కోసం ఉపయోగించబడుతుంది.",
             "units": "Timeline శ్రేణులకు యూనిట్ లేబుళ్ళు. ఆకృతి: attribute=యూనిట్. ఉదాహరణ: temp=°C, humidity=%",
-            "progress_entity": "ట్రాక్ చేయబడిన ఎంటిటీకి బదులుగా వేరే ఎంటిటీ నుండి పురోగతిని చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ ఫీల్డ్ సెట్ చేస్తే, ఈ ఎంటిటీ యొక్క ఆ ఆట్రిబ్యూట్‌ను చదువుతుంది; లేకపోతే దాని స్థితిని.",
-            "remaining_time_entity": "వేరే ఎంటిటీ నుండి మిగిలిన సమయాన్ని చదవండి (ఉదా. వాషర్ యొక్క సమయ సెన్సార్). ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. టైమ్‌స్టాంప్ (ముగింపు-సమయం) సెన్సార్, యూనిట్‌లతో వ్యవధి సెన్సార్, H:MM:SS స్ట్రింగ్, లేదా సాదా సెకన్లను స్వయంచాలకంగా అన్వయిస్తుంది.",
-            "current_step_entity": "వేరే ఎంటిటీ నుండి ప్రస్తుత దశను చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి.",
-            "value_entity": "వేరే ఎంటిటీ నుండి gauge విలువను చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ సెట్ చేయకపోతే మూల ఎంటిటీ యొక్క స్థితిని ఉపయోగిస్తుంది.",
-            "subtitle_entity": "వేరే ఎంటిటీ నుండి ఉప శీర్షికను చూపండి (ఉదా. ప్రోగ్రామ్/మోడ్ సెన్సార్). ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. ఆట్రిబ్యూట్ సెట్ చేయకపోతే మూల ఎంటిటీ యొక్క స్థితిని ఉపయోగిస్తుంది.",
-            "tap_action_url": "Live Activity నేపథ్యాన్ని నొక్కినప్పుడు తెరిచే ఐచ్ఛిక URL. http(s) (Safari తెరుస్తుంది) లేదా homeassistant://navigate/lovelace/0 వంటి అనుకూల స్కీమ్‌లకు (ఆ యాప్‌ను తెరుస్తుంది) మద్దతు ఇస్తుంది.",
-            "tap_action_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే) — Lock Screen ను వదలకుండా నేపథ్యంలో POST ను ఫైర్ చేస్తుంది.",
-            "url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
-            "url_title": "ప్రాథమిక బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు).",
-            "secondary_url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
-            "secondary_url_title": "ద్వితీయ బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు).",
-            "snooze_seconds": "iOS Snooze బటన్ కౌంట్‌డౌన్‌ను ఎంత పొడిగిస్తుందో (60–3600). 300s (5 నిమి) డిఫాల్ట్ కోసం ఖాళీగా వదలండి. అలారం అవసరం. Countdown టెంప్లేట్ మాత్రమే.",
-            "fired_at_entity": "వేరే ఎంటిటీ నుండి alert యొక్క ట్రిగ్గర్-సమయాన్ని చదవండి. ట్రాక్ చేయబడిన ఎంటిటీని ఉపయోగించడానికి ఖాళీగా వదలండి. unix టైమ్‌స్టాంప్ లేదా ISO టైమ్‌స్టాంప్ సెన్సార్‌ను అంగీకరిస్తుంది. Alert టెంప్లేట్ మాత్రమే.",
-            "log_columns": "ప్రతి లాగ్ లైన్‌కు జోడించబడే అదనపు విలువలు (గరిష్టంగా 6), కామాతో వేరు చేయబడినవి. ఆకృతి: [Label=]source[|unit]. source = ఈ ఎంటిటీ యొక్క ఆట్రిబ్యూట్ (brightness), మరొక ఎంటిటీ స్థితి (binary_sensor.door), లేదా మరొక ఎంటిటీ ఆట్రిబ్యూట్ (sensor.temp:temperature). ఉదాహరణ: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. లాగ్ టెంప్లేట్ మాత్రమే."
+            "tiles": "బోర్డ్ టైల్‌లు (1–4), ప్రతి ఒక్కటి వేరే ఎంటిటీని చదువుతుంది. ఆకృతి: Label=entity_id:attribute:unit:icon (attribute, unit, icon ఐచ్ఛికం). ఉదాహరణ: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Board టెంప్లేట్ మాత్రమే.",
+            "log_columns": "ప్రతి లాగ్ లైన్‌కు జోడించబడే అదనపు విలువలు (గరిష్టంగా 6), కామాతో వేరు చేయబడినవి. ఆకృతి: [Label=]source[|unit]. source = ఈ ఎంటిటీ యొక్క ఆట్రిబ్యూట్ (brightness), మరొక ఎంటిటీ స్థితి (binary_sensor.door), లేదా మరొక ఎంటిటీ ఆట్రిబ్యూట్ (sensor.temp:temperature). ఉదాహరణ: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. లాగ్ టెంప్లేట్ మాత్రమే.",
+            "log_level_attribute": "ప్రతి లాగ్ లైన్ యొక్క level (info/warn/error) ను అందించే ఆట్రిబ్యూట్. level ట్యాగ్ ఏదీ లేకుండా ఉండటానికి ఖాళీగా వదలండి. లాగ్ టెంప్లేట్ మాత్రమే."
           }
         },
         "reconfigure": {
@@ -1223,8 +1395,10 @@
       },
       "error": {
         "invalid_url": "URL http:// లేదా https:// స్కీమ్ ఉపయోగించాలి.",
+        "silent_requires_http": "నిశ్శబ్ద webhook (foreground ఆఫ్) కు http:// లేదా https:// URL అవసరం.",
         "invalid_gauge_range": "కనిష్ట విలువ గరిష్ట విలువ కంటే తక్కువగా ఉండాలి.",
-        "silent_requires_http": "నిశ్శబ్ద webhook (foreground ఆఫ్) కు http:// లేదా https:// URL అవసరం."
+        "tiles_required": "board టెంప్లేట్ కోసం కనీసం ఒక టైల్ అవసరం.",
+        "too_many_series": "ఒక Timeline మొత్తం 10 శ్రేణుల వరకు మాత్రమే మద్దతు ఇస్తుంది (శ్రేణి ఆట్రిబ్యూట్‌లు ప్లస్ శ్రేణి ఎంటిటీలు)."
       },
       "abort": {
         "already_configured": "ఈ ఎంటిటీ ఇప్పటికే ట్రాక్ చేయబడుతోంది.",
@@ -1319,34 +1493,6 @@
         "already_configured": "ఈ slug తో విడ్జెట్ ఇప్పటికే ఉంది.",
         "reconfigure_successful": "విడ్జెట్ కాన్ఫిగరేషన్ అప్‌డేట్ చేయబడింది."
       }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "notifications_used": {
-        "name": "ఉపయోగించిన నోటిఫికేషన్లు"
-      },
-      "live_activity_updates_used": {
-        "name": "ఉపయోగించిన Live Activity అప్‌డేట్లు"
-      },
-      "widget_updates_used": {
-        "name": "ఉపయోగించిన విడ్జెట్ అప్‌డేట్లు"
-      },
-      "emails_used": {
-        "name": "ఉపయోగించిన ఇమెయిల్‌లు"
-      },
-      "subscription_tier": {
-        "name": "సబ్‌స్క్రిప్షన్ స్థాయి",
-        "state": {
-          "free": "ఉచితం",
-          "premium": "ప్రీమియం"
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "widget_not_found": {
-      "message": "slug={slug} entity_id={entity_id} కు సరిపోలే PushWard విడ్జెట్ లేదు."
     }
   },
   "issues": {

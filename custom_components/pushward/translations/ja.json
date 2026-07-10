@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "使用済み通知数"
+      },
+      "live_activity_updates_used": {
+        "name": "使用済み Live Activity 更新数"
+      },
+      "widget_updates_used": {
+        "name": "使用済みウィジェット更新数"
+      },
+      "emails_used": {
+        "name": "使用済みメール数"
+      },
+      "subscription_tier": {
+        "name": "サブスクリプション層",
+        "state": {
+          "free": "無料",
+          "premium": "プレミアム"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "アクティビティを更新 (deprecated)",
@@ -34,7 +57,7 @@
         },
         "accent_color": {
           "name": "アクセントカラー",
-          "description": "アクティビティのアクセントカラー名。"
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
         },
         "remaining_time": {
           "name": "残り時間",
@@ -63,6 +86,10 @@
         "severity": {
           "name": "重大度",
           "description": "alert の重大度レベル。"
+        },
+        "severity_label": {
+          "name": "重大度ラベル",
+          "description": "Info/Warning/Critical バッジテキストを上書きします。alert テンプレートのみ。"
         },
         "value": {
           "name": "値",
@@ -124,6 +151,10 @@
           "name": "アラーム",
           "description": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+、countdown テンプレートのみ）。"
         },
+        "snooze_seconds": {
+          "name": "スヌーズ秒数",
+          "description": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。デフォルトは 300（5分）。アラームが必要（iOS 26+、countdown テンプレートのみ）。"
+        },
         "step_labels": {
           "name": "ステップラベル",
           "description": "ステップラベルの順序付きリスト。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
@@ -139,10 +170,6 @@
         "units": {
           "name": "単位マップ",
           "description": "系列ごとの単位ラベル。キーは value dict のキーと一致する必要があります。timeline テンプレートのみ。"
-        },
-        "snooze_seconds": {
-          "name": "スヌーズ秒数",
-          "description": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。デフォルトは 300（5分）。アラームが必要（iOS 26+、countdown テンプレートのみ）。"
         },
         "duration": {
           "name": "継続時間",
@@ -230,7 +257,7 @@
         },
         "accent_color": {
           "name": "アクセントカラー",
-          "description": "アクティビティのアクセントカラー名。"
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
         },
         "background_color": {
           "name": "背景色",
@@ -338,7 +365,7 @@
         },
         "accent_color": {
           "name": "アクセントカラー",
-          "description": "アクティビティのアクセントカラー名。"
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
         },
         "background_color": {
           "name": "背景色",
@@ -466,7 +493,7 @@
         },
         "accent_color": {
           "name": "アクセントカラー",
-          "description": "アクティビティのアクセントカラー名。"
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
         },
         "background_color": {
           "name": "背景色",
@@ -536,6 +563,10 @@
           "name": "重大度",
           "description": "alert の重大度レベル。"
         },
+        "severity_label": {
+          "name": "重大度ラベル",
+          "description": "Info/Warning/Critical バッジテキストを上書きします。alert テンプレートのみ。"
+        },
         "state_text": {
           "name": "状態テキスト",
           "description": "アクティビティの状態として表示されるテキスト。"
@@ -570,7 +601,7 @@
         },
         "accent_color": {
           "name": "アクセントカラー",
-          "description": "アクティビティのアクセントカラー名。"
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
         },
         "background_color": {
           "name": "背景色",
@@ -674,7 +705,7 @@
         },
         "accent_color": {
           "name": "アクセントカラー",
-          "description": "アクティビティのアクセントカラー名。"
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
         },
         "background_color": {
           "name": "背景色",
@@ -772,6 +803,10 @@
           "name": "単位マップ",
           "description": "系列ごとの単位ラベル。キーは value dict のキーと一致する必要があります。timeline テンプレートのみ。"
         },
+        "primary_series": {
+          "name": "プライマリシリーズ",
+          "description": "見出し値として表示され、コンパクトな高低範囲に使用されるシリーズのラベル。空白のままにすると自動選択されたシリーズを使用します。最大 32 文字。timeline テンプレートのみ。"
+        },
         "scale": {
           "name": "スケール",
           "description": "Y軸のスケールモード（線形または対数）。timeline テンプレートのみ。"
@@ -794,7 +829,7 @@
         },
         "accent_color": {
           "name": "アクセントカラー",
-          "description": "アクティビティのアクセントカラー名。"
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
         },
         "background_color": {
           "name": "背景色",
@@ -860,6 +895,122 @@
         }
       }
     },
+    "update_activity_board": {
+      "name": "アクティビティを更新 (Board)",
+      "description": "PushWard board Live Activity（1〜4個のタイル）を更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "tiles": {
+          "name": "タイル",
+          "description": "1〜4個のタイルのリスト。各タイル: label（必須、≤32）、value（必須の文字列、≤16）、および任意の unit（≤8）、icon（SF Symbol または mdi:）、color（色名または16進数）、trend（up/down/flat）、url_action オブジェクト。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: square.grid.2x2.fill, mdi:view-dashboard）。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。（タイルごとのタップは各タイルの url_action で指定します。）"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      }
+    },
+    "update_activity_log": {
+      "name": "アクティビティを更新 (Log)",
+      "description": "PushWard log Live Activity（新しい順の1〜20行）を更新します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "lines": {
+          "name": "ログ行",
+          "description": "新しい順に並んだ1〜20件のログ行のリスト。各行: text（必須、≤512）、および任意の at（unixタイムスタンプ）と level（info/warn/error）。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: list.bullet.rectangle, mdi:format-list-bulleted）。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        }
+      }
+    },
     "create_activity": {
       "name": "アクティビティを作成",
       "description": "新しいPushWard Live Activityを作成します。",
@@ -910,6 +1061,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "ウィジェットを更新",
+      "description": "追跡中の PushWard ウィジェットを強制的に更新します。メモリ内の差分キャッシュをバイパスし、値が変わっていなくてもウィジェットを再描画して iOS にプッシュします。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "ウィジェットのスラッグ識別子。slug または entity_id のいずれかを指定する必要があります。"
+        },
+        "entity_id": {
+          "name": "エンティティ",
+          "description": "ウィジェットに紐付けられた HA エンティティ。slug または entity_id のいずれかを指定する必要があります。"
+        }
+      }
+    },
     "send_notification": {
       "name": "通知を送信",
       "description": "PushWard経由でプッシュ通知を送信します。",
@@ -929,6 +1094,10 @@
         "level": {
           "name": "レベル",
           "description": "iOSの割り込みレベル。通知の配信方法を制御します。"
+        },
+        "volume": {
+          "name": "音量",
+          "description": "critical レベルの通知の音量（0.0〜1.0）。level が critical の場合のみ使用されます。"
         },
         "thread_id": {
           "name": "スレッドID",
@@ -958,6 +1127,10 @@
           "name": "URL",
           "description": "通知をタップしたときに開く URL。"
         },
+        "media": {
+          "name": "メディア",
+          "description": "`url`（HTTPS）と `type`（image、video、または audio）を持つオブジェクトとしてのメディア添付。"
+        },
         "icon_url": {
           "name": "アイコン URL",
           "description": "通知ごとのカスタムアイコンの HTTPS URL。"
@@ -966,27 +1139,9 @@
           "name": "メタデータ",
           "description": "通知に添付される追加メタデータのキーと値のペア。"
         },
-        "media": {
-          "name": "メディア",
-          "description": "`url`（HTTPS）と `type`（image、video、または audio）を持つオブジェクトとしてのメディア添付。"
-        },
         "actions": {
           "name": "アクション",
           "description": "アクションボタンのリスト。各アクションは id、title、任意の url、foreground、destructive、authentication_required、icon を持つオブジェクトです。http(s) URL の場合は method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers、body を指定してサイレント Webhook を送信することもできます。"
-        }
-      }
-    },
-    "widget_refresh": {
-      "name": "ウィジェットを更新",
-      "description": "追跡中の PushWard ウィジェットを強制的に更新します。メモリ内の差分キャッシュをバイパスし、値が変わっていなくてもウィジェットを再描画して iOS にプッシュします。",
-      "fields": {
-        "slug": {
-          "name": "スラッグ",
-          "description": "ウィジェットのスラッグ識別子。slug または entity_id のいずれかを指定する必要があります。"
-        },
-        "entity_id": {
-          "name": "エンティティ",
-          "description": "ウィジェットに紐付けられた HA エンティティ。slug または entity_id のいずれかを指定する必要があります。"
         }
       }
     },
@@ -1027,14 +1182,19 @@
       }
     }
   },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "slug={slug} entity_id={entity_id} に一致する PushWard ウィジェットがありません。"
+    }
+  },
   "config": {
     "step": {
       "user": {
         "title": "PushWardに接続",
+        "description": "始めるには PushWard 統合キーを入力してください。PushWard iOS アプリは App Store から入手できます: {app_store_url}",
         "data": {
           "integration_key": "統合キー"
         },
-        "description": "始めるには PushWard 統合キーを入力してください。PushWard iOS アプリは App Store から入手できます: {app_store_url}",
         "data_description": {
           "integration_key": "PushWard iOS アプリ（App Store: {app_store_url}）を開き、設定 → 統合キーへ進みます。デフォルトのキーを貼り付けるか、スコープ 'ha-*' で新しいキーを作成できます。"
         }
@@ -1094,16 +1254,24 @@
           "data": {
             "start_states": "開始状態",
             "end_states": "終了状態",
+            "progress_entity": "進捗エンティティ",
             "progress_attribute": "進捗属性",
+            "remaining_time_entity": "残り時間エンティティ",
             "remaining_time_attribute": "残り時間属性",
+            "live_progress": "ライブ進捗ETA",
             "total_steps": "総 steps 数",
+            "current_step_entity": "現在のステップエンティティ",
             "current_step_attribute": "現在のステップ属性",
             "severity": "重大度",
+            "severity_label": "重大度ラベル",
+            "value_entity": "値エンティティ",
             "value_attribute": "値属性",
             "min_value": "最小値",
             "max_value": "最大値",
             "unit": "単位",
             "series": "シリーズ",
+            "series_entities": "シリーズエンティティ",
+            "primary_series": "プライマリシリーズ",
             "scale": "スケール",
             "decimals": "小数点以下の桁数",
             "smoothing": "スムーズな折れ線",
@@ -1115,13 +1283,20 @@
             "icon_attribute": "アイコン属性",
             "priority": "優先度 (0〜10)",
             "update_interval": "最小更新間隔（秒）",
+            "subtitle_entity": "サブタイトルエンティティ",
             "subtitle_attribute": "サブタイトル属性",
             "state_labels": "状態ラベル",
             "completion_message": "完了メッセージ",
             "accent_color": "アクセントカラー",
             "accent_color_attribute": "アクセントカラー属性",
+            "tap_action_url": "タップアクションURL",
+            "tap_action_foreground": "タップアクションURLを開く",
             "url": "URL",
+            "url_foreground": "プライマリボタンURLを開く",
+            "url_title": "プライマリボタンのタイトル",
             "secondary_url": "セカンダリURL",
+            "secondary_url_foreground": "セカンダリボタンURLを開く",
+            "secondary_url_title": "セカンダリボタンのタイトル",
             "ended_ttl": "終了後に自動削除（秒）",
             "stale_ttl": "アイドル後に自動終了（秒）",
             "sound": "サウンド",
@@ -1131,38 +1306,37 @@
             "text_color_attribute": "テキスト色属性",
             "warning_threshold": "警告しきい値（秒）",
             "alarm": "アラーム（iOS 26+）",
+            "snooze_seconds": "スヌーズ秒数（iOS 26+）",
             "step_labels": "ステップラベル",
             "step_rows": "ステップ行高",
+            "fired_at_entity": "発火時刻エンティティ",
             "fired_at_attribute": "発火時刻属性",
             "units": "系列ごとの単位",
-            "progress_entity": "進捗エンティティ",
-            "remaining_time_entity": "残り時間エンティティ",
-            "current_step_entity": "現在のステップエンティティ",
-            "value_entity": "値エンティティ",
-            "subtitle_entity": "サブタイトルエンティティ",
-            "tap_action_url": "タップアクションURL",
-            "tap_action_foreground": "タップアクションURLを開く",
-            "url_foreground": "プライマリボタンURLを開く",
-            "url_title": "プライマリボタンのタイトル",
-            "secondary_url_foreground": "セカンダリボタンURLを開く",
-            "secondary_url_title": "セカンダリボタンのタイトル",
-            "snooze_seconds": "スヌーズ秒数（iOS 26+）",
-            "fired_at_entity": "発火時刻エンティティ",
-            "log_columns": "ログ列"
+            "tiles": "board タイル",
+            "log_columns": "ログ列",
+            "log_level_attribute": "ログレベル属性"
           },
           "data_description": {
             "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
             "end_states": "Live Activityを終了するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
+            "progress_entity": "追跡エンティティの代わりに別のエンティティから進捗を読み取ります。空白のままにすると追跡エンティティを使用します。属性フィールドを設定するとこのエンティティのその属性を、設定しない場合は状態を読み取ります。",
             "progress_attribute": "0〜100の進捗値を持つエンティティ属性。例: percentage",
+            "remaining_time_entity": "別のエンティティ（例: 洗濯機の時間センサー）から残り時間を読み取ります。空白のままにすると追跡エンティティを使用します。タイムスタンプ（終了時刻）センサー、単位付きの継続時間センサー、H:MM:SS 文字列、または単純な秒数を自動的に解析します。",
             "remaining_time_attribute": "残り時間（秒）を持つエンティティ属性。例: remaining",
+            "live_progress": "上記の残り時間ソースを使用して、進捗バーをスムーズに埋め、デバイス上で完了時刻までのETAをカウントダウンします。残り時間のエンティティまたは属性が必要です。steps テンプレートでは、実行全体ではなく現在のステップを埋めます。",
             "total_steps": "steps の総数。",
+            "current_step_entity": "別のエンティティから現在のステップを読み取ります。空白のままにすると追跡エンティティを使用します。",
             "current_step_attribute": "現在のステップを整数で保持するエンティティ属性。",
             "severity": "alert の重大度レベル。",
+            "severity_label": "alert に表示される Info/Warning/Critical バッジテキストを上書きします。空白のままにすると重大度名を使用します。最大 32 文字。alert テンプレートのみ。",
+            "value_entity": "別のエンティティから gauge の値を読み取ります。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
             "value_attribute": "現在の gauge 値を数値で保持するエンティティ属性。空白のままにするとエンティティの状態を使用します。",
             "min_value": "gauge 範囲の最小値。",
             "max_value": "gauge 範囲の最大値。",
             "unit": "値の隣に表示される単位（例: °C, %, kW）。最大32文字。",
             "series": "エンティティ属性を名前付きシリーズにマッピングします。形式: attribute=Label, attribute2=Label2。空白のままにするとエンティティの状態を単一シリーズとして使用します。",
+            "series_entities": "個別のエンティティを1つのチャート上の名前付きラインとして結び付けます（例: 部屋ごとのPM2.5センサー）。形式: [Label=]entity_id[:attribute]、カンマ区切り。ラベルを省略するとエンティティのフレンドリー名が使用されます。entity_id:attribute で属性を読み取れます。シリーズと組み合わせて使用でき、合計最大10ラインまでです。",
+            "primary_series": "見出し値として表示され、コンパクトな高低範囲に使用されるシリーズのラベル。空白のままにすると、追跡エンティティ自身のシリーズ（または最初に設定されたシリーズ）を使用します。",
             "scale": "スパークラインチャートのY軸スケールモード。",
             "decimals": "値の小数点以下の桁数（0〜10）。",
             "smoothing": "データポイント間のカーブ補間を有効にして、スパークラインを滑らかにします。",
@@ -1174,13 +1348,20 @@
             "icon_attribute": "動的アイコン用のエンティティ属性。設定すると静的アイコンおよびエンティティアイコンより優先されます。",
             "priority": "デバイスの上限に達した場合、優先度の高いアクティビティが長く保持されます（0 = 最低, 10 = 最高）。",
             "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
+            "subtitle_entity": "別のエンティティ（例: プログラム/モードセンサー）からサブタイトルを表示します。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
             "subtitle_attribute": "サブタイトルとして表示するエンティティ属性。空白のままにするとエンティティのフレンドリー名を使用します。",
             "state_labels": "状態のカスタム表示テキスト。形式: state=Label, state2=Label 2。例: heating=加熱中, idle=待機中",
             "completion_message": "アクティビティ終了時に表示されるテキスト。空白のままにすると「完了」と表示されます。例: 洗濯完了",
             "accent_color": "Live Activityのアクセントカラー。空白のままにするとデフォルトの青色を使用します。",
             "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。静的カラーより優先されます。RGB、HS、XY、ケルビン、カラー名、16進数に対応しています。",
+            "tap_action_url": "Live Activity の背景をタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキーム（そのアプリを開く）に対応しています。",
+            "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— ロック画面を離れずにバックグラウンドで POST を送信します。",
             "url": "Live Activityをタップしたときに開くリンク。http:// または https:// で始まる必要があります。steps および alert テンプレートのみ。",
+            "url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+            "url_title": "プライマリボタンのラベル（最大 64 文字）。",
             "secondary_url": "Live Activityのセカンダリリンク。steps および alert テンプレートのみ。",
+            "secondary_url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+            "secondary_url_title": "セカンダリボタンのラベル（最大 64 文字）。",
             "ended_ttl": "アクティビティ終了後、サーバーから自動削除されるまでの秒数。空白のままにすると無期限に保持されます。例: 300",
             "stale_ttl": "サーバーがアクティビティを自動終了するまでの非アクティブ秒数。空白のままにすると無効にします。例: 1800",
             "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
@@ -1190,24 +1371,15 @@
             "text_color_attribute": "動的テキスト色のエンティティ属性。静的色より優先されます。",
             "warning_threshold": "countdown 終了前にサーバーが警告プッシュを送信する秒数。空白のままにすると無効にします。countdown テンプレートのみ。",
             "alarm": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+）。countdown テンプレートのみ。",
+            "snooze_seconds": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
             "step_labels": "各ステップのラベル。形式: 1=最初のステップ, 2=2番目のステップ。ステップ 1..total_steps をカバーする必要があります。steps テンプレートのみ。",
             "step_rows": "各ステップの行高（1–10）、カンマ区切り。total_steps 個のエントリが必要です。steps テンプレートのみ。",
+            "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。",
             "fired_at_attribute": "alert が発火したときの Unix タイムスタンプを持つエンティティ属性。alert テンプレートのみ。",
             "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。",
-            "progress_entity": "追跡エンティティの代わりに別のエンティティから進捗を読み取ります。空白のままにすると追跡エンティティを使用します。属性フィールドを設定するとこのエンティティのその属性を、設定しない場合は状態を読み取ります。",
-            "remaining_time_entity": "別のエンティティ（例: 洗濯機の時間センサー）から残り時間を読み取ります。空白のままにすると追跡エンティティを使用します。タイムスタンプ（終了時刻）センサー、単位付きの継続時間センサー、H:MM:SS 文字列、または単純な秒数を自動的に解析します。",
-            "current_step_entity": "別のエンティティから現在のステップを読み取ります。空白のままにすると追跡エンティティを使用します。",
-            "value_entity": "別のエンティティから gauge の値を読み取ります。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
-            "subtitle_entity": "別のエンティティ（例: プログラム/モードセンサー）からサブタイトルを表示します。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
-            "tap_action_url": "Live Activity の背景をタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキーム（そのアプリを開く）に対応しています。",
-            "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— ロック画面を離れずにバックグラウンドで POST を送信します。",
-            "url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
-            "url_title": "プライマリボタンのラベル（最大 64 文字）。",
-            "secondary_url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
-            "secondary_url_title": "セカンダリボタンのラベル（最大 64 文字）。",
-            "snooze_seconds": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
-            "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。",
-            "log_columns": "各ログ行に追加される値（最大6個）、カンマ区切り。形式: [Label=]source[|unit]。source = このエンティティの属性 (brightness)、別のエンティティの状態 (binary_sensor.door)、または別のエンティティの属性 (sensor.temp:temperature)。例: color_temp_kelvin|K, brightness → 'On · 4000K · 153'。ログテンプレートのみ。"
+            "tiles": "board タイル（1〜4）。それぞれが個別のエンティティを読み取ります。形式: Label=entity_id:attribute:unit:icon（attribute、unit、icon は省略可）。例: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door。board テンプレートのみ。",
+            "log_columns": "各ログ行に追加される値（最大6個）、カンマ区切り。形式: [Label=]source[|unit]。source = このエンティティの属性 (brightness)、別のエンティティの状態 (binary_sensor.door)、または別のエンティティの属性 (sensor.temp:temperature)。例: color_temp_kelvin|K, brightness → 'On · 4000K · 153'。ログテンプレートのみ。",
+            "log_level_attribute": "各ログ行のレベル（info/warn/error）を示すエンティティ属性。レベルタグを付けない場合は空のままにします。log テンプレートのみ。"
           }
         },
         "reconfigure": {
@@ -1223,8 +1395,10 @@
       },
       "error": {
         "invalid_url": "URLは http:// または https:// で始まる必要があります。",
+        "silent_requires_http": "サイレント Webhook（フォアグラウンドオフ）には http:// または https:// の URL が必要です。",
         "invalid_gauge_range": "最小値は最大値より小さくなければなりません。",
-        "silent_requires_http": "サイレント Webhook（フォアグラウンドオフ）には http:// または https:// の URL が必要です。"
+        "tiles_required": "board テンプレートには少なくとも 1 つのタイルが必要です。",
+        "too_many_series": "timeline は、シリーズ属性とシリーズエンティティを合わせて最大10個までのシリーズをサポートします。"
       },
       "abort": {
         "already_configured": "このエンティティはすでに追跡されています。",
@@ -1319,34 +1493,6 @@
         "already_configured": "このスラッグのウィジェットはすでに存在します。",
         "reconfigure_successful": "ウィジェットの設定を更新しました。"
       }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "notifications_used": {
-        "name": "使用済み通知数"
-      },
-      "live_activity_updates_used": {
-        "name": "使用済み Live Activity 更新数"
-      },
-      "widget_updates_used": {
-        "name": "使用済みウィジェット更新数"
-      },
-      "emails_used": {
-        "name": "使用済みメール数"
-      },
-      "subscription_tier": {
-        "name": "サブスクリプション層",
-        "state": {
-          "free": "無料",
-          "premium": "プレミアム"
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "widget_not_found": {
-      "message": "slug={slug} entity_id={entity_id} に一致する PushWard ウィジェットがありません。"
     }
   },
   "issues": {

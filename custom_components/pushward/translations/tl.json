@@ -1,4 +1,27 @@
 {
+  "entity": {
+    "sensor": {
+      "notifications_used": {
+        "name": "Mga notification na nagamit"
+      },
+      "live_activity_updates_used": {
+        "name": "Mga Live Activity update na nagamit"
+      },
+      "widget_updates_used": {
+        "name": "Mga widget update na nagamit"
+      },
+      "emails_used": {
+        "name": "Mga email na nagamit"
+      },
+      "subscription_tier": {
+        "name": "Tier ng subscription",
+        "state": {
+          "free": "Libre",
+          "premium": "Premium"
+        }
+      }
+    }
+  },
   "services": {
     "update_activity": {
       "name": "I-update ang Activity (deprecated)",
@@ -34,7 +57,7 @@
         },
         "accent_color": {
           "name": "Accent na Kulay",
-          "description": "Pangalan ng accent color para sa activity."
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
         },
         "remaining_time": {
           "name": "Natitirang Oras",
@@ -63,6 +86,10 @@
         "severity": {
           "name": "Kalubhaan",
           "description": "Antas ng kalubhaan ng alert."
+        },
+        "severity_label": {
+          "name": "Label ng Kalubhaan",
+          "description": "I-override ang Info/Warning/Critical badge text. Para sa alert template lamang."
         },
         "value": {
           "name": "Halaga",
@@ -124,6 +151,10 @@
           "name": "Alarma",
           "description": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Gumagana lamang sa iOS 26+."
         },
+        "snooze_seconds": {
+          "name": "Snooze na Segundo",
+          "description": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Default ay 300 (5 min). Nangangailangan ng alarm (iOS 26+, countdown template lamang)."
+        },
         "step_labels": {
           "name": "Mga Label ng Hakbang",
           "description": "Nakaayos na listahan ng mga label ng hakbang. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
@@ -139,10 +170,6 @@
         "units": {
           "name": "Mga Yunit",
           "description": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
-        },
-        "snooze_seconds": {
-          "name": "Snooze na Segundo",
-          "description": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Default ay 300 (5 min). Nangangailangan ng alarm (iOS 26+, countdown template lamang)."
         },
         "duration": {
           "name": "Tagal",
@@ -230,7 +257,7 @@
         },
         "accent_color": {
           "name": "Accent na Kulay",
-          "description": "Pangalan ng accent color para sa activity."
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
         },
         "background_color": {
           "name": "Kulay ng Background",
@@ -338,7 +365,7 @@
         },
         "accent_color": {
           "name": "Accent na Kulay",
-          "description": "Pangalan ng accent color para sa activity."
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
         },
         "background_color": {
           "name": "Kulay ng Background",
@@ -466,7 +493,7 @@
         },
         "accent_color": {
           "name": "Accent na Kulay",
-          "description": "Pangalan ng accent color para sa activity."
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
         },
         "background_color": {
           "name": "Kulay ng Background",
@@ -536,6 +563,10 @@
           "name": "Kalubhaan",
           "description": "Antas ng kalubhaan ng alert."
         },
+        "severity_label": {
+          "name": "Label ng Kalubhaan",
+          "description": "I-override ang Info/Warning/Critical badge text. Para sa alert template lamang."
+        },
         "state_text": {
           "name": "Teksto ng Estado",
           "description": "Tekstong ipinapakita bilang estado ng activity."
@@ -570,7 +601,7 @@
         },
         "accent_color": {
           "name": "Accent na Kulay",
-          "description": "Pangalan ng accent color para sa activity."
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
         },
         "background_color": {
           "name": "Kulay ng Background",
@@ -674,7 +705,7 @@
         },
         "accent_color": {
           "name": "Accent na Kulay",
-          "description": "Pangalan ng accent color para sa activity."
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
         },
         "background_color": {
           "name": "Kulay ng Background",
@@ -772,6 +803,10 @@
           "name": "Mga Yunit",
           "description": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%"
         },
+        "primary_series": {
+          "name": "Pangunahing Serye",
+          "description": "Label ng serye na ipinapakita bilang headline value at ginagamit para sa compact na high/low range. Iwanan itong blangko para panatilihin ang awtomatikong napiling serye. Hanggang 32 na character. Para sa timeline template lamang."
+        },
         "scale": {
           "name": "Sukat",
           "description": "Mode ng sukat ng Y-axis (linear o logarithmic). Para sa timeline template lamang."
@@ -794,7 +829,7 @@
         },
         "accent_color": {
           "name": "Accent na Kulay",
-          "description": "Pangalan ng accent color para sa activity."
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
         },
         "background_color": {
           "name": "Kulay ng Background",
@@ -860,6 +895,122 @@
         }
       }
     },
+    "update_activity_board": {
+      "name": "I-update ang Activity (Board)",
+      "description": "I-update ang isang PushWard board Live Activity (1–4 tile).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "tiles": {
+          "name": "Mga Tile",
+          "description": "Listahan ng 1–4 tile. Bawat isa: label (kinakailangan, ≤32), value (kinakailangang string, ≤16), at opsyonal na unit (≤8), icon (SF Symbol o mdi:), color (pangalan o hex), trend (up/down/flat), url_action object."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. square.grid.2x2.fill, mdi:view-dashboard)."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent na Kulay",
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Background color para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body. (Ang mga tap kada tile ay napupunta sa url_action ng bawat tile.)"
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Tunog ng notification na tinutugtog sa device para sa update na ito."
+        },
+        "priority": {
+          "name": "Override ng Priyoridad",
+          "description": "Priyoridad kada update (0-10). Nino-override ang naka-configure na priyoridad ng activity para sa push na ito lamang."
+        }
+      }
+    },
+    "update_activity_log": {
+      "name": "I-update ang Activity (Log)",
+      "description": "I-update ang isang PushWard log Live Activity (1–20 newest-first na linya).",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "lines": {
+          "name": "Mga Linya",
+          "description": "Listahan ng 1–20 newest-first na log line. Bawat isa: text (kinakailangan, ≤512), at opsyonal na at (unix timestamp) at level (info/warn/error)."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. list.bullet.rectangle, mdi:format-list-bulleted)."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent na Kulay",
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Background color para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Tunog ng notification na tinutugtog sa device para sa update na ito."
+        },
+        "priority": {
+          "name": "Override ng Priyoridad",
+          "description": "Priyoridad kada update (0-10). Nino-override ang naka-configure na priyoridad ng activity para sa push na ito lamang."
+        }
+      }
+    },
     "create_activity": {
       "name": "Lumikha ng Activity",
       "description": "Lumikha ng bagong PushWard Live Activity.",
@@ -910,6 +1061,20 @@
         }
       }
     },
+    "widget_refresh": {
+      "name": "I-refresh ang Widget",
+      "description": "Pwersahang i-refresh ang isang na-track na PushWard widget. Nila-laktawan ang in-memory diff cache upang muling ma-render at maipadala sa iOS ang widget kahit hindi nagbago ang halaga.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng widget. Dapat ibigay ang alinman sa slug o entity_id."
+        },
+        "entity_id": {
+          "name": "Entity",
+          "description": "HA entity na nakatali sa widget. Dapat ibigay ang alinman sa slug o entity_id."
+        }
+      }
+    },
     "send_notification": {
       "name": "Magpadala ng Notification",
       "description": "Magpadala ng push notification sa pamamagitan ng PushWard.",
@@ -929,6 +1094,10 @@
         "level": {
           "name": "Antas",
           "description": "Antas ng iOS interruption. Kinokontrol kung paano idine-deliver ang notification."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Volume ng tunog para sa critical na alert (0.0-1.0). Ginagamit lamang kapag critical ang level."
         },
         "thread_id": {
           "name": "Thread ID",
@@ -958,6 +1127,10 @@
           "name": "URL",
           "description": "URL na bubukas kapag na-tap ang notification. Nangangailangan ng HTTPS."
         },
+        "media": {
+          "name": "Media",
+          "description": "Media attachment bilang object na may `url` (HTTPS) at `type` (image, video, o audio)."
+        },
         "icon_url": {
           "name": "URL ng Icon",
           "description": "URL para sa icon ng notification. Nangangailangan ng HTTPS."
@@ -966,27 +1139,9 @@
           "name": "Metadata",
           "description": "Karagdagang key-value pair na metadata na ipinapadala kasama ang notification."
         },
-        "media": {
-          "name": "Media",
-          "description": "Media attachment bilang object na may `url` (HTTPS) at `type` (image, video, o audio)."
-        },
         "actions": {
           "name": "Mga Aksyon",
           "description": "Listahan ng action buttons. Ang bawat aksyon ay isang object na may id, title, opsyonal na url, foreground, destructive, authentication_required, at icon. Para sa http(s) url, maaari ka ring magpadala ng silent webhook na may method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, at body."
-        }
-      }
-    },
-    "widget_refresh": {
-      "name": "I-refresh ang Widget",
-      "description": "Pwersahang i-refresh ang isang na-track na PushWard widget. Nila-laktawan ang in-memory diff cache upang muling ma-render at maipadala sa iOS ang widget kahit hindi nagbago ang halaga.",
-      "fields": {
-        "slug": {
-          "name": "Slug",
-          "description": "Slug identifier ng widget. Dapat ibigay ang alinman sa slug o entity_id."
-        },
-        "entity_id": {
-          "name": "Entity",
-          "description": "HA entity na nakatali sa widget. Dapat ibigay ang alinman sa slug o entity_id."
         }
       }
     },
@@ -1027,14 +1182,19 @@
       }
     }
   },
+  "exceptions": {
+    "widget_not_found": {
+      "message": "Walang PushWard widget na tumutugma sa slug={slug} entity_id={entity_id}."
+    }
+  },
   "config": {
     "step": {
       "user": {
         "title": "Kumonekta sa PushWard",
+        "description": "Ilagay ang iyong PushWard integration key upang magsimula. Kunin ang PushWard iOS app mula sa App Store: {app_store_url}",
         "data": {
           "integration_key": "Integration Key"
         },
-        "description": "Ilagay ang iyong PushWard integration key upang magsimula. Kunin ang PushWard iOS app mula sa App Store: {app_store_url}",
         "data_description": {
           "integration_key": "Buksan ang PushWard iOS app (App Store: {app_store_url}) → Settings → Integration Keys. Maaari mong i-paste ang default key, o gumawa ng bago na may scope na 'ha-*'."
         }
@@ -1094,16 +1254,24 @@
           "data": {
             "start_states": "Mga Start State",
             "end_states": "Mga End State",
+            "progress_entity": "Entity ng Progreso",
             "progress_attribute": "Attribute ng Progreso",
+            "remaining_time_entity": "Entity ng Natitirang Oras",
             "remaining_time_attribute": "Attribute ng Natitirang Oras",
+            "live_progress": "Live Progress ETA",
             "total_steps": "Kabuuang Steps",
+            "current_step_entity": "Entity ng Kasalukuyang Hakbang",
             "current_step_attribute": "Attribute ng Kasalukuyang Hakbang",
             "severity": "Kalubhaan",
+            "severity_label": "Label ng Kalubhaan",
+            "value_entity": "Entity ng Halaga",
             "value_attribute": "Attribute ng Halaga",
             "min_value": "Pinakamababang Halaga",
             "max_value": "Pinakamataas na Halaga",
             "unit": "Yunit",
             "series": "Serye",
+            "series_entities": "Mga Entity ng Serye",
+            "primary_series": "Pangunahing Serye",
             "scale": "Sukat",
             "decimals": "Mga Decimal na Lugar",
             "smoothing": "Maayos na Linya",
@@ -1115,13 +1283,20 @@
             "icon_attribute": "Attribute ng Icon",
             "priority": "Priyoridad (0-10)",
             "update_interval": "Pinakamababang Agwat ng Update (segundo)",
+            "subtitle_entity": "Entity ng Subtitle",
             "subtitle_attribute": "Attribute ng Subtitle",
             "state_labels": "Mga Label ng Estado",
             "completion_message": "Mensahe ng Pagkumpleto",
             "accent_color": "Accent na Kulay",
             "accent_color_attribute": "Attribute ng Accent na Kulay",
+            "tap_action_url": "Tap Action URL",
+            "tap_action_foreground": "Buksan ang Tap Action URL",
             "url": "URL",
+            "url_foreground": "Buksan ang Primary Button URL",
+            "url_title": "Title ng Pangunahing Button",
             "secondary_url": "Secondary URL",
+            "secondary_url_foreground": "Buksan ang Secondary Button URL",
+            "secondary_url_title": "Title ng Pangalawang Button",
             "ended_ttl": "Awtomatikong Burahin Pagkatapos ng Pagtatapos (segundo)",
             "stale_ttl": "Awtomatikong Tapusin Pagkatapos ng Kawalan ng Aktibidad (segundo)",
             "sound": "Tunog",
@@ -1131,38 +1306,37 @@
             "text_color_attribute": "Attribute ng Kulay ng Teksto",
             "warning_threshold": "Babala na Threshold",
             "alarm": "Alarma",
+            "snooze_seconds": "Snooze na Segundo (iOS 26+)",
             "step_labels": "Mga Label ng Hakbang",
             "step_rows": "Mga Hilera ng Hakbang",
+            "fired_at_entity": "Entity ng Fired At",
             "fired_at_attribute": "Attribute ng Oras ng Pag-trigger",
             "units": "Mga Yunit",
-            "progress_entity": "Entity ng Progreso",
-            "remaining_time_entity": "Entity ng Natitirang Oras",
-            "current_step_entity": "Entity ng Kasalukuyang Hakbang",
-            "value_entity": "Entity ng Halaga",
-            "subtitle_entity": "Entity ng Subtitle",
-            "tap_action_url": "Tap Action URL",
-            "tap_action_foreground": "Buksan ang Tap Action URL",
-            "url_foreground": "Buksan ang Primary Button URL",
-            "url_title": "Title ng Pangunahing Button",
-            "secondary_url_foreground": "Buksan ang Secondary Button URL",
-            "secondary_url_title": "Title ng Pangalawang Button",
-            "snooze_seconds": "Snooze na Segundo (iOS 26+)",
-            "fired_at_entity": "Entity ng Fired At",
-            "log_columns": "Mga Column ng Log"
+            "tiles": "Mga Tile ng Board",
+            "log_columns": "Mga Column ng Log",
+            "log_level_attribute": "Attribute ng Antas ng Log"
           },
           "data_description": {
             "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
             "end_states": "Mga estado ng entity na nagtatapos ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
+            "progress_entity": "Basahin ang progreso mula sa hiwalay na entity sa halip na sa na-track na entity. Iwanang blanko upang gamitin ang na-track na entity. Kapag nakatakda ang attribute field, babasahin ang attribute na iyon ng entity na ito; kung hindi, ang state nito.",
             "progress_attribute": "Attribute ng entity na nagtataglay ng halaga ng progreso mula 0 hanggang 100. Halimbawa: percentage",
+            "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
             "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
+            "live_progress": "Punuin nang maayos ang progress bar at mag-countdown ng ETA hanggang sa oras ng pagkumpleto sa device, gamit ang remaining-time source sa itaas. Nangangailangan ng remaining-time entity o attribute. Sa steps template, pinupuno nito ang kasalukuyang hakbang sa halip na ang buong run.",
             "total_steps": "Kabuuang bilang ng mga steps.",
+            "current_step_entity": "Basahin ang kasalukuyang hakbang mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity.",
             "current_step_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang hakbang bilang integer.",
             "severity": "Antas ng kalubhaan ng alert.",
+            "severity_label": "I-override ang Info/Warning/Critical badge text na ipinapakita sa alert. Iwanan itong blangko para gamitin ang pangalan ng kalubhaan. Hanggang 32 na character. Para sa alert template lamang.",
+            "value_entity": "Basahin ang gauge value mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
             "value_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang halaga ng gauge bilang numero. Iwanan itong blangko para gamitin ang estado ng entity.",
             "min_value": "Pinakamababang halaga para sa saklaw ng gauge.",
             "max_value": "Pinakamataas na halaga para sa saklaw ng gauge.",
             "unit": "Display na yunit na ipinapakita katabi ng halaga (hal. °C, %, kW). Hanggang 32 karakter.",
             "series": "I-map ang mga attribute ng entity sa mga pinangalanang serye. Format: attribute=Label, attribute2=Label2. Iwanan itong blangko para gamitin ang estado ng entity bilang isang serye.",
+            "series_entities": "I-bind ang hiwalay na entity bilang mga pinangalanang linya sa isang chart (hal. isang PM2.5 sensor kada silid). Format: [Label=]entity_id[:attribute], pinaghihiwalay ng kuwit. Ang label ay nagde-default sa friendly name ng entity; magbasa ng attribute gamit ang entity_id:attribute. Pinagsasama sa Serye; hanggang 10 linya sa kabuuan.",
+            "primary_series": "Label ng serye na ipinapakita bilang headline value at ginagamit para sa compact na high/low range. Iwanan itong blangko para gamitin ang sariling serye ng na-track na entity (o ang unang naka-configure na serye).",
             "scale": "Mode ng sukat ng Y-axis para sa sparkline chart.",
             "decimals": "Bilang ng mga decimal na lugar na ipinapakita para sa mga halaga (0–10).",
             "smoothing": "Paganahin ang curve interpolation sa pagitan ng mga data point para sa mas maayos na sparkline.",
@@ -1174,13 +1348,20 @@
             "icon_attribute": "Attribute ng entity para sa dynamic na icon. Nino-override ang static icon at entity icon kapag nakatakda.",
             "priority": "Mas mataas na priyoridad na mga activity ang pinananatili nang mas matagal kapag naabot ang limitasyon ng device (0 = pinakamababa, 10 = pinakamataas).",
             "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
+            "subtitle_entity": "Ipakita ang subtitle mula sa hiwalay na entity (hal. program/mode sensor). Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
             "subtitle_attribute": "Attribute ng entity na ipinapakita bilang subtitle. Iwanan itong blangko para gamitin ang friendly name ng entity.",
             "state_labels": "Custom na display na teksto para sa mga estado. Format: state=Label, state2=Label 2. Halimbawa: heating=Nagpapainit, idle=Naghihintay",
             "completion_message": "Tekstong ipinapakita kapag natapos ang activity. Iwanan itong blangko para sa 'Kumpleto'. Halimbawa: Tapos na ang Paglalaba",
             "accent_color": "Accent color para sa Live Activity. Iwanan itong blangko para sa default na asul.",
             "accent_color_attribute": "Attribute ng entity para sa dynamic na accent color. Nino-override ang static na kulay. Sinusuportahan ang RGB, HS, XY, Kelvin, mga pinangalanang kulay, at hex.",
+            "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang background ng Live Activity. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0 (bumubukas ng app na iyon).",
+            "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background nang hindi umaalis sa Lock Screen.",
             "url": "Link na bubukas kapag na-tap ang Live Activity. Dapat magsimula sa http:// o https://. Para sa mga steps at alert na template lamang.",
+            "url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+            "url_title": "Label ng pangunahing button (max 64 na character).",
             "secondary_url": "Secondary link para sa Live Activity. Para sa mga steps at alert na template lamang.",
+            "secondary_url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+            "secondary_url_title": "Label ng pangalawang button (max 64 na character).",
             "ended_ttl": "Mga segundo pagkatapos matapos ang activity bago ito awtomatikong mabura mula sa server. Iwanan itong blangko para panatilihing walang hanggan. Halimbawa: 300",
             "stale_ttl": "Mga segundo ng kawalan ng aktibidad bago awtomatikong tapusin ng server ang activity. Iwanan itong blangko para i-disable. Halimbawa: 1800",
             "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
@@ -1190,24 +1371,15 @@
             "text_color_attribute": "Attribute ng entity para sa dynamic na kulay ng teksto. Nino-override ang static na kulay ng teksto.",
             "warning_threshold": "Kapag ang halaga ay umabot o lumampas dito, nati-trigger ang kulay ng babala. Mga template na gauge at timeline.",
             "alarm": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Para sa iOS 26+ lamang.",
+            "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
             "step_labels": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang.",
             "step_rows": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template.",
+            "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang.",
             "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
             "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%",
-            "progress_entity": "Basahin ang progreso mula sa hiwalay na entity sa halip na sa na-track na entity. Iwanang blanko upang gamitin ang na-track na entity. Kapag nakatakda ang attribute field, babasahin ang attribute na iyon ng entity na ito; kung hindi, ang state nito.",
-            "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
-            "current_step_entity": "Basahin ang kasalukuyang hakbang mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity.",
-            "value_entity": "Basahin ang gauge value mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
-            "subtitle_entity": "Ipakita ang subtitle mula sa hiwalay na entity (hal. program/mode sensor). Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
-            "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang background ng Live Activity. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0 (bumubukas ng app na iyon).",
-            "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background nang hindi umaalis sa Lock Screen.",
-            "url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
-            "url_title": "Label ng pangunahing button (max 64 na character).",
-            "secondary_url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
-            "secondary_url_title": "Label ng pangalawang button (max 64 na character).",
-            "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
-            "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang.",
-            "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6), pinaghihiwalay ng kuwit. Format: [Label=]source[|unit]. source = isang attribute ng entity na ito (brightness), ang estado ng ibang entity (binary_sensor.door), o isang attribute ng ibang entity (sensor.temp:temperature). Halimbawa: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Para lang sa log template."
+            "tiles": "Mga tile ng board (1–4), bawat isa ay nagbabasa ng hiwalay na entity. Format: Label=entity_id:attribute:unit:icon (opsyonal ang attribute, unit, icon). Halimbawa: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Para sa board template lamang.",
+            "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6), pinaghihiwalay ng kuwit. Format: [Label=]source[|unit]. source = isang attribute ng entity na ito (brightness), ang estado ng ibang entity (binary_sensor.door), o isang attribute ng ibang entity (sensor.temp:temperature). Halimbawa: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Para lang sa log template.",
+            "log_level_attribute": "Attribute na nagbibigay ng level (info/warn/error) ng bawat log line. Iwanang blangko para walang level tag. Para sa log template lamang."
           }
         },
         "reconfigure": {
@@ -1223,8 +1395,10 @@
       },
       "error": {
         "invalid_url": "Ang URL ay dapat gumamit ng http:// o https:// scheme.",
+        "silent_requires_http": "Ang silent webhook (naka-off ang foreground) ay nangangailangan ng http:// o https:// URL.",
         "invalid_gauge_range": "Ang pinakamababang halaga ay dapat na mas mababa sa pinakamataas na halaga.",
-        "silent_requires_http": "Ang silent webhook (naka-off ang foreground) ay nangangailangan ng http:// o https:// URL."
+        "tiles_required": "Kailangan ng kahit isang tile para sa board template.",
+        "too_many_series": "Sinusuportahan ng isang timeline ang hanggang 10 serye sa kabuuan (mga series attribute kasama ang mga series entity)."
       },
       "abort": {
         "already_configured": "Ang entity na ito ay naka-track na.",
@@ -1319,34 +1493,6 @@
         "already_configured": "May widget na umiiral na sa slug na ito.",
         "reconfigure_successful": "Na-update ang configuration ng widget."
       }
-    }
-  },
-  "entity": {
-    "sensor": {
-      "notifications_used": {
-        "name": "Mga notification na nagamit"
-      },
-      "live_activity_updates_used": {
-        "name": "Mga Live Activity update na nagamit"
-      },
-      "widget_updates_used": {
-        "name": "Mga widget update na nagamit"
-      },
-      "emails_used": {
-        "name": "Mga email na nagamit"
-      },
-      "subscription_tier": {
-        "name": "Tier ng subscription",
-        "state": {
-          "free": "Libre",
-          "premium": "Premium"
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "widget_not_found": {
-      "message": "Walang PushWard widget na tumutugma sa slug={slug} entity_id={entity_id}."
     }
   },
   "issues": {
