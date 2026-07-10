@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import logging
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -414,3 +416,106 @@ async def test_cache_survives_restart(hass: HomeAssistant) -> None:
     api2.patch_widget.assert_not_called()
 
     await manager2.async_stop()
+
+
+async def test_patch_404_recreates_only_once(hass: HomeAssistant) -> None:
+    """A 404 streak recreates once; a successful PATCH re-arms the self-heal."""
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+    api.reset_mock()
+    api.patch_widget = AsyncMock(side_effect=PushWardNotFoundError("widget not found", status_code=404))
+
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+    api.create_widget.assert_awaited_once()
+
+    # Still 404ing: no second recreate on the next change.
+    hass.states.async_set("sensor.users", "44")
+    await hass.async_block_till_done()
+    api.create_widget.assert_awaited_once()
+
+    # A successful PATCH resets the guard...
+    api.patch_widget = AsyncMock()
+    hass.states.async_set("sensor.users", "45")
+    await hass.async_block_till_done()
+    api.patch_widget.assert_awaited_once()
+
+    # ...so a fresh out-of-band deletion self-heals again.
+    api.patch_widget = AsyncMock(side_effect=PushWardNotFoundError("widget not found", status_code=404))
+    hass.states.async_set("sensor.users", "46")
+    await hass.async_block_till_done()
+    assert api.create_widget.await_count == 2
+
+    await manager.async_stop()
+
+
+async def test_widget_burst_trailing_resend(hass: HomeAssistant) -> None:
+    """Changes landing during an in-flight PATCH re-send the newest state after."""
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+    api.reset_mock()
+
+    gate = asyncio.Event()
+
+    async def _gated(*_a, **_k):
+        await gate.wait()
+
+    api.patch_widget.side_effect = _gated
+
+    hass.states.async_set("sensor.users", "43")
+    await asyncio.sleep(0)  # let the send task start and block on the gate
+    hass.states.async_set("sensor.users", "44")
+    hass.states.async_set("sensor.users", "45")
+    await asyncio.sleep(0)
+    assert api.patch_widget.await_count == 1
+
+    api.patch_widget.side_effect = None
+    gate.set()
+    await hass.async_block_till_done()
+
+    # One gated PATCH plus one trailing re-send carrying the newest value.
+    assert api.patch_widget.await_count == 2
+    assert api.patch_widget.call_args.args[1]["content"]["value"] == 45.0
+
+    await manager.async_stop()
+
+
+async def test_push_failure_warns_once_per_streak(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """Repeated push failures WARN once, then DEBUG; recovery logs INFO and re-arms."""
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+    api.reset_mock()
+
+    def _warnings() -> list[str]:
+        return [r.getMessage() for r in caplog.records if r.levelno == logging.WARNING and "ha-users" in r.getMessage()]
+
+    api.patch_widget = AsyncMock(side_effect=PushWardApiError("boom"))
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+    hass.states.async_set("sensor.users", "44")
+    await hass.async_block_till_done()
+    assert len(_warnings()) == 1
+
+    api.patch_widget = AsyncMock()
+    hass.states.async_set("sensor.users", "45")
+    await hass.async_block_till_done()
+    assert any("succeeding again" in r.getMessage() for r in caplog.records if r.levelno == logging.INFO)
+
+    api.patch_widget = AsyncMock(side_effect=PushWardApiError("boom"))
+    hass.states.async_set("sensor.users", "46")
+    await hass.async_block_till_done()
+    assert len(_warnings()) == 2
+
+    await manager.async_stop()

@@ -82,6 +82,10 @@ class TrackedWidget:
     unsub_poll: Callable[[], None] | None = None
     registry_icon: str | None = None
     pending_task: asyncio.Task | None = field(default=None, repr=False)
+    # A change landing while a send is in flight re-sends the newest state after.
+    update_pending: bool = False
+    # One recreate per 404 streak; reset on the next successful PATCH.
+    recreate_attempted: bool = False
 
 
 def _entity_ids_for_widget(config: dict) -> list[str]:
@@ -128,6 +132,8 @@ class WidgetManager:
         self._store = build_widget_store(hass, entry.entry_id)
         self._reauth_triggered = False
         self._permission_notified = False
+        # Slugs currently in a push-failure streak: WARN once on entry, DEBUG after.
+        self._failed_slugs: set[str] = set()
 
     # ----- public lifecycle -----
 
@@ -282,17 +288,26 @@ class WidgetManager:
 
     @callback
     def _schedule_update(self, tracked: TrackedWidget) -> None:
-        """Coalesce burst events into a single update task per widget."""
+        """Coalesce burst events into a single update task per widget.
+
+        A change landing mid-send marks the widget dirty so the newest state is
+        re-sent once the in-flight task finishes, instead of being dropped.
+        """
         if tracked.pending_task is not None and not tracked.pending_task.done():
+            tracked.update_pending = True
             return
         task = self._hass.async_create_task(self._send_update(tracked))
         tracked.pending_task = task
-        task.add_done_callback(partial(self._clear_pending_task, tracked))
+        task.add_done_callback(partial(self._on_send_done, tracked))
 
-    @staticmethod
-    def _clear_pending_task(tracked: TrackedWidget, task: asyncio.Task) -> None:
-        if tracked.pending_task is task:
-            tracked.pending_task = None
+    def _on_send_done(self, tracked: TrackedWidget, task: asyncio.Task) -> None:
+        if tracked.pending_task is not task:
+            return
+        tracked.pending_task = None
+        resend = tracked.update_pending and not task.cancelled()
+        tracked.update_pending = False
+        if resend and self._tracked.get(tracked.config[CONF_SLUG]) is tracked:
+            self._schedule_update(tracked)
 
     # ----- core send -----
 
@@ -379,8 +394,16 @@ class WidgetManager:
                     # The server has no row for this slug (deleted out-of-band, or our
                     # cached created=True outlived the server state). Reconcile by
                     # recreating it so updates self-heal instead of 404ing forever.
-                    _LOGGER.info("Widget %s missing server-side on update; recreating", slug)
+                    # One recreate per 404 streak: if the recreate did not stick,
+                    # don't hammer the server on every state change.
+                    if tracked.recreate_attempted:
+                        _LOGGER.debug("Widget %s still missing server-side; skipping recreate", slug)
+                        return
+                    tracked.recreate_attempted = True
+                    _LOGGER.debug("Widget %s missing server-side on update; recreating", slug)
                     await self._create_widget(tracked, content)
+                else:
+                    tracked.recreate_attempted = False
 
             tracked.last_content = content
             self._clear_forbidden_notification(slug)
@@ -480,6 +503,17 @@ class WidgetManager:
             self._permission_notified = False
             persistent_notification.async_dismiss(self._hass, _WIDGET_PERMISSION_NOTIFICATION)
         persistent_notification.async_dismiss(self._hass, _forbidden_notification_id(slug))
+        if slug in self._failed_slugs:
+            self._failed_slugs.discard(slug)
+            _LOGGER.info("PushWard widget %s: pushes succeeding again", slug)
+
+    def _log_push_failure(self, slug: str, msg: str, *args: Any, exc_info: bool = False) -> None:
+        """WARN on entering the failure state per slug; DEBUG while it persists."""
+        if slug in self._failed_slugs:
+            _LOGGER.debug(msg, *args, exc_info=exc_info)
+        else:
+            self._failed_slugs.add(slug)
+            _LOGGER.warning(msg, *args, exc_info=exc_info)
 
     @contextlib.asynccontextmanager
     async def _api_error_guard(self, slug: str, context: str):
@@ -489,7 +523,7 @@ class WidgetManager:
             self._trigger_reauth()
         except PushWardWidgetPermissionError as err:
             self._notify_widget_permission(str(err))
-            _LOGGER.warning("PushWard widget permission denied while %s %s: %s", context, slug, err)
+            self._log_push_failure(slug, "PushWard widget permission denied while %s %s: %s", context, slug, err)
         except PushWardForbiddenError as err:
             persistent_notification.async_create(
                 self._hass,
@@ -497,8 +531,8 @@ class WidgetManager:
                 title=f"PushWard widget — {slug}",
                 notification_id=_forbidden_notification_id(slug),
             )
-            _LOGGER.warning("PushWard 403 while %s widget %s: %s", context, slug, err)
+            self._log_push_failure(slug, "PushWard 403 while %s widget %s: %s", context, slug, err)
         except PushWardApiError as err:
-            _LOGGER.warning("PushWard API error while %s widget %s: %s", context, slug, err)
+            self._log_push_failure(slug, "PushWard API error while %s widget %s: %s", context, slug, err)
         except aiohttp.ClientError:
-            _LOGGER.warning("PushWard network error while %s widget %s", context, slug, exc_info=True)
+            self._log_push_failure(slug, "PushWard network error while %s widget %s", context, slug, exc_info=True)
