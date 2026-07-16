@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Einddatum",
-          "description": "Unix-tijdstempel voor de countdown-einddatum."
+          "description": "Unix-tijdstempel. Countdown: wanneer het aftellen eindigt. Live voortgang (generic en steps): wanneer de balk klaar is met animeren."
         },
         "total_steps": {
           "name": "Totaal aantal steps",
@@ -167,6 +167,10 @@
           "name": "Stapgewichten",
           "description": "Geordende lijst met relatieve stapbreedtes, allemaal positief. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
         },
+        "live_progress": {
+          "name": "Live voortgang",
+          "description": "Animeert de voortgangsbalk tussen updates naar de Einddatum toe. Sjablonen generic en steps; steps vereist ook een Startdatum."
+        },
         "step_colors": {
           "name": "Stapkleuren",
           "description": "Geordende lijst met kleuren per stap, benoemd of hex. Een lege invoer gebruikt de accentkleur. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Startdatum",
-          "description": "Unix-tijdstempel waarop het aftellen begon (verankert de verstreken/resterende balk). De server stelt dit standaard in op nu."
+          "description": "Unix-tijdstempel. Countdown: wanneer het aftellen begon; de server stelt dit standaard in op nu. Live voortgang van steps: wanneer de huidige stap begon."
         },
         "history": {
           "name": "Geschiedenis (seed)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Voortgang",
           "description": "Voortgangswaarde tussen 0.0 en 1.0."
+        },
+        "live_progress": {
+          "name": "Live voortgang",
+          "description": "Animeert de voortgangsbalk tussen updates naar de Einddatum toe."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-tijdstempel waarop het animatievenster begon."
+        },
+        "end_date": {
+          "name": "Einddatum",
+          "description": "Unix-tijdstempel waar de voortgangsbalk naartoe animeert. Moet in de toekomst liggen wanneer Live voortgang aan staat."
         },
         "completion_message": {
           "name": "Voltooiingsbericht",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Stapkleuren",
           "description": "Geordende lijst met kleuren per stap, benoemd of hex. Een lege invoer gebruikt de accentkleur. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "live_progress": {
+          "name": "Live voortgang",
+          "description": "Animeert het segment van de huidige stap tussen updates naar de Einddatum toe. Vereist Startdatum en Einddatum."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-tijdstempel waarop de huidige stap begon. Verankert de geanimeerde balk; moet vóór de Einddatum liggen."
+        },
+        "end_date": {
+          "name": "Einddatum",
+          "description": "Unix-tijdstempel waar de geanimeerde balk naartoe vult. Moet in de toekomst liggen."
         },
         "url": {
           "name": "URL",

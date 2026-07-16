@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Data zakończenia",
-          "description": "Znacznik czasu Unix dla daty zakończenia countdown."
+          "description": "Znacznik czasu Unix. Countdown: kiedy kończy się odliczanie. Postęp na żywo (generic i steps): kiedy pasek kończy animację."
         },
         "total_steps": {
           "name": "Łączna liczba steps",
@@ -167,6 +167,10 @@
           "name": "Wagi Kroków",
           "description": "Uporządkowana lista względnych szerokości kroków, wszystkie dodatnie. Długość musi być równa total_steps. Tylko szablon steps."
         },
+        "live_progress": {
+          "name": "Postęp na żywo",
+          "description": "Animuje pasek postępu w stronę Daty zakończenia między aktualizacjami. Szablony generic i steps; steps wymaga też Daty rozpoczęcia."
+        },
         "step_colors": {
           "name": "Kolory Kroków",
           "description": "Uporządkowana lista kolorów dla każdego kroku, nazwane lub hex. Puste pole używa koloru akcentu. Długość musi być równa total_steps. Tylko szablon steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Data rozpoczęcia",
-          "description": "Znacznik czasu Unix rozpoczęcia odliczania (kotwiczy pasek upłynęło/pozostało). Serwer domyślnie ustawia teraz."
+          "description": "Znacznik czasu Unix. Countdown: kiedy rozpoczęło się odliczanie; serwer domyślnie ustawia teraz. Postęp na żywo steps: kiedy rozpoczął się bieżący krok."
         },
         "history": {
           "name": "Historia (wartości początkowe)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Postęp",
           "description": "Wartość postępu między 0.0 a 1.0."
+        },
+        "live_progress": {
+          "name": "Postęp na żywo",
+          "description": "Animuje pasek postępu w stronę Daty zakończenia między aktualizacjami."
+        },
+        "start_date": {
+          "name": "Data rozpoczęcia",
+          "description": "Znacznik czasu Unix rozpoczęcia okna animacji."
+        },
+        "end_date": {
+          "name": "Data zakończenia",
+          "description": "Znacznik czasu Unix, w stronę którego animuje się pasek postępu. Musi być w przyszłości, gdy Postęp na żywo jest włączony."
         },
         "completion_message": {
           "name": "Komunikat zakończenia",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Kolory Kroków",
           "description": "Uporządkowana lista kolorów dla każdego kroku, nazwane lub hex. Puste pole używa koloru akcentu. Długość musi być równa total_steps. Tylko szablon steps."
+        },
+        "live_progress": {
+          "name": "Postęp na żywo",
+          "description": "Animuje segment bieżącego kroku w stronę Daty zakończenia między aktualizacjami. Wymaga Daty rozpoczęcia i Daty zakończenia."
+        },
+        "start_date": {
+          "name": "Data rozpoczęcia",
+          "description": "Znacznik czasu Unix rozpoczęcia bieżącego kroku. Kotwiczy animowany pasek; musi poprzedzać Datę zakończenia."
+        },
+        "end_date": {
+          "name": "Data zakończenia",
+          "description": "Znacznik czasu Unix, w stronę którego wypełnia się animowany pasek. Musi być w przyszłości."
         },
         "url": {
           "name": "URL",

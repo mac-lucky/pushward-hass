@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "结束日期",
-          "description": "countdown 结束日期的 Unix 时间戳。"
+          "description": "Unix 时间戳。Countdown：倒计时何时结束。实时进度（generic 和 steps）：进度条何时完成动画。"
         },
         "total_steps": {
           "name": "总 steps 数",
@@ -167,6 +167,10 @@
           "name": "步骤权重",
           "description": "每个步骤相对宽度的有序列表，全部为正数。长度必须等于 total_steps。仅适用于 steps 模板。"
         },
+        "live_progress": {
+          "name": "实时进度",
+          "description": "在更新之间将进度条向结束日期动画填充。generic 和 steps 模板；steps 还需要开始日期。"
+        },
         "step_colors": {
           "name": "步骤颜色",
           "description": "每个步骤颜色的有序列表（颜色名称或十六进制）。留空条目使用强调色。长度必须等于 total_steps。仅适用于 steps 模板。"
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "开始日期",
-          "description": "倒计时开始时的 Unix 时间戳（用于锚定已用/剩余进度条）。服务器默认将其设为当前时间。"
+          "description": "Unix 时间戳。Countdown：倒计时何时开始；服务器默认将其设为当前时间。steps 实时进度：当前步骤何时开始。"
         },
         "history": {
           "name": "历史记录（初始值）",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "进度",
           "description": "0.0 到 1.0 之间的进度值。"
+        },
+        "live_progress": {
+          "name": "实时进度",
+          "description": "在更新之间将进度条向结束日期动画填充。"
+        },
+        "start_date": {
+          "name": "开始日期",
+          "description": "动画窗口开始时的 Unix 时间戳。"
+        },
+        "end_date": {
+          "name": "结束日期",
+          "description": "进度条动画所朝向的 Unix 时间戳。启用实时进度时必须是未来时间。"
         },
         "completion_message": {
           "name": "完成消息",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "步骤颜色",
           "description": "每个步骤颜色的有序列表（颜色名称或十六进制）。留空条目使用强调色。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "live_progress": {
+          "name": "实时进度",
+          "description": "在更新之间将当前步骤的区段向结束日期动画填充。需要开始日期和结束日期。"
+        },
+        "start_date": {
+          "name": "开始日期",
+          "description": "当前步骤开始时的 Unix 时间戳。锚定动画进度条；必须早于结束日期。"
+        },
+        "end_date": {
+          "name": "结束日期",
+          "description": "动画进度条填充所朝向的 Unix 时间戳。必须是未来时间。"
         },
         "url": {
           "name": "URL",

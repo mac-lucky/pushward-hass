@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Bitiş Tarihi",
-          "description": "countdown bitiş tarihi için Unix zaman damgası."
+          "description": "Unix zaman damgası. Countdown: geri sayımın ne zaman bittiği. Canlı İlerleme (generic ve steps): çubuğun animasyonu ne zaman bitirdiği."
         },
         "total_steps": {
           "name": "Toplam steps",
@@ -167,6 +167,10 @@
           "name": "Adım Ağırlıkları",
           "description": "Her adımın göreli genişliğinin sıralı listesi, hepsi pozitif olmalı. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
         },
+        "live_progress": {
+          "name": "Canlı İlerleme",
+          "description": "Güncellemeler arasında ilerleme çubuğunu Bitiş Tarihine doğru canlandırır. generic ve steps şablonları; steps ayrıca Başlangıç Tarihi gerektirir."
+        },
         "step_colors": {
           "name": "Adım Renkleri",
           "description": "Her adımın renginin sıralı listesi, isim veya hex. Boş bir girdi vurgu rengini kullanır. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Başlangıç Tarihi",
-          "description": "Geri sayımın başladığı Unix zaman damgası (geçen/kalan çubuğunu sabitler). Sunucu bunu varsayılan olarak şimdiye ayarlar."
+          "description": "Unix zaman damgası. Countdown: geri sayımın ne zaman başladığı; sunucu bunu varsayılan olarak şimdiye ayarlar. steps Canlı İlerleme: geçerli adımın ne zaman başladığı."
         },
         "history": {
           "name": "Geçmiş (başlangıç)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "İlerleme",
           "description": "0,0 ile 1,0 arasında ilerleme değeri."
+        },
+        "live_progress": {
+          "name": "Canlı İlerleme",
+          "description": "Güncellemeler arasında ilerleme çubuğunu Bitiş Tarihine doğru canlandırır."
+        },
+        "start_date": {
+          "name": "Başlangıç Tarihi",
+          "description": "Animasyon penceresinin başladığı Unix zaman damgası."
+        },
+        "end_date": {
+          "name": "Bitiş Tarihi",
+          "description": "İlerleme çubuğunun dolarak yöneldiği Unix zaman damgası. Canlı İlerleme açıkken gelecekte olmalıdır."
         },
         "completion_message": {
           "name": "Tamamlanma Mesajı",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Adım Renkleri",
           "description": "Her adımın renginin sıralı listesi, isim veya hex. Boş bir girdi vurgu rengini kullanır. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
+        },
+        "live_progress": {
+          "name": "Canlı İlerleme",
+          "description": "Güncellemeler arasında geçerli adımın bölümünü Bitiş Tarihine doğru canlandırır. Başlangıç Tarihi ve Bitiş Tarihi gerektirir."
+        },
+        "start_date": {
+          "name": "Başlangıç Tarihi",
+          "description": "Geçerli adımın başladığı Unix zaman damgası. Canlandırılan çubuğu sabitler; Bitiş Tarihinden önce olmalıdır."
+        },
+        "end_date": {
+          "name": "Bitiş Tarihi",
+          "description": "Canlandırılan çubuğun dolarak yöneldiği Unix zaman damgası. Gelecekte olmalıdır."
         },
         "url": {
           "name": "URL",

@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Petsa ng Pagtatapos",
-          "description": "Unix timestamp para sa petsa ng pagtatapos ng countdown."
+          "description": "Unix timestamp. Countdown: kung kailan nagtatapos ang countdown. Live Progress (generic at steps): kung kailan natapos mag-animate ang bar."
         },
         "total_steps": {
           "name": "Kabuuang Steps",
@@ -167,6 +167,10 @@
           "name": "Timbang ng Hakbang",
           "description": "Nakaayos na listahan ng relatibong lapad ng bawat hakbang, lahat positibo. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
         },
+        "live_progress": {
+          "name": "Live Progress",
+          "description": "Ina-animate ang progress bar patungo sa Petsa ng Pagtatapos sa pagitan ng mga update. Mga template na generic at steps; kailangan din ng steps ang Petsa ng Simula."
+        },
         "step_colors": {
           "name": "Kulay ng Hakbang",
           "description": "Nakaayos na listahan ng kulay bawat hakbang, pangalan o hex. Ang blangkong entry ay gagamit ng accent color. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Petsa ng Simula",
-          "description": "Unix timestamp kung kailan nagsimula ang countdown (nag-aanchor sa elapsed/remaining bar). Ang default nito sa server ay ngayon."
+          "description": "Unix timestamp. Countdown: kung kailan nagsimula ang countdown; ang default nito sa server ay ngayon. Live Progress ng steps: kung kailan nagsimula ang kasalukuyang hakbang."
         },
         "history": {
           "name": "Kasaysayan (seed)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Progreso",
           "description": "Halaga ng progreso sa pagitan ng 0.0 at 1.0."
+        },
+        "live_progress": {
+          "name": "Live Progress",
+          "description": "Ina-animate ang progress bar patungo sa Petsa ng Pagtatapos sa pagitan ng mga update."
+        },
+        "start_date": {
+          "name": "Petsa ng Simula",
+          "description": "Unix timestamp kung kailan nagsimula ang animation window."
+        },
+        "end_date": {
+          "name": "Petsa ng Pagtatapos",
+          "description": "Unix timestamp na pinupuntahan ng progress bar habang ina-animate. Dapat nasa hinaharap kapag naka-on ang Live Progress."
         },
         "completion_message": {
           "name": "Mensahe ng Pagkumpleto",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Kulay ng Hakbang",
           "description": "Nakaayos na listahan ng kulay bawat hakbang, pangalan o hex. Ang blangkong entry ay gagamit ng accent color. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
+        },
+        "live_progress": {
+          "name": "Live Progress",
+          "description": "Ina-animate ang segment ng kasalukuyang hakbang patungo sa Petsa ng Pagtatapos sa pagitan ng mga update. Kailangan ng Petsa ng Simula at Petsa ng Pagtatapos."
+        },
+        "start_date": {
+          "name": "Petsa ng Simula",
+          "description": "Unix timestamp kung kailan nagsimula ang kasalukuyang hakbang. Nag-aanchor sa animated na bar; dapat mauna sa Petsa ng Pagtatapos."
+        },
+        "end_date": {
+          "name": "Petsa ng Pagtatapos",
+          "description": "Unix timestamp na pinupuntahan ng animated na bar habang pinupuno. Dapat nasa hinaharap."
         },
         "url": {
           "name": "URL",

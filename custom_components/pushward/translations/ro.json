@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Dată de încheiere",
-          "description": "Marcaj de timp Unix pentru data de încheiere countdown."
+          "description": "Marcaj de timp Unix. Countdown: când se termină numărătoarea inversă. Progres live (generic și steps): când bara termină animația."
         },
         "total_steps": {
           "name": "Total steps",
@@ -167,6 +167,10 @@
           "name": "Ponderile Pașilor",
           "description": "Listă ordonată a lățimilor relative ale pașilor, toate pozitive. Lungimea trebuie să fie egală cu total_steps. Numai pentru șablonul steps."
         },
+        "live_progress": {
+          "name": "Progres live",
+          "description": "Animează bara de progres către Data de încheiere între actualizări. Șabloanele generic și steps; steps necesită și o Dată de început."
+        },
         "step_colors": {
           "name": "Culorile Pașilor",
           "description": "Listă ordonată a culorilor pentru fiecare pas, numite sau hex. O intrare goală folosește culoarea de accent. Lungimea trebuie să fie egală cu total_steps. Numai pentru șablonul steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Dată de început",
-          "description": "Marca temporală Unix când a început numărătoarea inversă (ancorează bara timp scurs/rămas). Serverul folosește implicit momentul curent."
+          "description": "Marcaj de timp Unix. Countdown: când a început numărătoarea inversă; serverul folosește implicit momentul curent. Progres live steps: când a început pasul curent."
         },
         "history": {
           "name": "Istoric (valori inițiale)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Progres",
           "description": "Valoarea progresului între 0.0 și 1.0."
+        },
+        "live_progress": {
+          "name": "Progres live",
+          "description": "Animează bara de progres către Data de încheiere între actualizări."
+        },
+        "start_date": {
+          "name": "Dată de început",
+          "description": "Marcaj de timp Unix când a început fereastra de animație."
+        },
+        "end_date": {
+          "name": "Dată de încheiere",
+          "description": "Marcaj de timp Unix către care se animează bara de progres. Trebuie să fie în viitor când Progres live este activat."
         },
         "completion_message": {
           "name": "Mesaj de finalizare",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Culorile Pașilor",
           "description": "Listă ordonată a culorilor pentru fiecare pas, numite sau hex. O intrare goală folosește culoarea de accent. Lungimea trebuie să fie egală cu total_steps. Numai pentru șablonul steps."
+        },
+        "live_progress": {
+          "name": "Progres live",
+          "description": "Animează segmentul pasului curent către Data de încheiere între actualizări. Necesită Dată de început și Dată de încheiere."
+        },
+        "start_date": {
+          "name": "Dată de început",
+          "description": "Marcaj de timp Unix când a început pasul curent. Ancorează bara animată; trebuie să preceadă Data de încheiere."
+        },
+        "end_date": {
+          "name": "Dată de încheiere",
+          "description": "Marcaj de timp Unix către care se umple bara animată. Trebuie să fie în viitor."
         },
         "url": {
           "name": "URL",

@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Tanggal Akhir",
-          "description": "Stempel waktu Unix untuk tanggal akhir countdown."
+          "description": "Stempel waktu Unix. Countdown: kapan hitung mundur berakhir. Kemajuan Live (generic dan steps): kapan bilah selesai beranimasi."
         },
         "total_steps": {
           "name": "Total Langkah",
@@ -167,6 +167,10 @@
           "name": "Bobot Langkah",
           "description": "Daftar terurut lebar relatif setiap langkah, semuanya positif. Panjang harus sama dengan total_steps. Hanya untuk templat steps."
         },
+        "live_progress": {
+          "name": "Kemajuan Live",
+          "description": "Menganimasikan bilah kemajuan menuju Tanggal Akhir di antara pembaruan. Templat generic dan steps; steps juga memerlukan Tanggal Mulai."
+        },
         "step_colors": {
           "name": "Warna Langkah",
           "description": "Daftar terurut warna setiap langkah, nama warna atau hex. Entri kosong menggunakan warna aksen. Panjang harus sama dengan total_steps. Hanya untuk templat steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Tanggal Mulai",
-          "description": "Stempel waktu Unix saat hitung mundur dimulai (menjadi acuan bilah berlalu/tersisa). Server menetapkan default ini ke sekarang."
+          "description": "Stempel waktu Unix. Countdown: kapan hitung mundur dimulai; server menetapkan default ini ke sekarang. Kemajuan Live steps: kapan langkah saat ini dimulai."
         },
         "history": {
           "name": "Riwayat (seed)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Kemajuan",
           "description": "Nilai kemajuan antara 0.0 dan 1.0."
+        },
+        "live_progress": {
+          "name": "Kemajuan Live",
+          "description": "Menganimasikan bilah kemajuan menuju Tanggal Akhir di antara pembaruan."
+        },
+        "start_date": {
+          "name": "Tanggal Mulai",
+          "description": "Stempel waktu Unix saat jendela animasi dimulai."
+        },
+        "end_date": {
+          "name": "Tanggal Akhir",
+          "description": "Stempel waktu Unix yang menjadi tujuan animasi bilah kemajuan. Harus di masa depan saat Kemajuan Live aktif."
         },
         "completion_message": {
           "name": "Pesan Penyelesaian",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Warna Langkah",
           "description": "Daftar terurut warna setiap langkah, nama warna atau hex. Entri kosong menggunakan warna aksen. Panjang harus sama dengan total_steps. Hanya untuk templat steps."
+        },
+        "live_progress": {
+          "name": "Kemajuan Live",
+          "description": "Menganimasikan segmen langkah saat ini menuju Tanggal Akhir di antara pembaruan. Memerlukan Tanggal Mulai dan Tanggal Akhir."
+        },
+        "start_date": {
+          "name": "Tanggal Mulai",
+          "description": "Stempel waktu Unix saat langkah saat ini dimulai. Menjadi acuan bilah animasi; harus mendahului Tanggal Akhir."
+        },
+        "end_date": {
+          "name": "Tanggal Akhir",
+          "description": "Stempel waktu Unix yang menjadi tujuan pengisian bilah animasi. Harus di masa depan."
         },
         "url": {
           "name": "URL",

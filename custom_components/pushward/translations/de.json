@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Enddatum",
-          "description": "Unix-Zeitstempel für das Countdown-Enddatum."
+          "description": "Unix-Zeitstempel. Countdown: wann der Countdown endet. Live-Fortschritt (generic und steps): wann die Leiste die Animation abschließt."
         },
         "total_steps": {
           "name": "Anzahl Steps",
@@ -167,6 +167,10 @@
           "name": "Schrittgewichte",
           "description": "Geordnete Liste der relativen Schrittbreiten, alle positiv. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
         },
+        "live_progress": {
+          "name": "Live-Fortschritt",
+          "description": "Die Fortschrittsleiste zwischen Aktualisierungen zum Enddatum hin animieren. Vorlagen 'generic' und 'steps'; 'steps' benötigt außerdem ein Startdatum."
+        },
         "step_colors": {
           "name": "Schrittfarben",
           "description": "Geordnete Liste der Farben pro Schritt, benannt oder als Hex. Ein leerer Eintrag verwendet die Akzentfarbe. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Startdatum",
-          "description": "Unix-Zeitstempel des Countdown-Beginns (verankert die Leiste für vergangene/verbleibende Zeit). Der Server setzt dies standardmäßig auf jetzt."
+          "description": "Unix-Zeitstempel. Countdown: wann der Countdown begann; der Server setzt dies standardmäßig auf jetzt. Steps-Live-Fortschritt: wann der aktuelle Schritt begann."
         },
         "history": {
           "name": "Verlauf (Startwert)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Fortschritt",
           "description": "Fortschrittswert zwischen 0.0 und 1.0."
+        },
+        "live_progress": {
+          "name": "Live-Fortschritt",
+          "description": "Die Fortschrittsleiste zwischen Aktualisierungen zum Enddatum hin animieren."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-Zeitstempel, an dem das Animationsfenster begann."
+        },
+        "end_date": {
+          "name": "Enddatum",
+          "description": "Unix-Zeitstempel, auf den sich die Fortschrittsleiste zubewegt. Muss in der Zukunft liegen, wenn Live-Fortschritt aktiviert ist."
         },
         "completion_message": {
           "name": "Abschlussnachricht",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Schrittfarben",
           "description": "Geordnete Liste der Farben pro Schritt, benannt oder als Hex. Ein leerer Eintrag verwendet die Akzentfarbe. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
+        },
+        "live_progress": {
+          "name": "Live-Fortschritt",
+          "description": "Das Segment des aktuellen Schritts zwischen Aktualisierungen zum Enddatum hin animieren. Benötigt Startdatum und Enddatum."
+        },
+        "start_date": {
+          "name": "Startdatum",
+          "description": "Unix-Zeitstempel, an dem der aktuelle Schritt begann. Verankert die animierte Leiste; muss vor dem Enddatum liegen."
+        },
+        "end_date": {
+          "name": "Enddatum",
+          "description": "Unix-Zeitstempel, auf den sich die animierte Leiste zubewegt. Muss in der Zukunft liegen."
         },
         "url": {
           "name": "URL",

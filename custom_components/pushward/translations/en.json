@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "End Date",
-          "description": "Unix timestamp for countdown end date."
+          "description": "Unix timestamp. Countdown: when the countdown ends. Live progress (generic and steps): when the bar finishes animating."
         },
         "total_steps": {
           "name": "Total Steps",
@@ -171,6 +171,10 @@
           "name": "Step Colors",
           "description": "Ordered list of per-step colors, named or hex. An empty entry uses the accent color. Length must equal total_steps. Steps template only."
         },
+        "live_progress": {
+          "name": "Live Progress",
+          "description": "Animate the progress bar toward End Date between updates. Generic and steps templates; steps also needs Start Date."
+        },
         "fired_at": {
           "name": "Fired At",
           "description": "Unix timestamp when the alert was triggered. Alert template only."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Start Date",
-          "description": "Unix timestamp when the countdown began (anchors the elapsed/remaining bar). The server defaults this to now."
+          "description": "Unix timestamp. Countdown: when the countdown began; the server defaults this to now. Steps live progress: when the current step began."
         },
         "history": {
           "name": "History (seed)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Progress",
           "description": "Progress value between 0.0 and 1.0."
+        },
+        "live_progress": {
+          "name": "Live Progress",
+          "description": "Animate the progress bar toward End Date between updates."
+        },
+        "start_date": {
+          "name": "Start Date",
+          "description": "Unix timestamp when the animation window began."
+        },
+        "end_date": {
+          "name": "End Date",
+          "description": "Unix timestamp the progress bar animates toward. Must be in the future when Live Progress is on."
         },
         "completion_message": {
           "name": "Completion Message",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Step Colors",
           "description": "Ordered list of per-step colors, named or hex. An empty entry uses the accent color. Length must equal total_steps. Steps template only."
+        },
+        "live_progress": {
+          "name": "Live Progress",
+          "description": "Animate the current step's segment toward End Date between updates. Needs Start Date and End Date."
+        },
+        "start_date": {
+          "name": "Start Date",
+          "description": "Unix timestamp when the current step began. Anchors the animated bar; must precede End Date."
+        },
+        "end_date": {
+          "name": "End Date",
+          "description": "Unix timestamp the animated bar fills toward. Must be in the future."
         },
         "url": {
           "name": "URL",

@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Data di fine",
-          "description": "Timestamp Unix per la data di fine countdown."
+          "description": "Timestamp Unix. Countdown: quando termina il conto alla rovescia. Avanzamento live (generic e steps): quando la barra termina l'animazione."
         },
         "total_steps": {
           "name": "Passaggi totali",
@@ -167,6 +167,10 @@
           "name": "Pesi dei passi",
           "description": "Elenco ordinato delle larghezze relative dei passi, tutte positive. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
         },
+        "live_progress": {
+          "name": "Avanzamento live",
+          "description": "Anima la barra di avanzamento verso la Data di fine tra un aggiornamento e l'altro. Modelli generic e steps; steps richiede anche la Data di inizio."
+        },
         "step_colors": {
           "name": "Colori dei passi",
           "description": "Elenco ordinato dei colori per passo, con nome o esadecimale. Una voce vuota usa il colore accento. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Data di inizio",
-          "description": "Timestamp Unix di inizio del conto alla rovescia (ancora la barra di tempo trascorso/rimanente). Per impostazione predefinita il server usa il momento attuale."
+          "description": "Timestamp Unix. Countdown: quando è iniziato il conto alla rovescia; per impostazione predefinita il server usa il momento attuale. Avanzamento live di steps: quando è iniziato il passo corrente."
         },
         "history": {
           "name": "Cronologia (seed)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Avanzamento",
           "description": "Valore di avanzamento compreso tra 0.0 e 1.0."
+        },
+        "live_progress": {
+          "name": "Avanzamento live",
+          "description": "Anima la barra di avanzamento verso la Data di fine tra un aggiornamento e l'altro."
+        },
+        "start_date": {
+          "name": "Data di inizio",
+          "description": "Timestamp Unix di quando è iniziata la finestra di animazione."
+        },
+        "end_date": {
+          "name": "Data di fine",
+          "description": "Timestamp Unix verso cui si anima la barra di avanzamento. Deve essere nel futuro quando l'Avanzamento live è attivo."
         },
         "completion_message": {
           "name": "Messaggio di completamento",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Colori dei passi",
           "description": "Elenco ordinato dei colori per passo, con nome o esadecimale. Una voce vuota usa il colore accento. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
+        },
+        "live_progress": {
+          "name": "Avanzamento live",
+          "description": "Anima il segmento del passo corrente verso la Data di fine tra un aggiornamento e l'altro. Richiede Data di inizio e Data di fine."
+        },
+        "start_date": {
+          "name": "Data di inizio",
+          "description": "Timestamp Unix di quando è iniziato il passo corrente. Ancora la barra animata; deve precedere la Data di fine."
+        },
+        "end_date": {
+          "name": "Data di fine",
+          "description": "Timestamp Unix verso cui si riempie la barra animata. Deve essere nel futuro."
         },
         "url": {
           "name": "URL",

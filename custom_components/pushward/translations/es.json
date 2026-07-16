@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Fecha de fin",
-          "description": "Marca de tiempo Unix para la fecha de fin del countdown."
+          "description": "Marca de tiempo Unix. Countdown: cuándo termina la cuenta atrás. Progreso en vivo (generic y steps): cuándo la barra termina de animarse."
         },
         "total_steps": {
           "name": "Total steps",
@@ -167,6 +167,10 @@
           "name": "Pesos de los pasos",
           "description": "Lista ordenada de anchos relativos de los pasos, todos positivos. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
         },
+        "live_progress": {
+          "name": "Progreso en vivo",
+          "description": "Anima la barra de progreso hacia la Fecha de fin entre actualizaciones. Plantillas generic y steps; steps también necesita Fecha de inicio."
+        },
         "step_colors": {
           "name": "Colores de los pasos",
           "description": "Lista ordenada de colores por paso, con nombre o en hexadecimal. Una entrada vacía usa el color de acento. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Fecha de inicio",
-          "description": "Marca de tiempo Unix de cuándo comenzó la cuenta atrás (ancla la barra de tiempo transcurrido/restante). El servidor usa el momento actual de forma predeterminada."
+          "description": "Marca de tiempo Unix. Countdown: cuándo comenzó la cuenta atrás; el servidor usa el momento actual de forma predeterminada. Progreso en vivo de steps: cuándo comenzó el paso actual."
         },
         "history": {
           "name": "Historial (inicial)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Progreso",
           "description": "Valor de progreso entre 0.0 y 1.0."
+        },
+        "live_progress": {
+          "name": "Progreso en vivo",
+          "description": "Anima la barra de progreso hacia la Fecha de fin entre actualizaciones."
+        },
+        "start_date": {
+          "name": "Fecha de inicio",
+          "description": "Marca de tiempo Unix de cuándo comenzó la ventana de animación."
+        },
+        "end_date": {
+          "name": "Fecha de fin",
+          "description": "Marca de tiempo Unix hacia la que se anima la barra de progreso. Debe estar en el futuro cuando el Progreso en vivo está activado."
         },
         "completion_message": {
           "name": "Mensaje de finalización",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Colores de los pasos",
           "description": "Lista ordenada de colores por paso, con nombre o en hexadecimal. Una entrada vacía usa el color de acento. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
+        },
+        "live_progress": {
+          "name": "Progreso en vivo",
+          "description": "Anima el segmento del paso actual hacia la Fecha de fin entre actualizaciones. Necesita Fecha de inicio y Fecha de fin."
+        },
+        "start_date": {
+          "name": "Fecha de inicio",
+          "description": "Marca de tiempo Unix de cuándo comenzó el paso actual. Ancla la barra animada; debe ser anterior a la Fecha de fin."
+        },
+        "end_date": {
+          "name": "Fecha de fin",
+          "description": "Marca de tiempo Unix hacia la que se llena la barra animada. Debe estar en el futuro."
         },
         "url": {
           "name": "URL",

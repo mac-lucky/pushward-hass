@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Ngày Kết Thúc",
-          "description": "Dấu thời gian Unix cho ngày kết thúc countdown."
+          "description": "Dấu thời gian Unix. Countdown: khi bộ đếm ngược kết thúc. Tiến độ trực tiếp (generic và steps): khi thanh hoàn tất hiệu ứng."
         },
         "total_steps": {
           "name": "Tổng Số steps",
@@ -167,6 +167,10 @@
           "name": "Trọng Số Bước",
           "description": "Danh sách có thứ tự độ rộng tương đối của mỗi bước, tất cả đều dương. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
         },
+        "live_progress": {
+          "name": "Tiến độ trực tiếp",
+          "description": "Tạo hiệu ứng lấp đầy thanh tiến độ hướng tới Ngày Kết Thúc giữa các lần cập nhật. Mẫu generic và steps; steps cũng cần Ngày bắt đầu."
+        },
         "step_colors": {
           "name": "Màu Bước",
           "description": "Danh sách có thứ tự màu của mỗi bước, tên màu hoặc hex. Mục để trống sẽ dùng màu nhấn. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Ngày bắt đầu",
-          "description": "Dấu thời gian Unix khi bắt đầu đếm ngược (neo thanh thời gian đã trôi qua/còn lại). Máy chủ mặc định đặt giá trị này về hiện tại."
+          "description": "Dấu thời gian Unix. Countdown: khi bộ đếm ngược bắt đầu; máy chủ mặc định đặt giá trị này về hiện tại. Tiến độ trực tiếp của steps: khi bước hiện tại bắt đầu."
         },
         "history": {
           "name": "Lịch sử (dữ liệu khởi tạo)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Tiến Độ",
           "description": "Giá trị tiến độ từ 0.0 đến 1.0."
+        },
+        "live_progress": {
+          "name": "Tiến độ trực tiếp",
+          "description": "Tạo hiệu ứng lấp đầy thanh tiến độ hướng tới Ngày Kết Thúc giữa các lần cập nhật."
+        },
+        "start_date": {
+          "name": "Ngày bắt đầu",
+          "description": "Dấu thời gian Unix khi cửa sổ hiệu ứng bắt đầu."
+        },
+        "end_date": {
+          "name": "Ngày Kết Thúc",
+          "description": "Dấu thời gian Unix mà thanh tiến độ tạo hiệu ứng hướng tới. Phải nằm trong tương lai khi Tiến độ trực tiếp được bật."
         },
         "completion_message": {
           "name": "Thông Báo Hoàn Thành",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Màu Bước",
           "description": "Danh sách có thứ tự màu của mỗi bước, tên màu hoặc hex. Mục để trống sẽ dùng màu nhấn. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
+        },
+        "live_progress": {
+          "name": "Tiến độ trực tiếp",
+          "description": "Tạo hiệu ứng lấp đầy phân đoạn của bước hiện tại hướng tới Ngày Kết Thúc giữa các lần cập nhật. Cần Ngày bắt đầu và Ngày Kết Thúc."
+        },
+        "start_date": {
+          "name": "Ngày bắt đầu",
+          "description": "Dấu thời gian Unix khi bước hiện tại bắt đầu. Neo thanh hiệu ứng; phải trước Ngày Kết Thúc."
+        },
+        "end_date": {
+          "name": "Ngày Kết Thúc",
+          "description": "Dấu thời gian Unix mà thanh hiệu ứng lấp đầy hướng tới. Phải nằm trong tương lai."
         },
         "url": {
           "name": "URL",

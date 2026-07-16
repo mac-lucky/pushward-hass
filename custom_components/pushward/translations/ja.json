@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "終了日時",
-          "description": "countdown の終了日時のUnixタイムスタンプ。"
+          "description": "Unix タイムスタンプ。Countdown: countdown が終了する時刻。ライブ進捗（generic および steps）: バーがアニメーションを終える時刻。"
         },
         "total_steps": {
           "name": "総 steps 数",
@@ -167,6 +167,10 @@
           "name": "ステップの幅",
           "description": "各ステップの相対幅の順序付きリスト（すべて正の値）。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
         },
+        "live_progress": {
+          "name": "ライブ進捗",
+          "description": "更新の合間に進捗バーを終了日時に向けてアニメーションします。generic および steps テンプレート。steps では開始日時も必要です。"
+        },
         "step_colors": {
           "name": "ステップの色",
           "description": "各ステップの色の順序付きリスト（色名または16進数）。空の項目はアクセントカラーを使用します。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "開始日時",
-          "description": "countdown が始まった時刻の Unix タイムスタンプ（経過/残りバーの基準）。サーバーのデフォルトは現在時刻です。"
+          "description": "Unix タイムスタンプ。Countdown: countdown が始まった時刻。サーバーのデフォルトは現在時刻です。steps のライブ進捗: 現在のステップが始まった時刻。"
         },
         "history": {
           "name": "履歴（シード）",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "進捗",
           "description": "0.0〜1.0の進捗値。"
+        },
+        "live_progress": {
+          "name": "ライブ進捗",
+          "description": "更新の合間に進捗バーを終了日時に向けてアニメーションします。"
+        },
+        "start_date": {
+          "name": "開始日時",
+          "description": "アニメーション期間が始まった時刻の Unix タイムスタンプ。"
+        },
+        "end_date": {
+          "name": "終了日時",
+          "description": "進捗バーが向かう先の Unix タイムスタンプ。ライブ進捗が有効な場合は未来の時刻である必要があります。"
         },
         "completion_message": {
           "name": "完了メッセージ",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "ステップの色",
           "description": "各ステップの色の順序付きリスト（色名または16進数）。空の項目はアクセントカラーを使用します。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "live_progress": {
+          "name": "ライブ進捗",
+          "description": "更新の合間に現在のステップのセグメントを終了日時に向けてアニメーションします。開始日時と終了日時が必要です。"
+        },
+        "start_date": {
+          "name": "開始日時",
+          "description": "現在のステップが始まった時刻の Unix タイムスタンプ。アニメーションバーの基準となり、終了日時より前である必要があります。"
+        },
+        "end_date": {
+          "name": "終了日時",
+          "description": "アニメーションバーが向かう先の Unix タイムスタンプ。未来の時刻である必要があります。"
         },
         "url": {
           "name": "URL",

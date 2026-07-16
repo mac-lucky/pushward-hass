@@ -198,6 +198,14 @@ _UNIVERSAL_APPEARANCE_FIELDS = {
     vol.Optional("sound"): vol.In(SOUNDS),
     vol.Optional("priority"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
 }
+# Animation window for the live-progress templates (generic, steps). The service
+# path is a stateless pass-through with no anchor carry-forward, so the caller
+# owns the window; steps needs both dates when live_progress is true.
+_LIVE_PROGRESS_FIELDS = {
+    vol.Optional("live_progress"): cv.boolean,
+    vol.Optional("start_date"): vol.Coerce(int),
+    vol.Optional("end_date"): vol.Coerce(int),
+}
 _COUNTDOWN_TEMPLATE_FIELDS = {
     vol.Optional("end_date"): vol.Coerce(int),
     # Set-and-forget alternative to end_date: int seconds (>=1) or a Go-style duration
@@ -309,7 +317,13 @@ def _board_log_schema(template_fields: dict) -> vol.Schema:
 
 
 def _update_template_schema(*template_fields: dict) -> vol.Schema:
-    """Build an update_activity schema from the shared groups plus the given template groups."""
+    """Build an update_activity schema from the shared groups plus the given template groups.
+
+    Groups may repeat a key (live-progress and countdown both carry start_date/
+    end_date): voluptuous markers compare by key name, so the merge keeps the
+    first group's marker and the last group's validator. Keep overlapping keys'
+    validators identical or the union schema silently takes the last one.
+    """
     merged = {
         **_UPDATE_TOPLEVEL_FIELDS,
         **_UNIVERSAL_LABEL_FIELDS,
@@ -322,9 +336,9 @@ def _update_template_schema(*template_fields: dict) -> vol.Schema:
 
 
 _UPDATE_TEMPLATE_SCHEMAS = {
-    "generic": _update_template_schema(),
+    "generic": _update_template_schema(_LIVE_PROGRESS_FIELDS),
     "countdown": _update_template_schema(_COUNTDOWN_TEMPLATE_FIELDS),
-    "steps": _update_template_schema(_STEPS_TEMPLATE_FIELDS),
+    "steps": _update_template_schema(_LIVE_PROGRESS_FIELDS, _STEPS_TEMPLATE_FIELDS),
     "alert": _update_template_schema(_ALERT_TEMPLATE_FIELDS),
     "gauge": _update_template_schema(_GAUGE_TEMPLATE_FIELDS),
     "timeline": _update_template_schema(_TIMELINE_TEMPLATE_FIELDS),
@@ -337,6 +351,7 @@ _UPDATE_TEMPLATE_SCHEMAS = {
 # `template` selector) — i.e. the union of all per-template schemas.
 SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
     {vol.Optional("template"): str},
+    _LIVE_PROGRESS_FIELDS,
     _COUNTDOWN_TEMPLATE_FIELDS,
     _STEPS_TEMPLATE_FIELDS,
     _ALERT_TEMPLATE_FIELDS,

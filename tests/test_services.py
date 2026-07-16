@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -876,6 +877,78 @@ async def test_update_activity_steps_accepts_weights_and_colors(hass: HomeAssist
     assert content["step_colors"] == ["green", "", "red"]
 
 
+async def test_update_activity_steps_accepts_live_progress_window(hass: HomeAssistant) -> None:
+    """live_progress plus its start/end anchors forward verbatim and satisfy the contract."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    now = int(time.time())
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_steps",
+        {
+            "slug": "s",
+            "state": "ongoing",
+            "total_steps": 3,
+            "current_step": 2,
+            "live_progress": True,
+            "start_date": now,
+            "end_date": now + 3600,
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "steps"
+    assert content["live_progress"] is True
+    assert content["start_date"] == now
+    assert content["end_date"] == now + 3600
+    assert_valid_activity_content(content, where="update_activity_steps live_progress")
+
+
+async def test_update_activity_generic_accepts_live_progress_window(hass: HomeAssistant) -> None:
+    """The generic action carries the same animation window as steps."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    now = int(time.time())
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {
+            "slug": "g",
+            "state": "ongoing",
+            "progress": 0.4,
+            "live_progress": True,
+            "start_date": now,
+            "end_date": now + 600,
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "generic"
+    assert content["live_progress"] is True
+    assert content["start_date"] == now
+    assert content["end_date"] == now + 600
+    assert_valid_activity_content(content, where="update_activity_generic live_progress")
+
+
+async def test_update_activity_gauge_rejects_live_progress(hass: HomeAssistant) -> None:
+    """live_progress stays scoped to the templates that render it."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_gauge",
+            {"slug": "g", "state": "ongoing", "live_progress": True},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
 async def test_update_activity_steps_rejects_dict_step_labels(hass: HomeAssistant) -> None:
     """A dict for step_labels is rejected — the schema requires a list (the old docs were wrong)."""
     api = _mock_api()
@@ -1039,6 +1112,21 @@ async def test_update_activity_service_accepts_units_dict(hass: HomeAssistant) -
 
     content = api.update_activity.call_args[0][2]
     assert content["units"] == {"Temp": "°C"}
+
+
+async def test_update_activity_service_accepts_live_progress(hass: HomeAssistant) -> None:
+    """live_progress passes the deprecated union schema and lands in content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ongoing", "template": "generic", "live_progress": True},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args[0][2]["live_progress"] is True
 
 
 async def test_send_notification_service_accepts_url_media_icon_metadata(hass: HomeAssistant) -> None:

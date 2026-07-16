@@ -70,7 +70,7 @@ update_activity:
       fields:
         end_date:
           name: End Date
-          description: Unix timestamp for countdown end date.
+          description: 'Unix timestamp. Countdown: when the countdown ends. Live progress (generic and steps): when the bar finishes animating.'
           example: 1700000000
           selector:
             number:
@@ -84,7 +84,7 @@ update_activity:
             text:
         start_date:
           name: Start Date
-          description: Unix timestamp when the countdown began (anchors the elapsed/remaining bar). The server defaults this to now. Countdown template only.
+          description: 'Unix timestamp. Countdown: when the countdown began; the server defaults this to now. Steps live progress: when the current step began.'
           example: 1700000000
           selector:
             number:
@@ -153,6 +153,11 @@ update_activity:
           description: 'Color for each step as a list of named colors or hex (e.g. ["green","","red"]). An empty entry uses the accent color. Length must equal total_steps. Steps template only.'
           selector:
             object:
+        live_progress:
+          name: Live Progress
+          description: Animate the progress bar toward End Date between updates. Generic and steps templates; steps also needs Start Date.
+          selector:
+            boolean:
     alert_options:
       collapsed: true
       fields:
@@ -374,6 +379,21 @@ update_activity_generic:
               max: 1.0
               step: 0.01
               mode: slider
+        live_progress:
+          selector:
+            boolean:
+        start_date:
+          example: 1700000000
+          selector:
+            number:
+              min: 0
+              mode: box
+        end_date:
+          example: 1700000300
+          selector:
+            number:
+              min: 0
+              mode: box
     action_buttons:
       collapsed: true
       fields:
@@ -652,6 +672,21 @@ update_activity_steps:
         step_colors:
           selector:
             object:
+        live_progress:
+          selector:
+            boolean:
+        start_date:
+          example: 1700000000
+          selector:
+            number:
+              min: 0
+              mode: box
+        end_date:
+          example: 1700000300
+          selector:
+            number:
+              min: 0
+              mode: box
     action_buttons:
       collapsed: true
       fields:

@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Data de Término",
-          "description": "Timestamp Unix para a data de término do countdown."
+          "description": "Timestamp Unix. Countdown: quando a contagem regressiva termina. Progresso ao Vivo (generic e steps): quando a barra termina de animar."
         },
         "total_steps": {
           "name": "Total steps",
@@ -167,6 +167,10 @@
           "name": "Pesos das Etapas",
           "description": "Lista ordenada das larguras relativas das etapas, todas positivas. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
         },
+        "live_progress": {
+          "name": "Progresso ao Vivo",
+          "description": "Anima a barra de progresso em direção à Data de Término entre atualizações. Modelos generic e steps; steps também requer Data de início."
+        },
         "step_colors": {
           "name": "Cores das Etapas",
           "description": "Lista ordenada das cores de cada etapa, nomeadas ou em hexadecimal. Uma entrada vazia usa a cor de destaque. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Data de início",
-          "description": "Timestamp Unix de quando a contagem regressiva começou (ancora a barra de tempo decorrido/restante). O servidor usa agora como padrão."
+          "description": "Timestamp Unix. Countdown: quando a contagem regressiva começou; o servidor usa agora como padrão. Progresso ao Vivo de steps: quando a etapa atual começou."
         },
         "history": {
           "name": "Histórico (semente)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Progresso",
           "description": "Valor de progresso entre 0.0 e 1.0."
+        },
+        "live_progress": {
+          "name": "Progresso ao Vivo",
+          "description": "Anima a barra de progresso em direção à Data de Término entre atualizações."
+        },
+        "start_date": {
+          "name": "Data de início",
+          "description": "Timestamp Unix de quando a janela de animação começou."
+        },
+        "end_date": {
+          "name": "Data de Término",
+          "description": "Timestamp Unix para o qual a barra de progresso é animada. Deve estar no futuro quando o Progresso ao Vivo está ativado."
         },
         "completion_message": {
           "name": "Mensagem de Conclusão",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Cores das Etapas",
           "description": "Lista ordenada das cores de cada etapa, nomeadas ou em hexadecimal. Uma entrada vazia usa a cor de destaque. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "live_progress": {
+          "name": "Progresso ao Vivo",
+          "description": "Anima o segmento da etapa atual em direção à Data de Término entre atualizações. Requer Data de início e Data de Término."
+        },
+        "start_date": {
+          "name": "Data de início",
+          "description": "Timestamp Unix de quando a etapa atual começou. Ancora a barra animada; deve ser anterior à Data de Término."
+        },
+        "end_date": {
+          "name": "Data de Término",
+          "description": "Timestamp Unix para o qual a barra animada se preenche. Deve estar no futuro."
         },
         "url": {
           "name": "URL",

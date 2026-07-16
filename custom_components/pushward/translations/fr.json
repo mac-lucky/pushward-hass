@@ -73,7 +73,7 @@
         },
         "end_date": {
           "name": "Date de fin",
-          "description": "Horodatage Unix pour la date de fin du countdown."
+          "description": "Horodatage Unix. Countdown : quand le countdown se termine. Progression en direct (generic et steps) : quand la barre termine son animation."
         },
         "total_steps": {
           "name": "Nombre total de steps",
@@ -167,6 +167,10 @@
           "name": "Poids des étapes",
           "description": "Liste ordonnée des largeurs relatives des étapes, toutes positives. La longueur doit être égale à total_steps. Modèle steps uniquement."
         },
+        "live_progress": {
+          "name": "Progression en direct",
+          "description": "Anime la barre de progression vers la Date de fin entre les mises à jour. Modèles generic et steps ; steps nécessite aussi une Date de début."
+        },
         "step_colors": {
           "name": "Couleurs des étapes",
           "description": "Liste ordonnée des couleurs par étape, nommées ou en hexadécimal. Une entrée vide utilise la couleur d'accentuation. La longueur doit être égale à total_steps. Modèle steps uniquement."
@@ -185,7 +189,7 @@
         },
         "start_date": {
           "name": "Date de début",
-          "description": "Horodatage Unix du démarrage du countdown (ancre la barre écoulé/restant). Le serveur utilise « maintenant » par défaut."
+          "description": "Horodatage Unix. Countdown : quand le countdown a commencé ; le serveur utilise « maintenant » par défaut. Progression en direct de steps : quand l'étape actuelle a commencé."
         },
         "history": {
           "name": "Historique (amorce)",
@@ -258,6 +262,18 @@
         "progress": {
           "name": "Progression",
           "description": "Valeur de progression entre 0.0 et 1.0."
+        },
+        "live_progress": {
+          "name": "Progression en direct",
+          "description": "Anime la barre de progression vers la Date de fin entre les mises à jour."
+        },
+        "start_date": {
+          "name": "Date de début",
+          "description": "Horodatage Unix du début de la fenêtre d'animation."
+        },
+        "end_date": {
+          "name": "Date de fin",
+          "description": "Horodatage Unix vers lequel la barre de progression s'anime. Doit être dans le futur lorsque la Progression en direct est activée."
         },
         "completion_message": {
           "name": "Message de fin",
@@ -494,6 +510,18 @@
         "step_colors": {
           "name": "Couleurs des étapes",
           "description": "Liste ordonnée des couleurs par étape, nommées ou en hexadécimal. Une entrée vide utilise la couleur d'accentuation. La longueur doit être égale à total_steps. Modèle steps uniquement."
+        },
+        "live_progress": {
+          "name": "Progression en direct",
+          "description": "Anime le segment de l'étape actuelle vers la Date de fin entre les mises à jour. Nécessite une Date de début et une Date de fin."
+        },
+        "start_date": {
+          "name": "Date de début",
+          "description": "Horodatage Unix du début de l'étape actuelle. Ancre la barre animée ; doit précéder la Date de fin."
+        },
+        "end_date": {
+          "name": "Date de fin",
+          "description": "Horodatage Unix vers lequel la barre animée se remplit. Doit être dans le futur."
         },
         "url": {
           "name": "URL",
