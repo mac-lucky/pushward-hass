@@ -215,8 +215,8 @@ def test_backup_progress_fraction(hass: HomeAssistant) -> None:
     assert_valid_widget_content(content, WIDGET_TEMPLATE_PROGRESS)
 
 
-def test_progress_percent_source_is_clamped(hass: HomeAssistant) -> None:
-    """A 0-100 percentage fed to a progress widget clamps to 1.0 (documents the gotcha)."""
+def test_progress_percent_source_is_rescaled(hass: HomeAssistant) -> None:
+    """A 0-100 percentage fed to a progress widget rescales rather than pinning to 100%."""
     hass.states.async_set("sensor.download_percent", "87", {"friendly_name": "Download"})
     config = make_widget_config(
         **{
@@ -227,7 +227,7 @@ def test_progress_percent_source_is_clamped(hass: HomeAssistant) -> None:
     )
     content = map_widget_content(hass, config)
     assert content is not None
-    assert content["value"] == 1.0  # 87 → clamped to [0,1]
+    assert content["value"] == 0.87
     assert_valid_widget_content(content, WIDGET_TEMPLATE_PROGRESS)
 
 

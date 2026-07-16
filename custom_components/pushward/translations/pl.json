@@ -163,6 +163,14 @@
           "name": "Wysokości wierszy kroków",
           "description": "Uporządkowana lista wysokości wierszy (1–10) dla każdego kroku. Długość musi być równa total_steps. Tylko szablon steps."
         },
+        "step_weights": {
+          "name": "Wagi Kroków",
+          "description": "Uporządkowana lista względnych szerokości kroków, wszystkie dodatnie. Długość musi być równa total_steps. Tylko szablon steps."
+        },
+        "step_colors": {
+          "name": "Kolory Kroków",
+          "description": "Uporządkowana lista kolorów dla każdego kroku, nazwane lub hex. Puste pole używa koloru akcentu. Długość musi być równa total_steps. Tylko szablon steps."
+        },
         "fired_at": {
           "name": "Czas wyzwolenia",
           "description": "Znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Wysokości wierszy kroków",
           "description": "Uporządkowana lista wysokości wierszy (1–10) dla każdego kroku. Długość musi być równa total_steps. Tylko szablon steps."
+        },
+        "step_weights": {
+          "name": "Wagi Kroków",
+          "description": "Uporządkowana lista względnych szerokości kroków, wszystkie dodatnie. Długość musi być równa total_steps. Tylko szablon steps."
+        },
+        "step_colors": {
+          "name": "Kolory Kroków",
+          "description": "Uporządkowana lista kolorów dla każdego kroku, nazwane lub hex. Puste pole używa koloru akcentu. Długość musi być równa total_steps. Tylko szablon steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Sekundy drzemki (iOS 26+)",
             "step_labels": "Etykiety kroków",
             "step_rows": "Wysokości wierszy kroków",
+            "step_weights": "Wagi Kroków",
+            "step_colors": "Kolory Kroków",
             "fired_at_entity": "Encja czasu wyzwolenia",
             "fired_at_attribute": "Atrybut czasu wyzwolenia",
             "units": "Jednostki dla serii",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
             "step_labels": "Etykiety dla każdego kroku. Format: 1=Pierwszy Krok, 2=Drugi Krok. Musi obejmować kroki 1..total_steps. Tylko szablon steps.",
             "step_rows": "Wysokość wiersza (1–10) dla każdego kroku, oddzielona przecinkami. Musi mieć total_steps wpisów. Tylko szablon steps.",
+            "step_weights": "Względna szerokość każdego kroku, oddzielona przecinkami. Przykład: 1, 2, 1 sprawia, że środkowy krok jest dwa razy szerszy. Wszystkie wartości muszą być dodatnie. Musi mieć total_steps wpisów. Tylko szablon steps.",
+            "step_colors": "Kolor każdego kroku, oddzielony przecinkami (nazwany lub hex). Przykład: green, , red pozostawia środkowy krok w kolorze akcentu. Musi mieć total_steps wpisów. Tylko szablon steps.",
             "fired_at_entity": "Odczytuj czas wyzwolenia alertu z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Akceptuje znacznik czasu Unix lub czujnik znacznika czasu ISO. Tylko szablon alertu.",
             "fired_at_attribute": "Atrybut encji zawierający znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert.",
             "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Nazwa widżetu",
             "value_attribute": "Atrybut wartości",
             "unit": "Jednostka",
+            "value_scale": "Skala Wartości",
             "min_value": "Wartość minimalna",
             "max_value": "Wartość maksymalna",
             "severity": "Poziom istotności",
@@ -1467,6 +1488,7 @@
             "widget_name": "Nazwa wyświetlana w selektorze widżetów iOS. Domyślnie przyjazna nazwa encji.",
             "value_attribute": "Atrybut encji przechowujący wartość. Pozostaw puste, aby użyć podstawowego stanu encji.",
             "unit": "Jednostka wyświetlana obok wartości. Maks. 32 znaki.",
+            "value_scale": "Jak odczytywać wartość postępu. auto traktuje jednostkę % lub wartość powyżej 1 jako percent, a wszystko inne jako ułamek 0.0-1.0 (fraction). Wybierz percent lub fraction, aby to nadpisać. Tylko szablon progress.",
             "min_value": "Wartość minimalna zakresu wskaźnika.",
             "max_value": "Wartość maksymalna zakresu wskaźnika.",
             "severity": "Istotność statusu (info, warning, critical, success).",

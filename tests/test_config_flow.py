@@ -17,8 +17,10 @@ from custom_components.pushward.config_flow import (
     _details_schema,
     _hex_to_rgb,
     _parse_board_tiles,
+    _parse_color_list,
     _parse_csv,
     _parse_entity_input,
+    _parse_float_list,
     _parse_int_list,
     _parse_log_columns,
     _parse_series_entities,
@@ -29,11 +31,14 @@ from custom_components.pushward.config_flow import (
     _resolve_series_entity_labels,
     _rgb_to_hex,
     _serialize_board_tiles,
+    _serialize_csv,
+    _serialize_float_list,
     _serialize_log_columns,
     _serialize_series_entities,
     _serialize_thresholds,
     _serialize_widget_stat_rows,
     _validate_integration_key,
+    _widget_details_schema,
 )
 from custom_components.pushward.const import (
     BOARD_MAX_TILES,
@@ -80,8 +85,10 @@ from custom_components.pushward.const import (
     CONF_START_STATES,
     CONF_STAT_ROWS,
     CONF_STATE_LABELS,
+    CONF_STEP_COLORS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
+    CONF_STEP_WEIGHTS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
@@ -100,12 +107,14 @@ from custom_components.pushward.const import (
     CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_ENTITY,
+    CONF_VALUE_SCALE,
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     DEFAULT_SERVER_URL,
+    DEFAULT_VALUE_SCALE,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
     LIVE_PROGRESS_TEMPLATES,
@@ -115,8 +124,10 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_WIDGET,
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
+    VALUE_SCALE_PERCENT,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_EVENT,
@@ -1271,6 +1282,40 @@ async def test_subentry_reconfigure_clearing_remaining_time_attr(hass: HomeAssis
     assert entry.subentries[subentry_id].data[CONF_REMAINING_TIME_ATTR] == ""
 
 
+async def test_subentry_reconfigure_prefills_step_weights_and_colors_as_text(hass: HomeAssistant) -> None:
+    """Stored lists must render back as CSV text: the details field is a str schema.
+
+    Without the serialize step the raw list reaches a str default, so the user
+    sees "[1.0, 2.5, 1.0]" and reparsing wipes their config.
+    """
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="steps",
+                step_weights=[1.0, 2.5, 1.0],
+                step_colors=["green", "", "red"],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "steps"}),
+    )
+    assert result["step_id"] == "details"
+
+    defaults = {
+        str(k): k.default()
+        for k in result["data_schema"].schema
+        if getattr(k, "default", vol.UNDEFINED) is not vol.UNDEFINED
+    }
+    assert defaults[CONF_STEP_WEIGHTS] == "1, 2.5, 1"
+    assert defaults[CONF_STEP_COLORS] == "green, , red"
+
+
 async def test_subentry_reconfigure_clearing_steps_attrs(hass: HomeAssistant) -> None:
     """Clearing steps attribute selectors during reconfigure saves empty strings."""
     entry = _mock_entry(
@@ -1541,6 +1586,23 @@ def test_details_schema_steps_has_step_labels_and_rows() -> None:
     assert CONF_STEP_ROWS in keys
 
 
+def test_details_schema_steps_has_step_weights_and_colors() -> None:
+    """Steps template exposes the per-step width and color fields."""
+    schema = _details_schema("binary_sensor.foo", "steps", defaults={})
+    keys = _schema_keys(schema)
+    assert CONF_STEP_WEIGHTS in keys
+    assert CONF_STEP_COLORS in keys
+
+
+def test_details_schema_widget_progress_has_value_scale() -> None:
+    """Only the progress widget gets the percent-vs-fraction dropdown."""
+    keys = _schema_keys(_widget_details_schema("sensor.foo", WIDGET_TEMPLATE_PROGRESS, defaults={}))
+    assert CONF_VALUE_SCALE in keys
+
+    keys = _schema_keys(_widget_details_schema("sensor.foo", WIDGET_TEMPLATE_GAUGE, defaults={}))
+    assert CONF_VALUE_SCALE not in keys
+
+
 def test_details_schema_alert_has_fired_at_attribute() -> None:
     """Alert template includes fired_at_attribute field."""
     schema = _details_schema("binary_sensor.foo", "alert", defaults={})
@@ -1587,6 +1649,53 @@ def test_parse_int_list_empty_string_returns_empty() -> None:
     assert _parse_int_list("") == []
 
 
+# --- _parse_float_list / _parse_color_list tests ---
+
+
+def test_parse_float_list_basic() -> None:
+    assert _parse_float_list("1, 2.5, 3") == [1.0, 2.5, 3.0]
+
+
+def test_parse_float_list_skips_non_numbers() -> None:
+    assert _parse_float_list("1, abc, 3") == [1.0, 3.0]
+
+
+def test_parse_float_list_empty_string_returns_empty() -> None:
+    assert _parse_float_list("") == []
+
+
+def test_float_list_round_trips_through_serialize() -> None:
+    """Reconfigure re-renders the stored list as text, so the pair must round-trip."""
+    assert _serialize_float_list([1.0, 2.5, 3.0]) == "1, 2.5, 3"
+    assert _parse_float_list(_serialize_float_list([1.0, 2.5, 3.0])) == [1.0, 2.5, 3.0]
+    assert _serialize_float_list([]) == ""
+
+
+def test_parse_color_list_keeps_empty_entries() -> None:
+    """Colors are positional, so an omitted one must hold its slot, not collapse the list."""
+    assert _parse_color_list("red,,blue") == ["red", "", "blue"]
+    assert _parse_color_list("red, , blue") == ["red", "", "blue"]
+
+
+def test_parse_color_list_trailing_comma_adds_a_slot() -> None:
+    """Unlike the float parser, empties are significant here, so a stray comma is a step.
+
+    content_mapper drops step_colors wholesale on a length mismatch, so this typo
+    silently costs the user every per-step color.
+    """
+    assert _parse_color_list("red, blue, green,") == ["red", "blue", "green", ""]
+    assert _parse_color_list(",") == ["", ""]
+    assert _parse_float_list("1, 2, 3,") == [1.0, 2.0, 3.0]
+
+
+def test_parse_color_list_empty_string_returns_empty() -> None:
+    assert _parse_color_list("") == []
+
+
+def test_color_list_round_trips_through_serialize() -> None:
+    assert _parse_color_list(_serialize_csv(["red", "", "blue"])) == ["red", "", "blue"]
+
+
 # --- _parse_entity_input new field tests ---
 
 
@@ -1616,6 +1725,18 @@ def test_parse_entity_input_step_rows_parsed_to_int_list() -> None:
     """step_rows CSV is parsed into a list of ints."""
     result = _parse_entity_input(_base_user_input(**{CONF_STEP_ROWS: "1, 2, 3"}))
     assert result[CONF_STEP_ROWS] == [1, 2, 3]
+
+
+def test_parse_entity_input_step_weights_parsed_to_float_list() -> None:
+    """step_weights CSV is parsed into a list of floats."""
+    result = _parse_entity_input(_base_user_input(**{CONF_STEP_WEIGHTS: "1, 2.5, 1"}))
+    assert result[CONF_STEP_WEIGHTS] == [1.0, 2.5, 1.0]
+
+
+def test_parse_entity_input_step_colors_keeps_blank_slot() -> None:
+    """'red,,blue' is 3 steps, the middle one on the accent color. Not 2 steps."""
+    result = _parse_entity_input(_base_user_input(**{CONF_STEP_COLORS: "red,,blue"}))
+    assert result[CONF_STEP_COLORS] == ["red", "", "blue"]
 
 
 def test_parse_entity_input_units_parsed_to_dict() -> None:
@@ -1831,6 +1952,22 @@ def test_parse_widget_input_unknown_trigger_falls_back_to_event() -> None:
     details = _widget_details(**{CONF_WIDGET_TRIGGER_MODE: "garbage"})
     result = _parse_widget_input(details, step1)
     assert result[CONF_WIDGET_TRIGGER_MODE] == WIDGET_TRIGGER_EVENT
+
+
+def test_parse_widget_input_value_scale_persisted() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS})
+    details = _widget_details(**{CONF_VALUE_SCALE: VALUE_SCALE_PERCENT})
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_VALUE_SCALE] == VALUE_SCALE_PERCENT
+
+
+def test_parse_widget_input_value_scale_defaults_to_auto() -> None:
+    """Absent (every pre-existing widget) or garbage both land on auto."""
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS})
+    assert _parse_widget_input(_widget_details(), step1)[CONF_VALUE_SCALE] == DEFAULT_VALUE_SCALE
+
+    details = _widget_details(**{CONF_VALUE_SCALE: "garbage"})
+    assert _parse_widget_input(details, step1)[CONF_VALUE_SCALE] == DEFAULT_VALUE_SCALE
 
 
 # --- Tap action parsing & validation ---

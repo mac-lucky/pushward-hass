@@ -163,6 +163,14 @@
           "name": "Rânduri pași",
           "description": "Listă ordonată de înălțimi de rând (1-10) pentru fiecare pas. Lungimea trebuie să fie egală cu total_steps. Doar șablonul steps."
         },
+        "step_weights": {
+          "name": "Ponderile Pașilor",
+          "description": "Listă ordonată a lățimilor relative ale pașilor, toate pozitive. Lungimea trebuie să fie egală cu total_steps. Numai pentru șablonul steps."
+        },
+        "step_colors": {
+          "name": "Culorile Pașilor",
+          "description": "Listă ordonată a culorilor pentru fiecare pas, numite sau hex. O intrare goală folosește culoarea de accent. Lungimea trebuie să fie egală cu total_steps. Numai pentru șablonul steps."
+        },
         "fired_at": {
           "name": "Timp declanșare",
           "description": "Marca temporală Unix când activitatea a fost declanșată. Folosit pentru a afișa timpul relativ."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Rânduri pași",
           "description": "Listă ordonată de înălțimi de rând (1-10) pentru fiecare pas. Lungimea trebuie să fie egală cu total_steps. Doar șablonul steps."
+        },
+        "step_weights": {
+          "name": "Ponderile Pașilor",
+          "description": "Listă ordonată a lățimilor relative ale pașilor, toate pozitive. Lungimea trebuie să fie egală cu total_steps. Numai pentru șablonul steps."
+        },
+        "step_colors": {
+          "name": "Culorile Pașilor",
+          "description": "Listă ordonată a culorilor pentru fiecare pas, numite sau hex. O intrare goală folosește culoarea de accent. Lungimea trebuie să fie egală cu total_steps. Numai pentru șablonul steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Secunde amânare (iOS 26+)",
             "step_labels": "Etichete pași",
             "step_rows": "Rânduri pași",
+            "step_weights": "Ponderile Pașilor",
+            "step_colors": "Culorile Pașilor",
             "fired_at_entity": "Entitate moment declanșare",
             "fired_at_attribute": "Atribut timp declanșare",
             "units": "Unități",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Lăsați gol pentru valoarea implicită de 300s (5 min). Necesită Alarmă. Doar șablonul countdown.",
             "step_labels": "Etichete personalizate pentru pașii șablonului steps. Format: 1=Etichetă, 2=Etichetă. Gol folosește numerele pașilor.",
             "step_rows": "Numărul de pași afișați pe un rând în șablonul steps.",
+            "step_weights": "Lățimea relativă a fiecărui pas, separate prin virgulă. Exemplu: 1, 2, 1 face pasul din mijloc de două ori mai lat. Toate valorile trebuie să fie pozitive. Trebuie să aibă total_steps intrări. Numai pentru șablonul steps.",
+            "step_colors": "Culoarea fiecărui pas, separate prin virgulă (numite sau hex). Exemplu: green, , red lasă pasul din mijloc în culoarea de accent. Trebuie să aibă total_steps intrări. Numai pentru șablonul steps.",
             "fired_at_entity": "Citește momentul declanșării alertei dintr-o entitate separată. Lăsați gol pentru a folosi entitatea urmărită. Acceptă o marcă temporală Unix sau un senzor de marcă temporală ISO. Doar șablonul alert.",
             "fired_at_attribute": "Atribut entitate care conține marca temporală Unix a declanșării. Folosit pentru afișarea timpului relativ.",
             "units": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%",
@@ -1445,6 +1465,7 @@
             "widget_name": "Nume widget",
             "value_attribute": "Atribut valoare",
             "unit": "Unitate",
+            "value_scale": "Scala Valorii",
             "min_value": "Valoare minimă",
             "max_value": "Valoare maximă",
             "severity": "Severitate",
@@ -1467,6 +1488,7 @@
             "widget_name": "Numele afișat în selectorul de widget-uri din iOS. Implicit, numele prietenos al entității.",
             "value_attribute": "Atributul entității care conține valoarea. Lăsați gol pentru a folosi starea principală a entității.",
             "unit": "Unitatea de afișare arătată lângă valoare. Maximum 32 de caractere.",
+            "value_scale": "Cum se interpretează valoarea de progres. auto tratează o unitate % sau orice valoare peste 1 ca percent, iar restul ca fracție 0.0-1.0 (fraction). Alegeți percent sau fraction pentru a suprascrie. Numai pentru șablonul progress.",
             "min_value": "Valoarea minimă pentru intervalul gauge.",
             "max_value": "Valoarea maximă pentru intervalul gauge.",
             "severity": "Severitatea stării (info, warning, critical, success).",

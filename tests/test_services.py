@@ -853,6 +853,29 @@ async def test_update_activity_steps_accepts_list_step_labels(hass: HomeAssistan
     assert content["step_labels"] == ["A", "B", "C"]
 
 
+async def test_update_activity_steps_accepts_weights_and_colors(hass: HomeAssistant) -> None:
+    """step_weights/step_colors are ordered lists forwarded verbatim, empties included."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_steps",
+        {
+            "slug": "s",
+            "state": "ongoing",
+            "total_steps": 3,
+            "step_weights": [1, 2.5, 1],
+            "step_colors": ["green", "", "red"],
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["step_weights"] == [1, 2.5, 1]
+    assert content["step_colors"] == ["green", "", "red"]
+
+
 async def test_update_activity_steps_rejects_dict_step_labels(hass: HomeAssistant) -> None:
     """A dict for step_labels is rejected — the schema requires a list (the old docs were wrong)."""
     api = _mock_api()

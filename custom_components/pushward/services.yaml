@@ -143,6 +143,16 @@ update_activity:
           description: Row heights for each step as a list of integers (1–10). Steps template only.
           selector:
             object:
+        step_weights:
+          name: Step Weights
+          description: Relative width of each step as a list of positive numbers (e.g. [1, 2, 1] makes the middle step twice as wide). Length must equal total_steps. Steps template only.
+          selector:
+            object:
+        step_colors:
+          name: Step Colors
+          description: 'Color for each step as a list of named colors or hex (e.g. ["green","","red"]). An empty entry uses the accent color. Length must equal total_steps. Steps template only.'
+          selector:
+            object:
     alert_options:
       collapsed: true
       fields:
@@ -634,6 +644,12 @@ update_activity_steps:
           selector:
             object:
         step_rows:
+          selector:
+            object:
+        step_weights:
+          selector:
+            object:
+        step_colors:
           selector:
             object:
     action_buttons:

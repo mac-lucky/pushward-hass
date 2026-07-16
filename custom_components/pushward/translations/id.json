@@ -163,6 +163,14 @@
           "name": "Baris Langkah",
           "description": "Daftar terurut tinggi baris (1-10) per langkah. Panjang harus sama dengan total_steps. Hanya templat steps."
         },
+        "step_weights": {
+          "name": "Bobot Langkah",
+          "description": "Daftar terurut lebar relatif setiap langkah, semuanya positif. Panjang harus sama dengan total_steps. Hanya untuk templat steps."
+        },
+        "step_colors": {
+          "name": "Warna Langkah",
+          "description": "Daftar terurut warna setiap langkah, nama warna atau hex. Entri kosong menggunakan warna aksen. Panjang harus sama dengan total_steps. Hanya untuk templat steps."
+        },
         "fired_at": {
           "name": "Waktu Dipicu",
           "description": "Unix timestamp saat aktivitas dipicu. Digunakan untuk menampilkan waktu relatif."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Baris Langkah",
           "description": "Daftar terurut tinggi baris (1-10) per langkah. Panjang harus sama dengan total_steps. Hanya templat steps."
+        },
+        "step_weights": {
+          "name": "Bobot Langkah",
+          "description": "Daftar terurut lebar relatif setiap langkah, semuanya positif. Panjang harus sama dengan total_steps. Hanya untuk templat steps."
+        },
+        "step_colors": {
+          "name": "Warna Langkah",
+          "description": "Daftar terurut warna setiap langkah, nama warna atau hex. Entri kosong menggunakan warna aksen. Panjang harus sama dengan total_steps. Hanya untuk templat steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Detik Tunda (iOS 26+)",
             "step_labels": "Label Langkah",
             "step_rows": "Baris Langkah",
+            "step_weights": "Bobot Langkah",
+            "step_colors": "Warna Langkah",
             "fired_at_entity": "Entitas Waktu Terpicu",
             "fired_at_attribute": "Atribut Waktu Dipicu",
             "units": "Satuan",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
             "step_labels": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah.",
             "step_rows": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps.",
+            "step_weights": "Lebar relatif setiap langkah, dipisahkan koma. Contoh: 1, 2, 1 membuat langkah tengah dua kali lebih lebar. Semua nilai harus positif. Harus memiliki total_steps entri. Hanya untuk templat steps.",
+            "step_colors": "Warna setiap langkah, dipisahkan koma (nama warna atau hex). Contoh: green, , red membuat langkah tengah tetap menggunakan warna aksen. Harus memiliki total_steps entri. Hanya untuk templat steps.",
             "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan.",
             "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
             "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%",
@@ -1445,6 +1465,7 @@
             "widget_name": "Nama Widget",
             "value_attribute": "Atribut Nilai",
             "unit": "Satuan",
+            "value_scale": "Skala Nilai",
             "min_value": "Nilai Minimum",
             "max_value": "Nilai Maksimum",
             "severity": "Tingkat Keparahan",
@@ -1467,6 +1488,7 @@
             "widget_name": "Nama tampilan yang ditampilkan di pemilih widget iOS. Default ke nama ramah entitas.",
             "value_attribute": "Atribut entitas yang menyimpan nilai. Biarkan kosong untuk menggunakan status utama entitas.",
             "unit": "Satuan tampilan yang ditampilkan di samping nilai. Maks 32 karakter.",
+            "value_scale": "Cara membaca nilai progres. auto memperlakukan satuan % atau nilai di atas 1 sebagai percent, dan selainnya sebagai pecahan 0.0-1.0 (fraction). Pilih percent atau fraction untuk menimpanya. Hanya untuk templat progress.",
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "severity": "Tingkat keparahan status (info, warning, critical, success).",

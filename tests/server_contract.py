@@ -291,6 +291,22 @@ def _assert_steps(content: dict, where: str) -> None:
             _fail(where, f"step_labels length ({len(labels)}) must equal total_steps ({total})")
         for i, label in enumerate(labels):
             _check_len(label, STEP_LABEL_MAX, f"step_labels[{i}]", where)
+    weights = content.get("step_weights")
+    if weights:
+        if len(weights) != total:
+            _fail(where, f"step_weights length ({len(weights)}) must equal total_steps ({total})")
+        for i, w in enumerate(weights):
+            if isinstance(w, bool) or not isinstance(w, (int, float)):
+                _fail(where, f"step_weights[{i}] must be a number, got {w!r}")
+            if not math.isfinite(w) or w <= 0:
+                _fail(where, f"step_weights[{i}] must be a positive finite number, got {w!r}")
+    colors = content.get("step_colors")
+    if colors:
+        if len(colors) != total:
+            _fail(where, f"step_colors length ({len(colors)}) must equal total_steps ({total})")
+        for i, col in enumerate(colors):
+            # "" is legal here: the server reads it as "fall back to accent_color".
+            _check_color(col, f"step_colors[{i}]", where)
     _assert_live_progress(content, where, "steps")
     # The animated window must be a real forward range, else iOS renders nothing.
     start_date = content.get("start_date")

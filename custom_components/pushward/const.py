@@ -79,6 +79,11 @@ CONF_ALARM = "alarm"
 CONF_SNOOZE_SECONDS = "snooze_seconds"
 CONF_STEP_LABELS = "step_labels"
 CONF_STEP_ROWS = "step_rows"
+# Steps template: per-step relative width (positive numbers) and per-step color.
+# Both are positional and must carry exactly total_steps entries or the server
+# 400s; an empty step_colors entry falls back to accent_color.
+CONF_STEP_WEIGHTS = "step_weights"
+CONF_STEP_COLORS = "step_colors"
 CONF_FIRED_AT_ATTRIBUTE = "fired_at_attribute"
 CONF_UNITS = "units"
 # Board template: 1-4 tiles, each bound to a separate entity. Stored as a list of
@@ -118,6 +123,10 @@ CONF_WIDGET_POLL_INTERVAL = "widget_poll_interval"
 CONF_LABEL = "label"
 CONF_LABEL_ATTRIBUTE = "label_attribute"
 CONF_STAT_ROWS = "stat_rows"
+# Widget progress template: how to read the bound value. The server wants a
+# 0.0-1.0 fraction, but plenty of HA sensors report 0-100. Not CONF_SCALE, which
+# is the timeline chart's linear/log axis.
+CONF_VALUE_SCALE = "value_scale"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
@@ -129,6 +138,7 @@ DEFAULT_SEVERITY = "info"
 DEFAULT_MIN_VALUE = 0.0
 DEFAULT_MAX_VALUE = 100.0
 DEFAULT_SCALE = "linear"
+DEFAULT_VALUE_SCALE = "auto"
 DEFAULT_DECIMALS = 1
 DEFAULT_HISTORY_PERIOD = 0
 DEFAULT_TAP_ACTION_FOREGROUND = True
@@ -220,6 +230,18 @@ WIDGET_NAME_MAX = 256
 
 # Widget severities (mirrors server validWidgetSeverities)
 WIDGET_SEVERITIES = ["", "info", "warning", "critical", "success"]
+
+# How the progress widget reads its bound value. Client-side only -- the server
+# always receives the 0.0-1.0 fraction it expects.
+VALUE_SCALE_AUTO = "auto"
+VALUE_SCALE_FRACTION = "fraction"
+VALUE_SCALE_PERCENT = "percent"
+VALUE_SCALES = [VALUE_SCALE_AUTO, VALUE_SCALE_FRACTION, VALUE_SCALE_PERCENT]
+
+# How far past 1.0 a value can land and still read as a fraction. A ratio like
+# elapsed/total overshoots by rounding noise right as it completes, and reading
+# that as a percent would drop a finished bar to nearly empty.
+FRACTION_OVERSHOOT_TOLERANCE = 0.05
 
 # Widget trend annotations (mirrors server validWidgetTrends)
 WIDGET_TREND_UP = "up"

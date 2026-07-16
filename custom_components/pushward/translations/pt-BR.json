@@ -163,6 +163,14 @@
           "name": "Alturas de Linha das Etapas",
           "description": "Lista ordenada de alturas de linha (1-10) por etapa. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
         },
+        "step_weights": {
+          "name": "Pesos das Etapas",
+          "description": "Lista ordenada das larguras relativas das etapas, todas positivas. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "step_colors": {
+          "name": "Cores das Etapas",
+          "description": "Lista ordenada das cores de cada etapa, nomeadas ou em hexadecimal. Uma entrada vazia usa a cor de destaque. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
         "fired_at": {
           "name": "Disparado em",
           "description": "Timestamp Unix quando o alert foi disparado. Apenas para o modelo alert."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Alturas de Linha das Etapas",
           "description": "Lista ordenada de alturas de linha (1-10) por etapa. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "step_weights": {
+          "name": "Pesos das Etapas",
+          "description": "Lista ordenada das larguras relativas das etapas, todas positivas. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
+        },
+        "step_colors": {
+          "name": "Cores das Etapas",
+          "description": "Lista ordenada das cores de cada etapa, nomeadas ou em hexadecimal. Uma entrada vazia usa a cor de destaque. O comprimento deve ser igual a total_steps. Apenas para o modelo steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Segundos de soneca (iOS 26+)",
             "step_labels": "Rótulos de Etapas",
             "step_rows": "Alturas de Linha das Etapas",
+            "step_weights": "Pesos das Etapas",
+            "step_colors": "Cores das Etapas",
             "fired_at_entity": "Entidade de horário do disparo",
             "fired_at_attribute": "Atributo de Disparo",
             "units": "Unidades por Série",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Por quanto tempo o botão Soneca do iOS estende a contagem regressiva (60–3600). Deixe vazio para o padrão de 300s (5 min). Requer Alarme. Apenas modelo de contagem regressiva.",
             "step_labels": "Rótulos para cada etapa. Formato: 1=Primeira Etapa, 2=Segunda Etapa. Deve cobrir as etapas 1..total_steps. Apenas para o modelo steps.",
             "step_rows": "Altura de linha (1–10) para cada etapa, separada por vírgulas. Deve ter total_steps entradas. Apenas para o modelo steps.",
+            "step_weights": "Largura relativa de cada etapa, separada por vírgulas. Exemplo: 1, 2, 1 faz a etapa do meio ficar duas vezes mais larga. Todos os valores devem ser positivos. Deve ter total_steps entradas. Apenas para o modelo steps.",
+            "step_colors": "Cor de cada etapa, separada por vírgulas (nomeada ou hexadecimal). Exemplo: green, , red deixa a etapa do meio na cor de destaque. Deve ter total_steps entradas. Apenas para o modelo steps.",
             "fired_at_entity": "Lê o horário de disparo do alerta de uma entidade separada. Deixe vazio para usar a entidade monitorada. Aceita um timestamp unix ou um sensor de timestamp ISO. Apenas modelo de alerta.",
             "fired_at_attribute": "Atributo da entidade com o timestamp Unix de quando o alert foi disparado. Apenas para o modelo alert.",
             "units": "Rótulos de unidades por série. Formato: RótuloSérie=unidade, Temperatura=°C, Umidade=%. Apenas para o modelo timeline.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Nome do widget",
             "value_attribute": "Atributo de valor",
             "unit": "Unidade",
+            "value_scale": "Escala de Valor",
             "min_value": "Valor mínimo",
             "max_value": "Valor máximo",
             "severity": "Severidade",
@@ -1467,6 +1488,7 @@
             "widget_name": "Nome de exibição mostrado no seletor de widgets do iOS. Padrão é o nome amigável da entidade.",
             "value_attribute": "Atributo da entidade que contém o valor. Deixe vazio para usar o estado principal da entidade.",
             "unit": "Unidade de exibição mostrada ao lado do valor. Máx. 32 caracteres.",
+            "value_scale": "Como interpretar o valor de progresso. auto trata uma unidade % ou qualquer valor acima de 1 como percent, e tudo o mais como uma fração 0.0-1.0 (fraction). Escolha percent ou fraction para substituir. Apenas para o modelo progress.",
             "min_value": "Valor mínimo do intervalo do medidor.",
             "max_value": "Valor máximo do intervalo do medidor.",
             "severity": "Severidade do status (info, warning, critical, success).",

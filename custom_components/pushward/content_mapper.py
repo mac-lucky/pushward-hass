@@ -64,8 +64,10 @@ from .const import (
     CONF_SMOOTHING,
     CONF_SNOOZE_SECONDS,
     CONF_STATE_LABELS,
+    CONF_STEP_COLORS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
+    CONF_STEP_WEIGHTS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
@@ -471,6 +473,27 @@ def _build_board_tiles(entity_config: dict, hass: HomeAssistant | None) -> list[
     return tiles_out
 
 
+def _clean_step_weights(weights: list) -> list[float]:
+    """Coerce configured step weights to what the server accepts, or [] to skip.
+
+    The server takes step_weights only as positive finite numbers, so one bad
+    entry drops the whole array rather than earning a 400. Services pass the list
+    through uncoerced, hence the bool guard: True would otherwise weigh 1.0.
+    """
+    cleaned: list[float] = []
+    for w in weights:
+        if isinstance(w, bool):
+            return []
+        try:
+            value = float(w)
+        except (TypeError, ValueError):
+            return []
+        if not math.isfinite(value) or value <= 0:
+            return []
+        cleaned.append(value)
+    return cleaned
+
+
 def _resolve_live_end(now: int, remaining: int | None, absolute_end: int | None) -> int | None:
     """Resolve the epoch live_progress animates toward, or None when nothing can.
 
@@ -634,6 +657,17 @@ def map_content(
         step_rows = entity_config.get(CONF_STEP_ROWS) or []
         if len(step_rows) == total:
             content["step_rows"] = [max(1, min(10, int(r))) for r in step_rows]
+        step_weights = entity_config.get(CONF_STEP_WEIGHTS) or []
+        if len(step_weights) == total and (cleaned := _clean_step_weights(step_weights)):
+            content["step_weights"] = cleaned
+        step_colors = entity_config.get(CONF_STEP_COLORS) or []
+        if len(step_colors) == total:
+            # An unrecognized entry becomes "", which the server reads as
+            # "use accent_color" rather than rejecting the whole push. All-empty
+            # says nothing the accent doesn't already, so skip the bytes.
+            colors_list = [color_to_str(c) for c in step_colors]
+            if any(colors_list):
+                content["step_colors"] = colors_list
         if entity_config.get(CONF_LIVE_PROGRESS):
             # Updates are merge-patches: an omitted key preserves a prior
             # live_progress=true against a now-expired end_date, leaving the bar

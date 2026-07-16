@@ -214,6 +214,8 @@ _STEPS_TEMPLATE_FIELDS = {
     vol.Optional("current_step"): vol.Coerce(int),
     vol.Optional("step_labels"): list,
     vol.Optional("step_rows"): list,
+    vol.Optional("step_weights"): list,
+    vol.Optional("step_colors"): list,
 }
 _ALERT_TEMPLATE_FIELDS = {
     vol.Optional("severity"): vol.In(SEVERITIES),

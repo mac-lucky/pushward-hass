@@ -86,8 +86,10 @@ from .const import (
     CONF_START_STATES,
     CONF_STAT_ROWS,
     CONF_STATE_LABELS,
+    CONF_STEP_COLORS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
+    CONF_STEP_WEIGHTS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
@@ -106,6 +108,7 @@ from .const import (
     CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_ENTITY,
+    CONF_VALUE_SCALE,
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
@@ -123,6 +126,7 @@ from .const import (
     DEFAULT_TAP_ACTION_FOREGROUND,
     DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
+    DEFAULT_VALUE_SCALE,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
     LIVE_PROGRESS_TEMPLATES,
@@ -147,6 +151,7 @@ from .const import (
     TIMELINE_SERIES_LABEL_MAX,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
+    VALUE_SCALES,
     WARNING_THRESHOLD_MAX,
     WIDGET_LABEL_MAX,
     WIDGET_MAX_STAT_ROWS,
@@ -443,6 +448,18 @@ def _details_schema(
             vol.Optional(
                 CONF_STEP_ROWS,
                 default=d.get(CONF_STEP_ROWS, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_STEP_WEIGHTS,
+                default=d.get(CONF_STEP_WEIGHTS, ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_STEP_COLORS,
+                default=d.get(CONF_STEP_COLORS, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
     if template == "alert":
@@ -1237,6 +1254,8 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         else None,
         CONF_STEP_LABELS: _parse_state_labels(user_input.get(CONF_STEP_LABELS, "")),
         CONF_STEP_ROWS: _parse_int_list(user_input.get(CONF_STEP_ROWS, "")),
+        CONF_STEP_WEIGHTS: _parse_float_list(user_input.get(CONF_STEP_WEIGHTS, "")),
+        CONF_STEP_COLORS: _parse_color_list(user_input.get(CONF_STEP_COLORS, "")),
         CONF_FIRED_AT_ATTRIBUTE: user_input.get(CONF_FIRED_AT_ATTRIBUTE, ""),
         CONF_FIRED_AT_ENTITY: user_input.get(CONF_FIRED_AT_ENTITY, ""),
         CONF_UNITS: _parse_state_labels(user_input.get(CONF_UNITS, "")),
@@ -1410,7 +1429,13 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
                 current[CONF_STEP_LABELS] = _serialize_key_value_pairs(step_labels)
             step_rows = current.get(CONF_STEP_ROWS)
             if isinstance(step_rows, list):
-                current[CONF_STEP_ROWS] = _serialize_int_list(step_rows)
+                current[CONF_STEP_ROWS] = _serialize_csv(step_rows)
+            step_weights = current.get(CONF_STEP_WEIGHTS)
+            if isinstance(step_weights, list):
+                current[CONF_STEP_WEIGHTS] = _serialize_float_list(step_weights)
+            step_colors = current.get(CONF_STEP_COLORS)
+            if isinstance(step_colors, list):
+                current[CONF_STEP_COLORS] = _serialize_csv(step_colors)
             units = current.get(CONF_UNITS)
             if isinstance(units, dict):
                 current[CONF_UNITS] = _serialize_key_value_pairs(units)
@@ -1536,6 +1561,19 @@ def _widget_details_schema(
                 default=d.get(CONF_UNIT, ""),
             )
         ] = vol.All(str, vol.Length(max=WIDGET_UNIT_MAX))
+
+    if template == WIDGET_TEMPLATE_PROGRESS:
+        fields[
+            vol.Optional(
+                CONF_VALUE_SCALE,
+                default=d.get(CONF_VALUE_SCALE, DEFAULT_VALUE_SCALE),
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=VALUE_SCALES,
+                mode=SelectSelectorMode.DROPDOWN,
+            )
+        )
 
     if template == WIDGET_TEMPLATE_GAUGE:
         fields[
@@ -1725,6 +1763,10 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     if trigger not in WIDGET_TRIGGER_MODES:
         trigger = WIDGET_TRIGGER_EVENT
 
+    value_scale = user_input.get(CONF_VALUE_SCALE) or DEFAULT_VALUE_SCALE
+    if value_scale not in VALUE_SCALES:
+        value_scale = DEFAULT_VALUE_SCALE
+
     tap_action_url = (user_input.get(CONF_TAP_ACTION_URL) or "").strip()
     tap_action_foreground = bool(user_input.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
     _raise_url_errors([(CONF_TAP_ACTION_URL, tap_action_url, tap_action_foreground)])
@@ -1740,6 +1782,7 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
         CONF_UNIT: user_input.get(CONF_UNIT, "") or "",
         CONF_MIN_VALUE: min_v,
         CONF_MAX_VALUE: max_v,
+        CONF_VALUE_SCALE: value_scale,
         CONF_SEVERITY: user_input.get(CONF_SEVERITY, "") or "",
         CONF_STAT_ROWS: stat_rows,
         CONF_LABEL: user_input.get(CONF_LABEL, "") or "",
@@ -1886,9 +1929,46 @@ def _parse_int_list(value: str) -> list[int]:
     return result
 
 
-def _serialize_int_list(values: list[int]) -> str:
-    """Serialize a list of ints to '1, 2, 3' text for UI editing."""
+def _serialize_csv(values: list) -> str:
+    """Serialize a list to '1, 2, 3' text for UI editing.
+
+    Positional callers keep their empty entries as bare separators:
+    ['red', '', 'blue'] -> 'red, , blue'.
+    """
     return ", ".join(str(v) for v in values) if values else ""
+
+
+def _parse_float_list(value: str) -> list[float]:
+    """Parse '1, 2.5, 3' into [1.0, 2.5, 3.0], skipping tokens float() rejects.
+
+    "nan" and "inf" are not among them - float() takes both. _clean_step_weights
+    is what drops those before they reach the server.
+    """
+    result: list[float] = []
+    for token in _parse_csv(value):
+        with contextlib.suppress(ValueError):
+            result.append(float(token))
+    return result
+
+
+def _serialize_float_list(values: list[float]) -> str:
+    """Serialize a list of floats to '1, 2.5, 3' text, without a trailing '.0'."""
+    if not values:
+        return ""
+    return ", ".join(str(int(v)) if float(v).is_integer() else str(v) for v in values)
+
+
+def _parse_color_list(value: str) -> list[str]:
+    """Parse 'red,,blue' into ['red', '', 'blue'], keeping empty entries.
+
+    Positional, unlike _parse_csv: the server matches step_colors to steps by
+    index and requires exactly total_steps entries, so dropping the empty token
+    that leaves a step on the accent color would shift every later color by one
+    and fail the length check.
+    """
+    if not value:
+        return []
+    return [s.strip() for s in value.split(",")]
 
 
 def _parse_state_labels(value: str) -> dict[str, str]:

@@ -163,6 +163,14 @@
           "name": "Alturas de fila de pasos",
           "description": "Lista ordenada de alturas de fila (1-10) por paso. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
         },
+        "step_weights": {
+          "name": "Pesos de los pasos",
+          "description": "Lista ordenada de anchos relativos de los pasos, todos positivos. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
+        },
+        "step_colors": {
+          "name": "Colores de los pasos",
+          "description": "Lista ordenada de colores por paso, con nombre o en hexadecimal. Una entrada vacía usa el color de acento. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
+        },
         "fired_at": {
           "name": "Activado en",
           "description": "Marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Alturas de fila de pasos",
           "description": "Lista ordenada de alturas de fila (1-10) por paso. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
+        },
+        "step_weights": {
+          "name": "Pesos de los pasos",
+          "description": "Lista ordenada de anchos relativos de los pasos, todos positivos. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
+        },
+        "step_colors": {
+          "name": "Colores de los pasos",
+          "description": "Lista ordenada de colores por paso, con nombre o en hexadecimal. Una entrada vacía usa el color de acento. La longitud debe ser igual a total_steps. Solo para la plantilla steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Segundos de posposición (iOS 26+)",
             "step_labels": "Etiquetas de pasos",
             "step_rows": "Alturas de fila de pasos",
+            "step_weights": "Pesos de los pasos",
+            "step_colors": "Colores de los pasos",
             "fired_at_entity": "Entidad de hora de activación",
             "fired_at_attribute": "Atributo de activación",
             "units": "Unidades por serie",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Cuánto extiende la cuenta atrás el botón Posponer de iOS (60–3600). Déjalo vacío para el valor predeterminado de 300 s (5 min). Requiere alarma. Solo plantilla de cuenta atrás.",
             "step_labels": "Etiquetas para cada paso. Formato: 1=Primer Paso, 2=Segundo Paso. Debe cubrir los pasos 1..total_steps. Solo para la plantilla steps.",
             "step_rows": "Altura de fila (1–10) para cada paso, separada por comas. Debe tener total_steps entradas. Solo para la plantilla steps.",
+            "step_weights": "Ancho relativo de cada paso, separado por comas. Ejemplo: 1, 2, 1 hace que el paso central sea el doble de ancho. Todos los valores deben ser positivos. Debe tener total_steps entradas. Solo para la plantilla steps.",
+            "step_colors": "Color de cada paso, separado por comas (con nombre o hexadecimal). Ejemplo: green, , red deja el paso central en el color de acento. Debe tener total_steps entradas. Solo para la plantilla steps.",
             "fired_at_entity": "Lee la hora de activación de la alerta de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Acepta una marca de tiempo Unix o un sensor de marca de tiempo ISO. Solo plantilla de alerta.",
             "fired_at_attribute": "Atributo de la entidad que contiene la marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert.",
             "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Nombre del widget",
             "value_attribute": "Atributo de valor",
             "unit": "Unidad",
+            "value_scale": "Escala de valor",
             "min_value": "Valor mínimo",
             "max_value": "Valor máximo",
             "severity": "Gravedad",
@@ -1467,6 +1488,7 @@
             "widget_name": "Nombre que se muestra en el selector de widgets de iOS. De forma predeterminada, el nombre descriptivo de la entidad.",
             "value_attribute": "Atributo de la entidad que contiene el valor. Déjalo vacío para usar el estado principal de la entidad.",
             "unit": "Unidad que se muestra junto al valor. Máx. 32 caracteres.",
+            "value_scale": "Cómo interpretar el valor de progreso. auto trata una unidad % o cualquier valor superior a 1 como percent, y todo lo demás como una fracción 0.0-1.0 (fraction). Elige percent o fraction para anularlo. Solo para la plantilla progress.",
             "min_value": "Valor mínimo del rango del indicador.",
             "max_value": "Valor máximo del rango del indicador.",
             "severity": "Gravedad del estado (info, warning, critical, success).",

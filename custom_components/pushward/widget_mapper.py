@@ -23,10 +23,15 @@ from .const import (
     CONF_TEXT_COLOR,
     CONF_UNIT,
     CONF_VALUE_ATTRIBUTE,
+    CONF_VALUE_SCALE,
     CONF_WIDGET_NAME,
     CONF_WIDGET_TEMPLATE,
     DEFAULT_MAX_VALUE,
     DEFAULT_MIN_VALUE,
+    DEFAULT_VALUE_SCALE,
+    FRACTION_OVERSHOOT_TOLERANCE,
+    VALUE_SCALE_FRACTION,
+    VALUE_SCALE_PERCENT,
     WIDGET_LABEL_MAX,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_NAME_MAX,
@@ -208,12 +213,32 @@ def _map_value(state: State, config: dict, content: dict, prev_value: float | No
     return content
 
 
+def _is_percent_scale(state: State, config: dict, value: float) -> bool:
+    """Decide whether a raw progress value is a 0-100 percent rather than a fraction.
+
+    A fraction only ever exceeds 1.0 by rounding noise, so a clearly larger value
+    is an unambiguous percent. Below that the value alone says nothing, so fall
+    back to the entity's own unit -- but only when reading the entity's state,
+    since the unit describes that, not some arbitrary attribute.
+    """
+    scale = config.get(CONF_VALUE_SCALE, DEFAULT_VALUE_SCALE)
+    if scale == VALUE_SCALE_PERCENT:
+        return True
+    if scale == VALUE_SCALE_FRACTION:
+        return False
+    if not config.get(CONF_VALUE_ATTRIBUTE) and state.attributes.get("unit_of_measurement") == "%":
+        return True
+    return value > 1.0 + FRACTION_OVERSHOOT_TOLERANCE
+
+
 def _map_progress(state: State, config: dict, content: dict) -> dict | None:
-    """progress template: value 0.0-1.0 required."""
+    """progress template: value 0.0-1.0 required, 0-100 sensors rescaled."""
     value = _coerce_float(_read_value(state, config))
     if value is None:
         _LOGGER.debug("Could not coerce progress value for %s; skipping update", state.entity_id)
         return None
+    if _is_percent_scale(state, config, value):
+        value = value / 100.0
     # Clamp to [0,1] so server validation never rejects the payload.
     value = max(0.0, min(1.0, value))
     content["value"] = value

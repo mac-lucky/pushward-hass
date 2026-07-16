@@ -163,6 +163,14 @@
           "name": "步骤行高",
           "description": "每个步骤的行高（1-10）有序列表。长度必须等于 total_steps。仅适用于 steps 模板。"
         },
+        "step_weights": {
+          "name": "步骤权重",
+          "description": "每个步骤相对宽度的有序列表，全部为正数。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "step_colors": {
+          "name": "步骤颜色",
+          "description": "每个步骤颜色的有序列表（颜色名称或十六进制）。留空条目使用强调色。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
         "fired_at": {
           "name": "触发时间",
           "description": "告警触发时的 Unix 时间戳。仅适用于 alert 模板。"
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "步骤行高",
           "description": "每个步骤的行高（1-10）有序列表。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "step_weights": {
+          "name": "步骤权重",
+          "description": "每个步骤相对宽度的有序列表，全部为正数。长度必须等于 total_steps。仅适用于 steps 模板。"
+        },
+        "step_colors": {
+          "name": "步骤颜色",
+          "description": "每个步骤颜色的有序列表（颜色名称或十六进制）。留空条目使用强调色。长度必须等于 total_steps。仅适用于 steps 模板。"
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "稍后提醒秒数（iOS 26+）",
             "step_labels": "步骤标签",
             "step_rows": "步骤行高",
+            "step_weights": "步骤权重",
+            "step_colors": "步骤颜色",
             "fired_at_entity": "触发时间实体",
             "fired_at_attribute": "触发时间属性",
             "units": "每系列单位",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
             "step_labels": "每个步骤的标签。格式：1=第一步, 2=第二步。必须覆盖步骤 1..total_steps。仅适用于 steps 模板。",
             "step_rows": "每个步骤的行高（1–10），以逗号分隔。必须有 total_steps 个条目。仅适用于 steps 模板。",
+            "step_weights": "每个步骤的相对宽度，以逗号分隔。示例：1, 2, 1 会使中间步骤的宽度变为两倍。所有值都必须为正数。必须有 total_steps 个条目。仅适用于 steps 模板。",
+            "step_colors": "每个步骤的颜色，以逗号分隔（颜色名称或十六进制）。示例：green, , red 会让中间步骤保留强调色。必须有 total_steps 个条目。仅适用于 steps 模板。",
             "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。",
             "fired_at_attribute": "持有告警触发时 Unix 时间戳的实体属性。仅适用于 alert 模板。",
             "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。",
@@ -1445,6 +1465,7 @@
             "widget_name": "小组件名称",
             "value_attribute": "数值属性",
             "unit": "单位",
+            "value_scale": "数值刻度",
             "min_value": "最小值",
             "max_value": "最大值",
             "severity": "严重程度",
@@ -1467,6 +1488,7 @@
             "widget_name": "在 iOS 小组件选择器中显示的名称。默认使用实体的友好名称。",
             "value_attribute": "持有数值的实体属性。留空则使用实体的主状态。",
             "unit": "显示在数值旁边的单位。最多 32 个字符。",
+            "value_scale": "如何解读进度值。auto 会将 % 单位或大于 1 的值视为 percent，其余视为 0.0-1.0 的 fraction。选择 percent 或 fraction 可覆盖此行为。仅适用于 progress 模板。",
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "severity": "状态严重程度（info、warning、critical、success）。",

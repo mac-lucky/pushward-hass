@@ -163,6 +163,14 @@
           "name": "ステップ行高",
           "description": "各ステップの行高（1〜10）の順序付きリスト。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
         },
+        "step_weights": {
+          "name": "ステップの幅",
+          "description": "各ステップの相対幅の順序付きリスト（すべて正の値）。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "step_colors": {
+          "name": "ステップの色",
+          "description": "各ステップの色の順序付きリスト（色名または16進数）。空の項目はアクセントカラーを使用します。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
         "fired_at": {
           "name": "発火時刻",
           "description": "alert が発火したときの Unix タイムスタンプ。alert テンプレートのみ。"
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "ステップ行高",
           "description": "各ステップの行高（1〜10）の順序付きリスト。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "step_weights": {
+          "name": "ステップの幅",
+          "description": "各ステップの相対幅の順序付きリスト（すべて正の値）。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
+        },
+        "step_colors": {
+          "name": "ステップの色",
+          "description": "各ステップの色の順序付きリスト（色名または16進数）。空の項目はアクセントカラーを使用します。長さは total_steps と等しくなければなりません。steps テンプレートのみ。"
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "スヌーズ秒数（iOS 26+）",
             "step_labels": "ステップラベル",
             "step_rows": "ステップ行高",
+            "step_weights": "ステップの幅",
+            "step_colors": "ステップの色",
             "fired_at_entity": "発火時刻エンティティ",
             "fired_at_attribute": "発火時刻属性",
             "units": "系列ごとの単位",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
             "step_labels": "各ステップのラベル。形式: 1=最初のステップ, 2=2番目のステップ。ステップ 1..total_steps をカバーする必要があります。steps テンプレートのみ。",
             "step_rows": "各ステップの行高（1–10）、カンマ区切り。total_steps 個のエントリが必要です。steps テンプレートのみ。",
+            "step_weights": "各ステップの相対的な幅（カンマ区切り）。例: 1, 2, 1 は中央のステップを2倍の幅にします。すべての値は正の数である必要があります。total_steps 個のエントリが必要です。steps テンプレートのみ。",
+            "step_colors": "各ステップの色（カンマ区切り、色名または16進数）。例: green, , red は中央のステップをアクセントカラーのままにします。total_steps 個のエントリが必要です。steps テンプレートのみ。",
             "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。",
             "fired_at_attribute": "alert が発火したときの Unix タイムスタンプを持つエンティティ属性。alert テンプレートのみ。",
             "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。",
@@ -1445,6 +1465,7 @@
             "widget_name": "ウィジェット名",
             "value_attribute": "値属性",
             "unit": "単位",
+            "value_scale": "値のスケール",
             "min_value": "最小値",
             "max_value": "最大値",
             "severity": "重大度",
@@ -1467,6 +1488,7 @@
             "widget_name": "iOS のウィジェット選択画面に表示される表示名。デフォルトはエンティティのフレンドリー名です。",
             "value_attribute": "値を保持するエンティティ属性。空白のままにするとエンティティの主状態を使用します。",
             "unit": "値の横に表示される単位。最大 32 文字。",
+            "value_scale": "進捗値の読み取り方法。auto は % 単位または1を超える値を percent として扱い、それ以外は 0.0-1.0 の fraction として扱います。上書きするには percent または fraction を選択してください。progress テンプレートのみ。",
             "min_value": "gauge 範囲の最小値。",
             "max_value": "gauge 範囲の最大値。",
             "severity": "ステータスの重大度（info、warning、critical、success）。",

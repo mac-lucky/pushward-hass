@@ -163,6 +163,14 @@
           "name": "Mga Hilera ng Hakbang",
           "description": "Nakaayos na listahan ng mga taas ng hilera (1-10) bawat hakbang. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
         },
+        "step_weights": {
+          "name": "Timbang ng Hakbang",
+          "description": "Nakaayos na listahan ng relatibong lapad ng bawat hakbang, lahat positibo. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
+        },
+        "step_colors": {
+          "name": "Kulay ng Hakbang",
+          "description": "Nakaayos na listahan ng kulay bawat hakbang, pangalan o hex. Ang blangkong entry ay gagamit ng accent color. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
+        },
         "fired_at": {
           "name": "Oras ng Pag-trigger",
           "description": "Unix timestamp ng pag-trigger ng activity. Ginagamit para ipakita ang kamag-anak na oras."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Mga Hilera ng Hakbang",
           "description": "Nakaayos na listahan ng mga taas ng hilera (1-10) bawat hakbang. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
+        },
+        "step_weights": {
+          "name": "Timbang ng Hakbang",
+          "description": "Nakaayos na listahan ng relatibong lapad ng bawat hakbang, lahat positibo. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
+        },
+        "step_colors": {
+          "name": "Kulay ng Hakbang",
+          "description": "Nakaayos na listahan ng kulay bawat hakbang, pangalan o hex. Ang blangkong entry ay gagamit ng accent color. Ang haba ay dapat katumbas ng total_steps. Steps template lamang."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Snooze na Segundo (iOS 26+)",
             "step_labels": "Mga Label ng Hakbang",
             "step_rows": "Mga Hilera ng Hakbang",
+            "step_weights": "Timbang ng Hakbang",
+            "step_colors": "Kulay ng Hakbang",
             "fired_at_entity": "Entity ng Fired At",
             "fired_at_attribute": "Attribute ng Oras ng Pag-trigger",
             "units": "Mga Yunit",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
             "step_labels": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang.",
             "step_rows": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template.",
+            "step_weights": "Relatibong lapad ng bawat hakbang, pinaghihiwalay ng kuwit. Halimbawa: 1, 2, 1 ay ginagawang doble ang lapad ng gitnang hakbang. Dapat positibo ang lahat ng halaga. Dapat may total_steps na entry. Steps template lamang.",
+            "step_colors": "Kulay ng bawat hakbang, pinaghihiwalay ng kuwit (pangalan o hex). Halimbawa: green, , red ay nananatili sa accent color ang gitnang hakbang. Dapat may total_steps na entry. Steps template lamang.",
             "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang.",
             "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
             "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%",
@@ -1445,6 +1465,7 @@
             "widget_name": "Pangalan ng Widget",
             "value_attribute": "Attribute ng Halaga",
             "unit": "Unit",
+            "value_scale": "Sukat ng Halaga",
             "min_value": "Pinakamababang Halaga",
             "max_value": "Pinakamataas na Halaga",
             "severity": "Severity",
@@ -1467,6 +1488,7 @@
             "widget_name": "Display name na ipinapakita sa iOS widget picker. Default sa friendly name ng entity.",
             "value_attribute": "Entity attribute na naglalaman ng halaga. Iwanang blanko upang gamitin ang pangunahing state ng entity.",
             "unit": "Display unit na ipinapakita sa tabi ng halaga. Max 32 na character.",
+            "value_scale": "Kung paano babasahin ang progress value. Ang auto ay itinuturing na percent ang % unit o anumang mas mataas sa 1, at fraction (0.0-1.0) ang lahat ng iba pa. Piliin ang percent o fraction para i-override ito. Progress template lamang.",
             "min_value": "Pinakamababang halaga para sa gauge range.",
             "max_value": "Pinakamataas na halaga para sa gauge range.",
             "severity": "Severity ng status (info, warning, critical, success).",

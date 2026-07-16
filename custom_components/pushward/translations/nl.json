@@ -163,6 +163,14 @@
           "name": "Stap-rijhoogten",
           "description": "Geordende lijst met rijhoogten (1–10) per stap. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
         },
+        "step_weights": {
+          "name": "Stapgewichten",
+          "description": "Geordende lijst met relatieve stapbreedtes, allemaal positief. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "step_colors": {
+          "name": "Stapkleuren",
+          "description": "Geordende lijst met kleuren per stap, benoemd of hex. Een lege invoer gebruikt de accentkleur. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
         "fired_at": {
           "name": "Afgevuurd om",
           "description": "Unix-tijdstempel wanneer de alert werd geactiveerd. Alleen voor het sjabloon alert."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Stap-rijhoogten",
           "description": "Geordende lijst met rijhoogten (1–10) per stap. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "step_weights": {
+          "name": "Stapgewichten",
+          "description": "Geordende lijst met relatieve stapbreedtes, allemaal positief. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
+        },
+        "step_colors": {
+          "name": "Stapkleuren",
+          "description": "Geordende lijst met kleuren per stap, benoemd of hex. Een lege invoer gebruikt de accentkleur. Lengte moet gelijk zijn aan total_steps. Alleen voor het sjabloon steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Snooze-seconden (iOS 26+)",
             "step_labels": "Staplabels",
             "step_rows": "Stap-rijhoogten",
+            "step_weights": "Stapgewichten",
+            "step_colors": "Stapkleuren",
             "fired_at_entity": "Geactiveerd-op-entiteit",
             "fired_at_attribute": "Attribuut activeringstijd",
             "units": "Eenheden per reeks",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
             "step_labels": "Labels voor elke stap. Indeling: 1=Eerste Stap, 2=Tweede Stap. Moet stappen 1..total_steps omvatten. Alleen voor het sjabloon steps.",
             "step_rows": "Rijhoogte (1–10) voor elke stap, kommagescheiden. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
+            "step_weights": "Relatieve breedte van elke stap, kommagescheiden. Voorbeeld: 1, 2, 1 maakt de middelste stap twee keer zo breed. Alle waarden moeten positief zijn. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
+            "step_colors": "Kleur van elke stap, kommagescheiden (benoemd of hex). Voorbeeld: green, , red laat de middelste stap in de accentkleur. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
             "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon.",
             "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
             "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Widgetnaam",
             "value_attribute": "Waarde-attribuut",
             "unit": "Eenheid",
+            "value_scale": "Waardeschaal",
             "min_value": "Minimumwaarde",
             "max_value": "Maximumwaarde",
             "severity": "Ernst",
@@ -1467,6 +1488,7 @@
             "widget_name": "Weergavenaam in de iOS-widgetkiezer. Standaard de vriendelijke naam van de entiteit.",
             "value_attribute": "Entiteitsattribuut dat de waarde bevat. Laat leeg om de primaire status van de entiteit te gebruiken.",
             "unit": "Weergegeven eenheid naast de waarde. Max. 32 tekens.",
+            "value_scale": "Hoe de voortgangswaarde gelezen wordt. auto behandelt een %-eenheid of een waarde boven 1 als percent, en al het andere als een 0.0-1.0 fraction. Kies percent of fraction om dit te overschrijven. Alleen voor het sjabloon progress.",
             "min_value": "Minimumwaarde voor het meterbereik.",
             "max_value": "Maximumwaarde voor het meterbereik.",
             "severity": "Ernst van de status (info, warning, critical, success).",

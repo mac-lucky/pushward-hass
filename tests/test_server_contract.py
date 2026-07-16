@@ -124,6 +124,11 @@ def test_valid_activity_payloads_pass(factory) -> None:
     assert_valid_activity_content(factory())
 
 
+def test_valid_steps_weights_and_colors_pass() -> None:
+    """Full-length weights + colors, with a blank entry deferring to accent_color."""
+    assert_valid_activity_content(_mut(valid_steps, step_weights=[1, 2.5, 1], step_colors=["green", "", "#ff0000"]))
+
+
 # --- activity: violations are rejected -------------------------------------
 
 _ACTIVITY_INVALID = [
@@ -156,6 +161,13 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_steps, step_rows=[1, 2, 99]), id="step_rows_out_of_range"),
     pytest.param(lambda: _mut(valid_steps, step_labels=["a", "b"]), id="step_labels_length_mismatch"),
     pytest.param(lambda: _mut(valid_steps, step_labels=["x" * 33, "b", "c"]), id="step_label_too_long"),
+    pytest.param(lambda: _mut(valid_steps, step_weights=[1, 2]), id="step_weights_length_mismatch"),
+    pytest.param(lambda: _mut(valid_steps, step_weights=[1, 0, 2]), id="step_weights_zero_entry"),
+    pytest.param(lambda: _mut(valid_steps, step_weights=[1, -2, 3]), id="step_weights_negative_entry"),
+    pytest.param(lambda: _mut(valid_steps, step_weights=[1, float("inf"), 3]), id="step_weights_not_finite"),
+    pytest.param(lambda: _mut(valid_steps, step_colors=["red", "blue"]), id="step_colors_length_mismatch"),
+    pytest.param(lambda: _mut(valid_steps, step_colors=["red", "chartreuse", "blue"]), id="step_colors_unknown_name"),
+    pytest.param(lambda: _mut(valid_steps, step_colors=["red", "#12", "blue"]), id="step_colors_bad_hex"),
     pytest.param(lambda: _mut(valid_alert, severity="meh"), id="alert_bad_severity"),
     pytest.param(lambda: _mut(valid_alert, fired_at=int(time.time()) + 99999), id="alert_fired_at_future"),
     pytest.param(lambda: _mut(valid_alert, fired_at=0), id="alert_fired_at_non_positive"),

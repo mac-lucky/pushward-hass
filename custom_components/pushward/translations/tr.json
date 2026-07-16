@@ -163,6 +163,14 @@
           "name": "Adım Satırları",
           "description": "Her adım için satır yüksekliklerinin (1-10) sıralı listesi. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
         },
+        "step_weights": {
+          "name": "Adım Ağırlıkları",
+          "description": "Her adımın göreli genişliğinin sıralı listesi, hepsi pozitif olmalı. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
+        },
+        "step_colors": {
+          "name": "Adım Renkleri",
+          "description": "Her adımın renginin sıralı listesi, isim veya hex. Boş bir girdi vurgu rengini kullanır. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
+        },
         "fired_at": {
           "name": "Tetiklenme Zamanı",
           "description": "Aktivitenin tetiklendiği Unix zaman damgası. Gösterilecek göreceli zaman için kullanılır."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Adım Satırları",
           "description": "Her adım için satır yüksekliklerinin (1-10) sıralı listesi. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
+        },
+        "step_weights": {
+          "name": "Adım Ağırlıkları",
+          "description": "Her adımın göreli genişliğinin sıralı listesi, hepsi pozitif olmalı. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
+        },
+        "step_colors": {
+          "name": "Adım Renkleri",
+          "description": "Her adımın renginin sıralı listesi, isim veya hex. Boş bir girdi vurgu rengini kullanır. Uzunluk total_steps ile eşit olmalıdır. Yalnızca steps şablonu."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Erteleme Saniyeleri (iOS 26+)",
             "step_labels": "Adım Etiketleri",
             "step_rows": "Adım Satırları",
+            "step_weights": "Adım Ağırlıkları",
+            "step_colors": "Adım Renkleri",
             "fired_at_entity": "Tetiklenme Zamanı Varlığı",
             "fired_at_attribute": "Tetiklenme Zamanı Niteliği",
             "units": "Birimler",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "iOS Ertele düğmesinin geri sayımı ne kadar uzattığı (60–3600). 300s (5 dk) varsayılanı için boş bırakın. Alarm gerektirir. Yalnızca geri sayım şablonu.",
             "step_labels": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır.",
             "step_rows": "Steps şablonunda bir satırda gösterilecek adım sayısı.",
+            "step_weights": "Her adımın göreli genişliği, virgülle ayrılmış. Örnek: 1, 2, 1 orta adımı iki kat genişletir. Tüm değerler pozitif olmalıdır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu.",
+            "step_colors": "Her adımın rengi, virgülle ayrılmış (isim veya hex). Örnek: green, , red orta adımı vurgu renginde bırakır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu.",
             "fired_at_entity": "Uyarının tetiklenme zamanını ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir unix zaman damgası veya bir ISO zaman damgası sensörü kabul eder. Yalnızca uyarı şablonu.",
             "fired_at_attribute": "Tetiklenme Unix zaman damgasını tutan varlık niteliği. Göreceli zaman görüntüsü için kullanılır.",
             "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%",
@@ -1445,6 +1465,7 @@
             "widget_name": "Widget Adı",
             "value_attribute": "Değer Özniteliği",
             "unit": "Birim",
+            "value_scale": "Değer Ölçeği",
             "min_value": "Minimum Değer",
             "max_value": "Maksimum Değer",
             "severity": "Önem Derecesi",
@@ -1467,6 +1488,7 @@
             "widget_name": "iOS widget seçicide gösterilen görünen ad. Varsayılan olarak varlığın kolay adıdır.",
             "value_attribute": "Değeri tutan varlık özniteliği. Varlığın birincil durumunu kullanmak için boş bırakın.",
             "unit": "Değerin yanında gösterilen görünen birim. En fazla 32 karakter.",
+            "value_scale": "İlerleme değerinin nasıl okunacağı. auto, % birimini veya 1'in üzerindeki herhangi bir değeri percent olarak, geri kalan her şeyi ise 0.0-1.0 aralığında fraction olarak ele alır. Geçersiz kılmak için percent veya fraction seçin. Yalnızca progress şablonu.",
             "min_value": "Gösterge aralığı için minimum değer.",
             "max_value": "Gösterge aralığı için maksimum değer.",
             "severity": "Durum önem derecesi (info, warning, critical, success).",

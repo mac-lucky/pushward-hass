@@ -163,6 +163,14 @@
           "name": "Step Rows",
           "description": "Ordered list of row heights (1-10) per step. Length must equal total_steps. Steps template only."
         },
+        "step_weights": {
+          "name": "Step Weights",
+          "description": "Ordered list of relative step widths, all positive. Length must equal total_steps. Steps template only."
+        },
+        "step_colors": {
+          "name": "Step Colors",
+          "description": "Ordered list of per-step colors, named or hex. An empty entry uses the accent color. Length must equal total_steps. Steps template only."
+        },
         "fired_at": {
           "name": "Fired At",
           "description": "Unix timestamp when the alert was triggered. Alert template only."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Step Rows",
           "description": "Ordered list of row heights (1-10) per step. Length must equal total_steps. Steps template only."
+        },
+        "step_weights": {
+          "name": "Step Weights",
+          "description": "Ordered list of relative step widths, all positive. Length must equal total_steps. Steps template only."
+        },
+        "step_colors": {
+          "name": "Step Colors",
+          "description": "Ordered list of per-step colors, named or hex. An empty entry uses the accent color. Length must equal total_steps. Steps template only."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Snooze Seconds (iOS 26+)",
             "step_labels": "Step Labels",
             "step_rows": "Step Rows",
+            "step_weights": "Step Weights",
+            "step_colors": "Step Colors",
             "fired_at_entity": "Fired At Entity",
             "fired_at_attribute": "Fired At Attribute",
             "units": "Per-Series Units",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "How long the iOS Snooze button extends the countdown (60–3600). Leave empty for the 300s (5 min) default. Requires Alarm. Countdown template only.",
             "step_labels": "Labels for each step. Format: 1=First Step, 2=Second Step. Must cover steps 1..total_steps. Steps template only.",
             "step_rows": "Row height (1–10) for each step, comma-separated. Must have total_steps entries. Steps template only.",
+            "step_weights": "Relative width of each step, comma-separated. Example: 1, 2, 1 makes the middle step twice as wide. All values must be positive. Must have total_steps entries. Steps template only.",
+            "step_colors": "Color of each step, comma-separated (named or hex). Example: green, , red leaves the middle step on the accent color. Must have total_steps entries. Steps template only.",
             "fired_at_entity": "Read the alert's fired-at time from a separate entity. Leave empty to use the tracked entity. Accepts a unix timestamp or an ISO timestamp sensor. Alert template only.",
             "fired_at_attribute": "Attribute holding the unix timestamp when the alert fired (on the source entity, or the tracked entity if no source is set). Alert template only.",
             "units": "Per-series unit labels. Format: SeriesLabel=unit, Temperature=°C, Humidity=%. Timeline template only.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Widget Name",
             "value_attribute": "Value Attribute",
             "unit": "Unit",
+            "value_scale": "Value Scale",
             "min_value": "Minimum Value",
             "max_value": "Maximum Value",
             "severity": "Severity",
@@ -1467,6 +1488,7 @@
             "widget_name": "Display name shown in the iOS widget picker. Defaults to the entity's friendly name.",
             "value_attribute": "Entity attribute holding the value. Leave empty to use the entity's primary state.",
             "unit": "Display unit shown next to the value. Max 32 characters.",
+            "value_scale": "How to read the progress value. Auto treats a % unit or anything above 1 as a percent, and everything else as a 0.0-1.0 fraction. Pick percent or fraction to override. Progress template only.",
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "severity": "Status severity (info, warning, critical, success).",

@@ -163,6 +163,14 @@
           "name": "Altezze righe passi",
           "description": "Elenco ordinato delle altezze di riga (1-10) per passo. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
         },
+        "step_weights": {
+          "name": "Pesi dei passi",
+          "description": "Elenco ordinato delle larghezze relative dei passi, tutte positive. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
+        },
+        "step_colors": {
+          "name": "Colori dei passi",
+          "description": "Elenco ordinato dei colori per passo, con nome o esadecimale. Una voce vuota usa il colore accento. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
+        },
         "fired_at": {
           "name": "Attivato alle",
           "description": "Timestamp Unix di quando è stato attivato l'alert. Solo per il modello alert."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Altezze righe passi",
           "description": "Elenco ordinato delle altezze di riga (1-10) per passo. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
+        },
+        "step_weights": {
+          "name": "Pesi dei passi",
+          "description": "Elenco ordinato delle larghezze relative dei passi, tutte positive. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
+        },
+        "step_colors": {
+          "name": "Colori dei passi",
+          "description": "Elenco ordinato dei colori per passo, con nome o esadecimale. Una voce vuota usa il colore accento. La lunghezza deve essere uguale a total_steps. Solo per il modello steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Secondi di posticipo (iOS 26+)",
             "step_labels": "Etichette passi",
             "step_rows": "Altezze righe passi",
+            "step_weights": "Pesi dei passi",
+            "step_colors": "Colori dei passi",
             "fired_at_entity": "Entità ora di attivazione",
             "fired_at_attribute": "Attributo orario di attivazione",
             "units": "Unità per serie",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Di quanto il pulsante Posticipa di iOS estende il conto alla rovescia (60–3600). Lascia vuoto per il valore predefinito di 300s (5 min). Richiede una sveglia. Solo modello conto alla rovescia.",
             "step_labels": "Etichette per ogni passo. Formato: 1=Primo Passo, 2=Secondo Passo. Deve coprire i passi 1..total_steps. Solo per il modello steps.",
             "step_rows": "Altezza di riga (1–10) per ogni passo, separata da virgole. Deve avere total_steps voci. Solo per il modello steps.",
+            "step_weights": "Larghezza relativa di ogni passo, separata da virgole. Esempio: 1, 2, 1 rende il passo centrale doppio in larghezza. Tutti i valori devono essere positivi. Deve avere total_steps voci. Solo per il modello steps.",
+            "step_colors": "Colore di ogni passo, separato da virgole (con nome o esadecimale). Esempio: green, , red lascia il passo centrale nel colore accento. Deve avere total_steps voci. Solo per il modello steps.",
             "fired_at_entity": "Legge l'ora di attivazione dell'avviso da un'entità separata. Lascia vuoto per usare l'entità monitorata. Accetta un timestamp unix o un sensore con timestamp ISO. Solo modello avviso.",
             "fired_at_attribute": "Attributo dell'entità con il timestamp Unix di quando è stato attivato l'alert. Solo per il modello alert.",
             "units": "Etichette delle unità per serie. Formato: EtichettaSerie=unità, Temperatura=°C, Umidità=%. Solo per il modello timeline.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Nome widget",
             "value_attribute": "Attributo valore",
             "unit": "Unità",
+            "value_scale": "Scala del valore",
             "min_value": "Valore minimo",
             "max_value": "Valore massimo",
             "severity": "Gravità",
@@ -1467,6 +1488,7 @@
             "widget_name": "Nome visualizzato mostrato nel selettore di widget di iOS. Per impostazione predefinita usa il nome descrittivo dell'entità.",
             "value_attribute": "Attributo dell'entità che contiene il valore. Lascia vuoto per usare lo stato primario dell'entità.",
             "unit": "Unità di visualizzazione mostrata accanto al valore. Max 32 caratteri.",
+            "value_scale": "Come interpretare il valore di avanzamento. auto tratta un'unità % o un valore superiore a 1 come percent, e tutto il resto come una frazione 0.0-1.0 (fraction). Scegli percent o fraction per sovrascrivere. Solo per il modello progress.",
             "min_value": "Valore minimo dell'intervallo dell'indicatore.",
             "max_value": "Valore massimo dell'intervallo dell'indicatore.",
             "severity": "Gravità dello stato (info, warning, critical, success).",

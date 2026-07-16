@@ -163,6 +163,14 @@
           "name": "Schrittzeilenhöhen",
           "description": "Geordnete Liste der Zeilenhöhen (1–10) pro Schritt. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
         },
+        "step_weights": {
+          "name": "Schrittgewichte",
+          "description": "Geordnete Liste der relativen Schrittbreiten, alle positiv. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
+        },
+        "step_colors": {
+          "name": "Schrittfarben",
+          "description": "Geordnete Liste der Farben pro Schritt, benannt oder als Hex. Ein leerer Eintrag verwendet die Akzentfarbe. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
+        },
         "fired_at": {
           "name": "Ausgelöst um",
           "description": "Unix-Zeitstempel, wann der Alert ausgelöst wurde. Nur für die Vorlage 'alert'."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Schrittzeilenhöhen",
           "description": "Geordnete Liste der Zeilenhöhen (1–10) pro Schritt. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
+        },
+        "step_weights": {
+          "name": "Schrittgewichte",
+          "description": "Geordnete Liste der relativen Schrittbreiten, alle positiv. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
+        },
+        "step_colors": {
+          "name": "Schrittfarben",
+          "description": "Geordnete Liste der Farben pro Schritt, benannt oder als Hex. Ein leerer Eintrag verwendet die Akzentfarbe. Länge muss total_steps entsprechen. Nur für die Vorlage 'steps'."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Schlummersekunden (iOS 26+)",
             "step_labels": "Schrittbeschriftungen",
             "step_rows": "Schrittzeilenhöhen",
+            "step_weights": "Schrittgewichte",
+            "step_colors": "Schrittfarben",
             "fired_at_entity": "Entität 'Ausgelöst um'",
             "fired_at_attribute": "Attribut 'Ausgelöst um'",
             "units": "Einheiten pro Datenreihe",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Wie lange die iOS-Schlummern-Schaltfläche den Countdown verlängert (60–3600). Leer lassen für den Standardwert 300 s (5 Min.). Erfordert Alarm. Nur für die Vorlage 'countdown'.",
             "step_labels": "Beschriftungen für jeden Schritt. Format: 1=Erster Schritt, 2=Zweiter Schritt. Muss Schritte 1..total_steps abdecken. Nur für die Vorlage 'steps'.",
             "step_rows": "Zeilenhöhe (1–10) für jeden Schritt, kommagetrennt. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'.",
+            "step_weights": "Relative Breite jedes Schritts, kommagetrennt. Beispiel: 1, 2, 1 macht den mittleren Schritt doppelt so breit. Alle Werte müssen positiv sein. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'.",
+            "step_colors": "Farbe jedes Schritts, kommagetrennt (benannt oder Hex). Beispiel: green, , red lässt den mittleren Schritt in der Akzentfarbe. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'.",
             "fired_at_entity": "Die Auslösezeit des Alerts aus einer separaten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden. Akzeptiert einen Unix-Zeitstempel oder einen ISO-Zeitstempel-Sensor. Nur für die Vorlage 'alert'.",
             "fired_at_attribute": "Entitätsattribut mit dem Unix-Zeitstempel, wann der Alert ausgelöst wurde. Nur für die Vorlage 'alert'.",
             "units": "Einheitenbeschriftungen pro Datenreihe. Format: Datenreihe=Einheit, Temperatur=°C, Luftfeuchtigkeit=%. Nur für die Vorlage 'timeline'.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Widget-Name",
             "value_attribute": "Wert-Attribut",
             "unit": "Einheit",
+            "value_scale": "Wertskala",
             "min_value": "Minimalwert",
             "max_value": "Maximalwert",
             "severity": "Schweregrad",
@@ -1467,6 +1488,7 @@
             "widget_name": "Anzeigename in der iOS-Widget-Auswahl. Standardmäßig der Anzeigename der Entität.",
             "value_attribute": "Entitätsattribut, das den Wert enthält. Leer lassen, um den primären Zustand der Entität zu verwenden.",
             "unit": "Neben dem Wert angezeigte Einheit. Maximal 32 Zeichen.",
+            "value_scale": "Wie der Fortschrittswert gelesen wird. auto behandelt eine %-Einheit oder einen Wert über 1 als percent, alles andere als 0.0-1.0 fraction. Wähle percent oder fraction, um dies zu überschreiben. Nur für die Vorlage 'progress'.",
             "min_value": "Minimalwert für den Gauge-Bereich.",
             "max_value": "Maximalwert für den Gauge-Bereich.",
             "severity": "Schweregrad des Status (info, warning, critical, success).",

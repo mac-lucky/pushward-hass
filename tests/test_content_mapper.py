@@ -42,8 +42,10 @@ from custom_components.pushward.const import (
     CONF_SEVERITY_LABEL,
     CONF_SMOOTHING,
     CONF_STATE_LABELS,
+    CONF_STEP_COLORS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
+    CONF_STEP_WEIGHTS,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
@@ -2100,6 +2102,120 @@ def test_steps_step_rows_omitted_when_length_mismatch():
     content = map_content(state, config)
 
     assert "step_rows" not in content
+
+
+# Steps: step_weights
+
+
+def test_steps_emits_step_weights_matching_total():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_WEIGHTS: [1, 2.5, 1],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_weights"] == [1.0, 2.5, 1.0]
+
+
+def test_steps_step_weights_omitted_when_length_mismatch():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_WEIGHTS: [1, 2],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "step_weights" not in content
+
+
+def test_steps_step_weights_omitted_when_entry_not_positive():
+    """The server rejects a non-positive weight, so drop the array instead of 400ing."""
+    for weights in ([1, 0, 2], [1, -3, 2], [1, float("inf"), 2], [1, float("nan"), 2], [1, "x", 2], [True, True, True]):
+        state = _make_state("running", {})
+        config = make_entity_config(
+            **{
+                CONF_TEMPLATE: "steps",
+                CONF_TOTAL_STEPS: 3,
+                CONF_STEP_WEIGHTS: weights,
+            }
+        )
+
+        content = map_content(state, config)
+
+        assert "step_weights" not in content, weights
+
+
+# Steps: step_colors
+
+
+def test_steps_emits_step_colors_matching_total():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_COLORS: ["green", "#ff0000", "blue"],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_colors"] == ["green", "#ff0000", "blue"]
+
+
+def test_steps_step_colors_keeps_empty_entry():
+    """An empty entry is legal and means "use accent_color", so it must hold its slot."""
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_COLORS: ["green", "", "red"],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_colors"] == ["green", "", "red"]
+
+
+def test_steps_step_colors_normalizes_invalid_entry_to_accent():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_COLORS: ["green", "chartreuse", "red"],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert content["step_colors"] == ["green", "", "red"]
+
+
+def test_steps_step_colors_omitted_when_length_mismatch():
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_COLORS: ["green", "red"],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "step_colors" not in content
 
 
 # Alert: fired_at

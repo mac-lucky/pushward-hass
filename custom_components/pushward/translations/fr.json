@@ -163,6 +163,14 @@
           "name": "Hauteurs de ligne des étapes",
           "description": "Liste ordonnée des hauteurs de ligne (1-10) par étape. La longueur doit être égale à total_steps. Modèle steps uniquement."
         },
+        "step_weights": {
+          "name": "Poids des étapes",
+          "description": "Liste ordonnée des largeurs relatives des étapes, toutes positives. La longueur doit être égale à total_steps. Modèle steps uniquement."
+        },
+        "step_colors": {
+          "name": "Couleurs des étapes",
+          "description": "Liste ordonnée des couleurs par étape, nommées ou en hexadécimal. Une entrée vide utilise la couleur d'accentuation. La longueur doit être égale à total_steps. Modèle steps uniquement."
+        },
         "fired_at": {
           "name": "Déclenché le",
           "description": "Horodatage Unix du déclenchement de l'alert. Modèle alert uniquement."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Hauteurs de ligne des étapes",
           "description": "Liste ordonnée des hauteurs de ligne (1-10) par étape. La longueur doit être égale à total_steps. Modèle steps uniquement."
+        },
+        "step_weights": {
+          "name": "Poids des étapes",
+          "description": "Liste ordonnée des largeurs relatives des étapes, toutes positives. La longueur doit être égale à total_steps. Modèle steps uniquement."
+        },
+        "step_colors": {
+          "name": "Couleurs des étapes",
+          "description": "Liste ordonnée des couleurs par étape, nommées ou en hexadécimal. Une entrée vide utilise la couleur d'accentuation. La longueur doit être égale à total_steps. Modèle steps uniquement."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Secondes de report (iOS 26+)",
             "step_labels": "Libellés des étapes",
             "step_rows": "Hauteurs de ligne des étapes",
+            "step_weights": "Poids des étapes",
+            "step_colors": "Couleurs des étapes",
             "fired_at_entity": "Entité de déclenchement",
             "fired_at_attribute": "Attribut de déclenchement",
             "units": "Unités par série",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Durée pendant laquelle le bouton Report d'iOS prolonge le countdown (60–3600). Laisser vide pour la valeur par défaut de 300s (5 min). Nécessite l'alarme. Modèle countdown uniquement.",
             "step_labels": "Libellés pour chaque étape. Format : 1=Première étape, 2=Deuxième étape. Doit couvrir les étapes 1..total_steps. Modèle steps uniquement.",
             "step_rows": "Hauteur de ligne (1–10) pour chaque étape, séparée par des virgules. Doit avoir total_steps entrées. Modèle steps uniquement.",
+            "step_weights": "Largeur relative de chaque étape, séparée par des virgules. Exemple : 1, 2, 1 rend l'étape du milieu deux fois plus large. Toutes les valeurs doivent être positives. Doit avoir total_steps entrées. Modèle steps uniquement.",
+            "step_colors": "Couleur de chaque étape, séparée par des virgules (nommée ou hexadécimale). Exemple : green, , red laisse l'étape du milieu dans la couleur d'accentuation. Doit avoir total_steps entrées. Modèle steps uniquement.",
             "fired_at_entity": "Lire l'heure de déclenchement de l'alert depuis une entité distincte. Laisser vide pour utiliser l'entité suivie. Accepte un horodatage Unix ou un capteur d'horodatage ISO. Modèle alert uniquement.",
             "fired_at_attribute": "Attribut de l'entité contenant l'horodatage Unix du déclenchement de l'alert. Modèle alert uniquement.",
             "units": "Libellés d'unités par série. Format : LibelléSérie=unité, Température=°C, Humidité=%. Modèle timeline uniquement.",
@@ -1445,6 +1465,7 @@
             "widget_name": "Nom du widget",
             "value_attribute": "Attribut de valeur",
             "unit": "Unité",
+            "value_scale": "Échelle de valeur",
             "min_value": "Valeur minimale",
             "max_value": "Valeur maximale",
             "severity": "Gravité",
@@ -1467,6 +1488,7 @@
             "widget_name": "Nom d'affichage indiqué dans le sélecteur de widgets iOS. Par défaut, le nom convivial de l'entité.",
             "value_attribute": "Attribut de l'entité contenant la valeur. Laisser vide pour utiliser l'état principal de l'entité.",
             "unit": "Unité d'affichage indiquée à côté de la valeur. 32 caractères maximum.",
+            "value_scale": "Comment interpréter la valeur de progression. auto traite une unité % ou toute valeur supérieure à 1 comme percent, et tout le reste comme une fraction 0.0-1.0 (fraction). Choisissez percent ou fraction pour remplacer. Modèle progress uniquement.",
             "min_value": "Valeur minimale de la plage du gauge.",
             "max_value": "Valeur maximale de la plage du gauge.",
             "severity": "Gravité du statut (info, warning, critical, success).",

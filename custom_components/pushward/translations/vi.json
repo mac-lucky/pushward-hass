@@ -163,6 +163,14 @@
           "name": "Số Hàng Bước",
           "description": "Danh sách có thứ tự chiều cao hàng (1-10) cho mỗi bước. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
         },
+        "step_weights": {
+          "name": "Trọng Số Bước",
+          "description": "Danh sách có thứ tự độ rộng tương đối của mỗi bước, tất cả đều dương. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
+        },
+        "step_colors": {
+          "name": "Màu Bước",
+          "description": "Danh sách có thứ tự màu của mỗi bước, tên màu hoặc hex. Mục để trống sẽ dùng màu nhấn. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
+        },
         "fired_at": {
           "name": "Thời Điểm Kích Hoạt",
           "description": "Dấu thời gian Unix khi hoạt động được kích hoạt. Dùng để hiển thị thời gian tương đối."
@@ -478,6 +486,14 @@
         "step_rows": {
           "name": "Số Hàng Bước",
           "description": "Danh sách có thứ tự chiều cao hàng (1-10) cho mỗi bước. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
+        },
+        "step_weights": {
+          "name": "Trọng Số Bước",
+          "description": "Danh sách có thứ tự độ rộng tương đối của mỗi bước, tất cả đều dương. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
+        },
+        "step_colors": {
+          "name": "Màu Bước",
+          "description": "Danh sách có thứ tự màu của mỗi bước, tên màu hoặc hex. Mục để trống sẽ dùng màu nhấn. Độ dài phải bằng total_steps. Chỉ dành cho mẫu steps."
         },
         "url": {
           "name": "URL",
@@ -1313,6 +1329,8 @@
             "snooze_seconds": "Số giây hoãn (iOS 26+)",
             "step_labels": "Nhãn Bước",
             "step_rows": "Số Hàng Bước",
+            "step_weights": "Trọng Số Bước",
+            "step_colors": "Màu Bước",
             "fired_at_entity": "Thực thể thời điểm kích hoạt",
             "fired_at_attribute": "Thuộc Tính Thời Điểm Kích Hoạt",
             "units": "Đơn Vị",
@@ -1378,6 +1396,8 @@
             "snooze_seconds": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Để trống để dùng mặc định 300s (5 phút). Yêu cầu Báo thức. Chỉ mẫu đếm ngược.",
             "step_labels": "Nhãn tùy chỉnh cho các bước trong mẫu steps. Định dạng: 1=Nhãn, 2=Nhãn. Để trống để dùng số bước.",
             "step_rows": "Số bước hiển thị trong một hàng trong mẫu steps.",
+            "step_weights": "Độ rộng tương đối của mỗi bước, cách nhau bằng dấu phẩy. Ví dụ: 1, 2, 1 làm bước giữa rộng gấp đôi. Tất cả giá trị phải là số dương. Phải có total_steps mục. Chỉ dành cho mẫu steps.",
+            "step_colors": "Màu của mỗi bước, cách nhau bằng dấu phẩy (tên màu hoặc hex). Ví dụ: green, , red giữ nguyên màu nhấn cho bước giữa. Phải có total_steps mục. Chỉ dành cho mẫu steps.",
             "fired_at_entity": "Đọc thời điểm kích hoạt của cảnh báo từ một thực thể riêng. Để trống để dùng thực thể được theo dõi. Chấp nhận dấu thời gian unix hoặc cảm biến dấu thời gian ISO. Chỉ mẫu cảnh báo.",
             "fired_at_attribute": "Thuộc tính thực thể chứa dấu thời gian Unix khi kích hoạt. Dùng để hiển thị thời gian tương đối.",
             "units": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%",
@@ -1445,6 +1465,7 @@
             "widget_name": "Tên widget",
             "value_attribute": "Thuộc tính giá trị",
             "unit": "Đơn vị",
+            "value_scale": "Thang Đo Giá Trị",
             "min_value": "Giá trị tối thiểu",
             "max_value": "Giá trị tối đa",
             "severity": "Mức độ nghiêm trọng",
@@ -1467,6 +1488,7 @@
             "widget_name": "Tên hiển thị trong bộ chọn widget trên iOS. Mặc định là tên thân thiện của thực thể.",
             "value_attribute": "Thuộc tính của thực thể chứa giá trị. Để trống để dùng trạng thái chính của thực thể.",
             "unit": "Đơn vị hiển thị bên cạnh giá trị. Tối đa 32 ký tự.",
+            "value_scale": "Cách đọc giá trị tiến độ. auto coi đơn vị % hoặc bất kỳ giá trị nào trên 1 là percent, và mọi thứ khác là phân số 0.0-1.0 (fraction). Chọn percent hoặc fraction để ghi đè. Chỉ dành cho mẫu progress.",
             "min_value": "Giá trị tối thiểu cho khoảng đồng hồ đo.",
             "max_value": "Giá trị tối đa cho khoảng đồng hồ đo.",
             "severity": "Mức độ nghiêm trọng của trạng thái (info, warning, critical, success).",

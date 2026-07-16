@@ -2,6 +2,8 @@
 
 from unittest.mock import MagicMock
 
+import pytest
+
 from custom_components.pushward.const import (
     CONF_ENTITY_ID,
     CONF_ICON,
@@ -14,7 +16,10 @@ from custom_components.pushward.const import (
     CONF_TAP_ACTION_URL,
     CONF_UNIT,
     CONF_VALUE_ATTRIBUTE,
+    CONF_VALUE_SCALE,
     CONF_WIDGET_TEMPLATE,
+    VALUE_SCALE_FRACTION,
+    VALUE_SCALE_PERCENT,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
@@ -95,16 +100,116 @@ def test_progress_template_clamps_and_requires_numeric():
     assert content is not None
     assert content["value"] == 0.5
 
-    # Out-of-range clamped
+    # Out-of-range clamped. Pinned to fraction so the clamp is what's under test;
+    # left on auto, 2.5 would read as 2.5% instead.
+    fraction = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS, CONF_VALUE_SCALE: VALUE_SCALE_FRACTION}
+    )
     state = make_mock_state("2.5", entity_id="sensor.users")
     hass = _make_hass({"sensor.users": state})
-    content = map_widget_content(hass, config)
+    content = map_widget_content(hass, fraction)
+    assert content["value"] == 1.0
+
+    # Percent rescale still clamps above 100.
+    percent = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS, CONF_VALUE_SCALE: VALUE_SCALE_PERCENT}
+    )
+    state = make_mock_state("150", entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    content = map_widget_content(hass, percent)
     assert content["value"] == 1.0
 
     # Non-numeric → None (skip)
     state = make_mock_state("playing", entity_id="sensor.users")
     hass = _make_hass({"sensor.users": state})
     assert map_widget_content(hass, config) is None
+
+
+def test_progress_auto_detects_percent_from_unit():
+    """A properly tagged % sensor rescales even inside the ambiguous 0-1 band."""
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS})
+
+    state = make_mock_state("65", {"unit_of_measurement": "%"}, entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    assert map_widget_content(hass, config)["value"] == 0.65
+
+    state = make_mock_state("0.5", {"unit_of_measurement": "%"}, entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    assert map_widget_content(hass, config)["value"] == 0.005
+
+
+def test_progress_auto_detects_percent_from_value_above_one():
+    """No unit, but a fraction can never exceed 1.0, so 65 is a percent."""
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS})
+    state = make_mock_state("65", entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    assert map_widget_content(hass, config)["value"] == 0.65
+
+
+def test_progress_auto_leaves_untagged_fraction_alone():
+    """Regression guard: existing 0.0-1.0 users must not start reading as percents."""
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS})
+    for raw, expected in (("0.5", 0.5), ("1", 1.0), ("0", 0.0)):
+        state = make_mock_state(raw, entity_id="sensor.users")
+        hass = _make_hass({"sensor.users": state})
+        assert map_widget_content(hass, config)["value"] == expected
+
+
+def test_progress_auto_tolerates_fraction_overshoot():
+    """A ratio sensor overshooting 1.0 by rounding noise must still read as done.
+
+    Rescaling it would collapse a finished bar to ~1% at the completion moment,
+    where the old clamp-only code showed 100%.
+    """
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS})
+    for raw in ("1.0000001", "1.01", "1.05"):
+        state = make_mock_state(raw, entity_id="sensor.users")
+        hass = _make_hass({"sensor.users": state})
+        assert map_widget_content(hass, config)["value"] == 1.0, raw
+
+    # Clear of the tolerance band, so it is a percent again.
+    state = make_mock_state("1.5", entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    assert map_widget_content(hass, config)["value"] == 0.015
+
+
+def test_progress_explicit_scale_overrides_auto_detect():
+    state = make_mock_state("0.65", {"unit_of_measurement": "%"}, entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+
+    # The % unit would make auto rescale; fraction says take it as-is.
+    fraction = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS, CONF_VALUE_SCALE: VALUE_SCALE_FRACTION}
+    )
+    assert map_widget_content(hass, fraction)["value"] == 0.65
+
+    # And percent rescales a value auto would have left alone.
+    percent = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS, CONF_VALUE_SCALE: VALUE_SCALE_PERCENT}
+    )
+    state = make_mock_state("0.65", entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    assert map_widget_content(hass, percent)["value"] == pytest.approx(0.0065)
+
+
+def test_progress_auto_ignores_entity_unit_for_attribute_source():
+    """The entity's % unit describes its state, not an arbitrary attribute.
+
+    So an attribute value in the 0-1 band stays a fraction, and only the >1 rule applies.
+    """
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS,
+            CONF_VALUE_ATTRIBUTE: "ratio",
+        }
+    )
+    state = make_mock_state("65", {"unit_of_measurement": "%", "ratio": 0.4}, entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    assert map_widget_content(hass, config)["value"] == 0.4
+
+    state = make_mock_state("65", {"unit_of_measurement": "%", "ratio": 40}, entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+    assert map_widget_content(hass, config)["value"] == 0.4
 
 
 def test_gauge_template_min_max_required_and_clamped():
