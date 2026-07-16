@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "Stale TTL",
           "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       }
     },

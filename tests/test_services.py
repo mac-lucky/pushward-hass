@@ -149,6 +149,7 @@ async def test_service_create_activity(hass: HomeAssistant) -> None:
     # TTLs omitted → None (server defaults)
     assert call_kwargs["ended_ttl"] is None
     assert call_kwargs["stale_ttl"] is None
+    assert call_kwargs["dismissal_ttl"] is None
 
 
 async def test_service_create_activity_with_ttls(hass: HomeAssistant) -> None:
@@ -159,13 +160,72 @@ async def test_service_create_activity_with_ttls(hass: HomeAssistant) -> None:
     await hass.services.async_call(
         DOMAIN,
         "create_activity",
-        {"slug": "ha-washer", "name": "Washer", "priority": 1, "ended_ttl": 60, "stale_ttl": 120},
+        {
+            "slug": "ha-washer",
+            "name": "Washer",
+            "priority": 1,
+            "ended_ttl": 60,
+            "stale_ttl": 120,
+            "dismissal_ttl": 0,
+        },
         blocking=True,
     )
 
     call_kwargs = api.create_activity.call_args[1]
     assert call_kwargs["ended_ttl"] == 60
     assert call_kwargs["stale_ttl"] == 120
+    # 0 = immediate Lock Screen removal; must pass through, not be treated as unset.
+    assert call_kwargs["dismissal_ttl"] == 0
+
+
+async def test_service_create_activity_accepts_ttl_bounds(hass: HomeAssistant) -> None:
+    """The exact bounds are accepted, so an off-by-one in vol.Range can't hide.
+
+    The rejection test below only proves out-of-range fails; without this an
+    accidental max=14399 would pass the whole suite.
+    """
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "create_activity",
+        {
+            "slug": "ha-bounds",
+            "name": "Bounds",
+            "dismissal_ttl": 14400,
+            "ended_ttl": 1,
+            "stale_ttl": 2592000,
+        },
+        blocking=True,
+    )
+
+    call_kwargs = api.create_activity.call_args[1]
+    assert call_kwargs["dismissal_ttl"] == 14400
+    assert call_kwargs["ended_ttl"] == 1
+    assert call_kwargs["stale_ttl"] == 2592000
+
+
+async def test_service_create_activity_rejects_out_of_range_dismissal_ttl(
+    hass: HomeAssistant,
+) -> None:
+    """dismissal_ttl outside the server's 0-14400 bound is rejected by the schema.
+
+    services.yaml's number selector only constrains the UI; automations, scripts and
+    REST callers hit the schema directly.
+    """
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad in (-1, 14401):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "create_activity",
+                {"slug": "ha-washer", "name": "Washer", "dismissal_ttl": bad},
+                blocking=True,
+            )
+        api.create_activity.assert_not_awaited()
 
 
 async def test_service_end_activity(hass: HomeAssistant) -> None:
@@ -1319,6 +1379,77 @@ async def test_send_notification_action_rejects_method_without_http_url(hass: Ho
             {"title": "t", "body": "b", "actions": [{"id": "a", "title": "A", "method": "POST"}]},
             blocking=True,
         )
+    api.create_notification.assert_not_awaited()
+
+
+async def test_send_notification_action_reply_with_text(hass: HomeAssistant) -> None:
+    """text_input on a silent http(s) action passes through to the API."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    actions = [
+        {
+            "id": "reply",
+            "title": "Reply",
+            "url": "https://example.com/reply",
+            "method": "POST",
+            "text_input": True,
+            "text_input_placeholder": "Type a reply",
+            "text_input_button_title": "Send",
+        }
+    ]
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "t", "body": "b", "actions": actions},
+        blocking=True,
+    )
+
+    action = api.create_notification.call_args[1]["actions"][0]
+    assert action["text_input"] is True
+    assert action["text_input_placeholder"] == "Type a reply"
+    assert action["text_input_button_title"] == "Send"
+
+
+async def test_send_notification_text_input_labels_reject_oversize(hass: HomeAssistant) -> None:
+    """text_input_placeholder / text_input_button_title over 64 chars are rejected by the caps."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad in (
+        {"id": "r", "title": "R", "url": "https://x", "text_input": True, "text_input_placeholder": "p" * 65},
+        {"id": "r", "title": "R", "url": "https://x", "text_input": True, "text_input_button_title": "b" * 65},
+    ):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "send_notification",
+                {"title": "t", "body": "b", "actions": [bad]},
+                blocking=True,
+            )
+    api.create_notification.assert_not_awaited()
+
+
+async def test_send_notification_action_text_input_requires_silent_http(hass: HomeAssistant) -> None:
+    """text_input on a foreground or non-http action is rejected (mirrors the server)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad in (
+        # foreground action cannot carry a reply field
+        {"id": "a", "title": "A", "url": "https://example.com", "foreground": True, "text_input": True},
+        # custom-scheme action has no http shape for the reply webhook
+        {"id": "a", "title": "A", "url": "homeassistant://navigate/0", "text_input": True},
+        # placeholder without text_input
+        {"id": "a", "title": "A", "url": "https://example.com", "text_input_placeholder": "x"},
+    ):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "send_notification",
+                {"title": "t", "body": "b", "actions": [bad]},
+                blocking=True,
+            )
     api.create_notification.assert_not_awaited()
 
 

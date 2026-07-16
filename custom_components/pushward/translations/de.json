@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL bei Inaktivität",
           "description": "Sekunden, bevor die Live Activity als veraltet gilt."
+        },
+        "dismissal_ttl": {
+          "name": "TTL für Entfernung",
+          "description": "Sekunden, die die beendete Aktivität auf dem Sperrbildschirm verbleibt, bevor sie entfernt wird. 0 entfernt sie sofort bei Ende."
         }
       }
     },

@@ -109,7 +109,7 @@ async def test_create_activity_success():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.create_activity("test-slug", "Test", priority=1, ended_ttl=300, stale_ttl=1800)
+    await client.create_activity("test-slug", "Test", priority=1, ended_ttl=300, stale_ttl=1800, dismissal_ttl=45)
 
     session.request.assert_called_once()
     call_args = session.request.call_args
@@ -121,6 +121,7 @@ async def test_create_activity_success():
     assert body["priority"] == 1
     assert body["ended_ttl"] == 300
     assert body["stale_ttl"] == 1800
+    assert body["dismissal_ttl"] == 45
 
 
 async def test_create_activity_already_exists():
@@ -160,6 +161,7 @@ async def test_create_activity_optional_ttls():
     body = session.request.call_args[1]["json"]
     assert "ended_ttl" not in body
     assert "stale_ttl" not in body
+    assert "dismissal_ttl" not in body
 
 
 async def test_create_activity_partial_ttls():
@@ -168,11 +170,13 @@ async def test_create_activity_partial_ttls():
     session = _make_session(resp)
     client = _make_client(session)
 
-    await client.create_activity("test-slug", "Test", priority=1, ended_ttl=600)
+    await client.create_activity("test-slug", "Test", priority=1, ended_ttl=600, dismissal_ttl=0)
 
     body = session.request.call_args[1]["json"]
     assert body["ended_ttl"] == 600
     assert "stale_ttl" not in body
+    # dismissal_ttl=0 is meaningful (immediate removal) and must be sent, not dropped.
+    assert body["dismissal_ttl"] == 0
 
 
 # --- update_activity ---

@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL de Inatividade",
           "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       }
     },

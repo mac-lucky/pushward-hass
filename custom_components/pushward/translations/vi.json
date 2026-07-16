@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL Hết Hạn",
           "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       }
     },

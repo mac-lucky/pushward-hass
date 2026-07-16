@@ -141,6 +141,12 @@ UPDATE_INTERVAL_MIN = 1
 WARNING_THRESHOLD_MAX = 86400  # 24 h
 SNOOZE_SECONDS_MIN = 60
 SNOOZE_SECONDS_MAX = 3600
+# Mirrors the server's dismissal_ttl bound (0 = remove on end, 14400 = the iOS 4h ceiling).
+DISMISSAL_TTL_MIN = 0
+DISMISSAL_TTL_MAX = 14400
+# Mirrors the server's ended_ttl / stale_ttl bounds (services.yaml declares the same).
+ACTIVITY_TTL_MIN = 1
+ACTIVITY_TTL_MAX = 2592000  # 30 d
 
 # Free-text input length caps.
 MAX_TEXT_LEN = 255
@@ -153,6 +159,8 @@ MAX_TAP_ACTION_TITLE_LEN = 64
 MAX_TAP_ACTION_ICON_LEN = 64
 MAX_TAP_ACTION_BODY_LEN = 1024  # server maxTapActionBodyRunes
 MAX_TAP_ACTION_HEADERS_LEN = 1024  # server maxTapActionHeadersBytes (sum of name+value byte lengths)
+# Reply-with-text placeholder / send-button label caps; mirror the server's 64.
+MAX_TEXT_INPUT_LABEL_LEN = 64
 
 # Tap-action / action-button HTTP routing — mirrors pushward-server action_validation.go.
 # method/headers/body are only valid on http(s) URLs; custom-scheme URLs (homeassistant://,

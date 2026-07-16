@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL bij inactiviteit",
           "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       }
     },

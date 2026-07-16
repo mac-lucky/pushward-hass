@@ -116,6 +116,7 @@ class PushWardApiClient:
         priority: int,
         ended_ttl: int | None = None,
         stale_ttl: int | None = None,
+        dismissal_ttl: int | None = None,
     ) -> None:
         """Create an activity via POST /activities.
 
@@ -131,6 +132,8 @@ class PushWardApiClient:
             body["ended_ttl"] = ended_ttl
         if stale_ttl is not None:
             body["stale_ttl"] = stale_ttl
+        if dismissal_ttl is not None:
+            body["dismissal_ttl"] = dismissal_ttl
         await self._request_with_retry(
             "POST",
             "/activities",

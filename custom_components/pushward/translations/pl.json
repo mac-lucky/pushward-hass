@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL nieaktywności",
           "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       }
     },

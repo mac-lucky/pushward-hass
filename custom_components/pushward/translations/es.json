@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL por inactividad",
           "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       }
     },

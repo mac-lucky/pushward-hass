@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL Kedaluwarsa",
           "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       }
     },

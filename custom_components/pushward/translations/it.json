@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL inattività",
           "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       }
     },

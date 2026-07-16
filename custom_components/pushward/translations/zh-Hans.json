@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "过期时长",
           "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       }
     },

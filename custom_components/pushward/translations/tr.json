@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "Bayatlama TTL",
           "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       }
     },

@@ -1306,6 +1306,15 @@ create_activity:
           min: 1
           max: 2592000
           mode: box
+    dismissal_ttl:
+      name: Dismissal TTL
+      description: Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end. Leave empty for the default.
+      example: 60
+      selector:
+        number:
+          min: 0
+          max: 14400
+          mode: box
 
 end_activity:
   name: End Activity
@@ -1437,8 +1446,8 @@ send_notification:
         object:
     actions:
       name: Actions
-      description: 'List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`. For an http(s) `url` you can also send a silent webhook with `method` (GET/POST/PUT/PATCH/DELETE/HEAD), `headers`, and `body`.'
-      example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}, {"id": "ack", "title": "Acknowledge", "url": "https://example.com/ack", "method": "POST", "body": "ok"}]'
+      description: 'List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`. For an http(s) `url` you can also send a silent webhook with `method` (GET/POST/PUT/PATCH/DELETE/HEAD), `headers`, and `body`. Set `text_input: true` on a silent http(s) action to prompt for a typed reply (optional `text_input_placeholder` and `text_input_button_title`); the reply is sent to your webhook as `{"text": ...}`. To embed it in `body` instead, use the `{{input}}` placeholder and wrap the body in `{% raw %}` / `{% endraw %}` in your automation, so Home Assistant does not render it away before the action is sent.'
+      example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}, {"id": "ack", "title": "Acknowledge", "url": "https://example.com/ack", "method": "POST", "body": "ok"}, {"id": "reply", "title": "Reply", "url": "https://example.com/reply", "method": "POST", "text_input": true, "text_input_placeholder": "Type a reply"}]'
       selector:
         object:
     push:

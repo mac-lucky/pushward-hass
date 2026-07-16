@@ -30,6 +30,8 @@ from .api import (
 from .const import (
     ACTIVITY_STATE_ENDED,
     ACTIVITY_STATES,
+    ACTIVITY_TTL_MAX,
+    ACTIVITY_TTL_MIN,
     BOARD_MAX_TILES,
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
@@ -40,6 +42,8 @@ from .const import (
     CONF_SERVER_URL,
     CONF_SLUG,
     DEFAULT_PRIORITY,
+    DISMISSAL_TTL_MAX,
+    DISMISSAL_TTL_MIN,
     DOMAIN,
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
@@ -48,7 +52,10 @@ from .const import (
     MAX_TAP_ACTION_BODY_LEN,
     MAX_TAP_ACTION_ICON_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
+    MAX_TEXT_INPUT_LABEL_LEN,
     NOTIFICATION_LEVELS,
+    PRIORITY_MAX,
+    PRIORITY_MIN,
     SCALES,
     SEVERITIES,
     SOUNDS,
@@ -98,6 +105,11 @@ _HTTP_ACTION_FIELDS = {
 }
 
 
+def _action_url_is_http(data: dict) -> bool:
+    """True when the action's url carries an http(s) scheme (the silent-webhook shape)."""
+    return urlparse(str(data.get("url", ""))).scheme.lower() in ("http", "https")
+
+
 def _validate_http_action_fields(data: dict) -> dict:
     """Reject method/headers/body on a non-http(s) action URL.
 
@@ -106,10 +118,27 @@ def _validate_http_action_fields(data: dict) -> dict:
     tap target is fine. The caller gets a clear HA error instead of a server 400; a
     missing/empty url has no scheme and fails here too.
     """
-    if any(data.get(key) for key in _HTTP_ACTION_KEYS):
-        scheme = urlparse(str(data.get("url", ""))).scheme.lower()
-        if scheme not in ("http", "https"):
-            raise vol.Invalid("method, headers, and body require an http or https url")
+    if any(data.get(key) for key in _HTTP_ACTION_KEYS) and not _action_url_is_http(data):
+        raise vol.Invalid("method, headers, and body require an http or https url")
+    return data
+
+
+def _validate_text_input_fields(data: dict) -> dict:
+    """Reject a reply-with-text action that the server would 400.
+
+    Mirrors pushward-server ValidateTextInput: the placeholder / button label
+    require text_input, and text_input itself needs a silent (non-foreground)
+    http(s) action, the only shape the iOS client renders a reply field for.
+    Surfacing it here gives a clear HA error instead of a server 400.
+    """
+    if not data.get("text_input"):
+        if data.get("text_input_placeholder") or data.get("text_input_button_title"):
+            raise vol.Invalid("text_input_placeholder and text_input_button_title require text_input")
+        return data
+    if not _action_url_is_http(data):
+        raise vol.Invalid("text_input requires an http or https url")
+    if data.get("foreground"):
+        raise vol.Invalid("text_input is only valid on silent (non-foreground) actions")
     return data
 
 
@@ -319,9 +348,16 @@ SCHEMA_CREATE_ACTIVITY = vol.Schema(
     {
         vol.Required("slug"): validate_slug,
         vol.Required("name"): str,
-        vol.Optional("priority", default=DEFAULT_PRIORITY): vol.Coerce(int),
-        vol.Optional("ended_ttl"): vol.Coerce(int),
-        vol.Optional("stale_ttl"): vol.Coerce(int),
+        # services.yaml's number selectors are only a UI hint; automations, scripts and
+        # REST callers reach the schema directly, so enforce the server's bounds here.
+        vol.Optional("priority", default=DEFAULT_PRIORITY): vol.All(
+            vol.Coerce(int), vol.Range(min=PRIORITY_MIN, max=PRIORITY_MAX)
+        ),
+        vol.Optional("ended_ttl"): vol.All(vol.Coerce(int), vol.Range(min=ACTIVITY_TTL_MIN, max=ACTIVITY_TTL_MAX)),
+        vol.Optional("stale_ttl"): vol.All(vol.Coerce(int), vol.Range(min=ACTIVITY_TTL_MIN, max=ACTIVITY_TTL_MAX)),
+        vol.Optional("dismissal_ttl"): vol.All(
+            vol.Coerce(int), vol.Range(min=DISMISSAL_TTL_MIN, max=DISMISSAL_TTL_MAX)
+        ),
     }
 )
 
@@ -359,11 +395,16 @@ SCHEMA_ACTION = vol.All(
             vol.Optional("destructive"): cv.boolean,
             vol.Optional("authentication_required"): cv.boolean,
             vol.Optional("icon"): str,
+            vol.Optional("text_input"): cv.boolean,
+            vol.Optional("text_input_placeholder"): vol.All(str, vol.Length(max=MAX_TEXT_INPUT_LABEL_LEN)),
+            vol.Optional("text_input_button_title"): vol.All(str, vol.Length(max=MAX_TEXT_INPUT_LABEL_LEN)),
             **_HTTP_ACTION_FIELDS,
         }
     ),
     # method/headers/body turn the button into a webhook — they need an http(s) url.
     _validate_http_action_fields,
+    # text_input (reply-with-text) needs that same silent http(s) shape.
+    _validate_text_input_fields,
 )
 
 SCHEMA_SEND_NOTIFICATION = vol.Schema(
@@ -515,6 +556,7 @@ async def _async_handle_create_activity(hass: HomeAssistant, call: ServiceCall) 
             priority=call.data["priority"],
             ended_ttl=call.data.get("ended_ttl"),
             stale_ttl=call.data.get("stale_ttl"),
+            dismissal_ttl=call.data.get("dismissal_ttl"),
         )
 
 

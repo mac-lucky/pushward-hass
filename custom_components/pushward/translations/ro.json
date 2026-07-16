@@ -1034,6 +1034,10 @@
         "stale_ttl": {
           "name": "TTL inactivitate",
           "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       }
     },
