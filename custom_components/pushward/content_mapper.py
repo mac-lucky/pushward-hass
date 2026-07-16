@@ -477,8 +477,8 @@ def _clean_step_weights(weights: list) -> list[float]:
     """Coerce configured step weights to what the server accepts, or [] to skip.
 
     The server takes step_weights only as positive finite numbers, so one bad
-    entry drops the whole array rather than earning a 400. Services pass the list
-    through uncoerced, hence the bool guard: True would otherwise weigh 1.0.
+    entry drops the whole array rather than earning a 400. The bool guard is
+    defensive: float(True) is 1.0, so a stray True would silently weigh 1.0.
     """
     cleaned: list[float] = []
     for w in weights:
@@ -492,6 +492,45 @@ def _clean_step_weights(weights: list) -> list[float]:
             return []
         cleaned.append(value)
     return cleaned
+
+
+def _apply_steps_fields(
+    content: dict,
+    entity_config: dict,
+    state: State,
+    hass: HomeAssistant | None,
+) -> None:
+    """Write the steps template's fields into ``content`` in place.
+
+    Everything but live_progress, which stays in map_content because it needs
+    the shared clock read and remaining/end window computed there.
+    """
+    total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
+    current = _get_current_step(state, entity_config, hass)
+    content["total_steps"] = total
+    content["current_step"] = current
+    # Auto-derive progress when no explicit progress source is configured
+    if not entity_config.get(CONF_PROGRESS_ATTRIBUTE) and not entity_config.get(CONF_PROGRESS_ENTITY) and total > 0:
+        content["progress"] = max(0.0, min(1.0, current / total))
+    step_labels = entity_config.get(CONF_STEP_LABELS) or {}
+    if step_labels:
+        labels_list = [step_labels.get(str(i), "") for i in range(1, total + 1)]
+        if any(labels_list):
+            content["step_labels"] = labels_list
+    step_rows = entity_config.get(CONF_STEP_ROWS) or []
+    if len(step_rows) == total:
+        content["step_rows"] = [max(1, min(10, int(r))) for r in step_rows]
+    step_weights = entity_config.get(CONF_STEP_WEIGHTS) or []
+    if len(step_weights) == total and (cleaned := _clean_step_weights(step_weights)):
+        content["step_weights"] = cleaned
+    step_colors = entity_config.get(CONF_STEP_COLORS) or []
+    if len(step_colors) == total:
+        # An unrecognized entry becomes "", which the server reads as
+        # "use accent_color" rather than rejecting the whole push. All-empty
+        # says nothing the accent doesn't already, so skip the bytes.
+        colors_list = [color_to_str(c) for c in step_colors]
+        if any(colors_list):
+            content["step_colors"] = colors_list
 
 
 def _resolve_live_end(now: int, remaining: int | None, absolute_end: int | None) -> int | None:
@@ -642,32 +681,7 @@ def map_content(
             if snooze_seconds is not None:
                 content["snooze_seconds"] = int(snooze_seconds)
     elif template == "steps":
-        total = entity_config.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)
-        current = _get_current_step(state, entity_config, hass)
-        content["total_steps"] = total
-        content["current_step"] = current
-        # Auto-derive progress when no explicit progress source is configured
-        if not entity_config.get(CONF_PROGRESS_ATTRIBUTE) and not entity_config.get(CONF_PROGRESS_ENTITY) and total > 0:
-            content["progress"] = max(0.0, min(1.0, current / total))
-        step_labels = entity_config.get(CONF_STEP_LABELS) or {}
-        if step_labels:
-            labels_list = [step_labels.get(str(i), "") for i in range(1, total + 1)]
-            if any(labels_list):
-                content["step_labels"] = labels_list
-        step_rows = entity_config.get(CONF_STEP_ROWS) or []
-        if len(step_rows) == total:
-            content["step_rows"] = [max(1, min(10, int(r))) for r in step_rows]
-        step_weights = entity_config.get(CONF_STEP_WEIGHTS) or []
-        if len(step_weights) == total and (cleaned := _clean_step_weights(step_weights)):
-            content["step_weights"] = cleaned
-        step_colors = entity_config.get(CONF_STEP_COLORS) or []
-        if len(step_colors) == total:
-            # An unrecognized entry becomes "", which the server reads as
-            # "use accent_color" rather than rejecting the whole push. All-empty
-            # says nothing the accent doesn't already, so skip the bytes.
-            colors_list = [color_to_str(c) for c in step_colors]
-            if any(colors_list):
-                content["step_colors"] = colors_list
+        _apply_steps_fields(content, entity_config, state, hass)
         if entity_config.get(CONF_LIVE_PROGRESS):
             # Updates are merge-patches: an omitted key preserves a prior
             # live_progress=true against a now-expired end_date, leaving the bar
@@ -988,7 +1002,11 @@ def _get_progress(state: State, entity_config: dict, hass: HomeAssistant | None 
     """Extract progress (0.0-1.0) from a companion entity or the tracked entity.
 
     Attributes in the 0-255 range (e.g. brightness) are divided by 255;
-    all others are treated as 0-100 percentages.
+    all others are treated as 0-100 percentages, so a raw 1 means 1%, not done.
+    Progress widgets follow a different convention: widget_mapper._map_progress
+    auto-detects fraction vs percent, with a value_scale config override. Do not
+    unify the two -- auto-detect here would flip the meaning of the most common
+    readings (0 and 1) for every existing activity.
     """
     raw, _source = _resolve_raw(state, entity_config, CONF_PROGRESS_ENTITY, CONF_PROGRESS_ATTRIBUTE, hass)
     if raw is _NO_VALUE:
@@ -996,6 +1014,8 @@ def _get_progress(state: State, entity_config: dict, hass: HomeAssistant | None 
     attr_name = entity_config.get(CONF_PROGRESS_ATTRIBUTE)
     try:
         value = float(raw)  # type: ignore[arg-type]
+        # Open-coded rather than _rescale_attr: that helper maps 0-255 to 0-100
+        # while this one needs 0-1.
         scale = 255.0 if attr_name in _ATTRS_0_255 else 100.0
         return round(max(0.0, min(1.0, value / scale)), 2)
     except (ValueError, TypeError):

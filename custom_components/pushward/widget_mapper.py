@@ -220,6 +220,10 @@ def _is_percent_scale(state: State, config: dict, value: float) -> bool:
     is an unambiguous percent. Below that the value alone says nothing, so fall
     back to the entity's own unit -- but only when reading the entity's state,
     since the unit describes that, not some arbitrary attribute.
+
+    Activity progress (content_mapper._get_progress) deliberately does NOT
+    auto-detect: there a raw 1 is 1%, never a full bar. Keep the conventions
+    separate -- see the note on that function.
     """
     scale = config.get(CONF_VALUE_SCALE, DEFAULT_VALUE_SCALE)
     if scale == VALUE_SCALE_PERCENT:

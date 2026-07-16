@@ -2056,6 +2056,22 @@ def test_steps_omits_step_labels_when_all_empty():
     assert "step_labels" not in content
 
 
+def test_steps_omits_step_labels_when_all_values_empty():
+    """A non-empty dict can still yield only empty slots (blank values, out-of-range keys)."""
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_LABELS: {"1": "", "2": "", "9": "Ghost"},
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "step_labels" not in content
+
+
 # Steps: step_rows
 
 
@@ -2201,6 +2217,22 @@ def test_steps_step_colors_normalizes_invalid_entry_to_accent():
     content = map_content(state, config)
 
     assert content["step_colors"] == ["green", "", "red"]
+
+
+def test_steps_omits_step_colors_when_all_resolve_empty():
+    """All-empty colors say nothing the accent doesn't; the list must be omitted."""
+    state = _make_state("running", {})
+    config = make_entity_config(
+        **{
+            CONF_TEMPLATE: "steps",
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_COLORS: ["", "chartreuse", ""],
+        }
+    )
+
+    content = map_content(state, config)
+
+    assert "step_colors" not in content
 
 
 def test_steps_step_colors_omitted_when_length_mismatch():
