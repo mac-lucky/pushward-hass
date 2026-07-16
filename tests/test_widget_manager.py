@@ -464,14 +464,18 @@ async def test_widget_burst_trailing_resend(hass: HomeAssistant) -> None:
     api.reset_mock()
 
     gate = asyncio.Event()
+    started = asyncio.Event()
 
     async def _gated(*_a, **_k):
+        started.set()
         await gate.wait()
 
     api.patch_widget.side_effect = _gated
 
     hass.states.async_set("sensor.users", "43")
-    await asyncio.sleep(0)  # let the send task start and block on the gate
+    # Wait for the send to actually reach the gate. A bare sleep(0) yields a single loop
+    # tick, which the task doesn't always win on a loaded runner (CI runs under coverage).
+    await asyncio.wait_for(started.wait(), timeout=5)
     hass.states.async_set("sensor.users", "44")
     hass.states.async_set("sensor.users", "45")
     await asyncio.sleep(0)

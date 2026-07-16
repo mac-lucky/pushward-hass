@@ -1145,7 +1145,7 @@
         },
         "actions": {
           "name": "Actions",
-          "description": "List of action buttons. Each action is an object with id, title, optional url, foreground, destructive, authentication_required, and icon. For an http(s) url you can also send a silent webhook with method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, and body. Set text_input: true on a silent http(s) action to prompt for a typed reply (optional text_input_placeholder and text_input_button_title); the reply is sent to your webhook as {\"text\": ...}. To embed it in body instead, use the {{input}} placeholder and wrap the body in {% raw %} / {% endraw %} in your automation, so Home Assistant does not render it away before the action is sent."
+          "description": "List of action buttons. Each action is an object with id, title, optional url, foreground, destructive, authentication_required, and icon. For an http(s) url you can also send a silent webhook with method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, and body. Set text_input: true on a silent http(s) action to prompt for a typed reply (optional text_input_placeholder and text_input_button_title); the reply is sent to your webhook as JSON with a text field. To embed it in body instead, use the {{input}} placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent."
         }
       }
     },

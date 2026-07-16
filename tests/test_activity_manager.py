@@ -1544,14 +1544,18 @@ async def test_burst_coalesces_to_one_inflight_send(hass: HomeAssistant) -> None
     api.update_activity.reset_mock()
 
     gate = asyncio.Event()
+    started = asyncio.Event()
 
     async def _gated(*_a, **_k):
+        started.set()
         await gate.wait()
 
     api.update_activity.side_effect = _gated
 
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
-    await asyncio.sleep(0)  # let the first send task start and block on the gate
+    # Wait for the send to actually reach the gate. A bare sleep(0) yields a single loop
+    # tick, which the task doesn't always win on a loaded runner (CI runs under coverage).
+    await asyncio.wait_for(started.wait(), timeout=5)
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 20})
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 30})
     await asyncio.sleep(0)
@@ -1581,14 +1585,16 @@ async def test_end_cancels_inflight_send(hass: HomeAssistant) -> None:
     api.update_activity.reset_mock()
 
     gate = asyncio.Event()
+    started = asyncio.Event()
 
     async def _gated(*_a, **_k):
+        started.set()
         await gate.wait()
 
     api.update_activity.side_effect = _gated
 
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
-    await asyncio.sleep(0)
+    await asyncio.wait_for(started.wait(), timeout=5)
     tracked = manager._tracked["binary_sensor.washer"]
     inflight = tracked.pending_task
     assert inflight is not None and not inflight.done()
@@ -1620,15 +1626,17 @@ async def test_trailing_resend_respects_cooldown(hass: HomeAssistant) -> None:
 
     tracked = manager._tracked["binary_sensor.washer"]
     gate = asyncio.Event()
+    started = asyncio.Event()
 
     async def _gated(*_a, **_k):
+        started.set()
         await gate.wait()
 
     api.update_activity.side_effect = _gated
 
     tracked.last_sent_at = 0.0  # cooldown elapsed: first change sends immediately
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
-    await asyncio.sleep(0)
+    await asyncio.wait_for(started.wait(), timeout=5)
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 20})
 
     api.update_activity.side_effect = None
