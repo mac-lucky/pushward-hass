@@ -1634,7 +1634,10 @@ async def test_trailing_resend_respects_cooldown(hass: HomeAssistant) -> None:
 
     api.update_activity.side_effect = _gated
 
-    tracked.last_sent_at = 0.0  # cooldown elapsed: first change sends immediately
+    # Backdate against time.monotonic (what the manager compares to) so the cooldown reads
+    # as elapsed and the first change sends immediately. 0.0 would only work on a machine
+    # up longer than the interval - monotonic counts from boot, and CI runners are fresh.
+    tracked.last_sent_at = time.monotonic() - 86400
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 10})
     await asyncio.wait_for(started.wait(), timeout=5)
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 20})

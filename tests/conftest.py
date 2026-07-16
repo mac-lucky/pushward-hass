@@ -1,5 +1,6 @@
 """Shared test fixtures for PushWard integration tests."""
 
+import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
@@ -86,6 +87,9 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_EVENT,
 )
+
+# Seconds to backdate last_sent_at by so any configured cooldown reads as elapsed.
+_COOLDOWN_BACKDATE = 86400
 
 
 @pytest.fixture(autouse=True)
@@ -339,11 +343,15 @@ async def bump_state(
 ) -> None:
     """Force a throttled update through the real subscription path.
 
-    Resetting the tracked entity's ``last_sent_at`` makes the cooldown read as
+    Backdating the tracked entity's ``last_sent_at`` makes the cooldown read as
     elapsed, so a state change on ``set_entity_id`` (the tracked entity itself or a
     companion) sends immediately instead of arming a timer.
+
+    Backdated against ``time.monotonic`` (what the manager compares to) rather than set
+    to 0.0: monotonic counts from boot, so on a freshly booted runner 0.0 is only a few
+    seconds ago and the cooldown would read as still running.
     """
-    manager._tracked[tracked_entity_id].last_sent_at = 0.0
+    manager._tracked[tracked_entity_id].last_sent_at = time.monotonic() - _COOLDOWN_BACKDATE
     hass.states.async_set(set_entity_id, value, attrs)
     await hass.async_block_till_done()
 
