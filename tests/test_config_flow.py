@@ -1051,6 +1051,19 @@ async def test_subentry_suggestion_only_offered_once(hass: HomeAssistant) -> Non
     assert result["step_id"] == "details"
 
 
+def test_gauge_min_max_use_number_selector() -> None:
+    """The gauge min/max fields render as a NumberSelector box, not a bare float coerce."""
+    for schema in (
+        _details_schema("sensor.foo", "gauge", defaults={}),
+        _widget_details_schema("sensor.foo", WIDGET_TEMPLATE_GAUGE, defaults={}),
+    ):
+        by_key = {(k.schema if hasattr(k, "schema") else k): v for k, v in schema.schema.items()}
+        for field in (CONF_MIN_VALUE, CONF_MAX_VALUE):
+            sel = by_key[field]
+            assert type(sel).__name__ == "NumberSelector", f"{field} is {type(sel).__name__}"
+            assert sel.config.get("step") == "any"
+
+
 # --- State labels parsing ---
 
 

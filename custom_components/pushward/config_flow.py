@@ -509,13 +509,13 @@ def _details_schema(
                 CONF_MIN_VALUE,
                 default=d.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE),
             )
-        ] = vol.Coerce(float)
+        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
         fields[
             vol.Required(
                 CONF_MAX_VALUE,
                 default=d.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE),
             )
-        ] = vol.Coerce(float)
+        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
         fields[
             vol.Optional(
                 CONF_UNIT,
@@ -1599,6 +1599,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             step_id="details",
             data_schema=schema,
             errors=errors,
+            last_step=True,
         )
 
 
@@ -1688,13 +1689,13 @@ def _widget_details_schema(
                 CONF_MIN_VALUE,
                 default=d.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE),
             )
-        ] = vol.Coerce(float)
+        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
         fields[
             vol.Required(
                 CONF_MAX_VALUE,
                 default=d.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE),
             )
-        ] = vol.Coerce(float)
+        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
 
     if template == WIDGET_TEMPLATE_STATUS:
         fields[
@@ -1996,6 +1997,7 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
             step_id="details",
             data_schema=schema,
             errors=errors,
+            last_step=True,
         )
 
 
