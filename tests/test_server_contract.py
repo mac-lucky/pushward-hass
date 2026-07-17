@@ -156,7 +156,7 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_steps, current_step=5), id="current_step_exceeds_total"),
     pytest.param(lambda: _mut(valid_steps, current_step=-1), id="negative_current_step"),
     pytest.param(lambda: _mut(valid_steps, total_steps=0), id="zero_total_steps"),
-    pytest.param(lambda: _mut(valid_steps, total_steps=21), id="total_steps_above_max"),
+    pytest.param(lambda: _mut(valid_steps, total_steps=65), id="total_steps_above_max"),
     pytest.param(lambda: _mut(valid_steps, step_rows=[1, 2]), id="step_rows_length_mismatch"),
     pytest.param(lambda: _mut(valid_steps, step_rows=[1, 2, 99]), id="step_rows_out_of_range"),
     pytest.param(lambda: _mut(valid_steps, step_labels=["a", "b"]), id="step_labels_length_mismatch"),
@@ -389,7 +389,7 @@ def test_max_length_completion_message_passes() -> None:
 
 def test_max_total_steps_passes() -> None:
     """total_steps at the documented ceiling is accepted; one over is rejected."""
-    assert_valid_activity_content(_mut(valid_steps, total_steps=20, current_step=20))
+    assert_valid_activity_content(_mut(valid_steps, total_steps=64, current_step=64))
 
 
 # --- targeted matches: a rejection must fire for the RIGHT reason -----------
@@ -397,7 +397,7 @@ def test_max_total_steps_passes() -> None:
 
 def test_rejections_pin_the_offending_rule() -> None:
     with pytest.raises(PushWardContractError, match="total_steps must be"):
-        assert_valid_activity_content(_mut(valid_steps, total_steps=21))
+        assert_valid_activity_content(_mut(valid_steps, total_steps=65))
     with pytest.raises(PushWardContractError, match="warning_threshold"):
         assert_valid_activity_content(_mut(valid_countdown, warning_threshold=99999))
     with pytest.raises(PushWardContractError, match="snooze_seconds"):

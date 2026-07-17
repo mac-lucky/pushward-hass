@@ -42,6 +42,7 @@ CONF_SUBTITLE_ATTRIBUTE = "subtitle_attribute"
 CONF_STATE_LABELS = "state_labels"
 CONF_ENDED_TTL = "ended_ttl"
 CONF_STALE_TTL = "stale_ttl"
+CONF_DISMISSAL_TTL = "dismissal_ttl"
 CONF_COMPLETION_MESSAGE = "completion_message"
 CONF_URL = "url"
 CONF_SECONDARY_URL = "secondary_url"
@@ -146,7 +147,7 @@ DEFAULT_TAP_ACTION_FOREGROUND = True
 # Validation ranges
 PRIORITY_MIN = 0
 PRIORITY_MAX = 10
-TOTAL_STEPS_MAX = 20
+TOTAL_STEPS_MAX = 64  # server MaxTotalSteps
 UPDATE_INTERVAL_MIN = 1
 WARNING_THRESHOLD_MAX = 86400  # 24 h
 SNOOZE_SECONDS_MIN = 60

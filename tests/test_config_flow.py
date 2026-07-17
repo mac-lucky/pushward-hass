@@ -51,6 +51,7 @@ from custom_components.pushward.const import (
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
+    CONF_DISMISSAL_TTL,
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_FIRED_AT_ATTRIBUTE,
@@ -882,6 +883,33 @@ async def test_subentry_reconfigure(hass: HomeAssistant) -> None:
     subentry = entry.subentries[subentry_id]
     assert subentry.data[CONF_ACTIVITY_NAME] == "My Washer"
     assert subentry.data[CONF_PRIORITY] == 5
+
+
+async def test_subentry_dismissal_ttl_round_trips(hass: HomeAssistant) -> None:
+    """dismissal_ttl persists through the add flow and survives a reconfigure that changes it."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_DISMISSAL_TTL: 60})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentry_id = next(iter(entry.subentries))
+    assert entry.subentries[subentry_id].data[CONF_DISMISSAL_TTL] == 60
+
+    # Reconfigure: the stored value rehydrates as the field default, and 0 (remove
+    # immediately) is a valid new value that must persist rather than read as "unset".
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(),
+    )
+    assert result["step_id"] == "details"
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("generic", **{CONF_DISMISSAL_TTL: 0}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_DISMISSAL_TTL] == 0
 
 
 # --- Template auto-suggestion tests ---
@@ -1762,6 +1790,19 @@ def test_parse_entity_input_warning_threshold_int_or_none() -> None:
 
     result_without = _parse_entity_input(_base_user_input())
     assert result_without[CONF_WARNING_THRESHOLD] is None
+
+
+def test_parse_entity_input_dismissal_ttl_int_or_none() -> None:
+    """dismissal_ttl is stored as int (incl. 0) when provided, None when omitted."""
+    result = _parse_entity_input(_base_user_input(**{CONF_DISMISSAL_TTL: 60.0}))
+    assert result[CONF_DISMISSAL_TTL] == 60
+    assert isinstance(result[CONF_DISMISSAL_TTL], int)
+
+    result_zero = _parse_entity_input(_base_user_input(**{CONF_DISMISSAL_TTL: 0}))
+    assert result_zero[CONF_DISMISSAL_TTL] == 0
+
+    result_none = _parse_entity_input(_base_user_input())
+    assert result_none[CONF_DISMISSAL_TTL] is None
 
 
 # --- Companion source entity tests ---

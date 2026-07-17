@@ -27,6 +27,7 @@ from custom_components.pushward.api import (
     PushWardNotFoundError,
 )
 from custom_components.pushward.const import (
+    CONF_DISMISSAL_TTL,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
@@ -489,7 +490,7 @@ async def test_stale_end_skips_ended_after_restart(hass: HomeAssistant) -> None:
 async def test_create_activity_with_custom_ttls(hass: HomeAssistant) -> None:
     """When TTLs are configured, they are passed to create_activity."""
     api = _mock_api()
-    config = _entity_config(**{CONF_ENDED_TTL: 60, CONF_STALE_TTL: 120})
+    config = _entity_config(**{CONF_ENDED_TTL: 60, CONF_STALE_TTL: 120, CONF_DISMISSAL_TTL: 45})
     manager = ActivityManager(hass, api, [config], _mock_entry())
 
     hass.states.async_set("binary_sensor.washer", "on")
@@ -500,6 +501,7 @@ async def test_create_activity_with_custom_ttls(hass: HomeAssistant) -> None:
     call_kwargs = api.create_activity.call_args
     assert call_kwargs[1]["ended_ttl"] == 60
     assert call_kwargs[1]["stale_ttl"] == 120
+    assert call_kwargs[1]["dismissal_ttl"] == 45
 
     await manager.async_stop()
 

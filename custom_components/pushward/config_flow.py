@@ -47,6 +47,7 @@ from .const import (
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
+    CONF_DISMISSAL_TTL,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
@@ -128,6 +129,8 @@ from .const import (
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_VALUE_SCALE,
     DEFAULT_WIDGET_POLL_INTERVAL,
+    DISMISSAL_TTL_MAX,
+    DISMISSAL_TTL_MIN,
     DOMAIN,
     LIVE_PROGRESS_TEMPLATES,
     LOG_MAX_COLUMNS,
@@ -373,6 +376,12 @@ def _details_schema(
         vol.Optional(CONF_STALE_TTL, default=stale_ttl_val)
         if stale_ttl_val is not None
         else vol.Optional(CONF_STALE_TTL)
+    )
+    dismissal_ttl_val = d.get(CONF_DISMISSAL_TTL)
+    dismissal_ttl_key = (
+        vol.Optional(CONF_DISMISSAL_TTL, default=dismissal_ttl_val)
+        if dismissal_ttl_val is not None
+        else vol.Optional(CONF_DISMISSAL_TTL)
     )
 
     fields: dict = {}
@@ -810,6 +819,14 @@ def _details_schema(
             unit_of_measurement="seconds",
         )
     )
+    fields[dismissal_ttl_key] = NumberSelector(
+        NumberSelectorConfig(
+            min=DISMISSAL_TTL_MIN,
+            max=DISMISSAL_TTL_MAX,
+            mode=NumberSelectorMode.BOX,
+            unit_of_measurement="seconds",
+        )
+    )
 
     return vol.Schema(fields)
 
@@ -1156,6 +1173,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     # Parse TTLs: NumberSelector returns float, convert to int or None
     ended_ttl = user_input.get(CONF_ENDED_TTL)
     stale_ttl = user_input.get(CONF_STALE_TTL)
+    dismissal_ttl = user_input.get(CONF_DISMISSAL_TTL)
 
     # Validate URLs (allow http/https + custom schemes; silent mode requires http(s))
     tap_action_url = user_input.get(CONF_TAP_ACTION_URL, "").strip()
@@ -1236,6 +1254,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_TAP_ACTION_FOREGROUND: tap_action_foreground,
         CONF_ENDED_TTL: int(ended_ttl) if ended_ttl is not None else None,
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
+        CONF_DISMISSAL_TTL: int(dismissal_ttl) if dismissal_ttl is not None else None,
         CONF_SERIES: series,
         CONF_SERIES_ENTITIES: series_entities,
         CONF_PRIMARY_SERIES: (user_input.get(CONF_PRIMARY_SERIES) or "").strip(),

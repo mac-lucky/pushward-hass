@@ -36,6 +36,7 @@ from .const import (
     ACTIVITY_STATE_ONGOING,
     CONF_ACTIVITY_NAME,
     CONF_CURRENT_STEP_ENTITY,
+    CONF_DISMISSAL_TTL,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
@@ -637,6 +638,7 @@ class ActivityManager:
             config.get(CONF_PRIORITY, 1),
             ended_ttl=config.get(CONF_ENDED_TTL),
             stale_ttl=config.get(CONF_STALE_TTL),
+            dismissal_ttl=config.get(CONF_DISMISSAL_TTL),
         )
 
     async def _seed_timeline_history(
