@@ -457,6 +457,41 @@ async def test_retry_after_http_date(mock_sleep):
     assert 0 < delay <= 5
 
 
+def test_parse_retry_after_clamped_to_max():
+    """Retry-After is clamped to RETRY_MAX_DELAY so a hostile/large value can't park a slot.
+
+    The request+retry loop sleeps while holding a shared concurrency-semaphore slot, so an
+    unbounded Retry-After (numeric or an HTTP-date far in the future) must not exceed the cap.
+    """
+    parse = PushWardApiClient._parse_retry_after
+    # Small honest values pass through untouched.
+    assert parse("5") == 5.0
+    # A large numeric value is clamped to the cap, not obeyed literally.
+    assert parse("600") == RETRY_MAX_DELAY
+    assert parse(str(RETRY_MAX_DELAY + 1)) == RETRY_MAX_DELAY
+    # An HTTP-date far in the future clamps to the cap as well.
+    future = format_datetime(datetime.now(UTC) + timedelta(hours=1), usegmt=True)
+    assert parse(future) == RETRY_MAX_DELAY
+    # Empty / unparseable headers fall back to 0 (caller then uses its own backoff).
+    assert parse("") == 0
+    assert parse("not-a-date") == 0
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_retry_after_large_value_clamped_on_429(mock_sleep):
+    """A 429 with a large Retry-After sleeps at most RETRY_MAX_DELAY, not the raw header."""
+    session = _make_session(
+        _mock_response(429, headers={"Retry-After": "600"}),
+        _mock_response(200),
+    )
+    client = _make_client(session)
+
+    await client.update_activity("test-slug", "ongoing", {"progress": 0.5})
+
+    delay = mock_sleep.call_args_list[0].args[0]
+    assert delay == RETRY_MAX_DELAY
+
+
 def test_backoff_delay_jitter_bounds():
     """Backoff stays within [base/2, base] so retries never sync in lockstep."""
     for attempt in range(6):

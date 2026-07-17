@@ -424,15 +424,19 @@ class PushWardApiClient:
 
     @staticmethod
     def _parse_retry_after(header: str) -> float:
+        # Clamp to RETRY_MAX_DELAY: the request+retry loop holds one of the shared
+        # MAX_CONCURRENT_REQUESTS semaphore slots while it sleeps, so an honest large
+        # value (or a hostile/misconfigured header) must not park that slot for
+        # minutes and starve concurrent pushes.
         if not header:
             return 0
         try:
-            return float(header)
+            return min(float(header), RETRY_MAX_DELAY)
         except ValueError:
             pass
         try:
             dt = parsedate_to_datetime(header)
             delta = dt.timestamp() - time.time()
-            return max(0, delta)
+            return min(max(0, delta), RETRY_MAX_DELAY)
         except (ValueError, TypeError):
             return 0
