@@ -152,7 +152,7 @@ from custom_components.pushward.const import (
     validate_url,
 )
 
-from .conftest import make_entity_config, make_mock_state
+from .conftest import make_entity_config, make_mock_state, make_widget_config
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -1751,6 +1751,10 @@ async def test_reconfigure_legacy_board_tile_over_cap_label_submits(hass: HomeAs
     result = await _reconfigure_to_details(hass, entry, subentry_id, "board")
     tiles = _all_field_defaults(result["data_schema"])[CONF_TILES]
     assert len(tiles[0][CONF_LABEL]) == BOARD_TILE_LABEL_MAX
+    # Only the form default is truncated - storage stays untouched until the user
+    # submits, so the original 40-char label is still stored raw (the truncation
+    # builds fresh dicts rather than mutating the stored list in place).
+    assert len(entry.subentries[subentry_id].data[CONF_TILES][0][CONF_LABEL]) == 40
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
@@ -1759,6 +1763,54 @@ async def test_reconfigure_legacy_board_tile_over_cap_label_submits(hass: HomeAs
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
     assert len(entry.subentries[subentry_id].data[CONF_TILES][0][CONF_LABEL]) == BOARD_TILE_LABEL_MAX
+
+
+async def test_reconfigure_legacy_widget_stat_row_over_cap_submits(hass: HomeAssistant) -> None:
+    """A stored stat_list widget with over-cap label/unit is truncated on rehydration and submits."""
+    over_label = "x" * (WIDGET_STAT_LABEL_MAX + 8)
+    over_unit = "u" * (WIDGET_STAT_UNIT_MAX + 8)
+    widget = make_widget_config(
+        widget_template=WIDGET_TEMPLATE_STAT_LIST,
+        stat_rows=[{CONF_LABEL: over_label, CONF_ENTITY_ID: "sensor.users", CONF_UNIT: over_unit}],
+    )
+    entry = _mock_entry(
+        subentries_data=[
+            ConfigSubentryData(
+                data=widget,
+                subentry_type=SUBENTRY_TYPE_WIDGET,
+                title=widget[CONF_WIDGET_NAME],
+                unique_id=widget[CONF_SLUG],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    assert result["step_id"] == "reconfigure"
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST},
+    )
+    assert result["step_id"] == "details"
+
+    # The form default is truncated to the caps...
+    rows = _all_field_defaults(result["data_schema"])[CONF_STAT_ROWS]
+    assert len(rows[0][CONF_LABEL]) == WIDGET_STAT_LABEL_MAX
+    assert len(rows[0][CONF_UNIT]) == WIDGET_STAT_UNIT_MAX
+    # ...while storage stays untouched until the user submits (fresh dicts, no aliasing).
+    stored = entry.subentries[subentry_id].data[CONF_STAT_ROWS]
+    assert len(stored[0][CONF_LABEL]) == WIDGET_STAT_LABEL_MAX + 8
+    assert len(stored[0][CONF_UNIT]) == WIDGET_STAT_UNIT_MAX + 8
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    stored = entry.subentries[subentry_id].data[CONF_STAT_ROWS]
+    assert len(stored[0][CONF_LABEL]) == WIDGET_STAT_LABEL_MAX
+    assert len(stored[0][CONF_UNIT]) == WIDGET_STAT_UNIT_MAX
 
 
 async def test_reconfigure_legacy_unknown_primary_series_submits(hass: HomeAssistant) -> None:

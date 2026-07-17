@@ -15,6 +15,7 @@ Without this the frontend falls back to the bare option value ("stat_list",
 
 from __future__ import annotations
 
+import ast
 import functools
 import json
 from pathlib import Path
@@ -44,6 +45,7 @@ from custom_components.pushward.const import (
 )
 
 _TRANSLATIONS = Path(__file__).parent.parent / "custom_components" / "pushward" / "translations"
+_CONFIG_FLOW = Path(__file__).parent.parent / "custom_components" / "pushward" / "config_flow.py"
 
 # translation_key -> the ordered wire values each SelectSelector renders. The
 # `selector.<key>.options` block in every translations/<lang>.json must carry a
@@ -391,3 +393,51 @@ def test_remaining_time_labelled_both_top_level_and_in_data_sources_en() -> None
     for field in ("remaining_time_entity", "remaining_time_attribute"):
         assert field in details["data"], f"en: top-level data missing {field}"
         assert field in details["sections"]["data_sources"]["data"], f"en: data_sources.data missing {field}"
+
+
+# ---------------------------------------------------------------------------
+# Raised-error-code coverage
+#
+# Every validation error the config flow raises with a string-literal code must have
+# a label in en.json, or the HA UI shows the bare code ("invalid_tile") to the user.
+# ---------------------------------------------------------------------------
+
+
+@functools.cache
+def _config_flow_error_codes() -> frozenset[str]:
+    """Every literal code raised via ``vol.Invalid("code", ...)`` in config_flow.py.
+
+    Parsed from the source with ``ast`` so a newly added code is caught without a
+    running flow. Codes raised from a variable (the URL-error batcher re-raises its
+    computed code) can't be resolved statically and are skipped.
+    """
+    tree = ast.parse(_CONFIG_FLOW.read_text())
+    codes: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if not (isinstance(func, ast.Attribute) and func.attr == "Invalid"):
+            continue
+        if not (isinstance(func.value, ast.Name) and func.value.id == "vol"):
+            continue
+        if node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
+            codes.add(node.args[0].value)
+    return frozenset(codes)
+
+
+def _en_error_codes() -> set[str]:
+    """Union of error codes translated across config.error + both subentry error blocks."""
+    en = _en_translations()
+    codes: set[str] = set(en["config"]["error"])
+    for flow in ("tracked_entity", "tracked_widget"):
+        codes |= set(en["config_subentries"][flow]["error"])
+    return codes
+
+
+def test_every_raised_error_code_is_translated() -> None:
+    """Each vol.Invalid("code") in config_flow.py has a label in en.json (else the UI shows the raw code)."""
+    raised = _config_flow_error_codes()
+    assert raised, "no vol.Invalid literal codes found - the AST scan regressed"
+    untranslated = sorted(raised - _en_error_codes())
+    assert not untranslated, f"error codes with no en.json translation: {untranslated}"

@@ -58,6 +58,7 @@ from .const import (
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
+    CONF_SERIES_ATTRIBUTE,
     CONF_SERIES_ENTITIES,
     CONF_SEVERITY,
     CONF_SEVERITY_LABEL,
@@ -76,6 +77,8 @@ from .const import (
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
+    CONF_TILE_COLOR,
+    CONF_TILE_URL_ACTION,
     CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
@@ -464,15 +467,15 @@ def _build_board_tiles(entity_config: dict, hass: HomeAssistant | None) -> list[
         icon = resolve_icon(tile_state, tile, registry_icon=lookup_registry_icon(hass, entity_id))
         if icon:
             out["icon"] = icon[:BOARD_TILE_ICON_MAX]
-        color = color_to_str(tile.get("color", "") or "")
+        color = color_to_str(tile.get(CONF_TILE_COLOR, "") or "")
         if color:
-            out["color"] = color
+            out[CONF_TILE_COLOR] = color
         trend = tile.get("trend")
         if trend in BOARD_TRENDS:
             out["trend"] = trend
-        url_action = build_tap_action(str(tile.get("url_action") or ""), foreground=True)
+        url_action = build_tap_action(str(tile.get(CONF_TILE_URL_ACTION) or ""), foreground=True)
         if url_action is not None:
-            out["url_action"] = url_action
+            out[CONF_TILE_URL_ACTION] = url_action
         tiles_out.append(out)
         if len(tiles_out) >= BOARD_MAX_TILES:
             break
@@ -739,7 +742,7 @@ def map_content(
         if units:
             content["units"] = units
         primary = _get_timeline_primary(state, entity_config)
-        if primary and len(primary) <= 32:
+        if primary and len(primary) <= TIMELINE_SERIES_LABEL_MAX:
             content["primary_series"] = primary
         content["progress"] = 0.0
     elif template == "board":
@@ -1103,7 +1106,7 @@ def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant 
         source = hass.states.get(entity_id)
         if source is None or source.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             continue
-        attr = series.get("attribute")
+        attr = series.get(CONF_SERIES_ATTRIBUTE)
         raw = source.attributes.get(attr) if attr else source.state
         if raw is None:
             continue

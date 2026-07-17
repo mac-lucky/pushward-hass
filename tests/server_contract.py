@@ -28,6 +28,7 @@ import time
 from urllib.parse import urlparse
 
 from custom_components.pushward.const import (
+    ACTIVITY_UNIT_MAX,
     BOARD_MAX_TILES,
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
@@ -50,6 +51,9 @@ from custom_components.pushward.const import (
     SNOOZE_SECONDS_MAX,
     SNOOZE_SECONDS_MIN,
     SOUNDS,
+    STEP_LABEL_MAX,
+    STEP_ROW_MAX,
+    STEP_ROW_MIN,
     TEMPLATES,
     THRESHOLD_LABEL_MAX,
     THRESHOLDS_MAX,
@@ -77,10 +81,6 @@ from custom_components.pushward.content_mapper import _COLOR_HEX_RE, _COLOR_NAME
 # once here so the contract validator can't drift. Do NOT alias these onto unrelated
 # const.py symbols that merely share a value (that would couple distinct fields).
 ICON_MAX = 128
-ACTIVITY_UNIT_MAX = 32  # config_flow caps gauge/timeline unit at 32
-STEP_LABEL_MAX = 32
-STEP_ROW_MIN = 1
-STEP_ROW_MAX = 10
 TIMELINE_DECIMALS_MIN = 0
 TIMELINE_DECIMALS_MAX = 10
 # Promoted to const.py (single source of truth); aliased here for the assertions

@@ -38,6 +38,9 @@ from homeassistant.helpers.selector import (
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
+    ACTIVITY_TTL_MAX,
+    ACTIVITY_TTL_MIN,
+    ACTIVITY_UNIT_MAX,
     APP_STORE_URL,
     BOARD_MAX_TILES,
     BOARD_TILE_ICON_MAX,
@@ -81,6 +84,7 @@ from .const import (
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
     CONF_SERIES,
+    CONF_SERIES_ATTRIBUTE,
     CONF_SERIES_ENTITIES,
     CONF_SERVER_URL,
     CONF_SEVERITY,
@@ -106,6 +110,8 @@ from .const import (
     CONF_TEXT_COLOR,
     CONF_TEXT_COLOR_ATTRIBUTE,
     CONF_THRESHOLDS,
+    CONF_TILE_COLOR,
+    CONF_TILE_URL_ACTION,
     CONF_TILES,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
@@ -199,9 +205,6 @@ _INTEGRATION_KEY_SCHEMA = vol.Schema(
     }
 )
 
-_TTL_MIN = 1
-_TTL_MAX = 2592000  # 30 days
-
 # Object-selector row editors for the two Required structured fields (board tiles,
 # widget stat_rows). Field keys equal the stored dict keys so a stored list feeds
 # straight back as the editor's value on reconfigure - no serialize/parse round
@@ -240,8 +243,8 @@ _BOARD_TILES_SELECTOR = ObjectSelector(
             CONF_VALUE_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
             CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
             CONF_ICON: {"label": "Icon", "selector": _ROW_ICON},
-            "color": {"label": "Color", "selector": _ROW_NAMED_COLOR},
-            "url_action": {"label": "URL", "selector": _ROW_URL},
+            CONF_TILE_COLOR: {"label": "Color", "selector": _ROW_NAMED_COLOR},
+            CONF_TILE_URL_ACTION: {"label": "URL", "selector": _ROW_URL},
         },
         multiple=True,
         label_field=CONF_LABEL,
@@ -263,11 +266,8 @@ _WIDGET_STAT_ROWS_SELECTOR = ObjectSelector(
     )
 )
 
-# Timeline series entities (each row binds a separate entity as a named line). Same
-# text-field-for-entity rationale as the board tiles above: an empty entity string
-# reaches the parse layer as our translated invalid_series_entity instead of a raw
-# schema-side rejection. The stored dicts use the bare "attribute" key (not
-# CONF_VALUE_ATTRIBUTE), matching _parse_series_entities / content_mapper.
+# Timeline series entities (each row binds a separate entity as a named line).
+# Text field, not an entity selector - see the note on _BOARD_TILES_SELECTOR above.
 _ROW_NUMBER_ANY = {"number": {"mode": "box", "step": "any"}}
 
 _SERIES_ENTITIES_SELECTOR = ObjectSelector(
@@ -275,7 +275,7 @@ _SERIES_ENTITIES_SELECTOR = ObjectSelector(
         fields={
             CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
             CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
-            "attribute": {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_SERIES_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
         },
         multiple=True,
         label_field=CONF_LABEL,
@@ -301,17 +301,16 @@ _THRESHOLDS_SELECTOR = ObjectSelector(
 )
 
 # Log columns: label, an optional entity, an optional attribute, and an optional
-# unit. Entity is a text field (leaving it empty is the common bare-attribute case,
-# which an entity selector would reject with a raw untranslated error). Source
-# semantics are governed by the parse layer: empty entity + attribute = a tracked-
-# entity attribute; entity + empty attribute = another entity's state; both = that
-# entity's attribute.
+# unit. Entity is a text field, not an entity selector - see the note on
+# _BOARD_TILES_SELECTOR above. Source semantics are governed by the parse layer:
+# empty entity + attribute = a tracked-entity attribute; entity + empty attribute =
+# another entity's state; both = that entity's attribute.
 _LOG_COLUMNS_SELECTOR = ObjectSelector(
     ObjectSelectorConfig(
         fields={
             CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
             CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
-            "attribute": {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_SERIES_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
             CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
         },
         multiple=True,
@@ -853,22 +852,12 @@ def _details_schema(
     # --- Template-specific fields ---
     if template in ("generic", "steps"):
         fields[_entity_source_key(CONF_PROGRESS_ENTITY, d)] = entity_selector
-        fields[
-            vol.Optional(
-                CONF_PROGRESS_ATTRIBUTE,
-                description={"suggested_value": d.get(CONF_PROGRESS_ATTRIBUTE, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_PROGRESS_ATTRIBUTE, d)] = attr_selector
     # live_progress derives its window from the remaining-time source, so every
     # template offering the toggle below must offer the source here too.
     if template == "countdown" or template in LIVE_PROGRESS_TEMPLATES:
         fields[_entity_source_key(CONF_REMAINING_TIME_ENTITY, d)] = entity_selector
-        fields[
-            vol.Optional(
-                CONF_REMAINING_TIME_ATTR,
-                description={"suggested_value": d.get(CONF_REMAINING_TIME_ATTR, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_REMAINING_TIME_ATTR, d)] = attr_selector
     if template in LIVE_PROGRESS_TEMPLATES:
         # Interpolate the bar to full and count down an ETA on the device. On steps
         # the remaining time is read as the time left in the current step, so the
@@ -887,12 +876,7 @@ def _details_schema(
             )
         ] = NumberSelector(NumberSelectorConfig(min=1, max=TOTAL_STEPS_MAX, mode=NumberSelectorMode.BOX))
         fields[_entity_source_key(CONF_CURRENT_STEP_ENTITY, d)] = entity_selector
-        fields[
-            vol.Optional(
-                CONF_CURRENT_STEP_ATTR,
-                description={"suggested_value": d.get(CONF_CURRENT_STEP_ATTR, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_CURRENT_STEP_ATTR, d)] = attr_selector
         # One row per step (label / row height / weight / color) in step order. A
         # legacy per-key comma string is still accepted by _parse_entity_input.
         fields[_object_rows_key(CONF_STEPS_EDITOR, d, required=False)] = _STEPS_EDITOR_SELECTOR
@@ -916,20 +900,10 @@ def _details_schema(
             )
         ] = vol.All(str, vol.Length(max=MAX_SEVERITY_LABEL_LEN))
         fields[_entity_source_key(CONF_FIRED_AT_ENTITY, d)] = entity_selector
-        fields[
-            vol.Optional(
-                CONF_FIRED_AT_ATTRIBUTE,
-                description={"suggested_value": d.get(CONF_FIRED_AT_ATTRIBUTE, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_FIRED_AT_ATTRIBUTE, d)] = attr_selector
     if template == "gauge":
         fields[_entity_source_key(CONF_VALUE_ENTITY, d)] = entity_selector
-        fields[
-            vol.Optional(
-                CONF_VALUE_ATTRIBUTE,
-                description={"suggested_value": d.get(CONF_VALUE_ATTRIBUTE, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
         fields[
             vol.Required(
                 CONF_MIN_VALUE,
@@ -947,7 +921,7 @@ def _details_schema(
                 CONF_UNIT,
                 default=d.get(CONF_UNIT, ""),
             )
-        ] = vol.All(str, vol.Length(max=32))
+        ] = vol.All(str, vol.Length(max=ACTIVITY_UNIT_MAX))
     if template == "timeline":
         # Map attributes of the tracked entity to named series (a two-column row
         # editor: attribute -> label). A legacy 'attr=Label, ...' string is still accepted.
@@ -976,18 +950,13 @@ def _details_schema(
             )
         )
         fields[_entity_source_key(CONF_VALUE_ENTITY, d)] = entity_selector
-        fields[
-            vol.Optional(
-                CONF_VALUE_ATTRIBUTE,
-                description={"suggested_value": d.get(CONF_VALUE_ATTRIBUTE, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
         fields[
             vol.Optional(
                 CONF_UNIT,
                 default=d.get(CONF_UNIT, ""),
             )
-        ] = vol.All(str, vol.Length(max=32))
+        ] = vol.All(str, vol.Length(max=ACTIVITY_UNIT_MAX))
         fields[
             vol.Optional(
                 CONF_SCALE,
@@ -1042,12 +1011,7 @@ def _details_schema(
         fields[_object_rows_key(CONF_LOG_COLUMNS, d, required=False)] = _LOG_COLUMNS_SELECTOR
         # Optional attribute on the tracked entity supplying each line's level
         # (info/warn/error); the line text is the formatted state.
-        fields[
-            vol.Optional(
-                CONF_LOG_LEVEL_ATTRIBUTE,
-                description={"suggested_value": d.get(CONF_LOG_LEVEL_ATTRIBUTE, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_LOG_LEVEL_ATTRIBUTE, d)] = attr_selector
 
     # --- Identity fields ---
     fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(str, vol.Length(max=MAX_SLUG_LEN))
@@ -1057,18 +1021,8 @@ def _details_schema(
             default=d.get(CONF_ACTIVITY_NAME, ""),
         )
     ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
-    fields[
-        vol.Optional(
-            CONF_ICON,
-            description={"suggested_value": d.get(CONF_ICON, "")},
-        )
-    ] = IconSelector(IconSelectorConfig())
-    fields[
-        vol.Optional(
-            CONF_ICON_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_ICON_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
+    fields[_attr_suggest_key(CONF_ICON, d)] = IconSelector(IconSelectorConfig())
+    fields[_attr_suggest_key(CONF_ICON_ATTRIBUTE, d)] = attr_selector
     fields[
         vol.Optional(
             CONF_PRIORITY,
@@ -1098,12 +1052,7 @@ def _details_schema(
 
     # --- Optional fields ---
     fields[_entity_source_key(CONF_SUBTITLE_ENTITY, d)] = entity_selector
-    fields[
-        vol.Optional(
-            CONF_SUBTITLE_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_SUBTITLE_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
+    fields[_attr_suggest_key(CONF_SUBTITLE_ATTRIBUTE, d)] = attr_selector
     # Custom display text per state (a two-column row editor: state -> label). A
     # legacy 'state=Label, ...' string is still accepted by _parse_entity_input.
     fields[_object_rows_key(CONF_STATE_LABELS, d, required=False)] = _STATE_LABELS_SELECTOR
@@ -1147,26 +1096,11 @@ def _details_schema(
             )
         )
     fields[accent_key] = ColorRGBSelector()
-    fields[
-        vol.Optional(
-            CONF_ACCENT_COLOR_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_ACCENT_COLOR_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
+    fields[_attr_suggest_key(CONF_ACCENT_COLOR_ATTRIBUTE, d)] = attr_selector
     fields[bg_color_key] = ColorRGBSelector()
-    fields[
-        vol.Optional(
-            CONF_BACKGROUND_COLOR_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_BACKGROUND_COLOR_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
+    fields[_attr_suggest_key(CONF_BACKGROUND_COLOR_ATTRIBUTE, d)] = attr_selector
     fields[text_color_key] = ColorRGBSelector()
-    fields[
-        vol.Optional(
-            CONF_TEXT_COLOR_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_TEXT_COLOR_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
+    fields[_attr_suggest_key(CONF_TEXT_COLOR_ATTRIBUTE, d)] = attr_selector
     fields[
         vol.Optional(
             CONF_TAP_ACTION_URL,
@@ -1218,16 +1152,16 @@ def _details_schema(
         ] = vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN))
     fields[ended_ttl_key] = NumberSelector(
         NumberSelectorConfig(
-            min=_TTL_MIN,
-            max=_TTL_MAX,
+            min=ACTIVITY_TTL_MIN,
+            max=ACTIVITY_TTL_MAX,
             mode=NumberSelectorMode.BOX,
             unit_of_measurement="seconds",
         )
     )
     fields[stale_ttl_key] = NumberSelector(
         NumberSelectorConfig(
-            min=_TTL_MIN,
-            max=_TTL_MAX,
+            min=ACTIVITY_TTL_MIN,
+            max=ACTIVITY_TTL_MAX,
             mode=NumberSelectorMode.BOX,
             unit_of_measurement="seconds",
         )
@@ -1322,8 +1256,8 @@ def _strict_board_tile(item: object) -> dict:
     attr = str(item.get(CONF_VALUE_ATTRIBUTE, "") or "").strip()
     unit = str(item.get(CONF_UNIT, "") or "").strip()
     icon = str(item.get(CONF_ICON, "") or "").strip()
-    color = str(item.get("color", "") or "").strip()
-    url_action = str(item.get("url_action", "") or "").strip()
+    color = str(item.get(CONF_TILE_COLOR, "") or "").strip()
+    url_action = str(item.get(CONF_TILE_URL_ACTION, "") or "").strip()
     if len(label) > BOARD_TILE_LABEL_MAX or len(unit) > BOARD_TILE_UNIT_MAX or len(icon) > BOARD_TILE_ICON_MAX:
         raise vol.Invalid("invalid_tile", path=[CONF_TILES])
     if color and not is_valid_color(color):
@@ -1344,9 +1278,9 @@ def _strict_board_tile(item: object) -> dict:
     if icon:
         tile[CONF_ICON] = icon
     if color:
-        tile["color"] = color
+        tile[CONF_TILE_COLOR] = color
     if url_action:
-        tile["url_action"] = url_action
+        tile[CONF_TILE_URL_ACTION] = url_action
     return tile
 
 
@@ -1416,7 +1350,7 @@ def _strict_log_column(item: object) -> dict:
     if not isinstance(item, dict):
         raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
     entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
-    attr = str(item.get("attribute", "") or "").strip()
+    attr = str(item.get(CONF_SERIES_ATTRIBUTE, "") or "").strip()
     if not entity_id and not attr:
         raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
     label = str(item.get(CONF_LABEL, "") or "").strip()
@@ -1429,7 +1363,7 @@ def _strict_log_column(item: object) -> dict:
     if entity_id:
         column[CONF_ENTITY_ID] = entity_id
     if attr:
-        column["attribute"] = attr
+        column[CONF_SERIES_ATTRIBUTE] = attr
     if unit:
         column[CONF_UNIT] = unit
     return column
@@ -1514,13 +1448,13 @@ def _strict_series_entity(item: object) -> dict:
     entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
     if not entity_id:
         raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
-    attr = str(item.get("attribute", "") or "").strip()
+    attr = str(item.get(CONF_SERIES_ATTRIBUTE, "") or "").strip()
     label = str(item.get(CONF_LABEL, "") or "").strip()
     if len(label) > TIMELINE_SERIES_LABEL_MAX:
         raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
     series: dict = {CONF_ENTITY_ID: entity_id}
     if attr:
-        series["attribute"] = attr
+        series[CONF_SERIES_ATTRIBUTE] = attr
     if label:
         series[CONF_LABEL] = label
     return series
@@ -2152,12 +2086,7 @@ def _widget_details_schema(
 
     # Template-specific
     if template in (WIDGET_TEMPLATE_VALUE, WIDGET_TEMPLATE_PROGRESS, WIDGET_TEMPLATE_GAUGE):
-        fields[
-            vol.Optional(
-                CONF_VALUE_ATTRIBUTE,
-                description={"suggested_value": d.get(CONF_VALUE_ATTRIBUTE, "")},
-            )
-        ] = attr_selector
+        fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
         fields[
             vol.Optional(
                 CONF_UNIT,
@@ -2219,37 +2148,12 @@ def _widget_details_schema(
             default=d.get(CONF_LABEL, ""),
         )
     ] = vol.All(str, vol.Length(max=WIDGET_LABEL_MAX))
-    fields[
-        vol.Optional(
-            CONF_LABEL_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_LABEL_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
-    fields[
-        vol.Optional(
-            CONF_SUBTITLE_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_SUBTITLE_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
-    fields[
-        vol.Optional(
-            CONF_ICON,
-            description={"suggested_value": d.get(CONF_ICON, "")},
-        )
-    ] = IconSelector(IconSelectorConfig())
-    fields[
-        vol.Optional(
-            CONF_ICON_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_ICON_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
+    fields[_attr_suggest_key(CONF_LABEL_ATTRIBUTE, d)] = attr_selector
+    fields[_attr_suggest_key(CONF_SUBTITLE_ATTRIBUTE, d)] = attr_selector
+    fields[_attr_suggest_key(CONF_ICON, d)] = IconSelector(IconSelectorConfig())
+    fields[_attr_suggest_key(CONF_ICON_ATTRIBUTE, d)] = attr_selector
     fields[accent_key] = ColorRGBSelector()
-    fields[
-        vol.Optional(
-            CONF_ACCENT_COLOR_ATTRIBUTE,
-            description={"suggested_value": d.get(CONF_ACCENT_COLOR_ATTRIBUTE, "")},
-        )
-    ] = attr_selector
+    fields[_attr_suggest_key(CONF_ACCENT_COLOR_ATTRIBUTE, d)] = attr_selector
     fields[bg_color_key] = ColorRGBSelector()
     fields[text_color_key] = ColorRGBSelector()
 
@@ -2576,6 +2480,15 @@ def _entity_source_key(conf_key: str, current: dict) -> vol.Optional:
     return vol.Optional(conf_key)
 
 
+def _attr_suggest_key(conf_key: str, current: dict) -> vol.Optional:
+    """Build a vol.Optional key that pre-fills an attribute/icon field via suggested_value.
+
+    The shared shape for the attribute-picker and icon fields: an empty-string
+    suggested value so a cleared field submits as absent rather than a stale default.
+    """
+    return vol.Optional(conf_key, description={"suggested_value": current.get(conf_key, "")})
+
+
 def _parse_csv(value: str) -> list[str]:
     """Parse a comma-separated string into a list of stripped, non-empty items."""
     if not value:
@@ -2760,7 +2673,7 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
                     raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR]) from None
                 have_weights = False
             else:
-                if strict and (not math.isfinite(weight) or weight <= 0):
+                if strict and not _is_valid_step_weight(weight):
                     raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR])
                 weights.append(weight)
 
@@ -2821,9 +2734,7 @@ def _compose_steps_rows(config: dict) -> list[dict]:
     # strict length check, so drop it rather than pre-fill an unsubmittable form.
     if len(rows) != total:
         rows = []
-    weights_ok = all(
-        isinstance(w, (int, float)) and not isinstance(w, bool) and math.isfinite(w) and w > 0 for w in weights
-    )
+    weights_ok = all(_is_valid_step_weight(w) for w in weights)
     if len(weights) != total or not weights_ok:
         weights = []
     if len(colors) != total:
@@ -2876,6 +2787,11 @@ def _legacy_step_list(raw: object, parser) -> list:
 def _is_number(value: object) -> bool:
     """True for a real int/float (a JSON bool is not a number here)."""
     return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _is_valid_step_weight(value: object) -> bool:
+    """True for a positive, finite step weight (a JSON bool is not a number here)."""
+    return _is_number(value) and math.isfinite(value) and value > 0
 
 
 def _strict_threshold(item: object) -> dict:

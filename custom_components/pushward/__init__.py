@@ -63,6 +63,7 @@ from .const import (
     SUBENTRY_TYPE_WIDGET,
     TAP_ACTION_METHODS,
     TEMPLATES,
+    TIMELINE_SERIES_LABEL_MAX,
     USAGE_LIMIT_RESOURCES,
     usage_limit_issue_id,
     validate_action_headers,
@@ -250,7 +251,7 @@ _TIMELINE_TEMPLATE_FIELDS = {
     vol.Optional("unit"): str,
     vol.Optional("units"): dict,
     # Override the headline series (else the mapper auto-picks it). Server caps it at 32.
-    vol.Optional("primary_series"): vol.All(str, vol.Length(max=32)),
+    vol.Optional("primary_series"): vol.All(str, vol.Length(max=TIMELINE_SERIES_LABEL_MAX)),
     vol.Optional("scale"): vol.In(SCALES),
     vol.Optional("decimals"): vol.All(vol.Coerce(int), vol.Range(min=0, max=10)),
     vol.Optional("smoothing"): bool,

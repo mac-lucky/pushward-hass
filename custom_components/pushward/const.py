@@ -65,6 +65,9 @@ CONF_SERIES = "series"
 # time (the server merges series by label); the config flow edits them as a
 # comma-separated `[Label=]entity_id[:attribute]` string (mirrors board tiles).
 CONF_SERIES_ENTITIES = "series_entities"
+# Companion-attribute key inside a stored series-entity / log-column row dict (read a
+# named attribute of the row's entity rather than its state). Shared by both editors.
+CONF_SERIES_ATTRIBUTE = "attribute"
 # Timeline template: label of the series whose value drives the headline number
 # and the compact high/low range on iOS. Empty = auto (the tracked entity's own
 # series when one exists, else the first configured series entity).
@@ -95,6 +98,10 @@ CONF_UNITS = "units"
 # tile dicts ({label, entity_id, value_attribute?, unit?, icon?}); the config flow
 # edits them as a comma-separated string (mirrors widget stat_rows).
 CONF_TILES = "tiles"
+# Per-tile stored keys inside a board tile dict: a named/hex color and a per-tile
+# tap-action URL (wrapped into a foreground TapAction at render time).
+CONF_TILE_COLOR = "color"
+CONF_TILE_URL_ACTION = "url_action"
 # Log template: optional attribute supplying the per-line level (info/warn/error).
 CONF_LOG_LEVEL_ATTRIBUTE = "log_level_attribute"
 # Log template: optional extra columns composed into each line's text. A freeform
@@ -182,6 +189,8 @@ MAX_TAP_ACTION_BODY_LEN = 1024  # server maxTapActionBodyRunes
 MAX_TAP_ACTION_HEADERS_LEN = 1024  # server maxTapActionHeadersBytes (sum of name+value byte lengths)
 # Reply-with-text placeholder / send-button label caps; mirror the server's 64.
 MAX_TEXT_INPUT_LABEL_LEN = 64
+# Gauge/timeline display-unit cap (mirrors the server's activity unit length).
+ACTIVITY_UNIT_MAX = 32
 
 # Tap-action / action-button HTTP routing — mirrors pushward-server action_validation.go.
 # method/headers/body are only valid on http(s) URLs; custom-scheme URLs (homeassistant://,
@@ -261,9 +270,9 @@ WIDGET_TREND_FLAT = "flat"
 
 # Named colors the server accepts (mirrors server-side ValidateColor's
 # validNamedColors; must stay in sync with
-# pushward-server/internal/model/activity.go). Used both for the is_valid_color
-# check in content_mapper and as the option set for the named-color dropdowns in
-# the config flow (tile color, and the timeline thresholds color in a later phase).
+# pushward-server/internal/model/activity.go). Used for the is_valid_color check in
+# content_mapper and as the option set for the named-color dropdowns in the config
+# flow (tile color and timeline threshold color).
 NAMED_COLORS = (
     "red",
     "orange",
