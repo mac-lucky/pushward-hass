@@ -91,20 +91,16 @@ class PushWardApiClient:
         capped resources (free tier caps everything; premium omits the uncapped
         Live Activity / widget limits and switches notifications to a daily cap).
         Raises PushWardAuthError on 401/403 (bad/expired key) and PushWardApiError
-        on any other failure, so callers can map auth failures to reauth.
+        on any other failure, so callers can map auth failures to reauth. Goes
+        through the same retry/backoff as the write paths so a transient 429 or
+        5xx doesn't flip the usage sensors to unavailable for a whole poll cycle.
         """
-        try:
-            async with self._session.get(
-                f"{self._base_url}/auth/me",
-                headers=self._headers,
-                timeout=_TIMEOUT,
-            ) as resp:
-                if resp.status in (HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN):
-                    raise PushWardAuthError("Invalid integration key", status_code=resp.status)
-                resp.raise_for_status()
-                data = await resp.json()
-        except (aiohttp.ClientError, TimeoutError, OSError) as err:
-            raise PushWardApiError(f"Cannot connect to PushWard: {err}") from err
+        data = await self._request_with_retry(
+            "GET",
+            "/auth/me",
+            forbidden_is_auth=True,
+            return_json=True,
+        )
         if not isinstance(data, dict):
             raise PushWardApiError("Unexpected /auth/me response shape")
         return data
@@ -296,8 +292,15 @@ class PushWardApiClient:
         json: dict | None = None,
         handle_409: bool = False,
         allow_404: bool = False,
-    ) -> None:
-        """Execute an HTTP request with exponential backoff retry."""
+        forbidden_is_auth: bool = False,
+        return_json: bool = False,
+    ) -> Any:
+        """Execute an HTTP request with exponential backoff retry.
+
+        ``forbidden_is_auth`` maps 403 to PushWardAuthError (endpoints where a
+        403 means a bad/expired key, e.g. /auth/me). ``return_json`` parses and
+        returns the success body instead of None.
+        """
         async with self._request_semaphore:
             url = f"{self._base_url}{path}"
             last_error: Exception | None = None
@@ -308,15 +311,20 @@ class PushWardApiClient:
                         method, url, headers=self._headers, json=json, timeout=_TIMEOUT
                     ) as resp:
                         if resp.ok:
-                            return
+                            if not return_json:
+                                return None
+                            try:
+                                return await resp.json(content_type=None)
+                            except ValueError as err:
+                                raise PushWardApiError(f"{method} {path} returned invalid JSON") from err
 
                         if allow_404 and resp.status == HTTPStatus.NOT_FOUND:
-                            return
+                            return None
 
                         if handle_409 and resp.status == HTTPStatus.CONFLICT:
                             code, detail, raw = await self._parse_problem(resp)
                             if code == "activity.already_exists" or "already exists" in (detail or raw).lower():
-                                return
+                                return None
                             raise PushWardApiError(
                                 f"Activity limit reached: {self._truncate(detail or raw)}",
                                 status_code=resp.status,
@@ -329,6 +337,11 @@ class PushWardApiClient:
                             )
 
                         if resp.status == HTTPStatus.FORBIDDEN:
+                            if forbidden_is_auth:
+                                raise PushWardAuthError(
+                                    "Invalid integration key",
+                                    status_code=resp.status,
+                                )
                             _, detail, raw = await self._parse_problem(resp)
                             message = self._truncate(detail or raw) or "Forbidden"
                             if path.startswith("/widgets"):

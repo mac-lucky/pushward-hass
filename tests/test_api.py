@@ -31,31 +31,22 @@ from .conftest import make_mock_session as _make_session
 
 
 async def test_validate_connection_success():
-    resp = _mock_response(200)
-    session = AsyncMock(spec=aiohttp.ClientSession)
-    cm = AsyncMock()
-    cm.__aenter__ = AsyncMock(return_value=resp)
-    cm.__aexit__ = AsyncMock(return_value=False)
-    session.get = MagicMock(return_value=cm)
+    payload = {"id": "u1"}
+    session = _make_session(_mock_response(200, json_body=payload))
 
     client = _make_client(session)
     result = await client.validate_connection()
 
     assert result is True
-    session.get.assert_called_once()
-    call_kwargs = session.get.call_args
-    assert "/auth/me" in call_kwargs[0][0]
-    assert call_kwargs[1]["headers"]["Authorization"] == "Bearer test-key"
+    session.request.assert_called_once()
+    call = session.request.call_args
+    assert call[0][0] == "GET"
+    assert "/auth/me" in call[0][1]
+    assert call[1]["headers"]["Authorization"] == "Bearer test-key"
 
 
 async def test_validate_connection_auth_error():
-    resp = _mock_response(401)
-    session = AsyncMock(spec=aiohttp.ClientSession)
-    cm = AsyncMock()
-    cm.__aenter__ = AsyncMock(return_value=resp)
-    cm.__aexit__ = AsyncMock(return_value=False)
-    session.get = MagicMock(return_value=cm)
-
+    session = _make_session(_mock_response(401))
     client = _make_client(session)
     with pytest.raises(PushWardAuthError):
         await client.validate_connection()
@@ -64,29 +55,23 @@ async def test_validate_connection_auth_error():
 # --- get_me ---
 
 
-def _get_session(resp: AsyncMock) -> AsyncMock:
-    session = AsyncMock(spec=aiohttp.ClientSession)
-    cm = AsyncMock()
-    cm.__aenter__ = AsyncMock(return_value=resp)
-    cm.__aexit__ = AsyncMock(return_value=False)
-    session.get = MagicMock(return_value=cm)
-    return session
-
-
 async def test_get_me_returns_usage_dict():
     payload = {"id": "u1", "subscribed": False, "notifications_used": 7, "notifications_limit": 500}
-    session = _get_session(_mock_response(200, json_body=payload))
+    session = _make_session(_mock_response(200, json_body=payload))
     client = _make_client(session)
 
     result = await client.get_me()
 
     assert result == payload
-    assert "/auth/me" in session.get.call_args[0][0]
-    assert session.get.call_args[1]["headers"]["Authorization"] == "Bearer test-key"
+    call = session.request.call_args
+    assert call[0][0] == "GET"
+    assert "/auth/me" in call[0][1]
+    assert call[1]["headers"]["Authorization"] == "Bearer test-key"
 
 
 async def test_get_me_auth_error():
-    session = _get_session(_mock_response(403))
+    """403 on /auth/me means a bad/expired key, not a policy rejection."""
+    session = _make_session(_mock_response(403))
     client = _make_client(session)
     with pytest.raises(PushWardAuthError):
         await client.get_me()
@@ -95,10 +80,37 @@ async def test_get_me_auth_error():
 async def test_get_me_rejects_non_dict_body():
     resp = _mock_response(200)
     resp.json = AsyncMock(return_value=["not", "a", "dict"])
-    session = _get_session(resp)
+    session = _make_session(resp)
     client = _make_client(session)
     with pytest.raises(PushWardApiError):
         await client.get_me()
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_get_me_retries_429(mock_sleep):
+    """A transient 429 on the usage poll retries instead of failing the cycle."""
+    payload = {"id": "u1", "notifications_used": 7}
+    session = _make_session(
+        _mock_response(429, headers={"Retry-After": "1"}),
+        _mock_response(200, json_body=payload),
+    )
+    client = _make_client(session)
+
+    result = await client.get_me()
+
+    assert result == payload
+    assert session.request.call_count == 2
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_get_me_429_exhaustion_is_typed(mock_sleep):
+    session = _make_session(*[_mock_response(429) for _ in range(MAX_RETRIES)])
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError) as excinfo:
+        await client.get_me()
+
+    assert excinfo.value.status_code == 429
 
 
 # --- create_activity ---
