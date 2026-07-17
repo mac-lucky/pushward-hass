@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import contextlib
 import logging
+import math
 from collections.abc import Mapping
 from typing import Any
 from urllib.parse import urlparse
@@ -173,7 +173,7 @@ from .const import (
     WIDGET_UNIT_MAX,
     normalize_slug,
 )
-from .content_mapper import get_domain_defaults, sanitize_slug
+from .content_mapper import get_domain_defaults, is_valid_color, sanitize_slug
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -878,36 +878,53 @@ def _raise_url_errors(checks: list[tuple[str, str, bool]]) -> None:
 
 
 def _coerce_gauge_range(user_input: dict, *, is_gauge: bool) -> tuple[float, float]:
-    """Coerce min/max value pair; raise invalid_gauge_range if min >= max for gauge templates."""
+    """Coerce min/max value pair; raise invalid_gauge_range if min >= max for gauge templates.
+
+    nan/inf are caught first: a nan never trips the min >= max check (every
+    comparison with nan is False) so it would otherwise slip through.
+    """
     min_v = float(user_input.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE))
     max_v = float(user_input.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE))
+    bad = [key for key, val in ((CONF_MIN_VALUE, min_v), (CONF_MAX_VALUE, max_v)) if not math.isfinite(val)]
+    if bad:
+        raise vol.Invalid("invalid_number", path=bad)
     if is_gauge and min_v >= max_v:
         raise vol.Invalid("invalid_gauge_range", path=[CONF_MIN_VALUE])
     return min_v, max_v
 
 
-def _parse_board_tiles(raw: object) -> list[dict]:
+def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
     """Parse board tiles from a string ('label=entity_id[:attr[:unit[:icon]]], ...') or list.
 
     Mirrors ``_parse_widget_stat_rows``. Capped at BOARD_MAX_TILES. Each parsed tile
-    is ``{label, entity_id, value_attribute?, unit?, icon?}``.
+    is ``{label, entity_id, value_attribute?, unit?, icon?}``. Lenient (default)
+    skips malformed entries and truncates past the cap; strict (form paths) raises
+    invalid_tile / too_many_tiles instead.
     """
     if isinstance(raw, list):
         tiles = [t for t in raw if isinstance(t, dict) and t.get(CONF_ENTITY_ID) and t.get(CONF_LABEL)]
+        if strict and len(tiles) > BOARD_MAX_TILES:
+            raise vol.Invalid("too_many_tiles", path=[CONF_TILES])
         return tiles[:BOARD_MAX_TILES]
     if not isinstance(raw, str) or not raw.strip():
         return []
     tiles = []
     for entry in raw.split(","):
         entry = entry.strip()
+        if not entry:
+            continue
         if "=" not in entry:
+            if strict:
+                raise vol.Invalid("invalid_tile", path=[CONF_TILES])
             continue
         label, rest = entry.split("=", 1)
         label = label.strip()
         # maxsplit=3 keeps the icon (4th field) intact even when it contains a
-        # colon, e.g. an "mdi:cpu" MDI icon — otherwise the prefix would be lost.
+        # colon, e.g. an "mdi:cpu" MDI icon - otherwise the prefix would be lost.
         parts = [p.strip() for p in rest.split(":", 3)]
         if not label or not parts or not parts[0]:
+            if strict:
+                raise vol.Invalid("invalid_tile", path=[CONF_TILES])
             continue
         tile: dict = {CONF_LABEL: label, CONF_ENTITY_ID: parts[0]}
         if len(parts) > 1 and parts[1]:
@@ -917,9 +934,11 @@ def _parse_board_tiles(raw: object) -> list[dict]:
         if len(parts) > 3 and parts[3]:
             tile[CONF_ICON] = parts[3]
         tiles.append(tile)
-        if len(tiles) >= BOARD_MAX_TILES:
+        if not strict and len(tiles) >= BOARD_MAX_TILES:
             break
-    return tiles
+    if strict and len(tiles) > BOARD_MAX_TILES:
+        raise vol.Invalid("too_many_tiles", path=[CONF_TILES])
+    return tiles[:BOARD_MAX_TILES]
 
 
 def _serialize_board_tiles(tiles: list[dict]) -> str:
@@ -944,18 +963,22 @@ def _serialize_board_tiles(tiles: list[dict]) -> str:
     return ", ".join(parts)
 
 
-def _parse_log_columns(raw: object) -> list[dict]:
+def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
     """Parse log columns from a string ('[Label=]source[|unit], ...') or list.
 
     Mirrors ``_parse_board_tiles``. Capped at LOG_MAX_COLUMNS. ``source`` disambiguates:
-      - ``brightness`` (no dot)           → an attribute of the tracked entity
-      - ``binary_sensor.door`` (has a dot) → another entity's state
-      - ``sensor.temp:temperature``        → another entity's attribute
+      - ``brightness`` (no dot)            an attribute of the tracked entity
+      - ``binary_sensor.door`` (has a dot) another entity's state
+      - ``sensor.temp:temperature``        another entity's attribute
     ``|`` splits off an optional unit suffix; ``=`` splits off an optional label.
-    Each parsed column is ``{label?, entity_id?, attribute?, unit?}``.
+    Each parsed column is ``{label?, entity_id?, attribute?, unit?}``. Lenient
+    (default) skips malformed entries and truncates past the cap; strict (form
+    paths) raises invalid_log_column / too_many_log_columns instead.
     """
     if isinstance(raw, list):
         cols = [c for c in raw if isinstance(c, dict) and (c.get(CONF_ENTITY_ID) or c.get("attribute"))]
+        if strict and len(cols) > LOG_MAX_COLUMNS:
+            raise vol.Invalid("too_many_log_columns", path=[CONF_LOG_COLUMNS])
         return cols[:LOG_MAX_COLUMNS]
     if not isinstance(raw, str) or not raw.strip():
         return []
@@ -972,6 +995,8 @@ def _parse_log_columns(raw: object) -> list[dict]:
             entry, unit = (part.strip() for part in entry.split("|", 1))
         source = entry
         if not source:
+            if strict:
+                raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
             continue
         column: dict = {}
         if label:
@@ -979,6 +1004,8 @@ def _parse_log_columns(raw: object) -> list[dict]:
         if ":" in source:
             entity_id, attr = (part.strip() for part in source.split(":", 1))
             if not entity_id:
+                if strict:
+                    raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
                 continue
             column[CONF_ENTITY_ID] = entity_id
             if attr:
@@ -990,9 +1017,11 @@ def _parse_log_columns(raw: object) -> list[dict]:
         if unit:
             column[CONF_UNIT] = unit
         columns.append(column)
-        if len(columns) >= LOG_MAX_COLUMNS:
+        if not strict and len(columns) >= LOG_MAX_COLUMNS:
             break
-    return columns
+    if strict and len(columns) > LOG_MAX_COLUMNS:
+        raise vol.Invalid("too_many_log_columns", path=[CONF_LOG_COLUMNS])
+    return columns[:LOG_MAX_COLUMNS]
 
 
 def _serialize_log_columns(columns: list[dict]) -> str:
@@ -1022,13 +1051,14 @@ def _serialize_log_columns(columns: list[dict]) -> str:
     return ", ".join(parts)
 
 
-def _parse_series_entities(raw: object) -> list[dict]:
+def _parse_series_entities(raw: object, *, strict: bool = False) -> list[dict]:
     """Parse timeline series entities from a string ('[Label=]entity_id[:attribute], ...') or list.
 
     Mirrors ``_parse_board_tiles``. Each series binds a separate entity as a line:
     the entity's state, or one of its attributes ('entity_id:attribute'). ``source``
-    must be an entity_id (contains a dot); a bare word is not a series and is
-    skipped. The optional label is left raw here and frozen later by
+    must be an entity_id (contains a dot); a bare word is not a series. Lenient
+    (default) skips a bare word; strict (form paths) raises invalid_series_entity.
+    The optional label is left raw here and frozen later by
     ``_resolve_series_entity_labels``. Capped at TIMELINE_MAX_SERIES. Each parsed
     series is ``{label?, entity_id, attribute?}``.
     """
@@ -1047,11 +1077,15 @@ def _parse_series_entities(raw: object) -> list[dict]:
             label, entry = (part.strip() for part in entry.split("=", 1))
         source = entry
         if not source:
+            if strict:
+                raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
             continue
         series: dict = {}
         if ":" in source:
             entity_id, attr = (part.strip() for part in source.split(":", 1))
             if not entity_id or "." not in entity_id:
+                if strict:
+                    raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
                 continue
             series[CONF_ENTITY_ID] = entity_id
             if attr:
@@ -1059,6 +1093,8 @@ def _parse_series_entities(raw: object) -> list[dict]:
         elif "." in source:
             series[CONF_ENTITY_ID] = source
         else:
+            if strict:
+                raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
             continue
         if label:
             series[CONF_LABEL] = label
@@ -1143,9 +1179,32 @@ def _resolve_series_entity_labels(series_entities: list[dict], hass: HomeAssista
     return resolved
 
 
+def _timeline_series_labels(
+    series: dict, series_entities: list[dict], entity_id: str, hass: HomeAssistant | None
+) -> set[str]:
+    """Collect every label a timeline primary_series may legitimately name.
+
+    Mirrors how content_mapper labels series: CONF_SERIES values, each resolved
+    CONF_SERIES_ENTITIES label, and - when neither source is configured - the
+    single default series labelled with the tracked entity's friendly name (see
+    _get_timeline_values).
+    """
+    labels: set[str] = set(series.values())
+    labels.update(s[CONF_LABEL] for s in series_entities if s.get(CONF_LABEL))
+    if not series and not series_entities:
+        labels.add(_entity_friendly_name(hass, entity_id))
+    return labels
+
+
 def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> dict:
-    """Normalize user input into an entity config dict."""
+    """Normalize user input into an entity config dict.
+
+    Called only from the two subentry form paths, so the DSL parsers run in
+    strict mode: malformed tokens raise vol.Invalid instead of being silently
+    dropped, and the details step maps each exc.path field to its error code.
+    """
     entity_id = user_input[CONF_ENTITY_ID]
+    template = user_input.get(CONF_TEMPLATE, "generic")
     raw_slug = user_input.get(CONF_SLUG, "").strip()
     slug = (normalize_slug(raw_slug) if raw_slug else "") or sanitize_slug(entity_id)
 
@@ -1193,24 +1252,53 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         ]
     )
 
-    min_v, max_v = _coerce_gauge_range(user_input, is_gauge=user_input.get(CONF_TEMPLATE) == "gauge")
+    min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == "gauge")
 
     # Parse timeline fields
     series_raw = user_input.get(CONF_SERIES, "")
     series = _parse_state_labels(series_raw) if isinstance(series_raw, str) else series_raw or {}
     series_entities = _resolve_series_entity_labels(
-        _parse_series_entities(user_input.get(CONF_SERIES_ENTITIES, "")), hass
+        _parse_series_entities(user_input.get(CONF_SERIES_ENTITIES, ""), strict=True), hass
     )
     if len(series) + len(series_entities) > TIMELINE_MAX_SERIES:
         raise vol.Invalid("too_many_series", path=[CONF_SERIES_ENTITIES])
+    primary_series = (user_input.get(CONF_PRIMARY_SERIES) or "").strip()
+    if template == "timeline" and primary_series:
+        known_labels = _timeline_series_labels(series, series_entities, entity_id, hass)
+        if primary_series not in known_labels:
+            raise vol.Invalid("unknown_primary_series", path=[CONF_PRIMARY_SERIES])
     thresholds_raw = user_input.get(CONF_THRESHOLDS, "")
-    thresholds = _parse_thresholds(thresholds_raw) if isinstance(thresholds_raw, str) else thresholds_raw or []
+    if isinstance(thresholds_raw, str):
+        thresholds = _parse_thresholds(thresholds_raw, strict=True)
+    else:
+        thresholds = thresholds_raw or []
     history_period_raw = user_input.get(CONF_HISTORY_PERIOD, DEFAULT_HISTORY_PERIOD)
 
     # Board tiles: a board needs at least one tile to render.
-    tiles = _parse_board_tiles(user_input.get(CONF_TILES, ""))
-    if user_input.get(CONF_TEMPLATE) == "board" and not tiles:
+    tiles = _parse_board_tiles(user_input.get(CONF_TILES, ""), strict=True)
+    if template == "board" and not tiles:
         raise vol.Invalid("tiles_required", path=[CONF_TILES])
+
+    # Step lists: reject malformed tokens, then hold the manager's contract that
+    # any configured list must have exactly total_steps entries (the server
+    # drops a wrong-length list, so surface it here rather than silently).
+    step_rows = _parse_int_list(user_input.get(CONF_STEP_ROWS, ""), strict=True)
+    step_weights = _parse_float_list(user_input.get(CONF_STEP_WEIGHTS, ""), strict=True)
+    step_colors = _parse_color_list(user_input.get(CONF_STEP_COLORS, ""), strict=True)
+    log_columns = _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, ""), strict=True)
+    if template == "steps":
+        total_steps = int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS))
+        mismatched = [
+            field
+            for field, parsed in (
+                (CONF_STEP_ROWS, step_rows),
+                (CONF_STEP_WEIGHTS, step_weights),
+                (CONF_STEP_COLORS, step_colors),
+            )
+            if parsed and len(parsed) != total_steps
+        ]
+        if mismatched:
+            raise vol.Invalid("step_length_mismatch", path=mismatched)
 
     return {
         CONF_ENTITY_ID: entity_id,
@@ -1257,7 +1345,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_DISMISSAL_TTL: int(dismissal_ttl) if dismissal_ttl is not None else None,
         CONF_SERIES: series,
         CONF_SERIES_ENTITIES: series_entities,
-        CONF_PRIMARY_SERIES: (user_input.get(CONF_PRIMARY_SERIES) or "").strip(),
+        CONF_PRIMARY_SERIES: primary_series,
         CONF_SCALE: user_input.get(CONF_SCALE, DEFAULT_SCALE),
         CONF_DECIMALS: int(user_input.get(CONF_DECIMALS, DEFAULT_DECIMALS)),
         CONF_SMOOTHING: user_input.get(CONF_SMOOTHING, False),
@@ -1272,9 +1360,9 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         if user_input.get(CONF_SNOOZE_SECONDS) is not None
         else None,
         CONF_STEP_LABELS: _parse_state_labels(user_input.get(CONF_STEP_LABELS, "")),
-        CONF_STEP_ROWS: _parse_int_list(user_input.get(CONF_STEP_ROWS, "")),
-        CONF_STEP_WEIGHTS: _parse_float_list(user_input.get(CONF_STEP_WEIGHTS, "")),
-        CONF_STEP_COLORS: _parse_color_list(user_input.get(CONF_STEP_COLORS, "")),
+        CONF_STEP_ROWS: step_rows,
+        CONF_STEP_WEIGHTS: step_weights,
+        CONF_STEP_COLORS: step_colors,
         CONF_FIRED_AT_ATTRIBUTE: user_input.get(CONF_FIRED_AT_ATTRIBUTE, ""),
         CONF_FIRED_AT_ENTITY: user_input.get(CONF_FIRED_AT_ENTITY, ""),
         CONF_UNITS: _parse_state_labels(user_input.get(CONF_UNITS, "")),
@@ -1284,7 +1372,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_TEXT_COLOR_ATTRIBUTE: user_input.get(CONF_TEXT_COLOR_ATTRIBUTE, ""),
         CONF_TILES: tiles,
         CONF_LOG_LEVEL_ATTRIBUTE: user_input.get(CONF_LOG_LEVEL_ATTRIBUTE, ""),
-        CONF_LOG_COLUMNS: _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, "")),
+        CONF_LOG_COLUMNS: log_columns,
     }
 
 
@@ -1716,22 +1804,34 @@ def _widget_details_schema(
     return vol.Schema(fields)
 
 
-def _parse_widget_stat_rows(raw: object) -> list[dict]:
-    """Parse stat_rows from string ('label=entity_id[:attr[:unit]], ...') or list."""
+def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse stat_rows from string ('label=entity_id[:attr[:unit]], ...') or list.
+
+    Lenient (default) skips malformed entries and truncates past the cap; strict
+    (form paths) raises invalid_stat_row / too_many_stat_rows instead.
+    """
     if isinstance(raw, list):
         rows = [row for row in raw if isinstance(row, dict) and row.get(CONF_ENTITY_ID) and row.get(CONF_LABEL)]
+        if strict and len(rows) > WIDGET_MAX_STAT_ROWS:
+            raise vol.Invalid("too_many_stat_rows", path=[CONF_STAT_ROWS])
         return rows[:WIDGET_MAX_STAT_ROWS]
     if not isinstance(raw, str) or not raw.strip():
         return []
     rows: list[dict] = []
     for entry in raw.split(","):
         entry = entry.strip()
+        if not entry:
+            continue
         if "=" not in entry:
+            if strict:
+                raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
             continue
         label, rest = entry.split("=", 1)
         label = label.strip()
         parts = [p.strip() for p in rest.split(":")]
         if not label or not parts or not parts[0]:
+            if strict:
+                raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
             continue
         row: dict = {CONF_LABEL: label, CONF_ENTITY_ID: parts[0]}
         if len(parts) > 1 and parts[1]:
@@ -1739,9 +1839,11 @@ def _parse_widget_stat_rows(raw: object) -> list[dict]:
         if len(parts) > 2 and parts[2]:
             row[CONF_UNIT] = parts[2]
         rows.append(row)
-        if len(rows) >= WIDGET_MAX_STAT_ROWS:
+        if not strict and len(rows) >= WIDGET_MAX_STAT_ROWS:
             break
-    return rows
+    if strict and len(rows) > WIDGET_MAX_STAT_ROWS:
+        raise vol.Invalid("too_many_stat_rows", path=[CONF_STAT_ROWS])
+    return rows[:WIDGET_MAX_STAT_ROWS]
 
 
 def _serialize_widget_stat_rows(rows: list[dict]) -> str:
@@ -1771,7 +1873,7 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
 
     min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == WIDGET_TEMPLATE_GAUGE)
 
-    stat_rows = _parse_widget_stat_rows(user_input.get(CONF_STAT_ROWS, ""))
+    stat_rows = _parse_widget_stat_rows(user_input.get(CONF_STAT_ROWS, ""), strict=True)
     if template == WIDGET_TEMPLATE_STAT_LIST and not stat_rows:
         raise vol.Invalid("stat_rows_required", path=[CONF_STAT_ROWS])
 
@@ -1939,12 +2041,19 @@ def _parse_csv(value: str) -> list[str]:
     return [s.strip() for s in value.split(",") if s.strip()]
 
 
-def _parse_int_list(value: str) -> list[int]:
-    """Parse '1,2,3' into [1, 2, 3], silently skipping non-integer tokens."""
+def _parse_int_list(value: str, *, strict: bool = False) -> list[int]:
+    """Parse '1,2,3' into [1, 2, 3].
+
+    Lenient (default) silently skips non-integer tokens; strict (form paths)
+    raises invalid_step_rows, since a dropped token shifts every later row by one.
+    """
     result: list[int] = []
     for token in _parse_csv(value):
-        with contextlib.suppress(ValueError):
+        try:
             result.append(int(token))
+        except ValueError:
+            if strict:
+                raise vol.Invalid("invalid_step_rows", path=[CONF_STEP_ROWS]) from None
     return result
 
 
@@ -1957,16 +2066,26 @@ def _serialize_csv(values: list) -> str:
     return ", ".join(str(v) for v in values) if values else ""
 
 
-def _parse_float_list(value: str) -> list[float]:
+def _parse_float_list(value: str, *, strict: bool = False) -> list[float]:
     """Parse '1, 2.5, 3' into [1.0, 2.5, 3.0], skipping tokens float() rejects.
 
-    "nan" and "inf" are not among them - float() takes both. _clean_step_weights
-    is what drops those before they reach the server.
+    "nan" and "inf" are not among them - float() takes both. Lenient (default)
+    keeps them; _clean_step_weights drops them before they reach the server.
+    Strict (form paths) rejects any unparseable, non-finite, or non-positive
+    weight with invalid_step_weights - a weight is a relative step size, so zero
+    or negative has no meaning.
     """
     result: list[float] = []
     for token in _parse_csv(value):
-        with contextlib.suppress(ValueError):
-            result.append(float(token))
+        try:
+            parsed = float(token)
+        except ValueError:
+            if strict:
+                raise vol.Invalid("invalid_step_weights", path=[CONF_STEP_WEIGHTS]) from None
+            continue
+        if strict and (not math.isfinite(parsed) or parsed <= 0):
+            raise vol.Invalid("invalid_step_weights", path=[CONF_STEP_WEIGHTS])
+        result.append(parsed)
     return result
 
 
@@ -1977,17 +2096,24 @@ def _serialize_float_list(values: list[float]) -> str:
     return ", ".join(str(int(v)) if float(v).is_integer() else str(v) for v in values)
 
 
-def _parse_color_list(value: str) -> list[str]:
+def _parse_color_list(value: str, *, strict: bool = False) -> list[str]:
     """Parse 'red,,blue' into ['red', '', 'blue'], keeping empty entries.
 
     Positional, unlike _parse_csv: the server matches step_colors to steps by
     index and requires exactly total_steps entries, so dropping the empty token
     that leaves a step on the accent color would shift every later color by one
-    and fail the length check.
+    and fail the length check. Strict (form paths) rejects a non-empty token that
+    is neither a named color nor 6/8-digit hex with invalid_step_colors; blank
+    tokens stay legal (positional slots).
     """
     if not value:
         return []
-    return [s.strip() for s in value.split(",")]
+    tokens = [s.strip() for s in value.split(",")]
+    if strict:
+        for token in tokens:
+            if token and not is_valid_color(token):
+                raise vol.Invalid("invalid_step_colors", path=[CONF_STEP_COLORS])
+    return tokens
 
 
 def _parse_state_labels(value: str) -> dict[str, str]:
@@ -2013,11 +2139,14 @@ def _serialize_key_value_pairs(pairs: dict[str, str]) -> str:
     return ", ".join(f"{k}={v}" for k, v in pairs.items())
 
 
-def _parse_thresholds(value: str) -> list[dict]:
+def _parse_thresholds(value: str, *, strict: bool = False) -> list[dict]:
     """Parse 'value:color:label, ...' into threshold dicts.
 
     Format: value[:color[:label]], ...
     Example: '25:red:Hot, 18:blue:Cold, 20'
+
+    Lenient (default) skips a non-numeric value and truncates past 5; strict
+    (form paths) raises invalid_threshold / too_many_thresholds instead.
     """
     if not value:
         return []
@@ -2025,16 +2154,22 @@ def _parse_thresholds(value: str) -> list[dict]:
     for entry in value.split(","):
         parts = [p.strip() for p in entry.strip().split(":")]
         if not parts or not parts[0]:
+            if strict and entry.strip():
+                raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
             continue
         try:
             threshold: dict = {"value": float(parts[0])}
         except ValueError:
+            if strict:
+                raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS]) from None
             continue
         if len(parts) > 1 and parts[1]:
             threshold["color"] = parts[1]
         if len(parts) > 2 and parts[2]:
             threshold["label"] = parts[2]
         result.append(threshold)
+    if strict and len(result) > 5:
+        raise vol.Invalid("too_many_thresholds", path=[CONF_THRESHOLDS])
     return result[:5]
 
 

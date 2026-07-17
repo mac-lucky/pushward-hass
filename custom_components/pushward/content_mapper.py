@@ -134,6 +134,21 @@ _COLOR_NAMED = frozenset(
 )
 
 
+def is_valid_color(value: str) -> bool:
+    """Return True if value is a color the server accepts.
+
+    Same rule as ValidateColor: an allowlisted named color or 6/8-digit hex
+    (optional leading '#'). 3-digit '#rgb' is not accepted - the server rejects
+    it too. Empty/non-string is False.
+    """
+    if not isinstance(value, str):
+        return False
+    stripped = value.strip()
+    if not stripped:
+        return False
+    return bool(_COLOR_HEX_RE.match(stripped)) or stripped.lower() in _COLOR_NAMED
+
+
 def sanitize_slug(entity_id: str) -> str:
     """Convert an HA entity_id to a PushWard slug.
 

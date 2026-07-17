@@ -66,6 +66,7 @@ from custom_components.pushward.const import (
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_PRIMARY_SERIES,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
@@ -2509,3 +2510,500 @@ async def test_decimals_stored_as_int(hass: HomeAssistant) -> None:
     data = next(iter(entry.subentries.values())).data
     assert data[CONF_DECIMALS] == 2
     assert isinstance(data[CONF_DECIMALS], int)
+
+
+# --- Phase 1: strict DSL validation surfaces config-time form errors ---
+#
+# Each of these drives the real subentry flow: a schema-valid but semantically
+# broken submission is bounced back as a FORM with errors[field] == code, the
+# same path the HA UI renders. The bad values are all strings/floats the field
+# schema accepts, so they reach _parse_*_input rather than tripping voluptuous.
+
+
+async def _add_widget_subentry(
+    hass: HomeAssistant,
+    entry: MockConfigEntry,
+    template: str,
+    details: dict,
+    step1_extra: dict | None = None,
+) -> dict:
+    """Run both steps of the widget subentry add flow, returning the final result."""
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    step1 = {CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: template}
+    if step1_extra:
+        step1.update(step1_extra)
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=step1)
+    assert result["step_id"] == "details"
+    return await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=details)
+
+
+async def test_flow_step_length_mismatch(hass: HomeAssistant) -> None:
+    """A step list whose length != total_steps bounces on that field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_WEIGHTS: "1, 2"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEP_WEIGHTS: "step_length_mismatch"}
+
+
+async def test_flow_step_length_mismatch_groups_every_offending_field(hass: HomeAssistant) -> None:
+    """rows, weights, and colors that all mismatch light up together in one raise."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_ROWS: "1, 2",
+            CONF_STEP_WEIGHTS: "1, 2",
+            CONF_STEP_COLORS: "red, blue",
+        },
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {
+        CONF_STEP_ROWS: "step_length_mismatch",
+        CONF_STEP_WEIGHTS: "step_length_mismatch",
+        CONF_STEP_COLORS: "step_length_mismatch",
+    }
+
+
+async def test_flow_invalid_step_rows(hass: HomeAssistant) -> None:
+    """A non-integer step row bounces instead of shifting every later row."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_ROWS: "1, x, 3"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEP_ROWS: "invalid_step_rows"}
+
+
+async def test_flow_invalid_step_weights_non_positive(hass: HomeAssistant) -> None:
+    """A zero or negative step weight bounces (weights are relative sizes)."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_WEIGHTS: "1, 0, 2"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEP_WEIGHTS: "invalid_step_weights"}
+
+
+async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
+    """An unknown color name bounces; a blank slot would have been fine."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_COLORS: "red, chartreuse, blue"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEP_COLORS: "invalid_step_colors"}
+
+
+async def test_flow_invalid_tile(hass: HomeAssistant) -> None:
+    """A tile without label=entity_id bounces on the tiles field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="board",
+        details_overrides={CONF_TILES: "just some text"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_TILES: "invalid_tile"}
+
+
+async def test_flow_too_many_tiles(hass: HomeAssistant) -> None:
+    """More than BOARD_MAX_TILES tiles bounces instead of silently truncating."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    tiles = ", ".join(f"T{i}=sensor.s{i}" for i in range(BOARD_MAX_TILES + 1))
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="board",
+        details_overrides={CONF_TILES: tiles},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_TILES: "too_many_tiles"}
+
+
+async def test_flow_invalid_series_entity(hass: HomeAssistant) -> None:
+    """A bare word (no entity_id) as a series entity bounces."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_SERIES_ENTITIES: "brightness"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_SERIES_ENTITIES: "invalid_series_entity"}
+
+
+async def test_flow_invalid_log_column(hass: HomeAssistant) -> None:
+    """A column entry with an empty source bounces."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="log",
+        details_overrides={CONF_LOG_COLUMNS: "Label="},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_LOG_COLUMNS: "invalid_log_column"}
+
+
+async def test_flow_too_many_log_columns(hass: HomeAssistant) -> None:
+    """More than LOG_MAX_COLUMNS columns bounces."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    columns = ", ".join(f"sensor.s{i}" for i in range(LOG_MAX_COLUMNS + 1))
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="log",
+        details_overrides={CONF_LOG_COLUMNS: columns},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_LOG_COLUMNS: "too_many_log_columns"}
+
+
+async def test_flow_invalid_threshold(hass: HomeAssistant) -> None:
+    """A threshold that does not start with a number bounces."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_THRESHOLDS: "abc:red:Hot"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_THRESHOLDS: "invalid_threshold"}
+
+
+async def test_flow_too_many_thresholds(hass: HomeAssistant) -> None:
+    """More than 5 thresholds bounces instead of silently truncating."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_THRESHOLDS: "1, 2, 3, 4, 5, 6"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_THRESHOLDS: "too_many_thresholds"}
+
+
+async def test_flow_invalid_number_nan_gauge(hass: HomeAssistant) -> None:
+    """A nan min_value bounces as invalid_number (it never trips the min >= max check)."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="gauge",
+        details_overrides={CONF_MIN_VALUE: float("nan"), CONF_MAX_VALUE: 100.0},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_MIN_VALUE: "invalid_number"}
+
+
+async def test_flow_unknown_primary_series(hass: HomeAssistant) -> None:
+    """A primary_series naming no configured series label bounces.
+
+    With neither series nor series_entities set, the only valid label is the
+    entity's own default single-series label (its friendly name, or the
+    entity_id when the entity has no state yet); "Nope" is not it.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_PRIMARY_SERIES: "Nope"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_PRIMARY_SERIES: "unknown_primary_series"}
+
+
+async def test_flow_primary_series_matching_configured_label_passes(hass: HomeAssistant) -> None:
+    """A primary_series that matches a configured series-entity label is accepted."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_SERIES_ENTITIES: "Air=sensor.air_quality", CONF_PRIMARY_SERIES: "Air"},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    assert data[CONF_PRIMARY_SERIES] == "Air"
+
+
+async def test_flow_primary_series_matching_default_entity_label_passes(hass: HomeAssistant) -> None:
+    """With no series configured, primary_series may name the entity's own default label.
+
+    _get_timeline_values labels the single fallback series with the tracked
+    entity's friendly name, or the entity_id when it has no state. The washer
+    entity has no state here, so its default label is the entity_id.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_PRIMARY_SERIES: "binary_sensor.washer"},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+
+async def test_flow_invalid_stat_row(hass: HomeAssistant) -> None:
+    """A stat row without label=entity_id bounces on the stat_rows field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_widget_subentry(
+        hass,
+        entry,
+        template=WIDGET_TEMPLATE_STAT_LIST,
+        details={CONF_STAT_ROWS: "just some text"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STAT_ROWS: "invalid_stat_row"}
+
+
+async def test_flow_too_many_stat_rows(hass: HomeAssistant) -> None:
+    """More than WIDGET_MAX_STAT_ROWS rows bounces instead of silently truncating."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    rows = ", ".join(f"L{i}=sensor.s{i}" for i in range(WIDGET_MAX_STAT_ROWS + 1))
+    result = await _add_widget_subentry(
+        hass,
+        entry,
+        template=WIDGET_TEMPLATE_STAT_LIST,
+        details={CONF_STAT_ROWS: rows},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STAT_ROWS: "too_many_stat_rows"}
+
+
+async def test_flow_valid_step_lists_pass(hass: HomeAssistant) -> None:
+    """Correct-length, well-formed step lists create the subentry unchanged."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_ROWS: "1, 2, 3",
+            CONF_STEP_WEIGHTS: "1, 2.5, 1",
+            CONF_STEP_COLORS: "red, , #00ff00",
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    assert data[CONF_STEP_ROWS] == [1, 2, 3]
+    assert data[CONF_STEP_WEIGHTS] == [1.0, 2.5, 1.0]
+    assert data[CONF_STEP_COLORS] == ["red", "", "#00ff00"]
+
+
+async def test_flow_error_preserves_submitted_dsl(hass: HomeAssistant) -> None:
+    """A bounced step list re-renders the form pre-filled with what was typed."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEP_WEIGHTS: "1, 0, 2",
+            CONF_ACTIVITY_NAME: "My Steps",
+        },
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEP_WEIGHTS: "invalid_step_weights"}
+    suggested = _suggested_values(result)
+    assert suggested[CONF_STEP_WEIGHTS] == "1, 0, 2"
+    assert suggested[CONF_ACTIVITY_NAME] == "My Steps"
+
+
+# --- strict= is opt-in: the low-level parsers stay lenient for non-form callers ---
+
+
+def test_strict_parsers_lenient_by_default_but_raise_when_strict() -> None:
+    """Existing non-form callers keep silent-skip behavior; strict=True raises."""
+    # _parse_int_list
+    assert _parse_int_list("1, x, 3") == [1, 3]
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_int_list("1, x, 3", strict=True)
+    assert "invalid_step_rows" in str(exc.value)
+
+    # _parse_float_list keeps inf/nan and zero lenient; strict rejects them
+    assert _parse_float_list("1, 0, 2") == [1.0, 0.0, 2.0]
+    for bad in ("1, 0, 2", "1, -2, 3", "1, inf, 3", "1, nan, 3", "1, x, 3"):
+        with pytest.raises(vol.Invalid) as exc:
+            _parse_float_list(bad, strict=True)
+        assert "invalid_step_weights" in str(exc.value), bad
+
+    # _parse_color_list
+    assert _parse_color_list("red, chartreuse") == ["red", "chartreuse"]
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_color_list("red, chartreuse", strict=True)
+    assert "invalid_step_colors" in str(exc.value)
+    # blank slots stay legal under strict; a hex value is accepted
+    assert _parse_color_list("red, , #00ff00", strict=True) == ["red", "", "#00ff00"]
+
+    # _parse_thresholds
+    assert _parse_thresholds("abc") == []
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_thresholds("abc", strict=True)
+    assert "invalid_threshold" in str(exc.value)
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_thresholds("1, 2, 3, 4, 5, 6", strict=True)
+    assert "too_many_thresholds" in str(exc.value)
+
+    # _parse_board_tiles
+    assert _parse_board_tiles("nope") == []
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_board_tiles("nope", strict=True)
+    assert "invalid_tile" in str(exc.value)
+
+    # _parse_series_entities
+    assert _parse_series_entities("brightness") == []
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_series_entities("brightness", strict=True)
+    assert "invalid_series_entity" in str(exc.value)
+
+    # _parse_log_columns
+    assert _parse_log_columns("Label=") == []
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_log_columns("Label=", strict=True)
+    assert "invalid_log_column" in str(exc.value)
+
+    # _parse_widget_stat_rows
+    assert _parse_widget_stat_rows("nope") == []
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_stat_rows("nope", strict=True)
+    assert "invalid_stat_row" in str(exc.value)
+
+
+# --- reconfigure round-trip: stored valid DSL re-serializes and re-parses strict cleanly ---
+#
+# Opening reconfigure re-serializes the stored lists to CSV strings and pressing
+# Save resubmits them through the same strict parse the add flow uses. Data the
+# strict parsers accept must survive that round trip untouched, so no field a user
+# never edited can trip one of the new errors.
+
+
+def _reconfigure_details_defaults(result: dict) -> dict:
+    """Every rehydrated default from a reconfigure details form.
+
+    Submitting this unchanged is what opening reconfigure and pressing Save
+    without editing does: the stored lists come back as serialized strings.
+    """
+    return {
+        str(key): key.default()
+        for key in result["data_schema"].schema
+        if getattr(key, "default", vol.UNDEFINED) is not vol.UNDEFINED
+    }
+
+
+@pytest.mark.parametrize(
+    ("template", "stored"),
+    [
+        (
+            "steps",
+            {
+                CONF_TOTAL_STEPS: 3,
+                CONF_STEP_ROWS: [1, 2, 3],
+                CONF_STEP_WEIGHTS: [1.0, 2.5, 1.0],
+                CONF_STEP_COLORS: ["red", "", "#00ff00"],
+            },
+        ),
+        ("board", {CONF_TILES: [{CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu"}]}),
+        (
+            "timeline",
+            {
+                CONF_SERIES_ENTITIES: [{CONF_LABEL: "Air", CONF_ENTITY_ID: "sensor.air"}],
+                CONF_PRIMARY_SERIES: "Air",
+                CONF_THRESHOLDS: [{"value": 25.0, "color": "red", "label": "Hot"}],
+            },
+        ),
+        ("log", {CONF_LOG_COLUMNS: [{CONF_LABEL: "Bright", "attribute": "brightness"}]}),
+    ],
+)
+async def test_reconfigure_round_trip_preserves_valid_dsl(hass: HomeAssistant, template: str, stored: dict) -> None:
+    """Reconfiguring a valid subentry and saving it unchanged must not trip strict errors."""
+    entry = _mock_entry(subentries_data=[_entity_subentry_data(template=template, **stored)])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**{CONF_TEMPLATE: template})
+    )
+    assert result["step_id"] == "details"
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+
+
+async def test_reconfigure_round_trip_preserves_widget_stat_rows(hass: HomeAssistant) -> None:
+    """A stat_list widget reconfigured and saved unchanged survives the strict re-parse."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_widget_subentry(
+        hass,
+        entry,
+        template=WIDGET_TEMPLATE_STAT_LIST,
+        details={CONF_STAT_ROWS: "Users=sensor.users, Load=sensor.load1:load"},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    assert result["step_id"] == "reconfigure"
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST},
+    )
+    assert result["step_id"] == "details"
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
