@@ -1445,13 +1445,13 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "unit": "Display unit shown next to the value (e.g. °C, %, kW). Max 32 characters.",
-            "series_entities": "Bind separate entities as named lines on one chart (e.g. a PM2.5 sensor per room). Format: [Label=]entity_id[:attribute], comma-separated. The label defaults to the entity's friendly name; read an attribute with entity_id:attribute. Combines with Series; up to 10 lines total.",
+            "series_entities": "Bind separate entities as named lines on one chart (e.g. a PM2.5 sensor per room): each row is a label, an entity, and an optional attribute. The label defaults to the entity's friendly name; leave the attribute empty to plot the entity's state. Combines with Series; up to 10 lines total. A comma-separated [Label=]entity_id[:attribute] string is still accepted.",
             "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
             "warning_threshold": "Seconds before the end of a countdown when the server sends a warning push. Leave empty to disable. Countdown template only.",
             "alarm": "Trigger an AlarmKit alarm when the countdown expires (iOS 26+). Countdown template only.",
             "snooze_seconds": "How long the iOS Snooze button extends the countdown (60–3600). Leave empty for the 300s (5 min) default. Requires Alarm. Countdown template only.",
             "tiles": "Up to 4 tiles, each reading a separate entity: label, entity, plus optional attribute, unit, icon, color, and tap URL. A comma-separated string is still accepted. Board template only.",
-            "log_columns": "Extra values appended to each log line (max 6), comma-separated. Format: [Label=]source[|unit]. source = an attribute of this entity (brightness), another entity's state (binary_sensor.door), or another entity's attribute (sensor.temp:temperature). Example: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Log template only."
+            "log_columns": "Extra values appended to each log line (max 6): each row is a label, an entity, an attribute, and a unit. An attribute with no entity reads this entity; an entity with no attribute reads that entity's state; setting both reads that entity's attribute. A comma-separated [Label=]source[|unit] string is still accepted. Log template only."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Y-axis scale mode for the sparkline chart.",
                 "decimals": "Number of decimal places shown for values (0–10).",
                 "smoothing": "Enable curve interpolation between data points for a smoother sparkline.",
-                "thresholds": "Horizontal reference lines on the sparkline. Format: value:color:label. Example: 25:red:Hot, 18:blue:Cold. Max 5.",
+                "thresholds": "Horizontal reference lines on the sparkline: each row is a value, an optional color (named or hex), and an optional label. Max 5. A comma-separated value:color:label string is still accepted.",
                 "history_period": "Minutes of past data to seed the sparkline when the activity starts. Numeric-state entities (plain sensors, value entities, and state-sourced series entities) backfill from Home Assistant's recorder; attribute-based series fill only from samples collected while the integration runs, because Home Assistant stopped recording most attributes in 2024.8. Set to 0 to start with no history."
               }
             },

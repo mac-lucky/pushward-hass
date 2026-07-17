@@ -1445,13 +1445,13 @@
             "min_value": "Valeur minimale de la plage du gauge.",
             "max_value": "Valeur maximale de la plage du gauge.",
             "unit": "Unité d'affichage indiquée à côté de la valeur (ex. °C, %, kW). 32 caractères maximum.",
-            "series_entities": "Associer des entités distinctes à des lignes nommées sur un même graphique (ex. un capteur PM2.5 par pièce). Format : [Label=]entity_id[:attribute], séparées par des virgules. Le libellé utilise par défaut le nom convivial de l'entité ; lisez un attribut avec entity_id:attribute. Se combine avec Séries ; jusqu'à 10 lignes au total.",
+            "series_entities": "Associer des entités distinctes à des lignes nommées sur un même graphique (ex. un capteur PM2.5 par pièce) : chaque ligne comporte un libellé, une entité et un attribut facultatif. Le libellé utilise par défaut le nom convivial de l'entité ; laissez l'attribut vide pour tracer l'état de l'entité. Se combine avec Séries ; jusqu'à 10 lignes au total. Une chaîne séparée par des virgules reste acceptée.",
             "completion_message": "Texte affiché lorsque la Live Activity se termine. Laisser vide pour 'Terminé'. Exemple : Lavage terminé",
             "warning_threshold": "Secondes avant la fin du countdown lorsque le serveur envoie un push d'avertissement. Laisser vide pour désactiver. Modèle countdown uniquement.",
             "alarm": "Déclencher une alarme AlarmKit à l'expiration du countdown (iOS 26+). Modèle countdown uniquement.",
             "snooze_seconds": "Durée pendant laquelle le bouton Report d'iOS prolonge le countdown (60–3600). Laisser vide pour la valeur par défaut de 300s (5 min). Nécessite l'alarme. Modèle countdown uniquement.",
             "tiles": "Jusqu'à 4 tuiles, chacune lisant une entité distincte : libellé, entité, puis attribut, unité, icône, couleur et URL de tap en option. Une chaîne séparée par des virgules reste acceptée. Modèle board uniquement.",
-            "log_columns": "Valeurs supplémentaires ajoutées à chaque ligne de journal (max. 6), séparées par des virgules. Format : [Label=]source[|unit]. source = un attribut de cette entité (brightness), l'état d'une autre entité (binary_sensor.door) ou un attribut d'une autre entité (sensor.temp:temperature). Exemple : color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Modèle journal uniquement."
+            "log_columns": "Valeurs supplémentaires ajoutées à chaque ligne de journal (max. 6) : chaque ligne comporte un libellé, une entité, un attribut et une unité. Un attribut sans entité lit cette entité ; une entité sans attribut lit son état ; les deux lisent l'attribut de cette entité. Une chaîne séparée par des virgules reste acceptée. Modèle journal uniquement."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Mode d'échelle de l'axe Y pour le sparkline.",
                 "decimals": "Nombre de décimales affichées pour les valeurs (0–10).",
                 "smoothing": "Activer l'interpolation en courbe entre les points de données pour un sparkline plus lisse.",
-                "thresholds": "Lignes de référence horizontales sur le sparkline. Format : valeur:couleur:libellé. Exemple : 25:red:Hot, 18:blue:Cold. 5 au maximum.",
+                "thresholds": "Lignes de référence horizontales sur le sparkline : chaque ligne comporte une valeur, une couleur facultative (nommée ou hex) et un libellé. 5 au maximum. Une chaîne séparée par des virgules reste acceptée.",
                 "history_period": "Minutes de données passées à utiliser pour initialiser le sparkline depuis le recorder de Home Assistant. Mettre à 0 pour démarrer sans historique."
               }
             },

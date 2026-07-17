@@ -1445,13 +1445,13 @@
             "min_value": "Minimalna wartość zakresu gauge.",
             "max_value": "Maksymalna wartość zakresu gauge.",
             "unit": "Jednostka wyświetlana obok wartości (np. °C, %, kW). Maks. 32 znaki.",
-            "series_entities": "Powiąż osobne encje jako nazwane linie na jednym wykresie (np. czujnik PM2.5 dla każdego pokoju). Format: [Label=]entity_id[:attribute], oddzielone przecinkami. Etykieta domyślnie to przyjazna nazwa encji; odczytaj atrybut za pomocą entity_id:attribute. Łączy się z Serie; maksymalnie 10 linii łącznie.",
+            "series_entities": "Powiąż osobne encje jako nazwane linie na jednym wykresie (np. czujnik PM2.5 dla każdego pokoju): każdy wiersz to etykieta, encja i opcjonalny atrybut. Etykieta domyślnie to przyjazna nazwa encji; pozostaw atrybut pusty, aby pokazać stan encji. Łączy się z Serie; maksymalnie 10 linii łącznie. Nadal akceptowany jest ciąg rozdzielony przecinkami.",
             "completion_message": "Tekst wyświetlany po zakończeniu Live Activity. Pozostaw puste dla 'Zakończono'. Przykład: Pranie zakończone",
             "warning_threshold": "Sekundy przed końcem countdown, w których serwer wysyła ostrzeżenie push. Pozostaw puste, aby wyłączyć. Tylko szablon countdown.",
             "alarm": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+). Tylko szablon countdown.",
             "snooze_seconds": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
             "tiles": "Do 4 kafelków, każdy odczytuje osobną encję: etykieta, encja oraz opcjonalnie atrybut, jednostka, ikona, kolor i adres URL po dotknięciu. Nadal akceptowany jest ciąg rozdzielony przecinkami. Tylko dla szablonu board.",
-            "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6), oddzielone przecinkami. Format: [Label=]source[|unit]. source = atrybut tej encji (brightness), stan innej encji (binary_sensor.door) lub atrybut innej encji (sensor.temp:temperature). Przykład: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Tylko szablon dziennika."
+            "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6): każdy wiersz to etykieta, encja, atrybut i jednostka. Atrybut bez encji odczytuje tę encję; encja bez atrybutu odczytuje jej stan; oba odczytują atrybut tej encji. Nadal akceptowany jest ciąg rozdzielony przecinkami. Tylko szablon dziennika."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Tryb skali osi Y dla wykresu sparkline.",
                 "decimals": "Liczba miejsc dziesiętnych wyświetlanych dla wartości (0–10).",
                 "smoothing": "Włącz interpolację krzywej między punktami danych dla gładszego wykresu sparkline.",
-                "thresholds": "Poziome linie odniesienia na wykresie sparkline. Format: wartość:kolor:etykieta. Przykład: 25:red:Gorąco, 18:blue:Zimno. Maks. 5.",
+                "thresholds": "Poziome linie odniesienia na wykresie sparkline: każdy wiersz to wartość, opcjonalny kolor (nazwa lub hex) i etykieta. Maks. 5. Nadal akceptowany jest ciąg rozdzielony przecinkami.",
                 "history_period": "Minuty danych historycznych do zasilenia wykresu sparkline z rejestratora Home Assistant. Ustaw 0, aby zacząć bez historii."
               }
             },

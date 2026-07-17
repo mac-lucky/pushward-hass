@@ -1445,13 +1445,13 @@
             "min_value": "Valor mínimo para o intervalo do gauge.",
             "max_value": "Valor máximo para o intervalo do gauge.",
             "unit": "Unidade de exibição mostrada ao lado do valor (ex.: °C, %, kW). Máximo de 32 caracteres.",
-            "series_entities": "Vincule entidades separadas como linhas nomeadas em um único gráfico (ex.: um sensor de PM2.5 por cômodo). Formato: [Label=]entity_id[:attribute], separadas por vírgula. O rótulo usa por padrão o nome amigável da entidade; leia um atributo com entity_id:attribute. Combina-se com Séries; até 10 linhas no total.",
+            "series_entities": "Vincule entidades separadas como linhas nomeadas em um único gráfico (ex.: um sensor de PM2.5 por cômodo): cada linha tem um rótulo, uma entidade e um atributo opcional. O rótulo usa por padrão o nome amigável da entidade; deixe o atributo vazio para exibir o estado da entidade. Combina-se com Séries; até 10 linhas no total. Uma string separada por vírgulas ainda é aceita.",
             "completion_message": "Texto exibido quando a atividade é encerrada. Deixe vazio para 'Concluído'. Exemplo: Lavagem Concluída",
             "warning_threshold": "Segundos antes do fim do countdown quando o servidor envia um push de aviso. Deixe vazio para desativar. Apenas para o modelo countdown.",
             "alarm": "Acionar alarme AlarmKit ao expirar o countdown (iOS 26+). Apenas para o modelo countdown.",
             "snooze_seconds": "Por quanto tempo o botão Soneca do iOS estende a contagem regressiva (60–3600). Deixe vazio para o padrão de 300s (5 min). Requer Alarme. Apenas modelo de contagem regressiva.",
             "tiles": "Até 4 blocos, cada um lê uma entidade distinta: rótulo, entidade e, opcionalmente, atributo, unidade, ícone, cor e URL de toque. Uma string separada por vírgulas ainda é aceita. Somente no modelo board.",
-            "log_columns": "Valores adicionais anexados a cada linha de registro (máx. 6), separados por vírgulas. Formato: [Label=]source[|unit]. source = um atributo desta entidade (brightness), o estado de outra entidade (binary_sensor.door) ou um atributo de outra entidade (sensor.temp:temperature). Exemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Apenas modelo de registro."
+            "log_columns": "Valores adicionais anexados a cada linha de registro (máx. 6): cada linha tem um rótulo, uma entidade, um atributo e uma unidade. Um atributo sem entidade lê esta entidade; uma entidade sem atributo lê o estado dela; ambos leem o atributo dessa entidade. Uma string separada por vírgulas ainda é aceita. Apenas modelo de registro."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Modo de escala do eixo Y para o gráfico sparkline.",
                 "decimals": "Número de casas decimais exibidas para os valores (0–10).",
                 "smoothing": "Ativar interpolação de curva entre pontos de dados para um sparkline mais suave.",
-                "thresholds": "Linhas de referência horizontais no sparkline. Formato: valor:cor:rótulo. Exemplo: 25:red:Quente, 18:blue:Frio. Máximo de 5.",
+                "thresholds": "Linhas de referência horizontais no sparkline: cada linha tem um valor, uma cor opcional (nomeada ou hex) e um rótulo. Máximo de 5. Uma string separada por vírgulas ainda é aceita.",
                 "history_period": "Minutos de dados anteriores para preencher o sparkline a partir do gravador do Home Assistant. Defina 0 para iniciar sem histórico."
               }
             },

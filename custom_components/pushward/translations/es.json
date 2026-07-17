@@ -1445,13 +1445,13 @@
             "min_value": "Valor mínimo del rango del gauge.",
             "max_value": "Valor máximo del rango del gauge.",
             "unit": "Unidad de visualización junto al valor (p. ej. °C, %, kW). Máximo 32 caracteres.",
-            "series_entities": "Vincula entidades independientes como líneas con nombre en un mismo gráfico (p. ej. un sensor de PM2.5 por habitación). Formato: [Label=]entity_id[:attribute], separadas por comas. La etiqueta usa por defecto el nombre descriptivo de la entidad; lee un atributo con entity_id:attribute. Se combina con Series; hasta 10 líneas en total.",
+            "series_entities": "Vincula entidades independientes como líneas con nombre en un mismo gráfico (p. ej. un sensor de PM2.5 por habitación): cada fila tiene una etiqueta, una entidad y un atributo opcional. La etiqueta usa por defecto el nombre descriptivo de la entidad; deja el atributo vacío para representar el estado de la entidad. Se combina con Series; hasta 10 líneas en total. También se admite una cadena separada por comas.",
             "completion_message": "Texto mostrado cuando la actividad finaliza. Dejar vacío para usar 'Completado'. Ejemplo: Lavado terminado",
             "warning_threshold": "Segundos antes del final del countdown cuando el servidor envía un push de advertencia. Dejar vacío para desactivar. Solo para la plantilla countdown.",
             "alarm": "Activar alarma AlarmKit al expirar el countdown (iOS 26+). Solo para la plantilla countdown.",
             "snooze_seconds": "Cuánto extiende la cuenta atrás el botón Posponer de iOS (60–3600). Déjalo vacío para el valor predeterminado de 300 s (5 min). Requiere alarma. Solo plantilla de cuenta atrás.",
             "tiles": "Hasta 4 mosaicos, cada uno lee una entidad distinta: etiqueta, entidad y, de forma opcional, atributo, unidad, icono, color y URL de toque. También se admite una cadena separada por comas. Solo para la plantilla board.",
-            "log_columns": "Valores adicionales añadidos a cada línea de registro (máx. 6), separados por comas. Formato: [Label=]source[|unit]. source = un atributo de esta entidad (brightness), el estado de otra entidad (binary_sensor.door) o un atributo de otra entidad (sensor.temp:temperature). Ejemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo plantilla de registro."
+            "log_columns": "Valores adicionales añadidos a cada línea de registro (máx. 6): cada fila tiene una etiqueta, una entidad, un atributo y una unidad. Un atributo sin entidad lee esta entidad; una entidad sin atributo lee su estado; con ambos se lee el atributo de esa entidad. También se admite una cadena separada por comas. Solo plantilla de registro."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Modo de escala del eje Y para el gráfico sparkline.",
                 "decimals": "Número de decimales mostrados para los valores (0–10).",
                 "smoothing": "Activar interpolación de curvas entre puntos de datos para un sparkline más suave.",
-                "thresholds": "Líneas de referencia horizontales en el sparkline. Formato: value:color:label. Ejemplo: 25:red:Calor, 18:blue:Frío. Máximo 5.",
+                "thresholds": "Líneas de referencia horizontales en el sparkline: cada fila tiene un valor, un color opcional (con nombre o hex) y una etiqueta. Máximo 5. También se admite una cadena separada por comas.",
                 "history_period": "Minutos de datos pasados para inicializar el sparkline desde el registrador de Home Assistant. Establecer a 0 para comenzar sin historial."
               }
             },

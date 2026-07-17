@@ -1445,13 +1445,13 @@
             "min_value": "Giá trị tối thiểu cho dải gauge.",
             "max_value": "Giá trị tối đa cho dải gauge.",
             "unit": "Đơn vị hiển thị bên cạnh giá trị (ví dụ: °C, %, kW). Tối đa 32 ký tự.",
-            "series_entities": "Gắn các thực thể riêng biệt thành các đường có tên trên một biểu đồ (ví dụ: một cảm biến PM2.5 cho mỗi phòng). Định dạng: [Label=]entity_id[:attribute], phân tách bằng dấu phẩy. Nhãn mặc định là tên thân thiện của thực thể; đọc một thuộc tính bằng entity_id:attribute. Kết hợp được với Chuỗi dữ liệu; tối đa 10 đường tổng cộng.",
+            "series_entities": "Gắn các thực thể riêng biệt thành các đường có tên trên một biểu đồ (ví dụ: một cảm biến PM2.5 cho mỗi phòng): mỗi hàng gồm một nhãn, một thực thể và một thuộc tính tùy chọn. Nhãn mặc định là tên thân thiện của thực thể; để trống thuộc tính để vẽ trạng thái của thực thể. Kết hợp được với Chuỗi dữ liệu; tối đa 10 đường tổng cộng. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy.",
             "completion_message": "Văn bản hiển thị khi hoạt động kết thúc. Để trống cho 'Hoàn thành'. Ví dụ: Giặt Xong",
             "warning_threshold": "Khi đạt hoặc vượt giá trị này, màu cảnh báo được kích hoạt. Mẫu gauge và timeline.",
             "alarm": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ dành cho iOS 26+.",
             "snooze_seconds": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Để trống để dùng mặc định 300s (5 phút). Yêu cầu Báo thức. Chỉ mẫu đếm ngược.",
             "tiles": "Tối đa 4 ô, mỗi ô đọc một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính, đơn vị, biểu tượng, màu và URL khi chạm. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Chỉ dành cho mẫu board.",
-            "log_columns": "Các giá trị bổ sung được thêm vào mỗi dòng nhật ký (tối đa 6), phân tách bằng dấu phẩy. Định dạng: [Label=]source[|unit]. source = một thuộc tính của thực thể này (brightness), trạng thái của thực thể khác (binary_sensor.door), hoặc một thuộc tính của thực thể khác (sensor.temp:temperature). Ví dụ: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Chỉ dành cho mẫu nhật ký."
+            "log_columns": "Các giá trị bổ sung được thêm vào mỗi dòng nhật ký (tối đa 6): mỗi hàng gồm một nhãn, một thực thể, một thuộc tính và một đơn vị. Thuộc tính không có thực thể sẽ đọc thực thể này; thực thể không có thuộc tính sẽ đọc trạng thái của nó; cả hai sẽ đọc thuộc tính của thực thể đó. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Chỉ dành cho mẫu nhật ký."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Chế độ tỉ lệ trục Y cho biểu đồ sparkline.",
                 "decimals": "Số chữ số thập phân hiển thị cho giá trị (0–10).",
                 "smoothing": "Bật nội suy đường cong giữa các điểm dữ liệu để sparkline mượt hơn.",
-                "thresholds": "Đường tham chiếu ngang trên sparkline. Định dạng: value:color:label. Ví dụ: 25:red:Hot, 18:blue:Cold. Tối đa 5.",
+                "thresholds": "Đường tham chiếu ngang trên sparkline: mỗi hàng gồm một giá trị, một màu tùy chọn (tên hoặc hex) và một nhãn. Tối đa 5. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy.",
                 "history_period": "Số phút dữ liệu quá khứ để khởi tạo sparkline từ recorder của Home Assistant. Đặt 0 để bắt đầu không có lịch sử."
               }
             },

@@ -1445,13 +1445,13 @@
             "min_value": "Minimalwert für den Gauge-Bereich.",
             "max_value": "Maximalwert für den Gauge-Bereich.",
             "unit": "Neben dem Wert angezeigte Einheit (z. B. °C, %, kW). Maximal 32 Zeichen.",
-            "series_entities": "Separate Entitäten als benannte Linien in einem Diagramm einbinden (z. B. ein PM2.5-Sensor pro Raum). Format: [Label=]entity_id[:attribute], durch Kommas getrennt. Die Beschriftung entspricht standardmäßig dem Anzeigenamen der Entität; ein Attribut wird mit entity_id:attribute gelesen. Kombinierbar mit Datenreihen; insgesamt bis zu 10 Linien.",
+            "series_entities": "Separate Entitäten als benannte Linien in einem Diagramm einbinden (z. B. ein PM2.5-Sensor pro Raum): jede Zeile hat eine Beschriftung, eine Entität und optional ein Attribut. Die Beschriftung entspricht standardmäßig dem Anzeigenamen der Entität; lassen Sie das Attribut leer, um den Zustand der Entität darzustellen. Kombinierbar mit Datenreihen; insgesamt bis zu 10 Linien. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert.",
             "completion_message": "Text, der beim Beenden der Live Activity angezeigt wird. Leer lassen für 'Complete'. Beispiel: Wash Done",
             "warning_threshold": "Sekunden vor Countdown-Ende, ab denen der Server einen Warn-Push sendet. Leer lassen, um zu deaktivieren. Nur für die Vorlage 'countdown'.",
             "alarm": "AlarmKit-Alarm beim Ablauf des Countdowns auslösen (iOS 26+). Nur für die Vorlage 'countdown'.",
             "snooze_seconds": "Wie lange die iOS-Schlummern-Schaltfläche den Countdown verlängert (60–3600). Leer lassen für den Standardwert 300 s (5 Min.). Erfordert Alarm. Nur für die Vorlage 'countdown'.",
             "tiles": "Bis zu 4 Kacheln, jede liest eine eigene Entität: Bezeichnung, Entität sowie optional Attribut, Einheit, Symbol, Farbe und Tipp-URL. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Nur für die Vorlage board.",
-            "log_columns": "Zusätzliche Werte, die an jede Protokollzeile angehängt werden (max. 6), durch Kommas getrennt. Format: [Label=]source[|unit]. source = ein Attribut dieser Entität (brightness), der Zustand einer anderen Entität (binary_sensor.door) oder ein Attribut einer anderen Entität (sensor.temp:temperature). Beispiel: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Nur Log-Vorlage."
+            "log_columns": "Zusätzliche Werte, die an jede Protokollzeile angehängt werden (max. 6): jede Zeile hat eine Beschriftung, eine Entität, ein Attribut und eine Einheit. Ein Attribut ohne Entität liest diese Entität; eine Entität ohne Attribut liest deren Zustand; beides liest das Attribut dieser Entität. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Nur Log-Vorlage."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Skalenmodus der Y-Achse für das Sparkline-Diagramm.",
                 "decimals": "Anzahl der Dezimalstellen für die Wertanzeige (0–10).",
                 "smoothing": "Kurveninterpolation zwischen Datenpunkten für eine glättere Sparkline aktivieren.",
-                "thresholds": "Horizontale Referenzlinien in der Sparkline. Format: value:color:label. Beispiel: 25:red:Heiß, 18:blue:Kalt. Maximal 5.",
+                "thresholds": "Horizontale Referenzlinien in der Sparkline: jede Zeile hat einen Wert, optional eine Farbe (benannt oder Hex) und eine Beschriftung. Maximal 5. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert.",
                 "history_period": "Minuten vergangener Daten, mit denen die Sparkline aus dem Home-Assistant-Recorder vorbefüllt wird. Auf 0 setzen, um ohne Verlauf zu starten."
               }
             },

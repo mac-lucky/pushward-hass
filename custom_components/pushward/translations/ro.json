@@ -1445,13 +1445,13 @@
             "min_value": "Valoarea minimă a intervalului gauge-ului.",
             "max_value": "Valoarea maximă a intervalului gauge-ului.",
             "unit": "Unitatea de afișare lângă valoare (ex. °C, %, kW). Maxim 32 de caractere.",
-            "series_entities": "Asociați entități separate ca linii denumite pe un singur grafic (ex. un senzor PM2.5 per cameră). Format: [Label=]entity_id[:attribute], separate prin virgulă. Eticheta este implicit numele prietenos al entității; citiți un atribut cu entity_id:attribute. Se combină cu Serii; până la 10 linii în total.",
+            "series_entities": "Asociați entități separate ca linii denumite pe un singur grafic (ex. un senzor PM2.5 per cameră): fiecare rând are o etichetă, o entitate și un atribut opțional. Eticheta este implicit numele prietenos al entității; lăsați atributul gol pentru a afișa starea entității. Se combină cu Serii; până la 10 linii în total. Un șir separat prin virgule este încă acceptat.",
             "completion_message": "Textul afișat la încheierea activității. Lăsați gol pentru 'Complet'. Exemplu: Spălare terminată",
             "warning_threshold": "Când valoarea atinge sau depășește aceasta, colorarea de avertizare este declanșată. Șabloane gauge și timeline.",
             "alarm": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Doar pentru iOS 26+.",
             "snooze_seconds": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Lăsați gol pentru valoarea implicită de 300s (5 min). Necesită Alarmă. Doar șablonul countdown.",
             "tiles": "Până la 4 casete, fiecare citește o entitate separată: etichetă, entitate și, opțional, atribut, unitate, pictogramă, culoare și URL la atingere. Un șir separat prin virgule este încă acceptat. Doar pentru șablonul board.",
-            "log_columns": "Valori suplimentare adăugate la fiecare linie de jurnal (max. 6), separate prin virgulă. Format: [Label=]source[|unit]. source = un atribut al acestei entități (brightness), starea altei entități (binary_sensor.door) sau un atribut al altei entități (sensor.temp:temperature). Exemplu: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Doar șablon jurnal."
+            "log_columns": "Valori suplimentare adăugate la fiecare linie de jurnal (max. 6): fiecare rând are o etichetă, o entitate, un atribut și o unitate. Un atribut fără entitate citește această entitate; o entitate fără atribut îi citește starea; ambele citesc atributul acelei entități. Un șir separat prin virgule este încă acceptat. Doar șablon jurnal."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Modul de scală al axei Y pentru graficul sparkline.",
                 "decimals": "Numărul de zecimale afișate pentru valori (0–10).",
                 "smoothing": "Activați interpolarea curbei între punctele de date pentru un sparkline mai fluid.",
-                "thresholds": "Linii de referință orizontale pe sparkline. Format: valoare:culoare:etichetă. Exemplu: 25:red:Cald, 18:blue:Rece. Maxim 5.",
+                "thresholds": "Linii de referință orizontale pe sparkline: fiecare rând are o valoare, o culoare opțională (denumită sau hex) și o etichetă. Maxim 5. Un șir separat prin virgule este încă acceptat.",
                 "history_period": "Minute de date anterioare pentru inițializarea sparkline-ului din înregistrările Home Assistant. Setați 0 pentru a începe fără istoric."
               }
             },

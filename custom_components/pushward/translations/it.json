@@ -1445,13 +1445,13 @@
             "min_value": "Valore minimo per l'intervallo del gauge.",
             "max_value": "Valore massimo per l'intervallo del gauge.",
             "unit": "Unità di visualizzazione mostrata accanto al valore (es. °C, %, kW). Massimo 32 caratteri.",
-            "series_entities": "Associa entità separate come linee denominate su un unico grafico (es. un sensore PM2.5 per stanza). Formato: [Label=]entity_id[:attribute], separate da virgola. L'etichetta usa come predefinito il nome descrittivo dell'entità; leggi un attributo con entity_id:attribute. Si combina con Serie; fino a 10 linee in totale.",
+            "series_entities": "Associa entità separate come linee denominate su un unico grafico (es. un sensore PM2.5 per stanza): ogni riga ha un'etichetta, un'entità e un attributo facoltativo. L'etichetta usa come predefinito il nome descrittivo dell'entità; lascia vuoto l'attributo per tracciare lo stato dell'entità. Si combina con Serie; fino a 10 linee in totale. È ancora accettata una stringa separata da virgole.",
             "completion_message": "Testo visualizzato al termine dell'attività. Lasciare vuoto per 'Completato'. Esempio: Lavaggio terminato",
             "warning_threshold": "Secondi prima della fine del countdown in cui il server invia un push di avviso. Lasciare vuoto per disabilitare. Solo per il modello countdown.",
             "alarm": "Attivare la sveglia AlarmKit alla scadenza del countdown (iOS 26+). Solo per il modello countdown.",
             "snooze_seconds": "Di quanto il pulsante Posticipa di iOS estende il conto alla rovescia (60–3600). Lascia vuoto per il valore predefinito di 300s (5 min). Richiede una sveglia. Solo modello conto alla rovescia.",
             "tiles": "Fino a 4 riquadri, ognuno legge un'entità distinta: etichetta, entità e, in opzione, attributo, unità, icona, colore e URL al tocco. È ancora accettata una stringa separata da virgole. Solo per il modello board.",
-            "log_columns": "Valori aggiuntivi aggiunti a ogni riga del registro (max 6), separati da virgole. Formato: [Label=]source[|unit]. source = un attributo di questa entità (brightness), lo stato di un'altra entità (binary_sensor.door) o un attributo di un'altra entità (sensor.temp:temperature). Esempio: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo modello registro."
+            "log_columns": "Valori aggiuntivi aggiunti a ogni riga del registro (max 6): ogni riga ha un'etichetta, un'entità, un attributo e un'unità. Un attributo senza entità legge questa entità; un'entità senza attributo ne legge lo stato; entrambi leggono l'attributo di quell'entità. È ancora accettata una stringa separata da virgole. Solo modello registro."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Modalità scala dell'asse Y per il grafico sparkline.",
                 "decimals": "Numero di cifre decimali visualizzate per i valori (0–10).",
                 "smoothing": "Abilitare l'interpolazione della curva tra i punti dati per uno sparkline più uniforme.",
-                "thresholds": "Linee di riferimento orizzontali sullo sparkline. Formato: valore:colore:etichetta. Esempio: 25:red:Caldo, 18:blue:Freddo. Massimo 5.",
+                "thresholds": "Linee di riferimento orizzontali sullo sparkline: ogni riga ha un valore, un colore facoltativo (nominato o esadecimale) e un'etichetta. Massimo 5. È ancora accettata una stringa separata da virgole.",
                 "history_period": "Minuti di dati passati con cui inizializzare lo sparkline dal registratore di Home Assistant. Impostare 0 per iniziare senza cronologia."
               }
             },

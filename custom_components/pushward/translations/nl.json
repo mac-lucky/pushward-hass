@@ -1445,13 +1445,13 @@
             "min_value": "Minimumwaarde voor het gauge-bereik.",
             "max_value": "Maximumwaarde voor het gauge-bereik.",
             "unit": "Weergave-eenheid naast de waarde (bijv. °C, %, kW). Max. 32 tekens.",
-            "series_entities": "Koppel aparte entiteiten als benoemde lijnen in één grafiek (bijv. een PM2.5-sensor per kamer). Indeling: [Label=]entity_id[:attribute], kommagescheiden. Het label is standaard de vriendelijke naam van de entiteit; lees een attribuut met entity_id:attribute. Combineert met Reeksen; maximaal 10 lijnen in totaal.",
+            "series_entities": "Koppel aparte entiteiten als benoemde lijnen in één grafiek (bijv. een PM2.5-sensor per kamer): elke rij heeft een label, een entiteit en een optioneel attribuut. Het label is standaard de vriendelijke naam van de entiteit; laat het attribuut leeg om de status van de entiteit weer te geven. Combineert met Reeksen; maximaal 10 lijnen in totaal. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd.",
             "completion_message": "Tekst bij het beëindigen van de activiteit. Laat leeg voor 'Voltooid'. Voorbeeld: Was klaar",
             "warning_threshold": "Seconden vóór het einde van de countdown waarop de server een waarschuwingspush verzendt. Laat leeg om uit te schakelen. Alleen voor het sjabloon countdown.",
             "alarm": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+). Alleen voor het sjabloon countdown.",
             "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
             "tiles": "Tot 4 tegels, elk leest een aparte entiteit: label, entiteit en optioneel attribuut, eenheid, pictogram, kleur en tik-URL. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Alleen voor de sjabloon board.",
-            "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon."
+            "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6): elke rij heeft een label, een entiteit, een attribuut en een eenheid. Een attribuut zonder entiteit leest deze entiteit; een entiteit zonder attribuut leest de status ervan; beide lezen het attribuut van die entiteit. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Alleen logsjabloon."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Y-as schaalmodus voor het sparkline-diagram.",
                 "decimals": "Aantal decimalen voor de waardeweergave (0–10).",
                 "smoothing": "Schakel curve-interpolatie in tussen gegevenspunten voor een vloeiendere sparkline.",
-                "thresholds": "Horizontale referentielijnen op de sparkline. Indeling: waarde:kleur:label. Voorbeeld: 25:red:Heet, 18:blue:Koud. Max. 5.",
+                "thresholds": "Horizontale referentielijnen op de sparkline: elke rij heeft een waarde, een optionele kleur (benoemd of hex) en een label. Max. 5. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd.",
                 "history_period": "Minuten aan historische gegevens om de sparkline te vullen vanuit de Home Assistant-recorder. Stel in op 0 om zonder geschiedenis te starten."
               }
             },

@@ -1445,13 +1445,13 @@
             "min_value": "gauge aralığı için minimum değer.",
             "max_value": "gauge aralığı için maksimum değer.",
             "unit": "Değerin yanında gösterilen birim (örn. °C, %, kW). En fazla 32 karakter.",
-            "series_entities": "Ayrı varlıkları tek bir grafikte adlandırılmış çizgiler olarak bağlar (örn. her oda için bir PM2.5 sensörü). Biçim: [Etiket=]entity_id[:öznitelik], virgülle ayrılmış. Etiket varsayılan olarak varlığın görünen adını kullanır; bir özniteliği entity_id:öznitelik ile okuyun. Seri alanıyla birleşir; toplam 10 çizgiye kadar.",
+            "series_entities": "Ayrı varlıkları tek bir grafikte adlandırılmış çizgiler olarak bağlar (örn. her oda için bir PM2.5 sensörü): her satırda bir etiket, bir varlık ve isteğe bağlı bir öznitelik bulunur. Etiket varsayılan olarak varlığın görünen adını kullanır; varlığın durumunu çizmek için özniteliği boş bırakın. Seri alanıyla birleşir; toplam 10 çizgiye kadar. Virgülle ayrılmış metin de kabul edilir.",
             "completion_message": "Aktivite sona erdiğinde gösterilen metin. 'Tamamlandı' için boş bırakın. Örnek: Yıkama Bitti",
             "warning_threshold": "Bu değere ulaşıldığında veya aşıldığında uyarı renklendirmesi tetiklenir. Gauge ve timeline şablonları.",
             "alarm": "Uyarı eşiği aşıldığında AlarmKit alarmını tetikler. Yalnızca iOS 26+.",
             "snooze_seconds": "iOS Ertele düğmesinin geri sayımı ne kadar uzattığı (60–3600). 300s (5 dk) varsayılanı için boş bırakın. Alarm gerektirir. Yalnızca geri sayım şablonu.",
             "tiles": "En fazla 4 kutu; her biri ayrı bir varlığı okur: etiket, varlık ve isteğe bağlı olarak öznitelik, birim, simge, renk ve dokunma URL'si. Virgülle ayrılmış metin de kabul edilir. Yalnızca board şablonu.",
-            "log_columns": "Her günlük satırına eklenen ek değerler (en fazla 6), virgülle ayrılır. Biçim: [Label=]source[|unit]. source = bu varlığın bir niteliği (brightness), başka bir varlığın durumu (binary_sensor.door) veya başka bir varlığın niteliği (sensor.temp:temperature). Örnek: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Yalnızca günlük şablonu."
+            "log_columns": "Her günlük satırına eklenen ek değerler (en fazla 6): her satırda bir etiket, bir varlık, bir öznitelik ve bir birim bulunur. Varlığı olmayan bir öznitelik bu varlığı okur; özniteliği olmayan bir varlık kendi durumunu okur; ikisi birlikte o varlığın özniteliğini okur. Virgülle ayrılmış metin de kabul edilir. Yalnızca günlük şablonu."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Kıvılcım çizelgesi için Y ekseni ölçek modu.",
                 "decimals": "Değerler için gösterilen ondalık basamak sayısı (0–10).",
                 "smoothing": "Daha düzgün bir kıvılcım çizelgesi için veri noktaları arasında eğri aradeğerlemeyi etkinleştir.",
-                "thresholds": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Biçim: değer:renk:etiket. Örnek: 25:red:Sıcak, 18:blue:Soğuk. En fazla 5.",
+                "thresholds": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri: her satırda bir değer, isteğe bağlı bir renk (adlı veya hex) ve bir etiket bulunur. En fazla 5. Virgülle ayrılmış metin de kabul edilir.",
                 "history_period": "Home Assistant'ın kaydedicisinden kıvılcım çizelgesini başlatmak için geriye dönük veri dakikası. Geçmiş olmadan başlamak için 0 girin."
               }
             },

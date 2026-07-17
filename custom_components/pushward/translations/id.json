@@ -1445,13 +1445,13 @@
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "unit": "Satuan tampilan yang ditampilkan di sebelah nilai (misalnya °C, %, kW). Maks 32 karakter.",
-            "series_entities": "Ikat entitas terpisah sebagai garis bernama pada satu chart (misalnya satu sensor PM2.5 per ruangan). Format: [Label=]entity_id[:attribute], dipisah koma. Label secara default menggunakan nama ramah entitas; baca atribut dengan entity_id:attribute. Dapat digabung dengan Seri; total maksimal 10 garis.",
+            "series_entities": "Ikat entitas terpisah sebagai garis bernama pada satu chart (misalnya satu sensor PM2.5 per ruangan): setiap baris berisi label, entitas, dan atribut opsional. Label secara default menggunakan nama ramah entitas; kosongkan atribut untuk menampilkan status entitas. Dapat digabung dengan Seri; total maksimal 10 garis. String yang dipisahkan koma masih diterima.",
             "completion_message": "Teks yang ditampilkan saat aktivitas berakhir. Kosongkan untuk 'Selesai'. Contoh: Cucian Selesai",
             "warning_threshold": "Saat nilai mencapai atau melebihi ini, pewarnaan peringatan dipicu. Templat gauge dan timeline.",
             "alarm": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya untuk iOS 26+.",
             "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
             "tiles": "Hingga 4 ubin, masing-masing membaca entitas terpisah: label, entitas, serta atribut, unit, ikon, warna, dan URL ketuk opsional. String yang dipisahkan koma masih diterima. Hanya untuk templat board.",
-            "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log."
+            "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6): setiap baris berisi label, entitas, atribut, dan unit. Atribut tanpa entitas membaca entitas ini; entitas tanpa atribut membaca statusnya; keduanya membaca atribut entitas tersebut. String yang dipisahkan koma masih diterima. Hanya templat log."
           },
           "sections": {
             "data_sources": {
@@ -1520,7 +1520,7 @@
                 "scale": "Mode skala sumbu Y untuk grafik sparkline.",
                 "decimals": "Jumlah angka desimal yang ditampilkan untuk nilai (0–10).",
                 "smoothing": "Aktifkan interpolasi kurva antar titik data untuk sparkline yang lebih halus.",
-                "thresholds": "Garis referensi horizontal pada sparkline. Format: value:color:label. Contoh: 25:red:Panas, 18:blue:Dingin. Maks 5.",
+                "thresholds": "Garis referensi horizontal pada sparkline: setiap baris berisi nilai, warna opsional (bernama atau hex), dan label. Maks 5. String yang dipisahkan koma masih diterima.",
                 "history_period": "Menit data masa lalu untuk mengisi sparkline dari recorder Home Assistant. Atur ke 0 untuk memulai tanpa riwayat."
               }
             },
