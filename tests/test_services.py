@@ -708,6 +708,76 @@ async def test_per_template_keeps_sound_priority_top_level(hass: HomeAssistant, 
     assert call.kwargs["priority"] == 7
 
 
+@pytest.mark.parametrize("template", TEMPLATES)
+async def test_per_template_keeps_ttls_top_level(hass: HomeAssistant, template: str) -> None:
+    """Every template's schema accepts the TTLs and passes them as kwargs, out of content."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        f"update_activity_{template}",
+        {"slug": "x", "state": "ongoing", "ended_ttl": 300, "stale_ttl": 1800, "dismissal_ttl": 60},
+        blocking=True,
+    )
+
+    call = api.update_activity.call_args
+    content = call[0][2]
+    assert not any(k in content for k in ("ended_ttl", "stale_ttl", "dismissal_ttl"))
+    assert call.kwargs["ended_ttl"] == 300
+    assert call.kwargs["stale_ttl"] == 1800
+    assert call.kwargs["dismissal_ttl"] == 60
+
+
+async def test_update_activity_dismissal_ttl_zero_forwarded(hass: HomeAssistant) -> None:
+    """dismissal_ttl=0 (remove immediately) survives the schema and reaches the kwarg."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {"slug": "x", "state": "ongoing", "dismissal_ttl": 0},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args.kwargs["dismissal_ttl"] == 0
+
+
+async def test_update_activity_rejects_out_of_range_ttls(hass: HomeAssistant) -> None:
+    """ended/stale below 1 and dismissal above 14400 are rejected by the schema."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for field, bad in (("ended_ttl", 0), ("stale_ttl", 2592001), ("dismissal_ttl", 14401)):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "update_activity_generic",
+                {"slug": "x", "state": "ongoing", field: bad},
+                blocking=True,
+            )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_deprecated_update_activity_forwards_ttls(hass: HomeAssistant) -> None:
+    """The deprecated alias also carries the TTLs as top-level kwargs."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ongoing", "template": "generic", "ended_ttl": 120, "dismissal_ttl": 30},
+        blocking=True,
+    )
+
+    call = api.update_activity.call_args
+    assert call.kwargs["ended_ttl"] == 120
+    assert call.kwargs["dismissal_ttl"] == 30
+    assert "ended_ttl" not in call[0][2]
+
+
 async def test_update_activity_countdown_forwards_fields(hass: HomeAssistant) -> None:
     """Countdown-specific fields go into content; sound/priority stay top-level kwargs."""
     api = _mock_api()

@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Botão secundário",
           "description": "Botão secundário tocável — mesmo formato de objeto do Botão principal."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Botão secundário",
           "description": "Botão secundário tocável — mesmo formato de objeto do Botão principal."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Botão secundário",
           "description": "Botão secundário tocável — mesmo formato de objeto do Botão principal."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Botão secundário",
           "description": "Botão secundário tocável — mesmo formato de objeto do Botão principal."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Botão secundário",
           "description": "Botão secundário tocável — mesmo formato de objeto do Botão principal."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Botão secundário",
           "description": "Botão secundário tocável — mesmo formato de objeto do Botão principal."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Botão secundário",
           "description": "Botão secundário tocável — mesmo formato de objeto do Botão principal."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Substituição de Prioridade",
           "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Substituição de Prioridade",
           "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Unidades por Série",
             "tiles": "Blocos do Painel",
             "log_columns": "Colunas de registro",
-            "log_level_attribute": "Atributo de Nível de Registro"
+            "log_level_attribute": "Atributo de Nível de Registro",
+            "dismissal_ttl": "Remoção Automática da Tela Bloqueada (segundos)"
           },
           "data_description": {
             "start_states": "Estados da entidade que iniciam a Live Activity. Selecione na lista ou digite valores personalizados.",
@@ -1431,7 +1540,8 @@
             "units": "Rótulos de unidades por série. Formato: RótuloSérie=unidade, Temperatura=°C, Umidade=%. Apenas para o modelo timeline.",
             "tiles": "Blocos do painel (1–4), cada um lendo uma entidade separada. Formato: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcionais). Exemplo: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Apenas modelo de painel.",
             "log_columns": "Valores adicionais anexados a cada linha de registro (máx. 6), separados por vírgulas. Formato: [Label=]source[|unit]. source = um atributo desta entidade (brightness), o estado de outra entidade (binary_sensor.door) ou um atributo de outra entidade (sensor.temp:temperature). Exemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Apenas modelo de registro.",
-            "log_level_attribute": "Atributo que fornece o nível de cada linha de registro (info/warn/error). Deixe vazio para nenhuma marca de nível. Apenas modelo de registro."
+            "log_level_attribute": "Atributo que fornece o nível de cada linha de registro (info/warn/error). Deixe vazio para nenhuma marca de nível. Apenas modelo de registro.",
+            "dismissal_ttl": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar. Exemplo: 60"
           }
         },
         "reconfigure": {

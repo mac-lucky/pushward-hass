@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Przycisk dodatkowy",
           "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Przycisk dodatkowy",
           "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Przycisk dodatkowy",
           "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Przycisk dodatkowy",
           "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Przycisk dodatkowy",
           "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Przycisk dodatkowy",
           "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Przycisk dodatkowy",
           "description": "Dodatkowy przycisk dotykowy — taki sam kształt obiektu jak Przycisk główny."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0-10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Nadpisanie priorytetu",
           "description": "Priorytet dla pojedynczej aktualizacji (0-10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Jednostki dla serii",
             "tiles": "Kafelki tablicy",
             "log_columns": "Kolumny dziennika",
-            "log_level_attribute": "Atrybut poziomu dziennika"
+            "log_level_attribute": "Atrybut poziomu dziennika",
+            "dismissal_ttl": "Automatyczne usunięcie z ekranu blokady (sekundy)"
           },
           "data_description": {
             "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości.",
@@ -1431,7 +1540,8 @@
             "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline.",
             "tiles": "Kafelki tablicy (1–4), każdy odczytuje osobną encję. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcjonalne). Przykład: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Tylko szablon board.",
             "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6), oddzielone przecinkami. Format: [Label=]source[|unit]. source = atrybut tej encji (brightness), stan innej encji (binary_sensor.door) lub atrybut innej encji (sensor.temp:temperature). Przykład: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Tylko szablon dziennika.",
-            "log_level_attribute": "Atrybut dostarczający poziom każdego wiersza dziennika (info/warn/error). Pozostaw puste, aby nie dodawać etykiety poziomu. Tylko szablon log."
+            "log_level_attribute": "Atrybut dostarczający poziom każdego wiersza dziennika (info/warn/error). Pozostaw puste, aby nie dodawać etykiety poziomu. Tylko szablon log.",
+            "dismissal_ttl": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu. Przykład: 60"
           }
         },
         "reconfigure": {

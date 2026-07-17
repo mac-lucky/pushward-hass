@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Pangalawang Button",
           "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Pangalawang Button",
           "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Pangalawang Button",
           "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Pangalawang Button",
           "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Pangalawang Button",
           "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Pangalawang Button",
           "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Pangalawang Button",
           "description": "Pangalawang matatap na button — kaparehong object shape ng Pangunahing Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Override ng Priyoridad",
           "description": "Priyoridad kada update (0-10). Nino-override ang naka-configure na priyoridad ng activity para sa push na ito lamang."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Override ng Priyoridad",
           "description": "Priyoridad kada update (0-10). Nino-override ang naka-configure na priyoridad ng activity para sa push na ito lamang."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Mga Yunit",
             "tiles": "Mga Tile ng Board",
             "log_columns": "Mga Column ng Log",
-            "log_level_attribute": "Attribute ng Antas ng Log"
+            "log_level_attribute": "Attribute ng Antas ng Log",
+            "dismissal_ttl": "Awtomatikong Alisin sa Lock Screen (segundo)"
           },
           "data_description": {
             "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
@@ -1431,7 +1540,8 @@
             "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%",
             "tiles": "Mga tile ng board (1–4), bawat isa ay nagbabasa ng hiwalay na entity. Format: Label=entity_id:attribute:unit:icon (opsyonal ang attribute, unit, icon). Halimbawa: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Para sa board template lamang.",
             "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6), pinaghihiwalay ng kuwit. Format: [Label=]source[|unit]. source = isang attribute ng entity na ito (brightness), ang estado ng ibang entity (binary_sensor.door), o isang attribute ng ibang entity (sensor.temp:temperature). Halimbawa: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Para lang sa log template.",
-            "log_level_attribute": "Attribute na nagbibigay ng level (info/warn/error) ng bawat log line. Iwanang blangko para walang level tag. Para sa log template lamang."
+            "log_level_attribute": "Attribute na nagbibigay ng level (info/warn/error) ng bawat log line. Iwanang blangko para walang level tag. Para sa log template lamang.",
+            "dismissal_ttl": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos. Halimbawa: 60"
           }
         },
         "reconfigure": {

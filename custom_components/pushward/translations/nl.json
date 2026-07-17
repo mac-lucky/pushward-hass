@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Secundaire knop",
           "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Secundaire knop",
           "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Secundaire knop",
           "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Secundaire knop",
           "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Secundaire knop",
           "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Secundaire knop",
           "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Secundaire knop",
           "description": "Secundaire aantikbare knop — zelfde objectvorm als de primaire knop."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0-10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Prioriteit overschrijven",
           "description": "Prioriteit per update (0-10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Eenheden per reeks",
             "tiles": "Bordtegels",
             "log_columns": "Logkolommen",
-            "log_level_attribute": "Logniveau-attribuut"
+            "log_level_attribute": "Logniveau-attribuut",
+            "dismissal_ttl": "Automatisch verwijderen van toegangsscherm (seconden)"
           },
           "data_description": {
             "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
@@ -1431,7 +1540,8 @@
             "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline.",
             "tiles": "Bordtegels (1–4), elk gekoppeld aan een aparte entiteit. Indeling: Label=entity_id:attribute:unit:icon (attribute, unit, icon optioneel). Voorbeeld: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Alleen voor het sjabloon board.",
             "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon.",
-            "log_level_attribute": "Attribuut dat het niveau van elke logregel levert (info/warn/error). Laat leeg voor geen niveaulabel. Alleen voor het sjabloon log."
+            "log_level_attribute": "Attribuut dat het niveau van elke logregel levert (info/warn/error). Laat leeg voor geen niveaulabel. Alleen voor het sjabloon log.",
+            "dismissal_ttl": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging. Voorbeeld: 60"
           }
         },
         "reconfigure": {

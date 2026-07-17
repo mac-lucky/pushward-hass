@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Pulsante secondario",
           "description": "Pulsante secondario toccabile — stessa forma di oggetto del pulsante primario."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Pulsante secondario",
           "description": "Pulsante secondario toccabile — stessa forma di oggetto del pulsante primario."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Pulsante secondario",
           "description": "Pulsante secondario toccabile — stessa forma di oggetto del pulsante primario."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Pulsante secondario",
           "description": "Pulsante secondario toccabile — stessa forma di oggetto del pulsante primario."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Pulsante secondario",
           "description": "Pulsante secondario toccabile — stessa forma di oggetto del pulsante primario."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Pulsante secondario",
           "description": "Pulsante secondario toccabile — stessa forma di oggetto del pulsante primario."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Pulsante secondario",
           "description": "Pulsante secondario toccabile — stessa forma di oggetto del pulsante primario."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Priorità temporanea",
           "description": "Priorità per singolo aggiornamento (0-10). Sostituisce la priorità configurata dell'attività solo per questo push."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Priorità temporanea",
           "description": "Priorità per singolo aggiornamento (0-10). Sostituisce la priorità configurata dell'attività solo per questo push."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Unità per serie",
             "tiles": "Riquadri del pannello",
             "log_columns": "Colonne del registro",
-            "log_level_attribute": "Attributo livello di registro"
+            "log_level_attribute": "Attributo livello di registro",
+            "dismissal_ttl": "Rimozione automatica dalla schermata di blocco (secondi)"
           },
           "data_description": {
             "start_states": "Stati dell'entità che avviano la Live Activity. Selezionare dall'elenco o digitare valori personalizzati.",
@@ -1431,7 +1540,8 @@
             "units": "Etichette delle unità per serie. Formato: EtichettaSerie=unità, Temperatura=°C, Umidità=%. Solo per il modello timeline.",
             "tiles": "Riquadri del pannello (1–4), ciascuno che legge un'entità separata. Formato: Label=entity_id:attribute:unit:icon (attribute, unit, icon facoltativi). Esempio: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Solo modello pannello.",
             "log_columns": "Valori aggiuntivi aggiunti a ogni riga del registro (max 6), separati da virgole. Formato: [Label=]source[|unit]. source = un attributo di questa entità (brightness), lo stato di un'altra entità (binary_sensor.door) o un attributo di un'altra entità (sensor.temp:temperature). Esempio: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo modello registro.",
-            "log_level_attribute": "Attributo che fornisce il livello di ciascuna riga di registro (info/warn/error). Lasciare vuoto per nessuna etichetta di livello. Solo modello registro."
+            "log_level_attribute": "Attributo che fornisce il livello di ciascuna riga di registro (info/warn/error). Lasciare vuoto per nessuna etichetta di livello. Solo modello registro.",
+            "dismissal_ttl": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine. Esempio: 60"
           }
         },
         "reconfigure": {

@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Buton secundar",
           "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Buton secundar",
           "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Buton secundar",
           "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Buton secundar",
           "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Buton secundar",
           "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Buton secundar",
           "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Buton secundar",
           "description": "Buton secundar apăsabil — aceeași structură de obiect ca Butonul principal."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Suprascriere prioritate",
           "description": "Prioritate per actualizare (0-10). Suprascrie prioritatea configurată a activității doar pentru acest push."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Suprascriere prioritate",
           "description": "Prioritate per actualizare (0-10). Suprascrie prioritatea configurată a activității doar pentru acest push."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Unități",
             "tiles": "Casete panou",
             "log_columns": "Coloane jurnal",
-            "log_level_attribute": "Atribut nivel jurnal"
+            "log_level_attribute": "Atribut nivel jurnal",
+            "dismissal_ttl": "Eliminare automată de pe ecranul de blocare (secunde)"
           },
           "data_description": {
             "start_states": "Stările entității care pornesc Live Activity. Selectați din listă sau introduceți valori personalizate.",
@@ -1431,7 +1540,8 @@
             "units": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%",
             "tiles": "Casete panou (1–4), fiecare citind o entitate separată. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opționale). Exemplu: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Numai pentru șablonul board.",
             "log_columns": "Valori suplimentare adăugate la fiecare linie de jurnal (max. 6), separate prin virgulă. Format: [Label=]source[|unit]. source = un atribut al acestei entități (brightness), starea altei entități (binary_sensor.door) sau un atribut al altei entități (sensor.temp:temperature). Exemplu: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Doar șablon jurnal.",
-            "log_level_attribute": "Atribut care furnizează nivelul fiecărei linii de jurnal (info/warn/error). Lăsați gol pentru a nu afișa nicio etichetă de nivel. Numai pentru șablonul log."
+            "log_level_attribute": "Atribut care furnizează nivelul fiecărei linii de jurnal (info/warn/error). Lăsați gol pentru a nu afișa nicio etichetă de nivel. Numai pentru șablonul log.",
+            "dismissal_ttl": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere. Exemplu: 60"
           }
         },
         "reconfigure": {

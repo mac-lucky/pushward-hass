@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Nút phụ",
           "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Nút phụ",
           "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Nút phụ",
           "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Nút phụ",
           "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Nút phụ",
           "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Nút phụ",
           "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Nút phụ",
           "description": "Nút phụ có thể chạm — cùng dạng đối tượng như Nút chính."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Ưu tiên ghi đè",
           "description": "Mức ưu tiên cho từng lần cập nhật (0-10). Chỉ ghi đè mức ưu tiên đã cấu hình của hoạt động cho lần đẩy này."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Ưu tiên ghi đè",
           "description": "Mức ưu tiên cho từng lần cập nhật (0-10). Chỉ ghi đè mức ưu tiên đã cấu hình của hoạt động cho lần đẩy này."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Đơn Vị",
             "tiles": "Ô board",
             "log_columns": "Cột nhật ký",
-            "log_level_attribute": "Thuộc tính mức nhật ký"
+            "log_level_attribute": "Thuộc tính mức nhật ký",
+            "dismissal_ttl": "Tự Động Gỡ Khỏi Màn Hình Khóa (giây)"
           },
           "data_description": {
             "start_states": "Trạng thái thực thể khởi động Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
@@ -1431,7 +1540,8 @@
             "units": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%",
             "tiles": "Ô board (1–4), mỗi ô đọc một thực thể riêng. Định dạng: Label=entity_id:attribute:unit:icon (attribute, unit, icon tùy chọn). Ví dụ: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Chỉ dành cho mẫu board.",
             "log_columns": "Các giá trị bổ sung được thêm vào mỗi dòng nhật ký (tối đa 6), phân tách bằng dấu phẩy. Định dạng: [Label=]source[|unit]. source = một thuộc tính của thực thể này (brightness), trạng thái của thực thể khác (binary_sensor.door), hoặc một thuộc tính của thực thể khác (sensor.temp:temperature). Ví dụ: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Chỉ dành cho mẫu nhật ký.",
-            "log_level_attribute": "Thuộc tính cung cấp mức (info/warn/error) cho mỗi dòng nhật ký. Để trống nếu không muốn có nhãn mức. Chỉ dành cho mẫu nhật ký."
+            "log_level_attribute": "Thuộc tính cung cấp mức (info/warn/error) cho mỗi dòng nhật ký. Để trống nếu không muốn có nhãn mức. Chỉ dành cho mẫu nhật ký.",
+            "dismissal_ttl": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc. Ví dụ: 60"
           }
         },
         "reconfigure": {

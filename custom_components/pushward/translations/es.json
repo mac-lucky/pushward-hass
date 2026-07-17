@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Botón secundario",
           "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Botón secundario",
           "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Botón secundario",
           "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Botón secundario",
           "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Botón secundario",
           "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Botón secundario",
           "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Botón secundario",
           "description": "Botón secundario pulsable: misma estructura de objeto que el botón principal."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Prioridad puntual",
           "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Unidades por serie",
             "tiles": "Mosaicos del panel",
             "log_columns": "Columnas de registro",
-            "log_level_attribute": "Atributo de nivel de registro"
+            "log_level_attribute": "Atributo de nivel de registro",
+            "dismissal_ttl": "Quitar automáticamente de la pantalla de bloqueo (segundos)"
           },
           "data_description": {
             "start_states": "Estados de la entidad que inician la Live Activity. Seleccionar de la lista o introducir valores personalizados.",
@@ -1431,7 +1540,8 @@
             "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline.",
             "tiles": "Mosaicos del panel (1–4), cada uno leyendo una entidad distinta. Formato: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcionales). Ejemplo: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Solo plantilla de panel.",
             "log_columns": "Valores adicionales añadidos a cada línea de registro (máx. 6), separados por comas. Formato: [Label=]source[|unit]. source = un atributo de esta entidad (brightness), el estado de otra entidad (binary_sensor.door) o un atributo de otra entidad (sensor.temp:temperature). Ejemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo plantilla de registro.",
-            "log_level_attribute": "Atributo que proporciona el nivel de cada línea de registro (info/warn/error). Dejar vacío para no incluir etiqueta de nivel. Solo plantilla de registro."
+            "log_level_attribute": "Atributo que proporciona el nivel de cada línea de registro (info/warn/error). Dejar vacío para no incluir etiqueta de nivel. Solo plantilla de registro.",
+            "dismissal_ttl": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar. Ejemplo: 60"
           }
         },
         "reconfigure": {

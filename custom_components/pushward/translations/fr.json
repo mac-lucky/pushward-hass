@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Bouton secondaire",
           "description": "Bouton secondaire cliquable — même forme d'objet que le bouton principal."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Bouton secondaire",
           "description": "Bouton secondaire cliquable — même forme d'objet que le bouton principal."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Bouton secondaire",
           "description": "Bouton secondaire cliquable — même forme d'objet que le bouton principal."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Bouton secondaire",
           "description": "Bouton secondaire cliquable — même forme d'objet que le bouton principal."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Bouton secondaire",
           "description": "Bouton secondaire cliquable — même forme d'objet que le bouton principal."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Bouton secondaire",
           "description": "Bouton secondaire cliquable — même forme d'objet que le bouton principal."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Bouton secondaire",
           "description": "Bouton secondaire cliquable — même forme d'objet que le bouton principal."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Priorité ponctuelle",
           "description": "Priorité par mise à jour (0-10). Remplace la priorité configurée de la Live Activity pour ce push uniquement."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Priorité ponctuelle",
           "description": "Priorité par mise à jour (0-10). Remplace la priorité configurée de la Live Activity pour ce push uniquement."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Unités par série",
             "tiles": "Tuiles du tableau",
             "log_columns": "Colonnes de journal",
-            "log_level_attribute": "Attribut de niveau de journal"
+            "log_level_attribute": "Attribut de niveau de journal",
+            "dismissal_ttl": "Retrait automatique de l'écran verrouillé (secondes)"
           },
           "data_description": {
             "start_states": "États de l'entité qui démarrent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées.",
@@ -1431,7 +1540,8 @@
             "units": "Libellés d'unités par série. Format : LibelléSérie=unité, Température=°C, Humidité=%. Modèle timeline uniquement.",
             "tiles": "Tuiles du tableau (1–4), chacune lisant une entité distincte. Format : Label=entity_id:attribute:unit:icon (attribute, unit, icon facultatifs). Exemple : Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Modèle tableau uniquement.",
             "log_columns": "Valeurs supplémentaires ajoutées à chaque ligne de journal (max. 6), séparées par des virgules. Format : [Label=]source[|unit]. source = un attribut de cette entité (brightness), l'état d'une autre entité (binary_sensor.door) ou un attribut d'une autre entité (sensor.temp:temperature). Exemple : color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Modèle journal uniquement.",
-            "log_level_attribute": "Attribut fournissant le niveau de chaque ligne de journal (info/warn/error). Laisser vide pour aucune étiquette de niveau. Modèle journal uniquement."
+            "log_level_attribute": "Attribut fournissant le niveau de chaque ligne de journal (info/warn/error). Laisser vide pour aucune étiquette de niveau. Modèle journal uniquement.",
+            "dismissal_ttl": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin. Exemple : 60"
           }
         },
         "reconfigure": {

@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "次按钮",
           "description": "可点击的次按钮——对象结构与主按钮相同。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "次按钮",
           "description": "可点击的次按钮——对象结构与主按钮相同。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "次按钮",
           "description": "可点击的次按钮——对象结构与主按钮相同。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "次按钮",
           "description": "可点击的次按钮——对象结构与主按钮相同。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "次按钮",
           "description": "可点击的次按钮——对象结构与主按钮相同。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "次按钮",
           "description": "可点击的次按钮——对象结构与主按钮相同。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "次按钮",
           "description": "可点击的次按钮——对象结构与主按钮相同。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "优先级覆盖",
           "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "每系列单位",
             "tiles": "board 磁贴",
             "log_columns": "日志列",
-            "log_level_attribute": "日志级别属性"
+            "log_level_attribute": "日志级别属性",
+            "dismissal_ttl": "从锁定屏幕自动移除（秒）"
           },
           "data_description": {
             "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
@@ -1431,7 +1540,8 @@
             "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。",
             "tiles": "board 磁贴（1-4 个），每个读取一个独立实体。格式：Label=entity_id:attribute:unit:icon（attribute、unit、icon 可选）。示例：Temp=sensor.kitchen::°C, Door=binary_sensor.front_door。仅适用于 board 模板。",
             "log_columns": "追加到每条日志行的额外值（最多 6 个），以逗号分隔。格式：[Label=]source[|unit]。source = 此实体的属性 (brightness)、另一实体的状态 (binary_sensor.door) 或另一实体的属性 (sensor.temp:temperature)。示例：color_temp_kelvin|K, brightness → 'On · 4000K · 153'。仅限日志模板。",
-            "log_level_attribute": "提供每条日志行级别（info/warn/error）的实体属性。留空则不显示级别标签。仅适用于 log 模板。"
+            "log_level_attribute": "提供每条日志行级别（info/warn/error）的实体属性。留空则不显示级别标签。仅适用于 log 模板。",
+            "dismissal_ttl": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。 示例：60"
           }
         },
         "reconfigure": {

@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "द्वितीयक बटन",
           "description": "द्वितीयक टैप-योग्य बटन — प्राथमिक बटन के समान ऑब्जेक्ट आकार।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "द्वितीयक बटन",
           "description": "द्वितीयक टैप-योग्य बटन — प्राथमिक बटन के समान ऑब्जेक्ट आकार।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "द्वितीयक बटन",
           "description": "द्वितीयक टैप-योग्य बटन — प्राथमिक बटन के समान ऑब्जेक्ट आकार।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "द्वितीयक बटन",
           "description": "द्वितीयक टैप-योग्य बटन — प्राथमिक बटन के समान ऑब्जेक्ट आकार।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "द्वितीयक बटन",
           "description": "द्वितीयक टैप-योग्य बटन — प्राथमिक बटन के समान ऑब्जेक्ट आकार।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "द्वितीयक बटन",
           "description": "द्वितीयक टैप-योग्य बटन — प्राथमिक बटन के समान ऑब्जेक्ट आकार।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "द्वितीयक बटन",
           "description": "द्वितीयक टैप-योग्य बटन — प्राथमिक बटन के समान ऑब्जेक्ट आकार।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "प्राथमिकता ओवरराइड",
           "description": "प्रति-अपडेट प्राथमिकता (0-10)। केवल इस पुश के लिए Activity की कॉन्फ़िगर की गई प्राथमिकता को ओवरराइड करती है।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "प्राथमिकता ओवरराइड",
           "description": "प्रति-अपडेट प्राथमिकता (0-10)। केवल इस पुश के लिए Activity की कॉन्फ़िगर की गई प्राथमिकता को ओवरराइड करती है।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "इकाइयां",
             "tiles": "Board टाइल्स",
             "log_columns": "लॉग कॉलम",
-            "log_level_attribute": "लॉग स्तर Attribute"
+            "log_level_attribute": "लॉग स्तर Attribute",
+            "dismissal_ttl": "लॉक स्क्रीन से स्वतः हटाएं (सेकंड)"
           },
           "data_description": {
             "start_states": "इकाई की वे अवस्थाएं जो Live Activity प्रारंभ करती हैं। सूची से चुनें या कस्टम मान टाइप करें।",
@@ -1431,7 +1540,8 @@
             "units": "Timeline श्रृंखला के लिए इकाई लेबल। प्रारूप: attribute=इकाई। उदाहरण: temp=°C, humidity=%",
             "tiles": "Board टाइल्स (1–4), प्रत्येक एक अलग इकाई से पढ़ता है। Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon वैकल्पिक)। उदाहरण: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door। केवल board टेम्पलेट।",
             "log_columns": "हर लॉग लाइन में जोड़े गए अतिरिक्त मान (अधिकतम 6), अल्पविराम से अलग। Format: [Label=]source[|unit]. source = इस इकाई का एक attribute (brightness), किसी अन्य इकाई की अवस्था (binary_sensor.door), या किसी अन्य इकाई का attribute (sensor.temp:temperature)। उदाहरण: color_temp_kelvin|K, brightness → 'On · 4000K · 153'। केवल लॉग टेम्पलेट।",
-            "log_level_attribute": "हर लॉग पंक्ति का स्तर (info/warn/error) देने वाला attribute। स्तर टैग न देने के लिए खाली छोड़ें। केवल लॉग टेम्पलेट।"
+            "log_level_attribute": "हर लॉग पंक्ति का स्तर (info/warn/error) देने वाला attribute। स्तर टैग न देने के लिए खाली छोड़ें। केवल लॉग टेम्पलेट।",
+            "dismissal_ttl": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है। उदाहरण: 60"
           }
         },
         "reconfigure": {

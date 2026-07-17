@@ -31,6 +31,8 @@ update_activity:
             - "alert"
             - "gauge"
             - "timeline"
+            - "board"
+            - "log"
     progress:
       name: Progress
       description: Progress value between 0.0 and 1.0.
@@ -341,6 +343,33 @@ update_activity:
               min: 0
               max: 10
               mode: slider
+        ended_ttl:
+          name: Ended TTL
+          description: Seconds to keep the activity after it ends. Leave empty to keep indefinitely.
+          example: 300
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        stale_ttl:
+          name: Stale TTL
+          description: Seconds before the activity is considered stale. Leave empty to disable.
+          example: 1800
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        dismissal_ttl:
+          name: Dismissal TTL
+          description: Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end. Leave empty for the default.
+          example: 60
+          selector:
+            number:
+              min: 0
+              max: 14400
+              mode: box
 
 update_activity_generic:
   fields:
@@ -463,6 +492,27 @@ update_activity_generic:
               min: 0
               max: 10
               mode: slider
+        ended_ttl:
+          example: 300
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        stale_ttl:
+          example: 1800
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        dismissal_ttl:
+          example: 60
+          selector:
+            number:
+              min: 0
+              max: 14400
+              mode: box
 
 update_activity_countdown:
   fields:
@@ -607,6 +657,27 @@ update_activity_countdown:
               min: 0
               max: 10
               mode: slider
+        ended_ttl:
+          example: 300
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        stale_ttl:
+          example: 1800
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        dismissal_ttl:
+          example: 60
+          selector:
+            number:
+              min: 0
+              max: 14400
+              mode: box
 
 update_activity_steps:
   fields:
@@ -756,6 +827,27 @@ update_activity_steps:
               min: 0
               max: 10
               mode: slider
+        ended_ttl:
+          example: 300
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        stale_ttl:
+          example: 1800
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        dismissal_ttl:
+          example: 60
+          selector:
+            number:
+              min: 0
+              max: 14400
+              mode: box
 
 update_activity_alert:
   fields:
@@ -884,6 +976,27 @@ update_activity_alert:
               min: 0
               max: 10
               mode: slider
+        ended_ttl:
+          example: 300
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        stale_ttl:
+          example: 1800
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        dismissal_ttl:
+          example: 60
+          selector:
+            number:
+              min: 0
+              max: 14400
+              mode: box
 
 update_activity_gauge:
   fields:
@@ -1013,6 +1126,27 @@ update_activity_gauge:
               min: 0
               max: 10
               mode: slider
+        ended_ttl:
+          example: 300
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        stale_ttl:
+          example: 1800
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        dismissal_ttl:
+          example: 60
+          selector:
+            number:
+              min: 0
+              max: 14400
+              mode: box
 
 update_activity_timeline:
   fields:
@@ -1161,6 +1295,27 @@ update_activity_timeline:
               min: 0
               max: 10
               mode: slider
+        ended_ttl:
+          example: 300
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        stale_ttl:
+          example: 1800
+          selector:
+            number:
+              min: 1
+              max: 2592000
+              mode: box
+        dismissal_ttl:
+          example: 60
+          selector:
+            number:
+              min: 0
+              max: 14400
+              mode: box
 
 # board/log use a deliberately FLAT field layout (no collapsible `sections`) so the
 # only new translation strings live in en.json — avoiding the all-locale `sections`
@@ -1237,6 +1392,27 @@ update_activity_board:
           min: 0
           max: 10
           mode: slider
+    ended_ttl:
+      example: 300
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    stale_ttl:
+      example: 1800
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    dismissal_ttl:
+      example: 60
+      selector:
+        number:
+          min: 0
+          max: 14400
+          mode: box
 
 update_activity_log:
   fields:
@@ -1310,6 +1486,27 @@ update_activity_log:
           min: 0
           max: 10
           mode: slider
+    ended_ttl:
+      example: 300
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    stale_ttl:
+      example: 1800
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    dismissal_ttl:
+      example: 60
+      selector:
+        number:
+          min: 0
+          max: 14400
+          mode: box
 
 create_activity:
   name: Create Activity

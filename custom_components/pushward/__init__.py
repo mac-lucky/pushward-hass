@@ -182,6 +182,10 @@ _UNIVERSAL_ACTION_FIELDS = {
 _UPDATE_TOPLEVEL_FIELDS = {
     vol.Required("slug"): validate_slug,
     vol.Required("state"): vol.In(ACTIVITY_STATES),
+    # Patchable persistence windows, top-level on the PATCH body, not content.
+    vol.Optional("ended_ttl"): vol.All(vol.Coerce(int), vol.Range(min=ACTIVITY_TTL_MIN, max=ACTIVITY_TTL_MAX)),
+    vol.Optional("stale_ttl"): vol.All(vol.Coerce(int), vol.Range(min=ACTIVITY_TTL_MIN, max=ACTIVITY_TTL_MAX)),
+    vol.Optional("dismissal_ttl"): vol.All(vol.Coerce(int), vol.Range(min=DISMISSAL_TTL_MIN, max=DISMISSAL_TTL_MAX)),
 }
 _UNIVERSAL_LABEL_FIELDS = {
     vol.Optional("state_text"): str,
@@ -224,6 +228,9 @@ _STEPS_TEMPLATE_FIELDS = {
     vol.Optional("step_rows"): list,
     vol.Optional("step_weights"): list,
     vol.Optional("step_colors"): list,
+    # Re-anchors the live-progress window server-side (start_date=now / end_date=now+duration),
+    # same validator as the countdown field: int seconds (>=1) or a Go-style duration string.
+    vol.Optional("duration"): validate_duration,
 }
 _ALERT_TEMPLATE_FIELDS = {
     vol.Optional("severity"): vol.In(SEVERITIES),
@@ -521,9 +528,10 @@ def _surface_api_errors():
 async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, template: str | None = None) -> None:
     """PATCH an activity from a service call.
 
-    sound/priority are top-level PATCH kwargs; every remaining field is content. state_text
-    is the user-facing name for the content "state" string. The per-template actions inject
-    their template (their schema omits it); the deprecated alias lets the caller pass it.
+    sound/priority and the ended/stale/dismissal TTLs are top-level PATCH kwargs; every
+    remaining field is content. state_text is the user-facing name for the content "state"
+    string. The per-template actions inject their template (their schema omits it); the
+    deprecated alias lets the caller pass it.
     """
     api = _get_api(hass)
     content = dict(call.data)
@@ -531,12 +539,24 @@ async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, templ
     state = content.pop("state")
     sound = content.pop("sound", None) or None
     priority = content.pop("priority", None)
+    ended_ttl = content.pop("ended_ttl", None)
+    stale_ttl = content.pop("stale_ttl", None)
+    dismissal_ttl = content.pop("dismissal_ttl", None)
     if "state_text" in content:
         content["state"] = content.pop("state_text")
     if template is not None:
         content["template"] = template
     with _surface_api_errors():
-        await api.update_activity(slug, state, content, sound=sound, priority=priority)
+        await api.update_activity(
+            slug,
+            state,
+            content,
+            sound=sound,
+            priority=priority,
+            ended_ttl=ended_ttl,
+            stale_ttl=stale_ttl,
+            dismissal_ttl=dismissal_ttl,
+        )
 
 
 async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) -> None:

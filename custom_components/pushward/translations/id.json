@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Tombol Sekunder",
           "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Tombol Sekunder",
           "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Tombol Sekunder",
           "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Tombol Sekunder",
           "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Tombol Sekunder",
           "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Tombol Sekunder",
           "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Tombol Sekunder",
           "description": "Tombol sekunder yang dapat diketuk — bentuk objek sama dengan Tombol Utama."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Override Prioritas",
           "description": "Prioritas per pembaruan (0-10). Hanya menimpa prioritas yang dikonfigurasi pada aktivitas untuk push ini."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Override Prioritas",
           "description": "Prioritas per pembaruan (0-10). Hanya menimpa prioritas yang dikonfigurasi pada aktivitas untuk push ini."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Satuan",
             "tiles": "Ubin board",
             "log_columns": "Kolom Log",
-            "log_level_attribute": "Atribut Tingkat Log"
+            "log_level_attribute": "Atribut Tingkat Log",
+            "dismissal_ttl": "Hapus Otomatis dari Layar Terkunci (detik)"
           },
           "data_description": {
             "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
@@ -1431,7 +1540,8 @@
             "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%",
             "tiles": "Ubin board (1–4), masing-masing membaca entitas terpisah. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opsional). Contoh: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Hanya templat board.",
             "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log.",
-            "log_level_attribute": "Atribut yang menyediakan level (info/warn/error) untuk setiap baris log. Kosongkan jika tidak ingin ada tag level. Hanya templat log."
+            "log_level_attribute": "Atribut yang menyediakan level (info/warn/error) untuk setiap baris log. Kosongkan jika tidak ingin ada tag level. Hanya templat log.",
+            "dismissal_ttl": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir. Contoh: 60"
           }
         },
         "reconfigure": {

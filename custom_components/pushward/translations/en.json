@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "Secondary Button",
           "description": "Secondary tappable button — same object shape as the Primary Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "Secondary Button",
           "description": "Secondary tappable button — same object shape as the Primary Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "Secondary Button",
           "description": "Secondary tappable button — same object shape as the Primary Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "Secondary Button",
           "description": "Secondary tappable button — same object shape as the Primary Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "Secondary Button",
           "description": "Secondary tappable button — same object shape as the Primary Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "Secondary Button",
           "description": "Secondary tappable button — same object shape as the Primary Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "Secondary Button",
           "description": "Secondary tappable button — same object shape as the Primary Button."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Priority Override",
           "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Per-Series Units",
             "tiles": "Board Tiles",
             "log_columns": "Log Columns",
-            "log_level_attribute": "Log Level Attribute"
+            "log_level_attribute": "Log Level Attribute",
+            "dismissal_ttl": "Auto-Remove From Lock Screen (seconds)"
           },
           "data_description": {
             "start_states": "Entity states that start the Live Activity. Select from the list or type custom values.",
@@ -1431,7 +1540,8 @@
             "units": "Per-series unit labels. Format: SeriesLabel=unit, Temperature=°C, Humidity=%. Timeline template only.",
             "tiles": "Board tiles (1–4), each reading a separate entity. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon optional). Example: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Board template only.",
             "log_columns": "Extra values appended to each log line (max 6), comma-separated. Format: [Label=]source[|unit]. source = an attribute of this entity (brightness), another entity's state (binary_sensor.door), or another entity's attribute (sensor.temp:temperature). Example: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Log template only.",
-            "log_level_attribute": "Attribute supplying each log line's level (info/warn/error). Leave empty for no level tag. Log template only."
+            "log_level_attribute": "Attribute supplying each log line's level (info/warn/error). Leave empty for no level tag. Log template only.",
+            "dismissal_ttl": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end. Example: 60"
           }
         },
         "reconfigure": {

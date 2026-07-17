@@ -145,13 +145,22 @@ class PushWardApiClient:
         *,
         sound: str | None = None,
         priority: int | None = None,
+        ended_ttl: int | None = None,
+        stale_ttl: int | None = None,
+        dismissal_ttl: int | None = None,
     ) -> None:
-        """PATCH /activities/{slug} — sound and priority are top-level, not content fields."""
+        """PATCH /activities/{slug}: sound, priority, and the TTLs are top-level, not content."""
         body: dict = {"state": state, "content": content}
         if sound is not None:
             body["sound"] = sound
         if priority is not None:
             body["priority"] = priority
+        if ended_ttl is not None:
+            body["ended_ttl"] = ended_ttl
+        if stale_ttl is not None:
+            body["stale_ttl"] = stale_ttl
+        if dismissal_ttl is not None:
+            body["dismissal_ttl"] = dismissal_ttl
         await self._request_with_retry("PATCH", f"/activities/{slug}", json=body)
 
     async def delete_activity(self, slug: str) -> None:

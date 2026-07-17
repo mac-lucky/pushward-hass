@@ -662,6 +662,65 @@ async def test_update_activity_omits_priority_when_none():
     assert "priority" not in body
 
 
+# --- patchable TTLs top-level ---
+
+
+async def test_update_activity_sends_ttls_top_level():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity(
+        "slug", "ongoing", {"template": "generic"}, ended_ttl=300, stale_ttl=1800, dismissal_ttl=60
+    )
+
+    body = session.request.call_args[1]["json"]
+    assert body["ended_ttl"] == 300
+    assert body["stale_ttl"] == 1800
+    assert body["dismissal_ttl"] == 60
+    # TTLs are top-level PATCH fields, never content.
+    assert "ended_ttl" not in body["content"]
+    assert "dismissal_ttl" not in body["content"]
+
+
+async def test_update_activity_omits_ttls_when_none():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("slug", "ongoing", {"template": "generic"})
+
+    body = session.request.call_args[1]["json"]
+    assert "ended_ttl" not in body
+    assert "stale_ttl" not in body
+    assert "dismissal_ttl" not in body
+
+
+async def test_update_activity_sends_dismissal_ttl_zero():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    # 0 means "remove immediately on end", a meaningful value that must not be dropped.
+    await client.update_activity("slug", "ongoing", {"template": "generic"}, dismissal_ttl=0)
+
+    body = session.request.call_args[1]["json"]
+    assert body["dismissal_ttl"] == 0
+
+
+async def test_update_activity_sends_partial_ttls():
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("slug", "ongoing", {"template": "generic"}, stale_ttl=1800)
+
+    body = session.request.call_args[1]["json"]
+    assert body["stale_ttl"] == 1800
+    assert "ended_ttl" not in body
+    assert "dismissal_ttl" not in body
+
+
 # --- exception hierarchy ---
 
 

@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "セカンダリボタン",
           "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "セカンダリボタン",
           "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "セカンダリボタン",
           "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "セカンダリボタン",
           "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "セカンダリボタン",
           "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "セカンダリボタン",
           "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "セカンダリボタン",
           "description": "タップ可能なセカンダリボタン — プライマリボタンと同じオブジェクト形式。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "優先度の上書き",
           "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "系列ごとの単位",
             "tiles": "board タイル",
             "log_columns": "ログ列",
-            "log_level_attribute": "ログレベル属性"
+            "log_level_attribute": "ログレベル属性",
+            "dismissal_ttl": "ロック画面から自動削除（秒）"
           },
           "data_description": {
             "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
@@ -1431,7 +1540,8 @@
             "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。",
             "tiles": "board タイル（1〜4）。それぞれが個別のエンティティを読み取ります。形式: Label=entity_id:attribute:unit:icon（attribute、unit、icon は省略可）。例: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door。board テンプレートのみ。",
             "log_columns": "各ログ行に追加される値（最大6個）、カンマ区切り。形式: [Label=]source[|unit]。source = このエンティティの属性 (brightness)、別のエンティティの状態 (binary_sensor.door)、または別のエンティティの属性 (sensor.temp:temperature)。例: color_temp_kelvin|K, brightness → 'On · 4000K · 153'。ログテンプレートのみ。",
-            "log_level_attribute": "各ログ行のレベル（info/warn/error）を示すエンティティ属性。レベルタグを付けない場合は空のままにします。log テンプレートのみ。"
+            "log_level_attribute": "各ログ行のレベル（info/warn/error）を示すエンティティ属性。レベルタグを付けない場合は空のままにします。log テンプレートのみ。",
+            "dismissal_ttl": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。 例: 60"
           }
         },
         "reconfigure": {

@@ -206,6 +206,18 @@
         "secondary_url_action": {
           "name": "İkincil Düğme",
           "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       },
       "sections": {
@@ -322,6 +334,18 @@
         "secondary_url_action": {
           "name": "İkincil Düğme",
           "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       },
       "sections": {
@@ -438,6 +462,18 @@
         "secondary_url_action": {
           "name": "İkincil Düğme",
           "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       },
       "sections": {
@@ -570,6 +606,18 @@
         "secondary_url_action": {
           "name": "İkincil Düğme",
           "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       },
       "sections": {
@@ -678,6 +726,18 @@
         "secondary_url_action": {
           "name": "İkincil Düğme",
           "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       },
       "sections": {
@@ -790,6 +850,18 @@
         "secondary_url_action": {
           "name": "İkincil Düğme",
           "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       },
       "sections": {
@@ -918,6 +990,18 @@
         "secondary_url_action": {
           "name": "İkincil Düğme",
           "description": "İkincil dokunulabilir düğme — Birincil Düğme ile aynı nesne yapısı."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       },
       "sections": {
@@ -994,6 +1078,18 @@
         "priority": {
           "name": "Öncelik Geçersiz Kılma",
           "description": "Güncelleme başına öncelik (0–10). Yalnızca bu push için aktivitenin yapılandırılmış önceliğini geçersiz kılar."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       }
     },
@@ -1052,6 +1148,18 @@
         "priority": {
           "name": "Öncelik Geçersiz Kılma",
           "description": "Güncelleme başına öncelik (0–10). Yalnızca bu push için aktivitenin yapılandırılmış önceliğini geçersiz kılar."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
         }
       }
     },
@@ -1364,7 +1472,8 @@
             "units": "Birimler",
             "tiles": "Board Kutuları",
             "log_columns": "Günlük Sütunları",
-            "log_level_attribute": "Günlük Düzeyi Özniteliği"
+            "log_level_attribute": "Günlük Düzeyi Özniteliği",
+            "dismissal_ttl": "Kilit Ekranından Otomatik Kaldır (saniye)"
           },
           "data_description": {
             "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin.",
@@ -1431,7 +1540,8 @@
             "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%",
             "tiles": "Board kutuları (1–4), her biri ayrı bir varlığı okur. Biçim: Etiket=entity_id:öznitelik:birim:simge (öznitelik, birim, simge isteğe bağlı). Örnek: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Yalnızca board şablonu.",
             "log_columns": "Her günlük satırına eklenen ek değerler (en fazla 6), virgülle ayrılır. Biçim: [Label=]source[|unit]. source = bu varlığın bir niteliği (brightness), başka bir varlığın durumu (binary_sensor.door) veya başka bir varlığın niteliği (sensor.temp:temperature). Örnek: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Yalnızca günlük şablonu.",
-            "log_level_attribute": "Her günlük satırının düzeyini (info/warn/error) sağlayan öznitelik. Düzey etiketi istemiyorsanız boş bırakın. Yalnızca log şablonu."
+            "log_level_attribute": "Her günlük satırının düzeyini (info/warn/error) sağlayan öznitelik. Düzey etiketi istemiyorsanız boş bırakın. Yalnızca log şablonu.",
+            "dismissal_ttl": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır. Örnek: 60"
           }
         },
         "reconfigure": {
