@@ -20,7 +20,12 @@ from custom_components.pushward.activity_manager import (
     _companion_entity_ids,
     _forbidden_notification_id,
 )
-from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardForbiddenError
+from custom_components.pushward.api import (
+    PushWardApiError,
+    PushWardAuthError,
+    PushWardForbiddenError,
+    PushWardNotFoundError,
+)
 from custom_components.pushward.const import (
     CONF_END_STATES,
     CONF_ENDED_TTL,
@@ -35,6 +40,7 @@ from custom_components.pushward.const import (
     CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_SUBTITLE_ENTITY,
     CONF_TEMPLATE,
     CONF_TILES,
     CONF_UNIT,
@@ -62,6 +68,36 @@ def _mock_entry() -> MagicMock:
     entry = MagicMock()
     entry.async_start_reauth = MagicMock()
     return entry
+
+
+# Patching this name swaps asyncio.sleep for the whole module (the module holds the
+# asyncio module object, so the patch is global). block_till_done then deadlocks
+# against a gated end task, so window tests pump the loop with sleep(0) instead.
+SLEEP_TARGET = "custom_components.pushward.activity_manager.asyncio.sleep"
+
+
+def _gated_sleep(gate: asyncio.Event):
+    """Return a fake asyncio.sleep: a non-zero delay blocks on ``gate``, sleep(0) passes.
+
+    ``real_sleep`` is captured before the patch is applied so sleep(0) (used by
+    HA internals and the pump loop) still yields normally instead of recursing
+    into the fake.
+    """
+    real_sleep = asyncio.sleep
+
+    async def fake(delay, *args):
+        if delay:
+            await gate.wait()
+        else:
+            await real_sleep(0)
+
+    return fake
+
+
+async def _pump(times: int = 10) -> None:
+    """Advance the loop without block_till_done (which would wait on a gated task)."""
+    for _ in range(times):
+        await asyncio.sleep(0)
 
 
 async def test_start_activity_on_state_change(hass: HomeAssistant) -> None:
@@ -186,40 +222,231 @@ async def test_stop_ends_all_active(hass: HomeAssistant) -> None:
 
 
 async def test_rapid_on_off_cancels_end(hass: HomeAssistant) -> None:
-    """Rapid on→off→on cancels the end task and keeps activity active."""
+    """off->on during the completion window cancels the end task and restarts.
+
+    The old body handed the sleep mock an un-awaited Event.wait() coroutine, so
+    the sleep resolved instantly and the window was never actually open. This
+    drives a real gated window: one completion frame goes out, then on returns
+    mid-window and must cancel the pending ENDED and re-upsert the activity.
+    """
     api = _mock_api()
     config = _entity_config()
     manager = ActivityManager(hass, api, [config], _mock_entry())
 
     hass.states.async_set("binary_sensor.washer", "off")
     await manager.async_start()
-
-    # Start activity
     hass.states.async_set("binary_sensor.washer", "on")
     await hass.async_block_till_done()
-
-    # End activity (schedules two-phase end with sleep)
-    with patch(
-        "custom_components.pushward.activity_manager.asyncio.sleep",
-        new_callable=AsyncMock,
-    ) as mock_sleep:
-        # Make sleep block so end task is pending
-        sleep_event = asyncio.Event()
-        mock_sleep.side_effect = lambda _: sleep_event.wait()
-
-        hass.states.async_set("binary_sensor.washer", "off")
-        await hass.async_block_till_done()
-
-        # Quickly turn back on — should cancel end task
-        hass.states.async_set("binary_sensor.washer", "on")
-        await hass.async_block_till_done()
-
-        # Release sleep to avoid dangling tasks
-        sleep_event.set()
-        await hass.async_block_till_done()
-
     tracked = manager._tracked["binary_sensor.washer"]
     assert tracked.is_active
+    api.reset_mock()
+
+    gate = asyncio.Event()
+    with patch(SLEEP_TARGET, _gated_sleep(gate)):
+        # Enter the completion window: one ONGOING completion frame, then block.
+        hass.states.async_set("binary_sensor.washer", "off")
+        await _pump()
+        end_task = tracked.end_task
+        assert end_task is not None and not end_task.done()
+        assert api.update_activity.await_count == 1
+        assert api.update_activity.call_args_list[0].args[1] == "ongoing"
+
+        # Turn back on while the window is open -> restart, not run-to-ENDED.
+        hass.states.async_set("binary_sensor.washer", "on")
+        await _pump()
+
+        assert end_task.cancelled()
+        # The restart re-upserts (create_activity) and stays active.
+        api.create_activity.assert_awaited_once()
+        assert tracked.is_active
+
+    # No ENDED was ever sent (asserted before async_stop, which would send one).
+    assert activity_updates(api, "ended") == []
+    await manager.async_stop()
+
+
+async def test_churn_during_end_window_keeps_completion_card(hass: HomeAssistant) -> None:
+    """Attribute churn while the entity sits in an end state cannot overpaint the completion card."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    api.reset_mock()
+
+    gate = asyncio.Event()
+    with patch(SLEEP_TARGET, _gated_sleep(gate)):
+        hass.states.async_set("binary_sensor.washer", "off")
+        await _pump()
+        assert api.update_activity.await_count == 1  # the completion frame
+
+        # Backdate so any throttled update would fire on cooldown grounds -- proving
+        # the ending guard, not the cooldown, is what drops the churn below.
+        tracked.last_sent_at = time.monotonic() - 86400
+        hass.states.async_set("binary_sensor.washer", "off", {"churn": 1})
+        hass.states.async_set("binary_sensor.washer", "off", {"churn": 2})
+        await _pump()
+
+        # No live frame over the completion card, and no second completion frame
+        # from the end-state re-report (_schedule_end early-returns while ending).
+        assert api.update_activity.await_count == 1
+
+    gate.set()
+    await hass.async_block_till_done()
+
+    wire_states = [c.args[1] for c in api.update_activity.call_args_list]
+    assert wire_states[-1] == "ended"
+    assert wire_states.count("ended") == 1
+    assert not tracked.is_active
+
+    await manager.async_stop()
+
+
+async def test_companion_churn_during_end_window_dropped(hass: HomeAssistant) -> None:
+    """A companion value change during the completion window is dropped, not pushed."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_SUBTITLE_ENTITY: "sensor.companion", CONF_UPDATE_INTERVAL: 0})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    hass.states.async_set("sensor.companion", "hello")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    api.reset_mock()
+
+    gate = asyncio.Event()
+    with patch(SLEEP_TARGET, _gated_sleep(gate)):
+        hass.states.async_set("binary_sensor.washer", "off")
+        await _pump()
+        assert api.update_activity.await_count == 1  # the completion frame
+
+        tracked.last_sent_at = time.monotonic() - 86400
+        hass.states.async_set("sensor.companion", "world")
+        await _pump()
+        assert api.update_activity.await_count == 1  # companion churn dropped while ending
+
+    gate.set()
+    await hass.async_block_till_done()
+
+    # Clean two-phase end: completion then ENDED, nothing in between.
+    wire_states = [c.args[1] for c in api.update_activity.call_args_list]
+    assert wire_states == ["ongoing", "ended"]
+    assert not tracked.is_active
+
+    await manager.async_stop()
+
+
+async def test_stop_during_end_window_sends_ended(hass: HomeAssistant) -> None:
+    """async_stop while the completion window is open still emits a single ENDED."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    assert manager._tracked["binary_sensor.washer"].is_active
+    api.reset_mock()
+
+    gate = asyncio.Event()
+    with patch(SLEEP_TARGET, _gated_sleep(gate)):
+        hass.states.async_set("binary_sensor.washer", "off")
+        await _pump()
+        assert api.update_activity.await_count == 1  # the completion frame
+
+        # Stop cancels the gated end task, then sends ENDED for the still-active entity.
+        await manager.async_stop()
+
+    wire_states = [c.args[1] for c in api.update_activity.call_args_list]
+    assert wire_states == ["ongoing", "ended"]
+
+
+async def test_update_404_recreates_activity(hass: HomeAssistant) -> None:
+    """A PATCH that 404s (activity gone server-side) self-heals via a recreate POST."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off", {"progress": 0})
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 1})
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    api.reset_mock()
+
+    # First PATCH 404s, the recreate + retry PATCH succeeds.
+    api.update_activity.side_effect = [PushWardNotFoundError("gone", status_code=404), None]
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 42})
+
+    api.create_activity.assert_awaited_once()
+    assert api.update_activity.await_count == 2
+    assert tracked.recreate_attempted is True
+
+    # A subsequent clean send re-arms the self-heal flag.
+    api.update_activity.side_effect = None
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 43})
+    assert tracked.recreate_attempted is False
+
+    await manager.async_stop()
+
+
+async def test_update_404_recreates_only_once_per_streak(hass: HomeAssistant) -> None:
+    """A persistent 404 streak recreates the activity once, not on every state change."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off", {"progress": 0})
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 1})
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    api.reset_mock()
+
+    # Every PATCH 404s (the recreate does not stick).
+    api.update_activity.side_effect = PushWardNotFoundError("gone", status_code=404)
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 42})
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 43})
+
+    api.create_activity.assert_awaited_once()
+
+    await manager.async_stop()
+
+
+async def test_end_404_skips_ended(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    """A phase-1 completion push that 404s means the activity is already gone: no ENDED follows."""
+    api = _mock_api()
+    config = _entity_config()
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    api.reset_mock()
+
+    api.update_activity.side_effect = PushWardNotFoundError("gone", status_code=404)
+    await end_activity_via_state(manager, hass, "binary_sensor.washer", "off", {})
+
+    assert api.update_activity.await_count == 1  # only the failed completion push
+    assert activity_updates(api, "ended") == []
+    assert not tracked.is_active
+    # A 404 here is expected (already gone), so the early return must swallow it
+    # quietly: the old guard-swallow path logged it as a push failure instead.
+    assert not [r for r in caplog.records if r.levelno == logging.WARNING and "ha-washer" in r.getMessage()]
 
     await manager.async_stop()
 

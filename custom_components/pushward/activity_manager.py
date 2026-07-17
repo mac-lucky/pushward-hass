@@ -24,7 +24,13 @@ from homeassistant.helpers.event import (
 )
 from homeassistant.helpers.storage import Store
 
-from .api import PushWardApiClient, PushWardApiError, PushWardAuthError, PushWardForbiddenError
+from .api import (
+    PushWardApiClient,
+    PushWardApiError,
+    PushWardAuthError,
+    PushWardForbiddenError,
+    PushWardNotFoundError,
+)
 from .const import (
     ACTIVITY_STATE_ENDED,
     ACTIVITY_STATE_ONGOING,
@@ -156,6 +162,8 @@ class TrackedEntity:
     update_pending: bool = False
     generation: int = 0
     last_sent_at: float = 0.0
+    # One recreate per 404 streak; reset on the next successful push.
+    recreate_attempted: bool = False
     # (ts_seconds, {label: value}) — sampled on every state change. HA 2024.8+
     # strips light attributes from the recorder DB, so recorder queries can't
     # rebuild brightness history. Keep our own ring buffer instead.
@@ -371,12 +379,16 @@ class ActivityManager:
             except Exception:
                 _LOGGER.warning("Failed to flush history buffer on stop", exc_info=True)
 
-        for _entity_id, tracked in self._tracked.items():
-            if tracked.end_task and not tracked.end_task.done():
-                tracked.end_task.cancel()
-
-            if tracked.pending_task and not tracked.pending_task.done():
-                tracked.pending_task.cancel()
+        # Cancel in-flight work and wait for it to settle so a mid-flight send or
+        # end can't fire against the tracker after async_start rebuilds it on a
+        # reload. A cancelled end task leaves is_active untouched (the canceller
+        # owns the state), so the ENDED push below still goes out.
+        cancelled: list[asyncio.Task] = []
+        for tracked in self._tracked.values():
+            for task in (tracked.end_task, tracked.pending_task):
+                if task and not task.done():
+                    task.cancel()
+                    cancelled.append(task)
 
             if tracked.flush_unsub:
                 tracked.flush_unsub()
@@ -388,6 +400,10 @@ class ActivityManager:
                 unsub()
             tracked.companion_unsubs.clear()
 
+        if cancelled:
+            await asyncio.gather(*cancelled, return_exceptions=True)
+
+        for tracked in self._tracked.values():
             if tracked.is_active:
                 slug = tracked.config[CONF_SLUG]
                 try:
@@ -424,7 +440,10 @@ class ActivityManager:
         start_states = config.get(CONF_START_STATES, [])
         end_states = config.get(CONF_END_STATES, [])
 
-        if new_state.state in start_states and not tracked.is_active:
+        # A start state during the completion window means the entity came back
+        # before the two-phase end finished -- restart instead of letting the
+        # window run out and end an activity whose device is on again.
+        if new_state.state in start_states and (not tracked.is_active or self._is_ending(tracked)):
             self._hass.async_create_task(self._start_activity(entity_id))
         elif new_state.state in end_states and tracked.is_active:
             self._schedule_end(entity_id)
@@ -580,18 +599,7 @@ class ActivityManager:
                 content.get("icon"),
             )
 
-            # Resolve activity name: configured name > friendly name > entity_id
-            name = config.get(CONF_ACTIVITY_NAME) or ""
-            if not name:
-                name = current_state.attributes.get("friendly_name", entity_id)
-
-            await self._api.create_activity(
-                slug,
-                name,
-                config.get(CONF_PRIORITY, 1),
-                ended_ttl=config.get(CONF_ENDED_TTL),
-                stale_ttl=config.get(CONF_STALE_TTL),
-            )
+            await self._create_activity(entity_id, config)
 
             # Seed timeline back-history from HA recorder if configured
             if config.get(CONF_TEMPLATE) == "timeline":
@@ -609,6 +617,27 @@ class ActivityManager:
             tracked.is_active = True
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
+            tracked.recreate_attempted = False
+
+    def _activity_name(self, entity_id: str, config: dict) -> str:
+        """Resolve activity name: configured name > friendly name > entity_id."""
+        name = config.get(CONF_ACTIVITY_NAME) or ""
+        if name:
+            return name
+        state = self._hass.states.get(entity_id)
+        if state is None:
+            return entity_id
+        return state.attributes.get("friendly_name", entity_id)
+
+    async def _create_activity(self, entity_id: str, config: dict) -> None:
+        """POST /activities (create-or-upsert) with the configured TTLs."""
+        await self._api.create_activity(
+            config[CONF_SLUG],
+            self._activity_name(entity_id, config),
+            config.get(CONF_PRIORITY, 1),
+            ended_ttl=config.get(CONF_ENDED_TTL),
+            stale_ttl=config.get(CONF_STALE_TTL),
+        )
 
     async def _seed_timeline_history(
         self, entity_id: str, config: dict, _content: dict
@@ -716,10 +745,19 @@ class ActivityManager:
                 result[entity_id] = points
         return result
 
+    @staticmethod
+    def _is_ending(tracked: TrackedEntity) -> bool:
+        """True while the two-phase end task is running (the completion window)."""
+        return tracked.end_task is not None and not tracked.end_task.done()
+
     @callback
     def _schedule_throttled_update(self, entity_id: str) -> None:
         """Rate-limited update: send immediately if cooldown expired, else schedule."""
         tracked = self._tracked[entity_id]
+        if self._is_ending(tracked):
+            # The completion card owns the activity during the end window; a live
+            # update here would overwrite it moments before ENDED lands.
+            return
         if tracked.pending_task is not None and not tracked.pending_task.done():
             # A send is in flight; mark dirty so the newest state goes out after.
             tracked.update_pending = True
@@ -760,7 +798,7 @@ class ActivityManager:
     async def _send_update(self, entity_id: str) -> None:
         """Send the latest content to PushWard."""
         tracked = self._tracked.get(entity_id)
-        if tracked is None or not tracked.is_active:
+        if tracked is None or not tracked.is_active or self._is_ending(tracked):
             return
 
         current_state = self._hass.states.get(entity_id)
@@ -787,7 +825,23 @@ class ActivityManager:
         slug = tracked.config[CONF_SLUG]
         async with self._api_error_guard(slug, "updating"):
             sound = tracked.config.get(CONF_SOUND) or None
-            await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
+            try:
+                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
+            except PushWardNotFoundError:
+                # The server has no row for this slug (dismissed on the phone,
+                # TTL-expired, or deleted out-of-band). Recreate so updates
+                # self-heal instead of 404ing forever -- mirrors the widget
+                # manager. One recreate per 404 streak: if the recreate did not
+                # stick, don't hammer the server on every state change.
+                if tracked.recreate_attempted:
+                    _LOGGER.debug("Activity %s still missing server-side; skipping recreate", slug)
+                    return
+                tracked.recreate_attempted = True
+                _LOGGER.debug("Activity %s missing server-side on update; recreating", slug)
+                await self._create_activity(entity_id, tracked.config)
+                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
+            else:
+                tracked.recreate_attempted = False
             self._clear_forbidden_notification(slug)
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
@@ -799,7 +853,7 @@ class ActivityManager:
         if tracked is None:
             return
         tracked.flush_unsub = None
-        if not tracked.is_active:
+        if not tracked.is_active or self._is_ending(tracked):
             return
         if tracked.pending_task is not None and not tracked.pending_task.done():
             tracked.update_pending = True
@@ -810,8 +864,11 @@ class ActivityManager:
     def _schedule_end(self, entity_id: str) -> None:
         """Schedule a two-phase activity end."""
         tracked = self._tracked[entity_id]
-        if tracked.end_task and not tracked.end_task.done():
-            tracked.end_task.cancel()
+        if self._is_ending(tracked):
+            # Already showing the completion card. Re-running the window here
+            # would re-send phase 1 and postpone ENDED on every end-state
+            # re-report (attribute churn while the device sits in "off").
+            return
         # A flush armed just before the end would fire during the completion sleep
         # and push live content back over the completion card -- re-arming a
         # live_progress window moments before the end push clears it.
@@ -832,11 +889,17 @@ class ActivityManager:
         slug = config[CONF_SLUG]
         gen_at_start = tracked.generation
 
+        cancelled = False
         try:
             async with self._api_error_guard(slug, "ending"):
                 # Phase 1: show completion content (preserves last progress/subtitle)
                 completion = map_completion_content(config, tracked.last_content)
-                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, completion)
+                try:
+                    await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, completion)
+                except PushWardNotFoundError:
+                    # Dismissed on the phone or TTL-expired; nothing left to end.
+                    _LOGGER.debug("Activity %s already gone server-side; skipping end", slug)
+                    return
 
                 # Wait for user to see the completion state
                 await asyncio.sleep(END_DELAY_SECONDS)
@@ -848,9 +911,15 @@ class ActivityManager:
                 # Phase 2: end the activity
                 await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, completion)
                 self._clear_forbidden_notification(slug)
+        except asyncio.CancelledError:
+            cancelled = True
+            raise
         finally:
-            task = asyncio.current_task()
-            if task is None or not task.cancelled():
+            # A cancelled end (restart or shutdown) or a superseding generation
+            # hands state ownership to the canceller / the new run. The old
+            # task.cancelled() check never fired here: it stays False while the
+            # task is still unwinding its own finally.
+            if not cancelled and tracked.generation == gen_at_start:
                 tracked.is_active = False
                 tracked.last_content = None
                 if tracked.flush_unsub:
