@@ -63,6 +63,7 @@ from custom_components.pushward.const import (
     CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
     MAX_SEVERITY_LABEL_LEN,
+    TIMELINE_SERIES_LABEL_MAX,
     normalize_slug,
     validate_slug,
 )
@@ -1636,6 +1637,26 @@ def test_map_content_timeline_multi_series():
 
     assert content["value"] == {"Current": 20.5, "Target": 22.0}
     assert content["unit"] == "\u00b0C"
+
+
+def test_map_content_timeline_series_map_label_clamped():
+    """An over-length series-map label is clamped to the cap as a value-map key.
+
+    Guards a stored config that predates the config-flow cap: without the clamp the value
+    key would exceed TIMELINE_SERIES_LABEL_MAX and the server would 400 the whole push.
+    """
+    long_label = "z" * (TIMELINE_SERIES_LABEL_MAX + 8)
+    state = _make_state("on", {"friendly_name": "Sensor", "temperature": 42.0})
+    config = {
+        CONF_TEMPLATE: "timeline",
+        CONF_SERIES: {"temperature": long_label},
+    }
+
+    content = map_content(state, config)
+
+    assert list(content["value"]) == [long_label[:TIMELINE_SERIES_LABEL_MAX]]
+    assert all(len(key) <= TIMELINE_SERIES_LABEL_MAX for key in content["value"])
+    assert_valid_activity_content(content, where="timeline")
 
 
 def test_map_content_timeline_primary_series_single_fallback():

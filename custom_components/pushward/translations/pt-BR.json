@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "As linhas dos passos devem ser números inteiros, uma por passo (ex.: 1, 2, 3).",
         "invalid_step_weights": "Os pesos dos passos devem ser números positivos, um por passo (ex.: 1, 2.5, 1).",
         "invalid_step_colors": "As cores dos passos devem ser cores nomeadas ou hex como #ff0000; deixe um campo em branco para manter a cor de destaque.",
+        "invalid_step_labels": "Os rótulos dos passos devem ter no máximo 32 caracteres.",
         "invalid_tile": "Cada bloco deve ser label=entity_id (ex.: CPU=sensor.cpu_temp).",
         "too_many_tiles": "Um painel suporta no máximo 4 blocos.",
         "invalid_series_entity": "Cada entidade de série deve referenciar um entity_id (ex.: Bedroom=sensor.bedroom_pm25).",

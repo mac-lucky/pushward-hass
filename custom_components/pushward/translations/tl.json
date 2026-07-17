@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Ang mga hilera ng hakbang ay dapat buong numero, isa bawat hakbang (hal. 1, 2, 3).",
         "invalid_step_weights": "Ang mga timbang ng hakbang ay dapat positibong numero, isa bawat hakbang (hal. 1, 2.5, 1).",
         "invalid_step_colors": "Ang mga kulay ng hakbang ay dapat pinangalanang kulay o hex tulad ng #ff0000; iwang blangko ang isang puwang para panatilihin ang accent na kulay.",
+        "invalid_step_labels": "Ang mga label ng hakbang ay dapat hindi hihigit sa 32 na character.",
         "invalid_tile": "Ang bawat tile ay dapat label=entity_id (hal. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Ang isang board ay sumusuporta ng hanggang 4 na tile.",
         "invalid_series_entity": "Ang bawat series entity ay dapat tumukoy sa isang entity_id (hal. Bedroom=sensor.bedroom_pm25).",

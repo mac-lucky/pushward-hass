@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "ステップの行は整数で、各ステップに1つ指定してください（例: 1, 2, 3）。",
         "invalid_step_weights": "ステップの重みは正の数で、各ステップに1つ指定してください（例: 1, 2.5, 1）。",
         "invalid_step_colors": "ステップの色は色名または #ff0000 のような16進数で指定してください。空欄にするとアクセントカラーが使われます。",
+        "invalid_step_labels": "ステップのラベルは32文字以内で指定してください。",
         "invalid_tile": "各タイルは label=entity_id の形式で指定してください（例: CPU=sensor.cpu_temp）。",
         "too_many_tiles": "ボードは最大4つのタイルまで対応しています。",
         "invalid_series_entity": "各シリーズのエンティティは entity_id を参照する必要があります（例: Bedroom=sensor.bedroom_pm25）。",

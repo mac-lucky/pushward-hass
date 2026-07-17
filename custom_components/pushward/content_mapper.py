@@ -101,6 +101,7 @@ from .const import (
     LOG_LINE_TEXT_MAX,
     MAX_SEVERITY_LABEL_LEN,
     NAMED_COLORS,
+    TIMELINE_SERIES_LABEL_MAX,
     normalize_slug,
 )
 
@@ -1086,7 +1087,11 @@ def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant 
         if coerced is None:
             _LOGGER.debug("Could not parse timeline series attribute %s for %s", attr_name, state.entity_id)
             continue
-        values[label] = coerced
+        # The label is emitted verbatim as a value-map key, which the server caps at
+        # TIMELINE_SERIES_LABEL_MAX runes; clamp defensively so a legacy/over-length
+        # series-map label can't 400 the whole timeline push (the config flow also caps
+        # it, but this guards stored configs that predate that cap).
+        values[str(label)[:TIMELINE_SERIES_LABEL_MAX]] = coerced
 
     for series in entity_config.get(CONF_SERIES_ENTITIES) or []:
         if not isinstance(series, dict):
@@ -1106,7 +1111,9 @@ def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant 
         if coerced is None:
             _LOGGER.debug("Could not parse timeline series entity %s for %s", entity_id, state.entity_id)
             continue
-        values[label] = coerced
+        # Frozen to <= TIMELINE_SERIES_LABEL_MAX at config time; clamp again defensively
+        # so the value-map key never exceeds the server cap.
+        values[str(label)[:TIMELINE_SERIES_LABEL_MAX]] = coerced
 
     if entity_config.get(CONF_SERIES) or entity_config.get(CONF_SERIES_ENTITIES):
         return values

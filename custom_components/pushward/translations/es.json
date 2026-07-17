@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Las filas de los pasos deben ser números enteros, uno por paso (p. ej. 1, 2, 3).",
         "invalid_step_weights": "Los pesos de los pasos deben ser números positivos, uno por paso (p. ej. 1, 2.5, 1).",
         "invalid_step_colors": "Los colores de los pasos deben ser colores con nombre o hex como #ff0000; deja el espacio en blanco para mantener el color de acento.",
+        "invalid_step_labels": "Las etiquetas de los pasos deben tener como máximo 32 caracteres.",
         "invalid_tile": "Cada mosaico debe ser label=entity_id (p. ej. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Un panel admite como máximo 4 mosaicos.",
         "invalid_series_entity": "Cada entidad de serie debe referenciar un entity_id (p. ej. Bedroom=sensor.bedroom_pm25).",

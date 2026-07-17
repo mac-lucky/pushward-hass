@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Wiersze kroków muszą być liczbami całkowitymi, po jednej na krok (np. 1, 2, 3).",
         "invalid_step_weights": "Wagi kroków muszą być liczbami dodatnimi, po jednej na krok (np. 1, 2.5, 1).",
         "invalid_step_colors": "Kolory kroków muszą być nazwami kolorów lub wartościami hex, np. #ff0000; pozostaw puste pole, aby zachować kolor akcentu.",
+        "invalid_step_labels": "Etykiety kroków mogą mieć maksymalnie 32 znaki.",
         "invalid_tile": "Każdy kafelek musi mieć postać label=entity_id (np. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Tablica obsługuje maksymalnie 4 kafelki.",
         "invalid_series_entity": "Każda encja serii musi wskazywać entity_id (np. Bedroom=sensor.bedroom_pm25).",

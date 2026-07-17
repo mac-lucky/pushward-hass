@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Step rows must be whole numbers, one per step (e.g. 1, 2, 3).",
         "invalid_step_weights": "Step weights must be positive numbers, one per step (e.g. 1, 2.5, 1).",
         "invalid_step_colors": "Step colors must be named colors or hex like #ff0000; leave a slot blank to keep the accent color.",
+        "invalid_step_labels": "Step labels must be at most 32 characters.",
         "invalid_tile": "Each tile must be label=entity_id (e.g. CPU=sensor.cpu_temp).",
         "too_many_tiles": "A board supports at most 4 tiles.",
         "invalid_series_entity": "Each series entity must reference an entity_id (e.g. Bedroom=sensor.bedroom_pm25).",

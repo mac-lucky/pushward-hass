@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Le righe dei passi devono essere numeri interi, una per passo (es. 1, 2, 3).",
         "invalid_step_weights": "I pesi dei passi devono essere numeri positivi, uno per passo (es. 1, 2.5, 1).",
         "invalid_step_colors": "I colori dei passi devono essere colori con nome o esadecimali come #ff0000; lascia vuoto uno slot per mantenere il colore d'accento.",
+        "invalid_step_labels": "Le etichette dei passi devono contenere al massimo 32 caratteri.",
         "invalid_tile": "Ogni riquadro deve essere label=entity_id (es. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Una board supporta al massimo 4 riquadri.",
         "invalid_series_entity": "Ogni entità della serie deve fare riferimento a un entity_id (es. Bedroom=sensor.bedroom_pm25).",

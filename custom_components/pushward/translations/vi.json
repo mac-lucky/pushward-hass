@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Hàng của các bước phải là số nguyên, mỗi bước một giá trị (vd. 1, 2, 3).",
         "invalid_step_weights": "Trọng số của các bước phải là số dương, mỗi bước một giá trị (vd. 1, 2.5, 1).",
         "invalid_step_colors": "Màu của các bước phải là tên màu hoặc hex như #ff0000; để trống một ô để giữ màu nhấn.",
+        "invalid_step_labels": "Nhãn của các bước phải có tối đa 32 ký tự.",
         "invalid_tile": "Mỗi ô phải theo dạng label=entity_id (vd. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Bảng hỗ trợ tối đa 4 ô.",
         "invalid_series_entity": "Mỗi thực thể chuỗi phải tham chiếu một entity_id (vd. Bedroom=sensor.bedroom_pm25).",

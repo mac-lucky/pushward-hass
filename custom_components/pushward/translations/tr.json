@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Adım satırları tam sayı olmalıdır, her adım için bir tane (örn. 1, 2, 3).",
         "invalid_step_weights": "Adım ağırlıkları pozitif sayı olmalıdır, her adım için bir tane (örn. 1, 2.5, 1).",
         "invalid_step_colors": "Adım renkleri adlandırılmış renk veya #ff0000 gibi hex olmalıdır; vurgu rengini korumak için bir alanı boş bırakın.",
+        "invalid_step_labels": "Adım etiketleri en fazla 32 karakter olmalıdır.",
         "invalid_tile": "Her kutu label=entity_id biçiminde olmalıdır (örn. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Bir pano en fazla 4 kutu destekler.",
         "invalid_series_entity": "Her seri varlığı bir entity_id belirtmelidir (örn. Bedroom=sensor.bedroom_pm25).",

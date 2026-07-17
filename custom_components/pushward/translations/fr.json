@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Les lignes des étapes doivent être des nombres entiers, un par étape (ex. 1, 2, 3).",
         "invalid_step_weights": "Les poids des étapes doivent être des nombres positifs, un par étape (ex. 1, 2.5, 1).",
         "invalid_step_colors": "Les couleurs des étapes doivent être des noms de couleur ou de l'hexadécimal comme #ff0000 ; laissez une case vide pour conserver la couleur d'accent.",
+        "invalid_step_labels": "Les libellés des étapes doivent comporter au maximum 32 caractères.",
         "invalid_tile": "Chaque tuile doit être au format label=entity_id (ex. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Un tableau prend en charge au maximum 4 tuiles.",
         "invalid_series_entity": "Chaque entité de série doit référencer un entity_id (ex. Bedroom=sensor.bedroom_pm25).",

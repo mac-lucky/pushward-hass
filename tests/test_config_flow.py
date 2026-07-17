@@ -131,6 +131,7 @@ from custom_components.pushward.const import (
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
     MAX_SEVERITY_LABEL_LEN,
+    MAX_URL_LEN,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     THRESHOLD_LABEL_MAX,
@@ -1590,6 +1591,7 @@ async def test_subentry_reconfigure_prefills_steps_editor_rows(hass: HomeAssista
         subentries_data=[
             _entity_subentry_data(
                 template="steps",
+                total_steps=3,
                 step_weights=[1.0, 2.5, 1.0],
                 step_colors=["green", "", "red"],
             )
@@ -1612,6 +1614,178 @@ async def test_subentry_reconfigure_prefills_steps_editor_rows(hass: HomeAssista
         {"weight": 2.5},
         {"weight": 1.0, "color": "red"},
     ]
+
+
+# --- Reconfigure of pre-0.37 stored shapes: legacy values that the strict submit-time
+# parser rejects must be sanitized on rehydration so the form opens and submits. ---
+
+
+async def _reconfigure_to_details(hass: HomeAssistant, entry: MockConfigEntry, subentry_id: str, template: str) -> dict:
+    """Open the reconfigure flow and advance to the details form.
+
+    Reaching the details step at all proves the form opened cleanly from the sanitized
+    stored defaults (a schema built from an un-sanitizable default would have raised).
+    """
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reconfigure"
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**{CONF_TEMPLATE: template})
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "details"
+    return result
+
+
+async def test_reconfigure_legacy_step_colors_off_allowlist_submits(hass: HomeAssistant) -> None:
+    """A stored step_colors with an off-allowlist name ('gray') reconfigures and submits."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="steps",
+                total_steps=2,
+                step_labels={"1": "Wash", "2": "Rinse"},
+                step_colors=["gray", ""],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_to_details(hass, entry, subentry_id, "steps")
+    rows = _all_field_defaults(result["data_schema"])[CONF_STEPS_EDITOR]
+    assert all(row.get("color") != "gray" for row in rows)
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("steps", **{CONF_TOTAL_STEPS: 2, CONF_STEPS_EDITOR: rows}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert "gray" not in entry.subentries[subentry_id].data[CONF_STEP_COLORS]
+
+
+async def test_reconfigure_legacy_step_rows_out_of_range_submits(hass: HomeAssistant) -> None:
+    """A stored step_rows value outside 1-10 clamps on rehydration and submits."""
+    entry = _mock_entry(subentries_data=[_entity_subentry_data(template="steps", total_steps=1, step_rows=[12])])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_to_details(hass, entry, subentry_id, "steps")
+    rows = _all_field_defaults(result["data_schema"])[CONF_STEPS_EDITOR]
+    assert rows == [{"row": 10}]
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("steps", **{CONF_TOTAL_STEPS: 1, CONF_STEPS_EDITOR: rows}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_STEP_ROWS] == [10]
+
+
+async def test_reconfigure_legacy_step_weights_non_positive_submits(hass: HomeAssistant) -> None:
+    """A stored non-positive step_weights drops the whole weight column on rehydration."""
+    entry = _mock_entry(subentries_data=[_entity_subentry_data(template="steps", total_steps=1, step_weights=[0.0])])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_to_details(hass, entry, subentry_id, "steps")
+    rows = _all_field_defaults(result["data_schema"])[CONF_STEPS_EDITOR]
+    assert all("weight" not in row for row in rows)
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("steps", **{CONF_TOTAL_STEPS: 1, CONF_STEPS_EDITOR: rows}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_STEP_WEIGHTS] == []
+
+
+async def test_reconfigure_legacy_steps_over_length_lists_submits(hass: HomeAssistant) -> None:
+    """A stored step list longer than total_steps is dropped/collapsed so reconfigure submits."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="steps",
+                total_steps=3,
+                step_labels={"1": "A", "5": "Done"},
+                step_colors=["red", "green", "blue", "red", "green"],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_to_details(hass, entry, subentry_id, "steps")
+    rows = _all_field_defaults(result["data_schema"])[CONF_STEPS_EDITOR]
+    # Exactly total_steps rows; the label at index 5 and the 5-element colors are dropped.
+    assert len(rows) == 3
+    assert all("color" not in row for row in rows)
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("steps", **{CONF_TOTAL_STEPS: 3, CONF_STEPS_EDITOR: rows}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    stored = entry.subentries[subentry_id].data
+    assert "5" not in stored[CONF_STEP_LABELS]
+    assert stored[CONF_STEP_COLORS] == []
+
+
+async def test_reconfigure_legacy_board_tile_over_cap_label_submits(hass: HomeAssistant) -> None:
+    """A stored board tile with an over-cap label is truncated on rehydration and submits."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="board",
+                tiles=[{CONF_LABEL: "x" * 40, CONF_ENTITY_ID: "sensor.x"}],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_to_details(hass, entry, subentry_id, "board")
+    tiles = _all_field_defaults(result["data_schema"])[CONF_TILES]
+    assert len(tiles[0][CONF_LABEL]) == BOARD_TILE_LABEL_MAX
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("board", **{CONF_TILES: tiles}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert len(entry.subentries[subentry_id].data[CONF_TILES][0][CONF_LABEL]) == BOARD_TILE_LABEL_MAX
+
+
+async def test_reconfigure_legacy_unknown_primary_series_submits(hass: HomeAssistant) -> None:
+    """A stored primary_series naming no series label is dropped on rehydration and submits."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="timeline",
+                series={"temperature": "Temp"},
+                primary_series="Nonexistent",
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_to_details(hass, entry, subentry_id, "timeline")
+    defaults = _all_field_defaults(result["data_schema"])
+    assert defaults.get(CONF_PRIMARY_SERIES, "") == ""
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("timeline", **{CONF_SERIES: defaults[CONF_SERIES], CONF_PRIMARY_SERIES: ""}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_PRIMARY_SERIES] == ""
 
 
 async def test_subentry_reconfigure_clearing_steps_attrs(hass: HomeAssistant) -> None:
@@ -3017,6 +3191,77 @@ async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
     assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_colors"}
 
 
+async def test_flow_step_label_too_long_bounces(hass: HomeAssistant) -> None:
+    """A step label over the server's 32-rune cap bounces instead of 400ing every push."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={
+            CONF_TOTAL_STEPS: 2,
+            CONF_STEPS_EDITOR: [{CONF_LABEL: "x" * 33}, {CONF_LABEL: "ok"}],
+        },
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_labels"}
+
+    # Exactly at the cap is accepted.
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={
+            CONF_TOTAL_STEPS: 2,
+            CONF_STEPS_EDITOR: [{CONF_LABEL: "x" * 32}, {CONF_LABEL: "ok"}],
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+
+async def test_flow_out_of_range_step_row_bounces_translated(hass: HomeAssistant) -> None:
+    """A step row height outside 1-10 raises the translated invalid_step_rows, not a raw error.
+
+    The row number box carries no schema min/max, so an out-of-range value reaches the
+    parse layer (translated, field-scoped) instead of tripping a raw voluptuous message.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={
+            CONF_TOTAL_STEPS: 2,
+            CONF_STEPS_EDITOR: [{"row": 12}, {"row": 3}],
+        },
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_rows"}
+
+
+async def test_flow_timeline_series_map_label_truncated(hass: HomeAssistant) -> None:
+    """A timeline series-map label over the 32-rune cap is truncated (not rejected).
+
+    The label becomes a value-map key on the wire, which the server caps; truncating at
+    config time (plus the defensive clamp in content_mapper) keeps the push from 400ing,
+    and unlike the series-entity path a legacy long label must not dead-end the save.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    long_label = "z" * (TIMELINE_SERIES_LABEL_MAX + 8)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_SERIES: [{"attribute": "temperature", CONF_LABEL: long_label}]},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    stored = next(iter(entry.subentries.values())).data[CONF_SERIES]
+    assert stored == {"temperature": "z" * TIMELINE_SERIES_LABEL_MAX}
+
+
 async def test_flow_invalid_tile(hass: HomeAssistant) -> None:
     """A row missing its entity bounces on the tiles field."""
     entry = _mock_entry()
@@ -3074,6 +3319,21 @@ async def test_flow_tile_label_over_cap(hass: HomeAssistant) -> None:
         entry,
         template="board",
         details_overrides={CONF_TILES: [{CONF_LABEL: "x" * (BOARD_TILE_LABEL_MAX + 1), CONF_ENTITY_ID: "sensor.c"}]},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_TILES: "invalid_tile"}
+
+
+async def test_flow_tile_url_action_over_cap(hass: HomeAssistant) -> None:
+    """A tile url_action past MAX_URL_LEN bounces instead of 400ing the whole board push."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    long_url = "https://example.com/deep?token=" + "a" * (MAX_URL_LEN + 1)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="board",
+        details_overrides={CONF_TILES: [{CONF_LABEL: "Kitchen", CONF_ENTITY_ID: "sensor.k", "url_action": long_url}]},
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_TILES: "invalid_tile"}

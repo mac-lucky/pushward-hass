@@ -156,6 +156,9 @@ from .const import (
     SNOOZE_SECONDS_MAX,
     SNOOZE_SECONDS_MIN,
     SOUNDS,
+    STEP_LABEL_MAX,
+    STEP_ROW_MAX,
+    STEP_ROW_MIN,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
@@ -363,10 +366,14 @@ _UNITS_SELECTOR = ObjectSelector(
 
 # Unified steps editor: one row per step in step order. A form-only field
 # (CONF_STEPS_EDITOR) decomposed in _parse_entity_input into the four stored step
-# keys, so the storage shape and content_mapper are untouched. Row height is a 1-10
-# number; weight is any positive number; color is a named/hex value (blank leaves
-# that step on the accent color). The row count must be 0 or exactly total_steps.
-_ROW_STEP_NUMBER = {"number": {"min": 1, "max": 10, "mode": "box"}}
+# keys, so the storage shape and content_mapper are untouched. Row height is a
+# STEP_ROW_MIN-STEP_ROW_MAX number; weight is any positive number; color is a
+# named/hex value (blank leaves that step on the accent color). The row count must be
+# 0 or exactly total_steps. The number box carries no min/max: bounding it at the
+# schema layer surfaces a raw untranslated voluptuous error for a legacy out-of-range
+# value, so the STEP_ROW range is enforced in _decompose_steps_rows instead (translated
+# invalid_step_rows), matching the timeline-threshold row-editor precedent.
+_ROW_STEP_NUMBER = {"number": {"mode": "box", "step": 1}}
 
 _STEPS_EDITOR_SELECTOR = ObjectSelector(
     ObjectSelectorConfig(
@@ -1322,6 +1329,10 @@ def _strict_board_tile(item: object) -> dict:
     if color and not is_valid_color(color):
         raise vol.Invalid("invalid_tile", path=[CONF_TILES])
     if url_action:
+        # Length cap first (the server rejects a tap-action URL over MAX_URL_LEN, same
+        # as the whole-activity URL slots), then the shared scheme/blocklist validator.
+        if len(url_action) > MAX_URL_LEN:
+            raise vol.Invalid("invalid_tile", path=[CONF_TILES])
         code = _tap_action_url_error(url_action, foreground=True)
         if code is not None:
             raise vol.Invalid(code, path=[CONF_TILES])
@@ -1734,8 +1745,15 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
 
     min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == "gauge")
 
-    # Parse timeline fields (series map: attribute -> label)
-    series = _kv_rows_to_map(user_input.get(CONF_SERIES, ""), "attribute", CONF_LABEL)
+    # Parse timeline fields (series map: attribute -> label). Each label becomes a
+    # value-map key on the wire, which the server caps at TIMELINE_SERIES_LABEL_MAX
+    # runes; cap it here (and again defensively at emission in content_mapper) so an
+    # over-length label can't 400 the whole timeline push. Done before the
+    # primary_series check so its known-label set matches what gets stored.
+    series = {
+        attr: label[:TIMELINE_SERIES_LABEL_MAX]
+        for attr, label in _kv_rows_to_map(user_input.get(CONF_SERIES, ""), "attribute", CONF_LABEL).items()
+    }
     series_entities = _resolve_series_entity_labels(
         _parse_series_entities(user_input.get(CONF_SERIES_ENTITIES, ""), strict=True), hass
     )
@@ -1993,8 +2011,31 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             if isinstance(units, dict):
                 current[CONF_UNITS] = _map_to_kv_rows(units, "series", CONF_UNIT)
             current[CONF_STEPS_EDITOR] = _compose_steps_rows(current)
-            # series_entities, thresholds, tiles and log_columns stay lists: their
-            # ObjectSelector row editors rehydrate from the stored list directly.
+            # series_entities and thresholds stay lists: their ObjectSelector row
+            # editors rehydrate from the stored list directly. tiles and log_columns
+            # also rehydrate as lists, but a pre-0.37 config may hold fields the strict
+            # parser now rejects, so sanitize the form defaults (storage untouched):
+            # truncate over-cap tile/log fields to their caps.
+            if isinstance(current.get(CONF_TILES), list):
+                current[CONF_TILES] = _truncate_row_fields(
+                    current[CONF_TILES],
+                    {
+                        CONF_LABEL: BOARD_TILE_LABEL_MAX,
+                        CONF_UNIT: BOARD_TILE_UNIT_MAX,
+                        CONF_ICON: BOARD_TILE_ICON_MAX,
+                        "url_action": MAX_URL_LEN,
+                    },
+                )
+            if isinstance(current.get(CONF_LOG_COLUMNS), list):
+                current[CONF_LOG_COLUMNS] = _truncate_row_fields(
+                    current[CONF_LOG_COLUMNS], {CONF_LABEL: LOG_COLUMN_LABEL_MAX}
+                )
+            # Drop a stored primary_series that names no configured series label
+            # (legacy free text, or a series later renamed/removed): the strict parse
+            # rejects an unknown value and would otherwise dead-end the reconfigure.
+            primary = current.get(CONF_PRIMARY_SERIES)
+            if primary and primary not in _primary_series_options(current):
+                current[CONF_PRIMARY_SERIES] = ""
             self._details_defaults = current
             return await self.async_step_details()
 
@@ -2436,7 +2477,14 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
             self._step1_input = user_input
             self._is_reconfigure = True
             current = dict(subentry.data)
-            # stat_rows stay a list: the ObjectSelector row editor rehydrates from it directly.
+            # stat_rows rehydrate as a list, but a pre-0.37 config may hold fields the
+            # strict parser now rejects, so truncate over-cap fields for the form
+            # default (storage stays untouched until the user submits).
+            if isinstance(current.get(CONF_STAT_ROWS), list):
+                current[CONF_STAT_ROWS] = _truncate_row_fields(
+                    current[CONF_STAT_ROWS],
+                    {CONF_LABEL: WIDGET_STAT_LABEL_MAX, CONF_UNIT: WIDGET_STAT_UNIT_MAX},
+                )
             self._details_defaults = current
             return await self.async_step_details()
         current = dict(subentry.data)
@@ -2621,6 +2669,32 @@ def _map_to_kv_rows(mapping: object, key_field: str, value_field: str) -> list[d
     return [{key_field: k, value_field: v} for k, v in mapping.items()]
 
 
+def _truncate_row_fields(rows: object, caps: dict[str, int]) -> object:
+    """Truncate over-cap string fields in a stored row list for reconfigure prefill.
+
+    Storage->form rehydration boundary for the board-tile / stat-row / log-column row
+    editors. 0.36.0 stored these with no per-field caps (only a whole-blob length
+    limit); the strict submit-time parser now rejects an over-cap field, which would
+    dead-end reconfigure of a legacy config. Truncate each named field to its cap so
+    the form opens clean and submits; storage stays untouched until the user submits.
+    Non-list input passes through so an add flow / legacy string is unaffected.
+    """
+    if not isinstance(rows, list):
+        return rows
+    out: list = []
+    for row in rows:
+        if not isinstance(row, dict):
+            out.append(row)
+            continue
+        clean = dict(row)
+        for field, cap in caps.items():
+            value = clean.get(field)
+            if isinstance(value, str) and len(value) > cap:
+                clean[field] = value[:cap]
+        out.append(clean)
+    return out
+
+
 def _blank(value: object) -> bool:
     """True for a missing/empty editor cell (None or an all-whitespace string)."""
     return value is None or (isinstance(value, str) and not value.strip())
@@ -2656,6 +2730,8 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
     for index, row in enumerate(rows, start=1):
         label = str(row.get(CONF_LABEL, "") or "").strip()
         if label:
+            if strict and len(label) > STEP_LABEL_MAX:
+                raise vol.Invalid("invalid_step_labels", path=[CONF_STEPS_EDITOR])
             labels[str(index)] = label
 
         row_val = row.get("row")
@@ -2663,11 +2739,15 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
             have_rows = False
         else:
             try:
-                row_heights.append(int(float(row_val)))
+                height = int(float(row_val))
             except (TypeError, ValueError):
                 if strict:
                     raise vol.Invalid("invalid_step_rows", path=[CONF_STEPS_EDITOR]) from None
                 have_rows = False
+            else:
+                if strict and not (STEP_ROW_MIN <= height <= STEP_ROW_MAX):
+                    raise vol.Invalid("invalid_step_rows", path=[CONF_STEPS_EDITOR])
+                row_heights.append(height)
 
         weight_val = row.get("weight")
         if _blank(weight_val):
@@ -2699,12 +2779,33 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
     }
 
 
+def _sanitize_step_row_height(value: object) -> int | None:
+    """Clamp a stored step-row height into [STEP_ROW_MIN, STEP_ROW_MAX], or None if unparseable."""
+    try:
+        return max(STEP_ROW_MIN, min(STEP_ROW_MAX, int(float(value))))  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+
+
 def _compose_steps_rows(config: dict) -> list[dict]:
     """Compose unified steps-editor rows from the four stored step keys.
 
-    One row per step, ordered: label from step_labels[str(i)], row/weight/color
-    positional. Returns [] when none of the four keys hold data (nothing to edit).
-    The row count covers every configured position so nothing stored is hidden.
+    One row per step (exactly total_steps), ordered: label from step_labels[str(i)],
+    row/weight/color positional. Returns [] when none of the four keys hold data.
+
+    This is a storage->form rehydration boundary, so it sanitizes legacy values a
+    pre-0.37 free-text config could hold but the strict submit-time parser now rejects,
+    so the reconfigure form opens clean and submits unchanged:
+      - a label over STEP_LABEL_MAX is truncated to the cap;
+      - a row height outside [STEP_ROW_MIN, STEP_ROW_MAX] is clamped (matching the
+        render-time clamp);
+      - a step_rows/step_weights/step_colors list whose length does not match
+        total_steps is dropped rather than pre-filling a length-mismatched form (the
+        server ignores a wrong-length list too);
+      - a non-positive/non-finite weight anywhere drops the whole weight column (the
+        render drops the array wholesale on any bad weight);
+      - an off-allowlist color is dropped to blank (the render maps it to accent).
+    Storage stays untouched until the user submits.
     """
     labels = config.get(CONF_STEP_LABELS) or {}
     rows = config.get(CONF_STEP_ROWS) or []
@@ -2712,27 +2813,34 @@ def _compose_steps_rows(config: dict) -> list[dict]:
     colors = config.get(CONF_STEP_COLORS) or []
     if not (labels or rows or weights or colors):
         return []
-    label_max = 0
-    if isinstance(labels, dict):
-        label_max = max((int(k) for k in labels if str(k).isdigit()), default=0)
-    total = max(
-        int(config.get(CONF_TOTAL_STEPS) or DEFAULT_TOTAL_STEPS),
-        len(rows),
-        len(weights),
-        len(colors),
-        label_max,
+    total = int(config.get(CONF_TOTAL_STEPS) or DEFAULT_TOTAL_STEPS)
+    if total < 1:
+        return []
+    # A per-step list only survives when it lines up with total_steps; a legacy list of
+    # a different length (e.g. left over after total_steps was reduced) would fail the
+    # strict length check, so drop it rather than pre-fill an unsubmittable form.
+    if len(rows) != total:
+        rows = []
+    weights_ok = all(
+        isinstance(w, (int, float)) and not isinstance(w, bool) and math.isfinite(w) and w > 0 for w in weights
     )
+    if len(weights) != total or not weights_ok:
+        weights = []
+    if len(colors) != total:
+        colors = []
     out: list[dict] = []
     for i in range(1, total + 1):
         row: dict = {}
         label = labels.get(str(i)) if isinstance(labels, dict) else None
         if label:
-            row[CONF_LABEL] = label
+            row[CONF_LABEL] = str(label)[:STEP_LABEL_MAX]
         if i - 1 < len(rows):
-            row["row"] = rows[i - 1]
+            height = _sanitize_step_row_height(rows[i - 1])
+            if height is not None:
+                row["row"] = height
         if i - 1 < len(weights):
             row["weight"] = weights[i - 1]
-        if i - 1 < len(colors) and colors[i - 1]:
+        if i - 1 < len(colors) and colors[i - 1] and is_valid_color(str(colors[i - 1])):
             row["color"] = colors[i - 1]
         out.append(row)
     return out

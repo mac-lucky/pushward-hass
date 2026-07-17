@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Staprijen moeten hele getallen zijn, één per stap (bijv. 1, 2, 3).",
         "invalid_step_weights": "Stapgewichten moeten positieve getallen zijn, één per stap (bijv. 1, 2.5, 1).",
         "invalid_step_colors": "Stapkleuren moeten benoemde kleuren of hex zoals #ff0000 zijn; laat een vak leeg om de accentkleur te behouden.",
+        "invalid_step_labels": "Staplabels mogen maximaal 32 tekens bevatten.",
         "invalid_tile": "Elke tegel moet label=entity_id zijn (bijv. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Een board ondersteunt maximaal 4 tegels.",
         "invalid_series_entity": "Elke reeks-entiteit moet naar een entity_id verwijzen (bijv. Bedroom=sensor.bedroom_pm25).",

@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Rândurile pașilor trebuie să fie numere întregi, câte unul per pas (ex. 1, 2, 3).",
         "invalid_step_weights": "Ponderile pașilor trebuie să fie numere pozitive, câte una per pas (ex. 1, 2.5, 1).",
         "invalid_step_colors": "Culorile pașilor trebuie să fie culori cu nume sau hex precum #ff0000; lasă un câmp gol pentru a păstra culoarea de accent.",
+        "invalid_step_labels": "Etichetele pașilor trebuie să aibă cel mult 32 de caractere.",
         "invalid_tile": "Fiecare dală trebuie să fie label=entity_id (ex. CPU=sensor.cpu_temp).",
         "too_many_tiles": "O tablă acceptă cel mult 4 dale.",
         "invalid_series_entity": "Fiecare entitate de serie trebuie să indice un entity_id (ex. Bedroom=sensor.bedroom_pm25).",

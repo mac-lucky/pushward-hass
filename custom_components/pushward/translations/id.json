@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Baris langkah harus berupa bilangan bulat, satu per langkah (mis. 1, 2, 3).",
         "invalid_step_weights": "Bobot langkah harus berupa angka positif, satu per langkah (mis. 1, 2.5, 1).",
         "invalid_step_colors": "Warna langkah harus berupa nama warna atau hex seperti #ff0000; kosongkan slot untuk mempertahankan warna aksen.",
+        "invalid_step_labels": "Label langkah maksimal 32 karakter.",
         "invalid_tile": "Setiap tile harus label=entity_id (mis. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Papan mendukung maksimal 4 tile.",
         "invalid_series_entity": "Setiap entitas seri harus merujuk ke entity_id (mis. Bedroom=sensor.bedroom_pm25).",

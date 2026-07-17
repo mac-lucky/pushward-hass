@@ -1619,6 +1619,7 @@
         "invalid_step_rows": "Schrittzeilen müssen ganze Zahlen sein, eine pro Schritt (z. B. 1, 2, 3).",
         "invalid_step_weights": "Schrittgewichte müssen positive Zahlen sein, eine pro Schritt (z. B. 1, 2.5, 1).",
         "invalid_step_colors": "Schrittfarben müssen benannte Farben oder Hex wie #ff0000 sein; ein leeres Feld behält die Akzentfarbe.",
+        "invalid_step_labels": "Schrittbeschriftungen dürfen höchstens 32 Zeichen lang sein.",
         "invalid_tile": "Jede Kachel muss label=entity_id sein (z. B. CPU=sensor.cpu_temp).",
         "too_many_tiles": "Ein Board unterstützt höchstens 4 Kacheln.",
         "invalid_series_entity": "Jede Datenreihen-Entität muss auf eine entity_id verweisen (z. B. Bedroom=sensor.bedroom_pm25).",

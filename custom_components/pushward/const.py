@@ -152,6 +152,12 @@ DEFAULT_TAP_ACTION_FOREGROUND = True
 PRIORITY_MIN = 0
 PRIORITY_MAX = 10
 TOTAL_STEPS_MAX = 64  # server MaxTotalSteps
+# Steps template per-step bounds (mirror pushward-server/internal/model/activity.go):
+# each step_labels entry is capped at STEP_LABEL_MAX runes and each step_rows entry
+# must fall in [STEP_ROW_MIN, STEP_ROW_MAX] or the server 400s the whole steps push.
+STEP_LABEL_MAX = 32
+STEP_ROW_MIN = 1
+STEP_ROW_MAX = 10
 UPDATE_INTERVAL_MIN = 1
 WARNING_THRESHOLD_MAX = 86400  # 24 h
 SNOOZE_SECONDS_MIN = 60
