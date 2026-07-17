@@ -12,6 +12,7 @@ import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
     AttributeSelector,
@@ -201,6 +202,200 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
 }
 
+# Collapsible-section layout for the two subentry detail forms. Each field a
+# template renders lands in exactly one section here or stays top-level (the
+# tables below); the schema builders filter these per template and drop a section
+# that has no field for the current template. Translations live under
+# step.details.sections.<key>.data[_description], with sections.<key>.name for the
+# header. A field key can be top-level for one template and sectioned for another
+# (remaining_time on countdown vs generic/steps) - its label then needs an entry
+# in BOTH step.details.data and the section's data block.
+ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
+    "data_sources": (
+        CONF_PROGRESS_ENTITY,
+        CONF_PROGRESS_ATTRIBUTE,
+        CONF_REMAINING_TIME_ENTITY,
+        CONF_REMAINING_TIME_ATTR,
+        CONF_LIVE_PROGRESS,
+        CONF_VALUE_ENTITY,
+        CONF_VALUE_ATTRIBUTE,
+        CONF_FIRED_AT_ENTITY,
+        CONF_FIRED_AT_ATTRIBUTE,
+        CONF_SUBTITLE_ENTITY,
+        CONF_SUBTITLE_ATTRIBUTE,
+        CONF_SERIES,
+        CONF_LOG_LEVEL_ATTRIBUTE,
+    ),
+    "steps_options": (
+        CONF_STEP_LABELS,
+        CONF_STEP_ROWS,
+        CONF_STEP_WEIGHTS,
+        CONF_STEP_COLORS,
+    ),
+    "timeline_options": (
+        CONF_UNITS,
+        CONF_PRIMARY_SERIES,
+        CONF_SCALE,
+        CONF_DECIMALS,
+        CONF_SMOOTHING,
+        CONF_THRESHOLDS,
+        CONF_HISTORY_PERIOD,
+    ),
+    "display_options": (
+        CONF_SLUG,
+        CONF_ACTIVITY_NAME,
+        CONF_ICON,
+        CONF_ICON_ATTRIBUTE,
+        CONF_PRIORITY,
+        CONF_SOUND,
+        CONF_UPDATE_INTERVAL,
+        CONF_STATE_LABELS,
+    ),
+    "colors": (
+        CONF_ACCENT_COLOR,
+        CONF_ACCENT_COLOR_ATTRIBUTE,
+        CONF_BACKGROUND_COLOR,
+        CONF_BACKGROUND_COLOR_ATTRIBUTE,
+        CONF_TEXT_COLOR,
+        CONF_TEXT_COLOR_ATTRIBUTE,
+    ),
+    "tap_actions": (
+        CONF_TAP_ACTION_URL,
+        CONF_TAP_ACTION_FOREGROUND,
+        CONF_URL,
+        CONF_URL_FOREGROUND,
+        CONF_URL_TITLE,
+        CONF_SECONDARY_URL,
+        CONF_SECONDARY_URL_FOREGROUND,
+        CONF_SECONDARY_URL_TITLE,
+    ),
+    "advanced": (
+        CONF_ENDED_TTL,
+        CONF_STALE_TTL,
+        CONF_DISMISSAL_TTL,
+    ),
+}
+
+# Fields the entity detail form keeps visible per template, on top of the always
+# top-level start/end states. remaining_time is top-level only on countdown; on
+# generic/steps it drops into data_sources.
+_ENTITY_TOPLEVEL_EXTRA: dict[str, tuple[str, ...]] = {
+    "generic": (),
+    "countdown": (
+        CONF_REMAINING_TIME_ENTITY,
+        CONF_REMAINING_TIME_ATTR,
+        CONF_COMPLETION_MESSAGE,
+        CONF_WARNING_THRESHOLD,
+        CONF_ALARM,
+        CONF_SNOOZE_SECONDS,
+    ),
+    "alert": (CONF_SEVERITY, CONF_SEVERITY_LABEL),
+    "steps": (CONF_TOTAL_STEPS, CONF_CURRENT_STEP_ENTITY, CONF_CURRENT_STEP_ATTR),
+    "gauge": (CONF_MIN_VALUE, CONF_MAX_VALUE, CONF_UNIT),
+    "timeline": (CONF_SERIES_ENTITIES, CONF_UNIT),
+    "board": (CONF_TILES,),
+    "log": (CONF_LOG_COLUMNS,),
+}
+
+WIDGET_SECTIONS: dict[str, tuple[str, ...]] = {
+    "display_options": (
+        CONF_LABEL,
+        CONF_LABEL_ATTRIBUTE,
+        CONF_SUBTITLE_ATTRIBUTE,
+        CONF_ICON,
+        CONF_ICON_ATTRIBUTE,
+    ),
+    "colors": (
+        CONF_ACCENT_COLOR,
+        CONF_ACCENT_COLOR_ATTRIBUTE,
+        CONF_BACKGROUND_COLOR,
+        CONF_TEXT_COLOR,
+    ),
+    "tap_actions": (
+        CONF_TAP_ACTION_URL,
+        CONF_TAP_ACTION_FOREGROUND,
+    ),
+    "refresh": (
+        CONF_WIDGET_TRIGGER_MODE,
+        CONF_WIDGET_POLL_INTERVAL,
+    ),
+}
+
+# Widget top-level = the widget name plus each template's essential value fields.
+# None of these overlap a widget section, so a flat set (no per-template table) works.
+_WIDGET_TOPLEVEL: frozenset[str] = frozenset(
+    {
+        CONF_WIDGET_NAME,
+        CONF_VALUE_ATTRIBUTE,
+        CONF_UNIT,
+        CONF_VALUE_SCALE,
+        CONF_MIN_VALUE,
+        CONF_MAX_VALUE,
+        CONF_SEVERITY,
+        CONF_STAT_ROWS,
+    }
+)
+
+
+def _entity_toplevel_fields(template: str) -> set[str]:
+    """Fields the entity detail form keeps uncollapsed for `template`."""
+    return {CONF_START_STATES, CONF_END_STATES, *_ENTITY_TOPLEVEL_EXTRA.get(template, ())}
+
+
+def _sectioned_schema(
+    fields: dict,
+    sections_def: dict[str, tuple[str, ...]],
+    toplevel: set[str] | frozenset[str],
+    expand: set[str],
+) -> vol.Schema:
+    """Partition an ordered {vol_key: selector} mapping into a top-level schema plus
+    collapsible ``section()`` groups.
+
+    ``sections_def`` maps section key -> the field names that belong to it; a field
+    listed in ``toplevel`` stays visible even when it has a section membership. A
+    section with no field for this form is dropped. ``expand`` names sections that
+    render open (used to reveal a section holding a field that failed validation).
+    Per-field defaults/suggested values already baked into the vol keys carry into
+    the section schemas unchanged, so reconfigure prefill needs no extra nesting.
+    """
+    field_section: dict[str, str] = {}
+    for sec, names in sections_def.items():
+        for name in names:
+            field_section.setdefault(name, sec)
+
+    top: dict = {}
+    grouped: dict[str, dict] = {sec: {} for sec in sections_def}
+    for key, selector in fields.items():
+        name = key.schema if isinstance(key, vol.Marker) else key
+        sec = field_section.get(name)
+        if sec is not None and name not in toplevel:
+            grouped[sec][key] = selector
+        else:
+            top[key] = selector
+
+    schema: dict = dict(top)
+    for sec, inner in grouped.items():
+        if inner:
+            schema[vol.Required(sec)] = section(vol.Schema(inner), {"collapsed": sec not in expand})
+    return vol.Schema(schema)
+
+
+def _flatten_section_input(user_input: dict, section_keys) -> dict:
+    """Lift ``section()`` groups back out to a flat field dict.
+
+    HA submits a section's fields nested under its key ({"colors": {...}}); this
+    unwraps only the known section keys so the managers/mappers keep seeing flat
+    storage. Any other dict-valued field (state_labels, series, ...) is left as-is,
+    and already-flat input passes through unchanged (idempotent).
+    """
+    flat: dict = {}
+    for key, value in user_input.items():
+        if key in section_keys and isinstance(value, dict):
+            flat.update(value)
+        else:
+            flat[key] = value
+    return flat
+
 
 async def _validate_integration_key(
     hass: HomeAssistant,
@@ -368,8 +563,14 @@ def _details_schema(
     template: str,
     defaults: dict | None = None,
     hass: HomeAssistant | None = None,
+    expand: set[str] | None = None,
 ) -> vol.Schema:
-    """Build step-2 schema with all config fields and dynamic selectors."""
+    """Build step-2 schema with all config fields and dynamic selectors.
+
+    Fields are grouped into collapsible sections per ENTITY_SECTIONS; only each
+    template's essentials stay top-level. ``expand`` opens named sections (so a
+    section holding a validation error re-renders uncollapsed).
+    """
     d = defaults or {}
     domain = _entity_domain(entity_id)
     domain_defs = get_domain_defaults(domain)
@@ -874,7 +1075,7 @@ def _details_schema(
         )
     )
 
-    return vol.Schema(fields)
+    return _sectioned_schema(fields, ENTITY_SECTIONS, _entity_toplevel_fields(template), expand or set())
 
 
 def _tap_action_url_error(url: str, foreground: bool) -> str | None:
@@ -1249,6 +1450,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     strict mode: malformed tokens raise vol.Invalid instead of being silently
     dropped, and the details step maps each exc.path field to its error code.
     """
+    user_input = _flatten_section_input(user_input, ENTITY_SECTIONS)
     entity_id = user_input[CONF_ENTITY_ID]
     template = user_input.get(CONF_TEMPLATE, "generic")
     raw_slug = user_input.get(CONF_SLUG, "").strip()
@@ -1637,9 +1839,14 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
                 )
 
         defaults = self._details_defaults if self._is_reconfigure else None
-        schema = _details_schema(entity_id, template, defaults=defaults, hass=self.hass)
+        # Reveal any section that holds a field that failed validation.
+        toplevel = _entity_toplevel_fields(template)
+        expand = {sec for sec, fs in ENTITY_SECTIONS.items() if set(errors) & (set(fs) - toplevel)}
+        schema = _details_schema(entity_id, template, defaults=defaults, hass=self.hass, expand=expand)
         if errors and user_input is not None:
             # Re-fill the form with what the user just submitted instead of dropping it.
+            # user_input is still nested per section; add_suggested_values recurses into
+            # sections, so the re-fill lands on the right keys.
             schema = self.add_suggested_values_to_schema(schema, user_input)
         return self.async_show_form(
             step_id="details",
@@ -1683,8 +1890,13 @@ def _widget_details_schema(
     entity_id: str,
     template: str,
     defaults: dict | None = None,
+    expand: set[str] | None = None,
 ) -> vol.Schema:
-    """Step-2 schema: template-specific fields + cosmetics + trigger mode."""
+    """Step-2 schema: template-specific fields + cosmetics + trigger mode.
+
+    Cosmetics, colors, tap action, and the trigger/poll pair collapse into
+    sections (WIDGET_SECTIONS); each template's value fields stay top-level.
+    """
     d = defaults or {}
 
     attr_selector = AttributeSelector(AttributeSelectorConfig(entity_id=entity_id))
@@ -1825,9 +2037,10 @@ def _widget_details_schema(
         )
     ] = BooleanSelector()
 
-    # Trigger mode + interval
+    # Trigger mode + interval. Optional (not Required) so the parser's own default
+    # applies when the collapsed "refresh" section is submitted without touching it.
     fields[
-        vol.Required(
+        vol.Optional(
             CONF_WIDGET_TRIGGER_MODE,
             default=d.get(CONF_WIDGET_TRIGGER_MODE, WIDGET_TRIGGER_EVENT),
         )
@@ -1852,7 +2065,7 @@ def _widget_details_schema(
         )
     )
 
-    return vol.Schema(fields)
+    return _sectioned_schema(fields, WIDGET_SECTIONS, _WIDGET_TOPLEVEL, expand or set())
 
 
 def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
@@ -1917,6 +2130,7 @@ def _serialize_widget_stat_rows(rows: list[dict]) -> str:
 
 def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     """Build the persisted subentry data from step-1 + step-2 inputs."""
+    user_input = _flatten_section_input(user_input, WIDGET_SECTIONS)
     entity_id = step1[CONF_ENTITY_ID]
     template = step1[CONF_WIDGET_TEMPLATE]
     raw_slug = (step1.get(CONF_SLUG) or "").strip()
@@ -2059,7 +2273,8 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                 )
 
         defaults = self._details_defaults if self._is_reconfigure else None
-        schema = _widget_details_schema(entity_id, template, defaults=defaults)
+        expand = {sec for sec, fs in WIDGET_SECTIONS.items() if set(errors) & (set(fs) - _WIDGET_TOPLEVEL)}
+        schema = _widget_details_schema(entity_id, template, defaults=defaults, expand=expand)
         if errors and user_input is not None:
             # Re-fill the form with what the user just submitted instead of dropping it.
             schema = self.add_suggested_values_to_schema(schema, user_input)

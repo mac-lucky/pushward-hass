@@ -9,12 +9,15 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType, InvalidData
+from homeassistant.data_entry_flow import FlowResultType, InvalidData, section
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import (
+    ENTITY_SECTIONS,
+    WIDGET_SECTIONS,
     _details_schema,
+    _flatten_section_input,
     _hex_to_rgb,
     _parse_board_tiles,
     _parse_color_list,
@@ -43,6 +46,7 @@ from custom_components.pushward.config_flow import (
 )
 from custom_components.pushward.const import (
     BOARD_MAX_TILES,
+    CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
     CONF_ALARM,
@@ -54,6 +58,7 @@ from custom_components.pushward.const import (
     CONF_DECIMALS,
     CONF_DISMISSAL_TTL,
     CONF_END_STATES,
+    CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_FIRED_AT_ATTRIBUTE,
     CONF_FIRED_AT_ENTITY,
@@ -144,6 +149,84 @@ from .conftest import make_entity_config, make_mock_state
 MOCK_INTEGRATION_KEY = "test-key-123"
 
 
+# --- section() helpers: the detail forms now nest fields into collapsible
+# sections, so a flat submission must be reshaped into {section: {field: val}}
+# before it validates, and schema introspection must recurse into sections. ---
+
+
+def _nest_for_schema(schema: vol.Schema, flat: dict) -> dict:
+    """Reshape a flat {field: value} dict into the nested shape `schema` expects.
+
+    Every section key present in the schema is included (empty dict when the flat
+    input sets none of its fields); fields with no section stay top-level.
+    """
+    field_to_section: dict[str, str] = {}
+    section_keys: list[str] = []
+    for key, value in schema.schema.items():
+        if isinstance(value, section):
+            sec = key.schema if isinstance(key, vol.Marker) else key
+            section_keys.append(sec)
+            for inner_key in value.schema.schema:
+                name = inner_key.schema if isinstance(inner_key, vol.Marker) else inner_key
+                field_to_section[name] = sec
+    nested: dict = {sec: {} for sec in section_keys}
+    for name, value in flat.items():
+        sec = field_to_section.get(name)
+        if sec is not None:
+            nested[sec][name] = value
+        else:
+            nested[name] = value
+    return nested
+
+
+def _nest_entity(template: str, flat: dict) -> dict:
+    """Nest flat entity detail input per the section layout of `template`."""
+    return _nest_for_schema(_details_schema("binary_sensor.washer", template, defaults={}), flat)
+
+
+def _nest_widget(template: str, flat: dict) -> dict:
+    """Nest flat widget detail input per the section layout of `template`."""
+    return _nest_for_schema(_widget_details_schema("sensor.users", template, defaults={}), flat)
+
+
+def _flow_schema_keys(schema: vol.Schema) -> set[str]:
+    """All field names in a schema, recursing into section() groups."""
+    names: set[str] = set()
+    for key, value in schema.schema.items():
+        if isinstance(value, section):
+            names |= _flow_schema_keys(value.schema)
+        else:
+            names.add(key.schema if isinstance(key, vol.Marker) else key)
+    return names
+
+
+def _all_field_defaults(schema: vol.Schema) -> dict:
+    """Flatten every field's baked-in default, recursing into section() groups."""
+    out: dict = {}
+    for key, value in schema.schema.items():
+        if isinstance(value, section):
+            out.update(_all_field_defaults(value.schema))
+        else:
+            default = getattr(key, "default", vol.UNDEFINED)
+            if default is not vol.UNDEFINED:
+                out[key.schema if isinstance(key, vol.Marker) else key] = default()
+    return out
+
+
+def _omit_fields(details: dict, *fields: str) -> None:
+    """Drop each field from a nested submission, wherever it sits (top-level or a section).
+
+    Simulates the user clearing a selector: HA omits that key from the section it lives in.
+    """
+    targets = set(fields)
+    for key in list(details):
+        if key in targets:
+            del details[key]
+        elif isinstance(details[key], dict):
+            for name in targets:
+                details[key].pop(name, None)
+
+
 def _mock_core_input(**overrides) -> dict:
     """Build step-1 (entity + template) form input."""
     data = {
@@ -205,8 +288,10 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
         data[CONF_URL] = ""
         data[CONF_SECONDARY_URL] = ""
 
+    # overrides address flat field names; nest into sections afterwards so the
+    # submission matches the sectioned schema the flow validates against.
     data.update(overrides)
-    return data
+    return _nest_entity(template, data)
 
 
 def _entity_subentry_data(**overrides) -> ConfigSubentryData:
@@ -677,7 +762,7 @@ async def test_subentry_generic_hides_steps_alert_fields(hass: HomeAssistant) ->
     assert result["step_id"] == "details"
 
     # Check which fields are in the schema
-    schema_keys = {str(k) for k in result["data_schema"].schema}
+    schema_keys = _flow_schema_keys(result["data_schema"])
     assert CONF_PROGRESS_ATTRIBUTE in schema_keys
     assert CONF_REMAINING_TIME_ATTR in schema_keys
     assert CONF_TOTAL_STEPS not in schema_keys
@@ -700,7 +785,7 @@ async def test_subentry_steps_shows_steps_fields(hass: HomeAssistant) -> None:
     )
     assert result["step_id"] == "details"
 
-    schema_keys = {str(k) for k in result["data_schema"].schema}
+    schema_keys = _flow_schema_keys(result["data_schema"])
     assert CONF_TOTAL_STEPS in schema_keys
     assert CONF_CURRENT_STEP_ATTR in schema_keys
     assert CONF_PROGRESS_ATTRIBUTE in schema_keys
@@ -714,7 +799,7 @@ async def test_subentry_steps_shows_steps_fields(hass: HomeAssistant) -> None:
 @pytest.mark.parametrize("template", LIVE_PROGRESS_TEMPLATES)
 def test_live_progress_templates_also_offer_a_remaining_time_source(template: str) -> None:
     """A live_progress toggle without a remaining-time source can never fire."""
-    schema_keys = {str(k) for k in _details_schema("binary_sensor.washer", template, {}).schema}
+    schema_keys = _flow_schema_keys(_details_schema("binary_sensor.washer", template, {}))
     assert CONF_LIVE_PROGRESS in schema_keys
     assert CONF_REMAINING_TIME_ATTR in schema_keys
     assert CONF_REMAINING_TIME_ENTITY in schema_keys
@@ -735,7 +820,7 @@ async def test_subentry_alert_shows_severity(hass: HomeAssistant) -> None:
     )
     assert result["step_id"] == "details"
 
-    schema_keys = {str(k) for k in result["data_schema"].schema}
+    schema_keys = _flow_schema_keys(result["data_schema"])
     assert CONF_SEVERITY in schema_keys
     assert CONF_TOTAL_STEPS not in schema_keys
     assert CONF_CURRENT_STEP_ATTR not in schema_keys
@@ -758,7 +843,7 @@ async def test_subentry_countdown_shows_remaining_time(hass: HomeAssistant) -> N
     )
     assert result["step_id"] == "details"
 
-    schema_keys = {str(k) for k in result["data_schema"].schema}
+    schema_keys = _flow_schema_keys(result["data_schema"])
     assert CONF_REMAINING_TIME_ATTR in schema_keys
     assert CONF_PROGRESS_ATTRIBUTE not in schema_keys
     assert CONF_TOTAL_STEPS not in schema_keys
@@ -830,7 +915,7 @@ async def test_subentry_gauge_shows_gauge_fields(hass: HomeAssistant) -> None:
     )
     assert result["step_id"] == "details"
 
-    schema_keys = {str(k) for k in result["data_schema"].schema}
+    schema_keys = _flow_schema_keys(result["data_schema"])
     assert CONF_VALUE_ATTRIBUTE in schema_keys
     assert CONF_MIN_VALUE in schema_keys
     assert CONF_MAX_VALUE in schema_keys
@@ -1342,7 +1427,7 @@ async def test_subentry_completion_message_only_for_countdown(hass: HomeAssistan
             user_input=_mock_core_input(**{CONF_TEMPLATE: template}),
         )
         assert result["step_id"] == "details"
-        schema_keys = {str(k) for k in result["data_schema"].schema}
+        schema_keys = _flow_schema_keys(result["data_schema"])
         assert (CONF_COMPLETION_MESSAGE in schema_keys) is expected, (
             f"template={template} expected completion_message={expected} but got keys={schema_keys}"
         )
@@ -1418,10 +1503,13 @@ async def test_subentry_reconfigure_clearing_attribute_selectors(hass: HomeAssis
 
     # Step 2: submit WITHOUT attribute selector keys (simulates clearing via X)
     details = _mock_details_input("generic")
-    del details[CONF_ICON_ATTRIBUTE]
-    del details[CONF_SUBTITLE_ATTRIBUTE]
-    del details[CONF_PROGRESS_ATTRIBUTE]
-    del details[CONF_ACCENT_COLOR_ATTRIBUTE]
+    _omit_fields(
+        details,
+        CONF_ICON_ATTRIBUTE,
+        CONF_SUBTITLE_ATTRIBUTE,
+        CONF_PROGRESS_ATTRIBUTE,
+        CONF_ACCENT_COLOR_ATTRIBUTE,
+    )
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
@@ -1461,7 +1549,7 @@ async def test_subentry_reconfigure_clearing_remaining_time_attr(hass: HomeAssis
     assert result["step_id"] == "details"
 
     details = _mock_details_input("countdown")
-    del details[CONF_REMAINING_TIME_ATTR]
+    _omit_fields(details, CONF_REMAINING_TIME_ATTR)
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
@@ -1497,11 +1585,8 @@ async def test_subentry_reconfigure_prefills_step_weights_and_colors_as_text(has
     )
     assert result["step_id"] == "details"
 
-    defaults = {
-        str(k): k.default()
-        for k in result["data_schema"].schema
-        if getattr(k, "default", vol.UNDEFINED) is not vol.UNDEFINED
-    }
+    # step_weights/step_colors now live in the steps_options section; recurse for their defaults.
+    defaults = _all_field_defaults(result["data_schema"])
     assert defaults[CONF_STEP_WEIGHTS] == "1, 2.5, 1"
     assert defaults[CONF_STEP_COLORS] == "green, , red"
 
@@ -1531,8 +1616,7 @@ async def test_subentry_reconfigure_clearing_steps_attrs(hass: HomeAssistant) ->
     assert result["step_id"] == "details"
 
     details = _mock_details_input("steps")
-    del details[CONF_PROGRESS_ATTRIBUTE]
-    del details[CONF_CURRENT_STEP_ATTR]
+    _omit_fields(details, CONF_PROGRESS_ATTRIBUTE, CONF_CURRENT_STEP_ATTR)
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
@@ -1745,8 +1829,8 @@ async def test_subentry_timeline_series_entities(hass: HomeAssistant) -> None:
 
 
 def _schema_keys(schema: vol.Schema) -> set[str]:
-    """Extract string key names from a voluptuous schema."""
-    return {m.schema if hasattr(m, "schema") else m for m in schema.schema}
+    """Extract string key names from a voluptuous schema, recursing into sections."""
+    return _flow_schema_keys(schema)
 
 
 def test_details_schema_common_has_sound_background_text_color() -> None:
@@ -2018,7 +2102,7 @@ async def test_subentry_countdown_shows_remaining_time_entity(hass: HomeAssistan
     )
     assert result["step_id"] == "details"
 
-    schema_keys = {str(k) for k in result["data_schema"].schema}
+    schema_keys = _flow_schema_keys(result["data_schema"])
     assert CONF_REMAINING_TIME_ENTITY in schema_keys
     assert CONF_SUBTITLE_ENTITY in schema_keys  # common field, always present
 
@@ -2038,7 +2122,7 @@ async def test_subentry_gauge_shows_value_entity(hass: HomeAssistant) -> None:
     )
     assert result["step_id"] == "details"
 
-    schema_keys = {str(k) for k in result["data_schema"].schema}
+    schema_keys = _flow_schema_keys(result["data_schema"])
     assert CONF_VALUE_ENTITY in schema_keys
 
 
@@ -2524,12 +2608,18 @@ def test_parse_entity_input_log_emits_level_attribute() -> None:
 
 
 def _suggested_values(result) -> dict:
-    """Map schema field name -> suggested_value from a re-shown form."""
-    return {
-        str(key): (key.description or {}).get("suggested_value")
-        for key in result["data_schema"].schema
-        if hasattr(key, "description")
-    }
+    """Map schema field name -> suggested_value from a re-shown form, recursing into sections."""
+    out: dict = {}
+
+    def walk(schema: vol.Schema) -> None:
+        for key, value in schema.schema.items():
+            if isinstance(value, section):
+                walk(value.schema)
+            elif isinstance(key, vol.Marker):
+                out[key.schema] = (key.description or {}).get("suggested_value")
+
+    walk(result["data_schema"])
+    return out
 
 
 async def test_details_error_preserves_user_input(hass: HomeAssistant) -> None:
@@ -2589,7 +2679,7 @@ async def test_widget_details_error_preserves_user_input(hass: HomeAssistant) ->
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input={CONF_STAT_ROWS: "", CONF_WIDGET_NAME: "My Stat Board"},
+        user_input=_nest_widget(WIDGET_TEMPLATE_STAT_LIST, {CONF_STAT_ROWS: "", CONF_WIDGET_NAME: "My Stat Board"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert CONF_STAT_ROWS in result["errors"]
@@ -2698,7 +2788,9 @@ async def _add_widget_subentry(
         step1.update(step1_extra)
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=step1)
     assert result["step_id"] == "details"
-    return await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=details)
+    return await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_nest_widget(template, details)
+    )
 
 
 async def test_flow_step_length_mismatch(hass: HomeAssistant) -> None:
@@ -3087,16 +3179,25 @@ def test_strict_parsers_lenient_by_default_but_raise_when_strict() -> None:
 
 
 def _reconfigure_details_defaults(result: dict) -> dict:
-    """Every rehydrated default from a reconfigure details form.
+    """Every rehydrated default from a reconfigure details form, in nested shape.
 
     Submitting this unchanged is what opening reconfigure and pressing Save
-    without editing does: the stored lists come back as serialized strings.
+    without editing does: the stored lists come back as serialized strings, and
+    each section's defaults come back nested under its key (the shape HA submits).
     """
-    return {
-        str(key): key.default()
-        for key in result["data_schema"].schema
-        if getattr(key, "default", vol.UNDEFINED) is not vol.UNDEFINED
-    }
+    out: dict = {}
+    for key, value in result["data_schema"].schema.items():
+        key_name = key.schema if isinstance(key, vol.Marker) else key
+        if isinstance(value, section):
+            # Include the section key even when empty so its Required marker is satisfied.
+            out[key_name] = {
+                (ikey.schema if isinstance(ikey, vol.Marker) else ikey): ikey.default()
+                for ikey in value.schema.schema
+                if getattr(ikey, "default", vol.UNDEFINED) is not vol.UNDEFINED
+            }
+        elif getattr(key, "default", vol.UNDEFINED) is not vol.UNDEFINED:
+            out[key_name] = key.default()
+    return out
 
 
 @pytest.mark.parametrize(
@@ -3140,6 +3241,136 @@ async def test_reconfigure_round_trip_preserves_valid_dsl(hass: HomeAssistant, t
     )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
+
+
+# --- Section flattening ---
+
+
+def test_flatten_section_input_unwraps_known_sections() -> None:
+    """A per-section submission is lifted back to a flat field dict for storage."""
+    nested = {
+        CONF_START_STATES: ["on"],
+        "colors": {CONF_ACCENT_COLOR: [255, 0, 0], CONF_BACKGROUND_COLOR: [0, 0, 0]},
+        "advanced": {CONF_ENDED_TTL: 60},
+    }
+    flat = _flatten_section_input(nested, ENTITY_SECTIONS)
+    assert flat == {
+        CONF_START_STATES: ["on"],
+        CONF_ACCENT_COLOR: [255, 0, 0],
+        CONF_BACKGROUND_COLOR: [0, 0, 0],
+        CONF_ENDED_TTL: 60,
+    }
+    assert "colors" not in flat
+    assert "advanced" not in flat
+
+
+def test_flatten_section_input_is_idempotent_on_flat_input() -> None:
+    """Already-flat input passes through unchanged, and flattening twice is a no-op."""
+    flat = {CONF_START_STATES: ["on"], CONF_ACCENT_COLOR: [1, 2, 3]}
+    assert _flatten_section_input(flat, ENTITY_SECTIONS) == flat
+    once = _flatten_section_input({"colors": {CONF_ACCENT_COLOR: [1, 2, 3]}}, ENTITY_SECTIONS)
+    assert _flatten_section_input(once, ENTITY_SECTIONS) == once
+
+
+def test_flatten_section_input_leaves_non_section_dict_values_alone() -> None:
+    """A dict-valued field that is not a section key (state_labels) is not unwrapped."""
+    nested = {CONF_STATE_LABELS: {"on": "Running"}, "colors": {CONF_ACCENT_COLOR: [1, 2, 3]}}
+    flat = _flatten_section_input(nested, ENTITY_SECTIONS)
+    assert flat[CONF_STATE_LABELS] == {"on": "Running"}
+    assert flat[CONF_ACCENT_COLOR] == [1, 2, 3]
+
+
+def test_flatten_section_input_works_for_widget_sections() -> None:
+    """The widget section keys unwrap the same way."""
+    nested = {CONF_WIDGET_NAME: "Board", "refresh": {CONF_WIDGET_POLL_INTERVAL: 30}}
+    flat = _flatten_section_input(nested, WIDGET_SECTIONS)
+    assert flat == {CONF_WIDGET_NAME: "Board", CONF_WIDGET_POLL_INTERVAL: 30}
+
+
+def _section_collapsed(schema: vol.Schema) -> dict[str, bool]:
+    """Map each section key in a form schema to its collapsed flag."""
+    out: dict[str, bool] = {}
+    for key, value in schema.schema.items():
+        if isinstance(value, section):
+            name = key.schema if isinstance(key, vol.Marker) else key
+            out[name] = bool(value.options.get("collapsed"))
+    return out
+
+
+async def test_details_error_expands_only_the_offending_section(hass: HomeAssistant) -> None:
+    """A validation error inside a collapsed section re-renders that section open, others shut."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    # step_weights lives in the steps_options section; a non-positive weight raises there.
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="steps",
+        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_WEIGHTS: "1, 0, 2"},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STEP_WEIGHTS: "invalid_step_weights"}
+
+    collapsed = _section_collapsed(result["data_schema"])
+    assert "steps_options" in collapsed
+    assert collapsed["steps_options"] is False, "section holding the error should render open"
+    assert collapsed["colors"] is True, "unrelated section stays collapsed"
+
+
+async def test_details_no_error_leaves_every_section_collapsed(hass: HomeAssistant) -> None:
+    """With no error the initial details form ships every section collapsed."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "steps"}),
+    )
+    assert result["step_id"] == "details"
+    collapsed = _section_collapsed(result["data_schema"])
+    assert collapsed, "steps form should have sections"
+    assert all(collapsed.values()), f"a section opened without an error: {collapsed}"
+
+
+async def test_sectioned_submission_stores_flat_and_reconfigure_prefills(hass: HomeAssistant) -> None:
+    """Nested section input persists flat, and reconfigure prefills every sectioned field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="generic",
+        details_overrides={
+            CONF_ICON: "mdi:washing-machine",
+            CONF_ENDED_TTL: 120,
+            CONF_UPDATE_INTERVAL: 45,
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+    stored = next(iter(entry.subentries.values())).data
+    # Storage is flat: no section wrapper keys, real field keys present.
+    assert not (set(stored) & set(ENTITY_SECTIONS)), "section keys leaked into storage"
+    assert stored[CONF_ICON] == "mdi:washing-machine"
+    assert stored[CONF_ENDED_TTL] == 120
+    assert stored[CONF_UPDATE_INTERVAL] == 45
+
+    subentry_id = next(iter(entry.subentries))
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**{CONF_TEMPLATE: "generic"})
+    )
+    assert result["step_id"] == "details"
+
+    # Sectioned fields come back prefilled (icon via suggested_value, the rest via default).
+    suggested = _suggested_values(result)
+    assert suggested.get(CONF_ICON) == "mdi:washing-machine"
+    defaults = _all_field_defaults(result["data_schema"])
+    assert defaults[CONF_ENDED_TTL] == 120
+    assert defaults[CONF_UPDATE_INTERVAL] == 45
 
 
 async def test_reconfigure_round_trip_preserves_widget_stat_rows(hass: HomeAssistant) -> None:
