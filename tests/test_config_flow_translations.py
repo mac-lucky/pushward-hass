@@ -57,10 +57,10 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "activity_template": tuple(TEMPLATES),
     "severity": tuple(SEVERITIES),
     "timeline_scale": tuple(SCALES),
-    "sound": ("", *SOUNDS),
+    "sound": tuple(SOUNDS),
     "widget_template": tuple(WIDGET_TEMPLATES),
     "value_scale": tuple(VALUE_SCALES),
-    "widget_severity": tuple(WIDGET_SEVERITIES),
+    "widget_severity": tuple(s for s in WIDGET_SEVERITIES if s),
     "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
     "named_color": tuple(NAMED_COLORS),
 }
@@ -92,7 +92,10 @@ def _translation_keys_in_schemas() -> dict[str, tuple[str, ...]]:
     def record(cfg: dict) -> None:
         key = cfg.get("translation_key")
         if key:
-            found[key] = tuple(cfg.get("options", []))
+            # The empty-string option (sound "silent", widget_severity "none") is a
+            # real selector value but cannot be translated: hassfest rejects a "" key
+            # under selector.<key>.options. It renders as a blank entry, untranslated.
+            found[key] = tuple(o for o in cfg.get("options", []) if o != "")
 
     def scan(schema) -> None:
         for sel in schema.schema.values():

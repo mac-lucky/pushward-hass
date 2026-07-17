@@ -1810,7 +1810,6 @@
     },
     "sound": {
       "options": {
-        "": "Sin sonido",
         "default": "Predeterminado",
         "chime": "Campanilla",
         "alert": "Alerta",
@@ -1840,7 +1839,6 @@
     },
     "widget_severity": {
       "options": {
-        "": "Ninguno",
         "info": "Información",
         "warning": "Advertencia",
         "critical": "Crítico",

@@ -1810,7 +1810,6 @@
     },
     "sound": {
       "options": {
-        "": "Bez dźwięku",
         "default": "Domyślny",
         "chime": "Dzwonek",
         "alert": "Alert",
@@ -1840,7 +1839,6 @@
     },
     "widget_severity": {
       "options": {
-        "": "Brak",
         "info": "Informacja",
         "warning": "Ostrzeżenie",
         "critical": "Krytyczny",

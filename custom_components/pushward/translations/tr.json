@@ -1810,7 +1810,6 @@
     },
     "sound": {
       "options": {
-        "": "Ses yok",
         "default": "Varsayılan",
         "chime": "Çan sesi",
         "alert": "Alarm",
@@ -1840,7 +1839,6 @@
     },
     "widget_severity": {
       "options": {
-        "": "Yok",
         "info": "Bilgi",
         "warning": "Uyarı",
         "critical": "Kritik",

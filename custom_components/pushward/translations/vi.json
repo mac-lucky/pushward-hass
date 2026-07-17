@@ -1810,7 +1810,6 @@
     },
     "sound": {
       "options": {
-        "": "Không có âm thanh",
         "default": "Mặc định",
         "chime": "Chuông ngân",
         "alert": "Báo động",
@@ -1840,7 +1839,6 @@
     },
     "widget_severity": {
       "options": {
-        "": "Không có",
         "info": "Thông tin",
         "warning": "Cảnh báo",
         "critical": "Nghiêm trọng",

@@ -1810,7 +1810,6 @@
     },
     "sound": {
       "options": {
-        "": "No sound",
         "default": "Default",
         "chime": "Chime",
         "alert": "Alert",
@@ -1840,7 +1839,6 @@
     },
     "widget_severity": {
       "options": {
-        "": "None",
         "info": "Info",
         "warning": "Warning",
         "critical": "Critical",

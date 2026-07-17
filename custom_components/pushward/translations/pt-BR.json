@@ -1810,7 +1810,6 @@
     },
     "sound": {
       "options": {
-        "": "Sem som",
         "default": "Padrão",
         "chime": "Carrilhão",
         "alert": "Alerta",
@@ -1840,7 +1839,6 @@
     },
     "widget_severity": {
       "options": {
-        "": "Nenhum",
         "info": "Info",
         "warning": "Aviso",
         "critical": "Crítico",
