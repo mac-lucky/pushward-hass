@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Atributo da entidade com o timestamp Unix de quando o alert foi disparado. Apenas para o modelo alert.",
                 "subtitle_entity": "Mostra o subtítulo de uma entidade separada (ex.: um sensor de programa/modo). Deixe vazio para usar a entidade monitorada. Usa o estado da entidade de origem, a menos que um atributo seja definido.",
                 "subtitle_attribute": "Atributo da entidade a exibir como subtítulo. Deixe vazio para usar o nome amigável da entidade.",
-                "series": "Mapear atributos da entidade para séries nomeadas. Formato: atributo=Rótulo, atributo2=Rótulo2. Deixe vazio para usar o estado da entidade como série única.",
+                "series": "Mapear atributos da entidade para séries nomeadas. Uma linha por atributo: o nome do atributo e seu rótulo de série. Deixe vazio para usar o estado da entidade como série única. Uma string antiga atributo=Rótulo ainda é aceita.",
                 "log_level_attribute": "Atributo que fornece o nível de cada linha de registro (info/warn/error). Deixe vazio para nenhuma marca de nível. Apenas modelo de registro."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Rótulos de Etapas",
-                "step_rows": "Alturas de Linha das Etapas",
-                "step_weights": "Pesos das Etapas",
-                "step_colors": "Cores das Etapas"
+                "steps_editor": "Etapas"
               },
               "data_description": {
-                "step_labels": "Rótulos para cada etapa. Formato: 1=Primeira Etapa, 2=Segunda Etapa. Deve cobrir as etapas 1..total_steps. Apenas para o modelo steps.",
-                "step_rows": "Altura de linha (1–10) para cada etapa, separada por vírgulas. Deve ter total_steps entradas. Apenas para o modelo steps.",
-                "step_weights": "Largura relativa de cada etapa, separada por vírgulas. Exemplo: 1, 2, 1 faz a etapa do meio ficar duas vezes mais larga. Todos os valores devem ser positivos. Deve ter total_steps entradas. Apenas para o modelo steps.",
-                "step_colors": "Cor de cada etapa, separada por vírgulas (nomeada ou hexadecimal). Exemplo: green, , red deixa a etapa do meio na cor de destaque. Deve ter total_steps entradas. Apenas para o modelo steps."
+                "steps_editor": "Uma linha por etapa, em ordem. Cada linha define um rótulo opcional, uma altura de linha (1-10), uma largura relativa (número positivo) e uma cor (nome ou hex; deixe vazio para manter a cor de destaque). Adicione nenhuma linha ou exatamente total_steps linhas. Apenas para o modelo steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Período de Histórico Anterior"
               },
               "data_description": {
-                "units": "Rótulos de unidades por série. Formato: RótuloSérie=unidade, Temperatura=°C, Umidade=%. Apenas para o modelo timeline.",
+                "units": "Rótulos de unidades por série. Uma linha por série: o rótulo da série e sua unidade (por exemplo Temperatura e °C). Apenas para o modelo timeline. Uma string antiga RótuloSérie=unidade ainda é aceita.",
                 "primary_series": "Rótulo da série exibida como valor principal e usada para o intervalo compacto de máximo/mínimo. Deixe vazio para usar a própria série da entidade monitorada (ou a primeira série configurada).",
                 "scale": "Modo de escala do eixo Y para o gráfico sparkline.",
                 "decimals": "Número de casas decimais exibidas para os valores (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Atividades com prioridade mais alta são mantidas por mais tempo quando o limite do dispositivo é atingido (0 = menor, 10 = maior).",
                 "sound": "Som reproduzido em cada atualização para esta entidade. Deixe vazio para não usar substituição.",
                 "update_interval": "Intervalo mínimo em segundos entre atualizações. Mudanças de estado rápidas são limitadas.",
-                "state_labels": "Texto de exibição personalizado para estados. Formato: estado=Rótulo, estado2=Rótulo 2. Exemplo: heating=Aquecendo, idle=Em espera"
+                "state_labels": "Texto de exibição personalizado para estados. Uma linha por estado: o valor do estado e o rótulo a exibir. Exemplo: heating e Aquecendo. Uma string antiga estado=Rótulo, estado2=Rótulo 2 ainda é aceita."
               }
             },
             "colors": {

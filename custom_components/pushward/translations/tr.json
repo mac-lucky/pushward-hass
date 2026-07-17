@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Tetiklenme Unix zaman damgasını tutan varlık niteliği. Göreceli zaman görüntüsü için kullanılır.",
                 "subtitle_entity": "Alt başlığı ayrı bir varlıktan gösterir (ör. bir program/mod sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
                 "subtitle_attribute": "Alt başlık olarak gösterilecek varlık niteliği. Varlığın kolay adını kullanmak için boş bırakın.",
-                "series": "Varlık niteliklerini adlandırılmış serilere eşleyin. Biçim: attribute=Etiket, attribute2=Etiket2. Tek seri olarak varlığın durumunu kullanmak için boş bırakın.",
+                "series": "Varlık niteliklerini adlandırılmış serilere eşleyin. Her nitelik için bir satır: nitelik adı ve seri etiketi. Tek seri olarak varlığın durumunu kullanmak için boş bırakın. Eski attribute=Etiket dizesi hâlâ kabul edilir.",
                 "log_level_attribute": "Her günlük satırının düzeyini (info/warn/error) sağlayan öznitelik. Düzey etiketi istemiyorsanız boş bırakın. Yalnızca log şablonu."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Adım Etiketleri",
-                "step_rows": "Adım Satırları",
-                "step_weights": "Adım Ağırlıkları",
-                "step_colors": "Adım Renkleri"
+                "steps_editor": "Adımlar"
               },
               "data_description": {
-                "step_labels": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır.",
-                "step_rows": "Steps şablonunda bir satırda gösterilecek adım sayısı.",
-                "step_weights": "Her adımın göreli genişliği, virgülle ayrılmış. Örnek: 1, 2, 1 orta adımı iki kat genişletir. Tüm değerler pozitif olmalıdır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu.",
-                "step_colors": "Her adımın rengi, virgülle ayrılmış (isim veya hex). Örnek: green, , red orta adımı vurgu renginde bırakır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu."
+                "steps_editor": "Sırayla her adım için bir satır. Her satır isteğe bağlı bir etiket, satır yüksekliği (1-10), göreli genişlik (pozitif sayı) ve renk (adlı veya hex; boş bırakmak vurgu rengini korur) belirler. Hiç satır eklemeyin veya tam olarak total_steps satır ekleyin. Yalnızca steps şablonu."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Geçmiş Dönemi"
               },
               "data_description": {
-                "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%",
+                "units": "Seri başına birim etiketleri. Her seri için bir satır: seri etiketi ve birimi (örneğin Sıcaklık ve °C). Yalnızca timeline şablonu. Eski SeriEtiketi=birim dizesi hâlâ kabul edilir.",
                 "primary_series": "Başlık değeri olarak gösterilen ve kompakt yüksek/düşük aralığı için kullanılan serinin etiketi. İzlenen varlığın kendi serisini (veya ilk yapılandırılmış seriyi) kullanmak için boş bırakın.",
                 "scale": "Kıvılcım çizelgesi için Y ekseni ölçek modu.",
                 "decimals": "Değerler için gösterilen ondalık basamak sayısı (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Cihaz sınırına ulaşıldığında daha yüksek öncelikli aktiviteler daha uzun süre tutulur (0 = en düşük, 10 = en yüksek).",
                 "sound": "Bu güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın.",
                 "update_interval": "Güncellemeler arasındaki minimum saniye. Hızlı durum değişiklikleri kısıtlanır.",
-                "state_labels": "Durumlar için özel görüntü metni. Biçim: durum=Etiket, durum2=Etiket 2. Örnek: heating=Isınıyor, idle=Beklemede"
+                "state_labels": "Durumlar için özel görüntü metni. Her durum için bir satır: durum değeri ve gösterilecek etiket. Örnek: heating ve Isınıyor. Eski durum=Etiket, durum2=Etiket 2 dizesi hâlâ kabul edilir."
               }
             },
             "colors": {

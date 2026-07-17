@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Attribute holding the unix timestamp when the alert fired (on the source entity, or the tracked entity if no source is set). Alert template only.",
                 "subtitle_entity": "Show the subtitle from a separate entity (e.g. a program/mode sensor). Leave empty to use the tracked entity. Uses the source entity's state unless an attribute is set.",
                 "subtitle_attribute": "Attribute to show as subtitle (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state, or the friendly name when no source is set.",
-                "series": "Map entity attributes to named series. Format: attribute=Label, attribute2=Label2. Leave empty to use the entity's state as a single series.",
+                "series": "Map entity attributes to named series. One row per attribute: the attribute name and its series label. Leave empty to use the entity's state as a single series. A legacy attribute=Label string is still accepted.",
                 "log_level_attribute": "Attribute supplying each log line's level (info/warn/error). Leave empty for no level tag. Log template only."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Step Labels",
-                "step_rows": "Step Rows",
-                "step_weights": "Step Weights",
-                "step_colors": "Step Colors"
+                "steps_editor": "Steps"
               },
               "data_description": {
-                "step_labels": "Labels for each step. Format: 1=First Step, 2=Second Step. Must cover steps 1..total_steps. Steps template only.",
-                "step_rows": "Row height (1–10) for each step, comma-separated. Must have total_steps entries. Steps template only.",
-                "step_weights": "Relative width of each step, comma-separated. Example: 1, 2, 1 makes the middle step twice as wide. All values must be positive. Must have total_steps entries. Steps template only.",
-                "step_colors": "Color of each step, comma-separated (named or hex). Example: green, , red leaves the middle step on the accent color. Must have total_steps entries. Steps template only."
+                "steps_editor": "One row per step, in order. Each row sets an optional label, a row height (1-10), a relative width (positive number), and a color (named or hex; leave blank to keep the accent color). Add no rows, or exactly total_steps rows. Steps template only."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Back-History Period"
               },
               "data_description": {
-                "units": "Per-series unit labels. Format: SeriesLabel=unit, Temperature=°C, Humidity=%. Timeline template only.",
+                "units": "Per-series unit labels. One row per series: the series label and its unit (for example Temperature and °C). Timeline template only. A legacy SeriesLabel=unit string is still accepted.",
                 "primary_series": "Label of the series shown as the headline value and used for the compact high/low range. Leave empty to use the tracked entity's own series (or the first configured series).",
                 "scale": "Y-axis scale mode for the sparkline chart.",
                 "decimals": "Number of decimal places shown for values (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
                 "sound": "Sound played on every update for this entity. Leave empty to use no override.",
                 "update_interval": "Minimum seconds between updates. Rapid state changes are throttled.",
-                "state_labels": "Custom display text for states. Format: state=Label, state2=Label 2. Example: heating=Heating Up, idle=Standby"
+                "state_labels": "Custom display text for states. One row per state: the state value and the label to show. Example: heating and Heating Up. A legacy state=Label, state2=Label 2 string is still accepted."
               }
             },
             "colors": {

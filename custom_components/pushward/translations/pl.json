@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Atrybut encji zawierający znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert.",
                 "subtitle_entity": "Pokaż podtytuł z osobnej encji (np. czujnika programu/trybu). Pozostaw puste, aby użyć śledzonej encji. Używa stanu encji źródłowej, chyba że ustawiono atrybut.",
                 "subtitle_attribute": "Atrybut encji wyświetlany jako podtytuł. Pozostaw puste, aby użyć przyjaznej nazwy encji.",
-                "series": "Mapuje atrybuty encji na nazwane serie. Format: atrybut=Etykieta, atrybut2=Etykieta2. Pozostaw puste, aby użyć stanu encji jako pojedynczej serii.",
+                "series": "Mapuje atrybuty encji na nazwane serie. Jeden wiersz na atrybut: nazwa atrybutu i etykieta serii. Pozostaw puste, aby użyć stanu encji jako pojedynczej serii. Stary ciąg atrybut=Etykieta jest nadal akceptowany.",
                 "log_level_attribute": "Atrybut dostarczający poziom każdego wiersza dziennika (info/warn/error). Pozostaw puste, aby nie dodawać etykiety poziomu. Tylko szablon log."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Etykiety kroków",
-                "step_rows": "Wysokości wierszy kroków",
-                "step_weights": "Wagi Kroków",
-                "step_colors": "Kolory Kroków"
+                "steps_editor": "Kroki"
               },
               "data_description": {
-                "step_labels": "Etykiety dla każdego kroku. Format: 1=Pierwszy Krok, 2=Drugi Krok. Musi obejmować kroki 1..total_steps. Tylko szablon steps.",
-                "step_rows": "Wysokość wiersza (1–10) dla każdego kroku, oddzielona przecinkami. Musi mieć total_steps wpisów. Tylko szablon steps.",
-                "step_weights": "Względna szerokość każdego kroku, oddzielona przecinkami. Przykład: 1, 2, 1 sprawia, że środkowy krok jest dwa razy szerszy. Wszystkie wartości muszą być dodatnie. Musi mieć total_steps wpisów. Tylko szablon steps.",
-                "step_colors": "Kolor każdego kroku, oddzielony przecinkami (nazwany lub hex). Przykład: green, , red pozostawia środkowy krok w kolorze akcentu. Musi mieć total_steps wpisów. Tylko szablon steps."
+                "steps_editor": "Jeden wiersz na krok, w kolejności. Każdy wiersz ustawia opcjonalną etykietę, wysokość wiersza (1-10), względną szerokość (liczba dodatnia) i kolor (nazwa lub hex; puste zachowuje kolor akcentu). Dodaj brak wierszy albo dokładnie total_steps wierszy. Tylko szablon steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Okres historii wstecznej"
               },
               "data_description": {
-                "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline.",
+                "units": "Etykiety jednostek dla serii. Jeden wiersz na serię: etykieta serii i jej jednostka (na przykład Temperatura i °C). Tylko szablon timeline. Stary ciąg EtykietaSerii=jednostka jest nadal akceptowany.",
                 "primary_series": "Etykieta serii pokazywanej jako wartość główna i używanej dla kompaktowego zakresu min/maks. Pozostaw puste, aby użyć własnej serii śledzonej encji (lub pierwszej skonfigurowanej serii).",
                 "scale": "Tryb skali osi Y dla wykresu sparkline.",
                 "decimals": "Liczba miejsc dziesiętnych wyświetlanych dla wartości (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Live Activity o wyższym priorytecie są utrzymywane dłużej, gdy osiągnięto limit urządzenia (0 = najniższy, 10 = najwyższy).",
                 "sound": "Dźwięk odtwarzany przy każdej aktualizacji dla tej encji. Pozostaw puste, aby nie używać żadnego nadpisania.",
                 "update_interval": "Minimalna liczba sekund między aktualizacjami. Szybkie zmiany stanu są ograniczane.",
-                "state_labels": "Własny tekst wyświetlany dla stanów. Format: stan=Etykieta, stan2=Etykieta 2. Przykład: heating=Nagrzewanie, idle=Czuwanie"
+                "state_labels": "Własny tekst wyświetlany dla stanów. Jeden wiersz na stan: wartość stanu i etykieta do wyświetlenia. Przykład: heating i Nagrzewanie. Stary ciąg stan=Etykieta, stan2=Etykieta 2 jest nadal akceptowany."
               }
             },
             "colors": {

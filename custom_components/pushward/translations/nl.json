@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
                 "subtitle_entity": "Toon de ondertitel van een aparte entiteit (bijv. een programma-/modussensor). Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
                 "subtitle_attribute": "Entiteitsattribuut als ondertitel. Laat leeg om de vriendelijke naam van de entiteit te gebruiken.",
-                "series": "Koppel entiteitsattributen aan benoemde reeksen. Indeling: attribuut=Label, attribuut2=Label2. Laat leeg om de entiteitsstatus als enkelvoudige reeks te gebruiken.",
+                "series": "Koppel entiteitsattributen aan benoemde reeksen. Eén rij per attribuut: de attribuutnaam en het reekslabel. Laat leeg om de entiteitsstatus als enkelvoudige reeks te gebruiken. Een oude tekenreeks attribuut=Label wordt nog steeds geaccepteerd.",
                 "log_level_attribute": "Attribuut dat het niveau van elke logregel levert (info/warn/error). Laat leeg voor geen niveaulabel. Alleen voor het sjabloon log."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Staplabels",
-                "step_rows": "Stap-rijhoogten",
-                "step_weights": "Stapgewichten",
-                "step_colors": "Stapkleuren"
+                "steps_editor": "Stappen"
               },
               "data_description": {
-                "step_labels": "Labels voor elke stap. Indeling: 1=Eerste Stap, 2=Tweede Stap. Moet stappen 1..total_steps omvatten. Alleen voor het sjabloon steps.",
-                "step_rows": "Rijhoogte (1–10) voor elke stap, kommagescheiden. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
-                "step_weights": "Relatieve breedte van elke stap, kommagescheiden. Voorbeeld: 1, 2, 1 maakt de middelste stap twee keer zo breed. Alle waarden moeten positief zijn. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
-                "step_colors": "Kleur van elke stap, kommagescheiden (benoemd of hex). Voorbeeld: green, , red laat de middelste stap in de accentkleur. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps."
+                "steps_editor": "Eén rij per stap, op volgorde. Elke rij stelt een optioneel label, een rijhoogte (1-10), een relatieve breedte (positief getal) en een kleur (benoemd of hex; leeg laten voor de accentkleur) in. Voeg geen rijen toe, of precies total_steps rijen. Alleen voor het sjabloon steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Periode terugkijkgeschiedenis"
               },
               "data_description": {
-                "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline.",
+                "units": "Eenheidslabels per reeks. Eén rij per reeks: het reekslabel en de eenheid (bijvoorbeeld Temperatuur en °C). Alleen voor het sjabloon timeline. Een oude tekenreeks Reekslabel=eenheid wordt nog steeds geaccepteerd.",
                 "primary_series": "Label van de reeks die als hoofdwaarde wordt getoond en gebruikt voor het compacte hoog/laag-bereik. Laat leeg om de eigen reeks van de gevolgde entiteit te gebruiken (of de eerst geconfigureerde reeks).",
                 "scale": "Y-as schaalmodus voor het sparkline-diagram.",
                 "decimals": "Aantal decimalen voor de waardeweergave (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
                 "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
                 "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
-                "state_labels": "Aangepaste weergavetekst voor statussen. Indeling: status=Label, status2=Label 2. Voorbeeld: heating=Bezig met opwarmen, idle=Stand-by"
+                "state_labels": "Aangepaste weergavetekst voor statussen. Eén rij per status: de statuswaarde en het te tonen label. Voorbeeld: heating en Bezig met opwarmen. Een oude tekenreeks status=Label, status2=Label 2 wordt nog steeds geaccepteerd."
               }
             },
             "colors": {

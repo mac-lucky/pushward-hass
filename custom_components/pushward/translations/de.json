@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Entitätsattribut mit dem Unix-Zeitstempel, wann der Alert ausgelöst wurde. Nur für die Vorlage 'alert'.",
                 "subtitle_entity": "Den Untertitel aus einer separaten Entität anzeigen (z. B. einem Programm-/Modus-Sensor). Leer lassen, um die verfolgte Entität zu verwenden. Verwendet den Zustand der Quell-Entität, sofern kein Attribut gesetzt ist.",
                 "subtitle_attribute": "Entitätsattribut, das als Untertitel angezeigt wird. Leer lassen, um den Anzeigenamen der Entität zu verwenden.",
-                "series": "Entitätsattribute benannten Datenreihen zuordnen. Format: attribute=Label, attribute2=Label2. Leer lassen, um den Zustand der Entität als einzelne Datenreihe zu verwenden.",
+                "series": "Entitätsattribute benannten Datenreihen zuordnen. Eine Zeile pro Attribut: der Attributname und seine Datenreihen-Beschriftung. Leer lassen, um den Zustand der Entität als einzelne Datenreihe zu verwenden. Eine alte Zeichenkette attribute=Label wird weiterhin akzeptiert.",
                 "log_level_attribute": "Attribut, das die Stufe jeder Logzeile liefert (info/warn/error). Leer lassen für keine Stufenmarkierung. Nur für die Vorlage 'log'."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Schrittbeschriftungen",
-                "step_rows": "Schrittzeilenhöhen",
-                "step_weights": "Schrittgewichte",
-                "step_colors": "Schrittfarben"
+                "steps_editor": "Schritte"
               },
               "data_description": {
-                "step_labels": "Beschriftungen für jeden Schritt. Format: 1=Erster Schritt, 2=Zweiter Schritt. Muss Schritte 1..total_steps abdecken. Nur für die Vorlage 'steps'.",
-                "step_rows": "Zeilenhöhe (1–10) für jeden Schritt, kommagetrennt. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'.",
-                "step_weights": "Relative Breite jedes Schritts, kommagetrennt. Beispiel: 1, 2, 1 macht den mittleren Schritt doppelt so breit. Alle Werte müssen positiv sein. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'.",
-                "step_colors": "Farbe jedes Schritts, kommagetrennt (benannt oder Hex). Beispiel: green, , red lässt den mittleren Schritt in der Akzentfarbe. Muss total_steps Einträge haben. Nur für die Vorlage 'steps'."
+                "steps_editor": "Eine Zeile pro Schritt, in Reihenfolge. Jede Zeile legt eine optionale Beschriftung, eine Zeilenhöhe (1-10), eine relative Breite (positive Zahl) und eine Farbe (benannt oder Hex; leer lassen für die Akzentfarbe) fest. Entweder keine Zeilen oder genau total_steps Zeilen angeben. Nur für die Vorlage 'steps'."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Zeitraum des Rückblicks"
               },
               "data_description": {
-                "units": "Einheitenbeschriftungen pro Datenreihe. Format: Datenreihe=Einheit, Temperatur=°C, Luftfeuchtigkeit=%. Nur für die Vorlage 'timeline'.",
+                "units": "Einheitenbeschriftungen pro Datenreihe. Eine Zeile pro Datenreihe: die Datenreihen-Beschriftung und ihre Einheit (zum Beispiel Temperatur und °C). Nur für die Vorlage 'timeline'. Eine alte Zeichenkette Datenreihe=Einheit wird weiterhin akzeptiert.",
                 "primary_series": "Beschriftung der Datenreihe, die als Hauptwert angezeigt und für den kompakten Hoch-/Tief-Bereich verwendet wird. Leer lassen, um die eigene Datenreihe der verfolgten Entität (oder die erste konfigurierte Datenreihe) zu verwenden.",
                 "scale": "Skalenmodus der Y-Achse für das Sparkline-Diagramm.",
                 "decimals": "Anzahl der Dezimalstellen für die Wertanzeige (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Live Activities mit höherer Priorität bleiben länger erhalten, wenn das Gerätelimit erreicht ist (0 = niedrigste, 10 = höchste).",
                 "sound": "Ton, der bei jedem Update für diese Entität abgespielt wird. Leer lassen, um keine Überschreibung zu verwenden.",
                 "update_interval": "Mindestanzahl Sekunden zwischen Aktualisierungen. Schnelle Zustandsänderungen werden gedrosselt.",
-                "state_labels": "Benutzerdefinierte Anzeigetexte für Zustände. Format: state=Label, state2=Label 2. Beispiel: heating=Heizt auf, idle=Standby"
+                "state_labels": "Benutzerdefinierte Anzeigetexte für Zustände. Eine Zeile pro Zustand: der Zustandswert und die anzuzeigende Beschriftung. Beispiel: heating und Heizt auf. Eine alte Zeichenkette state=Label, state2=Label 2 wird weiterhin akzeptiert."
               }
             },
             "colors": {

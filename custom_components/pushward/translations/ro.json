@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Atribut entitate care conține marca temporală Unix a declanșării. Folosit pentru afișarea timpului relativ.",
                 "subtitle_entity": "Afișează subtitrarea dintr-o entitate separată (de ex. un senzor de program/mod). Lăsați gol pentru a folosi entitatea urmărită. Folosește starea entității sursă dacă nu este setat un atribut.",
                 "subtitle_attribute": "Atributul entității de afișat ca subtitrare. Lăsați gol pentru a folosi numele prietenos al entității.",
-                "series": "Asociați atributele entității cu serii denumite. Format: atribut=Etichetă, atribut2=Etichetă2. Lăsați gol pentru a folosi starea entității ca serie unică.",
+                "series": "Asociați atributele entității cu serii denumite. Un rând pe atribut: numele atributului și eticheta seriei. Lăsați gol pentru a folosi starea entității ca serie unică. Un șir vechi atribut=Etichetă este încă acceptat.",
                 "log_level_attribute": "Atribut care furnizează nivelul fiecărei linii de jurnal (info/warn/error). Lăsați gol pentru a nu afișa nicio etichetă de nivel. Numai pentru șablonul log."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Etichete pași",
-                "step_rows": "Rânduri pași",
-                "step_weights": "Ponderile Pașilor",
-                "step_colors": "Culorile Pașilor"
+                "steps_editor": "Pași"
               },
               "data_description": {
-                "step_labels": "Etichete personalizate pentru pașii șablonului steps. Format: 1=Etichetă, 2=Etichetă. Gol folosește numerele pașilor.",
-                "step_rows": "Numărul de pași afișați pe un rând în șablonul steps.",
-                "step_weights": "Lățimea relativă a fiecărui pas, separate prin virgulă. Exemplu: 1, 2, 1 face pasul din mijloc de două ori mai lat. Toate valorile trebuie să fie pozitive. Trebuie să aibă total_steps intrări. Numai pentru șablonul steps.",
-                "step_colors": "Culoarea fiecărui pas, separate prin virgulă (numite sau hex). Exemplu: green, , red lasă pasul din mijloc în culoarea de accent. Trebuie să aibă total_steps intrări. Numai pentru șablonul steps."
+                "steps_editor": "Un rând pe pas, în ordine. Fiecare rând setează o etichetă opțională, o înălțime de rând (1-10), o lățime relativă (număr pozitiv) și o culoare (denumită sau hex; lăsați gol pentru culoarea de accent). Adăugați niciun rând sau exact total_steps rânduri. Doar pentru șablonul steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Perioadă istoric retroactiv"
               },
               "data_description": {
-                "units": "Etichete de unități pentru seriile timeline. Format: attribute=Unitate. Exemplu: temp=°C, humidity=%",
+                "units": "Etichete de unități pentru serii. Un rând pe serie: eticheta seriei și unitatea sa (de exemplu Temperatură și °C). Doar pentru șablonul timeline. Un șir vechi EtichetăSerie=unitate este încă acceptat.",
                 "primary_series": "Eticheta seriei afișate ca valoare principală și folosită pentru intervalul compact minim/maxim. Lăsați gol pentru a folosi propria serie a entității urmărite (sau prima serie configurată).",
                 "scale": "Modul de scală al axei Y pentru graficul sparkline.",
                 "decimals": "Numărul de zecimale afișate pentru valori (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Activitățile cu prioritate mai mare sunt păstrate mai mult timp când se atinge limita dispozitivului (0 = cea mai mică, 10 = cea mai mare).",
                 "sound": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS.",
                 "update_interval": "Numărul minim de secunde între actualizări. Modificările rapide ale stării sunt limitate ca rată.",
-                "state_labels": "Text de afișare personalizat pentru stări. Format: stare=Etichetă, stare2=Etichetă 2. Exemplu: heating=Se încălzește, idle=Standby"
+                "state_labels": "Text de afișare personalizat pentru stări. Un rând pe stare: valoarea stării și eticheta de afișat. Exemplu: heating și Se încălzește. Un șir vechi stare=Etichetă, stare2=Etichetă 2 este încă acceptat."
               }
             },
             "colors": {

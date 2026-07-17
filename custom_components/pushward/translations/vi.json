@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Thuộc tính thực thể chứa dấu thời gian Unix khi kích hoạt. Dùng để hiển thị thời gian tương đối.",
                 "subtitle_entity": "Hiển thị phụ đề từ một thực thể riêng (ví dụ cảm biến chương trình/chế độ). Để trống để dùng thực thể được theo dõi. Dùng trạng thái của thực thể nguồn trừ khi đặt một thuộc tính.",
                 "subtitle_attribute": "Thuộc tính thực thể hiển thị làm phụ đề. Để trống để dùng tên thân thiện của thực thể.",
-                "series": "Ánh xạ thuộc tính thực thể sang chuỗi có tên. Định dạng: attribute=Label, attribute2=Label2. Để trống để dùng trạng thái của thực thể làm chuỗi duy nhất.",
+                "series": "Ánh xạ thuộc tính thực thể sang chuỗi có tên. Mỗi thuộc tính một hàng: tên thuộc tính và nhãn chuỗi. Để trống để dùng trạng thái của thực thể làm chuỗi duy nhất. Chuỗi cũ attribute=Label vẫn được chấp nhận.",
                 "log_level_attribute": "Thuộc tính cung cấp mức (info/warn/error) cho mỗi dòng nhật ký. Để trống nếu không muốn có nhãn mức. Chỉ dành cho mẫu nhật ký."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Nhãn Bước",
-                "step_rows": "Số Hàng Bước",
-                "step_weights": "Trọng Số Bước",
-                "step_colors": "Màu Bước"
+                "steps_editor": "Các Bước"
               },
               "data_description": {
-                "step_labels": "Nhãn tùy chỉnh cho các bước trong mẫu steps. Định dạng: 1=Nhãn, 2=Nhãn. Để trống để dùng số bước.",
-                "step_rows": "Số bước hiển thị trong một hàng trong mẫu steps.",
-                "step_weights": "Độ rộng tương đối của mỗi bước, cách nhau bằng dấu phẩy. Ví dụ: 1, 2, 1 làm bước giữa rộng gấp đôi. Tất cả giá trị phải là số dương. Phải có total_steps mục. Chỉ dành cho mẫu steps.",
-                "step_colors": "Màu của mỗi bước, cách nhau bằng dấu phẩy (tên màu hoặc hex). Ví dụ: green, , red giữ nguyên màu nhấn cho bước giữa. Phải có total_steps mục. Chỉ dành cho mẫu steps."
+                "steps_editor": "Mỗi bước một hàng, theo thứ tự. Mỗi hàng đặt nhãn tùy chọn, chiều cao hàng (1-10), chiều rộng tương đối (số dương) và màu (tên hoặc hex; để trống giữ màu nhấn). Thêm không hàng nào, hoặc đúng total_steps hàng. Chỉ mẫu steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Khoảng Thời Gian Lịch Sử"
               },
               "data_description": {
-                "units": "Nhãn đơn vị cho chuỗi timeline. Định dạng: attribute=Đơn vị. Ví dụ: temp=°C, humidity=%",
+                "units": "Nhãn đơn vị cho từng chuỗi. Mỗi chuỗi một hàng: nhãn chuỗi và đơn vị của nó (ví dụ Nhiệt độ và °C). Chỉ mẫu timeline. Chuỗi cũ NhãnChuỗi=đơn vị vẫn được chấp nhận.",
                 "primary_series": "Nhãn của chuỗi dữ liệu được hiển thị làm giá trị chính và dùng cho khoảng cao/thấp thu gọn. Để trống để dùng chuỗi riêng của thực thể được theo dõi (hoặc chuỗi được cấu hình đầu tiên).",
                 "scale": "Chế độ tỉ lệ trục Y cho biểu đồ sparkline.",
                 "decimals": "Số chữ số thập phân hiển thị cho giá trị (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Hoạt động có mức ưu tiên cao hơn được giữ lâu hơn khi đạt giới hạn thiết bị (0 = thấp nhất, 10 = cao nhất).",
                 "sound": "Tên âm thanh thông báo cho bản cập nhật này. Để trống để dùng âm thanh hệ thống iOS.",
                 "update_interval": "Số giây tối thiểu giữa các lần cập nhật. Các thay đổi trạng thái nhanh sẽ bị giới hạn tốc độ.",
-                "state_labels": "Văn bản hiển thị tùy chỉnh cho các trạng thái. Định dạng: state=Label, state2=Label 2. Ví dụ: heating=Đang Sưởi, idle=Chờ"
+                "state_labels": "Văn bản hiển thị tùy chỉnh cho các trạng thái. Mỗi trạng thái một hàng: giá trị trạng thái và nhãn hiển thị. Ví dụ: heating và Đang Sưởi. Chuỗi cũ state=Label, state2=Label 2 vẫn được chấp nhận."
               }
             },
             "colors": {

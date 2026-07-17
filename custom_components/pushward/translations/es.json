@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Atributo de la entidad que contiene la marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert.",
                 "subtitle_entity": "Muestra el subtítulo de una entidad distinta (p. ej., un sensor de programa/modo). Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
                 "subtitle_attribute": "Atributo de la entidad que se muestra como subtítulo. Dejar vacío para usar el nombre descriptivo de la entidad.",
-                "series": "Asociar atributos de la entidad a series con nombre. Formato: attribute=Etiqueta, attribute2=Etiqueta2. Dejar vacío para usar el estado de la entidad como serie única.",
+                "series": "Asociar atributos de la entidad a series con nombre. Una fila por atributo: el nombre del atributo y su etiqueta de serie. Dejar vacío para usar el estado de la entidad como serie única. Se sigue aceptando una cadena antigua attribute=Etiqueta.",
                 "log_level_attribute": "Atributo que proporciona el nivel de cada línea de registro (info/warn/error). Dejar vacío para no incluir etiqueta de nivel. Solo plantilla de registro."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Etiquetas de pasos",
-                "step_rows": "Alturas de fila de pasos",
-                "step_weights": "Pesos de los pasos",
-                "step_colors": "Colores de los pasos"
+                "steps_editor": "Pasos"
               },
               "data_description": {
-                "step_labels": "Etiquetas para cada paso. Formato: 1=Primer Paso, 2=Segundo Paso. Debe cubrir los pasos 1..total_steps. Solo para la plantilla steps.",
-                "step_rows": "Altura de fila (1–10) para cada paso, separada por comas. Debe tener total_steps entradas. Solo para la plantilla steps.",
-                "step_weights": "Ancho relativo de cada paso, separado por comas. Ejemplo: 1, 2, 1 hace que el paso central sea el doble de ancho. Todos los valores deben ser positivos. Debe tener total_steps entradas. Solo para la plantilla steps.",
-                "step_colors": "Color de cada paso, separado por comas (con nombre o hexadecimal). Ejemplo: green, , red deja el paso central en el color de acento. Debe tener total_steps entradas. Solo para la plantilla steps."
+                "steps_editor": "Una fila por paso, en orden. Cada fila define una etiqueta opcional, una altura de fila (1-10), un ancho relativo (número positivo) y un color (con nombre o hex; dejar vacío para conservar el color de acento). Añade ninguna fila o exactamente total_steps filas. Solo para la plantilla steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Período de historial previo"
               },
               "data_description": {
-                "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline.",
+                "units": "Etiquetas de unidades por serie. Una fila por serie: la etiqueta de la serie y su unidad (por ejemplo Temperatura y °C). Solo para la plantilla timeline. Se sigue aceptando una cadena antigua EtiquetaSerie=unidad.",
                 "primary_series": "Etiqueta de la serie mostrada como valor principal y usada para el rango compacto de máximo/mínimo. Dejar vacío para usar la propia serie de la entidad rastreada (o la primera serie configurada).",
                 "scale": "Modo de escala del eje Y para el gráfico sparkline.",
                 "decimals": "Número de decimales mostrados para los valores (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Las actividades de mayor prioridad se conservan más tiempo cuando se alcanza el límite del dispositivo (0 = mínima, 10 = máxima).",
                 "sound": "Sonido que se reproduce en cada actualización para esta entidad. Dejar vacío para no forzar ningún sonido.",
                 "update_interval": "Segundos mínimos entre actualizaciones. Los cambios de estado rápidos se limitan.",
-                "state_labels": "Texto de visualización personalizado para los estados. Formato: state=Etiqueta, state2=Etiqueta 2. Ejemplo: heating=Calentando, idle=En espera"
+                "state_labels": "Texto de visualización personalizado para los estados. Una fila por estado: el valor del estado y la etiqueta a mostrar. Ejemplo: heating y Calentando. Se sigue aceptando una cadena antigua state=Etiqueta, state2=Etiqueta 2."
               }
             },
             "colors": {

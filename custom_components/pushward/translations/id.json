@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
                 "subtitle_entity": "Tampilkan subjudul dari entitas terpisah (mis. sensor program/mode). Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
                 "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul. Kosongkan untuk menggunakan nama ramah entitas.",
-                "series": "Petakan atribut entitas ke seri bernama. Format: attribute=Label, attribute2=Label2. Kosongkan untuk menggunakan status entitas sebagai satu seri.",
+                "series": "Petakan atribut entitas ke seri bernama. Satu baris per atribut: nama atribut dan label serinya. Kosongkan untuk menggunakan status entitas sebagai satu seri. String lama attribute=Label masih diterima.",
                 "log_level_attribute": "Atribut yang menyediakan level (info/warn/error) untuk setiap baris log. Kosongkan jika tidak ingin ada tag level. Hanya templat log."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Label Langkah",
-                "step_rows": "Baris Langkah",
-                "step_weights": "Bobot Langkah",
-                "step_colors": "Warna Langkah"
+                "steps_editor": "Langkah"
               },
               "data_description": {
-                "step_labels": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah.",
-                "step_rows": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps.",
-                "step_weights": "Lebar relatif setiap langkah, dipisahkan koma. Contoh: 1, 2, 1 membuat langkah tengah dua kali lebih lebar. Semua nilai harus positif. Harus memiliki total_steps entri. Hanya untuk templat steps.",
-                "step_colors": "Warna setiap langkah, dipisahkan koma (nama warna atau hex). Contoh: green, , red membuat langkah tengah tetap menggunakan warna aksen. Harus memiliki total_steps entri. Hanya untuk templat steps."
+                "steps_editor": "Satu baris per langkah, berurutan. Setiap baris mengatur label opsional, tinggi baris (1-10), lebar relatif (angka positif), dan warna (nama atau hex; kosongkan untuk mempertahankan warna aksen). Tambahkan tanpa baris, atau tepat total_steps baris. Hanya template steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Periode Riwayat Mundur"
               },
               "data_description": {
-                "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%",
+                "units": "Label satuan per seri. Satu baris per seri: label seri dan satuannya (misalnya Suhu dan °C). Hanya template timeline. String lama LabelSeri=satuan masih diterima.",
                 "primary_series": "Label seri yang ditampilkan sebagai nilai utama dan digunakan untuk rentang tinggi/rendah ringkas. Kosongkan untuk menggunakan seri milik entitas yang dilacak sendiri (atau seri pertama yang dikonfigurasi).",
                 "scale": "Mode skala sumbu Y untuk grafik sparkline.",
                 "decimals": "Jumlah angka desimal yang ditampilkan untuk nilai (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
                 "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
                 "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
-                "state_labels": "Teks tampilan kustom untuk status. Format: state=Label, state2=Label 2. Contoh: heating=Sedang Memanaskan, idle=Siaga"
+                "state_labels": "Teks tampilan kustom untuk status. Satu baris per status: nilai status dan label yang ditampilkan. Contoh: heating dan Sedang Memanaskan. String lama state=Label, state2=Label 2 masih diterima."
               }
             },
             "colors": {

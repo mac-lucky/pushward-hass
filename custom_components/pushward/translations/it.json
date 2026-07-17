@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Attributo dell'entità con il timestamp Unix di quando è stato attivato l'alert. Solo per il modello alert.",
                 "subtitle_entity": "Mostra il sottotitolo da un'entità separata (ad es. un sensore di programma/modalità). Lascia vuoto per usare l'entità monitorata. Usa lo stato dell'entità di origine a meno che non sia impostato un attributo.",
                 "subtitle_attribute": "Attributo dell'entità da mostrare come sottotitolo. Lasciare vuoto per usare il nome descrittivo dell'entità.",
-                "series": "Mappare gli attributi dell'entità a serie con nome. Formato: attributo=Etichetta, attributo2=Etichetta2. Lasciare vuoto per utilizzare lo stato dell'entità come serie singola.",
+                "series": "Mappare gli attributi dell'entità a serie con nome. Una riga per attributo: il nome dell'attributo e la sua etichetta di serie. Lasciare vuoto per utilizzare lo stato dell'entità come serie singola. Una vecchia stringa attributo=Etichetta è ancora accettata.",
                 "log_level_attribute": "Attributo che fornisce il livello di ciascuna riga di registro (info/warn/error). Lasciare vuoto per nessuna etichetta di livello. Solo modello registro."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Etichette passi",
-                "step_rows": "Altezze righe passi",
-                "step_weights": "Pesi dei passi",
-                "step_colors": "Colori dei passi"
+                "steps_editor": "Passi"
               },
               "data_description": {
-                "step_labels": "Etichette per ogni passo. Formato: 1=Primo Passo, 2=Secondo Passo. Deve coprire i passi 1..total_steps. Solo per il modello steps.",
-                "step_rows": "Altezza di riga (1–10) per ogni passo, separata da virgole. Deve avere total_steps voci. Solo per il modello steps.",
-                "step_weights": "Larghezza relativa di ogni passo, separata da virgole. Esempio: 1, 2, 1 rende il passo centrale doppio in larghezza. Tutti i valori devono essere positivi. Deve avere total_steps voci. Solo per il modello steps.",
-                "step_colors": "Colore di ogni passo, separato da virgole (con nome o esadecimale). Esempio: green, , red lascia il passo centrale nel colore accento. Deve avere total_steps voci. Solo per il modello steps."
+                "steps_editor": "Una riga per passo, in ordine. Ogni riga imposta un'etichetta facoltativa, un'altezza riga (1-10), una larghezza relativa (numero positivo) e un colore (con nome o hex; lasciare vuoto per mantenere il colore d'accento). Aggiungi nessuna riga oppure esattamente total_steps righe. Solo per il modello steps."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Periodo cronologia precedente"
               },
               "data_description": {
-                "units": "Etichette delle unità per serie. Formato: EtichettaSerie=unità, Temperatura=°C, Umidità=%. Solo per il modello timeline.",
+                "units": "Etichette delle unità per serie. Una riga per serie: l'etichetta della serie e la sua unità (ad esempio Temperatura e °C). Solo per il modello timeline. Una vecchia stringa EtichettaSerie=unità è ancora accettata.",
                 "primary_series": "Etichetta della serie mostrata come valore principale e usata per l'intervallo compatto massimo/minimo. Lasciare vuoto per usare la serie propria dell'entità monitorata (o la prima serie configurata).",
                 "scale": "Modalità scala dell'asse Y per il grafico sparkline.",
                 "decimals": "Numero di cifre decimali visualizzate per i valori (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Le attività con priorità maggiore vengono conservate più a lungo quando si raggiunge il limite del dispositivo (0 = minima, 10 = massima).",
                 "sound": "Suono riprodotto ad ogni aggiornamento per questa entità. Lasciare vuoto per non forzare alcun suono.",
                 "update_interval": "Secondi minimi tra un aggiornamento e l'altro. I cambi di stato rapidi vengono limitati.",
-                "state_labels": "Testo personalizzato per gli stati. Formato: stato=Etichetta, stato2=Etichetta 2. Esempio: heating=In riscaldamento, idle=In standby"
+                "state_labels": "Testo personalizzato per gli stati. Una riga per stato: il valore dello stato e l'etichetta da mostrare. Esempio: heating e In riscaldamento. Una vecchia stringa stato=Etichetta, stato2=Etichetta 2 è ancora accettata."
               }
             },
             "colors": {

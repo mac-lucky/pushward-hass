@@ -1484,23 +1484,17 @@
                 "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
                 "subtitle_entity": "Ipakita ang subtitle mula sa hiwalay na entity (hal. program/mode sensor). Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
                 "subtitle_attribute": "Attribute ng entity na ipinapakita bilang subtitle. Iwanan itong blangko para gamitin ang friendly name ng entity.",
-                "series": "I-map ang mga attribute ng entity sa mga pinangalanang serye. Format: attribute=Label, attribute2=Label2. Iwanan itong blangko para gamitin ang estado ng entity bilang isang serye.",
+                "series": "I-map ang mga attribute ng entity sa mga pinangalanang serye. Isang hilera bawat attribute: ang pangalan ng attribute at ang label ng serye nito. Iwanang blangko para gamitin ang estado ng entity bilang isang serye. Tinatanggap pa rin ang lumang attribute=Label na string.",
                 "log_level_attribute": "Attribute na nagbibigay ng level (info/warn/error) ng bawat log line. Iwanang blangko para walang level tag. Para sa log template lamang."
               }
             },
             "steps_options": {
               "name": "Steps",
               "data": {
-                "step_labels": "Mga Label ng Hakbang",
-                "step_rows": "Mga Hilera ng Hakbang",
-                "step_weights": "Timbang ng Hakbang",
-                "step_colors": "Kulay ng Hakbang"
+                "steps_editor": "Mga Hakbang"
               },
               "data_description": {
-                "step_labels": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang.",
-                "step_rows": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template.",
-                "step_weights": "Relatibong lapad ng bawat hakbang, pinaghihiwalay ng kuwit. Halimbawa: 1, 2, 1 ay ginagawang doble ang lapad ng gitnang hakbang. Dapat positibo ang lahat ng halaga. Dapat may total_steps na entry. Steps template lamang.",
-                "step_colors": "Kulay ng bawat hakbang, pinaghihiwalay ng kuwit (pangalan o hex). Halimbawa: green, , red ay nananatili sa accent color ang gitnang hakbang. Dapat may total_steps na entry. Steps template lamang."
+                "steps_editor": "Isang hilera bawat hakbang, ayon sa pagkakasunod. Bawat hilera ay nagtatakda ng opsyonal na label, taas ng hilera (1-10), kaugnay na lapad (positibong numero), at kulay (pangalan o hex; iwanang blangko para panatilihin ang accent na kulay). Magdagdag ng walang hilera, o eksaktong total_steps na hilera. Template na steps lamang."
               }
             },
             "timeline_options": {
@@ -1515,7 +1509,7 @@
                 "history_period": "Panahon ng Kasaysayan"
               },
               "data_description": {
-                "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%",
+                "units": "Mga label ng yunit bawat serye. Isang hilera bawat serye: ang label ng serye at ang yunit nito (halimbawa Temperature at °C). Template na timeline lamang. Tinatanggap pa rin ang lumang SeriesLabel=unit na string.",
                 "primary_series": "Label ng serye na ipinapakita bilang headline value at ginagamit para sa compact na high/low range. Iwanan itong blangko para gamitin ang sariling serye ng na-track na entity (o ang unang naka-configure na serye).",
                 "scale": "Mode ng sukat ng Y-axis para sa sparkline chart.",
                 "decimals": "Bilang ng mga decimal na lugar na ipinapakita para sa mga halaga (0–10).",
@@ -1544,7 +1538,7 @@
                 "priority": "Mas mataas na priyoridad na mga activity ang pinananatili nang mas matagal kapag naabot ang limitasyon ng device (0 = pinakamababa, 10 = pinakamataas).",
                 "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
                 "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
-                "state_labels": "Custom na display na teksto para sa mga estado. Format: state=Label, state2=Label 2. Halimbawa: heating=Nagpapainit, idle=Naghihintay"
+                "state_labels": "Custom na display na teksto para sa mga estado. Isang hilera bawat estado: ang halaga ng estado at ang label na ipapakita. Halimbawa: heating at Nagpapainit. Tinatanggap pa rin ang lumang state=Label, state2=Label 2 na string."
               }
             },
             "colors": {
