@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "Estados de inicio",
             "end_states": "Estados de fin",
-            "progress_entity": "Entidad de progreso",
-            "progress_attribute": "Atributo de progreso",
             "remaining_time_entity": "Entidad de tiempo restante",
             "remaining_time_attribute": "Atributo de tiempo restante",
-            "live_progress": "Progreso en vivo (ETA)",
             "total_steps": "Total steps",
             "current_step_entity": "Entidad del paso actual",
             "current_step_attribute": "Atributo de paso actual",
             "severity": "Severidad",
             "severity_label": "Etiqueta de severidad",
-            "value_entity": "Entidad de valor",
-            "value_attribute": "Atributo de valor",
             "min_value": "Valor mínimo",
             "max_value": "Valor máximo",
             "unit": "Unidad",
-            "series": "Series",
             "series_entities": "Entidades de serie",
-            "primary_series": "Serie principal",
-            "scale": "Escala",
-            "decimals": "Decimales",
-            "smoothing": "Líneas suavizadas",
-            "thresholds": "Umbrales",
-            "history_period": "Período de historial previo",
-            "slug": "Slug de actividad",
-            "activity_name": "Nombre de actividad",
-            "icon": "Icono",
-            "icon_attribute": "Atributo de icono",
-            "priority": "Prioridad (0-10)",
-            "update_interval": "Intervalo mínimo de actualización (segundos)",
-            "subtitle_entity": "Entidad de subtítulo",
-            "subtitle_attribute": "Atributo de subtítulo",
-            "state_labels": "Etiquetas de estado",
             "completion_message": "Mensaje de finalización",
-            "accent_color": "Color de acento",
-            "accent_color_attribute": "Atributo de color de acento",
-            "tap_action_url": "URL de acción al tocar",
-            "tap_action_foreground": "Abrir la URL de acción al tocar",
-            "url": "URL",
-            "url_foreground": "Abrir la URL del botón principal",
-            "url_title": "Título del botón principal",
-            "secondary_url": "URL secundaria",
-            "secondary_url_foreground": "Abrir la URL del botón secundario",
-            "secondary_url_title": "Título del botón secundario",
-            "ended_ttl": "Eliminar automáticamente tras finalizar (segundos)",
-            "stale_ttl": "Finalizar automáticamente por inactividad (segundos)",
-            "sound": "Sonido",
-            "background_color": "Color de fondo",
-            "background_color_attribute": "Atributo de color de fondo",
-            "text_color": "Color del texto",
-            "text_color_attribute": "Atributo de color del texto",
             "warning_threshold": "Umbral de advertencia (segundos)",
             "alarm": "Alarma (iOS 26+)",
             "snooze_seconds": "Segundos de posposición (iOS 26+)",
-            "step_labels": "Etiquetas de pasos",
-            "step_rows": "Alturas de fila de pasos",
-            "step_weights": "Pesos de los pasos",
-            "step_colors": "Colores de los pasos",
-            "fired_at_entity": "Entidad de hora de activación",
-            "fired_at_attribute": "Atributo de activación",
-            "units": "Unidades por serie",
             "tiles": "Mosaicos del panel",
-            "log_columns": "Columnas de registro",
-            "log_level_attribute": "Atributo de nivel de registro",
-            "dismissal_ttl": "Quitar automáticamente de la pantalla de bloqueo (segundos)"
+            "log_columns": "Columnas de registro"
           },
           "data_description": {
             "start_states": "Estados de la entidad que inician la Live Activity. Seleccionar de la lista o introducir valores personalizados.",
             "end_states": "Estados de la entidad que finalizan la Live Activity. Seleccionar de la lista o introducir valores personalizados.",
-            "progress_entity": "Lee el progreso de una entidad distinta en lugar de la entidad rastreada. Déjalo vacío para usar la entidad rastreada. Si el campo de atributo está definido, lee ese atributo de esta entidad; de lo contrario, su estado.",
-            "progress_attribute": "Atributo de la entidad que contiene un valor de progreso entre 0 y 100. Ejemplo: percentage",
             "remaining_time_entity": "Lee el tiempo restante de una entidad distinta (p. ej., el sensor de tiempo de una lavadora). Déjalo vacío para usar la entidad rastreada. Interpreta automáticamente un sensor de marca de tiempo (hora de finalización), un sensor de duración con unidades, una cadena H:MM:SS o segundos sin más.",
             "remaining_time_attribute": "Atributo de la entidad que contiene el tiempo restante en segundos. Ejemplo: remaining",
-            "live_progress": "Rellena la barra de progreso de forma fluida y cuenta atrás una ETA hasta la hora de finalización en el dispositivo, usando la fuente de tiempo restante indicada arriba. Necesita una entidad o atributo de tiempo restante. En la plantilla steps, rellena el paso actual en lugar de todo el recorrido.",
             "total_steps": "Número total de steps.",
             "current_step_entity": "Lee el paso actual de una entidad distinta. Déjalo vacío para usar la entidad rastreada.",
             "current_step_attribute": "Atributo de la entidad que contiene el paso actual como número entero.",
             "severity": "Nivel de severidad del alert.",
             "severity_label": "Sobrescribe el texto de la insignia Info/Warning/Critical mostrada en el alert. Dejar vacío para usar el nombre de la severidad. Máximo 32 caracteres. Solo para la plantilla alert.",
-            "value_entity": "Lee el valor del indicador de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
-            "value_attribute": "Atributo de la entidad que contiene el valor actual del gauge como número. Dejar vacío para usar el estado de la entidad.",
             "min_value": "Valor mínimo del rango del gauge.",
             "max_value": "Valor máximo del rango del gauge.",
             "unit": "Unidad de visualización junto al valor (p. ej. °C, %, kW). Máximo 32 caracteres.",
-            "series": "Asociar atributos de la entidad a series con nombre. Formato: attribute=Etiqueta, attribute2=Etiqueta2. Dejar vacío para usar el estado de la entidad como serie única.",
             "series_entities": "Vincula entidades independientes como líneas con nombre en un mismo gráfico (p. ej. un sensor de PM2.5 por habitación). Formato: [Label=]entity_id[:attribute], separadas por comas. La etiqueta usa por defecto el nombre descriptivo de la entidad; lee un atributo con entity_id:attribute. Se combina con Series; hasta 10 líneas en total.",
-            "primary_series": "Etiqueta de la serie mostrada como valor principal y usada para el rango compacto de máximo/mínimo. Dejar vacío para usar la propia serie de la entidad rastreada (o la primera serie configurada).",
-            "scale": "Modo de escala del eje Y para el gráfico sparkline.",
-            "decimals": "Número de decimales mostrados para los valores (0–10).",
-            "smoothing": "Activar interpolación de curvas entre puntos de datos para un sparkline más suave.",
-            "thresholds": "Líneas de referencia horizontales en el sparkline. Formato: value:color:label. Ejemplo: 25:red:Calor, 18:blue:Frío. Máximo 5.",
-            "history_period": "Minutos de datos pasados para inicializar el sparkline desde el registrador de Home Assistant. Establecer a 0 para comenzar sin historial.",
-            "slug": "Identificador único para esta actividad. Dejar vacío para generarlo automáticamente a partir del ID de entidad. Ejemplo: ha-living-room-lamp",
-            "activity_name": "Nombre de visualización en la Live Activity del iPhone. Por defecto, el nombre descriptivo de la entidad.",
-            "icon": "Sobrescribir el icono. Dejar vacío para usar el icono nativo de la entidad (p. ej. mdi:thermometer). También se admiten SF Symbols (p. ej. lamp.desk.fill).",
-            "icon_attribute": "Atributo de la entidad para el icono dinámico. Tiene prioridad sobre el icono estático y el de la entidad cuando está definido.",
-            "priority": "Las actividades de mayor prioridad se conservan más tiempo cuando se alcanza el límite del dispositivo (0 = mínima, 10 = máxima).",
-            "update_interval": "Segundos mínimos entre actualizaciones. Los cambios de estado rápidos se limitan.",
-            "subtitle_entity": "Muestra el subtítulo de una entidad distinta (p. ej., un sensor de programa/modo). Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
-            "subtitle_attribute": "Atributo de la entidad que se muestra como subtítulo. Dejar vacío para usar el nombre descriptivo de la entidad.",
-            "state_labels": "Texto de visualización personalizado para los estados. Formato: state=Etiqueta, state2=Etiqueta 2. Ejemplo: heating=Calentando, idle=En espera",
             "completion_message": "Texto mostrado cuando la actividad finaliza. Dejar vacío para usar 'Completado'. Ejemplo: Lavado terminado",
-            "accent_color": "Color de acento para la Live Activity. Dejar vacío para el azul predeterminado.",
-            "accent_color_attribute": "Atributo de la entidad para el color de acento dinámico. Tiene prioridad sobre el color estático. Admite RGB, HS, XY, Kelvin, colores con nombre y hexadecimal.",
-            "tap_action_url": "URL opcional que se abre al tocar el fondo de la Live Activity. Admite http(s) (abre Safari) o esquemas personalizados como homeassistant://navigate/lovelace/0 (abre esa app).",
-            "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano sin salir de la pantalla de bloqueo.",
-            "url": "Enlace que se abre al pulsar la Live Activity. Debe comenzar con http:// o https://. Solo para las plantillas steps y alert.",
-            "url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
-            "url_title": "Etiqueta del botón principal (máx. 64 caracteres).",
-            "secondary_url": "Enlace secundario para la Live Activity. Solo para las plantillas steps y alert.",
-            "secondary_url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
-            "secondary_url_title": "Etiqueta del botón secundario (máx. 64 caracteres).",
-            "ended_ttl": "Segundos tras la finalización de la actividad antes de eliminarla automáticamente del servidor. Dejar vacío para conservarla indefinidamente. Ejemplo: 300",
-            "stale_ttl": "Segundos de inactividad antes de que el servidor finalice automáticamente la actividad. Dejar vacío para desactivar. Ejemplo: 1800",
-            "sound": "Sonido que se reproduce en cada actualización para esta entidad. Dejar vacío para no forzar ningún sonido.",
-            "background_color": "Color de fondo de la Live Activity. Dejar vacío para el valor predeterminado.",
-            "background_color_attribute": "Atributo de la entidad para el color de fondo dinámico. Anula el color estático. Admite RGB, HS, XY, Kelvin, colores con nombre y hexadecimal.",
-            "text_color": "Color del texto de la Live Activity. Dejar vacío para el valor predeterminado.",
-            "text_color_attribute": "Atributo de la entidad para el color del texto dinámico. Anula el color estático.",
             "warning_threshold": "Segundos antes del final del countdown cuando el servidor envía un push de advertencia. Dejar vacío para desactivar. Solo para la plantilla countdown.",
             "alarm": "Activar alarma AlarmKit al expirar el countdown (iOS 26+). Solo para la plantilla countdown.",
             "snooze_seconds": "Cuánto extiende la cuenta atrás el botón Posponer de iOS (60–3600). Déjalo vacío para el valor predeterminado de 300 s (5 min). Requiere alarma. Solo plantilla de cuenta atrás.",
-            "step_labels": "Etiquetas para cada paso. Formato: 1=Primer Paso, 2=Segundo Paso. Debe cubrir los pasos 1..total_steps. Solo para la plantilla steps.",
-            "step_rows": "Altura de fila (1–10) para cada paso, separada por comas. Debe tener total_steps entradas. Solo para la plantilla steps.",
-            "step_weights": "Ancho relativo de cada paso, separado por comas. Ejemplo: 1, 2, 1 hace que el paso central sea el doble de ancho. Todos los valores deben ser positivos. Debe tener total_steps entradas. Solo para la plantilla steps.",
-            "step_colors": "Color de cada paso, separado por comas (con nombre o hexadecimal). Ejemplo: green, , red deja el paso central en el color de acento. Debe tener total_steps entradas. Solo para la plantilla steps.",
-            "fired_at_entity": "Lee la hora de activación de la alerta de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Acepta una marca de tiempo Unix o un sensor de marca de tiempo ISO. Solo plantilla de alerta.",
-            "fired_at_attribute": "Atributo de la entidad que contiene la marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert.",
-            "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline.",
             "tiles": "Mosaicos del panel (1–4), cada uno leyendo una entidad distinta. Formato: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcionales). Ejemplo: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Solo plantilla de panel.",
-            "log_columns": "Valores adicionales añadidos a cada línea de registro (máx. 6), separados por comas. Formato: [Label=]source[|unit]. source = un atributo de esta entidad (brightness), el estado de otra entidad (binary_sensor.door) o un atributo de otra entidad (sensor.temp:temperature). Ejemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo plantilla de registro.",
-            "log_level_attribute": "Atributo que proporciona el nivel de cada línea de registro (info/warn/error). Dejar vacío para no incluir etiqueta de nivel. Solo plantilla de registro.",
-            "dismissal_ttl": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar. Ejemplo: 60"
+            "log_columns": "Valores adicionales añadidos a cada línea de registro (máx. 6), separados por comas. Formato: [Label=]source[|unit]. source = un atributo de esta entidad (brightness), el estado de otra entidad (binary_sensor.door) o un atributo de otra entidad (sensor.temp:temperature). Ejemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo plantilla de registro."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "Entidad de progreso",
+                "progress_attribute": "Atributo de progreso",
+                "remaining_time_entity": "Entidad de tiempo restante",
+                "remaining_time_attribute": "Atributo de tiempo restante",
+                "live_progress": "Progreso en vivo (ETA)",
+                "value_entity": "Entidad de valor",
+                "value_attribute": "Atributo de valor",
+                "fired_at_entity": "Entidad de hora de activación",
+                "fired_at_attribute": "Atributo de activación",
+                "subtitle_entity": "Entidad de subtítulo",
+                "subtitle_attribute": "Atributo de subtítulo",
+                "series": "Series",
+                "log_level_attribute": "Atributo de nivel de registro"
+              },
+              "data_description": {
+                "progress_entity": "Lee el progreso de una entidad distinta en lugar de la entidad rastreada. Déjalo vacío para usar la entidad rastreada. Si el campo de atributo está definido, lee ese atributo de esta entidad; de lo contrario, su estado.",
+                "progress_attribute": "Atributo de la entidad que contiene un valor de progreso entre 0 y 100. Ejemplo: percentage",
+                "remaining_time_entity": "Lee el tiempo restante de una entidad distinta (p. ej., el sensor de tiempo de una lavadora). Déjalo vacío para usar la entidad rastreada. Interpreta automáticamente un sensor de marca de tiempo (hora de finalización), un sensor de duración con unidades, una cadena H:MM:SS o segundos sin más.",
+                "remaining_time_attribute": "Atributo de la entidad que contiene el tiempo restante en segundos. Ejemplo: remaining",
+                "live_progress": "Rellena la barra de progreso de forma fluida y cuenta atrás una ETA hasta la hora de finalización en el dispositivo, usando la fuente de tiempo restante indicada arriba. Necesita una entidad o atributo de tiempo restante. En la plantilla steps, rellena el paso actual en lugar de todo el recorrido.",
+                "value_entity": "Lee el valor del indicador de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
+                "value_attribute": "Atributo de la entidad que contiene el valor actual del gauge como número. Dejar vacío para usar el estado de la entidad.",
+                "fired_at_entity": "Lee la hora de activación de la alerta de una entidad distinta. Déjalo vacío para usar la entidad rastreada. Acepta una marca de tiempo Unix o un sensor de marca de tiempo ISO. Solo plantilla de alerta.",
+                "fired_at_attribute": "Atributo de la entidad que contiene la marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert.",
+                "subtitle_entity": "Muestra el subtítulo de una entidad distinta (p. ej., un sensor de programa/modo). Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
+                "subtitle_attribute": "Atributo de la entidad que se muestra como subtítulo. Dejar vacío para usar el nombre descriptivo de la entidad.",
+                "series": "Asociar atributos de la entidad a series con nombre. Formato: attribute=Etiqueta, attribute2=Etiqueta2. Dejar vacío para usar el estado de la entidad como serie única.",
+                "log_level_attribute": "Atributo que proporciona el nivel de cada línea de registro (info/warn/error). Dejar vacío para no incluir etiqueta de nivel. Solo plantilla de registro."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "Etiquetas de pasos",
+                "step_rows": "Alturas de fila de pasos",
+                "step_weights": "Pesos de los pasos",
+                "step_colors": "Colores de los pasos"
+              },
+              "data_description": {
+                "step_labels": "Etiquetas para cada paso. Formato: 1=Primer Paso, 2=Segundo Paso. Debe cubrir los pasos 1..total_steps. Solo para la plantilla steps.",
+                "step_rows": "Altura de fila (1–10) para cada paso, separada por comas. Debe tener total_steps entradas. Solo para la plantilla steps.",
+                "step_weights": "Ancho relativo de cada paso, separado por comas. Ejemplo: 1, 2, 1 hace que el paso central sea el doble de ancho. Todos los valores deben ser positivos. Debe tener total_steps entradas. Solo para la plantilla steps.",
+                "step_colors": "Color de cada paso, separado por comas (con nombre o hexadecimal). Ejemplo: green, , red deja el paso central en el color de acento. Debe tener total_steps entradas. Solo para la plantilla steps."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "Unidades por serie",
+                "primary_series": "Serie principal",
+                "scale": "Escala",
+                "decimals": "Decimales",
+                "smoothing": "Líneas suavizadas",
+                "thresholds": "Umbrales",
+                "history_period": "Período de historial previo"
+              },
+              "data_description": {
+                "units": "Etiquetas de unidades por serie. Formato: EtiquetaSerie=unidad, Temperatura=°C, Humedad=%. Solo para la plantilla timeline.",
+                "primary_series": "Etiqueta de la serie mostrada como valor principal y usada para el rango compacto de máximo/mínimo. Dejar vacío para usar la propia serie de la entidad rastreada (o la primera serie configurada).",
+                "scale": "Modo de escala del eje Y para el gráfico sparkline.",
+                "decimals": "Número de decimales mostrados para los valores (0–10).",
+                "smoothing": "Activar interpolación de curvas entre puntos de datos para un sparkline más suave.",
+                "thresholds": "Líneas de referencia horizontales en el sparkline. Formato: value:color:label. Ejemplo: 25:red:Calor, 18:blue:Frío. Máximo 5.",
+                "history_period": "Minutos de datos pasados para inicializar el sparkline desde el registrador de Home Assistant. Establecer a 0 para comenzar sin historial."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Slug de actividad",
+                "activity_name": "Nombre de actividad",
+                "icon": "Icono",
+                "icon_attribute": "Atributo de icono",
+                "priority": "Prioridad (0-10)",
+                "sound": "Sonido",
+                "update_interval": "Intervalo mínimo de actualización (segundos)",
+                "state_labels": "Etiquetas de estado"
+              },
+              "data_description": {
+                "slug": "Identificador único para esta actividad. Dejar vacío para generarlo automáticamente a partir del ID de entidad. Ejemplo: ha-living-room-lamp",
+                "activity_name": "Nombre de visualización en la Live Activity del iPhone. Por defecto, el nombre descriptivo de la entidad.",
+                "icon": "Sobrescribir el icono. Dejar vacío para usar el icono nativo de la entidad (p. ej. mdi:thermometer). También se admiten SF Symbols (p. ej. lamp.desk.fill).",
+                "icon_attribute": "Atributo de la entidad para el icono dinámico. Tiene prioridad sobre el icono estático y el de la entidad cuando está definido.",
+                "priority": "Las actividades de mayor prioridad se conservan más tiempo cuando se alcanza el límite del dispositivo (0 = mínima, 10 = máxima).",
+                "sound": "Sonido que se reproduce en cada actualización para esta entidad. Dejar vacío para no forzar ningún sonido.",
+                "update_interval": "Segundos mínimos entre actualizaciones. Los cambios de estado rápidos se limitan.",
+                "state_labels": "Texto de visualización personalizado para los estados. Formato: state=Etiqueta, state2=Etiqueta 2. Ejemplo: heating=Calentando, idle=En espera"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Color de acento",
+                "accent_color_attribute": "Atributo de color de acento",
+                "background_color": "Color de fondo",
+                "background_color_attribute": "Atributo de color de fondo",
+                "text_color": "Color del texto",
+                "text_color_attribute": "Atributo de color del texto"
+              },
+              "data_description": {
+                "accent_color": "Color de acento para la Live Activity. Dejar vacío para el azul predeterminado.",
+                "accent_color_attribute": "Atributo de la entidad para el color de acento dinámico. Tiene prioridad sobre el color estático. Admite RGB, HS, XY, Kelvin, colores con nombre y hexadecimal.",
+                "background_color": "Color de fondo de la Live Activity. Dejar vacío para el valor predeterminado.",
+                "background_color_attribute": "Atributo de la entidad para el color de fondo dinámico. Anula el color estático. Admite RGB, HS, XY, Kelvin, colores con nombre y hexadecimal.",
+                "text_color": "Color del texto de la Live Activity. Dejar vacío para el valor predeterminado.",
+                "text_color_attribute": "Atributo de la entidad para el color del texto dinámico. Anula el color estático."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "URL de acción al tocar",
+                "tap_action_foreground": "Abrir la URL de acción al tocar",
+                "url": "URL",
+                "url_foreground": "Abrir la URL del botón principal",
+                "url_title": "Título del botón principal",
+                "secondary_url": "URL secundaria",
+                "secondary_url_foreground": "Abrir la URL del botón secundario",
+                "secondary_url_title": "Título del botón secundario"
+              },
+              "data_description": {
+                "tap_action_url": "URL opcional que se abre al tocar el fondo de la Live Activity. Admite http(s) (abre Safari) o esquemas personalizados como homeassistant://navigate/lovelace/0 (abre esa app).",
+                "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano sin salir de la pantalla de bloqueo.",
+                "url": "Enlace que se abre al pulsar la Live Activity. Debe comenzar con http:// o https://. Solo para las plantillas steps y alert.",
+                "url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
+                "url_title": "Etiqueta del botón principal (máx. 64 caracteres).",
+                "secondary_url": "Enlace secundario para la Live Activity. Solo para las plantillas steps y alert.",
+                "secondary_url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
+                "secondary_url_title": "Etiqueta del botón secundario (máx. 64 caracteres)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "Eliminar automáticamente tras finalizar (segundos)",
+                "stale_ttl": "Finalizar automáticamente por inactividad (segundos)",
+                "dismissal_ttl": "Quitar automáticamente de la pantalla de bloqueo (segundos)"
+              },
+              "data_description": {
+                "ended_ttl": "Segundos tras la finalización de la actividad antes de eliminarla automáticamente del servidor. Dejar vacío para conservarla indefinidamente. Ejemplo: 300",
+                "stale_ttl": "Segundos de inactividad antes de que el servidor finalice automáticamente la actividad. Dejar vacío para desactivar. Ejemplo: 1800",
+                "dismissal_ttl": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar. Ejemplo: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "Valor mínimo",
             "max_value": "Valor máximo",
             "severity": "Gravedad",
-            "stat_rows": "Filas de estadísticas",
-            "label": "Etiqueta",
-            "label_attribute": "Atributo de etiqueta",
-            "subtitle_attribute": "Atributo de subtítulo",
-            "icon": "Icono",
-            "icon_attribute": "Atributo de icono",
-            "accent_color": "Color de acento",
-            "accent_color_attribute": "Atributo de color de acento",
-            "background_color": "Color de fondo",
-            "text_color": "Color de texto",
-            "widget_trigger_mode": "Modo de activación",
-            "widget_poll_interval": "Intervalo de sondeo (segundos)",
-            "tap_action_url": "URL de acción al tocar",
-            "tap_action_foreground": "Abrir la URL de acción al tocar"
+            "stat_rows": "Filas de estadísticas"
           },
           "data_description": {
             "widget_name": "Nombre que se muestra en el selector de widgets de iOS. De forma predeterminada, el nombre descriptivo de la entidad.",
@@ -1647,20 +1690,63 @@
             "min_value": "Valor mínimo del rango del indicador.",
             "max_value": "Valor máximo del rango del indicador.",
             "severity": "Gravedad del estado (info, warning, critical, success).",
-            "stat_rows": "Hasta 6 filas. Formato: `Label=entity_id[:attribute[:unit]]`, separadas por comas. Ejemplo: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
-            "label": "Etiqueta estática que se muestra en el widget. Déjalo vacío para derivarla de la entidad.",
-            "label_attribute": "Atributo de la entidad que se usa como etiqueta. Anula la etiqueta estática.",
-            "subtitle_attribute": "Atributo de la entidad que se muestra como subtítulo del widget.",
-            "icon": "Icono estático. Se admiten SF Symbols y nombres MDI.",
-            "icon_attribute": "Atributo de la entidad para un icono dinámico. Anula el icono estático.",
-            "accent_color": "Color de acento del widget. Déjalo vacío para el predeterminado.",
-            "accent_color_attribute": "Atributo de la entidad para un color de acento dinámico.",
-            "background_color": "Color de fondo opcional.",
-            "text_color": "Color de texto opcional.",
-            "widget_trigger_mode": "Cómo se activan las actualizaciones. `event` reacciona a los cambios de estado; `poll` reevalúa en un intervalo fijo.",
-            "widget_poll_interval": "Intervalo entre sondeos (10–3600 segundos). Solo se usa cuando el modo de activación es `poll`.",
-            "tap_action_url": "URL opcional que se abre al tocar el widget. Admite http(s) (abre Safari) o esquemas personalizados como homeassistant://navigate/lovelace/0.",
-            "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano."
+            "stat_rows": "Hasta 6 filas. Formato: `Label=entity_id[:attribute[:unit]]`, separadas por comas. Ejemplo: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "Etiqueta",
+                "label_attribute": "Atributo de etiqueta",
+                "subtitle_attribute": "Atributo de subtítulo",
+                "icon": "Icono",
+                "icon_attribute": "Atributo de icono"
+              },
+              "data_description": {
+                "label": "Etiqueta estática que se muestra en el widget. Déjalo vacío para derivarla de la entidad.",
+                "label_attribute": "Atributo de la entidad que se usa como etiqueta. Anula la etiqueta estática.",
+                "subtitle_attribute": "Atributo de la entidad que se muestra como subtítulo del widget.",
+                "icon": "Icono estático. Se admiten SF Symbols y nombres MDI.",
+                "icon_attribute": "Atributo de la entidad para un icono dinámico. Anula el icono estático."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Color de acento",
+                "accent_color_attribute": "Atributo de color de acento",
+                "background_color": "Color de fondo",
+                "text_color": "Color de texto"
+              },
+              "data_description": {
+                "accent_color": "Color de acento del widget. Déjalo vacío para el predeterminado.",
+                "accent_color_attribute": "Atributo de la entidad para un color de acento dinámico.",
+                "background_color": "Color de fondo opcional.",
+                "text_color": "Color de texto opcional."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "URL de acción al tocar",
+                "tap_action_foreground": "Abrir la URL de acción al tocar"
+              },
+              "data_description": {
+                "tap_action_url": "URL opcional que se abre al tocar el widget. Admite http(s) (abre Safari) o esquemas personalizados como homeassistant://navigate/lovelace/0.",
+                "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "Modo de activación",
+                "widget_poll_interval": "Intervalo de sondeo (segundos)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "Cómo se activan las actualizaciones. `event` reacciona a los cambios de estado; `poll` reevalúa en un intervalo fijo.",
+                "widget_poll_interval": "Intervalo entre sondeos (10–3600 segundos). Solo se usa cuando el modo de activación es `poll`."
+              }
+            }
           }
         }
       },

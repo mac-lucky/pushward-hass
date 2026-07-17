@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "Startstatussen",
             "end_states": "Eindstatussen",
-            "progress_entity": "Voortgangsentiteit",
-            "progress_attribute": "Voortgangsattribuut",
             "remaining_time_entity": "Resterende-tijd-entiteit",
             "remaining_time_attribute": "Attribuut resterende tijd",
-            "live_progress": "Live voortgang-ETA",
             "total_steps": "Totaal aantal steps",
             "current_step_entity": "Huidige-stap-entiteit",
             "current_step_attribute": "Attribuut huidige stap",
             "severity": "Ernst",
             "severity_label": "Ernstlabel",
-            "value_entity": "Waarde-entiteit",
-            "value_attribute": "Waardeattribuut",
             "min_value": "Minimumwaarde",
             "max_value": "Maximumwaarde",
             "unit": "Eenheid",
-            "series": "Reeksen",
             "series_entities": "Reeksentiteiten",
-            "primary_series": "Primaire reeks",
-            "scale": "Schaal",
-            "decimals": "Decimalen",
-            "smoothing": "Vloeiende lijnen",
-            "thresholds": "Drempelwaarden",
-            "history_period": "Periode terugkijkgeschiedenis",
-            "slug": "Activiteits-slug",
-            "activity_name": "Activiteitsnaam",
-            "icon": "Pictogram",
-            "icon_attribute": "Pictogramattribuut",
-            "priority": "Prioriteit (0-10)",
-            "update_interval": "Min. bijwerkinterval (seconden)",
-            "subtitle_entity": "Ondertitel-entiteit",
-            "subtitle_attribute": "Ondertitelattribuut",
-            "state_labels": "Statuslabels",
             "completion_message": "Voltooiingsbericht",
-            "accent_color": "Accentkleur",
-            "accent_color_attribute": "Accentkleurattribuut",
-            "tap_action_url": "Tikactie-URL",
-            "tap_action_foreground": "Tikactie-URL openen",
-            "url": "URL",
-            "url_foreground": "Primaire-knop-URL openen",
-            "url_title": "Titel primaire knop",
-            "secondary_url": "Secundaire URL",
-            "secondary_url_foreground": "Secundaire-knop-URL openen",
-            "secondary_url_title": "Titel secundaire knop",
-            "ended_ttl": "Automatisch verwijderen na beëindigen (seconden)",
-            "stale_ttl": "Automatisch beëindigen na inactiviteit (seconden)",
-            "sound": "Geluid",
-            "background_color": "Achtergrondkleur",
-            "background_color_attribute": "Achtergrondkleurattribuut",
-            "text_color": "Tekstkleur",
-            "text_color_attribute": "Tekstkleurattribuut",
             "warning_threshold": "Waarschuwingsdrempel (seconden)",
             "alarm": "Alarm (iOS 26+)",
             "snooze_seconds": "Snooze-seconden (iOS 26+)",
-            "step_labels": "Staplabels",
-            "step_rows": "Stap-rijhoogten",
-            "step_weights": "Stapgewichten",
-            "step_colors": "Stapkleuren",
-            "fired_at_entity": "Geactiveerd-op-entiteit",
-            "fired_at_attribute": "Attribuut activeringstijd",
-            "units": "Eenheden per reeks",
             "tiles": "Bordtegels",
-            "log_columns": "Logkolommen",
-            "log_level_attribute": "Logniveau-attribuut",
-            "dismissal_ttl": "Automatisch verwijderen van toegangsscherm (seconden)"
+            "log_columns": "Logkolommen"
           },
           "data_description": {
             "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
             "end_states": "Entiteitsstatussen die de Live Activity beëindigen. Selecteer uit de lijst of typ aangepaste waarden.",
-            "progress_entity": "Lees de voortgang van een aparte entiteit in plaats van de gevolgde entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Als het attribuutveld is ingesteld, leest het dat attribuut van deze entiteit; anders de status.",
-            "progress_attribute": "Entiteitsattribuut met een voortgangswaarde van 0–100. Voorbeeld: percentage",
             "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
             "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
-            "live_progress": "Vul de voortgangsbalk vloeiend en tel een ETA af naar de eindtijd op het apparaat, met behulp van de bovenstaande bron voor resterende tijd. Vereist een entiteit of attribuut voor resterende tijd. Bij het sjabloon steps vult dit de huidige stap in plaats van de hele run.",
             "total_steps": "Totaal aantal steps.",
             "current_step_entity": "Lees de huidige stap van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken.",
             "current_step_attribute": "Entiteitsattribuut met de huidige stap als geheel getal.",
             "severity": "alert-ernstniveau.",
             "severity_label": "Overschrijf de Info/Warning/Critical-badgetekst die op de alert wordt getoond. Laat leeg om de ernstnaam te gebruiken. Max. 32 tekens. Alleen voor het sjabloon alert.",
-            "value_entity": "Lees de meterwaarde van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
-            "value_attribute": "Entiteitsattribuut met de huidige gauge-waarde als getal. Laat leeg om de entiteitsstatus te gebruiken.",
             "min_value": "Minimumwaarde voor het gauge-bereik.",
             "max_value": "Maximumwaarde voor het gauge-bereik.",
             "unit": "Weergave-eenheid naast de waarde (bijv. °C, %, kW). Max. 32 tekens.",
-            "series": "Koppel entiteitsattributen aan benoemde reeksen. Indeling: attribuut=Label, attribuut2=Label2. Laat leeg om de entiteitsstatus als enkelvoudige reeks te gebruiken.",
             "series_entities": "Koppel aparte entiteiten als benoemde lijnen in één grafiek (bijv. een PM2.5-sensor per kamer). Indeling: [Label=]entity_id[:attribute], kommagescheiden. Het label is standaard de vriendelijke naam van de entiteit; lees een attribuut met entity_id:attribute. Combineert met Reeksen; maximaal 10 lijnen in totaal.",
-            "primary_series": "Label van de reeks die als hoofdwaarde wordt getoond en gebruikt voor het compacte hoog/laag-bereik. Laat leeg om de eigen reeks van de gevolgde entiteit te gebruiken (of de eerst geconfigureerde reeks).",
-            "scale": "Y-as schaalmodus voor het sparkline-diagram.",
-            "decimals": "Aantal decimalen voor de waardeweergave (0–10).",
-            "smoothing": "Schakel curve-interpolatie in tussen gegevenspunten voor een vloeiendere sparkline.",
-            "thresholds": "Horizontale referentielijnen op de sparkline. Indeling: waarde:kleur:label. Voorbeeld: 25:red:Heet, 18:blue:Koud. Max. 5.",
-            "history_period": "Minuten aan historische gegevens om de sparkline te vullen vanuit de Home Assistant-recorder. Stel in op 0 om zonder geschiedenis te starten.",
-            "slug": "Unieke identificator voor deze activiteit. Laat leeg om automatisch te genereren vanuit de entiteits-ID. Voorbeeld: ha-living-room-lamp",
-            "activity_name": "Weergavenaam op de iPhone Live Activity. Standaard is de vriendelijke naam van de entiteit.",
-            "icon": "Pictogram overschrijven. Laat leeg om het eigen pictogram van de entiteit te gebruiken (bijv. mdi:thermometer). SF Symbols worden ook ondersteund (bijv. lamp.desk.fill).",
-            "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Heeft voorrang op statisch pictogram en entiteitspictogram wanneer ingesteld.",
-            "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
-            "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
-            "subtitle_entity": "Toon de ondertitel van een aparte entiteit (bijv. een programma-/modussensor). Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
-            "subtitle_attribute": "Entiteitsattribuut als ondertitel. Laat leeg om de vriendelijke naam van de entiteit te gebruiken.",
-            "state_labels": "Aangepaste weergavetekst voor statussen. Indeling: status=Label, status2=Label 2. Voorbeeld: heating=Bezig met opwarmen, idle=Stand-by",
             "completion_message": "Tekst bij het beëindigen van de activiteit. Laat leeg voor 'Voltooid'. Voorbeeld: Was klaar",
-            "accent_color": "Accentkleur voor de Live Activity. Laat leeg voor standaard blauw.",
-            "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
-            "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de achtergrond van de Live Activity. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0 (opent die app).",
-            "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST zonder het toegangsscherm te verlaten.",
-            "url": "Link die wordt geopend bij het tikken op de Live Activity. Moet beginnen met http:// of https://. Alleen voor sjablonen steps en alert.",
-            "url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
-            "url_title": "Label van de primaire knop (max. 64 tekens).",
-            "secondary_url": "Secundaire link voor de Live Activity. Alleen voor sjablonen steps en alert.",
-            "secondary_url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
-            "secondary_url_title": "Label van de secundaire knop (max. 64 tekens).",
-            "ended_ttl": "Seconden na het beëindigen van de activiteit voordat deze automatisch van de server wordt verwijderd. Laat leeg om onbeperkt te bewaren. Voorbeeld: 300",
-            "stale_ttl": "Seconden inactiviteit voordat de server de activiteit automatisch beëindigt. Laat leeg om uit te schakelen. Voorbeeld: 1800",
-            "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
-            "background_color": "Achtergrondkleur van de Live Activity. Laat leeg voor standaard.",
-            "background_color_attribute": "Entiteitsattribuut voor dynamische achtergrondkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
-            "text_color": "Tekstkleur van de Live Activity. Laat leeg voor standaard.",
-            "text_color_attribute": "Entiteitsattribuut voor dynamische tekstkleur. Heeft voorrang op statische kleur.",
             "warning_threshold": "Seconden vóór het einde van de countdown waarop de server een waarschuwingspush verzendt. Laat leeg om uit te schakelen. Alleen voor het sjabloon countdown.",
             "alarm": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+). Alleen voor het sjabloon countdown.",
             "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
-            "step_labels": "Labels voor elke stap. Indeling: 1=Eerste Stap, 2=Tweede Stap. Moet stappen 1..total_steps omvatten. Alleen voor het sjabloon steps.",
-            "step_rows": "Rijhoogte (1–10) voor elke stap, kommagescheiden. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
-            "step_weights": "Relatieve breedte van elke stap, kommagescheiden. Voorbeeld: 1, 2, 1 maakt de middelste stap twee keer zo breed. Alle waarden moeten positief zijn. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
-            "step_colors": "Kleur van elke stap, kommagescheiden (benoemd of hex). Voorbeeld: green, , red laat de middelste stap in de accentkleur. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
-            "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon.",
-            "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
-            "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline.",
             "tiles": "Bordtegels (1–4), elk gekoppeld aan een aparte entiteit. Indeling: Label=entity_id:attribute:unit:icon (attribute, unit, icon optioneel). Voorbeeld: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Alleen voor het sjabloon board.",
-            "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon.",
-            "log_level_attribute": "Attribuut dat het niveau van elke logregel levert (info/warn/error). Laat leeg voor geen niveaulabel. Alleen voor het sjabloon log.",
-            "dismissal_ttl": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging. Voorbeeld: 60"
+            "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "Voortgangsentiteit",
+                "progress_attribute": "Voortgangsattribuut",
+                "remaining_time_entity": "Resterende-tijd-entiteit",
+                "remaining_time_attribute": "Attribuut resterende tijd",
+                "live_progress": "Live voortgang-ETA",
+                "value_entity": "Waarde-entiteit",
+                "value_attribute": "Waardeattribuut",
+                "fired_at_entity": "Geactiveerd-op-entiteit",
+                "fired_at_attribute": "Attribuut activeringstijd",
+                "subtitle_entity": "Ondertitel-entiteit",
+                "subtitle_attribute": "Ondertitelattribuut",
+                "series": "Reeksen",
+                "log_level_attribute": "Logniveau-attribuut"
+              },
+              "data_description": {
+                "progress_entity": "Lees de voortgang van een aparte entiteit in plaats van de gevolgde entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Als het attribuutveld is ingesteld, leest het dat attribuut van deze entiteit; anders de status.",
+                "progress_attribute": "Entiteitsattribuut met een voortgangswaarde van 0–100. Voorbeeld: percentage",
+                "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
+                "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
+                "live_progress": "Vul de voortgangsbalk vloeiend en tel een ETA af naar de eindtijd op het apparaat, met behulp van de bovenstaande bron voor resterende tijd. Vereist een entiteit of attribuut voor resterende tijd. Bij het sjabloon steps vult dit de huidige stap in plaats van de hele run.",
+                "value_entity": "Lees de meterwaarde van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
+                "value_attribute": "Entiteitsattribuut met de huidige gauge-waarde als getal. Laat leeg om de entiteitsstatus te gebruiken.",
+                "fired_at_entity": "Lees het activeringstijdstip van de waarschuwing van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Accepteert een unix-tijdstempel of een ISO-tijdstempel-sensor. Alleen waarschuwingssjabloon.",
+                "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
+                "subtitle_entity": "Toon de ondertitel van een aparte entiteit (bijv. een programma-/modussensor). Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
+                "subtitle_attribute": "Entiteitsattribuut als ondertitel. Laat leeg om de vriendelijke naam van de entiteit te gebruiken.",
+                "series": "Koppel entiteitsattributen aan benoemde reeksen. Indeling: attribuut=Label, attribuut2=Label2. Laat leeg om de entiteitsstatus als enkelvoudige reeks te gebruiken.",
+                "log_level_attribute": "Attribuut dat het niveau van elke logregel levert (info/warn/error). Laat leeg voor geen niveaulabel. Alleen voor het sjabloon log."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "Staplabels",
+                "step_rows": "Stap-rijhoogten",
+                "step_weights": "Stapgewichten",
+                "step_colors": "Stapkleuren"
+              },
+              "data_description": {
+                "step_labels": "Labels voor elke stap. Indeling: 1=Eerste Stap, 2=Tweede Stap. Moet stappen 1..total_steps omvatten. Alleen voor het sjabloon steps.",
+                "step_rows": "Rijhoogte (1–10) voor elke stap, kommagescheiden. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
+                "step_weights": "Relatieve breedte van elke stap, kommagescheiden. Voorbeeld: 1, 2, 1 maakt de middelste stap twee keer zo breed. Alle waarden moeten positief zijn. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps.",
+                "step_colors": "Kleur van elke stap, kommagescheiden (benoemd of hex). Voorbeeld: green, , red laat de middelste stap in de accentkleur. Moet total_steps vermeldingen hebben. Alleen voor het sjabloon steps."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "Eenheden per reeks",
+                "primary_series": "Primaire reeks",
+                "scale": "Schaal",
+                "decimals": "Decimalen",
+                "smoothing": "Vloeiende lijnen",
+                "thresholds": "Drempelwaarden",
+                "history_period": "Periode terugkijkgeschiedenis"
+              },
+              "data_description": {
+                "units": "Eenheidslabels per reeks. Indeling: Reekslabel=eenheid, Temperatuur=°C, Vochtigheid=%. Alleen voor het sjabloon timeline.",
+                "primary_series": "Label van de reeks die als hoofdwaarde wordt getoond en gebruikt voor het compacte hoog/laag-bereik. Laat leeg om de eigen reeks van de gevolgde entiteit te gebruiken (of de eerst geconfigureerde reeks).",
+                "scale": "Y-as schaalmodus voor het sparkline-diagram.",
+                "decimals": "Aantal decimalen voor de waardeweergave (0–10).",
+                "smoothing": "Schakel curve-interpolatie in tussen gegevenspunten voor een vloeiendere sparkline.",
+                "thresholds": "Horizontale referentielijnen op de sparkline. Indeling: waarde:kleur:label. Voorbeeld: 25:red:Heet, 18:blue:Koud. Max. 5.",
+                "history_period": "Minuten aan historische gegevens om de sparkline te vullen vanuit de Home Assistant-recorder. Stel in op 0 om zonder geschiedenis te starten."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Activiteits-slug",
+                "activity_name": "Activiteitsnaam",
+                "icon": "Pictogram",
+                "icon_attribute": "Pictogramattribuut",
+                "priority": "Prioriteit (0-10)",
+                "sound": "Geluid",
+                "update_interval": "Min. bijwerkinterval (seconden)",
+                "state_labels": "Statuslabels"
+              },
+              "data_description": {
+                "slug": "Unieke identificator voor deze activiteit. Laat leeg om automatisch te genereren vanuit de entiteits-ID. Voorbeeld: ha-living-room-lamp",
+                "activity_name": "Weergavenaam op de iPhone Live Activity. Standaard is de vriendelijke naam van de entiteit.",
+                "icon": "Pictogram overschrijven. Laat leeg om het eigen pictogram van de entiteit te gebruiken (bijv. mdi:thermometer). SF Symbols worden ook ondersteund (bijv. lamp.desk.fill).",
+                "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Heeft voorrang op statisch pictogram en entiteitspictogram wanneer ingesteld.",
+                "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
+                "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
+                "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
+                "state_labels": "Aangepaste weergavetekst voor statussen. Indeling: status=Label, status2=Label 2. Voorbeeld: heating=Bezig met opwarmen, idle=Stand-by"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Accentkleur",
+                "accent_color_attribute": "Accentkleurattribuut",
+                "background_color": "Achtergrondkleur",
+                "background_color_attribute": "Achtergrondkleurattribuut",
+                "text_color": "Tekstkleur",
+                "text_color_attribute": "Tekstkleurattribuut"
+              },
+              "data_description": {
+                "accent_color": "Accentkleur voor de Live Activity. Laat leeg voor standaard blauw.",
+                "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
+                "background_color": "Achtergrondkleur van de Live Activity. Laat leeg voor standaard.",
+                "background_color_attribute": "Entiteitsattribuut voor dynamische achtergrondkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
+                "text_color": "Tekstkleur van de Live Activity. Laat leeg voor standaard.",
+                "text_color_attribute": "Entiteitsattribuut voor dynamische tekstkleur. Heeft voorrang op statische kleur."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Tikactie-URL",
+                "tap_action_foreground": "Tikactie-URL openen",
+                "url": "URL",
+                "url_foreground": "Primaire-knop-URL openen",
+                "url_title": "Titel primaire knop",
+                "secondary_url": "Secundaire URL",
+                "secondary_url_foreground": "Secundaire-knop-URL openen",
+                "secondary_url_title": "Titel secundaire knop"
+              },
+              "data_description": {
+                "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de achtergrond van de Live Activity. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0 (opent die app).",
+                "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST zonder het toegangsscherm te verlaten.",
+                "url": "Link die wordt geopend bij het tikken op de Live Activity. Moet beginnen met http:// of https://. Alleen voor sjablonen steps en alert.",
+                "url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+                "url_title": "Label van de primaire knop (max. 64 tekens).",
+                "secondary_url": "Secundaire link voor de Live Activity. Alleen voor sjablonen steps en alert.",
+                "secondary_url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+                "secondary_url_title": "Label van de secundaire knop (max. 64 tekens)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "Automatisch verwijderen na beëindigen (seconden)",
+                "stale_ttl": "Automatisch beëindigen na inactiviteit (seconden)",
+                "dismissal_ttl": "Automatisch verwijderen van toegangsscherm (seconden)"
+              },
+              "data_description": {
+                "ended_ttl": "Seconden na het beëindigen van de activiteit voordat deze automatisch van de server wordt verwijderd. Laat leeg om onbeperkt te bewaren. Voorbeeld: 300",
+                "stale_ttl": "Seconden inactiviteit voordat de server de activiteit automatisch beëindigt. Laat leeg om uit te schakelen. Voorbeeld: 1800",
+                "dismissal_ttl": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging. Voorbeeld: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "Minimumwaarde",
             "max_value": "Maximumwaarde",
             "severity": "Ernst",
-            "stat_rows": "Statistiekrijen",
-            "label": "Label",
-            "label_attribute": "Label-attribuut",
-            "subtitle_attribute": "Ondertitel-attribuut",
-            "icon": "Pictogram",
-            "icon_attribute": "Pictogram-attribuut",
-            "accent_color": "Accentkleur",
-            "accent_color_attribute": "Accentkleur-attribuut",
-            "background_color": "Achtergrondkleur",
-            "text_color": "Tekstkleur",
-            "widget_trigger_mode": "Triggermodus",
-            "widget_poll_interval": "Pollinginterval (seconden)",
-            "tap_action_url": "Tikactie-URL",
-            "tap_action_foreground": "Tikactie-URL openen"
+            "stat_rows": "Statistiekrijen"
           },
           "data_description": {
             "widget_name": "Weergavenaam in de iOS-widgetkiezer. Standaard de vriendelijke naam van de entiteit.",
@@ -1647,20 +1690,63 @@
             "min_value": "Minimumwaarde voor het meterbereik.",
             "max_value": "Maximumwaarde voor het meterbereik.",
             "severity": "Ernst van de status (info, warning, critical, success).",
-            "stat_rows": "Maximaal 6 rijen. Formaat: `Label=entity_id[:attribute[:unit]]`, door komma's gescheiden. Voorbeeld: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
-            "label": "Statisch label op de widget. Laat leeg om af te leiden van de entiteit.",
-            "label_attribute": "Entiteitsattribuut dat als label wordt gebruikt. Overschrijft het statische label.",
-            "subtitle_attribute": "Entiteitsattribuut dat als ondertitel van de widget wordt getoond.",
-            "icon": "Statisch pictogram. SF Symbols- en MDI-namen worden ondersteund.",
-            "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Overschrijft het statische pictogram.",
-            "accent_color": "Accentkleur voor de widget. Laat leeg voor de standaard.",
-            "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur.",
-            "background_color": "Optionele achtergrondkleur.",
-            "text_color": "Optionele tekstkleur.",
-            "widget_trigger_mode": "Hoe updates worden getriggerd. `event` reageert op statuswijzigingen; `poll` evalueert opnieuw met een vast interval.",
-            "widget_poll_interval": "Interval tussen pollingacties (10–3600 seconden). Wordt alleen gebruikt als de triggermodus `poll` is.",
-            "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de widget. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0.",
-            "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST."
+            "stat_rows": "Maximaal 6 rijen. Formaat: `Label=entity_id[:attribute[:unit]]`, door komma's gescheiden. Voorbeeld: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "Label",
+                "label_attribute": "Label-attribuut",
+                "subtitle_attribute": "Ondertitel-attribuut",
+                "icon": "Pictogram",
+                "icon_attribute": "Pictogram-attribuut"
+              },
+              "data_description": {
+                "label": "Statisch label op de widget. Laat leeg om af te leiden van de entiteit.",
+                "label_attribute": "Entiteitsattribuut dat als label wordt gebruikt. Overschrijft het statische label.",
+                "subtitle_attribute": "Entiteitsattribuut dat als ondertitel van de widget wordt getoond.",
+                "icon": "Statisch pictogram. SF Symbols- en MDI-namen worden ondersteund.",
+                "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Overschrijft het statische pictogram."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Accentkleur",
+                "accent_color_attribute": "Accentkleur-attribuut",
+                "background_color": "Achtergrondkleur",
+                "text_color": "Tekstkleur"
+              },
+              "data_description": {
+                "accent_color": "Accentkleur voor de widget. Laat leeg voor de standaard.",
+                "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur.",
+                "background_color": "Optionele achtergrondkleur.",
+                "text_color": "Optionele tekstkleur."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Tikactie-URL",
+                "tap_action_foreground": "Tikactie-URL openen"
+              },
+              "data_description": {
+                "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de widget. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0.",
+                "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "Triggermodus",
+                "widget_poll_interval": "Pollinginterval (seconden)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "Hoe updates worden getriggerd. `event` reageert op statuswijzigingen; `poll` evalueert opnieuw met een vast interval.",
+                "widget_poll_interval": "Interval tussen pollingacties (10–3600 seconden). Wordt alleen gebruikt als de triggermodus `poll` is."
+              }
+            }
           }
         }
       },

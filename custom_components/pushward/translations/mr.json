@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "प्रारंभ स्थिती",
             "end_states": "समाप्ती स्थिती",
-            "progress_entity": "प्रगती घटक",
-            "progress_attribute": "प्रगती गुणधर्म",
             "remaining_time_entity": "उरलेला वेळ घटक",
             "remaining_time_attribute": "उरलेल्या वेळाचा गुणधर्म",
-            "live_progress": "Live Progress ETA",
             "total_steps": "एकूण steps",
             "current_step_entity": "सध्याची पायरी घटक",
             "current_step_attribute": "सध्याच्या चरणाचा गुणधर्म",
             "severity": "तीव्रता",
             "severity_label": "तीव्रता लेबल",
-            "value_entity": "मूल्य घटक",
-            "value_attribute": "मूल्य गुणधर्म",
             "min_value": "किमान मूल्य",
             "max_value": "कमाल मूल्य",
             "unit": "एकक",
-            "series": "मालिका",
             "series_entities": "मालिका एंटिटी",
-            "primary_series": "प्राथमिक मालिका",
-            "scale": "स्केल",
-            "decimals": "दशांश स्थाने",
-            "smoothing": "रेषा गुळगुळीत करा",
-            "thresholds": "थ्रेशोल्ड",
-            "history_period": "मागील इतिहास कालावधी",
-            "slug": "Activity स्लग",
-            "activity_name": "Activity नाव",
-            "icon": "आयकॉन",
-            "icon_attribute": "आयकॉन गुणधर्म",
-            "priority": "प्राधान्य (0-10)",
-            "update_interval": "किमान अपडेट मध्यांतर (सेकंद)",
-            "subtitle_entity": "उपशीर्षक घटक",
-            "subtitle_attribute": "उपशीर्षक गुणधर्म",
-            "state_labels": "स्थिती लेबले",
             "completion_message": "पूर्णता संदेश",
-            "accent_color": "Accent रंग",
-            "accent_color_attribute": "Accent रंग गुणधर्म",
-            "tap_action_url": "टॅप क्रिया URL",
-            "tap_action_foreground": "टॅप क्रिया URL उघडा",
-            "url": "URL",
-            "url_foreground": "प्राथमिक बटण URL उघडा",
-            "url_title": "प्राथमिक बटण शीर्षक",
-            "secondary_url": "दुय्यम URL",
-            "secondary_url_foreground": "दुय्यम बटण URL उघडा",
-            "secondary_url_title": "दुय्यम बटण शीर्षक",
-            "ended_ttl": "समाप्तीनंतर स्वयं-हटवा (सेकंद)",
-            "stale_ttl": "निष्क्रियतेनंतर स्वयं-समाप्त (सेकंद)",
-            "sound": "ध्वनी",
-            "background_color": "पार्श्वभूमी रंग",
-            "background_color_attribute": "पार्श्वभूमी रंग गुणधर्म",
-            "text_color": "मजकूर रंग",
-            "text_color_attribute": "मजकूर रंग गुणधर्म",
             "warning_threshold": "इशारा थ्रेशोल्ड",
             "alarm": "अलार्म",
             "snooze_seconds": "स्नूझ सेकंद (iOS 26+)",
-            "step_labels": "पायऱ्यांचे लेबल",
-            "step_rows": "पायऱ्यांच्या ओळी",
-            "step_weights": "पायरी वजन",
-            "step_colors": "पायरी रंग",
-            "fired_at_entity": "फायर झाल्याची वेळ घटक",
-            "fired_at_attribute": "सक्रियण वेळ गुणधर्म",
-            "units": "एकके",
             "tiles": "Board टाइल",
-            "log_columns": "लॉग स्तंभ",
-            "log_level_attribute": "Log Level गुणधर्म",
-            "dismissal_ttl": "लॉक स्क्रीनवरून स्वयं-काढा (सेकंद)"
+            "log_columns": "लॉग स्तंभ"
           },
           "data_description": {
             "start_states": "Live Activity सुरू करणाऱ्या एंटिटी स्थिती. यादीतून निवडा किंवा कस्टम मूल्ये टाइप करा.",
             "end_states": "Live Activity समाप्त करणाऱ्या एंटिटी स्थिती. यादीतून निवडा किंवा कस्टम मूल्ये टाइप करा.",
-            "progress_entity": "ट्रॅक केलेल्या घटकाऐवजी वेगळ्या घटकातून प्रगती वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म फील्ड सेट असल्यास, या घटकाचा तो गुणधर्म वाचते; अन्यथा त्याची स्थिती.",
-            "progress_attribute": "0–100 प्रगती मूल्य ठेवणारा एंटिटी गुणधर्म. उदाहरण: percentage",
             "remaining_time_entity": "वेगळ्या घटकातून उरलेला वेळ वाचा (उदा. वॉशरचा वेळ सेन्सर). ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. टाइमस्टॅम्प (समाप्ती-वेळ) सेन्सर, युनिटसह कालावधी सेन्सर, H:MM:SS स्ट्रिंग, किंवा साधे सेकंद आपोआप पार्स करते.",
             "remaining_time_attribute": "सेकंदांमध्ये उरलेला वेळ ठेवणारा एंटिटी गुणधर्म. उदाहरण: remaining",
-            "live_progress": "वरील उरलेल्या वेळेचा स्रोत वापरून, प्रगती बार सुरळीतपणे भरते आणि डिव्हाइसवर समाप्तीच्या वेळेपर्यंतचा ETA उलट मोजते. उरलेल्या वेळेचा घटक किंवा गुणधर्म आवश्यक आहे. steps टेम्पलेटवर हे संपूर्ण रन ऐवजी सध्याचा चरण भरते.",
             "total_steps": "एकूण steps ची संख्या.",
             "current_step_entity": "वेगळ्या घटकातून सध्याची पायरी वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा.",
             "current_step_attribute": "पूर्णांक म्हणून सध्याचा चरण ठेवणारा एंटिटी गुणधर्म.",
             "severity": "Alert तीव्रता पातळी.",
             "severity_label": "अलर्टवर दाखवला जाणारा Info/Warning/Critical बॅज मजकूर बदला. तीव्रतेचे नाव वापरण्यासाठी रिकामे ठेवा. कमाल 32 अक्षरे. फक्त Alert टेम्पलेटसाठी.",
-            "value_entity": "वेगळ्या घटकातून गेज मूल्य वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म सेट नसल्यास स्रोत घटकाची स्थिती वापरते.",
-            "value_attribute": "संख्या म्हणून सध्याचे gauge मूल्य ठेवणारा एंटिटी गुणधर्म. एंटिटीची स्थिती वापरण्यासाठी रिकामे ठेवा.",
             "min_value": "Gauge श्रेणीसाठी किमान मूल्य.",
             "max_value": "Gauge श्रेणीसाठी कमाल मूल्य.",
             "unit": "मूल्याच्या पुढे दाखवले जाणारे प्रदर्शन एकक (उदा. °C, %, kW). कमाल 32 अक्षरे.",
-            "series": "एंटिटी गुणधर्मांना नावाच्या मालिकांशी मॅप करा. स्वरूप: attribute=Label, attribute2=Label2. एकल मालिका म्हणून एंटिटीची स्थिती वापरण्यासाठी रिकामे ठेवा.",
             "series_entities": "वेगवेगळ्या एंटिटींना एका चार्टवर नावाच्या ओळी म्हणून बांधा (उदा. प्रत्येक खोलीसाठी एक PM2.5 सेन्सर). स्वरूप: [Label=]entity_id[:attribute], स्वल्पविरामाने विभक्त. लेबल डीफॉल्टनुसार एंटिटीचे friendly name वापरते; entity_id:attribute ने गुणधर्म वाचा. मालिकेसह एकत्रित होते; एकूण 10 ओळींपर्यंत.",
-            "primary_series": "जी मालिका मुख्य मूल्य म्हणून दाखवली जाते आणि संक्षिप्त high/low श्रेणीसाठी वापरली जाते तिचे लेबल. ट्रॅक केलेल्या एंटिटीची स्वतःची मालिका (किंवा पहिली कॉन्फिगर केलेली मालिका) वापरण्यासाठी रिकामे सोडा.",
-            "scale": "Sparkline चार्टसाठी Y-अक्ष स्केल मोड.",
-            "decimals": "मूल्यांसाठी दाखवल्या जाणाऱ्या दशांश स्थानांची संख्या (0–10).",
-            "smoothing": "अधिक गुळगुळीत sparkline साठी डेटा बिंदूंमध्ये वक्र प्रक्षेपण सक्षम करा.",
-            "thresholds": "Sparkline वरील क्षैतिज संदर्भ रेषा. स्वरूप: value:color:label. उदाहरण: 25:red:Hot, 18:blue:Cold. कमाल 5.",
-            "history_period": "Home Assistant च्या recorder मधून sparkline seed करण्यासाठी भूतकाळातील डेटाचे मिनिटे. कोणताही इतिहास न घेण्यासाठी 0 सेट करा.",
-            "slug": "या activity साठी अद्वितीय ओळखकर्ता. entity ID वरून स्वयं-निर्मितीसाठी रिकामे ठेवा. उदाहरण: ha-living-room-lamp",
-            "activity_name": "iPhone Live Activity वर दाखवले जाणारे प्रदर्शन नाव. डीफॉल्टनुसार एंटिटीचे friendly name वापरते.",
-            "icon": "आयकॉन बदला. एंटिटीचा native आयकॉन वापरण्यासाठी रिकामे ठेवा (उदा. mdi:thermometer). SF Symbols देखील समर्थित आहेत (उदा. lamp.desk.fill).",
-            "icon_attribute": "डायनॅमिक आयकॉनसाठी एंटिटी गुणधर्म. सेट केल्यावर static आयकॉन आणि एंटिटी आयकॉन ओव्हररायड करतो.",
-            "priority": "डिव्हाइसची मर्यादा गाठल्यावर उच्च प्राधान्य activities जास्त काळ ठेवल्या जातात (0 = सर्वात कमी, 10 = सर्वात जास्त).",
-            "update_interval": "अपडेटमधील किमान सेकंद. जलद स्थिती बदल throttle केले जातात.",
-            "subtitle_entity": "वेगळ्या घटकातून उपशीर्षक दाखवा (उदा. प्रोग्राम/मोड सेन्सर). ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म सेट नसल्यास स्रोत घटकाची स्थिती वापरते.",
-            "subtitle_attribute": "उपशीर्षक म्हणून दाखवण्यासाठी एंटिटी गुणधर्म. एंटिटीचे friendly name वापरण्यासाठी रिकामे ठेवा.",
-            "state_labels": "स्थितींसाठी कस्टम प्रदर्शन मजकूर. स्वरूप: state=Label, state2=Label 2. उदाहरण: heating=Heating Up, idle=Standby",
             "completion_message": "Activity समाप्त झाल्यावर दाखवला जाणारा मजकूर. 'Complete' साठी रिकामे ठेवा. उदाहरण: Wash Done",
-            "accent_color": "Live Activity साठी accent रंग. डीफॉल्ट निळ्यासाठी रिकामे ठेवा.",
-            "accent_color_attribute": "डायनॅमिक accent रंगासाठी एंटिटी गुणधर्म. Static रंग ओव्हररायड करतो. RGB, HS, XY, Kelvin, named colors, आणि hex समर्थित.",
-            "tap_action_url": "Live Activity पार्श्वभूमीवर टॅप केल्यावर उघडले जाणारे पर्यायी URL. http(s) (Safari उघडते) किंवा homeassistant://navigate/lovelace/0 सारख्या कस्टम स्कीम (ते अॅप उघडते) समर्थित.",
-            "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — Lock Screen न सोडता पार्श्वभूमीत POST फायर करते.",
-            "url": "Live Activity टॅप केल्यावर उघडणारी लिंक. http:// किंवा https:// ने सुरू होणे आवश्यक. फक्त steps आणि alert टेम्पलेटसाठी.",
-            "url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
-            "url_title": "प्राथमिक बटण लेबल (कमाल 64 अक्षरे).",
-            "secondary_url": "Live Activity साठी दुय्यम लिंक. फक्त steps आणि alert टेम्पलेटसाठी.",
-            "secondary_url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
-            "secondary_url_title": "दुय्यम बटण लेबल (कमाल 64 अक्षरे).",
-            "ended_ttl": "Activity समाप्त झाल्यानंतर सर्व्हरमधून स्वयं-हटवण्यापूर्वीचे सेकंद. अनिश्चित काळासाठी ठेवण्यासाठी रिकामे ठेवा. उदाहरण: 300",
-            "stale_ttl": "सर्व्हर activity स्वयं-समाप्त करण्यापूर्वी निष्क्रियतेचे सेकंद. अक्षम करण्यासाठी रिकामे ठेवा. उदाहरण: 1800",
-            "sound": "या अपडेटसाठी सूचना ध्वनीचे नाव. iOS सिस्टम ध्वनी वापरण्यासाठी रिकामे सोडा.",
-            "background_color": "Live Activity पार्श्वभूमी रंग. #RRGGBB किंवा नामित रंग. सिस्टम डिफॉल्टसाठी रिकामे सोडा.",
-            "background_color_attribute": "डायनॅमिक पार्श्वभूमी रंगासाठी एन्टिटी गुणधर्म. स्थिर पार्श्वभूमी रंग बदलतो.",
-            "text_color": "Live Activity मजकूर रंग. #RRGGBB किंवा नामित रंग. सिस्टम डिफॉल्टसाठी रिकामे सोडा.",
-            "text_color_attribute": "डायनॅमिक मजकूर रंगासाठी एन्टिटी गुणधर्म. स्थिर मजकूर रंग बदलतो.",
             "warning_threshold": "मूल्य या पातळीपर्यंत पोहोचल्यावर किंवा ओलांडल्यावर इशारा रंग सक्रिय होतो. gauge आणि timeline टेम्पलेट.",
             "alarm": "इशारा थ्रेशोल्ड ओलांडल्यावर AlarmKit अलार्म सक्रिय करतो. फक्त iOS 26+.",
             "snooze_seconds": "iOS स्नूझ बटण काउंटडाउन किती वेळ वाढवते (60–3600). 300s (5 मिनिटे) डीफॉल्टसाठी रिकामे ठेवा. अलार्म आवश्यक. फक्त काउंटडाउन टेम्पलेट.",
-            "step_labels": "steps टेम्पलेट पायऱ्यांसाठी सानुकूल लेबल. स्वरूप: 1=लेबल, 2=लेबल. रिकामे असल्यास पायरी क्रमांक वापरले जातात.",
-            "step_rows": "steps टेम्पलेटमध्ये एका ओळीत दाखवल्या जाणाऱ्या पायऱ्यांची संख्या.",
-            "step_weights": "प्रत्येक पायरीची सापेक्ष रुंदी, स्वल्पविरामाने वेगळे केलेली. उदाहरण: 1, 2, 1 मधली पायरी दुप्पट रुंद करते. सर्व मूल्ये धनात्मक असावीत. total_steps नोंदी असाव्यात. फक्त steps टेम्पलेटसाठी.",
-            "step_colors": "प्रत्येक पायरीचा रंग, स्वल्पविरामाने वेगळे केलेला (नाव किंवा hex). उदाहरण: green, , red मधली पायरी accent रंगात ठेवते. total_steps नोंदी असाव्यात. फक्त steps टेम्पलेटसाठी.",
-            "fired_at_entity": "वेगळ्या घटकातून अलर्टची फायर-झाल्याची वेळ वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. unix टाइमस्टॅम्प किंवा ISO टाइमस्टॅम्प सेन्सर स्वीकारते. फक्त अलर्ट टेम्पलेट.",
-            "fired_at_attribute": "ट्रिगर Unix टाइमस्टॅम्प धारण करणारा एन्टिटी गुणधर्म. सापेक्ष वेळ प्रदर्शनासाठी वापरला जातो.",
-            "units": "Timeline मालिकांसाठी एकक लेबल. स्वरूप: attribute=एकक. उदाहरण: temp=°C, humidity=%",
             "tiles": "Board टाइल (1–4), प्रत्येक वेगळा घटक वाचते. स्वरूप: Label=entity_id:attribute:unit:icon (attribute, unit, icon पर्यायी). उदाहरण: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. फक्त Board टेम्पलेटसाठी.",
-            "log_columns": "प्रत्येक लॉग ओळीला जोडलेली अतिरिक्त मूल्ये (कमाल 6), स्वल्पविरामाने विभक्त. Format: [Label=]source[|unit]. source = या एंटिटीचा गुणधर्म (brightness), दुसऱ्या एंटिटीची स्थिती (binary_sensor.door), किंवा दुसऱ्या एंटिटीचा गुणधर्म (sensor.temp:temperature). उदाहरण: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. फक्त लॉग टेम्प्लेट.",
-            "log_level_attribute": "प्रत्येक लॉग ओळीचा level (info/warn/error) पुरवणारा एंटिटी गुणधर्म. level टॅगशिवाय ठेवण्यासाठी रिकामे सोडा. फक्त Log टेम्पलेटसाठी.",
-            "dismissal_ttl": "संपलेली अ‍ॅक्टिव्हिटी काढून टाकण्यापूर्वी लॉक स्क्रीनवर किती सेकंद राहते. 0 दिल्यास ती संपताच लगेच काढून टाकली जाते. उदाहरण: 60"
+            "log_columns": "प्रत्येक लॉग ओळीला जोडलेली अतिरिक्त मूल्ये (कमाल 6), स्वल्पविरामाने विभक्त. Format: [Label=]source[|unit]. source = या एंटिटीचा गुणधर्म (brightness), दुसऱ्या एंटिटीची स्थिती (binary_sensor.door), किंवा दुसऱ्या एंटिटीचा गुणधर्म (sensor.temp:temperature). उदाहरण: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. फक्त लॉग टेम्प्लेट."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "प्रगती घटक",
+                "progress_attribute": "प्रगती गुणधर्म",
+                "remaining_time_entity": "उरलेला वेळ घटक",
+                "remaining_time_attribute": "उरलेल्या वेळाचा गुणधर्म",
+                "live_progress": "Live Progress ETA",
+                "value_entity": "मूल्य घटक",
+                "value_attribute": "मूल्य गुणधर्म",
+                "fired_at_entity": "फायर झाल्याची वेळ घटक",
+                "fired_at_attribute": "सक्रियण वेळ गुणधर्म",
+                "subtitle_entity": "उपशीर्षक घटक",
+                "subtitle_attribute": "उपशीर्षक गुणधर्म",
+                "series": "मालिका",
+                "log_level_attribute": "Log Level गुणधर्म"
+              },
+              "data_description": {
+                "progress_entity": "ट्रॅक केलेल्या घटकाऐवजी वेगळ्या घटकातून प्रगती वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म फील्ड सेट असल्यास, या घटकाचा तो गुणधर्म वाचते; अन्यथा त्याची स्थिती.",
+                "progress_attribute": "0–100 प्रगती मूल्य ठेवणारा एंटिटी गुणधर्म. उदाहरण: percentage",
+                "remaining_time_entity": "वेगळ्या घटकातून उरलेला वेळ वाचा (उदा. वॉशरचा वेळ सेन्सर). ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. टाइमस्टॅम्प (समाप्ती-वेळ) सेन्सर, युनिटसह कालावधी सेन्सर, H:MM:SS स्ट्रिंग, किंवा साधे सेकंद आपोआप पार्स करते.",
+                "remaining_time_attribute": "सेकंदांमध्ये उरलेला वेळ ठेवणारा एंटिटी गुणधर्म. उदाहरण: remaining",
+                "live_progress": "वरील उरलेल्या वेळेचा स्रोत वापरून, प्रगती बार सुरळीतपणे भरते आणि डिव्हाइसवर समाप्तीच्या वेळेपर्यंतचा ETA उलट मोजते. उरलेल्या वेळेचा घटक किंवा गुणधर्म आवश्यक आहे. steps टेम्पलेटवर हे संपूर्ण रन ऐवजी सध्याचा चरण भरते.",
+                "value_entity": "वेगळ्या घटकातून गेज मूल्य वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म सेट नसल्यास स्रोत घटकाची स्थिती वापरते.",
+                "value_attribute": "संख्या म्हणून सध्याचे gauge मूल्य ठेवणारा एंटिटी गुणधर्म. एंटिटीची स्थिती वापरण्यासाठी रिकामे ठेवा.",
+                "fired_at_entity": "वेगळ्या घटकातून अलर्टची फायर-झाल्याची वेळ वाचा. ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. unix टाइमस्टॅम्प किंवा ISO टाइमस्टॅम्प सेन्सर स्वीकारते. फक्त अलर्ट टेम्पलेट.",
+                "fired_at_attribute": "ट्रिगर Unix टाइमस्टॅम्प धारण करणारा एन्टिटी गुणधर्म. सापेक्ष वेळ प्रदर्शनासाठी वापरला जातो.",
+                "subtitle_entity": "वेगळ्या घटकातून उपशीर्षक दाखवा (उदा. प्रोग्राम/मोड सेन्सर). ट्रॅक केलेला घटक वापरण्यासाठी रिकामे ठेवा. गुणधर्म सेट नसल्यास स्रोत घटकाची स्थिती वापरते.",
+                "subtitle_attribute": "उपशीर्षक म्हणून दाखवण्यासाठी एंटिटी गुणधर्म. एंटिटीचे friendly name वापरण्यासाठी रिकामे ठेवा.",
+                "series": "एंटिटी गुणधर्मांना नावाच्या मालिकांशी मॅप करा. स्वरूप: attribute=Label, attribute2=Label2. एकल मालिका म्हणून एंटिटीची स्थिती वापरण्यासाठी रिकामे ठेवा.",
+                "log_level_attribute": "प्रत्येक लॉग ओळीचा level (info/warn/error) पुरवणारा एंटिटी गुणधर्म. level टॅगशिवाय ठेवण्यासाठी रिकामे सोडा. फक्त Log टेम्पलेटसाठी."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "पायऱ्यांचे लेबल",
+                "step_rows": "पायऱ्यांच्या ओळी",
+                "step_weights": "पायरी वजन",
+                "step_colors": "पायरी रंग"
+              },
+              "data_description": {
+                "step_labels": "steps टेम्पलेट पायऱ्यांसाठी सानुकूल लेबल. स्वरूप: 1=लेबल, 2=लेबल. रिकामे असल्यास पायरी क्रमांक वापरले जातात.",
+                "step_rows": "steps टेम्पलेटमध्ये एका ओळीत दाखवल्या जाणाऱ्या पायऱ्यांची संख्या.",
+                "step_weights": "प्रत्येक पायरीची सापेक्ष रुंदी, स्वल्पविरामाने वेगळे केलेली. उदाहरण: 1, 2, 1 मधली पायरी दुप्पट रुंद करते. सर्व मूल्ये धनात्मक असावीत. total_steps नोंदी असाव्यात. फक्त steps टेम्पलेटसाठी.",
+                "step_colors": "प्रत्येक पायरीचा रंग, स्वल्पविरामाने वेगळे केलेला (नाव किंवा hex). उदाहरण: green, , red मधली पायरी accent रंगात ठेवते. total_steps नोंदी असाव्यात. फक्त steps टेम्पलेटसाठी."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "एकके",
+                "primary_series": "प्राथमिक मालिका",
+                "scale": "स्केल",
+                "decimals": "दशांश स्थाने",
+                "smoothing": "रेषा गुळगुळीत करा",
+                "thresholds": "थ्रेशोल्ड",
+                "history_period": "मागील इतिहास कालावधी"
+              },
+              "data_description": {
+                "units": "Timeline मालिकांसाठी एकक लेबल. स्वरूप: attribute=एकक. उदाहरण: temp=°C, humidity=%",
+                "primary_series": "जी मालिका मुख्य मूल्य म्हणून दाखवली जाते आणि संक्षिप्त high/low श्रेणीसाठी वापरली जाते तिचे लेबल. ट्रॅक केलेल्या एंटिटीची स्वतःची मालिका (किंवा पहिली कॉन्फिगर केलेली मालिका) वापरण्यासाठी रिकामे सोडा.",
+                "scale": "Sparkline चार्टसाठी Y-अक्ष स्केल मोड.",
+                "decimals": "मूल्यांसाठी दाखवल्या जाणाऱ्या दशांश स्थानांची संख्या (0–10).",
+                "smoothing": "अधिक गुळगुळीत sparkline साठी डेटा बिंदूंमध्ये वक्र प्रक्षेपण सक्षम करा.",
+                "thresholds": "Sparkline वरील क्षैतिज संदर्भ रेषा. स्वरूप: value:color:label. उदाहरण: 25:red:Hot, 18:blue:Cold. कमाल 5.",
+                "history_period": "Home Assistant च्या recorder मधून sparkline seed करण्यासाठी भूतकाळातील डेटाचे मिनिटे. कोणताही इतिहास न घेण्यासाठी 0 सेट करा."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Activity स्लग",
+                "activity_name": "Activity नाव",
+                "icon": "आयकॉन",
+                "icon_attribute": "आयकॉन गुणधर्म",
+                "priority": "प्राधान्य (0-10)",
+                "sound": "ध्वनी",
+                "update_interval": "किमान अपडेट मध्यांतर (सेकंद)",
+                "state_labels": "स्थिती लेबले"
+              },
+              "data_description": {
+                "slug": "या activity साठी अद्वितीय ओळखकर्ता. entity ID वरून स्वयं-निर्मितीसाठी रिकामे ठेवा. उदाहरण: ha-living-room-lamp",
+                "activity_name": "iPhone Live Activity वर दाखवले जाणारे प्रदर्शन नाव. डीफॉल्टनुसार एंटिटीचे friendly name वापरते.",
+                "icon": "आयकॉन बदला. एंटिटीचा native आयकॉन वापरण्यासाठी रिकामे ठेवा (उदा. mdi:thermometer). SF Symbols देखील समर्थित आहेत (उदा. lamp.desk.fill).",
+                "icon_attribute": "डायनॅमिक आयकॉनसाठी एंटिटी गुणधर्म. सेट केल्यावर static आयकॉन आणि एंटिटी आयकॉन ओव्हररायड करतो.",
+                "priority": "डिव्हाइसची मर्यादा गाठल्यावर उच्च प्राधान्य activities जास्त काळ ठेवल्या जातात (0 = सर्वात कमी, 10 = सर्वात जास्त).",
+                "sound": "या अपडेटसाठी सूचना ध्वनीचे नाव. iOS सिस्टम ध्वनी वापरण्यासाठी रिकामे सोडा.",
+                "update_interval": "अपडेटमधील किमान सेकंद. जलद स्थिती बदल throttle केले जातात.",
+                "state_labels": "स्थितींसाठी कस्टम प्रदर्शन मजकूर. स्वरूप: state=Label, state2=Label 2. उदाहरण: heating=Heating Up, idle=Standby"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Accent रंग",
+                "accent_color_attribute": "Accent रंग गुणधर्म",
+                "background_color": "पार्श्वभूमी रंग",
+                "background_color_attribute": "पार्श्वभूमी रंग गुणधर्म",
+                "text_color": "मजकूर रंग",
+                "text_color_attribute": "मजकूर रंग गुणधर्म"
+              },
+              "data_description": {
+                "accent_color": "Live Activity साठी accent रंग. डीफॉल्ट निळ्यासाठी रिकामे ठेवा.",
+                "accent_color_attribute": "डायनॅमिक accent रंगासाठी एंटिटी गुणधर्म. Static रंग ओव्हररायड करतो. RGB, HS, XY, Kelvin, named colors, आणि hex समर्थित.",
+                "background_color": "Live Activity पार्श्वभूमी रंग. #RRGGBB किंवा नामित रंग. सिस्टम डिफॉल्टसाठी रिकामे सोडा.",
+                "background_color_attribute": "डायनॅमिक पार्श्वभूमी रंगासाठी एन्टिटी गुणधर्म. स्थिर पार्श्वभूमी रंग बदलतो.",
+                "text_color": "Live Activity मजकूर रंग. #RRGGBB किंवा नामित रंग. सिस्टम डिफॉल्टसाठी रिकामे सोडा.",
+                "text_color_attribute": "डायनॅमिक मजकूर रंगासाठी एन्टिटी गुणधर्म. स्थिर मजकूर रंग बदलतो."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "टॅप क्रिया URL",
+                "tap_action_foreground": "टॅप क्रिया URL उघडा",
+                "url": "URL",
+                "url_foreground": "प्राथमिक बटण URL उघडा",
+                "url_title": "प्राथमिक बटण शीर्षक",
+                "secondary_url": "दुय्यम URL",
+                "secondary_url_foreground": "दुय्यम बटण URL उघडा",
+                "secondary_url_title": "दुय्यम बटण शीर्षक"
+              },
+              "data_description": {
+                "tap_action_url": "Live Activity पार्श्वभूमीवर टॅप केल्यावर उघडले जाणारे पर्यायी URL. http(s) (Safari उघडते) किंवा homeassistant://navigate/lovelace/0 सारख्या कस्टम स्कीम (ते अॅप उघडते) समर्थित.",
+                "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — Lock Screen न सोडता पार्श्वभूमीत POST फायर करते.",
+                "url": "Live Activity टॅप केल्यावर उघडणारी लिंक. http:// किंवा https:// ने सुरू होणे आवश्यक. फक्त steps आणि alert टेम्पलेटसाठी.",
+                "url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
+                "url_title": "प्राथमिक बटण लेबल (कमाल 64 अक्षरे).",
+                "secondary_url": "Live Activity साठी दुय्यम लिंक. फक्त steps आणि alert टेम्पलेटसाठी.",
+                "secondary_url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
+                "secondary_url_title": "दुय्यम बटण लेबल (कमाल 64 अक्षरे)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "समाप्तीनंतर स्वयं-हटवा (सेकंद)",
+                "stale_ttl": "निष्क्रियतेनंतर स्वयं-समाप्त (सेकंद)",
+                "dismissal_ttl": "लॉक स्क्रीनवरून स्वयं-काढा (सेकंद)"
+              },
+              "data_description": {
+                "ended_ttl": "Activity समाप्त झाल्यानंतर सर्व्हरमधून स्वयं-हटवण्यापूर्वीचे सेकंद. अनिश्चित काळासाठी ठेवण्यासाठी रिकामे ठेवा. उदाहरण: 300",
+                "stale_ttl": "सर्व्हर activity स्वयं-समाप्त करण्यापूर्वी निष्क्रियतेचे सेकंद. अक्षम करण्यासाठी रिकामे ठेवा. उदाहरण: 1800",
+                "dismissal_ttl": "संपलेली अ‍ॅक्टिव्हिटी काढून टाकण्यापूर्वी लॉक स्क्रीनवर किती सेकंद राहते. 0 दिल्यास ती संपताच लगेच काढून टाकली जाते. उदाहरण: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "किमान मूल्य",
             "max_value": "कमाल मूल्य",
             "severity": "तीव्रता",
-            "stat_rows": "स्टॅट ओळी",
-            "label": "लेबल",
-            "label_attribute": "लेबल गुणधर्म",
-            "subtitle_attribute": "उपशीर्षक गुणधर्म",
-            "icon": "चिन्ह",
-            "icon_attribute": "चिन्ह गुणधर्म",
-            "accent_color": "अॅक्सेंट रंग",
-            "accent_color_attribute": "अॅक्सेंट रंग गुणधर्म",
-            "background_color": "पार्श्वभूमी रंग",
-            "text_color": "मजकूर रंग",
-            "widget_trigger_mode": "ट्रिगर मोड",
-            "widget_poll_interval": "पोल अंतराल (सेकंद)",
-            "tap_action_url": "टॅप क्रिया URL",
-            "tap_action_foreground": "टॅप क्रिया URL उघडा"
+            "stat_rows": "स्टॅट ओळी"
           },
           "data_description": {
             "widget_name": "iOS विजेट पिकरमध्ये दाखवले जाणारे प्रदर्शन नाव. डीफॉल्ट घटकाचे फ्रेंडली नाव.",
@@ -1647,20 +1690,63 @@
             "min_value": "गेज श्रेणीसाठी किमान मूल्य.",
             "max_value": "गेज श्रेणीसाठी कमाल मूल्य.",
             "severity": "स्थिती तीव्रता (info, warning, critical, success).",
-            "stat_rows": "6 पर्यंत ओळी. स्वरूप: `Label=entity_id[:attribute[:unit]]`, स्वल्पविरामाने विभक्त. उदाहरण: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
-            "label": "विजेटवर दाखवले जाणारे स्थिर लेबल. घटकातून मिळवण्यासाठी रिकामे ठेवा.",
-            "label_attribute": "लेबल म्हणून वापरलेला घटक गुणधर्म. स्थिर लेबलला ओव्हरराइड करते.",
-            "subtitle_attribute": "विजेट उपशीर्षक म्हणून दाखवलेला घटक गुणधर्म.",
-            "icon": "स्थिर चिन्ह. SF Symbols आणि MDI नावे समर्थित.",
-            "icon_attribute": "डायनॅमिक चिन्हासाठी घटक गुणधर्म. स्थिर चिन्हाला ओव्हरराइड करते.",
-            "accent_color": "विजेटसाठी अॅक्सेंट रंग. डीफॉल्टसाठी रिकामे ठेवा.",
-            "accent_color_attribute": "डायनॅमिक अॅक्सेंट रंगासाठी घटक गुणधर्म.",
-            "background_color": "पर्यायी पार्श्वभूमी रंग.",
-            "text_color": "पर्यायी मजकूर रंग.",
-            "widget_trigger_mode": "अपडेट्स कसे ट्रिगर होतात. `event` स्थिती बदलांना प्रतिसाद देतो; `poll` निश्चित अंतरालावर पुन्हा मूल्यांकन करतो.",
-            "widget_poll_interval": "पोल्समधील अंतराल (10–3600 सेकंद). फक्त ट्रिगर मोड `poll` असताना वापरले जाते.",
-            "tap_action_url": "विजेटवर टॅप केल्यावर उघडले जाणारे पर्यायी URL. http(s) (Safari उघडते) किंवा homeassistant://navigate/lovelace/0 सारख्या कस्टम स्कीम समर्थित.",
-            "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — पार्श्वभूमीत POST फायर करते."
+            "stat_rows": "6 पर्यंत ओळी. स्वरूप: `Label=entity_id[:attribute[:unit]]`, स्वल्पविरामाने विभक्त. उदाहरण: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "लेबल",
+                "label_attribute": "लेबल गुणधर्म",
+                "subtitle_attribute": "उपशीर्षक गुणधर्म",
+                "icon": "चिन्ह",
+                "icon_attribute": "चिन्ह गुणधर्म"
+              },
+              "data_description": {
+                "label": "विजेटवर दाखवले जाणारे स्थिर लेबल. घटकातून मिळवण्यासाठी रिकामे ठेवा.",
+                "label_attribute": "लेबल म्हणून वापरलेला घटक गुणधर्म. स्थिर लेबलला ओव्हरराइड करते.",
+                "subtitle_attribute": "विजेट उपशीर्षक म्हणून दाखवलेला घटक गुणधर्म.",
+                "icon": "स्थिर चिन्ह. SF Symbols आणि MDI नावे समर्थित.",
+                "icon_attribute": "डायनॅमिक चिन्हासाठी घटक गुणधर्म. स्थिर चिन्हाला ओव्हरराइड करते."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "अॅक्सेंट रंग",
+                "accent_color_attribute": "अॅक्सेंट रंग गुणधर्म",
+                "background_color": "पार्श्वभूमी रंग",
+                "text_color": "मजकूर रंग"
+              },
+              "data_description": {
+                "accent_color": "विजेटसाठी अॅक्सेंट रंग. डीफॉल्टसाठी रिकामे ठेवा.",
+                "accent_color_attribute": "डायनॅमिक अॅक्सेंट रंगासाठी घटक गुणधर्म.",
+                "background_color": "पर्यायी पार्श्वभूमी रंग.",
+                "text_color": "पर्यायी मजकूर रंग."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "टॅप क्रिया URL",
+                "tap_action_foreground": "टॅप क्रिया URL उघडा"
+              },
+              "data_description": {
+                "tap_action_url": "विजेटवर टॅप केल्यावर उघडले जाणारे पर्यायी URL. http(s) (Safari उघडते) किंवा homeassistant://navigate/lovelace/0 सारख्या कस्टम स्कीम समर्थित.",
+                "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — पार्श्वभूमीत POST फायर करते."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "ट्रिगर मोड",
+                "widget_poll_interval": "पोल अंतराल (सेकंद)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "अपडेट्स कसे ट्रिगर होतात. `event` स्थिती बदलांना प्रतिसाद देतो; `poll` निश्चित अंतरालावर पुन्हा मूल्यांकन करतो.",
+                "widget_poll_interval": "पोल्समधील अंतराल (10–3600 सेकंद). फक्त ट्रिगर मोड `poll` असताना वापरले जाते."
+              }
+            }
           }
         }
       },

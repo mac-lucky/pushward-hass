@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "開始状態",
             "end_states": "終了状態",
-            "progress_entity": "進捗エンティティ",
-            "progress_attribute": "進捗属性",
             "remaining_time_entity": "残り時間エンティティ",
             "remaining_time_attribute": "残り時間属性",
-            "live_progress": "ライブ進捗ETA",
             "total_steps": "総 steps 数",
             "current_step_entity": "現在のステップエンティティ",
             "current_step_attribute": "現在のステップ属性",
             "severity": "重大度",
             "severity_label": "重大度ラベル",
-            "value_entity": "値エンティティ",
-            "value_attribute": "値属性",
             "min_value": "最小値",
             "max_value": "最大値",
             "unit": "単位",
-            "series": "シリーズ",
             "series_entities": "シリーズエンティティ",
-            "primary_series": "プライマリシリーズ",
-            "scale": "スケール",
-            "decimals": "小数点以下の桁数",
-            "smoothing": "スムーズな折れ線",
-            "thresholds": "しきい値",
-            "history_period": "過去データ期間",
-            "slug": "アクティビティスラッグ",
-            "activity_name": "アクティビティ名",
-            "icon": "アイコン",
-            "icon_attribute": "アイコン属性",
-            "priority": "優先度 (0〜10)",
-            "update_interval": "最小更新間隔（秒）",
-            "subtitle_entity": "サブタイトルエンティティ",
-            "subtitle_attribute": "サブタイトル属性",
-            "state_labels": "状態ラベル",
             "completion_message": "完了メッセージ",
-            "accent_color": "アクセントカラー",
-            "accent_color_attribute": "アクセントカラー属性",
-            "tap_action_url": "タップアクションURL",
-            "tap_action_foreground": "タップアクションURLを開く",
-            "url": "URL",
-            "url_foreground": "プライマリボタンURLを開く",
-            "url_title": "プライマリボタンのタイトル",
-            "secondary_url": "セカンダリURL",
-            "secondary_url_foreground": "セカンダリボタンURLを開く",
-            "secondary_url_title": "セカンダリボタンのタイトル",
-            "ended_ttl": "終了後に自動削除（秒）",
-            "stale_ttl": "アイドル後に自動終了（秒）",
-            "sound": "サウンド",
-            "background_color": "背景色",
-            "background_color_attribute": "背景色属性",
-            "text_color": "テキスト色",
-            "text_color_attribute": "テキスト色属性",
             "warning_threshold": "警告しきい値（秒）",
             "alarm": "アラーム（iOS 26+）",
             "snooze_seconds": "スヌーズ秒数（iOS 26+）",
-            "step_labels": "ステップラベル",
-            "step_rows": "ステップ行高",
-            "step_weights": "ステップの幅",
-            "step_colors": "ステップの色",
-            "fired_at_entity": "発火時刻エンティティ",
-            "fired_at_attribute": "発火時刻属性",
-            "units": "系列ごとの単位",
             "tiles": "board タイル",
-            "log_columns": "ログ列",
-            "log_level_attribute": "ログレベル属性",
-            "dismissal_ttl": "ロック画面から自動削除（秒）"
+            "log_columns": "ログ列"
           },
           "data_description": {
             "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
             "end_states": "Live Activityを終了するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
-            "progress_entity": "追跡エンティティの代わりに別のエンティティから進捗を読み取ります。空白のままにすると追跡エンティティを使用します。属性フィールドを設定するとこのエンティティのその属性を、設定しない場合は状態を読み取ります。",
-            "progress_attribute": "0〜100の進捗値を持つエンティティ属性。例: percentage",
             "remaining_time_entity": "別のエンティティ（例: 洗濯機の時間センサー）から残り時間を読み取ります。空白のままにすると追跡エンティティを使用します。タイムスタンプ（終了時刻）センサー、単位付きの継続時間センサー、H:MM:SS 文字列、または単純な秒数を自動的に解析します。",
             "remaining_time_attribute": "残り時間（秒）を持つエンティティ属性。例: remaining",
-            "live_progress": "上記の残り時間ソースを使用して、進捗バーをスムーズに埋め、デバイス上で完了時刻までのETAをカウントダウンします。残り時間のエンティティまたは属性が必要です。steps テンプレートでは、実行全体ではなく現在のステップを埋めます。",
             "total_steps": "steps の総数。",
             "current_step_entity": "別のエンティティから現在のステップを読み取ります。空白のままにすると追跡エンティティを使用します。",
             "current_step_attribute": "現在のステップを整数で保持するエンティティ属性。",
             "severity": "alert の重大度レベル。",
             "severity_label": "alert に表示される Info/Warning/Critical バッジテキストを上書きします。空白のままにすると重大度名を使用します。最大 32 文字。alert テンプレートのみ。",
-            "value_entity": "別のエンティティから gauge の値を読み取ります。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
-            "value_attribute": "現在の gauge 値を数値で保持するエンティティ属性。空白のままにするとエンティティの状態を使用します。",
             "min_value": "gauge 範囲の最小値。",
             "max_value": "gauge 範囲の最大値。",
             "unit": "値の隣に表示される単位（例: °C, %, kW）。最大32文字。",
-            "series": "エンティティ属性を名前付きシリーズにマッピングします。形式: attribute=Label, attribute2=Label2。空白のままにするとエンティティの状態を単一シリーズとして使用します。",
             "series_entities": "個別のエンティティを1つのチャート上の名前付きラインとして結び付けます（例: 部屋ごとのPM2.5センサー）。形式: [Label=]entity_id[:attribute]、カンマ区切り。ラベルを省略するとエンティティのフレンドリー名が使用されます。entity_id:attribute で属性を読み取れます。シリーズと組み合わせて使用でき、合計最大10ラインまでです。",
-            "primary_series": "見出し値として表示され、コンパクトな高低範囲に使用されるシリーズのラベル。空白のままにすると、追跡エンティティ自身のシリーズ（または最初に設定されたシリーズ）を使用します。",
-            "scale": "スパークラインチャートのY軸スケールモード。",
-            "decimals": "値の小数点以下の桁数（0〜10）。",
-            "smoothing": "データポイント間のカーブ補間を有効にして、スパークラインを滑らかにします。",
-            "thresholds": "スパークラインの水平参照線。形式: value:color:label。例: 25:red:Hot, 18:blue:Cold。最大5つ。",
-            "history_period": "Home Assistantのレコーダーからスパークラインにシードする過去データの分数。0に設定すると履歴なしで開始します。",
-            "slug": "このアクティビティの一意の識別子。空白のままにするとエンティティIDから自動生成されます。例: ha-living-room-lamp",
-            "activity_name": "iPhone Live Activityに表示される名前。デフォルトはエンティティのフレンドリー名です。",
-            "icon": "アイコンの上書き。空白のままにするとエンティティのネイティブアイコンを使用します（例: mdi:thermometer）。SF Symbolsもサポートされています（例: lamp.desk.fill）。",
-            "icon_attribute": "動的アイコン用のエンティティ属性。設定すると静的アイコンおよびエンティティアイコンより優先されます。",
-            "priority": "デバイスの上限に達した場合、優先度の高いアクティビティが長く保持されます（0 = 最低, 10 = 最高）。",
-            "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
-            "subtitle_entity": "別のエンティティ（例: プログラム/モードセンサー）からサブタイトルを表示します。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
-            "subtitle_attribute": "サブタイトルとして表示するエンティティ属性。空白のままにするとエンティティのフレンドリー名を使用します。",
-            "state_labels": "状態のカスタム表示テキスト。形式: state=Label, state2=Label 2。例: heating=加熱中, idle=待機中",
             "completion_message": "アクティビティ終了時に表示されるテキスト。空白のままにすると「完了」と表示されます。例: 洗濯完了",
-            "accent_color": "Live Activityのアクセントカラー。空白のままにするとデフォルトの青色を使用します。",
-            "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。静的カラーより優先されます。RGB、HS、XY、ケルビン、カラー名、16進数に対応しています。",
-            "tap_action_url": "Live Activity の背景をタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキーム（そのアプリを開く）に対応しています。",
-            "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— ロック画面を離れずにバックグラウンドで POST を送信します。",
-            "url": "Live Activityをタップしたときに開くリンク。http:// または https:// で始まる必要があります。steps および alert テンプレートのみ。",
-            "url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
-            "url_title": "プライマリボタンのラベル（最大 64 文字）。",
-            "secondary_url": "Live Activityのセカンダリリンク。steps および alert テンプレートのみ。",
-            "secondary_url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
-            "secondary_url_title": "セカンダリボタンのラベル（最大 64 文字）。",
-            "ended_ttl": "アクティビティ終了後、サーバーから自動削除されるまでの秒数。空白のままにすると無期限に保持されます。例: 300",
-            "stale_ttl": "サーバーがアクティビティを自動終了するまでの非アクティブ秒数。空白のままにすると無効にします。例: 1800",
-            "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
-            "background_color": "Live Activity の背景色。空白のままにするとデフォルト色を使用します。",
-            "background_color_attribute": "動的背景色のエンティティ属性。静的色より優先されます。RGB、HS、XY、ケルビン、色名、16進数に対応しています。",
-            "text_color": "Live Activity のテキスト色。空白のままにするとデフォルト色を使用します。",
-            "text_color_attribute": "動的テキスト色のエンティティ属性。静的色より優先されます。",
             "warning_threshold": "countdown 終了前にサーバーが警告プッシュを送信する秒数。空白のままにすると無効にします。countdown テンプレートのみ。",
             "alarm": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+）。countdown テンプレートのみ。",
             "snooze_seconds": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
-            "step_labels": "各ステップのラベル。形式: 1=最初のステップ, 2=2番目のステップ。ステップ 1..total_steps をカバーする必要があります。steps テンプレートのみ。",
-            "step_rows": "各ステップの行高（1–10）、カンマ区切り。total_steps 個のエントリが必要です。steps テンプレートのみ。",
-            "step_weights": "各ステップの相対的な幅（カンマ区切り）。例: 1, 2, 1 は中央のステップを2倍の幅にします。すべての値は正の数である必要があります。total_steps 個のエントリが必要です。steps テンプレートのみ。",
-            "step_colors": "各ステップの色（カンマ区切り、色名または16進数）。例: green, , red は中央のステップをアクセントカラーのままにします。total_steps 個のエントリが必要です。steps テンプレートのみ。",
-            "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。",
-            "fired_at_attribute": "alert が発火したときの Unix タイムスタンプを持つエンティティ属性。alert テンプレートのみ。",
-            "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。",
             "tiles": "board タイル（1〜4）。それぞれが個別のエンティティを読み取ります。形式: Label=entity_id:attribute:unit:icon（attribute、unit、icon は省略可）。例: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door。board テンプレートのみ。",
-            "log_columns": "各ログ行に追加される値（最大6個）、カンマ区切り。形式: [Label=]source[|unit]。source = このエンティティの属性 (brightness)、別のエンティティの状態 (binary_sensor.door)、または別のエンティティの属性 (sensor.temp:temperature)。例: color_temp_kelvin|K, brightness → 'On · 4000K · 153'。ログテンプレートのみ。",
-            "log_level_attribute": "各ログ行のレベル（info/warn/error）を示すエンティティ属性。レベルタグを付けない場合は空のままにします。log テンプレートのみ。",
-            "dismissal_ttl": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。 例: 60"
+            "log_columns": "各ログ行に追加される値（最大6個）、カンマ区切り。形式: [Label=]source[|unit]。source = このエンティティの属性 (brightness)、別のエンティティの状態 (binary_sensor.door)、または別のエンティティの属性 (sensor.temp:temperature)。例: color_temp_kelvin|K, brightness → 'On · 4000K · 153'。ログテンプレートのみ。"
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "進捗エンティティ",
+                "progress_attribute": "進捗属性",
+                "remaining_time_entity": "残り時間エンティティ",
+                "remaining_time_attribute": "残り時間属性",
+                "live_progress": "ライブ進捗ETA",
+                "value_entity": "値エンティティ",
+                "value_attribute": "値属性",
+                "fired_at_entity": "発火時刻エンティティ",
+                "fired_at_attribute": "発火時刻属性",
+                "subtitle_entity": "サブタイトルエンティティ",
+                "subtitle_attribute": "サブタイトル属性",
+                "series": "シリーズ",
+                "log_level_attribute": "ログレベル属性"
+              },
+              "data_description": {
+                "progress_entity": "追跡エンティティの代わりに別のエンティティから進捗を読み取ります。空白のままにすると追跡エンティティを使用します。属性フィールドを設定するとこのエンティティのその属性を、設定しない場合は状態を読み取ります。",
+                "progress_attribute": "0〜100の進捗値を持つエンティティ属性。例: percentage",
+                "remaining_time_entity": "別のエンティティ（例: 洗濯機の時間センサー）から残り時間を読み取ります。空白のままにすると追跡エンティティを使用します。タイムスタンプ（終了時刻）センサー、単位付きの継続時間センサー、H:MM:SS 文字列、または単純な秒数を自動的に解析します。",
+                "remaining_time_attribute": "残り時間（秒）を持つエンティティ属性。例: remaining",
+                "live_progress": "上記の残り時間ソースを使用して、進捗バーをスムーズに埋め、デバイス上で完了時刻までのETAをカウントダウンします。残り時間のエンティティまたは属性が必要です。steps テンプレートでは、実行全体ではなく現在のステップを埋めます。",
+                "value_entity": "別のエンティティから gauge の値を読み取ります。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
+                "value_attribute": "現在の gauge 値を数値で保持するエンティティ属性。空白のままにするとエンティティの状態を使用します。",
+                "fired_at_entity": "別のエンティティから alert の発火時刻を読み取ります。空白のままにすると追跡エンティティを使用します。Unix タイムスタンプまたは ISO タイムスタンプセンサーを受け付けます。alert テンプレートのみ。",
+                "fired_at_attribute": "alert が発火したときの Unix タイムスタンプを持つエンティティ属性。alert テンプレートのみ。",
+                "subtitle_entity": "別のエンティティ（例: プログラム/モードセンサー）からサブタイトルを表示します。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
+                "subtitle_attribute": "サブタイトルとして表示するエンティティ属性。空白のままにするとエンティティのフレンドリー名を使用します。",
+                "series": "エンティティ属性を名前付きシリーズにマッピングします。形式: attribute=Label, attribute2=Label2。空白のままにするとエンティティの状態を単一シリーズとして使用します。",
+                "log_level_attribute": "各ログ行のレベル（info/warn/error）を示すエンティティ属性。レベルタグを付けない場合は空のままにします。log テンプレートのみ。"
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "ステップラベル",
+                "step_rows": "ステップ行高",
+                "step_weights": "ステップの幅",
+                "step_colors": "ステップの色"
+              },
+              "data_description": {
+                "step_labels": "各ステップのラベル。形式: 1=最初のステップ, 2=2番目のステップ。ステップ 1..total_steps をカバーする必要があります。steps テンプレートのみ。",
+                "step_rows": "各ステップの行高（1–10）、カンマ区切り。total_steps 個のエントリが必要です。steps テンプレートのみ。",
+                "step_weights": "各ステップの相対的な幅（カンマ区切り）。例: 1, 2, 1 は中央のステップを2倍の幅にします。すべての値は正の数である必要があります。total_steps 個のエントリが必要です。steps テンプレートのみ。",
+                "step_colors": "各ステップの色（カンマ区切り、色名または16進数）。例: green, , red は中央のステップをアクセントカラーのままにします。total_steps 個のエントリが必要です。steps テンプレートのみ。"
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "系列ごとの単位",
+                "primary_series": "プライマリシリーズ",
+                "scale": "スケール",
+                "decimals": "小数点以下の桁数",
+                "smoothing": "スムーズな折れ線",
+                "thresholds": "しきい値",
+                "history_period": "過去データ期間"
+              },
+              "data_description": {
+                "units": "系列ごとの単位ラベル。形式: 系列ラベル=単位, 温度=°C, 湿度=%。timeline テンプレートのみ。",
+                "primary_series": "見出し値として表示され、コンパクトな高低範囲に使用されるシリーズのラベル。空白のままにすると、追跡エンティティ自身のシリーズ（または最初に設定されたシリーズ）を使用します。",
+                "scale": "スパークラインチャートのY軸スケールモード。",
+                "decimals": "値の小数点以下の桁数（0〜10）。",
+                "smoothing": "データポイント間のカーブ補間を有効にして、スパークラインを滑らかにします。",
+                "thresholds": "スパークラインの水平参照線。形式: value:color:label。例: 25:red:Hot, 18:blue:Cold。最大5つ。",
+                "history_period": "Home Assistantのレコーダーからスパークラインにシードする過去データの分数。0に設定すると履歴なしで開始します。"
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "アクティビティスラッグ",
+                "activity_name": "アクティビティ名",
+                "icon": "アイコン",
+                "icon_attribute": "アイコン属性",
+                "priority": "優先度 (0〜10)",
+                "sound": "サウンド",
+                "update_interval": "最小更新間隔（秒）",
+                "state_labels": "状態ラベル"
+              },
+              "data_description": {
+                "slug": "このアクティビティの一意の識別子。空白のままにするとエンティティIDから自動生成されます。例: ha-living-room-lamp",
+                "activity_name": "iPhone Live Activityに表示される名前。デフォルトはエンティティのフレンドリー名です。",
+                "icon": "アイコンの上書き。空白のままにするとエンティティのネイティブアイコンを使用します（例: mdi:thermometer）。SF Symbolsもサポートされています（例: lamp.desk.fill）。",
+                "icon_attribute": "動的アイコン用のエンティティ属性。設定すると静的アイコンおよびエンティティアイコンより優先されます。",
+                "priority": "デバイスの上限に達した場合、優先度の高いアクティビティが長く保持されます（0 = 最低, 10 = 最高）。",
+                "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
+                "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
+                "state_labels": "状態のカスタム表示テキスト。形式: state=Label, state2=Label 2。例: heating=加熱中, idle=待機中"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "アクセントカラー",
+                "accent_color_attribute": "アクセントカラー属性",
+                "background_color": "背景色",
+                "background_color_attribute": "背景色属性",
+                "text_color": "テキスト色",
+                "text_color_attribute": "テキスト色属性"
+              },
+              "data_description": {
+                "accent_color": "Live Activityのアクセントカラー。空白のままにするとデフォルトの青色を使用します。",
+                "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。静的カラーより優先されます。RGB、HS、XY、ケルビン、カラー名、16進数に対応しています。",
+                "background_color": "Live Activity の背景色。空白のままにするとデフォルト色を使用します。",
+                "background_color_attribute": "動的背景色のエンティティ属性。静的色より優先されます。RGB、HS、XY、ケルビン、色名、16進数に対応しています。",
+                "text_color": "Live Activity のテキスト色。空白のままにするとデフォルト色を使用します。",
+                "text_color_attribute": "動的テキスト色のエンティティ属性。静的色より優先されます。"
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "タップアクションURL",
+                "tap_action_foreground": "タップアクションURLを開く",
+                "url": "URL",
+                "url_foreground": "プライマリボタンURLを開く",
+                "url_title": "プライマリボタンのタイトル",
+                "secondary_url": "セカンダリURL",
+                "secondary_url_foreground": "セカンダリボタンURLを開く",
+                "secondary_url_title": "セカンダリボタンのタイトル"
+              },
+              "data_description": {
+                "tap_action_url": "Live Activity の背景をタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキーム（そのアプリを開く）に対応しています。",
+                "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— ロック画面を離れずにバックグラウンドで POST を送信します。",
+                "url": "Live Activityをタップしたときに開くリンク。http:// または https:// で始まる必要があります。steps および alert テンプレートのみ。",
+                "url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+                "url_title": "プライマリボタンのラベル（最大 64 文字）。",
+                "secondary_url": "Live Activityのセカンダリリンク。steps および alert テンプレートのみ。",
+                "secondary_url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+                "secondary_url_title": "セカンダリボタンのラベル（最大 64 文字）。"
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "終了後に自動削除（秒）",
+                "stale_ttl": "アイドル後に自動終了（秒）",
+                "dismissal_ttl": "ロック画面から自動削除（秒）"
+              },
+              "data_description": {
+                "ended_ttl": "アクティビティ終了後、サーバーから自動削除されるまでの秒数。空白のままにすると無期限に保持されます。例: 300",
+                "stale_ttl": "サーバーがアクティビティを自動終了するまでの非アクティブ秒数。空白のままにすると無効にします。例: 1800",
+                "dismissal_ttl": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。 例: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "最小値",
             "max_value": "最大値",
             "severity": "重大度",
-            "stat_rows": "統計行",
-            "label": "ラベル",
-            "label_attribute": "ラベル属性",
-            "subtitle_attribute": "サブタイトル属性",
-            "icon": "アイコン",
-            "icon_attribute": "アイコン属性",
-            "accent_color": "アクセントカラー",
-            "accent_color_attribute": "アクセントカラー属性",
-            "background_color": "背景色",
-            "text_color": "テキスト色",
-            "widget_trigger_mode": "トリガーモード",
-            "widget_poll_interval": "ポーリング間隔（秒）",
-            "tap_action_url": "タップアクションURL",
-            "tap_action_foreground": "タップアクションURLを開く"
+            "stat_rows": "統計行"
           },
           "data_description": {
             "widget_name": "iOS のウィジェット選択画面に表示される表示名。デフォルトはエンティティのフレンドリー名です。",
@@ -1647,20 +1690,63 @@
             "min_value": "gauge 範囲の最小値。",
             "max_value": "gauge 範囲の最大値。",
             "severity": "ステータスの重大度（info、warning、critical、success）。",
-            "stat_rows": "最大 6 行。形式: `Label=entity_id[:attribute[:unit]]`、カンマ区切り。例: `Users=sensor.user_count, Active=sensor.active_devices:count`。",
-            "label": "ウィジェットに表示される静的ラベル。空白のままにするとエンティティから取得します。",
-            "label_attribute": "ラベルとして使用するエンティティ属性。静的ラベルより優先されます。",
-            "subtitle_attribute": "ウィジェットのサブタイトルとして表示するエンティティ属性。",
-            "icon": "静的アイコン。SF Symbols と MDI 名に対応しています。",
-            "icon_attribute": "動的アイコン用のエンティティ属性。静的アイコンより優先されます。",
-            "accent_color": "ウィジェットのアクセントカラー。空白のままにするとデフォルトになります。",
-            "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。",
-            "background_color": "任意の背景色。",
-            "text_color": "任意のテキスト色。",
-            "widget_trigger_mode": "更新がトリガーされる方法。`event` は状態変化に反応し、`poll` は一定間隔で再評価します。",
-            "widget_poll_interval": "ポーリングの間隔（10〜3600 秒）。トリガーモードが `poll` の場合にのみ使用されます。",
-            "tap_action_url": "ウィジェットをタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキームに対応しています。",
-            "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— バックグラウンドで POST を送信します。"
+            "stat_rows": "最大 6 行。形式: `Label=entity_id[:attribute[:unit]]`、カンマ区切り。例: `Users=sensor.user_count, Active=sensor.active_devices:count`。"
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "ラベル",
+                "label_attribute": "ラベル属性",
+                "subtitle_attribute": "サブタイトル属性",
+                "icon": "アイコン",
+                "icon_attribute": "アイコン属性"
+              },
+              "data_description": {
+                "label": "ウィジェットに表示される静的ラベル。空白のままにするとエンティティから取得します。",
+                "label_attribute": "ラベルとして使用するエンティティ属性。静的ラベルより優先されます。",
+                "subtitle_attribute": "ウィジェットのサブタイトルとして表示するエンティティ属性。",
+                "icon": "静的アイコン。SF Symbols と MDI 名に対応しています。",
+                "icon_attribute": "動的アイコン用のエンティティ属性。静的アイコンより優先されます。"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "アクセントカラー",
+                "accent_color_attribute": "アクセントカラー属性",
+                "background_color": "背景色",
+                "text_color": "テキスト色"
+              },
+              "data_description": {
+                "accent_color": "ウィジェットのアクセントカラー。空白のままにするとデフォルトになります。",
+                "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。",
+                "background_color": "任意の背景色。",
+                "text_color": "任意のテキスト色。"
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "タップアクションURL",
+                "tap_action_foreground": "タップアクションURLを開く"
+              },
+              "data_description": {
+                "tap_action_url": "ウィジェットをタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキームに対応しています。",
+                "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— バックグラウンドで POST を送信します。"
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "トリガーモード",
+                "widget_poll_interval": "ポーリング間隔（秒）"
+              },
+              "data_description": {
+                "widget_trigger_mode": "更新がトリガーされる方法。`event` は状態変化に反応し、`poll` は一定間隔で再評価します。",
+                "widget_poll_interval": "ポーリングの間隔（10〜3600 秒）。トリガーモードが `poll` の場合にのみ使用されます。"
+              }
+            }
           }
         }
       },

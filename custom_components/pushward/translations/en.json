@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "Start States",
             "end_states": "End States",
-            "progress_entity": "Progress Entity",
-            "progress_attribute": "Progress Attribute",
             "remaining_time_entity": "Remaining Time Entity",
             "remaining_time_attribute": "Remaining Time Attribute",
-            "live_progress": "Live Progress ETA",
             "total_steps": "Total Steps",
             "current_step_entity": "Current Step Entity",
             "current_step_attribute": "Current Step Attribute",
             "severity": "Severity",
             "severity_label": "Severity Label",
-            "value_entity": "Value Entity",
-            "value_attribute": "Value Attribute",
             "min_value": "Minimum Value",
             "max_value": "Maximum Value",
             "unit": "Unit",
-            "series": "Series",
             "series_entities": "Series Entities",
-            "primary_series": "Primary Series",
-            "scale": "Scale",
-            "decimals": "Decimal Places",
-            "smoothing": "Smooth Lines",
-            "thresholds": "Thresholds",
-            "history_period": "Back-History Period",
-            "slug": "Activity Slug",
-            "activity_name": "Activity Name",
-            "icon": "Icon",
-            "icon_attribute": "Icon Attribute",
-            "priority": "Priority (0-10)",
-            "update_interval": "Min. Update Interval (seconds)",
-            "subtitle_entity": "Subtitle Entity",
-            "subtitle_attribute": "Subtitle Attribute",
-            "state_labels": "State Labels",
             "completion_message": "Completion Message",
-            "accent_color": "Accent Color",
-            "accent_color_attribute": "Accent Color Attribute",
-            "tap_action_url": "Tap Action URL",
-            "tap_action_foreground": "Open Tap Action URL",
-            "url": "Primary Button URL",
-            "url_foreground": "Open Primary Button URL",
-            "url_title": "Primary Button Title",
-            "secondary_url": "Secondary Button URL",
-            "secondary_url_foreground": "Open Secondary Button URL",
-            "secondary_url_title": "Secondary Button Title",
-            "ended_ttl": "Auto-Delete After End (seconds)",
-            "stale_ttl": "Auto-End After Idle (seconds)",
-            "sound": "Sound",
-            "background_color": "Background Color",
-            "background_color_attribute": "Background Color Attribute",
-            "text_color": "Text Color",
-            "text_color_attribute": "Text Color Attribute",
             "warning_threshold": "Warning Threshold (seconds)",
             "alarm": "Alarm (iOS 26+)",
             "snooze_seconds": "Snooze Seconds (iOS 26+)",
-            "step_labels": "Step Labels",
-            "step_rows": "Step Rows",
-            "step_weights": "Step Weights",
-            "step_colors": "Step Colors",
-            "fired_at_entity": "Fired At Entity",
-            "fired_at_attribute": "Fired At Attribute",
-            "units": "Per-Series Units",
             "tiles": "Board Tiles",
-            "log_columns": "Log Columns",
-            "log_level_attribute": "Log Level Attribute",
-            "dismissal_ttl": "Auto-Remove From Lock Screen (seconds)"
+            "log_columns": "Log Columns"
           },
           "data_description": {
             "start_states": "Entity states that start the Live Activity. Select from the list or type custom values.",
             "end_states": "Entity states that end the Live Activity. Select from the list or type custom values.",
-            "progress_entity": "Read progress from a separate entity instead of the tracked entity. Leave empty to use the tracked entity. With the attribute field set, reads that attribute of this entity; otherwise its state.",
-            "progress_attribute": "Attribute holding a 0–100 progress value (on the source entity, or the tracked entity if no source is set). Example: percentage",
             "remaining_time_entity": "Read remaining time from a separate entity (e.g. a washer's time sensor). Leave empty to use the tracked entity. Auto-parses a timestamp (finish-time) sensor, a duration sensor with units, an H:MM:SS string, or plain seconds.",
             "remaining_time_attribute": "Attribute holding remaining time (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state. Example: remaining",
-            "live_progress": "Fill the progress bar smoothly and count down an ETA to the finish time on the device, using the remaining-time source above. Needs a remaining-time entity or attribute. On the steps template it fills the current step rather than the whole run.",
             "total_steps": "Total number of steps.",
             "current_step_entity": "Read the current step from a separate entity. Leave empty to use the tracked entity.",
             "current_step_attribute": "Attribute holding the current step as an integer (on the source entity, or the tracked entity if no source is set).",
             "severity": "Alert severity level.",
             "severity_label": "Override the Info/Warning/Critical badge text shown on the alert. Leave empty to use the severity name. Max 32 characters. Alert template only.",
-            "value_entity": "Read the gauge value from a separate entity. Leave empty to use the tracked entity. Uses the source entity's state unless an attribute is set.",
-            "value_attribute": "Attribute holding the current gauge value as a number (on the source entity, or the tracked entity if no source is set). Leave empty to use the entity's state.",
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "unit": "Display unit shown next to the value (e.g. °C, %, kW). Max 32 characters.",
-            "series": "Map entity attributes to named series. Format: attribute=Label, attribute2=Label2. Leave empty to use the entity's state as a single series.",
             "series_entities": "Bind separate entities as named lines on one chart (e.g. a PM2.5 sensor per room). Format: [Label=]entity_id[:attribute], comma-separated. The label defaults to the entity's friendly name; read an attribute with entity_id:attribute. Combines with Series; up to 10 lines total.",
-            "primary_series": "Label of the series shown as the headline value and used for the compact high/low range. Leave empty to use the tracked entity's own series (or the first configured series).",
-            "scale": "Y-axis scale mode for the sparkline chart.",
-            "decimals": "Number of decimal places shown for values (0–10).",
-            "smoothing": "Enable curve interpolation between data points for a smoother sparkline.",
-            "thresholds": "Horizontal reference lines on the sparkline. Format: value:color:label. Example: 25:red:Hot, 18:blue:Cold. Max 5.",
-            "history_period": "Minutes of past data to seed the sparkline when the activity starts. Numeric-state entities (plain sensors, value entities, and state-sourced series entities) backfill from Home Assistant's recorder; attribute-based series fill only from samples collected while the integration runs, because Home Assistant stopped recording most attributes in 2024.8. Set to 0 to start with no history.",
-            "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
-            "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
-            "icon": "Override icon. Leave empty to use the entity’s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",
-            "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon and entity icon when set.",
-            "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
-            "update_interval": "Minimum seconds between updates. Rapid state changes are throttled.",
-            "subtitle_entity": "Show the subtitle from a separate entity (e.g. a program/mode sensor). Leave empty to use the tracked entity. Uses the source entity's state unless an attribute is set.",
-            "subtitle_attribute": "Attribute to show as subtitle (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state, or the friendly name when no source is set.",
-            "state_labels": "Custom display text for states. Format: state=Label, state2=Label 2. Example: heating=Heating Up, idle=Standby",
             "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
-            "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
-            "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
-            "tap_action_url": "Optional URL opened when tapping the Live Activity background. Supports http(s) (opens Safari) or custom schemes like homeassistant://navigate/lovelace/0 (opens that app).",
-            "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background without leaving the Lock Screen.",
-            "url": "Primary button URL. Steps and alert templates only. Supports http(s) or custom schemes.",
-            "url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
-            "url_title": "Primary button label (max 64 characters).",
-            "secondary_url": "Secondary button URL. Steps and alert templates only.",
-            "secondary_url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
-            "secondary_url_title": "Secondary button label (max 64 characters).",
-            "ended_ttl": "Seconds after the activity ends before the server auto-deletes it. This also controls how soon the ended card leaves the iPhone Lock Screen (iOS caps it at 4 hours regardless). Leave empty to keep indefinitely. Example: 300",
-            "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800",
-            "sound": "Sound played on every update for this entity. Leave empty to use no override.",
-            "background_color": "Background color for the Live Activity. Leave empty for default.",
-            "background_color_attribute": "Entity attribute for dynamic background color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
-            "text_color": "Text color for the Live Activity. Leave empty for default.",
-            "text_color_attribute": "Entity attribute for dynamic text color. Overrides static color.",
             "warning_threshold": "Seconds before the end of a countdown when the server sends a warning push. Leave empty to disable. Countdown template only.",
             "alarm": "Trigger an AlarmKit alarm when the countdown expires (iOS 26+). Countdown template only.",
             "snooze_seconds": "How long the iOS Snooze button extends the countdown (60–3600). Leave empty for the 300s (5 min) default. Requires Alarm. Countdown template only.",
-            "step_labels": "Labels for each step. Format: 1=First Step, 2=Second Step. Must cover steps 1..total_steps. Steps template only.",
-            "step_rows": "Row height (1–10) for each step, comma-separated. Must have total_steps entries. Steps template only.",
-            "step_weights": "Relative width of each step, comma-separated. Example: 1, 2, 1 makes the middle step twice as wide. All values must be positive. Must have total_steps entries. Steps template only.",
-            "step_colors": "Color of each step, comma-separated (named or hex). Example: green, , red leaves the middle step on the accent color. Must have total_steps entries. Steps template only.",
-            "fired_at_entity": "Read the alert's fired-at time from a separate entity. Leave empty to use the tracked entity. Accepts a unix timestamp or an ISO timestamp sensor. Alert template only.",
-            "fired_at_attribute": "Attribute holding the unix timestamp when the alert fired (on the source entity, or the tracked entity if no source is set). Alert template only.",
-            "units": "Per-series unit labels. Format: SeriesLabel=unit, Temperature=°C, Humidity=%. Timeline template only.",
             "tiles": "Board tiles (1–4), each reading a separate entity. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon optional). Example: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Board template only.",
-            "log_columns": "Extra values appended to each log line (max 6), comma-separated. Format: [Label=]source[|unit]. source = an attribute of this entity (brightness), another entity's state (binary_sensor.door), or another entity's attribute (sensor.temp:temperature). Example: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Log template only.",
-            "log_level_attribute": "Attribute supplying each log line's level (info/warn/error). Leave empty for no level tag. Log template only.",
-            "dismissal_ttl": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end. Example: 60"
+            "log_columns": "Extra values appended to each log line (max 6), comma-separated. Format: [Label=]source[|unit]. source = an attribute of this entity (brightness), another entity's state (binary_sensor.door), or another entity's attribute (sensor.temp:temperature). Example: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Log template only."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "Progress Entity",
+                "progress_attribute": "Progress Attribute",
+                "remaining_time_entity": "Remaining Time Entity",
+                "remaining_time_attribute": "Remaining Time Attribute",
+                "live_progress": "Live Progress ETA",
+                "value_entity": "Value Entity",
+                "value_attribute": "Value Attribute",
+                "fired_at_entity": "Fired At Entity",
+                "fired_at_attribute": "Fired At Attribute",
+                "subtitle_entity": "Subtitle Entity",
+                "subtitle_attribute": "Subtitle Attribute",
+                "series": "Series",
+                "log_level_attribute": "Log Level Attribute"
+              },
+              "data_description": {
+                "progress_entity": "Read progress from a separate entity instead of the tracked entity. Leave empty to use the tracked entity. With the attribute field set, reads that attribute of this entity; otherwise its state.",
+                "progress_attribute": "Attribute holding a 0–100 progress value (on the source entity, or the tracked entity if no source is set). Example: percentage",
+                "remaining_time_entity": "Read remaining time from a separate entity (e.g. a washer's time sensor). Leave empty to use the tracked entity. Auto-parses a timestamp (finish-time) sensor, a duration sensor with units, an H:MM:SS string, or plain seconds.",
+                "remaining_time_attribute": "Attribute holding remaining time (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state. Example: remaining",
+                "live_progress": "Fill the progress bar smoothly and count down an ETA to the finish time on the device, using the remaining-time source above. Needs a remaining-time entity or attribute. On the steps template it fills the current step rather than the whole run.",
+                "value_entity": "Read the gauge value from a separate entity. Leave empty to use the tracked entity. Uses the source entity's state unless an attribute is set.",
+                "value_attribute": "Attribute holding the current gauge value as a number (on the source entity, or the tracked entity if no source is set). Leave empty to use the entity's state.",
+                "fired_at_entity": "Read the alert's fired-at time from a separate entity. Leave empty to use the tracked entity. Accepts a unix timestamp or an ISO timestamp sensor. Alert template only.",
+                "fired_at_attribute": "Attribute holding the unix timestamp when the alert fired (on the source entity, or the tracked entity if no source is set). Alert template only.",
+                "subtitle_entity": "Show the subtitle from a separate entity (e.g. a program/mode sensor). Leave empty to use the tracked entity. Uses the source entity's state unless an attribute is set.",
+                "subtitle_attribute": "Attribute to show as subtitle (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state, or the friendly name when no source is set.",
+                "series": "Map entity attributes to named series. Format: attribute=Label, attribute2=Label2. Leave empty to use the entity's state as a single series.",
+                "log_level_attribute": "Attribute supplying each log line's level (info/warn/error). Leave empty for no level tag. Log template only."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "Step Labels",
+                "step_rows": "Step Rows",
+                "step_weights": "Step Weights",
+                "step_colors": "Step Colors"
+              },
+              "data_description": {
+                "step_labels": "Labels for each step. Format: 1=First Step, 2=Second Step. Must cover steps 1..total_steps. Steps template only.",
+                "step_rows": "Row height (1–10) for each step, comma-separated. Must have total_steps entries. Steps template only.",
+                "step_weights": "Relative width of each step, comma-separated. Example: 1, 2, 1 makes the middle step twice as wide. All values must be positive. Must have total_steps entries. Steps template only.",
+                "step_colors": "Color of each step, comma-separated (named or hex). Example: green, , red leaves the middle step on the accent color. Must have total_steps entries. Steps template only."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "Per-Series Units",
+                "primary_series": "Primary Series",
+                "scale": "Scale",
+                "decimals": "Decimal Places",
+                "smoothing": "Smooth Lines",
+                "thresholds": "Thresholds",
+                "history_period": "Back-History Period"
+              },
+              "data_description": {
+                "units": "Per-series unit labels. Format: SeriesLabel=unit, Temperature=°C, Humidity=%. Timeline template only.",
+                "primary_series": "Label of the series shown as the headline value and used for the compact high/low range. Leave empty to use the tracked entity's own series (or the first configured series).",
+                "scale": "Y-axis scale mode for the sparkline chart.",
+                "decimals": "Number of decimal places shown for values (0–10).",
+                "smoothing": "Enable curve interpolation between data points for a smoother sparkline.",
+                "thresholds": "Horizontal reference lines on the sparkline. Format: value:color:label. Example: 25:red:Hot, 18:blue:Cold. Max 5.",
+                "history_period": "Minutes of past data to seed the sparkline when the activity starts. Numeric-state entities (plain sensors, value entities, and state-sourced series entities) backfill from Home Assistant's recorder; attribute-based series fill only from samples collected while the integration runs, because Home Assistant stopped recording most attributes in 2024.8. Set to 0 to start with no history."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Activity Slug",
+                "activity_name": "Activity Name",
+                "icon": "Icon",
+                "icon_attribute": "Icon Attribute",
+                "priority": "Priority (0-10)",
+                "sound": "Sound",
+                "update_interval": "Min. Update Interval (seconds)",
+                "state_labels": "State Labels"
+              },
+              "data_description": {
+                "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
+                "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
+                "icon": "Override icon. Leave empty to use the entity’s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",
+                "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon and entity icon when set.",
+                "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
+                "sound": "Sound played on every update for this entity. Leave empty to use no override.",
+                "update_interval": "Minimum seconds between updates. Rapid state changes are throttled.",
+                "state_labels": "Custom display text for states. Format: state=Label, state2=Label 2. Example: heating=Heating Up, idle=Standby"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Accent Color",
+                "accent_color_attribute": "Accent Color Attribute",
+                "background_color": "Background Color",
+                "background_color_attribute": "Background Color Attribute",
+                "text_color": "Text Color",
+                "text_color_attribute": "Text Color Attribute"
+              },
+              "data_description": {
+                "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
+                "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
+                "background_color": "Background color for the Live Activity. Leave empty for default.",
+                "background_color_attribute": "Entity attribute for dynamic background color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
+                "text_color": "Text color for the Live Activity. Leave empty for default.",
+                "text_color_attribute": "Entity attribute for dynamic text color. Overrides static color."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Tap Action URL",
+                "tap_action_foreground": "Open Tap Action URL",
+                "url": "Primary Button URL",
+                "url_foreground": "Open Primary Button URL",
+                "url_title": "Primary Button Title",
+                "secondary_url": "Secondary Button URL",
+                "secondary_url_foreground": "Open Secondary Button URL",
+                "secondary_url_title": "Secondary Button Title"
+              },
+              "data_description": {
+                "tap_action_url": "Optional URL opened when tapping the Live Activity background. Supports http(s) (opens Safari) or custom schemes like homeassistant://navigate/lovelace/0 (opens that app).",
+                "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background without leaving the Lock Screen.",
+                "url": "Primary button URL. Steps and alert templates only. Supports http(s) or custom schemes.",
+                "url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
+                "url_title": "Primary button label (max 64 characters).",
+                "secondary_url": "Secondary button URL. Steps and alert templates only.",
+                "secondary_url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
+                "secondary_url_title": "Secondary button label (max 64 characters)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "Auto-Delete After End (seconds)",
+                "stale_ttl": "Auto-End After Idle (seconds)",
+                "dismissal_ttl": "Auto-Remove From Lock Screen (seconds)"
+              },
+              "data_description": {
+                "ended_ttl": "Seconds after the activity ends before the server auto-deletes it. This also controls how soon the ended card leaves the iPhone Lock Screen (iOS caps it at 4 hours regardless). Leave empty to keep indefinitely. Example: 300",
+                "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800",
+                "dismissal_ttl": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end. Example: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "Minimum Value",
             "max_value": "Maximum Value",
             "severity": "Severity",
-            "stat_rows": "Stat Rows",
-            "label": "Label",
-            "label_attribute": "Label Attribute",
-            "subtitle_attribute": "Subtitle Attribute",
-            "icon": "Icon",
-            "icon_attribute": "Icon Attribute",
-            "accent_color": "Accent Color",
-            "accent_color_attribute": "Accent Color Attribute",
-            "background_color": "Background Color",
-            "text_color": "Text Color",
-            "widget_trigger_mode": "Trigger Mode",
-            "widget_poll_interval": "Poll Interval (seconds)",
-            "tap_action_url": "Tap Action URL",
-            "tap_action_foreground": "Open Tap Action URL"
+            "stat_rows": "Stat Rows"
           },
           "data_description": {
             "widget_name": "Display name shown in the iOS widget picker. Defaults to the entity's friendly name.",
@@ -1647,20 +1690,63 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "severity": "Status severity (info, warning, critical, success).",
-            "stat_rows": "Up to 6 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`. By default medium and large Home Screen widgets show all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3 (both show up to 6 when every value is very short, like a single status glyph). Override this per widget in the PushWard app under Row Density (Auto, Compact, Comfortable).",
-            "label": "Static label shown on the widget. Leave empty to derive from the entity.",
-            "label_attribute": "Entity attribute used as the label. Overrides the static label.",
-            "subtitle_attribute": "Entity attribute shown as the widget subtitle.",
-            "icon": "Static icon. SF Symbols and MDI names supported.",
-            "icon_attribute": "Entity attribute for a dynamic icon. Overrides the static icon.",
-            "accent_color": "Accent color for the widget. Leave empty for the default.",
-            "accent_color_attribute": "Entity attribute for a dynamic accent color.",
-            "background_color": "Optional background color.",
-            "text_color": "Optional text color.",
-            "widget_trigger_mode": "How updates are triggered. `event` reacts to state changes; `poll` re-evaluates on a fixed interval.",
-            "widget_poll_interval": "Interval between polls (10–3600 seconds). Only used when trigger mode is `poll`.",
-            "tap_action_url": "Optional URL opened when tapping the widget. Supports http(s) (opens Safari) or custom schemes like homeassistant://navigate/lovelace/0.",
-            "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background."
+            "stat_rows": "Up to 6 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`. By default medium and large Home Screen widgets show all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3 (both show up to 6 when every value is very short, like a single status glyph). Override this per widget in the PushWard app under Row Density (Auto, Compact, Comfortable)."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "Label",
+                "label_attribute": "Label Attribute",
+                "subtitle_attribute": "Subtitle Attribute",
+                "icon": "Icon",
+                "icon_attribute": "Icon Attribute"
+              },
+              "data_description": {
+                "label": "Static label shown on the widget. Leave empty to derive from the entity.",
+                "label_attribute": "Entity attribute used as the label. Overrides the static label.",
+                "subtitle_attribute": "Entity attribute shown as the widget subtitle.",
+                "icon": "Static icon. SF Symbols and MDI names supported.",
+                "icon_attribute": "Entity attribute for a dynamic icon. Overrides the static icon."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Accent Color",
+                "accent_color_attribute": "Accent Color Attribute",
+                "background_color": "Background Color",
+                "text_color": "Text Color"
+              },
+              "data_description": {
+                "accent_color": "Accent color for the widget. Leave empty for the default.",
+                "accent_color_attribute": "Entity attribute for a dynamic accent color.",
+                "background_color": "Optional background color.",
+                "text_color": "Optional text color."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Tap Action URL",
+                "tap_action_foreground": "Open Tap Action URL"
+              },
+              "data_description": {
+                "tap_action_url": "Optional URL opened when tapping the widget. Supports http(s) (opens Safari) or custom schemes like homeassistant://navigate/lovelace/0.",
+                "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "Trigger Mode",
+                "widget_poll_interval": "Poll Interval (seconds)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "How updates are triggered. `event` reacts to state changes; `poll` re-evaluates on a fixed interval.",
+                "widget_poll_interval": "Interval between polls (10–3600 seconds). Only used when trigger mode is `poll`."
+              }
+            }
           }
         }
       },

@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "Status Awal",
             "end_states": "Status Akhir",
-            "progress_entity": "Entitas Kemajuan",
-            "progress_attribute": "Atribut Kemajuan",
             "remaining_time_entity": "Entitas Waktu Tersisa",
             "remaining_time_attribute": "Atribut Waktu Tersisa",
-            "live_progress": "ETA Kemajuan Live",
             "total_steps": "Total Langkah",
             "current_step_entity": "Entitas Langkah Saat Ini",
             "current_step_attribute": "Atribut Langkah Saat Ini",
             "severity": "Tingkat Keparahan",
             "severity_label": "Label Tingkat Keparahan",
-            "value_entity": "Entitas Nilai",
-            "value_attribute": "Atribut Nilai",
             "min_value": "Nilai Minimum",
             "max_value": "Nilai Maksimum",
             "unit": "Satuan",
-            "series": "Seri",
             "series_entities": "Entitas Seri",
-            "primary_series": "Seri Utama",
-            "scale": "Skala",
-            "decimals": "Angka Desimal",
-            "smoothing": "Garis Halus",
-            "thresholds": "Ambang Batas",
-            "history_period": "Periode Riwayat Mundur",
-            "slug": "Slug Aktivitas",
-            "activity_name": "Nama Aktivitas",
-            "icon": "Ikon",
-            "icon_attribute": "Atribut Ikon",
-            "priority": "Prioritas (0-10)",
-            "update_interval": "Interval Pembaruan Min. (detik)",
-            "subtitle_entity": "Entitas Subjudul",
-            "subtitle_attribute": "Atribut Subjudul",
-            "state_labels": "Label Status",
             "completion_message": "Pesan Penyelesaian",
-            "accent_color": "Warna Aksen",
-            "accent_color_attribute": "Atribut Warna Aksen",
-            "tap_action_url": "URL Aksi Ketuk",
-            "tap_action_foreground": "Buka URL Aksi Ketuk",
-            "url": "URL",
-            "url_foreground": "Buka URL Tombol Utama",
-            "url_title": "Judul Tombol Utama",
-            "secondary_url": "URL Sekunder",
-            "secondary_url_foreground": "Buka URL Tombol Sekunder",
-            "secondary_url_title": "Judul Tombol Sekunder",
-            "ended_ttl": "Hapus Otomatis Setelah Berakhir (detik)",
-            "stale_ttl": "Akhiri Otomatis Setelah Tidak Aktif (detik)",
-            "sound": "Suara",
-            "background_color": "Warna Latar",
-            "background_color_attribute": "Atribut Warna Latar",
-            "text_color": "Warna Teks",
-            "text_color_attribute": "Atribut Warna Teks",
             "warning_threshold": "Ambang Peringatan",
             "alarm": "Alarm",
             "snooze_seconds": "Detik Tunda (iOS 26+)",
-            "step_labels": "Label Langkah",
-            "step_rows": "Baris Langkah",
-            "step_weights": "Bobot Langkah",
-            "step_colors": "Warna Langkah",
-            "fired_at_entity": "Entitas Waktu Terpicu",
-            "fired_at_attribute": "Atribut Waktu Dipicu",
-            "units": "Satuan",
             "tiles": "Ubin board",
-            "log_columns": "Kolom Log",
-            "log_level_attribute": "Atribut Tingkat Log",
-            "dismissal_ttl": "Hapus Otomatis dari Layar Terkunci (detik)"
+            "log_columns": "Kolom Log"
           },
           "data_description": {
             "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
             "end_states": "Status entitas yang mengakhiri Live Activity. Pilih dari daftar atau ketik nilai kustom.",
-            "progress_entity": "Baca kemajuan dari entitas terpisah alih-alih entitas yang dilacak. Biarkan kosong untuk menggunakan entitas yang dilacak. Jika kolom atribut disetel, baca atribut tersebut dari entitas ini; jika tidak, statusnya.",
-            "progress_attribute": "Atribut entitas yang menyimpan nilai kemajuan 0–100. Contoh: percentage",
             "remaining_time_entity": "Baca waktu tersisa dari entitas terpisah (mis. sensor waktu mesin cuci). Biarkan kosong untuk menggunakan entitas yang dilacak. Mengurai otomatis sensor stempel waktu (waktu selesai), sensor durasi dengan satuan, string H:MM:SS, atau detik biasa.",
             "remaining_time_attribute": "Atribut entitas yang menyimpan waktu tersisa dalam detik. Contoh: remaining",
-            "live_progress": "Isi bilah kemajuan secara mulus dan hitung mundur ETA ke waktu selesai di perangkat, menggunakan sumber waktu tersisa di atas. Memerlukan entitas atau atribut waktu tersisa. Pada templat steps, ini mengisi langkah saat ini, bukan keseluruhan proses.",
             "total_steps": "Total jumlah steps.",
             "current_step_entity": "Baca langkah saat ini dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak.",
             "current_step_attribute": "Atribut entitas yang menyimpan langkah saat ini sebagai bilangan bulat.",
             "severity": "Tingkat keparahan alert.",
             "severity_label": "Timpa teks lencana Info/Warning/Critical yang ditampilkan pada alert. Kosongkan untuk menggunakan nama tingkat keparahan. Maks 32 karakter. Hanya templat alert.",
-            "value_entity": "Baca nilai gauge dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
-            "value_attribute": "Atribut entitas yang menyimpan nilai gauge saat ini sebagai angka. Kosongkan untuk menggunakan status entitas.",
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "unit": "Satuan tampilan yang ditampilkan di sebelah nilai (misalnya °C, %, kW). Maks 32 karakter.",
-            "series": "Petakan atribut entitas ke seri bernama. Format: attribute=Label, attribute2=Label2. Kosongkan untuk menggunakan status entitas sebagai satu seri.",
             "series_entities": "Ikat entitas terpisah sebagai garis bernama pada satu chart (misalnya satu sensor PM2.5 per ruangan). Format: [Label=]entity_id[:attribute], dipisah koma. Label secara default menggunakan nama ramah entitas; baca atribut dengan entity_id:attribute. Dapat digabung dengan Seri; total maksimal 10 garis.",
-            "primary_series": "Label seri yang ditampilkan sebagai nilai utama dan digunakan untuk rentang tinggi/rendah ringkas. Kosongkan untuk menggunakan seri milik entitas yang dilacak sendiri (atau seri pertama yang dikonfigurasi).",
-            "scale": "Mode skala sumbu Y untuk grafik sparkline.",
-            "decimals": "Jumlah angka desimal yang ditampilkan untuk nilai (0–10).",
-            "smoothing": "Aktifkan interpolasi kurva antar titik data untuk sparkline yang lebih halus.",
-            "thresholds": "Garis referensi horizontal pada sparkline. Format: value:color:label. Contoh: 25:red:Panas, 18:blue:Dingin. Maks 5.",
-            "history_period": "Menit data masa lalu untuk mengisi sparkline dari recorder Home Assistant. Atur ke 0 untuk memulai tanpa riwayat.",
-            "slug": "Identifikasi unik untuk aktivitas ini. Kosongkan untuk dibuat otomatis dari ID entitas. Contoh: ha-living-room-lamp",
-            "activity_name": "Nama tampilan yang ditampilkan pada iPhone Live Activity. Default ke nama ramah entitas.",
-            "icon": "Ganti ikon. Kosongkan untuk menggunakan ikon asli entitas (misalnya mdi:thermometer). SF Symbols juga didukung (misalnya lamp.desk.fill).",
-            "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis dan ikon entitas saat diatur.",
-            "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
-            "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
-            "subtitle_entity": "Tampilkan subjudul dari entitas terpisah (mis. sensor program/mode). Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
-            "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul. Kosongkan untuk menggunakan nama ramah entitas.",
-            "state_labels": "Teks tampilan kustom untuk status. Format: state=Label, state2=Label 2. Contoh: heating=Sedang Memanaskan, idle=Siaga",
             "completion_message": "Teks yang ditampilkan saat aktivitas berakhir. Kosongkan untuk 'Selesai'. Contoh: Cucian Selesai",
-            "accent_color": "Warna aksen untuk Live Activity. Kosongkan untuk biru default.",
-            "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis. Menggantikan warna statis. Mendukung RGB, HS, XY, Kelvin, nama warna, dan hex.",
-            "tap_action_url": "URL opsional yang dibuka saat mengetuk latar Live Activity. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0 (membuka aplikasi itu).",
-            "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang tanpa meninggalkan Layar Kunci.",
-            "url": "Tautan yang dibuka saat menekan Live Activity. Harus dimulai dengan http:// atau https://. Hanya untuk templat steps dan alert.",
-            "url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
-            "url_title": "Label tombol utama (maks 64 karakter).",
-            "secondary_url": "Tautan sekunder untuk Live Activity. Hanya untuk templat steps dan alert.",
-            "secondary_url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
-            "secondary_url_title": "Label tombol sekunder (maks 64 karakter).",
-            "ended_ttl": "Detik setelah aktivitas berakhir sebelum dihapus otomatis dari server. Kosongkan untuk menyimpan tanpa batas. Contoh: 300",
-            "stale_ttl": "Detik tidak aktif sebelum server mengakhiri aktivitas secara otomatis. Kosongkan untuk menonaktifkan. Contoh: 1800",
-            "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
-            "background_color": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
-            "background_color_attribute": "Atribut entitas untuk warna latar dinamis. Menggantikan warna latar statis.",
-            "text_color": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
-            "text_color_attribute": "Atribut entitas untuk warna teks dinamis. Menggantikan warna teks statis.",
             "warning_threshold": "Saat nilai mencapai atau melebihi ini, pewarnaan peringatan dipicu. Templat gauge dan timeline.",
             "alarm": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya untuk iOS 26+.",
             "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
-            "step_labels": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah.",
-            "step_rows": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps.",
-            "step_weights": "Lebar relatif setiap langkah, dipisahkan koma. Contoh: 1, 2, 1 membuat langkah tengah dua kali lebih lebar. Semua nilai harus positif. Harus memiliki total_steps entri. Hanya untuk templat steps.",
-            "step_colors": "Warna setiap langkah, dipisahkan koma (nama warna atau hex). Contoh: green, , red membuat langkah tengah tetap menggunakan warna aksen. Harus memiliki total_steps entri. Hanya untuk templat steps.",
-            "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan.",
-            "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
-            "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%",
             "tiles": "Ubin board (1–4), masing-masing membaca entitas terpisah. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opsional). Contoh: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Hanya templat board.",
-            "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log.",
-            "log_level_attribute": "Atribut yang menyediakan level (info/warn/error) untuk setiap baris log. Kosongkan jika tidak ingin ada tag level. Hanya templat log.",
-            "dismissal_ttl": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir. Contoh: 60"
+            "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "Entitas Kemajuan",
+                "progress_attribute": "Atribut Kemajuan",
+                "remaining_time_entity": "Entitas Waktu Tersisa",
+                "remaining_time_attribute": "Atribut Waktu Tersisa",
+                "live_progress": "ETA Kemajuan Live",
+                "value_entity": "Entitas Nilai",
+                "value_attribute": "Atribut Nilai",
+                "fired_at_entity": "Entitas Waktu Terpicu",
+                "fired_at_attribute": "Atribut Waktu Dipicu",
+                "subtitle_entity": "Entitas Subjudul",
+                "subtitle_attribute": "Atribut Subjudul",
+                "series": "Seri",
+                "log_level_attribute": "Atribut Tingkat Log"
+              },
+              "data_description": {
+                "progress_entity": "Baca kemajuan dari entitas terpisah alih-alih entitas yang dilacak. Biarkan kosong untuk menggunakan entitas yang dilacak. Jika kolom atribut disetel, baca atribut tersebut dari entitas ini; jika tidak, statusnya.",
+                "progress_attribute": "Atribut entitas yang menyimpan nilai kemajuan 0–100. Contoh: percentage",
+                "remaining_time_entity": "Baca waktu tersisa dari entitas terpisah (mis. sensor waktu mesin cuci). Biarkan kosong untuk menggunakan entitas yang dilacak. Mengurai otomatis sensor stempel waktu (waktu selesai), sensor durasi dengan satuan, string H:MM:SS, atau detik biasa.",
+                "remaining_time_attribute": "Atribut entitas yang menyimpan waktu tersisa dalam detik. Contoh: remaining",
+                "live_progress": "Isi bilah kemajuan secara mulus dan hitung mundur ETA ke waktu selesai di perangkat, menggunakan sumber waktu tersisa di atas. Memerlukan entitas atau atribut waktu tersisa. Pada templat steps, ini mengisi langkah saat ini, bukan keseluruhan proses.",
+                "value_entity": "Baca nilai gauge dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
+                "value_attribute": "Atribut entitas yang menyimpan nilai gauge saat ini sebagai angka. Kosongkan untuk menggunakan status entitas.",
+                "fired_at_entity": "Baca waktu terpicu peringatan dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak. Menerima stempel waktu unix atau sensor stempel waktu ISO. Hanya templat peringatan.",
+                "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
+                "subtitle_entity": "Tampilkan subjudul dari entitas terpisah (mis. sensor program/mode). Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
+                "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul. Kosongkan untuk menggunakan nama ramah entitas.",
+                "series": "Petakan atribut entitas ke seri bernama. Format: attribute=Label, attribute2=Label2. Kosongkan untuk menggunakan status entitas sebagai satu seri.",
+                "log_level_attribute": "Atribut yang menyediakan level (info/warn/error) untuk setiap baris log. Kosongkan jika tidak ingin ada tag level. Hanya templat log."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "Label Langkah",
+                "step_rows": "Baris Langkah",
+                "step_weights": "Bobot Langkah",
+                "step_colors": "Warna Langkah"
+              },
+              "data_description": {
+                "step_labels": "Label kustom untuk langkah-langkah templat steps. Format: 1=Label, 2=Label. Kosong menggunakan nomor langkah.",
+                "step_rows": "Jumlah langkah yang ditampilkan dalam satu baris pada templat steps.",
+                "step_weights": "Lebar relatif setiap langkah, dipisahkan koma. Contoh: 1, 2, 1 membuat langkah tengah dua kali lebih lebar. Semua nilai harus positif. Harus memiliki total_steps entri. Hanya untuk templat steps.",
+                "step_colors": "Warna setiap langkah, dipisahkan koma (nama warna atau hex). Contoh: green, , red membuat langkah tengah tetap menggunakan warna aksen. Harus memiliki total_steps entri. Hanya untuk templat steps."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "Satuan",
+                "primary_series": "Seri Utama",
+                "scale": "Skala",
+                "decimals": "Angka Desimal",
+                "smoothing": "Garis Halus",
+                "thresholds": "Ambang Batas",
+                "history_period": "Periode Riwayat Mundur"
+              },
+              "data_description": {
+                "units": "Label satuan untuk seri timeline. Format: attribute=Satuan. Contoh: temp=°C, humidity=%",
+                "primary_series": "Label seri yang ditampilkan sebagai nilai utama dan digunakan untuk rentang tinggi/rendah ringkas. Kosongkan untuk menggunakan seri milik entitas yang dilacak sendiri (atau seri pertama yang dikonfigurasi).",
+                "scale": "Mode skala sumbu Y untuk grafik sparkline.",
+                "decimals": "Jumlah angka desimal yang ditampilkan untuk nilai (0–10).",
+                "smoothing": "Aktifkan interpolasi kurva antar titik data untuk sparkline yang lebih halus.",
+                "thresholds": "Garis referensi horizontal pada sparkline. Format: value:color:label. Contoh: 25:red:Panas, 18:blue:Dingin. Maks 5.",
+                "history_period": "Menit data masa lalu untuk mengisi sparkline dari recorder Home Assistant. Atur ke 0 untuk memulai tanpa riwayat."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Slug Aktivitas",
+                "activity_name": "Nama Aktivitas",
+                "icon": "Ikon",
+                "icon_attribute": "Atribut Ikon",
+                "priority": "Prioritas (0-10)",
+                "sound": "Suara",
+                "update_interval": "Interval Pembaruan Min. (detik)",
+                "state_labels": "Label Status"
+              },
+              "data_description": {
+                "slug": "Identifikasi unik untuk aktivitas ini. Kosongkan untuk dibuat otomatis dari ID entitas. Contoh: ha-living-room-lamp",
+                "activity_name": "Nama tampilan yang ditampilkan pada iPhone Live Activity. Default ke nama ramah entitas.",
+                "icon": "Ganti ikon. Kosongkan untuk menggunakan ikon asli entitas (misalnya mdi:thermometer). SF Symbols juga didukung (misalnya lamp.desk.fill).",
+                "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis dan ikon entitas saat diatur.",
+                "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
+                "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
+                "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
+                "state_labels": "Teks tampilan kustom untuk status. Format: state=Label, state2=Label 2. Contoh: heating=Sedang Memanaskan, idle=Siaga"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Warna Aksen",
+                "accent_color_attribute": "Atribut Warna Aksen",
+                "background_color": "Warna Latar",
+                "background_color_attribute": "Atribut Warna Latar",
+                "text_color": "Warna Teks",
+                "text_color_attribute": "Atribut Warna Teks"
+              },
+              "data_description": {
+                "accent_color": "Warna aksen untuk Live Activity. Kosongkan untuk biru default.",
+                "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis. Menggantikan warna statis. Mendukung RGB, HS, XY, Kelvin, nama warna, dan hex.",
+                "background_color": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
+                "background_color_attribute": "Atribut entitas untuk warna latar dinamis. Menggantikan warna latar statis.",
+                "text_color": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
+                "text_color_attribute": "Atribut entitas untuk warna teks dinamis. Menggantikan warna teks statis."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "URL Aksi Ketuk",
+                "tap_action_foreground": "Buka URL Aksi Ketuk",
+                "url": "URL",
+                "url_foreground": "Buka URL Tombol Utama",
+                "url_title": "Judul Tombol Utama",
+                "secondary_url": "URL Sekunder",
+                "secondary_url_foreground": "Buka URL Tombol Sekunder",
+                "secondary_url_title": "Judul Tombol Sekunder"
+              },
+              "data_description": {
+                "tap_action_url": "URL opsional yang dibuka saat mengetuk latar Live Activity. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0 (membuka aplikasi itu).",
+                "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang tanpa meninggalkan Layar Kunci.",
+                "url": "Tautan yang dibuka saat menekan Live Activity. Harus dimulai dengan http:// atau https://. Hanya untuk templat steps dan alert.",
+                "url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+                "url_title": "Label tombol utama (maks 64 karakter).",
+                "secondary_url": "Tautan sekunder untuk Live Activity. Hanya untuk templat steps dan alert.",
+                "secondary_url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+                "secondary_url_title": "Label tombol sekunder (maks 64 karakter)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "Hapus Otomatis Setelah Berakhir (detik)",
+                "stale_ttl": "Akhiri Otomatis Setelah Tidak Aktif (detik)",
+                "dismissal_ttl": "Hapus Otomatis dari Layar Terkunci (detik)"
+              },
+              "data_description": {
+                "ended_ttl": "Detik setelah aktivitas berakhir sebelum dihapus otomatis dari server. Kosongkan untuk menyimpan tanpa batas. Contoh: 300",
+                "stale_ttl": "Detik tidak aktif sebelum server mengakhiri aktivitas secara otomatis. Kosongkan untuk menonaktifkan. Contoh: 1800",
+                "dismissal_ttl": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir. Contoh: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "Nilai Minimum",
             "max_value": "Nilai Maksimum",
             "severity": "Tingkat Keparahan",
-            "stat_rows": "Baris Statistik",
-            "label": "Label",
-            "label_attribute": "Atribut Label",
-            "subtitle_attribute": "Atribut Subjudul",
-            "icon": "Ikon",
-            "icon_attribute": "Atribut Ikon",
-            "accent_color": "Warna Aksen",
-            "accent_color_attribute": "Atribut Warna Aksen",
-            "background_color": "Warna Latar",
-            "text_color": "Warna Teks",
-            "widget_trigger_mode": "Mode Pemicu",
-            "widget_poll_interval": "Interval Polling (detik)",
-            "tap_action_url": "URL Aksi Ketuk",
-            "tap_action_foreground": "Buka URL Aksi Ketuk"
+            "stat_rows": "Baris Statistik"
           },
           "data_description": {
             "widget_name": "Nama tampilan yang ditampilkan di pemilih widget iOS. Default ke nama ramah entitas.",
@@ -1647,20 +1690,63 @@
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "severity": "Tingkat keparahan status (info, warning, critical, success).",
-            "stat_rows": "Hingga 6 baris. Format: `Label=entity_id[:attribute[:unit]]`, dipisah koma. Contoh: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
-            "label": "Label statis yang ditampilkan pada widget. Biarkan kosong untuk diturunkan dari entitas.",
-            "label_attribute": "Atribut entitas yang digunakan sebagai label. Menggantikan label statis.",
-            "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul widget.",
-            "icon": "Ikon statis. Mendukung nama SF Symbols dan MDI.",
-            "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis.",
-            "accent_color": "Warna aksen untuk widget. Biarkan kosong untuk default.",
-            "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis.",
-            "background_color": "Warna latar opsional.",
-            "text_color": "Warna teks opsional.",
-            "widget_trigger_mode": "Bagaimana pembaruan dipicu. `event` bereaksi terhadap perubahan status; `poll` mengevaluasi ulang pada interval tetap.",
-            "widget_poll_interval": "Interval antar polling (10–3600 detik). Hanya digunakan saat mode pemicu adalah `poll`.",
-            "tap_action_url": "URL opsional yang dibuka saat mengetuk widget. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0.",
-            "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang."
+            "stat_rows": "Hingga 6 baris. Format: `Label=entity_id[:attribute[:unit]]`, dipisah koma. Contoh: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "Label",
+                "label_attribute": "Atribut Label",
+                "subtitle_attribute": "Atribut Subjudul",
+                "icon": "Ikon",
+                "icon_attribute": "Atribut Ikon"
+              },
+              "data_description": {
+                "label": "Label statis yang ditampilkan pada widget. Biarkan kosong untuk diturunkan dari entitas.",
+                "label_attribute": "Atribut entitas yang digunakan sebagai label. Menggantikan label statis.",
+                "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul widget.",
+                "icon": "Ikon statis. Mendukung nama SF Symbols dan MDI.",
+                "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Warna Aksen",
+                "accent_color_attribute": "Atribut Warna Aksen",
+                "background_color": "Warna Latar",
+                "text_color": "Warna Teks"
+              },
+              "data_description": {
+                "accent_color": "Warna aksen untuk widget. Biarkan kosong untuk default.",
+                "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis.",
+                "background_color": "Warna latar opsional.",
+                "text_color": "Warna teks opsional."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "URL Aksi Ketuk",
+                "tap_action_foreground": "Buka URL Aksi Ketuk"
+              },
+              "data_description": {
+                "tap_action_url": "URL opsional yang dibuka saat mengetuk widget. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0.",
+                "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "Mode Pemicu",
+                "widget_poll_interval": "Interval Polling (detik)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "Bagaimana pembaruan dipicu. `event` bereaksi terhadap perubahan status; `poll` mengevaluasi ulang pada interval tetap.",
+                "widget_poll_interval": "Interval antar polling (10–3600 detik). Hanya digunakan saat mode pemicu adalah `poll`."
+              }
+            }
           }
         }
       },

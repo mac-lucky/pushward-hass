@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "Başlangıç Durumları",
             "end_states": "Bitiş Durumları",
-            "progress_entity": "İlerleme Varlığı",
-            "progress_attribute": "İlerleme Niteliği",
             "remaining_time_entity": "Kalan Süre Varlığı",
             "remaining_time_attribute": "Kalan Süre Niteliği",
-            "live_progress": "Canlı İlerleme ETA",
             "total_steps": "Toplam steps",
             "current_step_entity": "Geçerli Adım Varlığı",
             "current_step_attribute": "Geçerli Adım Niteliği",
             "severity": "Önem Derecesi",
             "severity_label": "Önem Derecesi Etiketi",
-            "value_entity": "Değer Varlığı",
-            "value_attribute": "Değer Niteliği",
             "min_value": "Minimum Değer",
             "max_value": "Maksimum Değer",
             "unit": "Birim",
-            "series": "Seri",
             "series_entities": "Seri Varlıkları",
-            "primary_series": "Birincil Seri",
-            "scale": "Ölçek",
-            "decimals": "Ondalık Basamak",
-            "smoothing": "Düzgün Çizgiler",
-            "thresholds": "Eşikler",
-            "history_period": "Geçmiş Dönemi",
-            "slug": "Aktivite Slug",
-            "activity_name": "Aktivite Adı",
-            "icon": "Simge",
-            "icon_attribute": "Simge Niteliği",
-            "priority": "Öncelik (0-10)",
-            "update_interval": "Min. Güncelleme Aralığı (saniye)",
-            "subtitle_entity": "Alt Başlık Varlığı",
-            "subtitle_attribute": "Alt Başlık Niteliği",
-            "state_labels": "Durum Etiketleri",
             "completion_message": "Tamamlanma Mesajı",
-            "accent_color": "Vurgu Rengi",
-            "accent_color_attribute": "Vurgu Rengi Niteliği",
-            "tap_action_url": "Dokunma Eylemi URL'si",
-            "tap_action_foreground": "Dokunma Eylemi URL'sini Aç",
-            "url": "URL",
-            "url_foreground": "Birincil Düğme URL'sini Aç",
-            "url_title": "Birincil Düğme Başlığı",
-            "secondary_url": "İkincil URL",
-            "secondary_url_foreground": "İkincil Düğme URL'sini Aç",
-            "secondary_url_title": "İkincil Düğme Başlığı",
-            "ended_ttl": "Bitişten Sonra Otomatik Sil (saniye)",
-            "stale_ttl": "Hareketsizlikte Otomatik Sonlandır (saniye)",
-            "sound": "Ses",
-            "background_color": "Arka Plan Rengi",
-            "background_color_attribute": "Arka Plan Rengi Niteliği",
-            "text_color": "Metin Rengi",
-            "text_color_attribute": "Metin Rengi Niteliği",
             "warning_threshold": "Uyarı Eşiği",
             "alarm": "Alarm",
             "snooze_seconds": "Erteleme Saniyeleri (iOS 26+)",
-            "step_labels": "Adım Etiketleri",
-            "step_rows": "Adım Satırları",
-            "step_weights": "Adım Ağırlıkları",
-            "step_colors": "Adım Renkleri",
-            "fired_at_entity": "Tetiklenme Zamanı Varlığı",
-            "fired_at_attribute": "Tetiklenme Zamanı Niteliği",
-            "units": "Birimler",
             "tiles": "Board Kutuları",
-            "log_columns": "Günlük Sütunları",
-            "log_level_attribute": "Günlük Düzeyi Özniteliği",
-            "dismissal_ttl": "Kilit Ekranından Otomatik Kaldır (saniye)"
+            "log_columns": "Günlük Sütunları"
           },
           "data_description": {
             "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin.",
             "end_states": "Live Activity'yi sonlandıran varlık durumları. Listeden seçin veya özel değer girin.",
-            "progress_entity": "İlerlemeyi izlenen varlık yerine ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Öznitelik alanı ayarlandığında bu varlığın o özniteliğini okur; aksi takdirde durumunu.",
-            "progress_attribute": "0–100 arasında ilerleme değeri tutan varlık niteliği. Örnek: percentage",
             "remaining_time_entity": "Kalan süreyi ayrı bir varlıktan okur (ör. bir çamaşır makinesinin süre sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir zaman damgası (bitiş zamanı) sensörünü, birimli bir süre sensörünü, bir H:MM:SS dizesini veya düz saniyeyi otomatik olarak ayrıştırır.",
             "remaining_time_attribute": "Saniye cinsinden kalan süreyi tutan varlık niteliği. Örnek: remaining",
-            "live_progress": "İlerleme çubuğunu düzgünce doldurur ve yukarıdaki kalan süre kaynağını kullanarak cihazda bitiş zamanına kadar tahmini süreyi (ETA) geri sayar. Bir kalan süre varlığı veya özniteliği gerektirir. steps şablonunda tüm süreç yerine yalnızca geçerli adımı doldurur.",
             "total_steps": "Toplam steps adedi.",
             "current_step_entity": "Geçerli adımı ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın.",
             "current_step_attribute": "Geçerli adımı tamsayı olarak tutan varlık niteliği.",
             "severity": "alert önem düzeyi.",
             "severity_label": "alert üzerinde gösterilen Info/Warning/Critical rozet metnini geçersiz kılar. Önem derecesi adını kullanmak için boş bırakın. En fazla 32 karakter. Yalnızca alert şablonu.",
-            "value_entity": "Gösterge değerini ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
-            "value_attribute": "Geçerli gauge değerini sayı olarak tutan varlık niteliği. Varlığın durumunu kullanmak için boş bırakın.",
             "min_value": "gauge aralığı için minimum değer.",
             "max_value": "gauge aralığı için maksimum değer.",
             "unit": "Değerin yanında gösterilen birim (örn. °C, %, kW). En fazla 32 karakter.",
-            "series": "Varlık niteliklerini adlandırılmış serilere eşleyin. Biçim: attribute=Etiket, attribute2=Etiket2. Tek seri olarak varlığın durumunu kullanmak için boş bırakın.",
             "series_entities": "Ayrı varlıkları tek bir grafikte adlandırılmış çizgiler olarak bağlar (örn. her oda için bir PM2.5 sensörü). Biçim: [Etiket=]entity_id[:öznitelik], virgülle ayrılmış. Etiket varsayılan olarak varlığın görünen adını kullanır; bir özniteliği entity_id:öznitelik ile okuyun. Seri alanıyla birleşir; toplam 10 çizgiye kadar.",
-            "primary_series": "Başlık değeri olarak gösterilen ve kompakt yüksek/düşük aralığı için kullanılan serinin etiketi. İzlenen varlığın kendi serisini (veya ilk yapılandırılmış seriyi) kullanmak için boş bırakın.",
-            "scale": "Kıvılcım çizelgesi için Y ekseni ölçek modu.",
-            "decimals": "Değerler için gösterilen ondalık basamak sayısı (0–10).",
-            "smoothing": "Daha düzgün bir kıvılcım çizelgesi için veri noktaları arasında eğri aradeğerlemeyi etkinleştir.",
-            "thresholds": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Biçim: değer:renk:etiket. Örnek: 25:red:Sıcak, 18:blue:Soğuk. En fazla 5.",
-            "history_period": "Home Assistant'ın kaydedicisinden kıvılcım çizelgesini başlatmak için geriye dönük veri dakikası. Geçmiş olmadan başlamak için 0 girin.",
-            "slug": "Bu aktivite için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın. Örnek: ha-living-room-lamp",
-            "activity_name": "iPhone Live Activity üzerinde gösterilen görüntü adı. Varsayılan olarak varlığın kolay adını kullanır.",
-            "icon": "Simgeyi geçersiz kıl. Varlığın yerel simgesini kullanmak için boş bırakın (örn. mdi:thermometer). SF Symbols da desteklenir (örn. lamp.desk.fill).",
-            "icon_attribute": "Dinamik simge için varlık niteliği. Ayarlandığında statik simgeyi ve varlık simgesini geçersiz kılar.",
-            "priority": "Cihaz sınırına ulaşıldığında daha yüksek öncelikli aktiviteler daha uzun süre tutulur (0 = en düşük, 10 = en yüksek).",
-            "update_interval": "Güncellemeler arasındaki minimum saniye. Hızlı durum değişiklikleri kısıtlanır.",
-            "subtitle_entity": "Alt başlığı ayrı bir varlıktan gösterir (ör. bir program/mod sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
-            "subtitle_attribute": "Alt başlık olarak gösterilecek varlık niteliği. Varlığın kolay adını kullanmak için boş bırakın.",
-            "state_labels": "Durumlar için özel görüntü metni. Biçim: durum=Etiket, durum2=Etiket 2. Örnek: heating=Isınıyor, idle=Beklemede",
             "completion_message": "Aktivite sona erdiğinde gösterilen metin. 'Tamamlandı' için boş bırakın. Örnek: Yıkama Bitti",
-            "accent_color": "Live Activity için vurgu rengi. Varsayılan mavi için boş bırakın.",
-            "accent_color_attribute": "Dinamik vurgu rengi için varlık niteliği. Statik rengi geçersiz kılar. RGB, HS, XY, Kelvin, adlandırılmış renkler ve onaltılık desteklenir.",
-            "tap_action_url": "Live Activity arka planına dokunulduğunda açılan isteğe bağlı URL. http(s) (Safari'yi açar) veya homeassistant://navigate/lovelace/0 gibi özel şemaları (o uygulamayı açar) destekler.",
-            "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — Kilit Ekranı'ndan ayrılmadan arka planda bir POST tetikler.",
-            "url": "Live Activity'ye dokunulduğunda açılan bağlantı. http:// veya https:// ile başlamalıdır. Yalnızca steps ve alert şablonları.",
-            "url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
-            "url_title": "Birincil düğme etiketi (en fazla 64 karakter).",
-            "secondary_url": "Live Activity için ikincil bağlantı. Yalnızca steps ve alert şablonları.",
-            "secondary_url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
-            "secondary_url_title": "İkincil düğme etiketi (en fazla 64 karakter).",
-            "ended_ttl": "Aktivite sona erdikten kaç saniye sonra sunucudan otomatik silineceği. Süresiz tutmak için boş bırakın. Örnek: 300",
-            "stale_ttl": "Sunucunun aktiviteyi otomatik sonlandırmasından önceki hareketsizlik süresi (saniye). Devre dışı bırakmak için boş bırakın. Örnek: 1800",
-            "sound": "Bu güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın.",
-            "background_color": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
-            "background_color_attribute": "Dinamik arka plan rengi için varlık niteliği. Statik arka plan rengini geçersiz kılar.",
-            "text_color": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
-            "text_color_attribute": "Dinamik metin rengi için varlık niteliği. Statik metin rengini geçersiz kılar.",
             "warning_threshold": "Bu değere ulaşıldığında veya aşıldığında uyarı renklendirmesi tetiklenir. Gauge ve timeline şablonları.",
             "alarm": "Uyarı eşiği aşıldığında AlarmKit alarmını tetikler. Yalnızca iOS 26+.",
             "snooze_seconds": "iOS Ertele düğmesinin geri sayımı ne kadar uzattığı (60–3600). 300s (5 dk) varsayılanı için boş bırakın. Alarm gerektirir. Yalnızca geri sayım şablonu.",
-            "step_labels": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır.",
-            "step_rows": "Steps şablonunda bir satırda gösterilecek adım sayısı.",
-            "step_weights": "Her adımın göreli genişliği, virgülle ayrılmış. Örnek: 1, 2, 1 orta adımı iki kat genişletir. Tüm değerler pozitif olmalıdır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu.",
-            "step_colors": "Her adımın rengi, virgülle ayrılmış (isim veya hex). Örnek: green, , red orta adımı vurgu renginde bırakır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu.",
-            "fired_at_entity": "Uyarının tetiklenme zamanını ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir unix zaman damgası veya bir ISO zaman damgası sensörü kabul eder. Yalnızca uyarı şablonu.",
-            "fired_at_attribute": "Tetiklenme Unix zaman damgasını tutan varlık niteliği. Göreceli zaman görüntüsü için kullanılır.",
-            "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%",
             "tiles": "Board kutuları (1–4), her biri ayrı bir varlığı okur. Biçim: Etiket=entity_id:öznitelik:birim:simge (öznitelik, birim, simge isteğe bağlı). Örnek: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Yalnızca board şablonu.",
-            "log_columns": "Her günlük satırına eklenen ek değerler (en fazla 6), virgülle ayrılır. Biçim: [Label=]source[|unit]. source = bu varlığın bir niteliği (brightness), başka bir varlığın durumu (binary_sensor.door) veya başka bir varlığın niteliği (sensor.temp:temperature). Örnek: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Yalnızca günlük şablonu.",
-            "log_level_attribute": "Her günlük satırının düzeyini (info/warn/error) sağlayan öznitelik. Düzey etiketi istemiyorsanız boş bırakın. Yalnızca log şablonu.",
-            "dismissal_ttl": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır. Örnek: 60"
+            "log_columns": "Her günlük satırına eklenen ek değerler (en fazla 6), virgülle ayrılır. Biçim: [Label=]source[|unit]. source = bu varlığın bir niteliği (brightness), başka bir varlığın durumu (binary_sensor.door) veya başka bir varlığın niteliği (sensor.temp:temperature). Örnek: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Yalnızca günlük şablonu."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "İlerleme Varlığı",
+                "progress_attribute": "İlerleme Niteliği",
+                "remaining_time_entity": "Kalan Süre Varlığı",
+                "remaining_time_attribute": "Kalan Süre Niteliği",
+                "live_progress": "Canlı İlerleme ETA",
+                "value_entity": "Değer Varlığı",
+                "value_attribute": "Değer Niteliği",
+                "fired_at_entity": "Tetiklenme Zamanı Varlığı",
+                "fired_at_attribute": "Tetiklenme Zamanı Niteliği",
+                "subtitle_entity": "Alt Başlık Varlığı",
+                "subtitle_attribute": "Alt Başlık Niteliği",
+                "series": "Seri",
+                "log_level_attribute": "Günlük Düzeyi Özniteliği"
+              },
+              "data_description": {
+                "progress_entity": "İlerlemeyi izlenen varlık yerine ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Öznitelik alanı ayarlandığında bu varlığın o özniteliğini okur; aksi takdirde durumunu.",
+                "progress_attribute": "0–100 arasında ilerleme değeri tutan varlık niteliği. Örnek: percentage",
+                "remaining_time_entity": "Kalan süreyi ayrı bir varlıktan okur (ör. bir çamaşır makinesinin süre sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir zaman damgası (bitiş zamanı) sensörünü, birimli bir süre sensörünü, bir H:MM:SS dizesini veya düz saniyeyi otomatik olarak ayrıştırır.",
+                "remaining_time_attribute": "Saniye cinsinden kalan süreyi tutan varlık niteliği. Örnek: remaining",
+                "live_progress": "İlerleme çubuğunu düzgünce doldurur ve yukarıdaki kalan süre kaynağını kullanarak cihazda bitiş zamanına kadar tahmini süreyi (ETA) geri sayar. Bir kalan süre varlığı veya özniteliği gerektirir. steps şablonunda tüm süreç yerine yalnızca geçerli adımı doldurur.",
+                "value_entity": "Gösterge değerini ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
+                "value_attribute": "Geçerli gauge değerini sayı olarak tutan varlık niteliği. Varlığın durumunu kullanmak için boş bırakın.",
+                "fired_at_entity": "Uyarının tetiklenme zamanını ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Bir unix zaman damgası veya bir ISO zaman damgası sensörü kabul eder. Yalnızca uyarı şablonu.",
+                "fired_at_attribute": "Tetiklenme Unix zaman damgasını tutan varlık niteliği. Göreceli zaman görüntüsü için kullanılır.",
+                "subtitle_entity": "Alt başlığı ayrı bir varlıktan gösterir (ör. bir program/mod sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
+                "subtitle_attribute": "Alt başlık olarak gösterilecek varlık niteliği. Varlığın kolay adını kullanmak için boş bırakın.",
+                "series": "Varlık niteliklerini adlandırılmış serilere eşleyin. Biçim: attribute=Etiket, attribute2=Etiket2. Tek seri olarak varlığın durumunu kullanmak için boş bırakın.",
+                "log_level_attribute": "Her günlük satırının düzeyini (info/warn/error) sağlayan öznitelik. Düzey etiketi istemiyorsanız boş bırakın. Yalnızca log şablonu."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "Adım Etiketleri",
+                "step_rows": "Adım Satırları",
+                "step_weights": "Adım Ağırlıkları",
+                "step_colors": "Adım Renkleri"
+              },
+              "data_description": {
+                "step_labels": "Steps şablonu adımları için özel etiketler. Biçim: 1=Etiket, 2=Etiket. Boş bırakılırsa adım numaraları kullanılır.",
+                "step_rows": "Steps şablonunda bir satırda gösterilecek adım sayısı.",
+                "step_weights": "Her adımın göreli genişliği, virgülle ayrılmış. Örnek: 1, 2, 1 orta adımı iki kat genişletir. Tüm değerler pozitif olmalıdır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu.",
+                "step_colors": "Her adımın rengi, virgülle ayrılmış (isim veya hex). Örnek: green, , red orta adımı vurgu renginde bırakır. total_steps girdiye sahip olmalıdır. Yalnızca steps şablonu."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "Birimler",
+                "primary_series": "Birincil Seri",
+                "scale": "Ölçek",
+                "decimals": "Ondalık Basamak",
+                "smoothing": "Düzgün Çizgiler",
+                "thresholds": "Eşikler",
+                "history_period": "Geçmiş Dönemi"
+              },
+              "data_description": {
+                "units": "Timeline serileri için birim etiketleri. Biçim: attribute=Birim. Örnek: temp=°C, humidity=%",
+                "primary_series": "Başlık değeri olarak gösterilen ve kompakt yüksek/düşük aralığı için kullanılan serinin etiketi. İzlenen varlığın kendi serisini (veya ilk yapılandırılmış seriyi) kullanmak için boş bırakın.",
+                "scale": "Kıvılcım çizelgesi için Y ekseni ölçek modu.",
+                "decimals": "Değerler için gösterilen ondalık basamak sayısı (0–10).",
+                "smoothing": "Daha düzgün bir kıvılcım çizelgesi için veri noktaları arasında eğri aradeğerlemeyi etkinleştir.",
+                "thresholds": "Kıvılcım çizelgesi üzerindeki yatay referans çizgileri. Biçim: değer:renk:etiket. Örnek: 25:red:Sıcak, 18:blue:Soğuk. En fazla 5.",
+                "history_period": "Home Assistant'ın kaydedicisinden kıvılcım çizelgesini başlatmak için geriye dönük veri dakikası. Geçmiş olmadan başlamak için 0 girin."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Aktivite Slug",
+                "activity_name": "Aktivite Adı",
+                "icon": "Simge",
+                "icon_attribute": "Simge Niteliği",
+                "priority": "Öncelik (0-10)",
+                "sound": "Ses",
+                "update_interval": "Min. Güncelleme Aralığı (saniye)",
+                "state_labels": "Durum Etiketleri"
+              },
+              "data_description": {
+                "slug": "Bu aktivite için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın. Örnek: ha-living-room-lamp",
+                "activity_name": "iPhone Live Activity üzerinde gösterilen görüntü adı. Varsayılan olarak varlığın kolay adını kullanır.",
+                "icon": "Simgeyi geçersiz kıl. Varlığın yerel simgesini kullanmak için boş bırakın (örn. mdi:thermometer). SF Symbols da desteklenir (örn. lamp.desk.fill).",
+                "icon_attribute": "Dinamik simge için varlık niteliği. Ayarlandığında statik simgeyi ve varlık simgesini geçersiz kılar.",
+                "priority": "Cihaz sınırına ulaşıldığında daha yüksek öncelikli aktiviteler daha uzun süre tutulur (0 = en düşük, 10 = en yüksek).",
+                "sound": "Bu güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın.",
+                "update_interval": "Güncellemeler arasındaki minimum saniye. Hızlı durum değişiklikleri kısıtlanır.",
+                "state_labels": "Durumlar için özel görüntü metni. Biçim: durum=Etiket, durum2=Etiket 2. Örnek: heating=Isınıyor, idle=Beklemede"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Vurgu Rengi",
+                "accent_color_attribute": "Vurgu Rengi Niteliği",
+                "background_color": "Arka Plan Rengi",
+                "background_color_attribute": "Arka Plan Rengi Niteliği",
+                "text_color": "Metin Rengi",
+                "text_color_attribute": "Metin Rengi Niteliği"
+              },
+              "data_description": {
+                "accent_color": "Live Activity için vurgu rengi. Varsayılan mavi için boş bırakın.",
+                "accent_color_attribute": "Dinamik vurgu rengi için varlık niteliği. Statik rengi geçersiz kılar. RGB, HS, XY, Kelvin, adlandırılmış renkler ve onaltılık desteklenir.",
+                "background_color": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
+                "background_color_attribute": "Dinamik arka plan rengi için varlık niteliği. Statik arka plan rengini geçersiz kılar.",
+                "text_color": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
+                "text_color_attribute": "Dinamik metin rengi için varlık niteliği. Statik metin rengini geçersiz kılar."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Dokunma Eylemi URL'si",
+                "tap_action_foreground": "Dokunma Eylemi URL'sini Aç",
+                "url": "URL",
+                "url_foreground": "Birincil Düğme URL'sini Aç",
+                "url_title": "Birincil Düğme Başlığı",
+                "secondary_url": "İkincil URL",
+                "secondary_url_foreground": "İkincil Düğme URL'sini Aç",
+                "secondary_url_title": "İkincil Düğme Başlığı"
+              },
+              "data_description": {
+                "tap_action_url": "Live Activity arka planına dokunulduğunda açılan isteğe bağlı URL. http(s) (Safari'yi açar) veya homeassistant://navigate/lovelace/0 gibi özel şemaları (o uygulamayı açar) destekler.",
+                "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — Kilit Ekranı'ndan ayrılmadan arka planda bir POST tetikler.",
+                "url": "Live Activity'ye dokunulduğunda açılan bağlantı. http:// veya https:// ile başlamalıdır. Yalnızca steps ve alert şablonları.",
+                "url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
+                "url_title": "Birincil düğme etiketi (en fazla 64 karakter).",
+                "secondary_url": "Live Activity için ikincil bağlantı. Yalnızca steps ve alert şablonları.",
+                "secondary_url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
+                "secondary_url_title": "İkincil düğme etiketi (en fazla 64 karakter)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "Bitişten Sonra Otomatik Sil (saniye)",
+                "stale_ttl": "Hareketsizlikte Otomatik Sonlandır (saniye)",
+                "dismissal_ttl": "Kilit Ekranından Otomatik Kaldır (saniye)"
+              },
+              "data_description": {
+                "ended_ttl": "Aktivite sona erdikten kaç saniye sonra sunucudan otomatik silineceği. Süresiz tutmak için boş bırakın. Örnek: 300",
+                "stale_ttl": "Sunucunun aktiviteyi otomatik sonlandırmasından önceki hareketsizlik süresi (saniye). Devre dışı bırakmak için boş bırakın. Örnek: 1800",
+                "dismissal_ttl": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır. Örnek: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "Minimum Değer",
             "max_value": "Maksimum Değer",
             "severity": "Önem Derecesi",
-            "stat_rows": "İstatistik Satırları",
-            "label": "Etiket",
-            "label_attribute": "Etiket Özniteliği",
-            "subtitle_attribute": "Alt Başlık Özniteliği",
-            "icon": "Simge",
-            "icon_attribute": "Simge Özniteliği",
-            "accent_color": "Vurgu Rengi",
-            "accent_color_attribute": "Vurgu Rengi Özniteliği",
-            "background_color": "Arka Plan Rengi",
-            "text_color": "Metin Rengi",
-            "widget_trigger_mode": "Tetikleme Modu",
-            "widget_poll_interval": "Yoklama Aralığı (saniye)",
-            "tap_action_url": "Dokunma Eylemi URL'si",
-            "tap_action_foreground": "Dokunma Eylemi URL'sini Aç"
+            "stat_rows": "İstatistik Satırları"
           },
           "data_description": {
             "widget_name": "iOS widget seçicide gösterilen görünen ad. Varsayılan olarak varlığın kolay adıdır.",
@@ -1647,20 +1690,63 @@
             "min_value": "Gösterge aralığı için minimum değer.",
             "max_value": "Gösterge aralığı için maksimum değer.",
             "severity": "Durum önem derecesi (info, warning, critical, success).",
-            "stat_rows": "En fazla 6 satır. Biçim: `Label=entity_id[:attribute[:unit]]`, virgülle ayrılmış. Örnek: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
-            "label": "Widget'ta gösterilen statik etiket. Varlıktan türetmek için boş bırakın.",
-            "label_attribute": "Etiket olarak kullanılan varlık özniteliği. Statik etiketi geçersiz kılar.",
-            "subtitle_attribute": "Widget alt başlığı olarak gösterilen varlık özniteliği.",
-            "icon": "Statik simge. SF Symbols ve MDI adları desteklenir.",
-            "icon_attribute": "Dinamik bir simge için varlık özniteliği. Statik simgeyi geçersiz kılar.",
-            "accent_color": "Widget için vurgu rengi. Varsayılan için boş bırakın.",
-            "accent_color_attribute": "Dinamik bir vurgu rengi için varlık özniteliği.",
-            "background_color": "İsteğe bağlı arka plan rengi.",
-            "text_color": "İsteğe bağlı metin rengi.",
-            "widget_trigger_mode": "Güncellemelerin nasıl tetiklendiği. `event` durum değişikliklerine tepki verir; `poll` sabit bir aralıkta yeniden değerlendirir.",
-            "widget_poll_interval": "Yoklamalar arasındaki aralık (10–3600 saniye). Yalnızca tetikleme modu `poll` olduğunda kullanılır.",
-            "tap_action_url": "Widget'a dokunulduğunda açılan isteğe bağlı URL. http(s) (Safari'yi açar) veya homeassistant://navigate/lovelace/0 gibi özel şemaları destekler.",
-            "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — arka planda bir POST tetikler."
+            "stat_rows": "En fazla 6 satır. Biçim: `Label=entity_id[:attribute[:unit]]`, virgülle ayrılmış. Örnek: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "Etiket",
+                "label_attribute": "Etiket Özniteliği",
+                "subtitle_attribute": "Alt Başlık Özniteliği",
+                "icon": "Simge",
+                "icon_attribute": "Simge Özniteliği"
+              },
+              "data_description": {
+                "label": "Widget'ta gösterilen statik etiket. Varlıktan türetmek için boş bırakın.",
+                "label_attribute": "Etiket olarak kullanılan varlık özniteliği. Statik etiketi geçersiz kılar.",
+                "subtitle_attribute": "Widget alt başlığı olarak gösterilen varlık özniteliği.",
+                "icon": "Statik simge. SF Symbols ve MDI adları desteklenir.",
+                "icon_attribute": "Dinamik bir simge için varlık özniteliği. Statik simgeyi geçersiz kılar."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Vurgu Rengi",
+                "accent_color_attribute": "Vurgu Rengi Özniteliği",
+                "background_color": "Arka Plan Rengi",
+                "text_color": "Metin Rengi"
+              },
+              "data_description": {
+                "accent_color": "Widget için vurgu rengi. Varsayılan için boş bırakın.",
+                "accent_color_attribute": "Dinamik bir vurgu rengi için varlık özniteliği.",
+                "background_color": "İsteğe bağlı arka plan rengi.",
+                "text_color": "İsteğe bağlı metin rengi."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Dokunma Eylemi URL'si",
+                "tap_action_foreground": "Dokunma Eylemi URL'sini Aç"
+              },
+              "data_description": {
+                "tap_action_url": "Widget'a dokunulduğunda açılan isteğe bağlı URL. http(s) (Safari'yi açar) veya homeassistant://navigate/lovelace/0 gibi özel şemaları destekler.",
+                "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — arka planda bir POST tetikler."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "Tetikleme Modu",
+                "widget_poll_interval": "Yoklama Aralığı (saniye)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "Güncellemelerin nasıl tetiklendiği. `event` durum değişikliklerine tepki verir; `poll` sabit bir aralıkta yeniden değerlendirir.",
+                "widget_poll_interval": "Yoklamalar arasındaki aralık (10–3600 saniye). Yalnızca tetikleme modu `poll` olduğunda kullanılır."
+              }
+            }
           }
         }
       },

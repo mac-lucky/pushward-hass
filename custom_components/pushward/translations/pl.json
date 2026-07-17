@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "Stany początkowe",
             "end_states": "Stany końcowe",
-            "progress_entity": "Encja postępu",
-            "progress_attribute": "Atrybut postępu",
             "remaining_time_entity": "Encja pozostałego czasu",
             "remaining_time_attribute": "Atrybut pozostałego czasu",
-            "live_progress": "Postęp na żywo (ETA)",
             "total_steps": "Łączna liczba steps",
             "current_step_entity": "Encja bieżącego kroku",
             "current_step_attribute": "Atrybut bieżącego kroku",
             "severity": "Poziom istotności",
             "severity_label": "Etykieta istotności",
-            "value_entity": "Encja wartości",
-            "value_attribute": "Atrybut wartości",
             "min_value": "Wartość minimalna",
             "max_value": "Wartość maksymalna",
             "unit": "Jednostka",
-            "series": "Serie",
             "series_entities": "Encje serii",
-            "primary_series": "Seria główna",
-            "scale": "Skala",
-            "decimals": "Miejsca dziesiętne",
-            "smoothing": "Wygładzanie linii",
-            "thresholds": "Progi",
-            "history_period": "Okres historii wstecznej",
-            "slug": "Slug Live Activity",
-            "activity_name": "Nazwa Live Activity",
-            "icon": "Ikona",
-            "icon_attribute": "Atrybut ikony",
-            "priority": "Priorytet (0-10)",
-            "update_interval": "Min. interwał aktualizacji (sekundy)",
-            "subtitle_entity": "Encja podtytułu",
-            "subtitle_attribute": "Atrybut podtytułu",
-            "state_labels": "Etykiety stanów",
             "completion_message": "Komunikat zakończenia",
-            "accent_color": "Kolor akcentu",
-            "accent_color_attribute": "Atrybut koloru akcentu",
-            "tap_action_url": "URL akcji dotknięcia",
-            "tap_action_foreground": "Otwórz URL akcji dotknięcia",
-            "url": "URL",
-            "url_foreground": "Otwórz URL przycisku głównego",
-            "url_title": "Tytuł przycisku głównego",
-            "secondary_url": "Dodatkowy URL",
-            "secondary_url_foreground": "Otwórz URL przycisku dodatkowego",
-            "secondary_url_title": "Tytuł przycisku dodatkowego",
-            "ended_ttl": "Automatyczne usunięcie po zakończeniu (sekundy)",
-            "stale_ttl": "Automatyczne zakończenie po nieaktywności (sekundy)",
-            "sound": "Dźwięk",
-            "background_color": "Kolor tła",
-            "background_color_attribute": "Atrybut koloru tła",
-            "text_color": "Kolor tekstu",
-            "text_color_attribute": "Atrybut koloru tekstu",
             "warning_threshold": "Próg ostrzeżenia (sekundy)",
             "alarm": "Alarm (iOS 26+)",
             "snooze_seconds": "Sekundy drzemki (iOS 26+)",
-            "step_labels": "Etykiety kroków",
-            "step_rows": "Wysokości wierszy kroków",
-            "step_weights": "Wagi Kroków",
-            "step_colors": "Kolory Kroków",
-            "fired_at_entity": "Encja czasu wyzwolenia",
-            "fired_at_attribute": "Atrybut czasu wyzwolenia",
-            "units": "Jednostki dla serii",
             "tiles": "Kafelki tablicy",
-            "log_columns": "Kolumny dziennika",
-            "log_level_attribute": "Atrybut poziomu dziennika",
-            "dismissal_ttl": "Automatyczne usunięcie z ekranu blokady (sekundy)"
+            "log_columns": "Kolumny dziennika"
           },
           "data_description": {
             "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości.",
             "end_states": "Stany encji, które kończą Live Activity. Wybierz z listy lub wpisz własne wartości.",
-            "progress_entity": "Odczytuj postęp z osobnej encji zamiast ze śledzonej encji. Pozostaw puste, aby użyć śledzonej encji. Gdy ustawione jest pole atrybutu, odczytuje ten atrybut tej encji; w przeciwnym razie jej stan.",
-            "progress_attribute": "Atrybut encji przechowujący wartość postępu 0–100. Przykład: percentage",
             "remaining_time_entity": "Odczytuj pozostały czas z osobnej encji (np. czujnika czasu pralki). Pozostaw puste, aby użyć śledzonej encji. Automatycznie analizuje czujnik znacznika czasu (czas zakończenia), czujnik czasu trwania z jednostkami, ciąg H:MM:SS lub zwykłe sekundy.",
             "remaining_time_attribute": "Atrybut encji przechowujący pozostały czas w sekundach. Przykład: remaining",
-            "live_progress": "Płynnie wypełnia pasek postępu i odlicza ETA do czasu zakończenia na urządzeniu, korzystając z powyższego źródła pozostałego czasu. Wymaga encji lub atrybutu pozostałego czasu. W szablonie steps wypełnia bieżący krok, a nie cały przebieg.",
             "total_steps": "Łączna liczba steps.",
             "current_step_entity": "Odczytuj bieżący krok z osobnej encji. Pozostaw puste, aby użyć śledzonej encji.",
             "current_step_attribute": "Atrybut encji przechowujący bieżący krok jako liczbę całkowitą.",
             "severity": "Poziom istotności dla szablonu alert.",
             "severity_label": "Nadpisz tekst odznaki Info/Warning/Critical pokazywany na alercie. Pozostaw puste, aby użyć nazwy poziomu istotności. Maks. 32 znaki. Tylko szablon alert.",
-            "value_entity": "Odczytuj wartość wskaźnika z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Używa stanu encji źródłowej, chyba że ustawiono atrybut.",
-            "value_attribute": "Atrybut encji przechowujący bieżącą wartość gauge jako liczbę. Pozostaw puste, aby użyć stanu encji.",
             "min_value": "Minimalna wartość zakresu gauge.",
             "max_value": "Maksymalna wartość zakresu gauge.",
             "unit": "Jednostka wyświetlana obok wartości (np. °C, %, kW). Maks. 32 znaki.",
-            "series": "Mapuje atrybuty encji na nazwane serie. Format: atrybut=Etykieta, atrybut2=Etykieta2. Pozostaw puste, aby użyć stanu encji jako pojedynczej serii.",
             "series_entities": "Powiąż osobne encje jako nazwane linie na jednym wykresie (np. czujnik PM2.5 dla każdego pokoju). Format: [Label=]entity_id[:attribute], oddzielone przecinkami. Etykieta domyślnie to przyjazna nazwa encji; odczytaj atrybut za pomocą entity_id:attribute. Łączy się z Serie; maksymalnie 10 linii łącznie.",
-            "primary_series": "Etykieta serii pokazywanej jako wartość główna i używanej dla kompaktowego zakresu min/maks. Pozostaw puste, aby użyć własnej serii śledzonej encji (lub pierwszej skonfigurowanej serii).",
-            "scale": "Tryb skali osi Y dla wykresu sparkline.",
-            "decimals": "Liczba miejsc dziesiętnych wyświetlanych dla wartości (0–10).",
-            "smoothing": "Włącz interpolację krzywej między punktami danych dla gładszego wykresu sparkline.",
-            "thresholds": "Poziome linie odniesienia na wykresie sparkline. Format: wartość:kolor:etykieta. Przykład: 25:red:Gorąco, 18:blue:Zimno. Maks. 5.",
-            "history_period": "Minuty danych historycznych do zasilenia wykresu sparkline z rejestratora Home Assistant. Ustaw 0, aby zacząć bez historii.",
-            "slug": "Unikalny identyfikator dla tego Live Activity. Pozostaw puste, aby wygenerować automatycznie z ID encji. Przykład: ha-living-room-lamp",
-            "activity_name": "Nazwa wyświetlana w Live Activity na iPhonie. Domyślnie przyjazna nazwa encji.",
-            "icon": "Zastąp ikonę. Pozostaw puste, aby użyć natywnej ikony encji (np. mdi:thermometer). Obsługiwane są także SF Symbols (np. lamp.desk.fill).",
-            "icon_attribute": "Atrybut encji dla dynamicznej ikony. Gdy ustawiony, zastępuje ikonę statyczną i ikonę encji.",
-            "priority": "Live Activity o wyższym priorytecie są utrzymywane dłużej, gdy osiągnięto limit urządzenia (0 = najniższy, 10 = najwyższy).",
-            "update_interval": "Minimalna liczba sekund między aktualizacjami. Szybkie zmiany stanu są ograniczane.",
-            "subtitle_entity": "Pokaż podtytuł z osobnej encji (np. czujnika programu/trybu). Pozostaw puste, aby użyć śledzonej encji. Używa stanu encji źródłowej, chyba że ustawiono atrybut.",
-            "subtitle_attribute": "Atrybut encji wyświetlany jako podtytuł. Pozostaw puste, aby użyć przyjaznej nazwy encji.",
-            "state_labels": "Własny tekst wyświetlany dla stanów. Format: stan=Etykieta, stan2=Etykieta 2. Przykład: heating=Nagrzewanie, idle=Czuwanie",
             "completion_message": "Tekst wyświetlany po zakończeniu Live Activity. Pozostaw puste dla 'Zakończono'. Przykład: Pranie zakończone",
-            "accent_color": "Kolor akcentu dla Live Activity. Pozostaw puste dla domyślnego niebieskiego.",
-            "accent_color_attribute": "Atrybut encji dla dynamicznego koloru akcentu. Zastępuje kolor statyczny. Obsługuje RGB, HS, XY, Kelvin, kolory nazwane oraz hex.",
-            "tap_action_url": "Opcjonalny adres URL otwierany po dotknięciu tła Live Activity. Obsługuje http(s) (otwiera Safari) lub niestandardowe schematy, np. homeassistant://navigate/lovelace/0 (otwiera daną aplikację).",
-            "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle, bez opuszczania ekranu blokady.",
-            "url": "Link otwierany po dotknięciu Live Activity. Musi zaczynać się od http:// lub https://. Tylko szablony steps i alert.",
-            "url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
-            "url_title": "Etykieta przycisku głównego (maks. 64 znaki).",
-            "secondary_url": "Dodatkowy link dla Live Activity. Tylko szablony steps i alert.",
-            "secondary_url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
-            "secondary_url_title": "Etykieta przycisku dodatkowego (maks. 64 znaki).",
-            "ended_ttl": "Liczba sekund po zakończeniu Live Activity, zanim zostanie automatycznie usunięty z serwera. Pozostaw puste, aby zachować bezterminowo. Przykład: 300",
-            "stale_ttl": "Liczba sekund nieaktywności, zanim serwer automatycznie zakończy Live Activity. Pozostaw puste, aby wyłączyć. Przykład: 1800",
-            "sound": "Dźwięk odtwarzany przy każdej aktualizacji dla tej encji. Pozostaw puste, aby nie używać żadnego nadpisania.",
-            "background_color": "Kolor tła Live Activity. Pozostaw puste dla wartości domyślnej.",
-            "background_color_attribute": "Atrybut encji dla dynamicznego koloru tła. Zastępuje kolor statyczny. Obsługuje RGB, HS, XY, Kelvin, kolory nazwane oraz hex.",
-            "text_color": "Kolor tekstu Live Activity. Pozostaw puste dla wartości domyślnej.",
-            "text_color_attribute": "Atrybut encji dla dynamicznego koloru tekstu. Zastępuje kolor statyczny.",
             "warning_threshold": "Sekundy przed końcem countdown, w których serwer wysyła ostrzeżenie push. Pozostaw puste, aby wyłączyć. Tylko szablon countdown.",
             "alarm": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+). Tylko szablon countdown.",
             "snooze_seconds": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
-            "step_labels": "Etykiety dla każdego kroku. Format: 1=Pierwszy Krok, 2=Drugi Krok. Musi obejmować kroki 1..total_steps. Tylko szablon steps.",
-            "step_rows": "Wysokość wiersza (1–10) dla każdego kroku, oddzielona przecinkami. Musi mieć total_steps wpisów. Tylko szablon steps.",
-            "step_weights": "Względna szerokość każdego kroku, oddzielona przecinkami. Przykład: 1, 2, 1 sprawia, że środkowy krok jest dwa razy szerszy. Wszystkie wartości muszą być dodatnie. Musi mieć total_steps wpisów. Tylko szablon steps.",
-            "step_colors": "Kolor każdego kroku, oddzielony przecinkami (nazwany lub hex). Przykład: green, , red pozostawia środkowy krok w kolorze akcentu. Musi mieć total_steps wpisów. Tylko szablon steps.",
-            "fired_at_entity": "Odczytuj czas wyzwolenia alertu z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Akceptuje znacznik czasu Unix lub czujnik znacznika czasu ISO. Tylko szablon alertu.",
-            "fired_at_attribute": "Atrybut encji zawierający znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert.",
-            "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline.",
             "tiles": "Kafelki tablicy (1–4), każdy odczytuje osobną encję. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcjonalne). Przykład: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Tylko szablon board.",
-            "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6), oddzielone przecinkami. Format: [Label=]source[|unit]. source = atrybut tej encji (brightness), stan innej encji (binary_sensor.door) lub atrybut innej encji (sensor.temp:temperature). Przykład: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Tylko szablon dziennika.",
-            "log_level_attribute": "Atrybut dostarczający poziom każdego wiersza dziennika (info/warn/error). Pozostaw puste, aby nie dodawać etykiety poziomu. Tylko szablon log.",
-            "dismissal_ttl": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu. Przykład: 60"
+            "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6), oddzielone przecinkami. Format: [Label=]source[|unit]. source = atrybut tej encji (brightness), stan innej encji (binary_sensor.door) lub atrybut innej encji (sensor.temp:temperature). Przykład: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Tylko szablon dziennika."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "Encja postępu",
+                "progress_attribute": "Atrybut postępu",
+                "remaining_time_entity": "Encja pozostałego czasu",
+                "remaining_time_attribute": "Atrybut pozostałego czasu",
+                "live_progress": "Postęp na żywo (ETA)",
+                "value_entity": "Encja wartości",
+                "value_attribute": "Atrybut wartości",
+                "fired_at_entity": "Encja czasu wyzwolenia",
+                "fired_at_attribute": "Atrybut czasu wyzwolenia",
+                "subtitle_entity": "Encja podtytułu",
+                "subtitle_attribute": "Atrybut podtytułu",
+                "series": "Serie",
+                "log_level_attribute": "Atrybut poziomu dziennika"
+              },
+              "data_description": {
+                "progress_entity": "Odczytuj postęp z osobnej encji zamiast ze śledzonej encji. Pozostaw puste, aby użyć śledzonej encji. Gdy ustawione jest pole atrybutu, odczytuje ten atrybut tej encji; w przeciwnym razie jej stan.",
+                "progress_attribute": "Atrybut encji przechowujący wartość postępu 0–100. Przykład: percentage",
+                "remaining_time_entity": "Odczytuj pozostały czas z osobnej encji (np. czujnika czasu pralki). Pozostaw puste, aby użyć śledzonej encji. Automatycznie analizuje czujnik znacznika czasu (czas zakończenia), czujnik czasu trwania z jednostkami, ciąg H:MM:SS lub zwykłe sekundy.",
+                "remaining_time_attribute": "Atrybut encji przechowujący pozostały czas w sekundach. Przykład: remaining",
+                "live_progress": "Płynnie wypełnia pasek postępu i odlicza ETA do czasu zakończenia na urządzeniu, korzystając z powyższego źródła pozostałego czasu. Wymaga encji lub atrybutu pozostałego czasu. W szablonie steps wypełnia bieżący krok, a nie cały przebieg.",
+                "value_entity": "Odczytuj wartość wskaźnika z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Używa stanu encji źródłowej, chyba że ustawiono atrybut.",
+                "value_attribute": "Atrybut encji przechowujący bieżącą wartość gauge jako liczbę. Pozostaw puste, aby użyć stanu encji.",
+                "fired_at_entity": "Odczytuj czas wyzwolenia alertu z osobnej encji. Pozostaw puste, aby użyć śledzonej encji. Akceptuje znacznik czasu Unix lub czujnik znacznika czasu ISO. Tylko szablon alertu.",
+                "fired_at_attribute": "Atrybut encji zawierający znacznik czasu Unix momentu wyzwolenia alert. Tylko szablon alert.",
+                "subtitle_entity": "Pokaż podtytuł z osobnej encji (np. czujnika programu/trybu). Pozostaw puste, aby użyć śledzonej encji. Używa stanu encji źródłowej, chyba że ustawiono atrybut.",
+                "subtitle_attribute": "Atrybut encji wyświetlany jako podtytuł. Pozostaw puste, aby użyć przyjaznej nazwy encji.",
+                "series": "Mapuje atrybuty encji na nazwane serie. Format: atrybut=Etykieta, atrybut2=Etykieta2. Pozostaw puste, aby użyć stanu encji jako pojedynczej serii.",
+                "log_level_attribute": "Atrybut dostarczający poziom każdego wiersza dziennika (info/warn/error). Pozostaw puste, aby nie dodawać etykiety poziomu. Tylko szablon log."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "Etykiety kroków",
+                "step_rows": "Wysokości wierszy kroków",
+                "step_weights": "Wagi Kroków",
+                "step_colors": "Kolory Kroków"
+              },
+              "data_description": {
+                "step_labels": "Etykiety dla każdego kroku. Format: 1=Pierwszy Krok, 2=Drugi Krok. Musi obejmować kroki 1..total_steps. Tylko szablon steps.",
+                "step_rows": "Wysokość wiersza (1–10) dla każdego kroku, oddzielona przecinkami. Musi mieć total_steps wpisów. Tylko szablon steps.",
+                "step_weights": "Względna szerokość każdego kroku, oddzielona przecinkami. Przykład: 1, 2, 1 sprawia, że środkowy krok jest dwa razy szerszy. Wszystkie wartości muszą być dodatnie. Musi mieć total_steps wpisów. Tylko szablon steps.",
+                "step_colors": "Kolor każdego kroku, oddzielony przecinkami (nazwany lub hex). Przykład: green, , red pozostawia środkowy krok w kolorze akcentu. Musi mieć total_steps wpisów. Tylko szablon steps."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "Jednostki dla serii",
+                "primary_series": "Seria główna",
+                "scale": "Skala",
+                "decimals": "Miejsca dziesiętne",
+                "smoothing": "Wygładzanie linii",
+                "thresholds": "Progi",
+                "history_period": "Okres historii wstecznej"
+              },
+              "data_description": {
+                "units": "Etykiety jednostek dla serii. Format: EtykietaSerii=jednostka, Temperatura=°C, Wilgotność=%. Tylko szablon timeline.",
+                "primary_series": "Etykieta serii pokazywanej jako wartość główna i używanej dla kompaktowego zakresu min/maks. Pozostaw puste, aby użyć własnej serii śledzonej encji (lub pierwszej skonfigurowanej serii).",
+                "scale": "Tryb skali osi Y dla wykresu sparkline.",
+                "decimals": "Liczba miejsc dziesiętnych wyświetlanych dla wartości (0–10).",
+                "smoothing": "Włącz interpolację krzywej między punktami danych dla gładszego wykresu sparkline.",
+                "thresholds": "Poziome linie odniesienia na wykresie sparkline. Format: wartość:kolor:etykieta. Przykład: 25:red:Gorąco, 18:blue:Zimno. Maks. 5.",
+                "history_period": "Minuty danych historycznych do zasilenia wykresu sparkline z rejestratora Home Assistant. Ustaw 0, aby zacząć bez historii."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Slug Live Activity",
+                "activity_name": "Nazwa Live Activity",
+                "icon": "Ikona",
+                "icon_attribute": "Atrybut ikony",
+                "priority": "Priorytet (0-10)",
+                "sound": "Dźwięk",
+                "update_interval": "Min. interwał aktualizacji (sekundy)",
+                "state_labels": "Etykiety stanów"
+              },
+              "data_description": {
+                "slug": "Unikalny identyfikator dla tego Live Activity. Pozostaw puste, aby wygenerować automatycznie z ID encji. Przykład: ha-living-room-lamp",
+                "activity_name": "Nazwa wyświetlana w Live Activity na iPhonie. Domyślnie przyjazna nazwa encji.",
+                "icon": "Zastąp ikonę. Pozostaw puste, aby użyć natywnej ikony encji (np. mdi:thermometer). Obsługiwane są także SF Symbols (np. lamp.desk.fill).",
+                "icon_attribute": "Atrybut encji dla dynamicznej ikony. Gdy ustawiony, zastępuje ikonę statyczną i ikonę encji.",
+                "priority": "Live Activity o wyższym priorytecie są utrzymywane dłużej, gdy osiągnięto limit urządzenia (0 = najniższy, 10 = najwyższy).",
+                "sound": "Dźwięk odtwarzany przy każdej aktualizacji dla tej encji. Pozostaw puste, aby nie używać żadnego nadpisania.",
+                "update_interval": "Minimalna liczba sekund między aktualizacjami. Szybkie zmiany stanu są ograniczane.",
+                "state_labels": "Własny tekst wyświetlany dla stanów. Format: stan=Etykieta, stan2=Etykieta 2. Przykład: heating=Nagrzewanie, idle=Czuwanie"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Kolor akcentu",
+                "accent_color_attribute": "Atrybut koloru akcentu",
+                "background_color": "Kolor tła",
+                "background_color_attribute": "Atrybut koloru tła",
+                "text_color": "Kolor tekstu",
+                "text_color_attribute": "Atrybut koloru tekstu"
+              },
+              "data_description": {
+                "accent_color": "Kolor akcentu dla Live Activity. Pozostaw puste dla domyślnego niebieskiego.",
+                "accent_color_attribute": "Atrybut encji dla dynamicznego koloru akcentu. Zastępuje kolor statyczny. Obsługuje RGB, HS, XY, Kelvin, kolory nazwane oraz hex.",
+                "background_color": "Kolor tła Live Activity. Pozostaw puste dla wartości domyślnej.",
+                "background_color_attribute": "Atrybut encji dla dynamicznego koloru tła. Zastępuje kolor statyczny. Obsługuje RGB, HS, XY, Kelvin, kolory nazwane oraz hex.",
+                "text_color": "Kolor tekstu Live Activity. Pozostaw puste dla wartości domyślnej.",
+                "text_color_attribute": "Atrybut encji dla dynamicznego koloru tekstu. Zastępuje kolor statyczny."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "URL akcji dotknięcia",
+                "tap_action_foreground": "Otwórz URL akcji dotknięcia",
+                "url": "URL",
+                "url_foreground": "Otwórz URL przycisku głównego",
+                "url_title": "Tytuł przycisku głównego",
+                "secondary_url": "Dodatkowy URL",
+                "secondary_url_foreground": "Otwórz URL przycisku dodatkowego",
+                "secondary_url_title": "Tytuł przycisku dodatkowego"
+              },
+              "data_description": {
+                "tap_action_url": "Opcjonalny adres URL otwierany po dotknięciu tła Live Activity. Obsługuje http(s) (otwiera Safari) lub niestandardowe schematy, np. homeassistant://navigate/lovelace/0 (otwiera daną aplikację).",
+                "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle, bez opuszczania ekranu blokady.",
+                "url": "Link otwierany po dotknięciu Live Activity. Musi zaczynać się od http:// lub https://. Tylko szablony steps i alert.",
+                "url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
+                "url_title": "Etykieta przycisku głównego (maks. 64 znaki).",
+                "secondary_url": "Dodatkowy link dla Live Activity. Tylko szablony steps i alert.",
+                "secondary_url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
+                "secondary_url_title": "Etykieta przycisku dodatkowego (maks. 64 znaki)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "Automatyczne usunięcie po zakończeniu (sekundy)",
+                "stale_ttl": "Automatyczne zakończenie po nieaktywności (sekundy)",
+                "dismissal_ttl": "Automatyczne usunięcie z ekranu blokady (sekundy)"
+              },
+              "data_description": {
+                "ended_ttl": "Liczba sekund po zakończeniu Live Activity, zanim zostanie automatycznie usunięty z serwera. Pozostaw puste, aby zachować bezterminowo. Przykład: 300",
+                "stale_ttl": "Liczba sekund nieaktywności, zanim serwer automatycznie zakończy Live Activity. Pozostaw puste, aby wyłączyć. Przykład: 1800",
+                "dismissal_ttl": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu. Przykład: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "Wartość minimalna",
             "max_value": "Wartość maksymalna",
             "severity": "Poziom istotności",
-            "stat_rows": "Wiersze statystyk",
-            "label": "Etykieta",
-            "label_attribute": "Atrybut etykiety",
-            "subtitle_attribute": "Atrybut podtytułu",
-            "icon": "Ikona",
-            "icon_attribute": "Atrybut ikony",
-            "accent_color": "Kolor akcentu",
-            "accent_color_attribute": "Atrybut koloru akcentu",
-            "background_color": "Kolor tła",
-            "text_color": "Kolor tekstu",
-            "widget_trigger_mode": "Tryb wyzwalania",
-            "widget_poll_interval": "Interwał odpytywania (sekundy)",
-            "tap_action_url": "URL akcji dotknięcia",
-            "tap_action_foreground": "Otwórz URL akcji dotknięcia"
+            "stat_rows": "Wiersze statystyk"
           },
           "data_description": {
             "widget_name": "Nazwa wyświetlana w selektorze widżetów iOS. Domyślnie przyjazna nazwa encji.",
@@ -1647,20 +1690,63 @@
             "min_value": "Wartość minimalna zakresu wskaźnika.",
             "max_value": "Wartość maksymalna zakresu wskaźnika.",
             "severity": "Istotność statusu (info, warning, critical, success).",
-            "stat_rows": "Maks. 6 wierszy. Format: `Label=entity_id[:attribute[:unit]]`, oddzielone przecinkami. Przykład: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
-            "label": "Statyczna etykieta pokazywana na widżecie. Pozostaw puste, aby wyprowadzić z encji.",
-            "label_attribute": "Atrybut encji używany jako etykieta. Nadpisuje etykietę statyczną.",
-            "subtitle_attribute": "Atrybut encji pokazywany jako podtytuł widżetu.",
-            "icon": "Statyczna ikona. Obsługiwane nazwy SF Symbols i MDI.",
-            "icon_attribute": "Atrybut encji dla dynamicznej ikony. Nadpisuje statyczną ikonę.",
-            "accent_color": "Kolor akcentu widżetu. Pozostaw puste dla wartości domyślnej.",
-            "accent_color_attribute": "Atrybut encji dla dynamicznego koloru akcentu.",
-            "background_color": "Opcjonalny kolor tła.",
-            "text_color": "Opcjonalny kolor tekstu.",
-            "widget_trigger_mode": "Sposób wyzwalania aktualizacji. `event` reaguje na zmiany stanu; `poll` ponownie oblicza w stałym interwale.",
-            "widget_poll_interval": "Interwał między odpytaniami (10–3600 sekund). Używany tylko, gdy tryb wyzwalania to `poll`.",
-            "tap_action_url": "Opcjonalny adres URL otwierany po dotknięciu widżetu. Obsługuje http(s) (otwiera Safari) lub niestandardowe schematy, np. homeassistant://navigate/lovelace/0.",
-            "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle."
+            "stat_rows": "Maks. 6 wierszy. Format: `Label=entity_id[:attribute[:unit]]`, oddzielone przecinkami. Przykład: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "Etykieta",
+                "label_attribute": "Atrybut etykiety",
+                "subtitle_attribute": "Atrybut podtytułu",
+                "icon": "Ikona",
+                "icon_attribute": "Atrybut ikony"
+              },
+              "data_description": {
+                "label": "Statyczna etykieta pokazywana na widżecie. Pozostaw puste, aby wyprowadzić z encji.",
+                "label_attribute": "Atrybut encji używany jako etykieta. Nadpisuje etykietę statyczną.",
+                "subtitle_attribute": "Atrybut encji pokazywany jako podtytuł widżetu.",
+                "icon": "Statyczna ikona. Obsługiwane nazwy SF Symbols i MDI.",
+                "icon_attribute": "Atrybut encji dla dynamicznej ikony. Nadpisuje statyczną ikonę."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Kolor akcentu",
+                "accent_color_attribute": "Atrybut koloru akcentu",
+                "background_color": "Kolor tła",
+                "text_color": "Kolor tekstu"
+              },
+              "data_description": {
+                "accent_color": "Kolor akcentu widżetu. Pozostaw puste dla wartości domyślnej.",
+                "accent_color_attribute": "Atrybut encji dla dynamicznego koloru akcentu.",
+                "background_color": "Opcjonalny kolor tła.",
+                "text_color": "Opcjonalny kolor tekstu."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "URL akcji dotknięcia",
+                "tap_action_foreground": "Otwórz URL akcji dotknięcia"
+              },
+              "data_description": {
+                "tap_action_url": "Opcjonalny adres URL otwierany po dotknięciu widżetu. Obsługuje http(s) (otwiera Safari) lub niestandardowe schematy, np. homeassistant://navigate/lovelace/0.",
+                "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "Tryb wyzwalania",
+                "widget_poll_interval": "Interwał odpytywania (sekundy)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "Sposób wyzwalania aktualizacji. `event` reaguje na zmiany stanu; `poll` ponownie oblicza w stałym interwale.",
+                "widget_poll_interval": "Interwał między odpytaniami (10–3600 sekund). Używany tylko, gdy tryb wyzwalania to `poll`."
+              }
+            }
           }
         }
       },

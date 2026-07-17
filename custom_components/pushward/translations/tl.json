@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "Mga Start State",
             "end_states": "Mga End State",
-            "progress_entity": "Entity ng Progreso",
-            "progress_attribute": "Attribute ng Progreso",
             "remaining_time_entity": "Entity ng Natitirang Oras",
             "remaining_time_attribute": "Attribute ng Natitirang Oras",
-            "live_progress": "Live Progress ETA",
             "total_steps": "Kabuuang Steps",
             "current_step_entity": "Entity ng Kasalukuyang Hakbang",
             "current_step_attribute": "Attribute ng Kasalukuyang Hakbang",
             "severity": "Kalubhaan",
             "severity_label": "Label ng Kalubhaan",
-            "value_entity": "Entity ng Halaga",
-            "value_attribute": "Attribute ng Halaga",
             "min_value": "Pinakamababang Halaga",
             "max_value": "Pinakamataas na Halaga",
             "unit": "Yunit",
-            "series": "Serye",
             "series_entities": "Mga Entity ng Serye",
-            "primary_series": "Pangunahing Serye",
-            "scale": "Sukat",
-            "decimals": "Mga Decimal na Lugar",
-            "smoothing": "Maayos na Linya",
-            "thresholds": "Mga Threshold",
-            "history_period": "Panahon ng Kasaysayan",
-            "slug": "Activity Slug",
-            "activity_name": "Pangalan ng Activity",
-            "icon": "Icon",
-            "icon_attribute": "Attribute ng Icon",
-            "priority": "Priyoridad (0-10)",
-            "update_interval": "Pinakamababang Agwat ng Update (segundo)",
-            "subtitle_entity": "Entity ng Subtitle",
-            "subtitle_attribute": "Attribute ng Subtitle",
-            "state_labels": "Mga Label ng Estado",
             "completion_message": "Mensahe ng Pagkumpleto",
-            "accent_color": "Accent na Kulay",
-            "accent_color_attribute": "Attribute ng Accent na Kulay",
-            "tap_action_url": "Tap Action URL",
-            "tap_action_foreground": "Buksan ang Tap Action URL",
-            "url": "URL",
-            "url_foreground": "Buksan ang Primary Button URL",
-            "url_title": "Title ng Pangunahing Button",
-            "secondary_url": "Secondary URL",
-            "secondary_url_foreground": "Buksan ang Secondary Button URL",
-            "secondary_url_title": "Title ng Pangalawang Button",
-            "ended_ttl": "Awtomatikong Burahin Pagkatapos ng Pagtatapos (segundo)",
-            "stale_ttl": "Awtomatikong Tapusin Pagkatapos ng Kawalan ng Aktibidad (segundo)",
-            "sound": "Tunog",
-            "background_color": "Kulay ng Background",
-            "background_color_attribute": "Attribute ng Kulay ng Background",
-            "text_color": "Kulay ng Teksto",
-            "text_color_attribute": "Attribute ng Kulay ng Teksto",
             "warning_threshold": "Babala na Threshold",
             "alarm": "Alarma",
             "snooze_seconds": "Snooze na Segundo (iOS 26+)",
-            "step_labels": "Mga Label ng Hakbang",
-            "step_rows": "Mga Hilera ng Hakbang",
-            "step_weights": "Timbang ng Hakbang",
-            "step_colors": "Kulay ng Hakbang",
-            "fired_at_entity": "Entity ng Fired At",
-            "fired_at_attribute": "Attribute ng Oras ng Pag-trigger",
-            "units": "Mga Yunit",
             "tiles": "Mga Tile ng Board",
-            "log_columns": "Mga Column ng Log",
-            "log_level_attribute": "Attribute ng Antas ng Log",
-            "dismissal_ttl": "Awtomatikong Alisin sa Lock Screen (segundo)"
+            "log_columns": "Mga Column ng Log"
           },
           "data_description": {
             "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
             "end_states": "Mga estado ng entity na nagtatapos ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
-            "progress_entity": "Basahin ang progreso mula sa hiwalay na entity sa halip na sa na-track na entity. Iwanang blanko upang gamitin ang na-track na entity. Kapag nakatakda ang attribute field, babasahin ang attribute na iyon ng entity na ito; kung hindi, ang state nito.",
-            "progress_attribute": "Attribute ng entity na nagtataglay ng halaga ng progreso mula 0 hanggang 100. Halimbawa: percentage",
             "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
             "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
-            "live_progress": "Punuin nang maayos ang progress bar at mag-countdown ng ETA hanggang sa oras ng pagkumpleto sa device, gamit ang remaining-time source sa itaas. Nangangailangan ng remaining-time entity o attribute. Sa steps template, pinupuno nito ang kasalukuyang hakbang sa halip na ang buong run.",
             "total_steps": "Kabuuang bilang ng mga steps.",
             "current_step_entity": "Basahin ang kasalukuyang hakbang mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity.",
             "current_step_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang hakbang bilang integer.",
             "severity": "Antas ng kalubhaan ng alert.",
             "severity_label": "I-override ang Info/Warning/Critical badge text na ipinapakita sa alert. Iwanan itong blangko para gamitin ang pangalan ng kalubhaan. Hanggang 32 na character. Para sa alert template lamang.",
-            "value_entity": "Basahin ang gauge value mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
-            "value_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang halaga ng gauge bilang numero. Iwanan itong blangko para gamitin ang estado ng entity.",
             "min_value": "Pinakamababang halaga para sa saklaw ng gauge.",
             "max_value": "Pinakamataas na halaga para sa saklaw ng gauge.",
             "unit": "Display na yunit na ipinapakita katabi ng halaga (hal. °C, %, kW). Hanggang 32 karakter.",
-            "series": "I-map ang mga attribute ng entity sa mga pinangalanang serye. Format: attribute=Label, attribute2=Label2. Iwanan itong blangko para gamitin ang estado ng entity bilang isang serye.",
             "series_entities": "I-bind ang hiwalay na entity bilang mga pinangalanang linya sa isang chart (hal. isang PM2.5 sensor kada silid). Format: [Label=]entity_id[:attribute], pinaghihiwalay ng kuwit. Ang label ay nagde-default sa friendly name ng entity; magbasa ng attribute gamit ang entity_id:attribute. Pinagsasama sa Serye; hanggang 10 linya sa kabuuan.",
-            "primary_series": "Label ng serye na ipinapakita bilang headline value at ginagamit para sa compact na high/low range. Iwanan itong blangko para gamitin ang sariling serye ng na-track na entity (o ang unang naka-configure na serye).",
-            "scale": "Mode ng sukat ng Y-axis para sa sparkline chart.",
-            "decimals": "Bilang ng mga decimal na lugar na ipinapakita para sa mga halaga (0–10).",
-            "smoothing": "Paganahin ang curve interpolation sa pagitan ng mga data point para sa mas maayos na sparkline.",
-            "thresholds": "Mga pahalang na reference line sa sparkline. Format: value:color:label. Halimbawa: 25:red:Mainit, 18:blue:Malamig. Hanggang 5.",
-            "history_period": "Mga minuto ng nakaraang data para i-seed ang sparkline mula sa recorder ng Home Assistant. Itakda sa 0 para magsimula nang walang kasaysayan.",
-            "slug": "Natatanging identifier para sa activity na ito. Iwanan itong blangko para awtomatikong buuin mula sa entity ID. Halimbawa: ha-living-room-lamp",
-            "activity_name": "Display na pangalan na ipinapakita sa iPhone Live Activity. Nagde-default sa friendly name ng entity.",
-            "icon": "Override na icon. Iwanan itong blangko para gamitin ang native na icon ng entity (hal. mdi:thermometer). Sinusuportahan din ang SF Symbols (hal. lamp.desk.fill).",
-            "icon_attribute": "Attribute ng entity para sa dynamic na icon. Nino-override ang static icon at entity icon kapag nakatakda.",
-            "priority": "Mas mataas na priyoridad na mga activity ang pinananatili nang mas matagal kapag naabot ang limitasyon ng device (0 = pinakamababa, 10 = pinakamataas).",
-            "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
-            "subtitle_entity": "Ipakita ang subtitle mula sa hiwalay na entity (hal. program/mode sensor). Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
-            "subtitle_attribute": "Attribute ng entity na ipinapakita bilang subtitle. Iwanan itong blangko para gamitin ang friendly name ng entity.",
-            "state_labels": "Custom na display na teksto para sa mga estado. Format: state=Label, state2=Label 2. Halimbawa: heating=Nagpapainit, idle=Naghihintay",
             "completion_message": "Tekstong ipinapakita kapag natapos ang activity. Iwanan itong blangko para sa 'Kumpleto'. Halimbawa: Tapos na ang Paglalaba",
-            "accent_color": "Accent color para sa Live Activity. Iwanan itong blangko para sa default na asul.",
-            "accent_color_attribute": "Attribute ng entity para sa dynamic na accent color. Nino-override ang static na kulay. Sinusuportahan ang RGB, HS, XY, Kelvin, mga pinangalanang kulay, at hex.",
-            "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang background ng Live Activity. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0 (bumubukas ng app na iyon).",
-            "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background nang hindi umaalis sa Lock Screen.",
-            "url": "Link na bubukas kapag na-tap ang Live Activity. Dapat magsimula sa http:// o https://. Para sa mga steps at alert na template lamang.",
-            "url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
-            "url_title": "Label ng pangunahing button (max 64 na character).",
-            "secondary_url": "Secondary link para sa Live Activity. Para sa mga steps at alert na template lamang.",
-            "secondary_url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
-            "secondary_url_title": "Label ng pangalawang button (max 64 na character).",
-            "ended_ttl": "Mga segundo pagkatapos matapos ang activity bago ito awtomatikong mabura mula sa server. Iwanan itong blangko para panatilihing walang hanggan. Halimbawa: 300",
-            "stale_ttl": "Mga segundo ng kawalan ng aktibidad bago awtomatikong tapusin ng server ang activity. Iwanan itong blangko para i-disable. Halimbawa: 1800",
-            "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
-            "background_color": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
-            "background_color_attribute": "Attribute ng entity para sa dynamic na kulay ng background. Nino-override ang static na kulay ng background.",
-            "text_color": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
-            "text_color_attribute": "Attribute ng entity para sa dynamic na kulay ng teksto. Nino-override ang static na kulay ng teksto.",
             "warning_threshold": "Kapag ang halaga ay umabot o lumampas dito, nati-trigger ang kulay ng babala. Mga template na gauge at timeline.",
             "alarm": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Para sa iOS 26+ lamang.",
             "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
-            "step_labels": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang.",
-            "step_rows": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template.",
-            "step_weights": "Relatibong lapad ng bawat hakbang, pinaghihiwalay ng kuwit. Halimbawa: 1, 2, 1 ay ginagawang doble ang lapad ng gitnang hakbang. Dapat positibo ang lahat ng halaga. Dapat may total_steps na entry. Steps template lamang.",
-            "step_colors": "Kulay ng bawat hakbang, pinaghihiwalay ng kuwit (pangalan o hex). Halimbawa: green, , red ay nananatili sa accent color ang gitnang hakbang. Dapat may total_steps na entry. Steps template lamang.",
-            "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang.",
-            "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
-            "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%",
             "tiles": "Mga tile ng board (1–4), bawat isa ay nagbabasa ng hiwalay na entity. Format: Label=entity_id:attribute:unit:icon (opsyonal ang attribute, unit, icon). Halimbawa: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Para sa board template lamang.",
-            "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6), pinaghihiwalay ng kuwit. Format: [Label=]source[|unit]. source = isang attribute ng entity na ito (brightness), ang estado ng ibang entity (binary_sensor.door), o isang attribute ng ibang entity (sensor.temp:temperature). Halimbawa: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Para lang sa log template.",
-            "log_level_attribute": "Attribute na nagbibigay ng level (info/warn/error) ng bawat log line. Iwanang blangko para walang level tag. Para sa log template lamang.",
-            "dismissal_ttl": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos. Halimbawa: 60"
+            "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6), pinaghihiwalay ng kuwit. Format: [Label=]source[|unit]. source = isang attribute ng entity na ito (brightness), ang estado ng ibang entity (binary_sensor.door), o isang attribute ng ibang entity (sensor.temp:temperature). Halimbawa: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Para lang sa log template."
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "Entity ng Progreso",
+                "progress_attribute": "Attribute ng Progreso",
+                "remaining_time_entity": "Entity ng Natitirang Oras",
+                "remaining_time_attribute": "Attribute ng Natitirang Oras",
+                "live_progress": "Live Progress ETA",
+                "value_entity": "Entity ng Halaga",
+                "value_attribute": "Attribute ng Halaga",
+                "fired_at_entity": "Entity ng Fired At",
+                "fired_at_attribute": "Attribute ng Oras ng Pag-trigger",
+                "subtitle_entity": "Entity ng Subtitle",
+                "subtitle_attribute": "Attribute ng Subtitle",
+                "series": "Serye",
+                "log_level_attribute": "Attribute ng Antas ng Log"
+              },
+              "data_description": {
+                "progress_entity": "Basahin ang progreso mula sa hiwalay na entity sa halip na sa na-track na entity. Iwanang blanko upang gamitin ang na-track na entity. Kapag nakatakda ang attribute field, babasahin ang attribute na iyon ng entity na ito; kung hindi, ang state nito.",
+                "progress_attribute": "Attribute ng entity na nagtataglay ng halaga ng progreso mula 0 hanggang 100. Halimbawa: percentage",
+                "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
+                "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
+                "live_progress": "Punuin nang maayos ang progress bar at mag-countdown ng ETA hanggang sa oras ng pagkumpleto sa device, gamit ang remaining-time source sa itaas. Nangangailangan ng remaining-time entity o attribute. Sa steps template, pinupuno nito ang kasalukuyang hakbang sa halip na ang buong run.",
+                "value_entity": "Basahin ang gauge value mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
+                "value_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang halaga ng gauge bilang numero. Iwanan itong blangko para gamitin ang estado ng entity.",
+                "fired_at_entity": "Basahin ang fired-at time ng alerto mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity. Tumatanggap ng unix timestamp o ISO timestamp sensor. Alert template lamang.",
+                "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
+                "subtitle_entity": "Ipakita ang subtitle mula sa hiwalay na entity (hal. program/mode sensor). Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
+                "subtitle_attribute": "Attribute ng entity na ipinapakita bilang subtitle. Iwanan itong blangko para gamitin ang friendly name ng entity.",
+                "series": "I-map ang mga attribute ng entity sa mga pinangalanang serye. Format: attribute=Label, attribute2=Label2. Iwanan itong blangko para gamitin ang estado ng entity bilang isang serye.",
+                "log_level_attribute": "Attribute na nagbibigay ng level (info/warn/error) ng bawat log line. Iwanang blangko para walang level tag. Para sa log template lamang."
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "Mga Label ng Hakbang",
+                "step_rows": "Mga Hilera ng Hakbang",
+                "step_weights": "Timbang ng Hakbang",
+                "step_colors": "Kulay ng Hakbang"
+              },
+              "data_description": {
+                "step_labels": "Mga custom na label para sa mga hakbang ng steps template. Format: 1=Label, 2=Label. Kung blangko, ginagamit ang mga numero ng hakbang.",
+                "step_rows": "Bilang ng mga hakbang na ipinapakita sa isang hilera sa steps template.",
+                "step_weights": "Relatibong lapad ng bawat hakbang, pinaghihiwalay ng kuwit. Halimbawa: 1, 2, 1 ay ginagawang doble ang lapad ng gitnang hakbang. Dapat positibo ang lahat ng halaga. Dapat may total_steps na entry. Steps template lamang.",
+                "step_colors": "Kulay ng bawat hakbang, pinaghihiwalay ng kuwit (pangalan o hex). Halimbawa: green, , red ay nananatili sa accent color ang gitnang hakbang. Dapat may total_steps na entry. Steps template lamang."
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "Mga Yunit",
+                "primary_series": "Pangunahing Serye",
+                "scale": "Sukat",
+                "decimals": "Mga Decimal na Lugar",
+                "smoothing": "Maayos na Linya",
+                "thresholds": "Mga Threshold",
+                "history_period": "Panahon ng Kasaysayan"
+              },
+              "data_description": {
+                "units": "Mga label ng yunit para sa mga serye ng timeline. Format: attribute=Yunit. Halimbawa: temp=°C, humidity=%",
+                "primary_series": "Label ng serye na ipinapakita bilang headline value at ginagamit para sa compact na high/low range. Iwanan itong blangko para gamitin ang sariling serye ng na-track na entity (o ang unang naka-configure na serye).",
+                "scale": "Mode ng sukat ng Y-axis para sa sparkline chart.",
+                "decimals": "Bilang ng mga decimal na lugar na ipinapakita para sa mga halaga (0–10).",
+                "smoothing": "Paganahin ang curve interpolation sa pagitan ng mga data point para sa mas maayos na sparkline.",
+                "thresholds": "Mga pahalang na reference line sa sparkline. Format: value:color:label. Halimbawa: 25:red:Mainit, 18:blue:Malamig. Hanggang 5.",
+                "history_period": "Mga minuto ng nakaraang data para i-seed ang sparkline mula sa recorder ng Home Assistant. Itakda sa 0 para magsimula nang walang kasaysayan."
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "Activity Slug",
+                "activity_name": "Pangalan ng Activity",
+                "icon": "Icon",
+                "icon_attribute": "Attribute ng Icon",
+                "priority": "Priyoridad (0-10)",
+                "sound": "Tunog",
+                "update_interval": "Pinakamababang Agwat ng Update (segundo)",
+                "state_labels": "Mga Label ng Estado"
+              },
+              "data_description": {
+                "slug": "Natatanging identifier para sa activity na ito. Iwanan itong blangko para awtomatikong buuin mula sa entity ID. Halimbawa: ha-living-room-lamp",
+                "activity_name": "Display na pangalan na ipinapakita sa iPhone Live Activity. Nagde-default sa friendly name ng entity.",
+                "icon": "Override na icon. Iwanan itong blangko para gamitin ang native na icon ng entity (hal. mdi:thermometer). Sinusuportahan din ang SF Symbols (hal. lamp.desk.fill).",
+                "icon_attribute": "Attribute ng entity para sa dynamic na icon. Nino-override ang static icon at entity icon kapag nakatakda.",
+                "priority": "Mas mataas na priyoridad na mga activity ang pinananatili nang mas matagal kapag naabot ang limitasyon ng device (0 = pinakamababa, 10 = pinakamataas).",
+                "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
+                "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
+                "state_labels": "Custom na display na teksto para sa mga estado. Format: state=Label, state2=Label 2. Halimbawa: heating=Nagpapainit, idle=Naghihintay"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Accent na Kulay",
+                "accent_color_attribute": "Attribute ng Accent na Kulay",
+                "background_color": "Kulay ng Background",
+                "background_color_attribute": "Attribute ng Kulay ng Background",
+                "text_color": "Kulay ng Teksto",
+                "text_color_attribute": "Attribute ng Kulay ng Teksto"
+              },
+              "data_description": {
+                "accent_color": "Accent color para sa Live Activity. Iwanan itong blangko para sa default na asul.",
+                "accent_color_attribute": "Attribute ng entity para sa dynamic na accent color. Nino-override ang static na kulay. Sinusuportahan ang RGB, HS, XY, Kelvin, mga pinangalanang kulay, at hex.",
+                "background_color": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
+                "background_color_attribute": "Attribute ng entity para sa dynamic na kulay ng background. Nino-override ang static na kulay ng background.",
+                "text_color": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
+                "text_color_attribute": "Attribute ng entity para sa dynamic na kulay ng teksto. Nino-override ang static na kulay ng teksto."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Tap Action URL",
+                "tap_action_foreground": "Buksan ang Tap Action URL",
+                "url": "URL",
+                "url_foreground": "Buksan ang Primary Button URL",
+                "url_title": "Title ng Pangunahing Button",
+                "secondary_url": "Secondary URL",
+                "secondary_url_foreground": "Buksan ang Secondary Button URL",
+                "secondary_url_title": "Title ng Pangalawang Button"
+              },
+              "data_description": {
+                "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang background ng Live Activity. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0 (bumubukas ng app na iyon).",
+                "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background nang hindi umaalis sa Lock Screen.",
+                "url": "Link na bubukas kapag na-tap ang Live Activity. Dapat magsimula sa http:// o https://. Para sa mga steps at alert na template lamang.",
+                "url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+                "url_title": "Label ng pangunahing button (max 64 na character).",
+                "secondary_url": "Secondary link para sa Live Activity. Para sa mga steps at alert na template lamang.",
+                "secondary_url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+                "secondary_url_title": "Label ng pangalawang button (max 64 na character)."
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "Awtomatikong Burahin Pagkatapos ng Pagtatapos (segundo)",
+                "stale_ttl": "Awtomatikong Tapusin Pagkatapos ng Kawalan ng Aktibidad (segundo)",
+                "dismissal_ttl": "Awtomatikong Alisin sa Lock Screen (segundo)"
+              },
+              "data_description": {
+                "ended_ttl": "Mga segundo pagkatapos matapos ang activity bago ito awtomatikong mabura mula sa server. Iwanan itong blangko para panatilihing walang hanggan. Halimbawa: 300",
+                "stale_ttl": "Mga segundo ng kawalan ng aktibidad bago awtomatikong tapusin ng server ang activity. Iwanan itong blangko para i-disable. Halimbawa: 1800",
+                "dismissal_ttl": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos. Halimbawa: 60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "Pinakamababang Halaga",
             "max_value": "Pinakamataas na Halaga",
             "severity": "Severity",
-            "stat_rows": "Stat Rows",
-            "label": "Label",
-            "label_attribute": "Attribute ng Label",
-            "subtitle_attribute": "Attribute ng Subtitle",
-            "icon": "Icon",
-            "icon_attribute": "Attribute ng Icon",
-            "accent_color": "Accent na Kulay",
-            "accent_color_attribute": "Attribute ng Accent na Kulay",
-            "background_color": "Kulay ng Background",
-            "text_color": "Kulay ng Teksto",
-            "widget_trigger_mode": "Trigger Mode",
-            "widget_poll_interval": "Poll Interval (segundo)",
-            "tap_action_url": "Tap Action URL",
-            "tap_action_foreground": "Buksan ang Tap Action URL"
+            "stat_rows": "Stat Rows"
           },
           "data_description": {
             "widget_name": "Display name na ipinapakita sa iOS widget picker. Default sa friendly name ng entity.",
@@ -1647,20 +1690,63 @@
             "min_value": "Pinakamababang halaga para sa gauge range.",
             "max_value": "Pinakamataas na halaga para sa gauge range.",
             "severity": "Severity ng status (info, warning, critical, success).",
-            "stat_rows": "Hanggang 6 na row. Format: `Label=entity_id[:attribute[:unit]]`, pinaghihiwalay ng kuwit. Halimbawa: `Users=sensor.user_count, Active=sensor.active_devices:count`.",
-            "label": "Static na label na ipinapakita sa widget. Iwanang blanko upang kunin mula sa entity.",
-            "label_attribute": "Entity attribute na ginagamit bilang label. Ina-override ang static na label.",
-            "subtitle_attribute": "Entity attribute na ipinapakita bilang subtitle ng widget.",
-            "icon": "Static na icon. Sinusuportahan ang SF Symbols at MDI names.",
-            "icon_attribute": "Entity attribute para sa dynamic na icon. Ina-override ang static na icon.",
-            "accent_color": "Accent na kulay para sa widget. Iwanang blanko para sa default.",
-            "accent_color_attribute": "Entity attribute para sa dynamic na accent na kulay.",
-            "background_color": "Opsyonal na kulay ng background.",
-            "text_color": "Opsyonal na kulay ng teksto.",
-            "widget_trigger_mode": "Kung paano nati-trigger ang mga update. Ang `event` ay tumutugon sa mga pagbabago ng state; ang `poll` ay muling sinusuri sa nakatakdang interval.",
-            "widget_poll_interval": "Interval sa pagitan ng mga poll (10–3600 na segundo). Ginagamit lamang kapag ang trigger mode ay `poll`.",
-            "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang widget. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0.",
-            "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background."
+            "stat_rows": "Hanggang 6 na row. Format: `Label=entity_id[:attribute[:unit]]`, pinaghihiwalay ng kuwit. Halimbawa: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "Label",
+                "label_attribute": "Attribute ng Label",
+                "subtitle_attribute": "Attribute ng Subtitle",
+                "icon": "Icon",
+                "icon_attribute": "Attribute ng Icon"
+              },
+              "data_description": {
+                "label": "Static na label na ipinapakita sa widget. Iwanang blanko upang kunin mula sa entity.",
+                "label_attribute": "Entity attribute na ginagamit bilang label. Ina-override ang static na label.",
+                "subtitle_attribute": "Entity attribute na ipinapakita bilang subtitle ng widget.",
+                "icon": "Static na icon. Sinusuportahan ang SF Symbols at MDI names.",
+                "icon_attribute": "Entity attribute para sa dynamic na icon. Ina-override ang static na icon."
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "Accent na Kulay",
+                "accent_color_attribute": "Attribute ng Accent na Kulay",
+                "background_color": "Kulay ng Background",
+                "text_color": "Kulay ng Teksto"
+              },
+              "data_description": {
+                "accent_color": "Accent na kulay para sa widget. Iwanang blanko para sa default.",
+                "accent_color_attribute": "Entity attribute para sa dynamic na accent na kulay.",
+                "background_color": "Opsyonal na kulay ng background.",
+                "text_color": "Opsyonal na kulay ng teksto."
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "Tap Action URL",
+                "tap_action_foreground": "Buksan ang Tap Action URL"
+              },
+              "data_description": {
+                "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang widget. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0.",
+                "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background."
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "Trigger Mode",
+                "widget_poll_interval": "Poll Interval (segundo)"
+              },
+              "data_description": {
+                "widget_trigger_mode": "Kung paano nati-trigger ang mga update. Ang `event` ay tumutugon sa mga pagbabago ng state; ang `poll` ay muling sinusuri sa nakatakdang interval.",
+                "widget_poll_interval": "Interval sa pagitan ng mga poll (10–3600 na segundo). Ginagamit lamang kapag ang trigger mode ay `poll`."
+              }
+            }
           }
         }
       },

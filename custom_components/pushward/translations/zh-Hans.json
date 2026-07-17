@@ -1414,138 +1414,194 @@
           "data": {
             "start_states": "开始状态",
             "end_states": "结束状态",
-            "progress_entity": "进度实体",
-            "progress_attribute": "进度属性",
             "remaining_time_entity": "剩余时间实体",
             "remaining_time_attribute": "剩余时间属性",
-            "live_progress": "实时进度 ETA",
             "total_steps": "总 steps 数",
             "current_step_entity": "当前步骤实体",
             "current_step_attribute": "当前步骤属性",
             "severity": "严重程度",
             "severity_label": "严重程度标签",
-            "value_entity": "数值实体",
-            "value_attribute": "值属性",
             "min_value": "最小值",
             "max_value": "最大值",
             "unit": "单位",
-            "series": "系列",
             "series_entities": "系列实体",
-            "primary_series": "主系列",
-            "scale": "刻度",
-            "decimals": "小数位数",
-            "smoothing": "平滑曲线",
-            "thresholds": "阈值",
-            "history_period": "历史回溯时长",
-            "slug": "活动标识符",
-            "activity_name": "活动名称",
-            "icon": "图标",
-            "icon_attribute": "图标属性",
-            "priority": "优先级（0-10）",
-            "update_interval": "最小更新间隔（秒）",
-            "subtitle_entity": "副标题实体",
-            "subtitle_attribute": "副标题属性",
-            "state_labels": "状态标签",
             "completion_message": "完成消息",
-            "accent_color": "强调色",
-            "accent_color_attribute": "强调色属性",
-            "tap_action_url": "点击动作 URL",
-            "tap_action_foreground": "打开点击动作 URL",
-            "url": "URL",
-            "url_foreground": "打开主按钮 URL",
-            "url_title": "主按钮标题",
-            "secondary_url": "次要 URL",
-            "secondary_url_foreground": "打开次按钮 URL",
-            "secondary_url_title": "次按钮标题",
-            "ended_ttl": "结束后自动删除（秒）",
-            "stale_ttl": "空闲后自动结束（秒）",
-            "sound": "声音",
-            "background_color": "背景颜色",
-            "background_color_attribute": "背景颜色属性",
-            "text_color": "文字颜色",
-            "text_color_attribute": "文字颜色属性",
             "warning_threshold": "警告阈值（秒）",
             "alarm": "闹钟（iOS 26+）",
             "snooze_seconds": "稍后提醒秒数（iOS 26+）",
-            "step_labels": "步骤标签",
-            "step_rows": "步骤行高",
-            "step_weights": "步骤权重",
-            "step_colors": "步骤颜色",
-            "fired_at_entity": "触发时间实体",
-            "fired_at_attribute": "触发时间属性",
-            "units": "每系列单位",
             "tiles": "board 磁贴",
-            "log_columns": "日志列",
-            "log_level_attribute": "日志级别属性",
-            "dismissal_ttl": "从锁定屏幕自动移除（秒）"
+            "log_columns": "日志列"
           },
           "data_description": {
             "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
             "end_states": "结束 Live Activity 的实体状态。从列表中选择或输入自定义值。",
-            "progress_entity": "从单独的实体（而非被追踪实体）读取进度。留空则使用被追踪实体。若设置了属性字段，则读取此实体的该属性；否则读取其状态。",
-            "progress_attribute": "持有 0–100 进度值的实体属性。示例：percentage",
             "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
             "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
-            "live_progress": "使用上面的剩余时间来源，平滑填充进度条，并在设备上倒计时显示到完成时间的 ETA。需要一个剩余时间实体或属性。在 steps 模板中，它填充的是当前步骤而不是整个流程。",
             "total_steps": "steps 总数。",
             "current_step_entity": "从单独的实体读取当前步骤。留空则使用被追踪实体。",
             "current_step_attribute": "以整数形式持有当前步骤的实体属性。",
             "severity": "alert 严重程度级别。",
             "severity_label": "覆盖 alert 上显示的 Info/Warning/Critical 徽章文本。留空则使用严重程度名称。最多 32 个字符。仅适用于 alert 模板。",
-            "value_entity": "从单独的实体读取 gauge 数值。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
-            "value_attribute": "以数字形式持有当前 gauge 值的实体属性。留空则使用实体的状态值。",
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "unit": "值旁边显示的单位（例如 °C、%、kW）。最多 32 个字符。",
-            "series": "将实体属性映射到命名系列。格式：attribute=标签, attribute2=标签2。留空则将实体状态用作单一系列。",
             "series_entities": "将独立的实体绑定为同一图表上的命名线条（例如每个房间一个 PM2.5 传感器）。格式：[Label=]entity_id[:attribute]，以逗号分隔。标签默认使用实体的友好名称；可通过 entity_id:attribute 读取属性。可与系列组合使用；总计最多 10 条线。",
-            "primary_series": "作为标题值显示、并用于精简高/低范围的系列标签。留空则使用被追踪实体自身的系列（或第一个已配置的系列）。",
-            "scale": "迷你图的 Y 轴刻度模式。",
-            "decimals": "值显示的小数位数（0–10）。",
-            "smoothing": "启用数据点之间的曲线插值，使迷你图更平滑。",
-            "thresholds": "迷你图上的水平参考线。格式：值:颜色:标签。示例：25:red:热, 18:blue:冷。最多 5 条。",
-            "history_period": "从 Home Assistant 记录仪中获取的历史数据时长（分钟），用于填充迷你图初始数据。设为 0 则不加载历史。",
-            "slug": "此活动的唯一标识符。留空则自动从实体 ID 生成。示例：ha-living-room-lamp",
-            "activity_name": "在 iPhone Live Activity 上显示的名称。默认使用实体的友好名称。",
-            "icon": "覆盖图标。留空则使用实体的原生图标（例如 mdi:thermometer）。也支持 SF Symbols（例如 lamp.desk.fill）。",
-            "icon_attribute": "动态图标的实体属性。设置后将覆盖静态图标和实体图标。",
-            "priority": "当设备达到上限时，优先级较高的活动会保留更长时间（0 = 最低，10 = 最高）。",
-            "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
-            "subtitle_entity": "从单独的实体（例如程序/模式传感器）显示副标题。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
-            "subtitle_attribute": "用作副标题的实体属性。留空则使用实体的友好名称。",
-            "state_labels": "状态的自定义显示文本。格式：state=标签, state2=标签2。示例：heating=加热中, idle=待机",
             "completion_message": "活动结束时显示的文本。留空则显示\"完成\"。示例：洗涤完毕",
-            "accent_color": "Live Activity 的强调色。留空则使用默认蓝色。",
-            "accent_color_attribute": "动态强调色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
-            "tap_action_url": "点击 Live Activity 背景时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0（打开对应应用）。",
-            "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST，无需离开锁屏。",
-            "url": "点击 Live Activity 时打开的链接。必须以 http:// 或 https:// 开头。仅适用于 steps 和 alert 模板。",
-            "url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
-            "url_title": "主按钮标签（最多 64 个字符）。",
-            "secondary_url": "Live Activity 的次要链接。仅适用于 steps 和 alert 模板。",
-            "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
-            "secondary_url_title": "次按钮标签（最多 64 个字符）。",
-            "ended_ttl": "活动结束后从服务器自动删除前等待的秒数。留空则永久保留。示例：300",
-            "stale_ttl": "服务器自动结束活动前的空闲秒数。留空则禁用。示例：1800",
-            "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
-            "background_color": "Live Activity 的背景颜色。留空则使用默认颜色。",
-            "background_color_attribute": "动态背景颜色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
-            "text_color": "Live Activity 的文字颜色。留空则使用默认颜色。",
-            "text_color_attribute": "动态文字颜色的实体属性。覆盖静态颜色。",
             "warning_threshold": "倒计时结束前服务器发送警告推送的秒数。留空则禁用。仅适用于 countdown 模板。",
             "alarm": "倒计时到期时触发 AlarmKit 闹钟（iOS 26+）。仅适用于 countdown 模板。",
             "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
-            "step_labels": "每个步骤的标签。格式：1=第一步, 2=第二步。必须覆盖步骤 1..total_steps。仅适用于 steps 模板。",
-            "step_rows": "每个步骤的行高（1–10），以逗号分隔。必须有 total_steps 个条目。仅适用于 steps 模板。",
-            "step_weights": "每个步骤的相对宽度，以逗号分隔。示例：1, 2, 1 会使中间步骤的宽度变为两倍。所有值都必须为正数。必须有 total_steps 个条目。仅适用于 steps 模板。",
-            "step_colors": "每个步骤的颜色，以逗号分隔（颜色名称或十六进制）。示例：green, , red 会让中间步骤保留强调色。必须有 total_steps 个条目。仅适用于 steps 模板。",
-            "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。",
-            "fired_at_attribute": "持有告警触发时 Unix 时间戳的实体属性。仅适用于 alert 模板。",
-            "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。",
             "tiles": "board 磁贴（1-4 个），每个读取一个独立实体。格式：Label=entity_id:attribute:unit:icon（attribute、unit、icon 可选）。示例：Temp=sensor.kitchen::°C, Door=binary_sensor.front_door。仅适用于 board 模板。",
-            "log_columns": "追加到每条日志行的额外值（最多 6 个），以逗号分隔。格式：[Label=]source[|unit]。source = 此实体的属性 (brightness)、另一实体的状态 (binary_sensor.door) 或另一实体的属性 (sensor.temp:temperature)。示例：color_temp_kelvin|K, brightness → 'On · 4000K · 153'。仅限日志模板。",
-            "log_level_attribute": "提供每条日志行级别（info/warn/error）的实体属性。留空则不显示级别标签。仅适用于 log 模板。",
-            "dismissal_ttl": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。 示例：60"
+            "log_columns": "追加到每条日志行的额外值（最多 6 个），以逗号分隔。格式：[Label=]source[|unit]。source = 此实体的属性 (brightness)、另一实体的状态 (binary_sensor.door) 或另一实体的属性 (sensor.temp:temperature)。示例：color_temp_kelvin|K, brightness → 'On · 4000K · 153'。仅限日志模板。"
+          },
+          "sections": {
+            "data_sources": {
+              "name": "Data sources",
+              "description": "Bind other entities or attributes that feed values into this activity.",
+              "data": {
+                "progress_entity": "进度实体",
+                "progress_attribute": "进度属性",
+                "remaining_time_entity": "剩余时间实体",
+                "remaining_time_attribute": "剩余时间属性",
+                "live_progress": "实时进度 ETA",
+                "value_entity": "数值实体",
+                "value_attribute": "值属性",
+                "fired_at_entity": "触发时间实体",
+                "fired_at_attribute": "触发时间属性",
+                "subtitle_entity": "副标题实体",
+                "subtitle_attribute": "副标题属性",
+                "series": "系列",
+                "log_level_attribute": "日志级别属性"
+              },
+              "data_description": {
+                "progress_entity": "从单独的实体（而非被追踪实体）读取进度。留空则使用被追踪实体。若设置了属性字段，则读取此实体的该属性；否则读取其状态。",
+                "progress_attribute": "持有 0–100 进度值的实体属性。示例：percentage",
+                "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
+                "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
+                "live_progress": "使用上面的剩余时间来源，平滑填充进度条，并在设备上倒计时显示到完成时间的 ETA。需要一个剩余时间实体或属性。在 steps 模板中，它填充的是当前步骤而不是整个流程。",
+                "value_entity": "从单独的实体读取 gauge 数值。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
+                "value_attribute": "以数字形式持有当前 gauge 值的实体属性。留空则使用实体的状态值。",
+                "fired_at_entity": "从单独的实体读取告警的触发时间。留空则使用被追踪实体。接受 unix 时间戳或 ISO 时间戳传感器。仅限 alert 模板。",
+                "fired_at_attribute": "持有告警触发时 Unix 时间戳的实体属性。仅适用于 alert 模板。",
+                "subtitle_entity": "从单独的实体（例如程序/模式传感器）显示副标题。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
+                "subtitle_attribute": "用作副标题的实体属性。留空则使用实体的友好名称。",
+                "series": "将实体属性映射到命名系列。格式：attribute=标签, attribute2=标签2。留空则将实体状态用作单一系列。",
+                "log_level_attribute": "提供每条日志行级别（info/warn/error）的实体属性。留空则不显示级别标签。仅适用于 log 模板。"
+              }
+            },
+            "steps_options": {
+              "name": "Steps",
+              "data": {
+                "step_labels": "步骤标签",
+                "step_rows": "步骤行高",
+                "step_weights": "步骤权重",
+                "step_colors": "步骤颜色"
+              },
+              "data_description": {
+                "step_labels": "每个步骤的标签。格式：1=第一步, 2=第二步。必须覆盖步骤 1..total_steps。仅适用于 steps 模板。",
+                "step_rows": "每个步骤的行高（1–10），以逗号分隔。必须有 total_steps 个条目。仅适用于 steps 模板。",
+                "step_weights": "每个步骤的相对宽度，以逗号分隔。示例：1, 2, 1 会使中间步骤的宽度变为两倍。所有值都必须为正数。必须有 total_steps 个条目。仅适用于 steps 模板。",
+                "step_colors": "每个步骤的颜色，以逗号分隔（颜色名称或十六进制）。示例：green, , red 会让中间步骤保留强调色。必须有 total_steps 个条目。仅适用于 steps 模板。"
+              }
+            },
+            "timeline_options": {
+              "name": "Timeline",
+              "data": {
+                "units": "每系列单位",
+                "primary_series": "主系列",
+                "scale": "刻度",
+                "decimals": "小数位数",
+                "smoothing": "平滑曲线",
+                "thresholds": "阈值",
+                "history_period": "历史回溯时长"
+              },
+              "data_description": {
+                "units": "每个系列的单位标签。格式：系列标签=单位, 温度=°C, 湿度=%。仅适用于 timeline 模板。",
+                "primary_series": "作为标题值显示、并用于精简高/低范围的系列标签。留空则使用被追踪实体自身的系列（或第一个已配置的系列）。",
+                "scale": "迷你图的 Y 轴刻度模式。",
+                "decimals": "值显示的小数位数（0–10）。",
+                "smoothing": "启用数据点之间的曲线插值，使迷你图更平滑。",
+                "thresholds": "迷你图上的水平参考线。格式：值:颜色:标签。示例：25:red:热, 18:blue:冷。最多 5 条。",
+                "history_period": "从 Home Assistant 记录仪中获取的历史数据时长（分钟），用于填充迷你图初始数据。设为 0 则不加载历史。"
+              }
+            },
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "slug": "活动标识符",
+                "activity_name": "活动名称",
+                "icon": "图标",
+                "icon_attribute": "图标属性",
+                "priority": "优先级（0-10）",
+                "sound": "声音",
+                "update_interval": "最小更新间隔（秒）",
+                "state_labels": "状态标签"
+              },
+              "data_description": {
+                "slug": "此活动的唯一标识符。留空则自动从实体 ID 生成。示例：ha-living-room-lamp",
+                "activity_name": "在 iPhone Live Activity 上显示的名称。默认使用实体的友好名称。",
+                "icon": "覆盖图标。留空则使用实体的原生图标（例如 mdi:thermometer）。也支持 SF Symbols（例如 lamp.desk.fill）。",
+                "icon_attribute": "动态图标的实体属性。设置后将覆盖静态图标和实体图标。",
+                "priority": "当设备达到上限时，优先级较高的活动会保留更长时间（0 = 最低，10 = 最高）。",
+                "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
+                "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
+                "state_labels": "状态的自定义显示文本。格式：state=标签, state2=标签2。示例：heating=加热中, idle=待机"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "强调色",
+                "accent_color_attribute": "强调色属性",
+                "background_color": "背景颜色",
+                "background_color_attribute": "背景颜色属性",
+                "text_color": "文字颜色",
+                "text_color_attribute": "文字颜色属性"
+              },
+              "data_description": {
+                "accent_color": "Live Activity 的强调色。留空则使用默认蓝色。",
+                "accent_color_attribute": "动态强调色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
+                "background_color": "Live Activity 的背景颜色。留空则使用默认颜色。",
+                "background_color_attribute": "动态背景颜色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
+                "text_color": "Live Activity 的文字颜色。留空则使用默认颜色。",
+                "text_color_attribute": "动态文字颜色的实体属性。覆盖静态颜色。"
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "点击动作 URL",
+                "tap_action_foreground": "打开点击动作 URL",
+                "url": "URL",
+                "url_foreground": "打开主按钮 URL",
+                "url_title": "主按钮标题",
+                "secondary_url": "次要 URL",
+                "secondary_url_foreground": "打开次按钮 URL",
+                "secondary_url_title": "次按钮标题"
+              },
+              "data_description": {
+                "tap_action_url": "点击 Live Activity 背景时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0（打开对应应用）。",
+                "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST，无需离开锁屏。",
+                "url": "点击 Live Activity 时打开的链接。必须以 http:// 或 https:// 开头。仅适用于 steps 和 alert 模板。",
+                "url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+                "url_title": "主按钮标签（最多 64 个字符）。",
+                "secondary_url": "Live Activity 的次要链接。仅适用于 steps 和 alert 模板。",
+                "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+                "secondary_url_title": "次按钮标签（最多 64 个字符）。"
+              }
+            },
+            "advanced": {
+              "name": "Advanced",
+              "data": {
+                "ended_ttl": "结束后自动删除（秒）",
+                "stale_ttl": "空闲后自动结束（秒）",
+                "dismissal_ttl": "从锁定屏幕自动移除（秒）"
+              },
+              "data_description": {
+                "ended_ttl": "活动结束后从服务器自动删除前等待的秒数。留空则永久保留。示例：300",
+                "stale_ttl": "服务器自动结束活动前的空闲秒数。留空则禁用。示例：1800",
+                "dismissal_ttl": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。 示例：60"
+              }
+            }
           }
         },
         "reconfigure": {
@@ -1624,20 +1680,7 @@
             "min_value": "最小值",
             "max_value": "最大值",
             "severity": "严重程度",
-            "stat_rows": "统计行",
-            "label": "标签",
-            "label_attribute": "标签属性",
-            "subtitle_attribute": "副标题属性",
-            "icon": "图标",
-            "icon_attribute": "图标属性",
-            "accent_color": "强调色",
-            "accent_color_attribute": "强调色属性",
-            "background_color": "背景颜色",
-            "text_color": "文字颜色",
-            "widget_trigger_mode": "触发模式",
-            "widget_poll_interval": "轮询间隔（秒）",
-            "tap_action_url": "点击动作 URL",
-            "tap_action_foreground": "打开点击动作 URL"
+            "stat_rows": "统计行"
           },
           "data_description": {
             "widget_name": "在 iOS 小组件选择器中显示的名称。默认使用实体的友好名称。",
@@ -1647,20 +1690,63 @@
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "severity": "状态严重程度（info、warning、critical、success）。",
-            "stat_rows": "最多 6 行。格式：`Label=entity_id[:attribute[:unit]]`，以逗号分隔。示例：`Users=sensor.user_count, Active=sensor.active_devices:count`。",
-            "label": "显示在小组件上的静态标签。留空则从实体推导。",
-            "label_attribute": "用作标签的实体属性。会覆盖静态标签。",
-            "subtitle_attribute": "作为小组件副标题显示的实体属性。",
-            "icon": "静态图标。支持 SF Symbols 和 MDI 名称。",
-            "icon_attribute": "用于动态图标的实体属性。会覆盖静态图标。",
-            "accent_color": "小组件的强调色。留空则使用默认值。",
-            "accent_color_attribute": "用于动态强调色的实体属性。",
-            "background_color": "可选的背景颜色。",
-            "text_color": "可选的文字颜色。",
-            "widget_trigger_mode": "更新的触发方式。`event` 响应状态变化；`poll` 按固定间隔重新评估。",
-            "widget_poll_interval": "两次轮询之间的间隔（10–3600 秒）。仅在触发模式为 `poll` 时使用。",
-            "tap_action_url": "点击小组件时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0。",
-            "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST。"
+            "stat_rows": "最多 6 行。格式：`Label=entity_id[:attribute[:unit]]`，以逗号分隔。示例：`Users=sensor.user_count, Active=sensor.active_devices:count`。"
+          },
+          "sections": {
+            "display_options": {
+              "name": "Appearance",
+              "data": {
+                "label": "标签",
+                "label_attribute": "标签属性",
+                "subtitle_attribute": "副标题属性",
+                "icon": "图标",
+                "icon_attribute": "图标属性"
+              },
+              "data_description": {
+                "label": "显示在小组件上的静态标签。留空则从实体推导。",
+                "label_attribute": "用作标签的实体属性。会覆盖静态标签。",
+                "subtitle_attribute": "作为小组件副标题显示的实体属性。",
+                "icon": "静态图标。支持 SF Symbols 和 MDI 名称。",
+                "icon_attribute": "用于动态图标的实体属性。会覆盖静态图标。"
+              }
+            },
+            "colors": {
+              "name": "Colors",
+              "data": {
+                "accent_color": "强调色",
+                "accent_color_attribute": "强调色属性",
+                "background_color": "背景颜色",
+                "text_color": "文字颜色"
+              },
+              "data_description": {
+                "accent_color": "小组件的强调色。留空则使用默认值。",
+                "accent_color_attribute": "用于动态强调色的实体属性。",
+                "background_color": "可选的背景颜色。",
+                "text_color": "可选的文字颜色。"
+              }
+            },
+            "tap_actions": {
+              "name": "Tap actions",
+              "data": {
+                "tap_action_url": "点击动作 URL",
+                "tap_action_foreground": "打开点击动作 URL"
+              },
+              "data_description": {
+                "tap_action_url": "点击小组件时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0。",
+                "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST。"
+              }
+            },
+            "refresh": {
+              "name": "Refresh",
+              "data": {
+                "widget_trigger_mode": "触发模式",
+                "widget_poll_interval": "轮询间隔（秒）"
+              },
+              "data_description": {
+                "widget_trigger_mode": "更新的触发方式。`event` 响应状态变化；`poll` 按固定间隔重新评估。",
+                "widget_poll_interval": "两次轮询之间的间隔（10–3600 秒）。仅在触发模式为 `poll` 时使用。"
+              }
+            }
           }
         }
       },
