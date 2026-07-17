@@ -159,11 +159,17 @@ class WidgetManager:
 
         # Idempotent server upsert per widget — fan out so HA boot isn't
         # serialized on N round-trips. The API client semaphore caps concurrency.
+        # Each sync claims the widget's single-flight slot: a state change landing
+        # mid-boot coalesces via the dirty flag instead of racing a second create
+        # for the same slug (the listener above is already attached).
         if pending:
-            await asyncio.gather(
-                *(self._initial_sync(t) for t in pending),
-                return_exceptions=True,
-            )
+            tasks = []
+            for tracked in pending:
+                task = self._hass.async_create_task(self._initial_sync(tracked))
+                tracked.pending_task = task
+                task.add_done_callback(partial(self._on_send_done, tracked))
+                tasks.append(task)
+            await asyncio.gather(*tasks, return_exceptions=True)
 
         # Rewrite the cache only when its key set differs from the new tracked
         # set — otherwise this startup-time save is a redundant disk write.
@@ -226,7 +232,16 @@ class WidgetManager:
         target = self._resolve_target(slug=slug, entity_id=entity_id)
         if target is None:
             raise ValueError(f"No tracked widget for slug={slug!r} entity_id={entity_id!r}")
-        await self._send_update(target, force=True)
+        # Wait out any in-flight send first -- two _send_update calls for the same
+        # widget must never interleave (they race last_content and the 404
+        # recreate flag). The forced send then claims the single-flight slot like
+        # any other update.
+        while (prev := target.pending_task) is not None and not prev.done():
+            await asyncio.wait([prev])
+        task = self._spawn_send(target, force=True)
+        await asyncio.wait([task])
+        if not task.cancelled() and (exc := task.exception()) is not None:
+            raise exc
 
     # ----- subscription setup -----
 
@@ -296,9 +311,15 @@ class WidgetManager:
         if tracked.pending_task is not None and not tracked.pending_task.done():
             tracked.update_pending = True
             return
-        task = self._hass.async_create_task(self._send_update(tracked))
+        self._spawn_send(tracked)
+
+    @callback
+    def _spawn_send(self, tracked: TrackedWidget, *, force: bool = False) -> asyncio.Task:
+        """Run _send_update as the widget's single in-flight task."""
+        task = self._hass.async_create_task(self._send_update(tracked, force=force))
         tracked.pending_task = task
         task.add_done_callback(partial(self._on_send_done, tracked))
+        return task
 
     def _on_send_done(self, tracked: TrackedWidget, task: asyncio.Task) -> None:
         if tracked.pending_task is not task:

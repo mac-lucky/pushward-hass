@@ -492,6 +492,105 @@ async def test_widget_burst_trailing_resend(hass: HomeAssistant) -> None:
     await manager.async_stop()
 
 
+async def test_refresh_waits_for_inflight_send(hass: HomeAssistant) -> None:
+    """A forced refresh waits out an in-flight send, then runs its own -- they never overlap.
+
+    Two _send_update calls for one widget must not interleave (they race last_content
+    and the 404 recreate flag). async_refresh blocks on the pending task first.
+    """
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()  # widget created; PATCH is the update path now
+
+    gate = asyncio.Event()
+    started = asyncio.Event()
+    concurrency = 0
+    peak = 0
+    calls = 0
+
+    async def _patch(*_a, **_k):
+        nonlocal concurrency, peak, calls
+        calls += 1
+        first = calls == 1
+        concurrency += 1
+        peak = max(peak, concurrency)
+        try:
+            if first:
+                started.set()
+                await gate.wait()
+        finally:
+            concurrency -= 1
+
+    api.patch_widget.side_effect = _patch
+
+    # Kick off an event-driven send and let it reach the gate.
+    hass.states.async_set("sensor.users", "43")
+    await asyncio.wait_for(started.wait(), timeout=5)
+    assert api.patch_widget.call_count == 1
+
+    refresh_task = hass.async_create_task(manager.async_refresh(slug="ha-users"))
+    for _ in range(10):
+        await asyncio.sleep(0)
+    # The refresh is parked on the in-flight send; no second PATCH yet.
+    assert not refresh_task.done()
+    assert api.patch_widget.call_count == 1
+
+    gate.set()
+    await refresh_task
+    await hass.async_block_till_done()
+
+    assert api.patch_widget.call_count == 2
+    assert peak == 1  # the two sends never ran concurrently
+
+    await manager.async_stop()
+
+
+async def test_initial_sync_coalesces_startup_state_change(hass: HomeAssistant) -> None:
+    """A state change during the boot-time create coalesces via the dirty flag, not a second POST."""
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+
+    gate = asyncio.Event()
+    started = asyncio.Event()
+
+    async def _create(*_a, **_k):
+        started.set()
+        await gate.wait()
+
+    api.create_widget.side_effect = _create
+
+    start_task = hass.async_create_task(manager.async_start())
+    await asyncio.wait_for(started.wait(), timeout=5)  # initial POST is in flight
+    assert api.create_widget.call_count == 1
+
+    # A startup state change lands mid-create. The listener is already attached, so
+    # this must set the dirty flag against the create's single-flight slot, not race
+    # a second POST for the same slug.
+    hass.states.async_set("sensor.users", "43")
+    for _ in range(10):
+        await asyncio.sleep(0)
+    assert api.create_widget.call_count == 1
+    assert api.patch_widget.call_count == 0
+
+    api.create_widget.side_effect = None
+    gate.set()
+    await start_task
+    await hass.async_block_till_done()
+
+    # The coalesced newest value is re-sent exactly once, as a PATCH.
+    assert api.create_widget.call_count == 1
+    assert api.patch_widget.await_count == 1
+    assert api.patch_widget.call_args.args[1]["content"]["value"] == 43.0
+
+    await manager.async_stop()
+
+
 async def test_push_failure_warns_once_per_streak(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     """Repeated push failures WARN once, then DEBUG; recovery logs INFO and re-arms."""
     api = _mock_api()
