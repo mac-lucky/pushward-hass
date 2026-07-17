@@ -1450,7 +1450,7 @@
             "warning_threshold": "Kapag ang halaga ay umabot o lumampas dito, nati-trigger ang kulay ng babala. Mga template na gauge at timeline.",
             "alarm": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Para sa iOS 26+ lamang.",
             "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
-            "tiles": "Mga tile ng board (1–4), bawat isa ay nagbabasa ng hiwalay na entity. Format: Label=entity_id:attribute:unit:icon (opsyonal ang attribute, unit, icon). Halimbawa: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Para sa board template lamang.",
+            "tiles": "Hanggang 4 na tile, bawat isa ay bumabasa ng hiwalay na entity: label, entity, at opsyonal na attribute, unit, icon, kulay, at tap URL. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Para sa board template lamang.",
             "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6), pinaghihiwalay ng kuwit. Format: [Label=]source[|unit]. source = isang attribute ng entity na ito (brightness), ang estado ng ibang entity (binary_sensor.door), o isang attribute ng ibang entity (sensor.temp:temperature). Halimbawa: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Para lang sa log template."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Pinakamababang halaga para sa gauge range.",
             "max_value": "Pinakamataas na halaga para sa gauge range.",
             "severity": "Severity ng status (info, warning, critical, success).",
-            "stat_rows": "Hanggang 6 na row. Format: `Label=entity_id[:attribute[:unit]]`, pinaghihiwalay ng kuwit. Halimbawa: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Hanggang 6 na hanay, bawat isa ay naka-ugnay sa hiwalay na entity: label, entity, at opsyonal na attribute at unit. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Itakda ang density ng hanay kada widget sa PushWard app."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Kapag nagbago",
         "poll": "Poll"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Pula",
+        "orange": "Kahel",
+        "yellow": "Dilaw",
+        "green": "Berde",
+        "blue": "Asul",
+        "purple": "Lila",
+        "pink": "Rosa",
+        "indigo": "Indigo",
+        "teal": "Teal",
+        "cyan": "Cyan",
+        "mint": "Mint",
+        "brown": "Kayumanggi"
       }
     }
   }

@@ -1450,7 +1450,7 @@
             "warning_threshold": "جب مان اس قدر پر پہنچے یا اس سے تجاوز کرے تو انتباہ رنگ متحرک ہوتا ہے۔ gauge اور timeline ٹیمپلیٹس۔",
             "alarm": "انتباہ کی حد تجاوز ہونے پر AlarmKit الارم متحرک کرتا ہے۔ صرف iOS 26+۔",
             "snooze_seconds": "iOS Snooze بٹن کاؤنٹ ڈاؤن کو کتنا بڑھاتا ہے (60–3600)۔ 300s (5 منٹ) ڈیفالٹ کے لیے خالی چھوڑیں۔ Alarm درکار ہے۔ صرف Countdown ٹیمپلیٹ۔",
-            "tiles": "بورڈ ٹائلز (1–4)، ہر ایک الگ اینٹٹی پڑھتا ہے۔ فارمیٹ: Label=entity_id:attribute:unit:icon (attribute، unit، icon اختیاری)۔ مثال: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door۔ صرف بورڈ ٹیمپلیٹ۔",
+            "tiles": "زیادہ سے زیادہ 4 ٹائلز، ہر ایک الگ اینٹیٹی پڑھتی ہے: لیبل، اینٹیٹی اور اختیاری طور پر ایٹری بیوٹ، یونٹ، آئیکن، رنگ اور ٹیپ URL۔ کوما سے جدا سٹرنگ اب بھی قبول کی جاتی ہے۔ صرف board ٹیمپلیٹ کے لیے۔",
             "log_columns": "ہر لاگ لائن میں شامل کی جانے والی اضافی اقدار (زیادہ سے زیادہ 6)، کوما سے الگ۔ فارمیٹ: [Label=]source[|unit]. source = اس اینٹٹی کی ایک خصوصیت (brightness)، کسی دوسری اینٹٹی کی حالت (binary_sensor.door)، یا کسی دوسری اینٹٹی کی خصوصیت (sensor.temp:temperature)۔ مثال: color_temp_kelvin|K, brightness → 'On · 4000K · 153'۔ صرف لاگ ٹیمپلیٹ۔"
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "gauge رینج کے لیے کم از کم قدر۔",
             "max_value": "gauge رینج کے لیے زیادہ سے زیادہ قدر۔",
             "severity": "اسٹیٹس شدت (info، warning، critical، success)۔",
-            "stat_rows": "6 تک قطاریں۔ فارمیٹ: `Label=entity_id[:attribute[:unit]]`، کاما سے جدا۔ مثال: `Users=sensor.user_count, Active=sensor.active_devices:count`۔"
+            "stat_rows": "زیادہ سے زیادہ 6 قطاریں، ہر ایک الگ اینٹیٹی سے منسلک: لیبل، اینٹیٹی اور اختیاری طور پر ایٹری بیوٹ اور یونٹ۔ کوما سے جدا سٹرنگ اب بھی قبول کی جاتی ہے۔ ہر ویجٹ کے لیے قطار کثافت PushWard ایپ میں سیٹ کریں۔"
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "تبدیلی پر",
         "poll": "پول"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "سرخ",
+        "orange": "نارنجی",
+        "yellow": "پیلا",
+        "green": "سبز",
+        "blue": "نیلا",
+        "purple": "جامنی",
+        "pink": "گلابی",
+        "indigo": "انڈگو",
+        "teal": "ٹیل",
+        "cyan": "سیان",
+        "mint": "منٹ",
+        "brown": "بھورا"
       }
     }
   }

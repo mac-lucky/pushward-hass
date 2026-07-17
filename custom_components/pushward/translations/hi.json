@@ -1450,7 +1450,7 @@
             "warning_threshold": "इस मान पर पहुंचने या इससे अधिक होने पर चेतावनी रंग सक्रिय होता है। gauge और timeline टेम्पलेट।",
             "alarm": "चेतावनी सीमा पार होने पर AlarmKit अलार्म सक्रिय करता है। केवल iOS 26+।",
             "snooze_seconds": "iOS स्नूज़ बटन काउंटडाउन को कितनी देर बढ़ाता है (60–3600)। 300s (5 मिनट) डिफ़ॉल्ट के लिए खाली छोड़ें। अलार्म आवश्यक। केवल काउंटडाउन टेम्पलेट।",
-            "tiles": "Board टाइल्स (1–4), प्रत्येक एक अलग इकाई से पढ़ता है। Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon वैकल्पिक)। उदाहरण: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door। केवल board टेम्पलेट।",
+            "tiles": "अधिकतम 4 टाइलें, प्रत्येक एक अलग एंटिटी पढ़ती है: लेबल, एंटिटी और वैकल्पिक रूप से एट्रिब्यूट, इकाई, आइकन, रंग और टैप URL। अल्पविराम से अलग की गई स्ट्रिंग अब भी स्वीकार्य है। केवल board टेम्पलेट के लिए।",
             "log_columns": "हर लॉग लाइन में जोड़े गए अतिरिक्त मान (अधिकतम 6), अल्पविराम से अलग। Format: [Label=]source[|unit]. source = इस इकाई का एक attribute (brightness), किसी अन्य इकाई की अवस्था (binary_sensor.door), या किसी अन्य इकाई का attribute (sensor.temp:temperature)। उदाहरण: color_temp_kelvin|K, brightness → 'On · 4000K · 153'। केवल लॉग टेम्पलेट।"
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "गेज रेंज के लिए न्यूनतम मान।",
             "max_value": "गेज रेंज के लिए अधिकतम मान।",
             "severity": "स्थिति की गंभीरता (info, warning, critical, success)।",
-            "stat_rows": "अधिकतम 6 पंक्तियाँ। प्रारूप: `Label=entity_id[:attribute[:unit]]`, अल्पविराम से अलग। उदाहरण: `Users=sensor.user_count, Active=sensor.active_devices:count`।"
+            "stat_rows": "अधिकतम 6 पंक्तियाँ, प्रत्येक एक अलग एंटिटी से जुड़ी: लेबल, एंटिटी और वैकल्पिक रूप से एट्रिब्यूट और इकाई। अल्पविराम से अलग की गई स्ट्रिंग अब भी स्वीकार्य है। हर विजेट के लिए पंक्ति घनत्व PushWard ऐप में सेट करें।"
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "बदलने पर",
         "poll": "पोल"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "लाल",
+        "orange": "नारंगी",
+        "yellow": "पीला",
+        "green": "हरा",
+        "blue": "नीला",
+        "purple": "बैंगनी",
+        "pink": "गुलाबी",
+        "indigo": "इंडिगो",
+        "teal": "टील",
+        "cyan": "सियान",
+        "mint": "मिंट",
+        "brown": "भूरा"
       }
     }
   }

@@ -1450,7 +1450,7 @@
             "warning_threshold": "Secondi prima della fine del countdown in cui il server invia un push di avviso. Lasciare vuoto per disabilitare. Solo per il modello countdown.",
             "alarm": "Attivare la sveglia AlarmKit alla scadenza del countdown (iOS 26+). Solo per il modello countdown.",
             "snooze_seconds": "Di quanto il pulsante Posticipa di iOS estende il conto alla rovescia (60–3600). Lascia vuoto per il valore predefinito di 300s (5 min). Richiede una sveglia. Solo modello conto alla rovescia.",
-            "tiles": "Riquadri del pannello (1–4), ciascuno che legge un'entità separata. Formato: Label=entity_id:attribute:unit:icon (attribute, unit, icon facoltativi). Esempio: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Solo modello pannello.",
+            "tiles": "Fino a 4 riquadri, ognuno legge un'entità distinta: etichetta, entità e, in opzione, attributo, unità, icona, colore e URL al tocco. È ancora accettata una stringa separata da virgole. Solo per il modello board.",
             "log_columns": "Valori aggiuntivi aggiunti a ogni riga del registro (max 6), separati da virgole. Formato: [Label=]source[|unit]. source = un attributo di questa entità (brightness), lo stato di un'altra entità (binary_sensor.door) o un attributo di un'altra entità (sensor.temp:temperature). Esempio: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo modello registro."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Valore minimo dell'intervallo dell'indicatore.",
             "max_value": "Valore massimo dell'intervallo dell'indicatore.",
             "severity": "Gravità dello stato (info, warning, critical, success).",
-            "stat_rows": "Fino a 6 righe. Formato: `Label=entity_id[:attribute[:unit]]`, separate da virgola. Esempio: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Fino a 6 righe, ognuna collega un'entità distinta: etichetta, entità e, in opzione, attributo e unità. È ancora accettata una stringa separata da virgole. Regola la densità delle righe per ogni widget nell'app PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Alla modifica",
         "poll": "Polling"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Rosso",
+        "orange": "Arancione",
+        "yellow": "Giallo",
+        "green": "Verde",
+        "blue": "Blu",
+        "purple": "Viola",
+        "pink": "Rosa",
+        "indigo": "Indaco",
+        "teal": "Verde acqua",
+        "cyan": "Ciano",
+        "mint": "Menta",
+        "brown": "Marrone"
       }
     }
   }

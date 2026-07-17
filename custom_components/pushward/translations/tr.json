@@ -1450,7 +1450,7 @@
             "warning_threshold": "Bu değere ulaşıldığında veya aşıldığında uyarı renklendirmesi tetiklenir. Gauge ve timeline şablonları.",
             "alarm": "Uyarı eşiği aşıldığında AlarmKit alarmını tetikler. Yalnızca iOS 26+.",
             "snooze_seconds": "iOS Ertele düğmesinin geri sayımı ne kadar uzattığı (60–3600). 300s (5 dk) varsayılanı için boş bırakın. Alarm gerektirir. Yalnızca geri sayım şablonu.",
-            "tiles": "Board kutuları (1–4), her biri ayrı bir varlığı okur. Biçim: Etiket=entity_id:öznitelik:birim:simge (öznitelik, birim, simge isteğe bağlı). Örnek: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Yalnızca board şablonu.",
+            "tiles": "En fazla 4 kutu; her biri ayrı bir varlığı okur: etiket, varlık ve isteğe bağlı olarak öznitelik, birim, simge, renk ve dokunma URL'si. Virgülle ayrılmış metin de kabul edilir. Yalnızca board şablonu.",
             "log_columns": "Her günlük satırına eklenen ek değerler (en fazla 6), virgülle ayrılır. Biçim: [Label=]source[|unit]. source = bu varlığın bir niteliği (brightness), başka bir varlığın durumu (binary_sensor.door) veya başka bir varlığın niteliği (sensor.temp:temperature). Örnek: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Yalnızca günlük şablonu."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Gösterge aralığı için minimum değer.",
             "max_value": "Gösterge aralığı için maksimum değer.",
             "severity": "Durum önem derecesi (info, warning, critical, success).",
-            "stat_rows": "En fazla 6 satır. Biçim: `Label=entity_id[:attribute[:unit]]`, virgülle ayrılmış. Örnek: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "En fazla 6 satır; her biri ayrı bir varlığa bağlanır: etiket, varlık ve isteğe bağlı olarak öznitelik ve birim. Virgülle ayrılmış metin de kabul edilir. Satır yoğunluğunu her widget için PushWard uygulamasından ayarlayın."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Değişince",
         "poll": "Yoklama"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Kırmızı",
+        "orange": "Turuncu",
+        "yellow": "Sarı",
+        "green": "Yeşil",
+        "blue": "Mavi",
+        "purple": "Mor",
+        "pink": "Pembe",
+        "indigo": "Çivit",
+        "teal": "Deniz mavisi",
+        "cyan": "Camgöbeği",
+        "mint": "Nane",
+        "brown": "Kahverengi"
       }
     }
   }

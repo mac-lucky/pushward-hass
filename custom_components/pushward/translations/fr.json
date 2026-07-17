@@ -1450,7 +1450,7 @@
             "warning_threshold": "Secondes avant la fin du countdown lorsque le serveur envoie un push d'avertissement. Laisser vide pour désactiver. Modèle countdown uniquement.",
             "alarm": "Déclencher une alarme AlarmKit à l'expiration du countdown (iOS 26+). Modèle countdown uniquement.",
             "snooze_seconds": "Durée pendant laquelle le bouton Report d'iOS prolonge le countdown (60–3600). Laisser vide pour la valeur par défaut de 300s (5 min). Nécessite l'alarme. Modèle countdown uniquement.",
-            "tiles": "Tuiles du tableau (1–4), chacune lisant une entité distincte. Format : Label=entity_id:attribute:unit:icon (attribute, unit, icon facultatifs). Exemple : Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Modèle tableau uniquement.",
+            "tiles": "Jusqu'à 4 tuiles, chacune lisant une entité distincte : libellé, entité, puis attribut, unité, icône, couleur et URL de tap en option. Une chaîne séparée par des virgules reste acceptée. Modèle board uniquement.",
             "log_columns": "Valeurs supplémentaires ajoutées à chaque ligne de journal (max. 6), séparées par des virgules. Format : [Label=]source[|unit]. source = un attribut de cette entité (brightness), l'état d'une autre entité (binary_sensor.door) ou un attribut d'une autre entité (sensor.temp:temperature). Exemple : color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Modèle journal uniquement."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Valeur minimale de la plage du gauge.",
             "max_value": "Valeur maximale de la plage du gauge.",
             "severity": "Gravité du statut (info, warning, critical, success).",
-            "stat_rows": "Jusqu'à 6 lignes. Format : `Label=entity_id[:attribute[:unit]]`, séparées par des virgules. Exemple : `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Jusqu'à 6 lignes, chacune liée à une entité distincte : libellé, entité, puis attribut et unité en option. Une chaîne séparée par des virgules reste acceptée. Réglez la densité des lignes par widget dans l'app PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Au changement",
         "poll": "Interrogation"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Rouge",
+        "orange": "Orange",
+        "yellow": "Jaune",
+        "green": "Vert",
+        "blue": "Bleu",
+        "purple": "Violet",
+        "pink": "Rose",
+        "indigo": "Indigo",
+        "teal": "Sarcelle",
+        "cyan": "Cyan",
+        "mint": "Menthe",
+        "brown": "Marron"
       }
     }
   }

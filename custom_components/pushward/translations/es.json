@@ -1450,7 +1450,7 @@
             "warning_threshold": "Segundos antes del final del countdown cuando el servidor envía un push de advertencia. Dejar vacío para desactivar. Solo para la plantilla countdown.",
             "alarm": "Activar alarma AlarmKit al expirar el countdown (iOS 26+). Solo para la plantilla countdown.",
             "snooze_seconds": "Cuánto extiende la cuenta atrás el botón Posponer de iOS (60–3600). Déjalo vacío para el valor predeterminado de 300 s (5 min). Requiere alarma. Solo plantilla de cuenta atrás.",
-            "tiles": "Mosaicos del panel (1–4), cada uno leyendo una entidad distinta. Formato: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcionales). Ejemplo: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Solo plantilla de panel.",
+            "tiles": "Hasta 4 mosaicos, cada uno lee una entidad distinta: etiqueta, entidad y, de forma opcional, atributo, unidad, icono, color y URL de toque. También se admite una cadena separada por comas. Solo para la plantilla board.",
             "log_columns": "Valores adicionales añadidos a cada línea de registro (máx. 6), separados por comas. Formato: [Label=]source[|unit]. source = un atributo de esta entidad (brightness), el estado de otra entidad (binary_sensor.door) o un atributo de otra entidad (sensor.temp:temperature). Ejemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Solo plantilla de registro."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Valor mínimo del rango del indicador.",
             "max_value": "Valor máximo del rango del indicador.",
             "severity": "Gravedad del estado (info, warning, critical, success).",
-            "stat_rows": "Hasta 6 filas. Formato: `Label=entity_id[:attribute[:unit]]`, separadas por comas. Ejemplo: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Hasta 6 filas, cada una vincula una entidad distinta: etiqueta, entidad y, de forma opcional, atributo y unidad. También se admite una cadena separada por comas. Ajusta la densidad de filas por widget en la app de PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Al cambiar",
         "poll": "Sondeo"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Rojo",
+        "orange": "Naranja",
+        "yellow": "Amarillo",
+        "green": "Verde",
+        "blue": "Azul",
+        "purple": "Morado",
+        "pink": "Rosa",
+        "indigo": "Índigo",
+        "teal": "Verde azulado",
+        "cyan": "Cian",
+        "mint": "Menta",
+        "brown": "Marrón"
       }
     }
   }

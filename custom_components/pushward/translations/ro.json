@@ -1450,7 +1450,7 @@
             "warning_threshold": "Când valoarea atinge sau depășește aceasta, colorarea de avertizare este declanșată. Șabloane gauge și timeline.",
             "alarm": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Doar pentru iOS 26+.",
             "snooze_seconds": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Lăsați gol pentru valoarea implicită de 300s (5 min). Necesită Alarmă. Doar șablonul countdown.",
-            "tiles": "Casete panou (1–4), fiecare citind o entitate separată. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opționale). Exemplu: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Numai pentru șablonul board.",
+            "tiles": "Până la 4 casete, fiecare citește o entitate separată: etichetă, entitate și, opțional, atribut, unitate, pictogramă, culoare și URL la atingere. Un șir separat prin virgule este încă acceptat. Doar pentru șablonul board.",
             "log_columns": "Valori suplimentare adăugate la fiecare linie de jurnal (max. 6), separate prin virgulă. Format: [Label=]source[|unit]. source = un atribut al acestei entități (brightness), starea altei entități (binary_sensor.door) sau un atribut al altei entități (sensor.temp:temperature). Exemplu: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Doar șablon jurnal."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Valoarea minimă pentru intervalul gauge.",
             "max_value": "Valoarea maximă pentru intervalul gauge.",
             "severity": "Severitatea stării (info, warning, critical, success).",
-            "stat_rows": "Până la 6 rânduri. Format: `Label=entity_id[:attribute[:unit]]`, separate prin virgulă. Exemplu: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Până la 6 rânduri, fiecare legat de o entitate separată: etichetă, entitate și, opțional, atribut și unitate. Un șir separat prin virgule este încă acceptat. Densitatea rândurilor se reglează per widget în aplicația PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "La schimbare",
         "poll": "Sondare"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Roșu",
+        "orange": "Portocaliu",
+        "yellow": "Galben",
+        "green": "Verde",
+        "blue": "Albastru",
+        "purple": "Mov",
+        "pink": "Roz",
+        "indigo": "Indigo",
+        "teal": "Verde-albăstrui",
+        "cyan": "Cyan",
+        "mint": "Mentă",
+        "brown": "Maro"
       }
     }
   }

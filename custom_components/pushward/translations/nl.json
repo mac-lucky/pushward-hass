@@ -1450,7 +1450,7 @@
             "warning_threshold": "Seconden vóór het einde van de countdown waarop de server een waarschuwingspush verzendt. Laat leeg om uit te schakelen. Alleen voor het sjabloon countdown.",
             "alarm": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+). Alleen voor het sjabloon countdown.",
             "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
-            "tiles": "Bordtegels (1–4), elk gekoppeld aan een aparte entiteit. Indeling: Label=entity_id:attribute:unit:icon (attribute, unit, icon optioneel). Voorbeeld: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Alleen voor het sjabloon board.",
+            "tiles": "Tot 4 tegels, elk leest een aparte entiteit: label, entiteit en optioneel attribuut, eenheid, pictogram, kleur en tik-URL. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Alleen voor de sjabloon board.",
             "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6), gescheiden door komma's. Indeling: [Label=]source[|unit]. source = een attribuut van deze entiteit (brightness), de status van een andere entiteit (binary_sensor.door) of een attribuut van een andere entiteit (sensor.temp:temperature). Voorbeeld: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Alleen logsjabloon."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Minimumwaarde voor het meterbereik.",
             "max_value": "Maximumwaarde voor het meterbereik.",
             "severity": "Ernst van de status (info, warning, critical, success).",
-            "stat_rows": "Maximaal 6 rijen. Formaat: `Label=entity_id[:attribute[:unit]]`, door komma's gescheiden. Voorbeeld: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Tot 6 rijen, elk gekoppeld aan een aparte entiteit: label, entiteit en optioneel attribuut en eenheid. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Stel de rijdichtheid per widget in de PushWard-app in."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Bij wijziging",
         "poll": "Peilen"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Rood",
+        "orange": "Oranje",
+        "yellow": "Geel",
+        "green": "Groen",
+        "blue": "Blauw",
+        "purple": "Paars",
+        "pink": "Roze",
+        "indigo": "Indigo",
+        "teal": "Blauwgroen",
+        "cyan": "Cyaan",
+        "mint": "Mint",
+        "brown": "Bruin"
       }
     }
   }

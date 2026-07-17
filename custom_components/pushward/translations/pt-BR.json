@@ -1450,7 +1450,7 @@
             "warning_threshold": "Segundos antes do fim do countdown quando o servidor envia um push de aviso. Deixe vazio para desativar. Apenas para o modelo countdown.",
             "alarm": "Acionar alarme AlarmKit ao expirar o countdown (iOS 26+). Apenas para o modelo countdown.",
             "snooze_seconds": "Por quanto tempo o botão Soneca do iOS estende a contagem regressiva (60–3600). Deixe vazio para o padrão de 300s (5 min). Requer Alarme. Apenas modelo de contagem regressiva.",
-            "tiles": "Blocos do painel (1–4), cada um lendo uma entidade separada. Formato: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcionais). Exemplo: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Apenas modelo de painel.",
+            "tiles": "Até 4 blocos, cada um lê uma entidade distinta: rótulo, entidade e, opcionalmente, atributo, unidade, ícone, cor e URL de toque. Uma string separada por vírgulas ainda é aceita. Somente no modelo board.",
             "log_columns": "Valores adicionais anexados a cada linha de registro (máx. 6), separados por vírgulas. Formato: [Label=]source[|unit]. source = um atributo desta entidade (brightness), o estado de outra entidade (binary_sensor.door) ou um atributo de outra entidade (sensor.temp:temperature). Exemplo: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Apenas modelo de registro."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Valor mínimo do intervalo do medidor.",
             "max_value": "Valor máximo do intervalo do medidor.",
             "severity": "Severidade do status (info, warning, critical, success).",
-            "stat_rows": "Até 6 linhas. Formato: `Label=entity_id[:attribute[:unit]]`, separados por vírgula. Exemplo: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Até 6 linhas, cada uma vinculada a uma entidade distinta: rótulo, entidade e, opcionalmente, atributo e unidade. Uma string separada por vírgulas ainda é aceita. Ajuste a densidade das linhas por widget no app PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Ao alterar",
         "poll": "Sondagem"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Vermelho",
+        "orange": "Laranja",
+        "yellow": "Amarelo",
+        "green": "Verde",
+        "blue": "Azul",
+        "purple": "Roxo",
+        "pink": "Rosa",
+        "indigo": "Índigo",
+        "teal": "Azul-petróleo",
+        "cyan": "Ciano",
+        "mint": "Menta",
+        "brown": "Marrom"
       }
     }
   }

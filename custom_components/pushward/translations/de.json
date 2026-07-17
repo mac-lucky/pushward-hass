@@ -1450,7 +1450,7 @@
             "warning_threshold": "Sekunden vor Countdown-Ende, ab denen der Server einen Warn-Push sendet. Leer lassen, um zu deaktivieren. Nur für die Vorlage 'countdown'.",
             "alarm": "AlarmKit-Alarm beim Ablauf des Countdowns auslösen (iOS 26+). Nur für die Vorlage 'countdown'.",
             "snooze_seconds": "Wie lange die iOS-Schlummern-Schaltfläche den Countdown verlängert (60–3600). Leer lassen für den Standardwert 300 s (5 Min.). Erfordert Alarm. Nur für die Vorlage 'countdown'.",
-            "tiles": "Board-Kacheln (1–4), die jeweils eine separate Entität auslesen. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon optional). Beispiel: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Nur für die Vorlage 'board'.",
+            "tiles": "Bis zu 4 Kacheln, jede liest eine eigene Entität: Bezeichnung, Entität sowie optional Attribut, Einheit, Symbol, Farbe und Tipp-URL. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Nur für die Vorlage board.",
             "log_columns": "Zusätzliche Werte, die an jede Protokollzeile angehängt werden (max. 6), durch Kommas getrennt. Format: [Label=]source[|unit]. source = ein Attribut dieser Entität (brightness), der Zustand einer anderen Entität (binary_sensor.door) oder ein Attribut einer anderen Entität (sensor.temp:temperature). Beispiel: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Nur Log-Vorlage."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Minimalwert für den Gauge-Bereich.",
             "max_value": "Maximalwert für den Gauge-Bereich.",
             "severity": "Schweregrad des Status (info, warning, critical, success).",
-            "stat_rows": "Bis zu 6 Zeilen. Format: `Label=entity_id[:attribute[:unit]]`, kommagetrennt. Beispiel: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Bis zu 6 Zeilen, jede bindet eine eigene Entität: Bezeichnung, Entität sowie optional Attribut und Einheit. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Die Zeilendichte lässt sich je Widget in der PushWard-App einstellen."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Bei Änderung",
         "poll": "Abfrage"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Rot",
+        "orange": "Orange",
+        "yellow": "Gelb",
+        "green": "Grün",
+        "blue": "Blau",
+        "purple": "Lila",
+        "pink": "Rosa",
+        "indigo": "Indigo",
+        "teal": "Blaugrün",
+        "cyan": "Cyan",
+        "mint": "Mint",
+        "brown": "Braun"
       }
     }
   }

@@ -1450,7 +1450,7 @@
             "warning_threshold": "Sekundy przed końcem countdown, w których serwer wysyła ostrzeżenie push. Pozostaw puste, aby wyłączyć. Tylko szablon countdown.",
             "alarm": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+). Tylko szablon countdown.",
             "snooze_seconds": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
-            "tiles": "Kafelki tablicy (1–4), każdy odczytuje osobną encję. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opcjonalne). Przykład: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Tylko szablon board.",
+            "tiles": "Do 4 kafelków, każdy odczytuje osobną encję: etykieta, encja oraz opcjonalnie atrybut, jednostka, ikona, kolor i adres URL po dotknięciu. Nadal akceptowany jest ciąg rozdzielony przecinkami. Tylko dla szablonu board.",
             "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6), oddzielone przecinkami. Format: [Label=]source[|unit]. source = atrybut tej encji (brightness), stan innej encji (binary_sensor.door) lub atrybut innej encji (sensor.temp:temperature). Przykład: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Tylko szablon dziennika."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Wartość minimalna zakresu wskaźnika.",
             "max_value": "Wartość maksymalna zakresu wskaźnika.",
             "severity": "Istotność statusu (info, warning, critical, success).",
-            "stat_rows": "Maks. 6 wierszy. Format: `Label=entity_id[:attribute[:unit]]`, oddzielone przecinkami. Przykład: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Do 6 wierszy, każdy powiązany z osobną encją: etykieta, encja oraz opcjonalnie atrybut i jednostka. Nadal akceptowany jest ciąg rozdzielony przecinkami. Gęstość wierszy ustawisz dla każdego widżetu w aplikacji PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Przy zmianie",
         "poll": "Odpytywanie"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Czerwony",
+        "orange": "Pomarańczowy",
+        "yellow": "Żółty",
+        "green": "Zielony",
+        "blue": "Niebieski",
+        "purple": "Fioletowy",
+        "pink": "Różowy",
+        "indigo": "Indygo",
+        "teal": "Morski",
+        "cyan": "Cyjan",
+        "mint": "Miętowy",
+        "brown": "Brązowy"
       }
     }
   }

@@ -1450,7 +1450,7 @@
             "warning_threshold": "倒计时结束前服务器发送警告推送的秒数。留空则禁用。仅适用于 countdown 模板。",
             "alarm": "倒计时到期时触发 AlarmKit 闹钟（iOS 26+）。仅适用于 countdown 模板。",
             "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
-            "tiles": "board 磁贴（1-4 个），每个读取一个独立实体。格式：Label=entity_id:attribute:unit:icon（attribute、unit、icon 可选）。示例：Temp=sensor.kitchen::°C, Door=binary_sensor.front_door。仅适用于 board 模板。",
+            "tiles": "最多 4 个磁贴，每个读取一个单独的实体：标签、实体，以及可选的属性、单位、图标、颜色和点按 URL。仍支持以逗号分隔的字符串。仅用于 board 模板。",
             "log_columns": "追加到每条日志行的额外值（最多 6 个），以逗号分隔。格式：[Label=]source[|unit]。source = 此实体的属性 (brightness)、另一实体的状态 (binary_sensor.door) 或另一实体的属性 (sensor.temp:temperature)。示例：color_temp_kelvin|K, brightness → 'On · 4000K · 153'。仅限日志模板。"
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "severity": "状态严重程度（info、warning、critical、success）。",
-            "stat_rows": "最多 6 行。格式：`Label=entity_id[:attribute[:unit]]`，以逗号分隔。示例：`Users=sensor.user_count, Active=sensor.active_devices:count`。"
+            "stat_rows": "最多 6 行，每行绑定一个单独的实体：标签、实体，以及可选的属性和单位。仍支持以逗号分隔的字符串。可在 PushWard 应用中按小组件设置行密度。"
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "变化时",
         "poll": "轮询"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "红色",
+        "orange": "橙色",
+        "yellow": "黄色",
+        "green": "绿色",
+        "blue": "蓝色",
+        "purple": "紫色",
+        "pink": "粉色",
+        "indigo": "靛蓝",
+        "teal": "蓝绿色",
+        "cyan": "青色",
+        "mint": "薄荷色",
+        "brown": "棕色"
       }
     }
   }

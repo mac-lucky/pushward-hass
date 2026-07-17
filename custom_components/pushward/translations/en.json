@@ -1450,7 +1450,7 @@
             "warning_threshold": "Seconds before the end of a countdown when the server sends a warning push. Leave empty to disable. Countdown template only.",
             "alarm": "Trigger an AlarmKit alarm when the countdown expires (iOS 26+). Countdown template only.",
             "snooze_seconds": "How long the iOS Snooze button extends the countdown (60–3600). Leave empty for the 300s (5 min) default. Requires Alarm. Countdown template only.",
-            "tiles": "Board tiles (1–4), each reading a separate entity. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon optional). Example: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Board template only.",
+            "tiles": "Up to 4 tiles, each reading a separate entity: label, entity, plus optional attribute, unit, icon, color, and tap URL. A comma-separated string is still accepted. Board template only.",
             "log_columns": "Extra values appended to each log line (max 6), comma-separated. Format: [Label=]source[|unit]. source = an attribute of this entity (brightness), another entity's state (binary_sensor.door), or another entity's attribute (sensor.temp:temperature). Example: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Log template only."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "severity": "Status severity (info, warning, critical, success).",
-            "stat_rows": "Up to 6 rows. Format: `Label=entity_id[:attribute[:unit]]`, comma-separated. Example: `Users=sensor.user_count, Active=sensor.active_devices:count`. By default medium and large Home Screen widgets show all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3 (both show up to 6 when every value is very short, like a single status glyph). Override this per widget in the PushWard app under Row Density (Auto, Compact, Comfortable)."
+            "stat_rows": "Up to 6 rows, each binding a separate entity: label, entity, plus optional attribute and unit. A comma-separated string is still accepted. Configure row density per widget in the PushWard app."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "On change",
         "poll": "Poll"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Red",
+        "orange": "Orange",
+        "yellow": "Yellow",
+        "green": "Green",
+        "blue": "Blue",
+        "purple": "Purple",
+        "pink": "Pink",
+        "indigo": "Indigo",
+        "teal": "Teal",
+        "cyan": "Cyan",
+        "mint": "Mint",
+        "brown": "Brown"
       }
     }
   }

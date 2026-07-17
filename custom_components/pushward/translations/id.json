@@ -1450,7 +1450,7 @@
             "warning_threshold": "Saat nilai mencapai atau melebihi ini, pewarnaan peringatan dipicu. Templat gauge dan timeline.",
             "alarm": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya untuk iOS 26+.",
             "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
-            "tiles": "Ubin board (1–4), masing-masing membaca entitas terpisah. Format: Label=entity_id:attribute:unit:icon (attribute, unit, icon opsional). Contoh: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Hanya templat board.",
+            "tiles": "Hingga 4 ubin, masing-masing membaca entitas terpisah: label, entitas, serta atribut, unit, ikon, warna, dan URL ketuk opsional. String yang dipisahkan koma masih diterima. Hanya untuk templat board.",
             "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6), dipisahkan koma. Format: [Label=]source[|unit]. source = atribut dari entitas ini (brightness), status entitas lain (binary_sensor.door), atau atribut entitas lain (sensor.temp:temperature). Contoh: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Hanya templat log."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "severity": "Tingkat keparahan status (info, warning, critical, success).",
-            "stat_rows": "Hingga 6 baris. Format: `Label=entity_id[:attribute[:unit]]`, dipisah koma. Contoh: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Hingga 6 baris, masing-masing terikat ke entitas terpisah: label, entitas, serta atribut dan unit opsional. String yang dipisahkan koma masih diterima. Atur kepadatan baris per widget di aplikasi PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Saat berubah",
         "poll": "Polling"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Merah",
+        "orange": "Oranye",
+        "yellow": "Kuning",
+        "green": "Hijau",
+        "blue": "Biru",
+        "purple": "Ungu",
+        "pink": "Merah muda",
+        "indigo": "Nila",
+        "teal": "Teal",
+        "cyan": "Sian",
+        "mint": "Mint",
+        "brown": "Cokelat"
       }
     }
   }

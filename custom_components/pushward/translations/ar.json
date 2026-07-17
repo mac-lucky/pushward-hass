@@ -1450,7 +1450,7 @@
             "warning_threshold": "الثواني قبل انتهاء countdown التي يرسل فيها الخادم push تحذيرياً. اتركه فارغاً لتعطيله. قالب countdown فقط.",
             "alarm": "تشغيل تنبيه AlarmKit عند انتهاء countdown (iOS 26+). قالب countdown فقط.",
             "snooze_seconds": "المدة التي يطيلها زر الغفوة في iOS للعد التنازلي (60–3600). اتركه فارغًا للقيمة الافتراضية 300 ثانية (5 دقائق). يتطلب منبهًا. قالب العد التنازلي فقط.",
-            "tiles": "بلاطات board (1–4)، تقرأ كل واحدة كيانًا منفصلاً. التنسيق: التسمية=entity_id:الخاصية:الوحدة:الأيقونة (الخاصية والوحدة والأيقونة اختيارية). مثال: Temp=sensor.kitchen::°C، Door=binary_sensor.front_door. قالب board فقط.",
+            "tiles": "حتى 4 بلاطات، تقرأ كل منها كِيانًا منفصلًا: التسمية والكيان، واختياريًا السمة والوحدة والأيقونة واللون وعنوان URL عند اللمس. لا يزال يُقبل نص مفصول بفواصل. لقالب board فقط.",
             "log_columns": "قيم إضافية تُضاف إلى كل سطر سجل (6 كحد أقصى)، مفصولة بفواصل. الصيغة: [Label=]source[|unit]. source = سمة لهذا الكيان (brightness)، أو حالة كيان آخر (binary_sensor.door)، أو سمة كيان آخر (sensor.temp:temperature). مثال: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. قالب السجل فقط."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "القيمة الدنيا لنطاق المقياس.",
             "max_value": "القيمة القصوى لنطاق المقياس.",
             "severity": "خطورة الحالة (info أو warning أو critical أو success).",
-            "stat_rows": "ما يصل إلى 6 صفوف. الصيغة: `Label=entity_id[:attribute[:unit]]`، مفصولة بفواصل. مثال: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "حتى 6 صفوف، يرتبط كل منها بكِيان منفصل: التسمية والكيان، واختياريًا السمة والوحدة. لا يزال يُقبل نص مفصول بفواصل. اضبط كثافة الصفوف لكل عنصر واجهة في تطبيق PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "عند التغيير",
         "poll": "استطلاع"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "أحمر",
+        "orange": "برتقالي",
+        "yellow": "أصفر",
+        "green": "أخضر",
+        "blue": "أزرق",
+        "purple": "بنفسجي",
+        "pink": "وردي",
+        "indigo": "نيلي",
+        "teal": "أزرق مخضر",
+        "cyan": "سماوي",
+        "mint": "نعناعي",
+        "brown": "بني"
       }
     }
   }

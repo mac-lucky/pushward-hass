@@ -1450,7 +1450,7 @@
             "warning_threshold": "Khi đạt hoặc vượt giá trị này, màu cảnh báo được kích hoạt. Mẫu gauge và timeline.",
             "alarm": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ dành cho iOS 26+.",
             "snooze_seconds": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Để trống để dùng mặc định 300s (5 phút). Yêu cầu Báo thức. Chỉ mẫu đếm ngược.",
-            "tiles": "Ô board (1–4), mỗi ô đọc một thực thể riêng. Định dạng: Label=entity_id:attribute:unit:icon (attribute, unit, icon tùy chọn). Ví dụ: Temp=sensor.kitchen::°C, Door=binary_sensor.front_door. Chỉ dành cho mẫu board.",
+            "tiles": "Tối đa 4 ô, mỗi ô đọc một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính, đơn vị, biểu tượng, màu và URL khi chạm. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Chỉ dành cho mẫu board.",
             "log_columns": "Các giá trị bổ sung được thêm vào mỗi dòng nhật ký (tối đa 6), phân tách bằng dấu phẩy. Định dạng: [Label=]source[|unit]. source = một thuộc tính của thực thể này (brightness), trạng thái của thực thể khác (binary_sensor.door), hoặc một thuộc tính của thực thể khác (sensor.temp:temperature). Ví dụ: color_temp_kelvin|K, brightness → 'On · 4000K · 153'. Chỉ dành cho mẫu nhật ký."
           },
           "sections": {
@@ -1690,7 +1690,7 @@
             "min_value": "Giá trị tối thiểu cho khoảng đồng hồ đo.",
             "max_value": "Giá trị tối đa cho khoảng đồng hồ đo.",
             "severity": "Mức độ nghiêm trọng của trạng thái (info, warning, critical, success).",
-            "stat_rows": "Tối đa 6 hàng. Định dạng: `Label=entity_id[:attribute[:unit]]`, phân tách bằng dấu phẩy. Ví dụ: `Users=sensor.user_count, Active=sensor.active_devices:count`."
+            "stat_rows": "Tối đa 6 hàng, mỗi hàng liên kết một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính và đơn vị. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Điều chỉnh mật độ hàng cho từng widget trong ứng dụng PushWard."
           },
           "sections": {
             "display_options": {
@@ -1856,6 +1856,22 @@
       "options": {
         "event": "Khi thay đổi",
         "poll": "Thăm dò"
+      }
+    },
+    "named_color": {
+      "options": {
+        "red": "Đỏ",
+        "orange": "Cam",
+        "yellow": "Vàng",
+        "green": "Xanh lá",
+        "blue": "Xanh dương",
+        "purple": "Tím",
+        "pink": "Hồng",
+        "indigo": "Chàm",
+        "teal": "Xanh mòng két",
+        "cyan": "Lục lam",
+        "mint": "Bạc hà",
+        "brown": "Nâu"
       }
     }
   }
