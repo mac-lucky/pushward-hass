@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Ang silent webhook (naka-off ang foreground) ay nangangailangan ng http:// o https:// URL.",
         "invalid_gauge_range": "Ang pinakamababang halaga ay dapat na mas mababa sa pinakamataas na halaga.",
         "tiles_required": "Kailangan ng kahit isang tile para sa board template.",
-        "too_many_series": "Sinusuportahan ng isang timeline ang hanggang 10 serye sa kabuuan (mga series attribute kasama ang mga series entity)."
+        "too_many_series": "Sinusuportahan ng isang timeline ang hanggang 10 serye sa kabuuan (mga series attribute kasama ang mga series entity).",
+        "step_length_mismatch": "Ang mga hilera, timbang, at kulay ng hakbang ay dapat may eksaktong isang entry bawat hakbang (katumbas ng kabuuang hakbang).",
+        "invalid_step_rows": "Ang mga hilera ng hakbang ay dapat buong numero, isa bawat hakbang (hal. 1, 2, 3).",
+        "invalid_step_weights": "Ang mga timbang ng hakbang ay dapat positibong numero, isa bawat hakbang (hal. 1, 2.5, 1).",
+        "invalid_step_colors": "Ang mga kulay ng hakbang ay dapat pinangalanang kulay o hex tulad ng #ff0000; iwang blangko ang isang puwang para panatilihin ang accent na kulay.",
+        "invalid_tile": "Ang bawat tile ay dapat label=entity_id (hal. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Ang isang board ay sumusuporta ng hanggang 4 na tile.",
+        "invalid_series_entity": "Ang bawat series entity ay dapat tumukoy sa isang entity_id (hal. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Kailangan ng bawat column ng pinagmulan: isang attribute, entity_id, o entity_id:attribute.",
+        "too_many_log_columns": "Ang isang log line ay sumusuporta ng hanggang 6 na column.",
+        "invalid_threshold": "Ang bawat threshold ay dapat magsimula sa numero (hal. 25:red:Hot).",
+        "too_many_thresholds": "Ang isang timeline ay sumusuporta ng hanggang 5 threshold.",
+        "invalid_number": "Maglagay ng wastong numero.",
+        "unknown_primary_series": "Ang pangunahing series ay dapat tumugma sa isa sa mga na-configure na label ng series."
       },
       "abort": {
         "already_configured": "Ang entity na ito ay naka-track na.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "Dapat may kasamang valid na scheme ang URL. Gamitin ang http(s):// o custom app scheme tulad ng homeassistant://.",
         "silent_requires_http": "Ang silent webhook (naka-off ang foreground) ay nangangailangan ng http:// o https:// URL.",
         "invalid_gauge_range": "Ang pinakamababang halaga ay dapat mas mababa sa pinakamataas na halaga.",
-        "stat_rows_required": "Kailangan ng kahit isang stat row para sa stat_list template."
+        "stat_rows_required": "Kailangan ng kahit isang stat row para sa stat_list template.",
+        "invalid_stat_row": "Ang bawat hilera ay dapat label=entity_id (hal. Users=sensor.user_count).",
+        "too_many_stat_rows": "Ang isang stat list ay sumusuporta ng hanggang 6 na hilera.",
+        "invalid_number": "Maglagay ng wastong numero."
       },
       "abort": {
         "already_configured": "May widget na umiiral na sa slug na ito.",

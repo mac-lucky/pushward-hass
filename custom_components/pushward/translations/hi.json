@@ -1564,7 +1564,20 @@
         "silent_requires_http": "साइलेंट वेबहुक (foreground बंद) के लिए http:// या https:// URL आवश्यक है।",
         "invalid_gauge_range": "न्यूनतम मान, अधिकतम मान से कम होना चाहिए।",
         "tiles_required": "board टेम्पलेट के लिए कम से कम एक टाइल आवश्यक है।",
-        "too_many_series": "एक timeline में कुल मिलाकर अधिकतम 10 सीरीज़ समर्थित हैं (सीरीज़ attributes और सीरीज़ एंटिटी मिलाकर)।"
+        "too_many_series": "एक timeline में कुल मिलाकर अधिकतम 10 सीरीज़ समर्थित हैं (सीरीज़ attributes और सीरीज़ एंटिटी मिलाकर)।",
+        "step_length_mismatch": "स्टेप की पंक्तियों, वज़न और रंगों में प्रति स्टेप ठीक एक मान होना चाहिए (कुल स्टेप के बराबर)।",
+        "invalid_step_rows": "स्टेप की पंक्तियाँ पूर्ण संख्याएँ होनी चाहिए, प्रति स्टेप एक (जैसे 1, 2, 3)।",
+        "invalid_step_weights": "स्टेप के वज़न धनात्मक संख्याएँ होनी चाहिए, प्रति स्टेप एक (जैसे 1, 2.5, 1)।",
+        "invalid_step_colors": "स्टेप के रंग नामित रंग या #ff0000 जैसे हेक्स होने चाहिए; एक्सेंट रंग रखने के लिए स्लॉट खाली छोड़ें।",
+        "invalid_tile": "प्रत्येक टाइल label=entity_id होनी चाहिए (जैसे CPU=sensor.cpu_temp)।",
+        "too_many_tiles": "एक बोर्ड अधिकतम 4 टाइल का समर्थन करता है।",
+        "invalid_series_entity": "प्रत्येक सीरीज़ एंटिटी को किसी entity_id का संदर्भ देना चाहिए (जैसे Bedroom=sensor.bedroom_pm25)।",
+        "invalid_log_column": "प्रत्येक कॉलम को एक स्रोत चाहिए: एक एट्रिब्यूट, entity_id, या entity_id:attribute।",
+        "too_many_log_columns": "एक लॉग लाइन अधिकतम 6 कॉलम का समर्थन करती है।",
+        "invalid_threshold": "प्रत्येक थ्रेशोल्ड एक संख्या से शुरू होना चाहिए (जैसे 25:red:Hot)।",
+        "too_many_thresholds": "एक टाइमलाइन अधिकतम 5 थ्रेशोल्ड का समर्थन करती है।",
+        "invalid_number": "एक मान्य संख्या दर्ज करें।",
+        "unknown_primary_series": "प्राइमरी सीरीज़ कॉन्फ़िगर की गई सीरीज़ लेबल में से किसी एक से मेल खानी चाहिए।"
       },
       "abort": {
         "already_configured": "यह इकाई पहले से ट्रैक की जा रही है।",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL में एक मान्य स्कीम होनी चाहिए। http(s):// या homeassistant:// जैसी कस्टम ऐप स्कीम उपयोग करें।",
         "silent_requires_http": "साइलेंट वेबहुक (foreground बंद) के लिए http:// या https:// URL आवश्यक है।",
         "invalid_gauge_range": "न्यूनतम मान अधिकतम मान से कम होना चाहिए।",
-        "stat_rows_required": "stat_list टेम्पलेट के लिए कम से कम एक स्टैट पंक्ति आवश्यक है।"
+        "stat_rows_required": "stat_list टेम्पलेट के लिए कम से कम एक स्टैट पंक्ति आवश्यक है।",
+        "invalid_stat_row": "प्रत्येक पंक्ति label=entity_id होनी चाहिए (जैसे Users=sensor.user_count)।",
+        "too_many_stat_rows": "एक स्टैट सूची अधिकतम 6 पंक्तियों का समर्थन करती है।",
+        "invalid_number": "एक मान्य संख्या दर्ज करें।"
       },
       "abort": {
         "already_configured": "इस स्लग वाला विजेट पहले से मौजूद है।",

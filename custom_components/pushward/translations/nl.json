@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Stille webhook (foreground uit) vereist een http:// of https://-URL.",
         "invalid_gauge_range": "De minimumwaarde moet kleiner zijn dan de maximumwaarde.",
         "tiles_required": "Voor het board-sjabloon is minimaal één tegel vereist.",
-        "too_many_series": "Een timeline ondersteunt in totaal maximaal 10 reeksen (reeksattributen plus reeksentiteiten)."
+        "too_many_series": "Een timeline ondersteunt in totaal maximaal 10 reeksen (reeksattributen plus reeksentiteiten).",
+        "step_length_mismatch": "Staprijen, -gewichten en -kleuren moeten elk precies één waarde per stap bevatten (gelijk aan het totale aantal stappen).",
+        "invalid_step_rows": "Staprijen moeten hele getallen zijn, één per stap (bijv. 1, 2, 3).",
+        "invalid_step_weights": "Stapgewichten moeten positieve getallen zijn, één per stap (bijv. 1, 2.5, 1).",
+        "invalid_step_colors": "Stapkleuren moeten benoemde kleuren of hex zoals #ff0000 zijn; laat een vak leeg om de accentkleur te behouden.",
+        "invalid_tile": "Elke tegel moet label=entity_id zijn (bijv. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Een board ondersteunt maximaal 4 tegels.",
+        "invalid_series_entity": "Elke reeks-entiteit moet naar een entity_id verwijzen (bijv. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Elke kolom heeft een bron nodig: een attribuut, entity_id of entity_id:attribute.",
+        "too_many_log_columns": "Een logregel ondersteunt maximaal 6 kolommen.",
+        "invalid_threshold": "Elke drempel moet met een getal beginnen (bijv. 25:red:Hot).",
+        "too_many_thresholds": "Een tijdlijn ondersteunt maximaal 5 drempels.",
+        "invalid_number": "Voer een geldig getal in.",
+        "unknown_primary_series": "De primaire reeks moet overeenkomen met een van de geconfigureerde reekslabels."
       },
       "abort": {
         "already_configured": "Deze entiteit wordt al gevolgd.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL moet een geldig schema bevatten. Gebruik http(s):// of een aangepast app-schema zoals homeassistant://.",
         "silent_requires_http": "Stille webhook (foreground uit) vereist een http:// of https://-URL.",
         "invalid_gauge_range": "Minimumwaarde moet kleiner zijn dan de maximumwaarde.",
-        "stat_rows_required": "Voor het stat_list-sjabloon is minimaal één statistiekrij vereist."
+        "stat_rows_required": "Voor het stat_list-sjabloon is minimaal één statistiekrij vereist.",
+        "invalid_stat_row": "Elke rij moet label=entity_id zijn (bijv. Users=sensor.user_count).",
+        "too_many_stat_rows": "Een statistiekenlijst ondersteunt maximaal 6 rijen.",
+        "invalid_number": "Voer een geldig getal in."
       },
       "abort": {
         "already_configured": "Er bestaat al een widget met deze slug.",

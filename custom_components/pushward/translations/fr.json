@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Le webhook silencieux (premier plan désactivé) nécessite une URL http:// ou https://.",
         "invalid_gauge_range": "La valeur minimale doit être inférieure à la valeur maximale.",
         "tiles_required": "Au moins une tuile est requise pour le modèle tableau.",
-        "too_many_series": "Un timeline prend en charge au maximum 10 séries au total (attributs de série plus entités de série)."
+        "too_many_series": "Un timeline prend en charge au maximum 10 séries au total (attributs de série plus entités de série).",
+        "step_length_mismatch": "Les lignes, poids et couleurs des étapes doivent avoir exactement une entrée par étape (égale au nombre total d'étapes).",
+        "invalid_step_rows": "Les lignes des étapes doivent être des nombres entiers, un par étape (ex. 1, 2, 3).",
+        "invalid_step_weights": "Les poids des étapes doivent être des nombres positifs, un par étape (ex. 1, 2.5, 1).",
+        "invalid_step_colors": "Les couleurs des étapes doivent être des noms de couleur ou de l'hexadécimal comme #ff0000 ; laissez une case vide pour conserver la couleur d'accent.",
+        "invalid_tile": "Chaque tuile doit être au format label=entity_id (ex. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Un tableau prend en charge au maximum 4 tuiles.",
+        "invalid_series_entity": "Chaque entité de série doit référencer un entity_id (ex. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Chaque colonne a besoin d'une source : un attribut, un entity_id ou entity_id:attribute.",
+        "too_many_log_columns": "Une ligne de journal prend en charge au maximum 6 colonnes.",
+        "invalid_threshold": "Chaque seuil doit commencer par un nombre (ex. 25:red:Hot).",
+        "too_many_thresholds": "Une timeline prend en charge au maximum 5 seuils.",
+        "invalid_number": "Saisissez un nombre valide.",
+        "unknown_primary_series": "La série principale doit correspondre à l'un des libellés de série configurés."
       },
       "abort": {
         "already_configured": "Cette entité est déjà suivie.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "L'URL doit comporter un schéma valide. Utilisez http(s):// ou un schéma d'application personnalisé comme homeassistant://.",
         "silent_requires_http": "Le webhook silencieux (premier plan désactivé) nécessite une URL http:// ou https://.",
         "invalid_gauge_range": "La valeur minimale doit être inférieure à la valeur maximale.",
-        "stat_rows_required": "Au moins une ligne de statistiques est requise pour le modèle stat_list."
+        "stat_rows_required": "Au moins une ligne de statistiques est requise pour le modèle stat_list.",
+        "invalid_stat_row": "Chaque ligne doit être au format label=entity_id (ex. Users=sensor.user_count).",
+        "too_many_stat_rows": "Une liste de statistiques prend en charge au maximum 6 lignes.",
+        "invalid_number": "Saisissez un nombre valide."
       },
       "abort": {
         "already_configured": "Un widget avec ce slug existe déjà.",

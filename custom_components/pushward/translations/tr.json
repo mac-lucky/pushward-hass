@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Sessiz webhook (foreground kapalı) bir http:// veya https:// URL'si gerektirir.",
         "invalid_gauge_range": "Minimum değer, maksimum değerden küçük olmalıdır.",
         "tiles_required": "board şablonu için en az bir kutu gereklidir.",
-        "too_many_series": "timeline şablonu, toplamda en fazla 10 seriyi destekler (seri öznitelikleri artı seri varlıkları)."
+        "too_many_series": "timeline şablonu, toplamda en fazla 10 seriyi destekler (seri öznitelikleri artı seri varlıkları).",
+        "step_length_mismatch": "Adım satırları, ağırlıkları ve renkleri her adım için tam olarak bir değer içermelidir (toplam adım sayısına eşit).",
+        "invalid_step_rows": "Adım satırları tam sayı olmalıdır, her adım için bir tane (örn. 1, 2, 3).",
+        "invalid_step_weights": "Adım ağırlıkları pozitif sayı olmalıdır, her adım için bir tane (örn. 1, 2.5, 1).",
+        "invalid_step_colors": "Adım renkleri adlandırılmış renk veya #ff0000 gibi hex olmalıdır; vurgu rengini korumak için bir alanı boş bırakın.",
+        "invalid_tile": "Her kutu label=entity_id biçiminde olmalıdır (örn. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Bir pano en fazla 4 kutu destekler.",
+        "invalid_series_entity": "Her seri varlığı bir entity_id belirtmelidir (örn. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Her sütun bir kaynak gerektirir: bir öznitelik, entity_id veya entity_id:attribute.",
+        "too_many_log_columns": "Bir günlük satırı en fazla 6 sütun destekler.",
+        "invalid_threshold": "Her eşik bir sayıyla başlamalıdır (örn. 25:red:Hot).",
+        "too_many_thresholds": "Bir zaman çizelgesi en fazla 5 eşik destekler.",
+        "invalid_number": "Geçerli bir sayı girin.",
+        "unknown_primary_series": "Birincil seri, yapılandırılmış seri etiketlerinden biriyle eşleşmelidir."
       },
       "abort": {
         "already_configured": "Bu varlık zaten izleniyor.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL geçerli bir şema içermelidir. http(s):// veya homeassistant:// gibi özel bir uygulama şeması kullanın.",
         "silent_requires_http": "Sessiz webhook (foreground kapalı) bir http:// veya https:// URL'si gerektirir.",
         "invalid_gauge_range": "Minimum değer maksimum değerden küçük olmalıdır.",
-        "stat_rows_required": "stat_list şablonu için en az bir istatistik satırı gereklidir."
+        "stat_rows_required": "stat_list şablonu için en az bir istatistik satırı gereklidir.",
+        "invalid_stat_row": "Her satır label=entity_id biçiminde olmalıdır (örn. Users=sensor.user_count).",
+        "too_many_stat_rows": "Bir istatistik listesi en fazla 6 satır destekler.",
+        "invalid_number": "Geçerli bir sayı girin."
       },
       "abort": {
         "already_configured": "Bu slug'a sahip bir widget zaten var.",

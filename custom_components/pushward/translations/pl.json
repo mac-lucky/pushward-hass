@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Cichy webhook (wyłączony pierwszy plan) wymaga adresu URL http:// lub https://.",
         "invalid_gauge_range": "Wartość minimalna musi być mniejsza od wartości maksymalnej.",
         "tiles_required": "Szablon board wymaga co najmniej jednego kafelka.",
-        "too_many_series": "Szablon timeline obsługuje maksymalnie 10 serii łącznie (atrybuty serii plus encje serii)."
+        "too_many_series": "Szablon timeline obsługuje maksymalnie 10 serii łącznie (atrybuty serii plus encje serii).",
+        "step_length_mismatch": "Wiersze, wagi i kolory kroków muszą mieć dokładnie jeden wpis na krok (zgodnie z łączną liczbą kroków).",
+        "invalid_step_rows": "Wiersze kroków muszą być liczbami całkowitymi, po jednej na krok (np. 1, 2, 3).",
+        "invalid_step_weights": "Wagi kroków muszą być liczbami dodatnimi, po jednej na krok (np. 1, 2.5, 1).",
+        "invalid_step_colors": "Kolory kroków muszą być nazwami kolorów lub wartościami hex, np. #ff0000; pozostaw puste pole, aby zachować kolor akcentu.",
+        "invalid_tile": "Każdy kafelek musi mieć postać label=entity_id (np. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Tablica obsługuje maksymalnie 4 kafelki.",
+        "invalid_series_entity": "Każda encja serii musi wskazywać entity_id (np. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Każda kolumna wymaga źródła: atrybutu, entity_id lub entity_id:attribute.",
+        "too_many_log_columns": "Wiersz dziennika obsługuje maksymalnie 6 kolumn.",
+        "invalid_threshold": "Każdy próg musi zaczynać się od liczby (np. 25:red:Hot).",
+        "too_many_thresholds": "Oś czasu obsługuje maksymalnie 5 progów.",
+        "invalid_number": "Wprowadź prawidłową liczbę.",
+        "unknown_primary_series": "Seria podstawowa musi odpowiadać jednej ze skonfigurowanych etykiet serii."
       },
       "abort": {
         "already_configured": "Ta encja jest już śledzona.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "Adres URL musi zawierać prawidłowy schemat. Użyj http(s):// lub niestandardowego schematu aplikacji, np. homeassistant://.",
         "silent_requires_http": "Cichy webhook (wyłączony pierwszy plan) wymaga adresu URL http:// lub https://.",
         "invalid_gauge_range": "Wartość minimalna musi być mniejsza niż wartość maksymalna.",
-        "stat_rows_required": "Szablon stat_list wymaga co najmniej jednego wiersza statystyk."
+        "stat_rows_required": "Szablon stat_list wymaga co najmniej jednego wiersza statystyk.",
+        "invalid_stat_row": "Każdy wiersz musi mieć postać label=entity_id (np. Users=sensor.user_count).",
+        "too_many_stat_rows": "Lista statystyk obsługuje maksymalnie 6 wierszy.",
+        "invalid_number": "Wprowadź prawidłową liczbę."
       },
       "abort": {
         "already_configured": "Widżet z tym slugiem już istnieje.",

@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Il webhook silenzioso (primo piano disattivato) richiede un URL http:// o https://.",
         "invalid_gauge_range": "Il valore minimo deve essere inferiore al valore massimo.",
         "tiles_required": "È richiesto almeno un riquadro per il modello pannello.",
-        "too_many_series": "Un timeline supporta al massimo 10 serie in totale (attributi di serie più entità di serie)."
+        "too_many_series": "Un timeline supporta al massimo 10 serie in totale (attributi di serie più entità di serie).",
+        "step_length_mismatch": "Righe, pesi e colori dei passi devono avere esattamente una voce per passo (pari al numero totale di passi).",
+        "invalid_step_rows": "Le righe dei passi devono essere numeri interi, una per passo (es. 1, 2, 3).",
+        "invalid_step_weights": "I pesi dei passi devono essere numeri positivi, uno per passo (es. 1, 2.5, 1).",
+        "invalid_step_colors": "I colori dei passi devono essere colori con nome o esadecimali come #ff0000; lascia vuoto uno slot per mantenere il colore d'accento.",
+        "invalid_tile": "Ogni riquadro deve essere label=entity_id (es. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Una board supporta al massimo 4 riquadri.",
+        "invalid_series_entity": "Ogni entità della serie deve fare riferimento a un entity_id (es. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Ogni colonna richiede una sorgente: un attributo, un entity_id o entity_id:attribute.",
+        "too_many_log_columns": "Una riga di log supporta al massimo 6 colonne.",
+        "invalid_threshold": "Ogni soglia deve iniziare con un numero (es. 25:red:Hot).",
+        "too_many_thresholds": "Una timeline supporta al massimo 5 soglie.",
+        "invalid_number": "Inserisci un numero valido.",
+        "unknown_primary_series": "La serie principale deve corrispondere a una delle etichette di serie configurate."
       },
       "abort": {
         "already_configured": "Questa entità è già monitorata.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "L'URL deve includere uno schema valido. Usa http(s):// o uno schema di app personalizzato come homeassistant://.",
         "silent_requires_http": "Il webhook silenzioso (primo piano disattivato) richiede un URL http:// o https://.",
         "invalid_gauge_range": "Il valore minimo deve essere inferiore al valore massimo.",
-        "stat_rows_required": "È necessaria almeno una riga statistica per il modello stat_list."
+        "stat_rows_required": "È necessaria almeno una riga statistica per il modello stat_list.",
+        "invalid_stat_row": "Ogni riga deve essere label=entity_id (es. Users=sensor.user_count).",
+        "too_many_stat_rows": "Un elenco di statistiche supporta al massimo 6 righe.",
+        "invalid_number": "Inserisci un numero valido."
       },
       "abort": {
         "already_configured": "Esiste già un widget con questo slug.",

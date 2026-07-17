@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Silent webhook (foreground off) requires an http:// or https:// URL.",
         "invalid_gauge_range": "Minimum value must be less than maximum value.",
         "tiles_required": "At least one tile is required for the board template.",
-        "too_many_series": "A timeline supports at most 10 series in total (series attributes plus series entities)."
+        "too_many_series": "A timeline supports at most 10 series in total (series attributes plus series entities).",
+        "step_length_mismatch": "Step rows, weights, and colors must each have exactly one entry per step (matching total steps).",
+        "invalid_step_rows": "Step rows must be whole numbers, one per step (e.g. 1, 2, 3).",
+        "invalid_step_weights": "Step weights must be positive numbers, one per step (e.g. 1, 2.5, 1).",
+        "invalid_step_colors": "Step colors must be named colors or hex like #ff0000; leave a slot blank to keep the accent color.",
+        "invalid_tile": "Each tile must be label=entity_id (e.g. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "A board supports at most 4 tiles.",
+        "invalid_series_entity": "Each series entity must reference an entity_id (e.g. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Each column needs a source: an attribute, entity_id, or entity_id:attribute.",
+        "too_many_log_columns": "A log line supports at most 6 columns.",
+        "invalid_threshold": "Each threshold must start with a number (e.g. 25:red:Hot).",
+        "too_many_thresholds": "A timeline supports at most 5 thresholds.",
+        "invalid_number": "Enter a valid number.",
+        "unknown_primary_series": "Primary series must match one of the configured series labels."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL must include a valid scheme. Use http(s):// or a custom app scheme like homeassistant://.",
         "silent_requires_http": "Silent webhook (foreground off) requires an http:// or https:// URL.",
         "invalid_gauge_range": "Minimum value must be less than maximum value.",
-        "stat_rows_required": "At least one stat row is required for the stat_list template."
+        "stat_rows_required": "At least one stat row is required for the stat_list template.",
+        "invalid_stat_row": "Each row must be label=entity_id (e.g. Users=sensor.user_count).",
+        "too_many_stat_rows": "A stat list supports at most 6 rows.",
+        "invalid_number": "Enter a valid number."
       },
       "abort": {
         "already_configured": "A widget with this slug already exists.",

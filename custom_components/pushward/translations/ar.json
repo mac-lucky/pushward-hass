@@ -1564,7 +1564,20 @@
         "silent_requires_http": "يتطلب خطاف الويب الصامت (إيقاف foreground) عنوان URL بصيغة http:// أو https://.",
         "invalid_gauge_range": "يجب أن يكون الحد الأدنى للقيمة أصغر من الحد الأقصى.",
         "tiles_required": "يلزم وجود بلاطة واحدة على الأقل لقالب board.",
-        "too_many_series": "يدعم قالب timeline ما لا يزيد عن 10 سلاسل إجمالاً (خصائص السلاسل بالإضافة إلى كيانات السلاسل)."
+        "too_many_series": "يدعم قالب timeline ما لا يزيد عن 10 سلاسل إجمالاً (خصائص السلاسل بالإضافة إلى كيانات السلاسل).",
+        "step_length_mismatch": "يجب أن تحتوي صفوف الخطوات وأوزانها وألوانها على إدخال واحد لكل خطوة (مطابق لإجمالي الخطوات).",
+        "invalid_step_rows": "يجب أن تكون صفوف الخطوات أعدادًا صحيحة، واحدًا لكل خطوة (مثال: 1، 2، 3).",
+        "invalid_step_weights": "يجب أن تكون أوزان الخطوات أرقامًا موجبة، واحدًا لكل خطوة (مثال: 1، 2.5، 1).",
+        "invalid_step_colors": "يجب أن تكون ألوان الخطوات أسماء ألوان أو قيمًا سداسية مثل #ff0000؛ اترك الخانة فارغة للإبقاء على لون التمييز.",
+        "invalid_tile": "يجب أن يكون كل مربع بالصيغة label=entity_id (مثال: CPU=sensor.cpu_temp).",
+        "too_many_tiles": "تدعم اللوحة 4 مربعات كحد أقصى.",
+        "invalid_series_entity": "يجب أن تشير كل سلسلة إلى entity_id (مثال: Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "تحتاج كل خانة إلى مصدر: سمة أو entity_id أو entity_id:attribute.",
+        "too_many_log_columns": "يدعم سطر السجل 6 خانات كحد أقصى.",
+        "invalid_threshold": "يجب أن تبدأ كل عتبة برقم (مثال: 25:red:Hot).",
+        "too_many_thresholds": "يدعم المخطط الزمني 5 عتبات كحد أقصى.",
+        "invalid_number": "أدخل رقمًا صالحًا.",
+        "unknown_primary_series": "يجب أن تطابق السلسلة الأساسية إحدى تسميات السلاسل المُهيأة."
       },
       "abort": {
         "already_configured": "هذا الكيان مُتتبَّع بالفعل.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "يجب أن يتضمن عنوان URL مخططًا صالحًا. استخدم http(s):// أو مخطط تطبيق مخصصًا مثل homeassistant://.",
         "silent_requires_http": "يتطلب خطاف الويب الصامت (إيقاف foreground) عنوان URL بصيغة http:// أو https://.",
         "invalid_gauge_range": "يجب أن تكون القيمة الدنيا أقل من القيمة القصوى.",
-        "stat_rows_required": "يلزم صف إحصائي واحد على الأقل لقالب stat_list."
+        "stat_rows_required": "يلزم صف إحصائي واحد على الأقل لقالب stat_list.",
+        "invalid_stat_row": "يجب أن يكون كل صف بالصيغة label=entity_id (مثال: Users=sensor.user_count).",
+        "too_many_stat_rows": "تدعم قائمة الإحصاءات 6 صفوف كحد أقصى.",
+        "invalid_number": "أدخل رقمًا صالحًا."
       },
       "abort": {
         "already_configured": "توجد بالفعل أداة بهذا الـ slug.",

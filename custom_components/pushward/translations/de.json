@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Ein stiller Webhook (Vordergrund aus) erfordert eine http://- oder https://-URL.",
         "invalid_gauge_range": "Der Minimalwert muss kleiner als der Maximalwert sein.",
         "tiles_required": "Für die Vorlage 'board' ist mindestens eine Kachel erforderlich.",
-        "too_many_series": "Eine Timeline unterstützt insgesamt höchstens 10 Datenreihen (Datenreihen-Attribute plus Datenreihen-Entitäten)."
+        "too_many_series": "Eine Timeline unterstützt insgesamt höchstens 10 Datenreihen (Datenreihen-Attribute plus Datenreihen-Entitäten).",
+        "step_length_mismatch": "Schrittzeilen, -gewichte und -farben müssen je genau einen Eintrag pro Schritt haben (passend zur Gesamtzahl der Schritte).",
+        "invalid_step_rows": "Schrittzeilen müssen ganze Zahlen sein, eine pro Schritt (z. B. 1, 2, 3).",
+        "invalid_step_weights": "Schrittgewichte müssen positive Zahlen sein, eine pro Schritt (z. B. 1, 2.5, 1).",
+        "invalid_step_colors": "Schrittfarben müssen benannte Farben oder Hex wie #ff0000 sein; ein leeres Feld behält die Akzentfarbe.",
+        "invalid_tile": "Jede Kachel muss label=entity_id sein (z. B. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Ein Board unterstützt höchstens 4 Kacheln.",
+        "invalid_series_entity": "Jede Datenreihen-Entität muss auf eine entity_id verweisen (z. B. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Jede Spalte benötigt eine Quelle: ein Attribut, eine entity_id oder entity_id:attribute.",
+        "too_many_log_columns": "Eine Protokollzeile unterstützt höchstens 6 Spalten.",
+        "invalid_threshold": "Jeder Schwellenwert muss mit einer Zahl beginnen (z. B. 25:red:Hot).",
+        "too_many_thresholds": "Eine Timeline unterstützt höchstens 5 Schwellenwerte.",
+        "invalid_number": "Geben Sie eine gültige Zahl ein.",
+        "unknown_primary_series": "Die primäre Datenreihe muss einer der konfigurierten Datenreihen-Bezeichnungen entsprechen."
       },
       "abort": {
         "already_configured": "Diese Entität wird bereits verfolgt.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "Die URL muss ein gültiges Schema enthalten. http(s):// oder ein benutzerdefiniertes App-Schema wie homeassistant:// verwenden.",
         "silent_requires_http": "Ein stiller Webhook (Vordergrund aus) erfordert eine http://- oder https://-URL.",
         "invalid_gauge_range": "Der Minimalwert muss kleiner als der Maximalwert sein.",
-        "stat_rows_required": "Für die Vorlage 'stat_list' ist mindestens eine Statistikzeile erforderlich."
+        "stat_rows_required": "Für die Vorlage 'stat_list' ist mindestens eine Statistikzeile erforderlich.",
+        "invalid_stat_row": "Jede Zeile muss label=entity_id sein (z. B. Users=sensor.user_count).",
+        "too_many_stat_rows": "Eine Statistikliste unterstützt höchstens 6 Zeilen.",
+        "invalid_number": "Geben Sie eine gültige Zahl ein."
       },
       "abort": {
         "already_configured": "Ein Widget mit diesem Slug existiert bereits.",

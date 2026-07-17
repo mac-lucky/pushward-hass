@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Webhook-ul silențios (prim-plan dezactivat) necesită un URL http:// sau https://.",
         "invalid_gauge_range": "Valoarea minimă trebuie să fie mai mică decât valoarea maximă.",
         "tiles_required": "Este necesară cel puțin o casetă pentru șablonul board.",
-        "too_many_series": "Un șablon timeline acceptă cel mult 10 serii în total (atribute de serie plus entități serie)."
+        "too_many_series": "Un șablon timeline acceptă cel mult 10 serii în total (atribute de serie plus entități serie).",
+        "step_length_mismatch": "Rândurile, ponderile și culorile pașilor trebuie să aibă exact o valoare per pas (egală cu numărul total de pași).",
+        "invalid_step_rows": "Rândurile pașilor trebuie să fie numere întregi, câte unul per pas (ex. 1, 2, 3).",
+        "invalid_step_weights": "Ponderile pașilor trebuie să fie numere pozitive, câte una per pas (ex. 1, 2.5, 1).",
+        "invalid_step_colors": "Culorile pașilor trebuie să fie culori cu nume sau hex precum #ff0000; lasă un câmp gol pentru a păstra culoarea de accent.",
+        "invalid_tile": "Fiecare dală trebuie să fie label=entity_id (ex. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "O tablă acceptă cel mult 4 dale.",
+        "invalid_series_entity": "Fiecare entitate de serie trebuie să indice un entity_id (ex. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Fiecare coloană are nevoie de o sursă: un atribut, entity_id sau entity_id:attribute.",
+        "too_many_log_columns": "O linie de jurnal acceptă cel mult 6 coloane.",
+        "invalid_threshold": "Fiecare prag trebuie să înceapă cu un număr (ex. 25:red:Hot).",
+        "too_many_thresholds": "O cronologie acceptă cel mult 5 praguri.",
+        "invalid_number": "Introduceți un număr valid.",
+        "unknown_primary_series": "Seria principală trebuie să corespundă uneia dintre etichetele de serie configurate."
       },
       "abort": {
         "already_configured": "Această entitate este deja urmărită.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL-ul trebuie să includă o schemă validă. Folosiți http(s):// sau o schemă personalizată de aplicație precum homeassistant://.",
         "silent_requires_http": "Webhook-ul silențios (prim-plan dezactivat) necesită un URL http:// sau https://.",
         "invalid_gauge_range": "Valoarea minimă trebuie să fie mai mică decât valoarea maximă.",
-        "stat_rows_required": "Cel puțin un rând de statistici este necesar pentru șablonul stat_list."
+        "stat_rows_required": "Cel puțin un rând de statistici este necesar pentru șablonul stat_list.",
+        "invalid_stat_row": "Fiecare rând trebuie să fie label=entity_id (ex. Users=sensor.user_count).",
+        "too_many_stat_rows": "O listă de statistici acceptă cel mult 6 rânduri.",
+        "invalid_number": "Introduceți un număr valid."
       },
       "abort": {
         "already_configured": "Există deja un widget cu acest slug.",

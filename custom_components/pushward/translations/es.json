@@ -1564,7 +1564,20 @@
         "silent_requires_http": "El webhook silencioso (primer plano desactivado) requiere una URL http:// o https://.",
         "invalid_gauge_range": "El valor mínimo debe ser menor que el valor máximo.",
         "tiles_required": "Se requiere al menos un mosaico para la plantilla de panel.",
-        "too_many_series": "Un timeline admite como máximo 10 series en total (atributos de serie más entidades de serie)."
+        "too_many_series": "Un timeline admite como máximo 10 series en total (atributos de serie más entidades de serie).",
+        "step_length_mismatch": "Las filas, los pesos y los colores de los pasos deben tener exactamente una entrada por paso (igual al total de pasos).",
+        "invalid_step_rows": "Las filas de los pasos deben ser números enteros, uno por paso (p. ej. 1, 2, 3).",
+        "invalid_step_weights": "Los pesos de los pasos deben ser números positivos, uno por paso (p. ej. 1, 2.5, 1).",
+        "invalid_step_colors": "Los colores de los pasos deben ser colores con nombre o hex como #ff0000; deja el espacio en blanco para mantener el color de acento.",
+        "invalid_tile": "Cada mosaico debe ser label=entity_id (p. ej. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Un panel admite como máximo 4 mosaicos.",
+        "invalid_series_entity": "Cada entidad de serie debe referenciar un entity_id (p. ej. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Cada columna necesita una fuente: un atributo, entity_id o entity_id:attribute.",
+        "too_many_log_columns": "Una línea de registro admite como máximo 6 columnas.",
+        "invalid_threshold": "Cada umbral debe empezar con un número (p. ej. 25:red:Hot).",
+        "too_many_thresholds": "Una línea de tiempo admite como máximo 5 umbrales.",
+        "invalid_number": "Introduce un número válido.",
+        "unknown_primary_series": "La serie principal debe coincidir con una de las etiquetas de serie configuradas."
       },
       "abort": {
         "already_configured": "Esta entidad ya está rastreada.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "La URL debe incluir un esquema válido. Usa http(s):// o un esquema de app personalizado como homeassistant://.",
         "silent_requires_http": "El webhook silencioso (primer plano desactivado) requiere una URL http:// o https://.",
         "invalid_gauge_range": "El valor mínimo debe ser menor que el valor máximo.",
-        "stat_rows_required": "Se requiere al menos una fila de estadísticas para la plantilla stat_list."
+        "stat_rows_required": "Se requiere al menos una fila de estadísticas para la plantilla stat_list.",
+        "invalid_stat_row": "Cada fila debe ser label=entity_id (p. ej. Users=sensor.user_count).",
+        "too_many_stat_rows": "Una lista de estadísticas admite como máximo 6 filas.",
+        "invalid_number": "Introduce un número válido."
       },
       "abort": {
         "already_configured": "Ya existe un widget con este slug.",

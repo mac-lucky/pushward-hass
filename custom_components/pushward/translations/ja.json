@@ -1564,7 +1564,20 @@
         "silent_requires_http": "サイレント Webhook（フォアグラウンドオフ）には http:// または https:// の URL が必要です。",
         "invalid_gauge_range": "最小値は最大値より小さくなければなりません。",
         "tiles_required": "board テンプレートには少なくとも 1 つのタイルが必要です。",
-        "too_many_series": "timeline は、シリーズ属性とシリーズエンティティを合わせて最大10個までのシリーズをサポートします。"
+        "too_many_series": "timeline は、シリーズ属性とシリーズエンティティを合わせて最大10個までのシリーズをサポートします。",
+        "step_length_mismatch": "ステップの行・重み・色は、各ステップにつき1つずつ（合計ステップ数と一致）指定してください。",
+        "invalid_step_rows": "ステップの行は整数で、各ステップに1つ指定してください（例: 1, 2, 3）。",
+        "invalid_step_weights": "ステップの重みは正の数で、各ステップに1つ指定してください（例: 1, 2.5, 1）。",
+        "invalid_step_colors": "ステップの色は色名または #ff0000 のような16進数で指定してください。空欄にするとアクセントカラーが使われます。",
+        "invalid_tile": "各タイルは label=entity_id の形式で指定してください（例: CPU=sensor.cpu_temp）。",
+        "too_many_tiles": "ボードは最大4つのタイルまで対応しています。",
+        "invalid_series_entity": "各シリーズのエンティティは entity_id を参照する必要があります（例: Bedroom=sensor.bedroom_pm25）。",
+        "invalid_log_column": "各列にはソースが必要です: 属性、entity_id、または entity_id:attribute。",
+        "too_many_log_columns": "ログ行は最大6列まで対応しています。",
+        "invalid_threshold": "各しきい値は数値で始める必要があります（例: 25:red:Hot）。",
+        "too_many_thresholds": "タイムラインは最大5つのしきい値まで対応しています。",
+        "invalid_number": "有効な数値を入力してください。",
+        "unknown_primary_series": "プライマリシリーズは、設定済みのシリーズラベルのいずれかと一致する必要があります。"
       },
       "abort": {
         "already_configured": "このエンティティはすでに追跡されています。",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL には有効なスキームを含める必要があります。http(s):// または homeassistant:// のようなカスタムアプリスキームを使用してください。",
         "silent_requires_http": "サイレント Webhook（フォアグラウンドオフ）には http:// または https:// の URL が必要です。",
         "invalid_gauge_range": "最小値は最大値より小さくなければなりません。",
-        "stat_rows_required": "stat_list テンプレートには少なくとも 1 つの統計行が必要です。"
+        "stat_rows_required": "stat_list テンプレートには少なくとも 1 つの統計行が必要です。",
+        "invalid_stat_row": "各行は label=entity_id の形式で指定してください（例: Users=sensor.user_count）。",
+        "too_many_stat_rows": "統計リストは最大6行まで対応しています。",
+        "invalid_number": "有効な数値を入力してください。"
       },
       "abort": {
         "already_configured": "このスラッグのウィジェットはすでに存在します。",

@@ -1564,7 +1564,20 @@
         "silent_requires_http": "सायलेंट वेबहूक (foreground बंद) साठी http:// किंवा https:// URL आवश्यक आहे.",
         "invalid_gauge_range": "किमान मूल्य कमाल मूल्यापेक्षा कमी असणे आवश्यक आहे.",
         "tiles_required": "board टेम्पलेटसाठी किमान एक टाइल आवश्यक आहे.",
-        "too_many_series": "एका Timeline मध्ये एकूण कमाल 10 मालिका असू शकतात (मालिका गुणधर्म अधिक मालिका एंटिटी)."
+        "too_many_series": "एका Timeline मध्ये एकूण कमाल 10 मालिका असू शकतात (मालिका गुणधर्म अधिक मालिका एंटिटी).",
+        "step_length_mismatch": "स्टेपच्या पंक्ती, वजन आणि रंग यांमध्ये प्रत्येक स्टेपसाठी नेमके एकच मूल्य असावे (एकूण स्टेप्सइतके).",
+        "invalid_step_rows": "स्टेपच्या पंक्ती पूर्णांक असाव्यात, प्रत्येक स्टेपसाठी एक (उदा. 1, 2, 3).",
+        "invalid_step_weights": "स्टेपची वजने धन संख्या असावीत, प्रत्येक स्टेपसाठी एक (उदा. 1, 2.5, 1).",
+        "invalid_step_colors": "स्टेपचे रंग नावाचे रंग किंवा #ff0000 सारखे हेक्स असावेत; अ‍ॅक्सेंट रंग ठेवण्यासाठी जागा रिकामी ठेवा.",
+        "invalid_tile": "प्रत्येक टाइल label=entity_id असावी (उदा. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "बोर्ड जास्तीत जास्त 4 टाइल्सना समर्थन देतो.",
+        "invalid_series_entity": "प्रत्येक सीरीज एंटिटीने entity_id चा संदर्भ द्यावा (उदा. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "प्रत्येक स्तंभाला स्रोत आवश्यक आहे: एक अ‍ॅट्रिब्यूट, entity_id, किंवा entity_id:attribute.",
+        "too_many_log_columns": "एक लॉग ओळ जास्तीत जास्त 6 स्तंभांना समर्थन देते.",
+        "invalid_threshold": "प्रत्येक थ्रेशोल्ड संख्येने सुरू व्हावा (उदा. 25:red:Hot).",
+        "too_many_thresholds": "एक टाइमलाइन जास्तीत जास्त 5 थ्रेशोल्डना समर्थन देते.",
+        "invalid_number": "वैध संख्या प्रविष्ट करा.",
+        "unknown_primary_series": "प्राथमिक सीरीज कॉन्फिगर केलेल्या सीरीज लेबलांपैकी एकाशी जुळली पाहिजे."
       },
       "abort": {
         "already_configured": "ही एंटिटी आधीच ट्रॅक केली जात आहे.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL मध्ये वैध स्कीम असावी. http(s):// किंवा homeassistant:// सारखी कस्टम अॅप स्कीम वापरा.",
         "silent_requires_http": "सायलेंट वेबहूक (foreground बंद) साठी http:// किंवा https:// URL आवश्यक आहे.",
         "invalid_gauge_range": "किमान मूल्य कमाल मूल्यापेक्षा कमी असावे.",
-        "stat_rows_required": "stat_list टेम्पलेटसाठी किमान एक स्टॅट ओळ आवश्यक आहे."
+        "stat_rows_required": "stat_list टेम्पलेटसाठी किमान एक स्टॅट ओळ आवश्यक आहे.",
+        "invalid_stat_row": "प्रत्येक पंक्ती label=entity_id असावी (उदा. Users=sensor.user_count).",
+        "too_many_stat_rows": "एक स्टॅट यादी जास्तीत जास्त 6 पंक्तींना समर्थन देते.",
+        "invalid_number": "वैध संख्या प्रविष्ट करा."
       },
       "abort": {
         "already_configured": "या स्लगसह विजेट आधीच अस्तित्वात आहे.",

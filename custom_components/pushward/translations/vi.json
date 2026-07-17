@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Webhook im lặng (tắt foreground) yêu cầu URL http:// hoặc https://.",
         "invalid_gauge_range": "Giá trị tối thiểu phải nhỏ hơn giá trị tối đa.",
         "tiles_required": "Cần ít nhất một ô cho mẫu board.",
-        "too_many_series": "Một timeline hỗ trợ tối đa tổng cộng 10 chuỗi dữ liệu (thuộc tính chuỗi dữ liệu cộng thực thể chuỗi dữ liệu)."
+        "too_many_series": "Một timeline hỗ trợ tối đa tổng cộng 10 chuỗi dữ liệu (thuộc tính chuỗi dữ liệu cộng thực thể chuỗi dữ liệu).",
+        "step_length_mismatch": "Hàng, trọng số và màu của các bước phải có đúng một giá trị cho mỗi bước (bằng tổng số bước).",
+        "invalid_step_rows": "Hàng của các bước phải là số nguyên, mỗi bước một giá trị (vd. 1, 2, 3).",
+        "invalid_step_weights": "Trọng số của các bước phải là số dương, mỗi bước một giá trị (vd. 1, 2.5, 1).",
+        "invalid_step_colors": "Màu của các bước phải là tên màu hoặc hex như #ff0000; để trống một ô để giữ màu nhấn.",
+        "invalid_tile": "Mỗi ô phải theo dạng label=entity_id (vd. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Bảng hỗ trợ tối đa 4 ô.",
+        "invalid_series_entity": "Mỗi thực thể chuỗi phải tham chiếu một entity_id (vd. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Mỗi cột cần một nguồn: một thuộc tính, entity_id hoặc entity_id:attribute.",
+        "too_many_log_columns": "Một dòng nhật ký hỗ trợ tối đa 6 cột.",
+        "invalid_threshold": "Mỗi ngưỡng phải bắt đầu bằng một số (vd. 25:red:Hot).",
+        "too_many_thresholds": "Một dòng thời gian hỗ trợ tối đa 5 ngưỡng.",
+        "invalid_number": "Nhập một số hợp lệ.",
+        "unknown_primary_series": "Chuỗi chính phải khớp với một trong các nhãn chuỗi đã cấu hình."
       },
       "abort": {
         "already_configured": "Thực thể này đã được theo dõi.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL phải bao gồm một scheme hợp lệ. Dùng http(s):// hoặc một scheme ứng dụng tùy chỉnh như homeassistant://.",
         "silent_requires_http": "Webhook im lặng (tắt foreground) yêu cầu URL http:// hoặc https://.",
         "invalid_gauge_range": "Giá trị tối thiểu phải nhỏ hơn giá trị tối đa.",
-        "stat_rows_required": "Cần ít nhất một hàng thống kê cho mẫu stat_list."
+        "stat_rows_required": "Cần ít nhất một hàng thống kê cho mẫu stat_list.",
+        "invalid_stat_row": "Mỗi hàng phải theo dạng label=entity_id (vd. Users=sensor.user_count).",
+        "too_many_stat_rows": "Danh sách thống kê hỗ trợ tối đa 6 hàng.",
+        "invalid_number": "Nhập một số hợp lệ."
       },
       "abort": {
         "already_configured": "Đã tồn tại một widget với slug này.",

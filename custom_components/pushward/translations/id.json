@@ -1564,7 +1564,20 @@
         "silent_requires_http": "Webhook senyap (foreground nonaktif) memerlukan URL http:// atau https://.",
         "invalid_gauge_range": "Nilai minimum harus lebih kecil dari nilai maksimum.",
         "tiles_required": "Minimal satu ubin diperlukan untuk templat board.",
-        "too_many_series": "Sebuah timeline mendukung maksimal 10 seri secara total (atribut seri ditambah entitas seri)."
+        "too_many_series": "Sebuah timeline mendukung maksimal 10 seri secara total (atribut seri ditambah entitas seri).",
+        "step_length_mismatch": "Baris, bobot, dan warna langkah masing-masing harus berisi tepat satu entri per langkah (sesuai total langkah).",
+        "invalid_step_rows": "Baris langkah harus berupa bilangan bulat, satu per langkah (mis. 1, 2, 3).",
+        "invalid_step_weights": "Bobot langkah harus berupa angka positif, satu per langkah (mis. 1, 2.5, 1).",
+        "invalid_step_colors": "Warna langkah harus berupa nama warna atau hex seperti #ff0000; kosongkan slot untuk mempertahankan warna aksen.",
+        "invalid_tile": "Setiap tile harus label=entity_id (mis. CPU=sensor.cpu_temp).",
+        "too_many_tiles": "Papan mendukung maksimal 4 tile.",
+        "invalid_series_entity": "Setiap entitas seri harus merujuk ke entity_id (mis. Bedroom=sensor.bedroom_pm25).",
+        "invalid_log_column": "Setiap kolom memerlukan sumber: atribut, entity_id, atau entity_id:attribute.",
+        "too_many_log_columns": "Satu baris log mendukung maksimal 6 kolom.",
+        "invalid_threshold": "Setiap ambang harus diawali angka (mis. 25:red:Hot).",
+        "too_many_thresholds": "Satu timeline mendukung maksimal 5 ambang.",
+        "invalid_number": "Masukkan angka yang valid.",
+        "unknown_primary_series": "Seri utama harus cocok dengan salah satu label seri yang dikonfigurasi."
       },
       "abort": {
         "already_configured": "Entitas ini sudah dilacak.",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL harus menyertakan skema yang valid. Gunakan http(s):// atau skema aplikasi khusus seperti homeassistant://.",
         "silent_requires_http": "Webhook senyap (foreground nonaktif) memerlukan URL http:// atau https://.",
         "invalid_gauge_range": "Nilai minimum harus lebih kecil dari nilai maksimum.",
-        "stat_rows_required": "Minimal satu baris statistik diperlukan untuk templat stat_list."
+        "stat_rows_required": "Minimal satu baris statistik diperlukan untuk templat stat_list.",
+        "invalid_stat_row": "Setiap baris harus label=entity_id (mis. Users=sensor.user_count).",
+        "too_many_stat_rows": "Daftar statistik mendukung maksimal 6 baris.",
+        "invalid_number": "Masukkan angka yang valid."
       },
       "abort": {
         "already_configured": "Widget dengan slug ini sudah ada.",

@@ -1564,7 +1564,20 @@
         "silent_requires_http": "خاموش webhook (foreground آف) کے لیے http:// یا https:// URL درکار ہے۔",
         "invalid_gauge_range": "کم از کم قدر زیادہ سے زیادہ قدر سے کم ہونی چاہیے۔",
         "tiles_required": "بورڈ ٹیمپلیٹ کے لیے کم از کم ایک ٹائل درکار ہے۔",
-        "too_many_series": "ایک Timeline میں مجموعی طور پر زیادہ سے زیادہ 10 سیریز سپورٹ ہیں (سیریز خصوصیات جمع سیریز اینٹٹیز)۔"
+        "too_many_series": "ایک Timeline میں مجموعی طور پر زیادہ سے زیادہ 10 سیریز سپورٹ ہیں (سیریز خصوصیات جمع سیریز اینٹٹیز)۔",
+        "step_length_mismatch": "قدم کی قطاریں، وزن اور رنگ ہر قدم کے لیے بالکل ایک اندراج رکھیں (کل اقدام کے برابر)۔",
+        "invalid_step_rows": "قدم کی قطاریں مکمل اعداد ہونی چاہئیں، ہر قدم کے لیے ایک (مثلاً 1، 2، 3)۔",
+        "invalid_step_weights": "قدم کے وزن مثبت اعداد ہونے چاہئیں، ہر قدم کے لیے ایک (مثلاً 1، 2.5، 1)۔",
+        "invalid_step_colors": "قدم کے رنگ نام والے رنگ یا #ff0000 جیسے ہیکس ہونے چاہئیں؛ ایکسنٹ رنگ برقرار رکھنے کے لیے خانہ خالی چھوڑ دیں۔",
+        "invalid_tile": "ہر ٹائل label=entity_id ہونی چاہیے (مثلاً CPU=sensor.cpu_temp)۔",
+        "too_many_tiles": "ایک بورڈ زیادہ سے زیادہ 4 ٹائلز کی حمایت کرتا ہے۔",
+        "invalid_series_entity": "ہر سیریز انٹیٹی کو کسی entity_id کا حوالہ دینا چاہیے (مثلاً Bedroom=sensor.bedroom_pm25)۔",
+        "invalid_log_column": "ہر کالم کو ایک ماخذ درکار ہے: ایک ایٹریبیوٹ، entity_id، یا entity_id:attribute۔",
+        "too_many_log_columns": "ایک لاگ لائن زیادہ سے زیادہ 6 کالمز کی حمایت کرتی ہے۔",
+        "invalid_threshold": "ہر تھریش ہولڈ نمبر سے شروع ہونا چاہیے (مثلاً 25:red:Hot)۔",
+        "too_many_thresholds": "ایک ٹائم لائن زیادہ سے زیادہ 5 تھریش ہولڈز کی حمایت کرتی ہے۔",
+        "invalid_number": "ایک درست نمبر درج کریں۔",
+        "unknown_primary_series": "پرائمری سیریز کو ترتیب دی گئی سیریز لیبلز میں سے کسی ایک سے مماثل ہونا چاہیے۔"
       },
       "abort": {
         "already_configured": "یہ اینٹٹی پہلے سے ٹریک ہو رہی ہے۔",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL میں ایک درست اسکیم ہونی چاہیے۔ http(s):// یا کوئی کسٹم ایپ اسکیم جیسے homeassistant:// استعمال کریں۔",
         "silent_requires_http": "خاموش webhook (foreground آف) کے لیے http:// یا https:// URL درکار ہے۔",
         "invalid_gauge_range": "کم از کم قدر زیادہ سے زیادہ قدر سے کم ہونی چاہیے۔",
-        "stat_rows_required": "stat_list ٹیمپلیٹ کے لیے کم از کم ایک stat قطار درکار ہے۔"
+        "stat_rows_required": "stat_list ٹیمپلیٹ کے لیے کم از کم ایک stat قطار درکار ہے۔",
+        "invalid_stat_row": "ہر قطار label=entity_id ہونی چاہیے (مثلاً Users=sensor.user_count)۔",
+        "too_many_stat_rows": "ایک شماریاتی فہرست زیادہ سے زیادہ 6 قطاروں کی حمایت کرتی ہے۔",
+        "invalid_number": "ایک درست نمبر درج کریں۔"
       },
       "abort": {
         "already_configured": "اس slug والا ویجٹ پہلے سے موجود ہے۔",

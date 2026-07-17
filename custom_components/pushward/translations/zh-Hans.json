@@ -1564,7 +1564,20 @@
         "silent_requires_http": "静默 webhook（关闭 foreground）需要 http:// 或 https:// URL。",
         "invalid_gauge_range": "最小值必须小于最大值。",
         "tiles_required": "board 模板至少需要一个磁贴。",
-        "too_many_series": "timeline 总共最多支持 10 个系列（系列属性加系列实体）。"
+        "too_many_series": "timeline 总共最多支持 10 个系列（系列属性加系列实体）。",
+        "step_length_mismatch": "步骤的行、权重和颜色必须每个步骤各有一个值（与总步骤数一致）。",
+        "invalid_step_rows": "步骤行必须是整数，每个步骤一个（例如 1, 2, 3）。",
+        "invalid_step_weights": "步骤权重必须是正数，每个步骤一个（例如 1, 2.5, 1）。",
+        "invalid_step_colors": "步骤颜色必须是颜色名称或类似 #ff0000 的十六进制值；留空以保留强调色。",
+        "invalid_tile": "每个磁贴必须为 label=entity_id 格式（例如 CPU=sensor.cpu_temp）。",
+        "too_many_tiles": "看板最多支持 4 个磁贴。",
+        "invalid_series_entity": "每个系列实体必须引用一个 entity_id（例如 Bedroom=sensor.bedroom_pm25）。",
+        "invalid_log_column": "每一列都需要一个来源：属性、entity_id 或 entity_id:attribute。",
+        "too_many_log_columns": "一条日志行最多支持 6 列。",
+        "invalid_threshold": "每个阈值必须以数字开头（例如 25:red:Hot）。",
+        "too_many_thresholds": "时间线最多支持 5 个阈值。",
+        "invalid_number": "请输入有效的数字。",
+        "unknown_primary_series": "主系列必须与已配置的某个系列标签匹配。"
       },
       "abort": {
         "already_configured": "此实体已被追踪。",
@@ -1655,7 +1668,10 @@
         "invalid_url": "URL 必须包含有效的协议。请使用 http(s):// 或自定义应用协议，例如 homeassistant://。",
         "silent_requires_http": "静默 webhook（关闭 foreground）需要 http:// 或 https:// URL。",
         "invalid_gauge_range": "最小值必须小于最大值。",
-        "stat_rows_required": "stat_list 模板至少需要一个统计行。"
+        "stat_rows_required": "stat_list 模板至少需要一个统计行。",
+        "invalid_stat_row": "每一行必须为 label=entity_id 格式（例如 Users=sensor.user_count）。",
+        "too_many_stat_rows": "统计列表最多支持 6 行。",
+        "invalid_number": "请输入有效的数字。"
       },
       "abort": {
         "already_configured": "已存在使用此 slug 的小组件。",
