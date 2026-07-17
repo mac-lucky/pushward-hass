@@ -1700,5 +1700,77 @@
       "title": "PushWard ای میل کی حد پہنچ گئی",
       "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} ای میلز میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی ای میلز مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "عام",
+        "countdown": "الٹی گنتی",
+        "alert": "الرٹ",
+        "steps": "مراحل",
+        "gauge": "گیج",
+        "timeline": "ٹائم لائن",
+        "board": "بورڈ",
+        "log": "لاگ"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "نازک",
+        "warning": "انتباہ",
+        "info": "معلومات"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "لکیری",
+        "logarithmic": "لاگرتھمک"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "کوئی آواز نہیں",
+        "default": "طے شدہ",
+        "chime": "گھنٹی",
+        "alert": "الرٹ",
+        "success": "کامیابی",
+        "warning": "انتباہ",
+        "bell": "گھنٹا",
+        "ding": "ڈنگ",
+        "buzz": "بھنبھناہٹ",
+        "notification": "اطلاع"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "قدر",
+        "progress": "پیش رفت",
+        "gauge": "گیج",
+        "status": "حیثیت",
+        "stat_list": "شماریات کی فہرست"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "خودکار",
+        "fraction": "کسر",
+        "percent": "فیصد"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "کوئی نہیں",
+        "info": "معلومات",
+        "warning": "انتباہ",
+        "critical": "نازک",
+        "success": "کامیابی"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "تبدیلی پر",
+        "poll": "پول"
+      }
+    }
   }
 }

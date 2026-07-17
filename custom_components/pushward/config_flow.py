@@ -186,6 +186,21 @@ _INTEGRATION_KEY_SCHEMA = vol.Schema(
 _TTL_MIN = 1
 _TTL_MAX = 2592000  # 30 days
 
+# translation_key -> the ordered wire values each SelectSelector renders. The
+# `selector.<key>.options` block in every translations/<lang>.json must carry a
+# label for every value here (guarded by test_config_flow_translations). Keep the
+# keys in sync with the translation_key= passed on each SelectSelectorConfig below.
+SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
+    "activity_template": tuple(TEMPLATES),
+    "severity": tuple(SEVERITIES),
+    "timeline_scale": tuple(SCALES),
+    "sound": ("", *SOUNDS),
+    "widget_template": tuple(WIDGET_TEMPLATES),
+    "value_scale": tuple(VALUE_SCALES),
+    "widget_severity": tuple(WIDGET_SEVERITIES),
+    "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
+}
+
 
 async def _validate_integration_key(
     hass: HomeAssistant,
@@ -230,6 +245,7 @@ def _entity_template_schema(defaults: dict | None = None) -> vol.Schema:
                 SelectSelectorConfig(
                     options=TEMPLATES,
                     mode=SelectSelectorMode.DROPDOWN,
+                    translation_key="activity_template",
                 )
             ),
         }
@@ -318,6 +334,33 @@ def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
             return "gauge"
 
     return "generic"
+
+
+# Domains whose primary state reads as an on/off-style status widget.
+_STATUS_WIDGET_DOMAINS = frozenset({"binary_sensor", "lock", "switch", "cover"})
+
+
+def _suggest_widget_template(hass: HomeAssistant | None, entity_id: str) -> str:
+    """Suggest the best widget template for an entity based on domain/device_class/state_class."""
+    if not entity_id or hass is None:
+        return WIDGET_TEMPLATE_VALUE
+
+    domain = _entity_domain(entity_id)
+    if domain in _STATUS_WIDGET_DOMAINS:
+        return WIDGET_TEMPLATE_STATUS
+
+    state_obj = hass.states.get(entity_id)
+    if state_obj is None:
+        return WIDGET_TEMPLATE_VALUE
+
+    attrs = state_obj.attributes
+    if domain in ("sensor", "number"):
+        if attrs.get("state_class") in ("measurement", "total"):
+            return WIDGET_TEMPLATE_GAUGE
+        if attrs.get("device_class", "") in _GAUGE_DEVICE_CLASSES:
+            return WIDGET_TEMPLATE_GAUGE
+
+    return WIDGET_TEMPLATE_VALUE
 
 
 def _details_schema(
@@ -481,6 +524,7 @@ def _details_schema(
             SelectSelectorConfig(
                 options=SEVERITIES,
                 mode=SelectSelectorMode.DROPDOWN,
+                translation_key="severity",
             )
         )
         fields[
@@ -571,6 +615,7 @@ def _details_schema(
             SelectSelectorConfig(
                 options=SCALES,
                 mode=SelectSelectorMode.DROPDOWN,
+                translation_key="timeline_scale",
             )
         )
         fields[
@@ -669,6 +714,7 @@ def _details_schema(
         SelectSelectorConfig(
             options=["", *list(SOUNDS)],
             mode=SelectSelectorMode.DROPDOWN,
+            translation_key="sound",
         )
     )
     fields[
@@ -1622,6 +1668,7 @@ def _widget_step1_schema(defaults: dict | None = None) -> vol.Schema:
                 SelectSelectorConfig(
                     options=WIDGET_TEMPLATES,
                     mode=SelectSelectorMode.DROPDOWN,
+                    translation_key="widget_template",
                 )
             ),
             vol.Optional(
@@ -1680,6 +1727,7 @@ def _widget_details_schema(
             SelectSelectorConfig(
                 options=VALUE_SCALES,
                 mode=SelectSelectorMode.DROPDOWN,
+                translation_key="value_scale",
             )
         )
 
@@ -1707,6 +1755,7 @@ def _widget_details_schema(
             SelectSelectorConfig(
                 options=WIDGET_SEVERITIES,
                 mode=SelectSelectorMode.DROPDOWN,
+                translation_key="widget_severity",
             )
         )
 
@@ -1786,6 +1835,7 @@ def _widget_details_schema(
         SelectSelectorConfig(
             options=WIDGET_TRIGGER_MODES,
             mode=SelectSelectorMode.DROPDOWN,
+            translation_key="widget_trigger_mode",
         )
     )
     fields[
@@ -1929,10 +1979,30 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
         self._step1_input: dict[str, Any] = {}
         self._is_reconfigure: bool = False
         self._details_defaults: dict[str, Any] = {}
+        self._suggestion_offered: bool = False
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
         """Step 1: entity + template + slug."""
         if user_input is not None:
+            entity_id = user_input[CONF_ENTITY_ID]
+            template = user_input.get(CONF_WIDGET_TEMPLATE, WIDGET_TEMPLATE_VALUE)
+
+            # Suggest a better template if the user left the default
+            if template == WIDGET_TEMPLATE_VALUE and not self._suggestion_offered:
+                suggested = _suggest_widget_template(self.hass, entity_id)
+                if suggested != WIDGET_TEMPLATE_VALUE:
+                    self._suggestion_offered = True
+                    return self.async_show_form(
+                        step_id="user",
+                        data_schema=_widget_step1_schema(
+                            defaults={
+                                CONF_ENTITY_ID: entity_id,
+                                CONF_WIDGET_TEMPLATE: suggested,
+                                CONF_SLUG: user_input.get(CONF_SLUG, ""),
+                            }
+                        ),
+                    )
+
             self._step1_input = user_input
             self._is_reconfigure = False
             return await self.async_step_details()

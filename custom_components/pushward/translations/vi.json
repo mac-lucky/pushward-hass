@@ -1700,5 +1700,77 @@
       "title": "Đã đạt giới hạn email của PushWard",
       "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} email cho kỳ hiện tại, nên các email mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Chung",
+        "countdown": "Đếm ngược",
+        "alert": "Báo động",
+        "steps": "Các bước",
+        "gauge": "Đồng hồ đo",
+        "timeline": "Dòng thời gian",
+        "board": "Bảng",
+        "log": "Nhật ký"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Nghiêm trọng",
+        "warning": "Cảnh báo",
+        "info": "Thông tin"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Tuyến tính",
+        "logarithmic": "Logarit"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Không có âm thanh",
+        "default": "Mặc định",
+        "chime": "Chuông ngân",
+        "alert": "Báo động",
+        "success": "Thành công",
+        "warning": "Cảnh báo",
+        "bell": "Chuông",
+        "ding": "Ding",
+        "buzz": "Tiếng vo ve",
+        "notification": "Thông báo"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Giá trị",
+        "progress": "Tiến trình",
+        "gauge": "Đồng hồ đo",
+        "status": "Trạng thái",
+        "stat_list": "Danh sách thống kê"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Tự động",
+        "fraction": "Phân số",
+        "percent": "Phần trăm"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Không có",
+        "info": "Thông tin",
+        "warning": "Cảnh báo",
+        "critical": "Nghiêm trọng",
+        "success": "Thành công"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Khi thay đổi",
+        "poll": "Thăm dò"
+      }
+    }
   }
 }

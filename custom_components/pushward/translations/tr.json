@@ -1700,5 +1700,77 @@
       "title": "PushWard e-posta limitine ulaşıldı",
       "description": "PushWard hesabınız mevcut dönem için {limit} e-postasının {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni e-postalar reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Genel",
+        "countdown": "Geri sayım",
+        "alert": "Alarm",
+        "steps": "Adımlar",
+        "gauge": "Gösterge",
+        "timeline": "Zaman çizelgesi",
+        "board": "Pano",
+        "log": "Günlük"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Kritik",
+        "warning": "Uyarı",
+        "info": "Bilgi"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Doğrusal",
+        "logarithmic": "Logaritmik"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Ses yok",
+        "default": "Varsayılan",
+        "chime": "Çan sesi",
+        "alert": "Alarm",
+        "success": "Başarılı",
+        "warning": "Uyarı",
+        "bell": "Zil",
+        "ding": "Ding",
+        "buzz": "Vızıltı",
+        "notification": "Bildirim"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Değer",
+        "progress": "İlerleme",
+        "gauge": "Gösterge",
+        "status": "Durum",
+        "stat_list": "İstatistik listesi"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Otomatik",
+        "fraction": "Kesir",
+        "percent": "Yüzde"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Yok",
+        "info": "Bilgi",
+        "warning": "Uyarı",
+        "critical": "Kritik",
+        "success": "Başarılı"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Değişince",
+        "poll": "Yoklama"
+      }
+    }
   }
 }

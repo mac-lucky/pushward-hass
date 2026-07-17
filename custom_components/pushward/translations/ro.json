@@ -1700,5 +1700,77 @@
       "title": "Limita de e-mailuri PushWard a fost atinsă",
       "description": "Contul dvs. PushWard a folosit {used} din cele {limit} e-mailuri pentru perioada curentă, așa că noile e-mailuri vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Generic",
+        "countdown": "Numărătoare inversă",
+        "alert": "Alertă",
+        "steps": "Pași",
+        "gauge": "Indicator",
+        "timeline": "Cronologie",
+        "board": "Panou",
+        "log": "Jurnal"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Critic",
+        "warning": "Avertisment",
+        "info": "Info"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Liniar",
+        "logarithmic": "Logaritmic"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Fără sunet",
+        "default": "Implicit",
+        "chime": "Clopoțel",
+        "alert": "Alertă",
+        "success": "Succes",
+        "warning": "Avertisment",
+        "bell": "Clopot",
+        "ding": "Ding",
+        "buzz": "Bâzâit",
+        "notification": "Notificare"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Valoare",
+        "progress": "Progres",
+        "gauge": "Indicator",
+        "status": "Stare",
+        "stat_list": "Listă de statistici"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Automat",
+        "fraction": "Fracție",
+        "percent": "Procent"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Niciunul",
+        "info": "Info",
+        "warning": "Avertisment",
+        "critical": "Critic",
+        "success": "Succes"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "La schimbare",
+        "poll": "Sondare"
+      }
+    }
   }
 }

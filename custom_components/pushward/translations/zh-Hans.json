@@ -1700,5 +1700,77 @@
       "title": "已达到 PushWard 邮件上限",
       "description": "你的 PushWard 账户在当前周期内已使用 {limit} 封邮件中的 {used} 封，因此在配额重置（{resets_at}）之前，新邮件将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "通用",
+        "countdown": "倒计时",
+        "alert": "警报",
+        "steps": "步骤",
+        "gauge": "仪表",
+        "timeline": "时间线",
+        "board": "看板",
+        "log": "日志"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "严重",
+        "warning": "警告",
+        "info": "信息"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "线性",
+        "logarithmic": "对数"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "无声音",
+        "default": "默认",
+        "chime": "钟声",
+        "alert": "警报",
+        "success": "成功",
+        "warning": "警告",
+        "bell": "铃铛",
+        "ding": "叮",
+        "buzz": "嗡嗡",
+        "notification": "通知"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "数值",
+        "progress": "进度",
+        "gauge": "仪表",
+        "status": "状态",
+        "stat_list": "统计列表"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "自动",
+        "fraction": "分数",
+        "percent": "百分比"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "无",
+        "info": "信息",
+        "warning": "警告",
+        "critical": "严重",
+        "success": "成功"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "变化时",
+        "poll": "轮询"
+      }
+    }
   }
 }

@@ -1700,5 +1700,77 @@
       "title": "Limite di email PushWard raggiunto",
       "description": "Il tuo account PushWard ha utilizzato {used} delle sue {limit} email per il periodo corrente, quindi le nuove email verranno rifiutate finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per iOS per aumentare il limite."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Generico",
+        "countdown": "Conto alla rovescia",
+        "alert": "Avviso",
+        "steps": "Passi",
+        "gauge": "Indicatore",
+        "timeline": "Cronologia",
+        "board": "Bacheca",
+        "log": "Registro"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Critico",
+        "warning": "Avvertimento",
+        "info": "Info"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Lineare",
+        "logarithmic": "Logaritmico"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Nessun suono",
+        "default": "Predefinito",
+        "chime": "Scampanellio",
+        "alert": "Avviso",
+        "success": "Successo",
+        "warning": "Avvertimento",
+        "bell": "Campana",
+        "ding": "Ding",
+        "buzz": "Ronzio",
+        "notification": "Notifica"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Valore",
+        "progress": "Avanzamento",
+        "gauge": "Indicatore",
+        "status": "Stato",
+        "stat_list": "Elenco statistiche"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Automatico",
+        "fraction": "Frazione",
+        "percent": "Percentuale"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Nessuno",
+        "info": "Info",
+        "warning": "Avvertimento",
+        "critical": "Critico",
+        "success": "Successo"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Alla modifica",
+        "poll": "Polling"
+      }
+    }
   }
 }

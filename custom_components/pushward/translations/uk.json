@@ -1700,5 +1700,77 @@
       "title": "Досягнуто ліміту листів PushWard",
       "description": "Ваш обліковий запис PushWard використав {used} зі {limit} листів за поточний період, тож нові листи відхилятимуться, доки не скинеться квота ({resets_at}). Підвищте рівень підписки в застосунку PushWard для iOS, щоб збільшити ліміт."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Загальний",
+        "countdown": "Зворотний відлік",
+        "alert": "Сповіщення",
+        "steps": "Кроки",
+        "gauge": "Індикатор",
+        "timeline": "Хронологія",
+        "board": "Панель",
+        "log": "Журнал"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Критичний",
+        "warning": "Попередження",
+        "info": "Інформація"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Лінійна",
+        "logarithmic": "Логарифмічна"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Без звуку",
+        "default": "За замовчуванням",
+        "chime": "Передзвін",
+        "alert": "Сповіщення",
+        "success": "Успіх",
+        "warning": "Попередження",
+        "bell": "Дзвіночок",
+        "ding": "Дінь",
+        "buzz": "Дзижчання",
+        "notification": "Повідомлення"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Значення",
+        "progress": "Прогрес",
+        "gauge": "Індикатор",
+        "status": "Статус",
+        "stat_list": "Список статистики"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Авто",
+        "fraction": "Частка",
+        "percent": "Відсоток"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Немає",
+        "info": "Інформація",
+        "warning": "Попередження",
+        "critical": "Критичний",
+        "success": "Успіх"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "При зміні",
+        "poll": "Опитування"
+      }
+    }
   }
 }

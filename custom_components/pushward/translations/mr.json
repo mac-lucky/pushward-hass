@@ -1700,5 +1700,77 @@
       "title": "PushWard ईमेल मर्यादा गाठली",
       "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} ईमेल वापरले आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन ईमेल नाकारले जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "सामान्य",
+        "countdown": "उलटगणती",
+        "alert": "अलर्ट",
+        "steps": "पायऱ्या",
+        "gauge": "गेज",
+        "timeline": "कालरेखा",
+        "board": "बोर्ड",
+        "log": "नोंद"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "गंभीर",
+        "warning": "इशारा",
+        "info": "माहिती"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "रेषीय",
+        "logarithmic": "लॉगरिदमिक"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "आवाज नाही",
+        "default": "डीफॉल्ट",
+        "chime": "घंटानाद",
+        "alert": "अलर्ट",
+        "success": "यशस्वी",
+        "warning": "इशारा",
+        "bell": "घंटा",
+        "ding": "डिंग",
+        "buzz": "गुंजन",
+        "notification": "सूचना"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "मूल्य",
+        "progress": "प्रगती",
+        "gauge": "गेज",
+        "status": "स्थिती",
+        "stat_list": "सांख्यिकी यादी"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "स्वयंचलित",
+        "fraction": "अपूर्णांक",
+        "percent": "टक्के"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "काहीही नाही",
+        "info": "माहिती",
+        "warning": "इशारा",
+        "critical": "गंभीर",
+        "success": "यशस्वी"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "बदल झाल्यावर",
+        "poll": "पोल"
+      }
+    }
   }
 }

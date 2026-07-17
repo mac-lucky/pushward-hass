@@ -1700,5 +1700,77 @@
       "title": "PushWard ఇమెయిల్ పరిమితి చేరుకుంది",
       "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} ఇమెయిల్‌లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త ఇమెయిల్‌ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "సాధారణ",
+        "countdown": "కౌంట్‌డౌన్",
+        "alert": "అలర్ట్",
+        "steps": "దశలు",
+        "gauge": "గేజ్",
+        "timeline": "కాలక్రమం",
+        "board": "బోర్డు",
+        "log": "లాగ్"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "క్లిష్టమైన",
+        "warning": "హెచ్చరిక",
+        "info": "సమాచారం"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "రేఖీయ",
+        "logarithmic": "లాగరిథమిక్"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "శబ్దం లేదు",
+        "default": "డిఫాల్ట్",
+        "chime": "గంటానాదం",
+        "alert": "అలర్ట్",
+        "success": "విజయవంతం",
+        "warning": "హెచ్చరిక",
+        "bell": "గంట",
+        "ding": "డింగ్",
+        "buzz": "రొద",
+        "notification": "నోటిఫికేషన్"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "విలువ",
+        "progress": "పురోగతి",
+        "gauge": "గేజ్",
+        "status": "స్థితి",
+        "stat_list": "గణాంక జాబితా"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "స్వయంచాలకం",
+        "fraction": "భిన్నం",
+        "percent": "శాతం"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "ఏదీ కాదు",
+        "info": "సమాచారం",
+        "warning": "హెచ్చరిక",
+        "critical": "క్లిష్టమైన",
+        "success": "విజయవంతం"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "మార్పు సమయంలో",
+        "poll": "పోల్"
+      }
+    }
   }
 }

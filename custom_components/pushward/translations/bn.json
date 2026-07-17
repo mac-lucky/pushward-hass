@@ -1700,5 +1700,77 @@
       "title": "PushWard ইমেল সীমায় পৌঁছেছে",
       "description": "আপনার PushWard অ্যাকাউন্ট বর্তমান সময়কালের জন্য তার {limit}টির মধ্যে {used}টি ইমেল ব্যবহার করেছে, তাই কোটা রিসেট না হওয়া পর্যন্ত ({resets_at}) নতুন ইমেল প্রত্যাখ্যাত হবে। সীমা বাড়াতে PushWard iOS অ্যাপে আপনার সাবস্ক্রিপশন আপগ্রেড করুন।"
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "সাধারণ",
+        "countdown": "কাউন্টডাউন",
+        "alert": "সতর্কতা",
+        "steps": "ধাপ",
+        "gauge": "গেজ",
+        "timeline": "টাইমলাইন",
+        "board": "বোর্ড",
+        "log": "লগ"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "গুরুতর",
+        "warning": "সতর্কীকরণ",
+        "info": "তথ্য"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "রৈখিক",
+        "logarithmic": "লগারিদমিক"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "কোনো শব্দ নেই",
+        "default": "ডিফল্ট",
+        "chime": "ঘণ্টাধ্বনি",
+        "alert": "সতর্কতা",
+        "success": "সফল",
+        "warning": "সতর্কীকরণ",
+        "bell": "ঘণ্টা",
+        "ding": "ডিং",
+        "buzz": "গুঞ্জন",
+        "notification": "বিজ্ঞপ্তি"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "মান",
+        "progress": "অগ্রগতি",
+        "gauge": "গেজ",
+        "status": "অবস্থা",
+        "stat_list": "পরিসংখ্যান তালিকা"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "স্বয়ংক্রিয়",
+        "fraction": "ভগ্নাংশ",
+        "percent": "শতাংশ"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "কোনোটিই নয়",
+        "info": "তথ্য",
+        "warning": "সতর্কীকরণ",
+        "critical": "গুরুতর",
+        "success": "সফল"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "পরিবর্তনে",
+        "poll": "পোল"
+      }
+    }
   }
 }

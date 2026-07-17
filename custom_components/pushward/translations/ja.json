@@ -1700,5 +1700,77 @@
       "title": "PushWard のメール上限に達しました",
       "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のメールを使用したため、クォータがリセットされる（{resets_at}）まで新しいメールは拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "汎用",
+        "countdown": "カウントダウン",
+        "alert": "アラート",
+        "steps": "ステップ",
+        "gauge": "ゲージ",
+        "timeline": "タイムライン",
+        "board": "ボード",
+        "log": "ログ"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "重大",
+        "warning": "警告",
+        "info": "情報"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "線形",
+        "logarithmic": "対数"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "サウンドなし",
+        "default": "デフォルト",
+        "chime": "チャイム",
+        "alert": "アラート",
+        "success": "成功",
+        "warning": "警告",
+        "bell": "ベル",
+        "ding": "ディン",
+        "buzz": "ブザー",
+        "notification": "通知"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "値",
+        "progress": "進捗",
+        "gauge": "ゲージ",
+        "status": "ステータス",
+        "stat_list": "統計リスト"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "自動",
+        "fraction": "分数",
+        "percent": "パーセント"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "なし",
+        "info": "情報",
+        "warning": "警告",
+        "critical": "重大",
+        "success": "成功"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "変化時",
+        "poll": "ポーリング"
+      }
+    }
   }
 }

@@ -1700,5 +1700,77 @@
       "title": "PushWard email limit reached",
       "description": "Your PushWard account has used {used} of its {limit} emails for the current period, so new emails will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Generic",
+        "countdown": "Countdown",
+        "alert": "Alert",
+        "steps": "Steps",
+        "gauge": "Gauge",
+        "timeline": "Timeline",
+        "board": "Board",
+        "log": "Log"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Linear",
+        "logarithmic": "Logarithmic"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "No sound",
+        "default": "Default",
+        "chime": "Chime",
+        "alert": "Alert",
+        "success": "Success",
+        "warning": "Warning",
+        "bell": "Bell",
+        "ding": "Ding",
+        "buzz": "Buzz",
+        "notification": "Notification"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Value",
+        "progress": "Progress",
+        "gauge": "Gauge",
+        "status": "Status",
+        "stat_list": "Stat list"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Auto",
+        "fraction": "Fraction",
+        "percent": "Percent"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "None",
+        "info": "Info",
+        "warning": "Warning",
+        "critical": "Critical",
+        "success": "Success"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "On change",
+        "poll": "Poll"
+      }
+    }
   }
 }

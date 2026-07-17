@@ -1700,5 +1700,77 @@
       "title": "تم بلوغ حد رسائل البريد الإلكتروني في PushWard",
       "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} رسالة بريد إلكتروني للفترة الحالية، لذا ستُرفض الرسائل الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "عام",
+        "countdown": "العد التنازلي",
+        "alert": "تنبيه",
+        "steps": "خطوات",
+        "gauge": "مقياس",
+        "timeline": "الجدول الزمني",
+        "board": "لوحة",
+        "log": "سجل"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "حرج",
+        "warning": "تحذير",
+        "info": "معلومات"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "خطي",
+        "logarithmic": "لوغاريتمي"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "بلا صوت",
+        "default": "افتراضي",
+        "chime": "رنين",
+        "alert": "تنبيه",
+        "success": "نجاح",
+        "warning": "تحذير",
+        "bell": "جرس",
+        "ding": "دينغ",
+        "buzz": "طنين",
+        "notification": "إشعار"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "قيمة",
+        "progress": "تقدم",
+        "gauge": "مقياس",
+        "status": "الحالة",
+        "stat_list": "قائمة الإحصائيات"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "تلقائي",
+        "fraction": "كسر",
+        "percent": "نسبة مئوية"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "بلا",
+        "info": "معلومات",
+        "warning": "تحذير",
+        "critical": "حرج",
+        "success": "نجاح"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "عند التغيير",
+        "poll": "استطلاع"
+      }
+    }
   }
 }

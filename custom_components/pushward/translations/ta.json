@@ -1700,5 +1700,77 @@
       "title": "PushWard மின்னஞ்சல் வரம்பு எட்டப்பட்டது",
       "description": "உங்கள் PushWard கணக்கு தற்போதைய காலத்திற்கான {limit} மின்னஞ்சல்களில் {used} ஐப் பயன்படுத்தியுள்ளது, எனவே ஒதுக்கீடு மீட்டமைக்கப்படும் வரை ({resets_at}) புதிய மின்னஞ்சல்கள் நிராகரிக்கப்படும். வரம்பை உயர்த்த PushWard iOS பயன்பாட்டில் உங்கள் சந்தாவை மேம்படுத்தவும்."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "பொது",
+        "countdown": "கவுண்டவுன்",
+        "alert": "விழிப்பூட்டல்",
+        "steps": "படிகள்",
+        "gauge": "அளவுமானி",
+        "timeline": "காலவரிசை",
+        "board": "பலகை",
+        "log": "பதிவு"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "தீவிர",
+        "warning": "எச்சரிக்கை",
+        "info": "தகவல்"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "நேரியல்",
+        "logarithmic": "மடக்கை"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "ஒலி இல்லை",
+        "default": "இயல்பு",
+        "chime": "மணியோசை",
+        "alert": "விழிப்பூட்டல்",
+        "success": "வெற்றி",
+        "warning": "எச்சரிக்கை",
+        "bell": "மணி",
+        "ding": "டிங்",
+        "buzz": "ரீங்காரம்",
+        "notification": "அறிவிப்பு"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "மதிப்பு",
+        "progress": "முன்னேற்றம்",
+        "gauge": "அளவுமானி",
+        "status": "நிலை",
+        "stat_list": "புள்ளிவிவரப் பட்டியல்"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "தானியங்கி",
+        "fraction": "பின்னம்",
+        "percent": "சதவீதம்"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "எதுவுமில்லை",
+        "info": "தகவல்",
+        "warning": "எச்சரிக்கை",
+        "critical": "தீவிர",
+        "success": "வெற்றி"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "மாறும்போது",
+        "poll": "வினவல்"
+      }
+    }
   }
 }

@@ -1700,5 +1700,77 @@
       "title": "Достигнут лимит писем PushWard",
       "description": "Ваша учётная запись PushWard использовала {used} из {limit} писем за текущий период, поэтому новые письма будут отклоняться до сброса квоты ({resets_at}). Повысьте лимит, оформив подписку в приложении PushWard для iOS."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Общий",
+        "countdown": "Обратный отсчёт",
+        "alert": "Оповещение",
+        "steps": "Шаги",
+        "gauge": "Индикатор",
+        "timeline": "Хронология",
+        "board": "Панель",
+        "log": "Журнал"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Критический",
+        "warning": "Предупреждение",
+        "info": "Информация"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Линейная",
+        "logarithmic": "Логарифмическая"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Без звука",
+        "default": "По умолчанию",
+        "chime": "Перезвон",
+        "alert": "Оповещение",
+        "success": "Успех",
+        "warning": "Предупреждение",
+        "bell": "Колокольчик",
+        "ding": "Динь",
+        "buzz": "Жужжание",
+        "notification": "Уведомление"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Значение",
+        "progress": "Прогресс",
+        "gauge": "Индикатор",
+        "status": "Статус",
+        "stat_list": "Список статистики"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Авто",
+        "fraction": "Доля",
+        "percent": "Проценты"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Нет",
+        "info": "Информация",
+        "warning": "Предупреждение",
+        "critical": "Критический",
+        "success": "Успех"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "При изменении",
+        "poll": "Опрос"
+      }
+    }
   }
 }

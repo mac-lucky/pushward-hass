@@ -1700,5 +1700,77 @@
       "title": "Naabot na ang limitasyon ng email sa PushWard",
       "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na email para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong email hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Pangkalahatan",
+        "countdown": "Countdown",
+        "alert": "Alerto",
+        "steps": "Mga hakbang",
+        "gauge": "Panukat",
+        "timeline": "Timeline",
+        "board": "Board",
+        "log": "Log"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Kritikal",
+        "warning": "Babala",
+        "info": "Impormasyon"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Linear",
+        "logarithmic": "Logaritmiko"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Walang tunog",
+        "default": "Default",
+        "chime": "Kampanilya",
+        "alert": "Alerto",
+        "success": "Tagumpay",
+        "warning": "Babala",
+        "bell": "Kampana",
+        "ding": "Ding",
+        "buzz": "Ugong",
+        "notification": "Abiso"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Halaga",
+        "progress": "Progreso",
+        "gauge": "Panukat",
+        "status": "Katayuan",
+        "stat_list": "Listahan ng estadistika"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Awto",
+        "fraction": "Praksyon",
+        "percent": "Porsyento"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Wala",
+        "info": "Impormasyon",
+        "warning": "Babala",
+        "critical": "Kritikal",
+        "success": "Tagumpay"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Kapag nagbago",
+        "poll": "Poll"
+      }
+    }
   }
 }

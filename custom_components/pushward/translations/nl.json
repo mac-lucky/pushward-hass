@@ -1700,5 +1700,77 @@
       "title": "PushWard-e-maillimiet bereikt",
       "description": "Je PushWard-account heeft {used} van zijn {limit} e-mails voor de huidige periode gebruikt, dus nieuwe e-mails worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Algemeen",
+        "countdown": "Aftellen",
+        "alert": "Alarm",
+        "steps": "Stappen",
+        "gauge": "Meter",
+        "timeline": "Tijdlijn",
+        "board": "Bord",
+        "log": "Logboek"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Kritiek",
+        "warning": "Waarschuwing",
+        "info": "Info"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Lineair",
+        "logarithmic": "Logaritmisch"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Geen geluid",
+        "default": "Standaard",
+        "chime": "Klokkenspel",
+        "alert": "Alarm",
+        "success": "Succes",
+        "warning": "Waarschuwing",
+        "bell": "Bel",
+        "ding": "Ding",
+        "buzz": "Zoemer",
+        "notification": "Melding"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Waarde",
+        "progress": "Voortgang",
+        "gauge": "Meter",
+        "status": "Status",
+        "stat_list": "Statistiekenlijst"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Automatisch",
+        "fraction": "Fractie",
+        "percent": "Percentage"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Geen",
+        "info": "Info",
+        "warning": "Waarschuwing",
+        "critical": "Kritiek",
+        "success": "Succes"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Bij wijziging",
+        "poll": "Peilen"
+      }
+    }
   }
 }

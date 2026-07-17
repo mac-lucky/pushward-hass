@@ -1700,5 +1700,77 @@
       "title": "Límite de correos de PushWard alcanzado",
       "description": "Tu cuenta de PushWard ha usado {used} de sus {limit} correos del periodo actual, por lo que se rechazarán los nuevos correos hasta que la cuota se restablezca ({resets_at}). Mejora tu suscripción en la app de PushWard para iOS para aumentar el límite."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Genérico",
+        "countdown": "Cuenta atrás",
+        "alert": "Alerta",
+        "steps": "Pasos",
+        "gauge": "Indicador",
+        "timeline": "Cronología",
+        "board": "Panel",
+        "log": "Registro"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Crítico",
+        "warning": "Advertencia",
+        "info": "Información"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Lineal",
+        "logarithmic": "Logarítmico"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Sin sonido",
+        "default": "Predeterminado",
+        "chime": "Campanilla",
+        "alert": "Alerta",
+        "success": "Éxito",
+        "warning": "Advertencia",
+        "bell": "Campana",
+        "ding": "Ding",
+        "buzz": "Zumbido",
+        "notification": "Notificación"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Valor",
+        "progress": "Progreso",
+        "gauge": "Indicador",
+        "status": "Estado",
+        "stat_list": "Lista de estadísticas"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Automático",
+        "fraction": "Fracción",
+        "percent": "Porcentaje"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Ninguno",
+        "info": "Información",
+        "warning": "Advertencia",
+        "critical": "Crítico",
+        "success": "Éxito"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Al cambiar",
+        "poll": "Sondeo"
+      }
+    }
   }
 }

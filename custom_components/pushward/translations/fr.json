@@ -1700,5 +1700,77 @@
       "title": "Limite d'e-mails PushWard atteinte",
       "description": "Votre compte PushWard a utilisé {used} de ses {limit} e-mails pour la période actuelle ; les nouveaux e-mails seront donc rejetés jusqu'à la réinitialisation du quota ({resets_at}). Améliorez votre abonnement dans l'application PushWard pour iOS afin d'augmenter la limite."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Générique",
+        "countdown": "Compte à rebours",
+        "alert": "Alerte",
+        "steps": "Étapes",
+        "gauge": "Jauge",
+        "timeline": "Chronologie",
+        "board": "Tableau",
+        "log": "Journal"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Critique",
+        "warning": "Avertissement",
+        "info": "Info"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Linéaire",
+        "logarithmic": "Logarithmique"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Aucun son",
+        "default": "Par défaut",
+        "chime": "Carillon",
+        "alert": "Alerte",
+        "success": "Succès",
+        "warning": "Avertissement",
+        "bell": "Cloche",
+        "ding": "Ding",
+        "buzz": "Bourdonnement",
+        "notification": "Notification"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Valeur",
+        "progress": "Progression",
+        "gauge": "Jauge",
+        "status": "Statut",
+        "stat_list": "Liste de statistiques"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Auto",
+        "fraction": "Fraction",
+        "percent": "Pourcentage"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Aucun",
+        "info": "Info",
+        "warning": "Avertissement",
+        "critical": "Critique",
+        "success": "Succès"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Au changement",
+        "poll": "Interrogation"
+      }
+    }
   }
 }

@@ -37,6 +37,7 @@ from custom_components.pushward.config_flow import (
     _serialize_series_entities,
     _serialize_thresholds,
     _serialize_widget_stat_rows,
+    _suggest_widget_template,
     _validate_integration_key,
     _widget_details_schema,
 )
@@ -131,6 +132,7 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_STATUS,
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_EVENT,
     WIDGET_TRIGGER_POLL,
@@ -1049,6 +1051,152 @@ async def test_subentry_suggestion_only_offered_once(hass: HomeAssistant) -> Non
         user_input={CONF_ENTITY_ID: "sensor.temp", CONF_TEMPLATE: "generic"},
     )
     assert result["step_id"] == "details"
+
+
+# --- Widget template auto-suggestion ---
+
+
+async def test_widget_subentry_suggests_gauge_for_measurement_sensor(hass: HomeAssistant) -> None:
+    """Submitting the default value template for a measurement sensor re-shows step 1 with gauge."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set(
+        "sensor.temperature",
+        "22.5",
+        {"device_class": "temperature", "state_class": "measurement", "friendly_name": "Temp"},
+    )
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE, CONF_SLUG: ""},
+    )
+    # Re-shown at step 1 with gauge suggested, not advanced to details
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "user"
+
+    # Accept the suggestion
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_GAUGE, CONF_SLUG: ""},
+    )
+    assert result["step_id"] == "details"
+
+
+async def test_widget_subentry_suggests_status_for_binary_sensor(hass: HomeAssistant) -> None:
+    """A binary_sensor auto-suggests the status widget."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set("binary_sensor.door", "off", {"friendly_name": "Door"})
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "binary_sensor.door", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE, CONF_SLUG: ""},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "user"
+
+
+async def test_widget_subentry_no_suggestion_for_plain_sensor(hass: HomeAssistant) -> None:
+    """A plain sensor (no measurement/device_class) keeps value and goes to details."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set("sensor.plain", "42", {"friendly_name": "Plain"})
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.plain", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE, CONF_SLUG: ""},
+    )
+    assert result["step_id"] == "details"
+
+
+async def test_widget_subentry_no_suggestion_when_non_value(hass: HomeAssistant) -> None:
+    """Explicitly picking a non-value template skips the suggestion."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set(
+        "sensor.temperature",
+        "22.5",
+        {"device_class": "temperature", "state_class": "measurement"},
+    )
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    # User picks status outright - straight to details, no re-show
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STATUS, CONF_SLUG: ""},
+    )
+    assert result["step_id"] == "details"
+
+
+async def test_widget_subentry_suggestion_only_offered_once(hass: HomeAssistant) -> None:
+    """Overriding the suggestion back to value proceeds without looping."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    hass.states.async_set(
+        "sensor.temperature",
+        "22.5",
+        {"device_class": "temperature", "state_class": "measurement"},
+    )
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    # First submit: value -> re-show with gauge
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE, CONF_SLUG: ""},
+    )
+    assert result["step_id"] == "user"
+
+    # Second submit: keep value -> proceeds (no infinite loop)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE, CONF_SLUG: ""},
+    )
+    assert result["step_id"] == "details"
+
+
+async def test_suggest_widget_template_status_domains_need_no_state(hass: HomeAssistant) -> None:
+    """lock/switch/cover/binary_sensor suggest status from the domain alone, even with no state."""
+    for entity_id in ("lock.front", "switch.fan", "cover.garage", "binary_sensor.door"):
+        assert _suggest_widget_template(hass, entity_id) == WIDGET_TEMPLATE_STATUS
+
+
+def test_suggest_widget_template_defaults_to_value_without_hass() -> None:
+    """No hass -> value; a bare word (no entity) -> value."""
+    assert _suggest_widget_template(None, "sensor.x") == WIDGET_TEMPLATE_VALUE
+    assert _suggest_widget_template(None, "") == WIDGET_TEMPLATE_VALUE
+
+
+async def test_suggest_widget_template_branches(hass: HomeAssistant) -> None:
+    """Domain/device_class/state_class drive the gauge/status/value split."""
+    hass.states.async_set("lock.front", "locked")
+    hass.states.async_set("cover.garage", "open")
+    hass.states.async_set("sensor.power", "120", {"device_class": "power"})
+    hass.states.async_set("sensor.energy", "5", {"state_class": "measurement"})
+    hass.states.async_set("sensor.text", "hello")
+
+    assert _suggest_widget_template(hass, "lock.front") == WIDGET_TEMPLATE_STATUS
+    assert _suggest_widget_template(hass, "cover.garage") == WIDGET_TEMPLATE_STATUS
+    assert _suggest_widget_template(hass, "sensor.power") == WIDGET_TEMPLATE_GAUGE
+    assert _suggest_widget_template(hass, "sensor.energy") == WIDGET_TEMPLATE_GAUGE
+    assert _suggest_widget_template(hass, "sensor.text") == WIDGET_TEMPLATE_VALUE
 
 
 def test_gauge_min_max_use_number_selector() -> None:

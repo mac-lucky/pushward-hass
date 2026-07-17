@@ -1700,5 +1700,77 @@
       "title": "Batas email PushWard tercapai",
       "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} email untuk periode saat ini, sehingga email baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Umum",
+        "countdown": "Hitung mundur",
+        "alert": "Lansiran",
+        "steps": "Langkah",
+        "gauge": "Pengukur",
+        "timeline": "Lini masa",
+        "board": "Papan",
+        "log": "Log"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Kritis",
+        "warning": "Peringatan",
+        "info": "Info"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Linear",
+        "logarithmic": "Logaritmik"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Tanpa suara",
+        "default": "Bawaan",
+        "chime": "Lonceng",
+        "alert": "Lansiran",
+        "success": "Berhasil",
+        "warning": "Peringatan",
+        "bell": "Bel",
+        "ding": "Ding",
+        "buzz": "Dengung",
+        "notification": "Notifikasi"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Nilai",
+        "progress": "Progres",
+        "gauge": "Pengukur",
+        "status": "Status",
+        "stat_list": "Daftar statistik"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Otomatis",
+        "fraction": "Pecahan",
+        "percent": "Persen"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Tidak ada",
+        "info": "Info",
+        "warning": "Peringatan",
+        "critical": "Kritis",
+        "success": "Berhasil"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Saat berubah",
+        "poll": "Polling"
+      }
+    }
   }
 }

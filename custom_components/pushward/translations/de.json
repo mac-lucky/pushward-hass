@@ -1700,5 +1700,77 @@
       "title": "PushWard-E-Mail-Limit erreicht",
       "description": "Das PushWard-Konto hat im aktuellen Zeitraum {used} von {limit} E-Mails verwendet, daher werden neue E-Mails abgelehnt, bis das Kontingent zurückgesetzt wird ({resets_at}). Für ein höheres Limit das Abonnement in der PushWard-iOS-App upgraden."
     }
+  },
+  "selector": {
+    "activity_template": {
+      "options": {
+        "generic": "Allgemein",
+        "countdown": "Countdown",
+        "alert": "Alarm",
+        "steps": "Schritte",
+        "gauge": "Messanzeige",
+        "timeline": "Zeitverlauf",
+        "board": "Tafel",
+        "log": "Protokoll"
+      }
+    },
+    "severity": {
+      "options": {
+        "critical": "Kritisch",
+        "warning": "Warnung",
+        "info": "Info"
+      }
+    },
+    "timeline_scale": {
+      "options": {
+        "linear": "Linear",
+        "logarithmic": "Logarithmisch"
+      }
+    },
+    "sound": {
+      "options": {
+        "": "Kein Ton",
+        "default": "Standard",
+        "chime": "Glockenspiel",
+        "alert": "Alarm",
+        "success": "Erfolg",
+        "warning": "Warnung",
+        "bell": "Glocke",
+        "ding": "Ding",
+        "buzz": "Summen",
+        "notification": "Benachrichtigung"
+      }
+    },
+    "widget_template": {
+      "options": {
+        "value": "Wert",
+        "progress": "Fortschritt",
+        "gauge": "Messanzeige",
+        "status": "Status",
+        "stat_list": "Statistikliste"
+      }
+    },
+    "value_scale": {
+      "options": {
+        "auto": "Automatisch",
+        "fraction": "Anteil",
+        "percent": "Prozent"
+      }
+    },
+    "widget_severity": {
+      "options": {
+        "": "Keine",
+        "info": "Info",
+        "warning": "Warnung",
+        "critical": "Kritisch",
+        "success": "Erfolg"
+      }
+    },
+    "widget_trigger_mode": {
+      "options": {
+        "event": "Bei Änderung",
+        "poll": "Abfrage"
+      }
+    }
   }
 }
