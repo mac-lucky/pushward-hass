@@ -3037,6 +3037,46 @@ def test_map_content_board_truncates_value_to_cap():
     assert_valid_activity_content(content)
 
 
+def test_map_content_board_emits_tile_color_and_url_action():
+    """A configured per-tile color and url become tile content (color + url_action)."""
+    primary = _make_state("on", {}, "binary_sensor.home_status")
+    cpu = _make_state("72", {}, "sensor.cpu")
+    config = {
+        CONF_TEMPLATE: "board",
+        CONF_TILES: [
+            {
+                CONF_LABEL: "CPU",
+                CONF_ENTITY_ID: "sensor.cpu",
+                "color": "red",
+                "url_action": "https://ha.local/cpu",
+            }
+        ],
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.cpu": cpu}))
+
+    tile = content["tiles"][0]
+    assert tile["color"] == "red"
+    assert tile["url_action"] == {"url": "https://ha.local/cpu", "foreground": True}
+    assert_valid_activity_content(content)
+
+
+def test_map_content_board_omits_unset_color_and_url_action():
+    """A tile without color/url emits neither key (no empty color, no null action)."""
+    primary = _make_state("on", {}, "binary_sensor.home_status")
+    cpu = _make_state("72", {}, "sensor.cpu")
+    config = {
+        CONF_TEMPLATE: "board",
+        CONF_TILES: [{CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu"}],
+    }
+
+    content = map_content(primary, config, hass=_FakeHass({"sensor.cpu": cpu}))
+
+    tile = content["tiles"][0]
+    assert "color" not in tile
+    assert "url_action" not in tile
+
+
 def test_map_completion_content_board_carries_tiles():
     """Board completion carries the last rendered tiles (server requires ≥1)."""
     config = {CONF_TEMPLATE: "board"}

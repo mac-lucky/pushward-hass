@@ -100,6 +100,7 @@ from .const import (
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     MAX_SEVERITY_LABEL_LEN,
+    NAMED_COLORS,
     normalize_slug,
 )
 
@@ -113,25 +114,9 @@ _TIMELINE_CARRY_FIELDS = ("unit", "scale", "decimals", "smoothing", "thresholds"
 _COMMON_CARRY_FIELDS = ("background_color", "text_color")
 
 # Mirrors server-side ValidateColor: 6- or 8-digit hex with optional '#', or
-# one of the server's allowlisted named colors. Must stay in sync with
-# pushward-server/internal/model/activity.go:validNamedColors.
+# one of the server's allowlisted named colors (NAMED_COLORS, defined in const).
 _COLOR_HEX_RE = re.compile(r"^#?[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?$")
-_COLOR_NAMED = frozenset(
-    {
-        "red",
-        "orange",
-        "yellow",
-        "green",
-        "blue",
-        "purple",
-        "pink",
-        "indigo",
-        "teal",
-        "cyan",
-        "mint",
-        "brown",
-    }
-)
+_COLOR_NAMED = frozenset(NAMED_COLORS)
 
 
 def is_valid_color(value: str) -> bool:
@@ -444,8 +429,10 @@ def _build_log_line(state: State, entity_config: dict, hass: HomeAssistant | Non
 def _build_board_tiles(entity_config: dict, hass: HomeAssistant | None) -> list[dict]:
     """Build the board ``tiles`` list by reading each tile's bound entity.
 
-    Each configured tile is ``{label, entity_id, value_attribute?, unit?, icon?}``.
-    Tiles whose entity is missing/unavailable or whose value is empty are skipped
+    Each configured tile is ``{label, entity_id, value_attribute?, unit?, icon?,
+    color?, url_action?}``. ``color`` (named or hex) and ``url_action`` (a URL,
+    wrapped into a foreground tap-action) are emitted only when configured. Tiles
+    whose entity is missing/unavailable or whose value is empty are skipped
     (mirrors the stat_list widget mapper). Returns at most BOARD_MAX_TILES tiles;
     an empty list when ``hass`` is unavailable (the values can't be read).
     """
@@ -476,12 +463,15 @@ def _build_board_tiles(entity_config: dict, hass: HomeAssistant | None) -> list[
         icon = resolve_icon(tile_state, tile, registry_icon=lookup_registry_icon(hass, entity_id))
         if icon:
             out["icon"] = icon[:BOARD_TILE_ICON_MAX]
-        color = color_to_str(tile.get(CONF_ACCENT_COLOR, "") or "")
+        color = color_to_str(tile.get("color", "") or "")
         if color:
             out["color"] = color
         trend = tile.get("trend")
         if trend in BOARD_TRENDS:
             out["trend"] = trend
+        url_action = build_tap_action(str(tile.get("url_action") or ""), foreground=True)
+        if url_action is not None:
+            out["url_action"] = url_action
         tiles_out.append(out)
         if len(tiles_out) >= BOARD_MAX_TILES:
             break

@@ -26,6 +26,8 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
+    ObjectSelector,
+    ObjectSelectorConfig,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -38,6 +40,9 @@ from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     APP_STORE_URL,
     BOARD_MAX_TILES,
+    BOARD_TILE_ICON_MAX,
+    BOARD_TILE_LABEL_MAX,
+    BOARD_TILE_UNIT_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
@@ -141,6 +146,7 @@ from .const import (
     MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_LEN,
     MAX_URL_LEN,
+    NAMED_COLORS,
     PRIORITY_MAX,
     PRIORITY_MIN,
     SCALES,
@@ -163,6 +169,8 @@ from .const import (
     WIDGET_POLL_INTERVAL_MAX,
     WIDGET_POLL_INTERVAL_MIN,
     WIDGET_SEVERITIES,
+    WIDGET_STAT_LABEL_MAX,
+    WIDGET_STAT_UNIT_MAX,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -200,7 +208,84 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "value_scale": tuple(VALUE_SCALES),
     "widget_severity": tuple(WIDGET_SEVERITIES),
     "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
+    # Nested inside the board-tile ObjectSelector (per-tile color); custom_value
+    # also accepts a hex string. Reused by the timeline thresholds editor later.
+    "named_color": tuple(NAMED_COLORS),
 }
+
+# Object-selector row editors for the two Required structured fields (board tiles,
+# widget stat_rows). Field keys equal the stored dict keys so a stored list feeds
+# straight back as the editor's value on reconfigure - no serialize/parse round
+# trip. The sub-field selectors are dict configs (not Selector instances): the
+# ObjectSelector re-wraps each through the selector() factory when it validates a
+# submitted row.
+#
+# That re-wrap matters: on HA >= 2025.8 ObjectSelector.__call__ is NOT a
+# passthrough - it runs every present sub-field through its own selector and
+# rejects a bad value with a raw, untranslated message BEFORE our step handler
+# runs (FlowManager validates data_schema first). So entity_id is a plain text
+# field, NOT {"entity": {}}: the entity selector rejects an empty string with
+# "Entity  is neither a valid entity ID..." - exactly the partial-row / YAML
+# fallback case - which would surface an untranslated error on the field. A text
+# field passes the value straight through, keeping requiredness and the
+# length/color/url caps in the parse layer (invalid_tile / invalid_stat_row) with
+# full locale parity. An unknown top-level key still trips the selector's own
+# "Field X is not allowed", but the form only ever submits the keys defined here.
+_ROW_TEXT = {"text": {}}
+_ROW_ICON = {"icon": {}}
+_ROW_URL = {"text": {"type": "url"}}
+_ROW_NAMED_COLOR = {
+    "select": {
+        "options": list(NAMED_COLORS),
+        "custom_value": True,
+        "mode": "dropdown",
+        "translation_key": "named_color",
+    }
+}
+
+_BOARD_TILES_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
+            CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
+            CONF_VALUE_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
+            CONF_ICON: {"label": "Icon", "selector": _ROW_ICON},
+            "color": {"label": "Color", "selector": _ROW_NAMED_COLOR},
+            "url_action": {"label": "URL", "selector": _ROW_URL},
+        },
+        multiple=True,
+        label_field=CONF_LABEL,
+        description_field=CONF_ENTITY_ID,
+    )
+)
+
+_WIDGET_STAT_ROWS_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
+            CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
+            CONF_VALUE_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field=CONF_LABEL,
+        description_field=CONF_ENTITY_ID,
+    )
+)
+
+
+def _object_rows_key(conf_key: str, current: dict, *, required: bool) -> vol.Marker:
+    """Build the vol key for an ObjectSelector row list.
+
+    The stored list becomes the field default so it rehydrates verbatim on
+    reconfigure (and satisfies the Required marker); an add flow starts empty.
+    """
+    stored = current.get(conf_key)
+    default = stored if isinstance(stored, list) else []
+    marker = vol.Required if required else vol.Optional
+    return marker(conf_key, default=default)
+
 
 # Collapsible-section layout for the two subentry detail forms. Each field a
 # template renders lands in exactly one section here or stays top-level (the
@@ -851,15 +936,10 @@ def _details_schema(
             )
         )
     if template == "board":
-        # Tiles are configured as a structured string (mirrors widget stat_rows).
-        # Format: 'label=entity_id[:attribute[:unit[:icon]]]' comma-separated.
-        # The anchor entity (step 1) drives start/end; tiles read separate entities.
-        fields[
-            vol.Required(
-                CONF_TILES,
-                default=d.get(CONF_TILES, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # Tiles are a row editor (ObjectSelector): each row binds a separate entity
+        # (label, entity, attribute, unit, icon, color, url). The anchor entity
+        # (step 1) drives start/end; tiles read the companion entities.
+        fields[_object_rows_key(CONF_TILES, d, required=True)] = _BOARD_TILES_SELECTOR
     if template == "log":
         # Optional extra columns composed into each line's text. Freeform string
         # mirroring the board-tile format: '[Label=]source[|unit]' comma-separated,
@@ -1140,19 +1220,65 @@ def _coerce_gauge_range(user_input: dict, *, is_gauge: bool) -> tuple[float, flo
     return min_v, max_v
 
 
-def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
-    """Parse board tiles from a string ('label=entity_id[:attr[:unit[:icon]]], ...') or list.
+def _strict_board_tile(item: object) -> dict:
+    """Validate + normalize one board-tile row dict, raising on any problem.
 
-    Mirrors ``_parse_widget_stat_rows``. Capped at BOARD_MAX_TILES. Each parsed tile
-    is ``{label, entity_id, value_attribute?, unit?, icon?}``. Lenient (default)
-    skips malformed entries and truncates past the cap; strict (form paths) raises
-    invalid_tile / too_many_tiles instead.
+    Enforces the requiredness of label/entity_id and the per-field length caps,
+    color rule, and URL rule that the removed whole-blob length check used to
+    approximate. Returns a tile carrying only the non-empty storage keys.
+    """
+    if not isinstance(item, dict):
+        raise vol.Invalid("invalid_tile", path=[CONF_TILES])
+    label = str(item.get(CONF_LABEL, "") or "").strip()
+    entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
+    if not label or not entity_id:
+        raise vol.Invalid("invalid_tile", path=[CONF_TILES])
+    attr = str(item.get(CONF_VALUE_ATTRIBUTE, "") or "").strip()
+    unit = str(item.get(CONF_UNIT, "") or "").strip()
+    icon = str(item.get(CONF_ICON, "") or "").strip()
+    color = str(item.get("color", "") or "").strip()
+    url_action = str(item.get("url_action", "") or "").strip()
+    if len(label) > BOARD_TILE_LABEL_MAX or len(unit) > BOARD_TILE_UNIT_MAX or len(icon) > BOARD_TILE_ICON_MAX:
+        raise vol.Invalid("invalid_tile", path=[CONF_TILES])
+    if color and not is_valid_color(color):
+        raise vol.Invalid("invalid_tile", path=[CONF_TILES])
+    if url_action:
+        code = _tap_action_url_error(url_action, foreground=True)
+        if code is not None:
+            raise vol.Invalid(code, path=[CONF_TILES])
+    tile: dict = {CONF_LABEL: label, CONF_ENTITY_ID: entity_id}
+    if attr:
+        tile[CONF_VALUE_ATTRIBUTE] = attr
+    if unit:
+        tile[CONF_UNIT] = unit
+    if icon:
+        tile[CONF_ICON] = icon
+    if color:
+        tile["color"] = color
+    if url_action:
+        tile["url_action"] = url_action
+    return tile
+
+
+def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse board tiles from a row-editor list (or the legacy comma string).
+
+    From the form each row is already a dict with the storage keys: ``{label,
+    entity_id, value_attribute?, unit?, icon?, color?, url_action?}``. The legacy
+    string form ('label=entity_id[:attr[:unit[:icon]]], ...') stays accepted for
+    stored-string edge cases and non-form callers. Capped at BOARD_MAX_TILES.
+    Lenient (default) skips malformed rows/entries and truncates past the cap;
+    strict (form paths) raises invalid_tile / too_many_tiles (and applies the
+    per-field length, color, and URL rules) instead.
     """
     if isinstance(raw, list):
-        tiles = [t for t in raw if isinstance(t, dict) and t.get(CONF_ENTITY_ID) and t.get(CONF_LABEL)]
-        if strict and len(tiles) > BOARD_MAX_TILES:
+        if not strict:
+            kept = [t for t in raw if isinstance(t, dict) and t.get(CONF_ENTITY_ID) and t.get(CONF_LABEL)]
+            return kept[:BOARD_MAX_TILES]
+        tiles = [_strict_board_tile(item) for item in raw]
+        if len(tiles) > BOARD_MAX_TILES:
             raise vol.Invalid("too_many_tiles", path=[CONF_TILES])
-        return tiles[:BOARD_MAX_TILES]
+        return tiles
     if not isinstance(raw, str) or not raw.strip():
         return []
     tiles = []
@@ -1186,28 +1312,6 @@ def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
     if strict and len(tiles) > BOARD_MAX_TILES:
         raise vol.Invalid("too_many_tiles", path=[CONF_TILES])
     return tiles[:BOARD_MAX_TILES]
-
-
-def _serialize_board_tiles(tiles: list[dict]) -> str:
-    """Serialize board tiles back to 'label=entity_id[:attr[:unit[:icon]]], ...' for editing."""
-    parts: list[str] = []
-    for tile in tiles or []:
-        label = tile.get(CONF_LABEL, "")
-        entity_id = tile.get(CONF_ENTITY_ID, "")
-        if not label or not entity_id:
-            continue
-        s = f"{label}={entity_id}"
-        attr = tile.get(CONF_VALUE_ATTRIBUTE) or ""
-        unit = tile.get(CONF_UNIT) or ""
-        icon = tile.get(CONF_ICON) or ""
-        if attr or unit or icon:
-            s += f":{attr}"
-        if unit or icon:
-            s += f":{unit}"
-        if icon:
-            s += f":{icon}"
-        parts.append(s)
-    return ", ".join(parts)
 
 
 def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
@@ -1794,9 +1898,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             units = current.get(CONF_UNITS)
             if isinstance(units, dict):
                 current[CONF_UNITS] = _serialize_key_value_pairs(units)
-            tiles = current.get(CONF_TILES)
-            if isinstance(tiles, list):
-                current[CONF_TILES] = _serialize_board_tiles(tiles)
+            # tiles stay a list: the ObjectSelector row editor rehydrates from it directly.
             log_columns = current.get(CONF_LOG_COLUMNS)
             if isinstance(log_columns, list):
                 current[CONF_LOG_COLUMNS] = _serialize_log_columns(log_columns)
@@ -1972,15 +2074,9 @@ def _widget_details_schema(
         )
 
     if template == WIDGET_TEMPLATE_STAT_LIST:
-        # stat_rows are configured as a structured string until HA gains a
-        # repeating-row selector. Format: 'label=entity_id[:attribute[:unit]]'
-        # comma-separated. Capped by WIDGET_MAX_STAT_ROWS.
-        fields[
-            vol.Required(
-                CONF_STAT_ROWS,
-                default=d.get(CONF_STAT_ROWS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # stat_rows are a row editor (ObjectSelector): each row binds a separate
+        # entity (label, entity, attribute, unit). Capped by WIDGET_MAX_STAT_ROWS.
+        fields[_object_rows_key(CONF_STAT_ROWS, d, required=True)] = _WIDGET_STAT_ROWS_SELECTOR
 
     # Cosmetic fields (all templates)
     fields[
@@ -2068,17 +2164,49 @@ def _widget_details_schema(
     return _sectioned_schema(fields, WIDGET_SECTIONS, _WIDGET_TOPLEVEL, expand or set())
 
 
-def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
-    """Parse stat_rows from string ('label=entity_id[:attr[:unit]], ...') or list.
+def _strict_stat_row(item: object) -> dict:
+    """Validate + normalize one widget stat_row dict, raising on any problem.
 
-    Lenient (default) skips malformed entries and truncates past the cap; strict
-    (form paths) raises invalid_stat_row / too_many_stat_rows instead.
+    Enforces requiredness of label/entity_id and the per-field length caps the
+    removed whole-blob length check used to approximate. Returns a row carrying
+    only the non-empty storage keys.
+    """
+    if not isinstance(item, dict):
+        raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
+    label = str(item.get(CONF_LABEL, "") or "").strip()
+    entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
+    if not label or not entity_id:
+        raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
+    attr = str(item.get(CONF_VALUE_ATTRIBUTE, "") or "").strip()
+    unit = str(item.get(CONF_UNIT, "") or "").strip()
+    if len(label) > WIDGET_STAT_LABEL_MAX or len(unit) > WIDGET_STAT_UNIT_MAX:
+        raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
+    row: dict = {CONF_LABEL: label, CONF_ENTITY_ID: entity_id}
+    if attr:
+        row[CONF_VALUE_ATTRIBUTE] = attr
+    if unit:
+        row[CONF_UNIT] = unit
+    return row
+
+
+def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse stat_rows from a row-editor list (or the legacy comma string).
+
+    From the form each row is a dict with the storage keys: ``{label, entity_id,
+    value_attribute?, unit?}``. The legacy string form
+    ('label=entity_id[:attr[:unit]], ...') stays accepted for stored-string edge
+    cases and non-form callers. Lenient (default) skips malformed rows/entries and
+    truncates past the cap; strict (form paths) raises invalid_stat_row /
+    too_many_stat_rows (and applies the per-field length caps) instead.
     """
     if isinstance(raw, list):
-        rows = [row for row in raw if isinstance(row, dict) and row.get(CONF_ENTITY_ID) and row.get(CONF_LABEL)]
-        if strict and len(rows) > WIDGET_MAX_STAT_ROWS:
+        if not strict:
+            kept = [r for r in raw if isinstance(r, dict) and r.get(CONF_ENTITY_ID) and r.get(CONF_LABEL)]
+            return kept[:WIDGET_MAX_STAT_ROWS]
+        rows = [_strict_stat_row(item) for item in raw]
+        if len(rows) > WIDGET_MAX_STAT_ROWS:
             raise vol.Invalid("too_many_stat_rows", path=[CONF_STAT_ROWS])
-        return rows[:WIDGET_MAX_STAT_ROWS]
+        return rows
     if not isinstance(raw, str) or not raw.strip():
         return []
     rows: list[dict] = []
@@ -2108,24 +2236,6 @@ def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
     if strict and len(rows) > WIDGET_MAX_STAT_ROWS:
         raise vol.Invalid("too_many_stat_rows", path=[CONF_STAT_ROWS])
     return rows[:WIDGET_MAX_STAT_ROWS]
-
-
-def _serialize_widget_stat_rows(rows: list[dict]) -> str:
-    parts: list[str] = []
-    for row in rows or []:
-        label = row.get(CONF_LABEL, "")
-        entity_id = row.get(CONF_ENTITY_ID, "")
-        if not label or not entity_id:
-            continue
-        s = f"{label}={entity_id}"
-        attr = row.get(CONF_VALUE_ATTRIBUTE) or ""
-        unit = row.get(CONF_UNIT) or ""
-        if attr or unit:
-            s += f":{attr}"
-        if unit:
-            s += f":{unit}"
-        parts.append(s)
-    return ", ".join(parts)
 
 
 def _parse_widget_input(user_input: dict, step1: dict) -> dict:
@@ -2233,9 +2343,7 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
             self._step1_input = user_input
             self._is_reconfigure = True
             current = dict(subentry.data)
-            stat_rows = current.get(CONF_STAT_ROWS)
-            if isinstance(stat_rows, list):
-                current[CONF_STAT_ROWS] = _serialize_widget_stat_rows(stat_rows)
+            # stat_rows stay a list: the ObjectSelector row editor rehydrates from it directly.
             self._details_defaults = current
             return await self.async_step_details()
         current = dict(subentry.data)

@@ -20,7 +20,7 @@ from pathlib import Path
 
 import voluptuous as vol
 from homeassistant.data_entry_flow import section
-from homeassistant.helpers.selector import SelectSelector
+from homeassistant.helpers.selector import ObjectSelector, SelectSelector
 
 from custom_components.pushward.config_flow import (
     ENTITY_SECTIONS,
@@ -36,22 +36,32 @@ from custom_components.pushward.const import TEMPLATES, WIDGET_TEMPLATES
 _TRANSLATIONS = Path(__file__).parent.parent / "custom_components" / "pushward" / "translations"
 
 
-def _translation_keys_in_schemas() -> dict[str, SelectSelector]:
-    """Every SelectSelector across both subentry flows that declares a translation_key.
+def _translation_keys_in_schemas() -> dict[str, tuple[str, ...]]:
+    """Every translated dropdown across both subentry flows: translation_key -> options.
 
-    Returns translation_key -> the selector, so a later assert can diff the option
-    set too. Templates are enumerated so template-specific dropdowns are covered.
+    Covers both plain SelectSelectors and selects nested inside an ObjectSelector's
+    row fields (the per-tile color editor is a ``{"select": {...}}`` dict config
+    there, not a SelectSelector instance). Templates are enumerated so
+    template-specific dropdowns are covered.
     """
-    found: dict[str, SelectSelector] = {}
+    found: dict[str, tuple[str, ...]] = {}
+
+    def record(cfg: dict) -> None:
+        key = cfg.get("translation_key")
+        if key:
+            found[key] = tuple(cfg.get("options", []))
 
     def scan(schema) -> None:
         for sel in schema.schema.values():
             if isinstance(sel, section):
                 scan(sel.schema)  # dropdowns like sound/scale/trigger_mode now live in sections
+            elif isinstance(sel, ObjectSelector):
+                for field in sel.config.get("fields", {}).values():
+                    inner = field.get("selector")
+                    if isinstance(inner, dict) and "select" in inner:
+                        record(inner["select"])
             elif isinstance(sel, SelectSelector):
-                key = sel.config.get("translation_key")
-                if key:
-                    found[key] = sel
+                record(sel.config)
 
     scan(_entity_template_schema())
     for template in TEMPLATES:
@@ -83,8 +93,7 @@ def test_registry_option_values_match_the_selector() -> None:
     """The wire values in the registry match the options the selector actually renders."""
     found = _translation_keys_in_schemas()
     for key, values in SELECT_TRANSLATION_KEYS.items():
-        sel = found[key]
-        rendered = tuple(sel.config.get("options", []))
+        rendered = found[key]
         assert rendered == values, f"{key}: registry {values} != selector options {rendered}"
 
 

@@ -33,19 +33,20 @@ from custom_components.pushward.config_flow import (
     _parse_widget_stat_rows,
     _resolve_series_entity_labels,
     _rgb_to_hex,
-    _serialize_board_tiles,
     _serialize_csv,
     _serialize_float_list,
     _serialize_log_columns,
     _serialize_series_entities,
     _serialize_thresholds,
-    _serialize_widget_stat_rows,
     _suggest_widget_template,
     _validate_integration_key,
     _widget_details_schema,
 )
 from custom_components.pushward.const import (
     BOARD_MAX_TILES,
+    BOARD_TILE_ICON_MAX,
+    BOARD_TILE_LABEL_MAX,
+    BOARD_TILE_UNIT_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
@@ -134,6 +135,8 @@ from custom_components.pushward.const import (
     TIMELINE_SERIES_LABEL_MAX,
     VALUE_SCALE_PERCENT,
     WIDGET_MAX_STAT_ROWS,
+    WIDGET_STAT_LABEL_MAX,
+    WIDGET_STAT_UNIT_MAX,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -2154,7 +2157,8 @@ def _widget_details(**overrides) -> dict:
     return data
 
 
-def test_parse_widget_stat_rows_round_trip() -> None:
+def test_parse_widget_stat_rows_legacy_string() -> None:
+    """The legacy comma string still parses into row dicts (non-form callers)."""
     raw = "Users=sensor.users, Active=sensor.active:count:online, Idle=sensor.idle::widgets"
     parsed = _parse_widget_stat_rows(raw)
     assert parsed == [
@@ -2162,10 +2166,17 @@ def test_parse_widget_stat_rows_round_trip() -> None:
         {"label": "Active", "entity_id": "sensor.active", "value_attribute": "count", "unit": "online"},
         {"label": "Idle", "entity_id": "sensor.idle", "unit": "widgets"},
     ]
-    # Round-trip: serialize → parse → equal (modulo unit-only edge case below).
-    serialized = _serialize_widget_stat_rows(parsed)
-    reparsed = _parse_widget_stat_rows(serialized)
-    assert reparsed == parsed
+
+
+def test_parse_widget_stat_rows_list_round_trip() -> None:
+    """A row list (what the editor submits) strict-parses to itself unchanged."""
+    rows = [
+        {"label": "Users", "entity_id": "sensor.users"},
+        {"label": "Active", "entity_id": "sensor.active", "value_attribute": "count", "unit": "online"},
+    ]
+    parsed = _parse_widget_stat_rows(rows, strict=True)
+    assert parsed == rows
+    assert _parse_widget_stat_rows(parsed, strict=True) == rows
 
 
 def test_parse_widget_stat_rows_caps_at_max() -> None:
@@ -2358,7 +2369,7 @@ def test_parse_widget_input_empty_tap_action_defaults() -> None:
     assert result[CONF_TAP_ACTION_FOREGROUND] is True
 
 
-# --- Board tiles parsing & serialization ---
+# --- Board tiles parsing ---
 
 
 def test_parse_board_tiles_basic() -> None:
@@ -2395,12 +2406,71 @@ def test_parse_board_tiles_empty() -> None:
     assert _parse_board_tiles(None) == []
 
 
-def test_board_tiles_round_trip() -> None:
-    """parse → serialize → parse yields the same list (attr+unit+icon preserved)."""
-    raw = "CPU=sensor.cpu:temperature:%:mdi:cpu-64, Door=binary_sensor.door"
-    parsed = _parse_board_tiles(raw)
-    reparsed = _parse_board_tiles(_serialize_board_tiles(parsed))
-    assert reparsed == parsed
+def test_parse_board_tiles_list_round_trip() -> None:
+    """A tile list (what the editor submits) strict-parses to itself unchanged."""
+    tiles = [
+        {
+            "label": "CPU",
+            "entity_id": "sensor.cpu",
+            "value_attribute": "temperature",
+            "unit": "%",
+            "icon": "mdi:cpu-64",
+        },
+        {"label": "Door", "entity_id": "binary_sensor.door", "color": "red", "url_action": "https://ha.local"},
+    ]
+    parsed = _parse_board_tiles(tiles, strict=True)
+    assert parsed == tiles
+    assert _parse_board_tiles(parsed, strict=True) == tiles
+
+
+def test_parse_board_tiles_strict_list_rejects_incomplete_row() -> None:
+    """A row missing its entity_id bounces with invalid_tile under strict parsing."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_board_tiles([{"label": "CPU"}], strict=True)
+    assert exc.value.path == [CONF_TILES]
+    assert "invalid_tile" in str(exc.value)
+
+
+def test_parse_board_tiles_strict_list_length_caps() -> None:
+    """Per-row length caps (label/unit/icon) bounce with invalid_tile."""
+    for bad in (
+        {"label": "x" * (BOARD_TILE_LABEL_MAX + 1), "entity_id": "sensor.c"},
+        {"label": "CPU", "entity_id": "sensor.c", "unit": "x" * (BOARD_TILE_UNIT_MAX + 1)},
+        {"label": "CPU", "entity_id": "sensor.c", "icon": "x" * (BOARD_TILE_ICON_MAX + 1)},
+    ):
+        with pytest.raises(vol.Invalid) as exc:
+            _parse_board_tiles([bad], strict=True)
+        assert "invalid_tile" in str(exc.value), bad
+
+
+def test_parse_board_tiles_strict_list_rejects_bad_color_and_url() -> None:
+    """An unknown color name or a schemeless URL bounces under strict parsing."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_board_tiles([{"label": "C", "entity_id": "sensor.c", "color": "chartreuse"}], strict=True)
+    assert "invalid_tile" in str(exc.value)
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_board_tiles([{"label": "C", "entity_id": "sensor.c", "url_action": "not a url"}], strict=True)
+    assert "invalid_url" in str(exc.value)
+
+
+def test_parse_board_tiles_strict_list_accepts_named_and_hex_color() -> None:
+    """A named color and an 8-digit hex both survive strict parsing."""
+    tiles = [
+        {"label": "A", "entity_id": "sensor.a", "color": "teal"},
+        {"label": "B", "entity_id": "sensor.b", "color": "#00ff0080"},
+    ]
+    assert _parse_board_tiles(tiles, strict=True) == tiles
+
+
+def test_parse_widget_stat_rows_strict_list_length_caps() -> None:
+    """Per-row label/unit caps bounce with invalid_stat_row."""
+    for bad in (
+        {"label": "x" * (WIDGET_STAT_LABEL_MAX + 1), "entity_id": "sensor.u"},
+        {"label": "U", "entity_id": "sensor.u", "unit": "x" * (WIDGET_STAT_UNIT_MAX + 1)},
+    ):
+        with pytest.raises(vol.Invalid) as exc:
+            _parse_widget_stat_rows([bad], strict=True)
+        assert "invalid_stat_row" in str(exc.value), bad
 
 
 # --- _parse_log_columns / _serialize_log_columns ---
@@ -2679,7 +2749,7 @@ async def test_widget_details_error_preserves_user_input(hass: HomeAssistant) ->
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],
-        user_input=_nest_widget(WIDGET_TEMPLATE_STAT_LIST, {CONF_STAT_ROWS: "", CONF_WIDGET_NAME: "My Stat Board"}),
+        user_input=_nest_widget(WIDGET_TEMPLATE_STAT_LIST, {CONF_STAT_ROWS: [], CONF_WIDGET_NAME: "My Stat Board"}),
     )
     assert result["type"] is FlowResultType.FORM
     assert CONF_STAT_ROWS in result["errors"]
@@ -2873,14 +2943,33 @@ async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
 
 
 async def test_flow_invalid_tile(hass: HomeAssistant) -> None:
-    """A tile without label=entity_id bounces on the tiles field."""
+    """A row missing its entity bounces on the tiles field."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_entity_subentry(
         hass,
         entry,
         template="board",
-        details_overrides={CONF_TILES: "just some text"},
+        details_overrides={CONF_TILES: [{CONF_LABEL: "CPU"}]},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_TILES: "invalid_tile"}
+
+
+async def test_flow_tile_empty_entity_string_bounces_cleanly(hass: HomeAssistant) -> None:
+    """A row with an empty entity string (partial row) yields our invalid_tile.
+
+    The entity_id sub-field is a text selector on purpose: an {"entity": {}}
+    selector would reject the empty string with a raw untranslated message inside
+    the schema, before our parse layer runs. Text keeps the controlled error.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="board",
+        details_overrides={CONF_TILES: [{CONF_LABEL: "CPU", CONF_ENTITY_ID: ""}]},
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_TILES: "invalid_tile"}
@@ -2890,7 +2979,7 @@ async def test_flow_too_many_tiles(hass: HomeAssistant) -> None:
     """More than BOARD_MAX_TILES tiles bounces instead of silently truncating."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
-    tiles = ", ".join(f"T{i}=sensor.s{i}" for i in range(BOARD_MAX_TILES + 1))
+    tiles = [{CONF_LABEL: f"T{i}", CONF_ENTITY_ID: f"sensor.s{i}"} for i in range(BOARD_MAX_TILES + 1)]
     result = await _add_entity_subentry(
         hass,
         entry,
@@ -2899,6 +2988,51 @@ async def test_flow_too_many_tiles(hass: HomeAssistant) -> None:
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_TILES: "too_many_tiles"}
+
+
+async def test_flow_tile_label_over_cap(hass: HomeAssistant) -> None:
+    """A tile label past the server cap bounces (the old whole-blob length is gone)."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="board",
+        details_overrides={CONF_TILES: [{CONF_LABEL: "x" * (BOARD_TILE_LABEL_MAX + 1), CONF_ENTITY_ID: "sensor.c"}]},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_TILES: "invalid_tile"}
+
+
+async def test_flow_board_tiles_persist_color_and_url(hass: HomeAssistant) -> None:
+    """A board created through the row editor stores per-tile color and url_action."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="board",
+        details_overrides={
+            CONF_TILES: [
+                {
+                    CONF_LABEL: "CPU",
+                    CONF_ENTITY_ID: "sensor.cpu",
+                    "color": "red",
+                    "url_action": "https://ha.local/cpu",
+                }
+            ]
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    stored = next(iter(entry.subentries.values())).data
+    assert stored[CONF_TILES] == [
+        {
+            CONF_LABEL: "CPU",
+            CONF_ENTITY_ID: "sensor.cpu",
+            "color": "red",
+            "url_action": "https://ha.local/cpu",
+        }
+    ]
 
 
 async def test_flow_invalid_series_entity(hass: HomeAssistant) -> None:
@@ -3039,14 +3173,32 @@ async def test_flow_primary_series_matching_default_entity_label_passes(hass: Ho
 
 
 async def test_flow_invalid_stat_row(hass: HomeAssistant) -> None:
-    """A stat row without label=entity_id bounces on the stat_rows field."""
+    """A row missing its entity bounces on the stat_rows field."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_widget_subentry(
         hass,
         entry,
         template=WIDGET_TEMPLATE_STAT_LIST,
-        details={CONF_STAT_ROWS: "just some text"},
+        details={CONF_STAT_ROWS: [{CONF_LABEL: "Users"}]},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STAT_ROWS: "invalid_stat_row"}
+
+
+async def test_flow_stat_row_empty_entity_string_bounces_cleanly(hass: HomeAssistant) -> None:
+    """A stat row with an empty entity string yields our invalid_stat_row.
+
+    Same reason as the board-tile case: entity_id is a text sub-field so the
+    empty string reaches the parse layer instead of a raw schema-side rejection.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_widget_subentry(
+        hass,
+        entry,
+        template=WIDGET_TEMPLATE_STAT_LIST,
+        details={CONF_STAT_ROWS: [{CONF_LABEL: "Users", CONF_ENTITY_ID: ""}]},
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_STAT_ROWS: "invalid_stat_row"}
@@ -3056,7 +3208,7 @@ async def test_flow_too_many_stat_rows(hass: HomeAssistant) -> None:
     """More than WIDGET_MAX_STAT_ROWS rows bounces instead of silently truncating."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
-    rows = ", ".join(f"L{i}=sensor.s{i}" for i in range(WIDGET_MAX_STAT_ROWS + 1))
+    rows = [{CONF_LABEL: f"L{i}", CONF_ENTITY_ID: f"sensor.s{i}"} for i in range(WIDGET_MAX_STAT_ROWS + 1)]
     result = await _add_widget_subentry(
         hass,
         entry,
@@ -3065,6 +3217,22 @@ async def test_flow_too_many_stat_rows(hass: HomeAssistant) -> None:
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_STAT_ROWS: "too_many_stat_rows"}
+
+
+async def test_flow_stat_row_unit_over_cap(hass: HomeAssistant) -> None:
+    """A stat-row unit past the server cap bounces (per-row length now enforced)."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_widget_subentry(
+        hass,
+        entry,
+        template=WIDGET_TEMPLATE_STAT_LIST,
+        details={
+            CONF_STAT_ROWS: [{CONF_LABEL: "U", CONF_ENTITY_ID: "sensor.u", CONF_UNIT: "x" * (WIDGET_STAT_UNIT_MAX + 1)}]
+        },
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_STAT_ROWS: "invalid_stat_row"}
 
 
 async def test_flow_valid_step_lists_pass(hass: HomeAssistant) -> None:
@@ -3381,7 +3549,12 @@ async def test_reconfigure_round_trip_preserves_widget_stat_rows(hass: HomeAssis
         hass,
         entry,
         template=WIDGET_TEMPLATE_STAT_LIST,
-        details={CONF_STAT_ROWS: "Users=sensor.users, Load=sensor.load1:load"},
+        details={
+            CONF_STAT_ROWS: [
+                {CONF_LABEL: "Users", CONF_ENTITY_ID: "sensor.users"},
+                {CONF_LABEL: "Load", CONF_ENTITY_ID: "sensor.load1", CONF_VALUE_ATTRIBUTE: "load"},
+            ]
+        },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentry_id = next(iter(entry.subentries))

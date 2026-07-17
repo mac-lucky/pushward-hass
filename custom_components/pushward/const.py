@@ -249,6 +249,26 @@ WIDGET_TREND_UP = "up"
 WIDGET_TREND_DOWN = "down"
 WIDGET_TREND_FLAT = "flat"
 
+# Named colors the server accepts (mirrors server-side ValidateColor's
+# validNamedColors; must stay in sync with
+# pushward-server/internal/model/activity.go). Used both for the is_valid_color
+# check in content_mapper and as the option set for the named-color dropdowns in
+# the config flow (tile color, and the timeline thresholds color in a later phase).
+NAMED_COLORS = (
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "purple",
+    "pink",
+    "indigo",
+    "teal",
+    "cyan",
+    "mint",
+    "brown",
+)
+
 # Board template caps (mirror pushward-server/internal/model/activity.go).
 # A board carries 1-BOARD_MAX_TILES tiles (RFC-7396 atomic replace). Per tile:
 # label (required, ≤32), value (string, required, ≤16 — a string so "Open"/"On"/
