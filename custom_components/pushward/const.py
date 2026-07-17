@@ -302,6 +302,11 @@ LOG_COLUMN_LABEL_MAX = 32
 # RFC 7396; each label (a value-map key) is capped at TIMELINE_SERIES_LABEL_MAX runes.
 TIMELINE_MAX_SERIES = 10
 TIMELINE_SERIES_LABEL_MAX = 32
+# Timeline sparkline thresholds: at most THRESHOLDS_MAX reference lines, each with a
+# numeric value, an optional color (ValidateColor), and an optional label capped at
+# THRESHOLD_LABEL_MAX runes.
+THRESHOLDS_MAX = 5
+THRESHOLD_LABEL_MAX = 12
 
 # Timeline scales
 SCALES = ["linear", "logarithmic"]

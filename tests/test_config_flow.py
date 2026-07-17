@@ -35,9 +35,6 @@ from custom_components.pushward.config_flow import (
     _rgb_to_hex,
     _serialize_csv,
     _serialize_float_list,
-    _serialize_log_columns,
-    _serialize_series_entities,
-    _serialize_thresholds,
     _suggest_widget_template,
     _validate_integration_key,
     _widget_details_schema,
@@ -127,10 +124,13 @@ from custom_components.pushward.const import (
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
     LIVE_PROGRESS_TEMPLATES,
+    LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
     MAX_SEVERITY_LABEL_LEN,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
+    THRESHOLD_LABEL_MAX,
+    THRESHOLDS_MAX,
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
     VALUE_SCALE_PERCENT,
@@ -270,7 +270,7 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
         data[CONF_SCALE] = "linear"
         data[CONF_DECIMALS] = 1
         data[CONF_SMOOTHING] = False
-        data[CONF_THRESHOLDS] = ""
+        data[CONF_THRESHOLDS] = []
         data[CONF_HISTORY_PERIOD] = 0
 
     # Identity fields
@@ -1683,7 +1683,7 @@ async def test_subentry_rejects_dangerous_secondary_url(hass: HomeAssistant) -> 
     assert result["errors"] == {CONF_SECONDARY_URL: "invalid_url"}
 
 
-# --- _parse_thresholds / _serialize_thresholds ---
+# --- _parse_thresholds ---
 
 
 def test_parse_thresholds_full():
@@ -1724,21 +1724,48 @@ def test_parse_thresholds_max_five():
     assert len(result) == 5
 
 
-def test_serialize_thresholds_roundtrip():
-    """Serialization produces parseable output."""
-    original = [
+def test_parse_thresholds_list_round_trip():
+    """A row list (what the editor submits) strict-parses to itself unchanged."""
+    rows = [
         {"value": 25.0, "color": "red", "label": "Hot"},
         {"value": 18.0, "color": "blue"},
         {"value": 20.0},
     ]
-    serialized = _serialize_thresholds(original)
-    roundtrip = _parse_thresholds(serialized)
-    assert roundtrip == original
+    parsed = _parse_thresholds(rows, strict=True)
+    assert parsed == rows
+    assert _parse_thresholds(parsed, strict=True) == rows
 
 
-def test_serialize_thresholds_empty():
-    """Empty list serializes to empty string."""
-    assert _serialize_thresholds([]) == ""
+def test_parse_thresholds_strict_list_rejects_missing_value():
+    """A row with no value bounces with invalid_threshold under strict parsing."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_thresholds([{"color": "red", "label": "Hot"}], strict=True)
+    assert exc.value.path == [CONF_THRESHOLDS]
+    assert "invalid_threshold" in str(exc.value)
+
+
+def test_parse_thresholds_strict_list_label_cap():
+    """A label past THRESHOLD_LABEL_MAX bounces with invalid_threshold."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_thresholds([{"value": 25.0, "label": "x" * (THRESHOLD_LABEL_MAX + 1)}], strict=True)
+    assert "invalid_threshold" in str(exc.value)
+
+
+def test_parse_thresholds_strict_list_rejects_bad_color():
+    """An unknown color name bounces; a named colour and 8-digit hex both survive."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_thresholds([{"value": 25.0, "color": "chartreuse"}], strict=True)
+    assert "invalid_threshold" in str(exc.value)
+    ok = [{"value": 25.0, "color": "teal"}, {"value": 18.0, "color": "#00ff0080"}]
+    assert _parse_thresholds(ok, strict=True) == ok
+
+
+def test_parse_thresholds_strict_list_too_many():
+    """More than THRESHOLDS_MAX rows bounces instead of silently truncating."""
+    rows = [{"value": float(i)} for i in range(THRESHOLDS_MAX + 1)]
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_thresholds(rows, strict=True)
+    assert "too_many_thresholds" in str(exc.value)
 
 
 # --- timeline subentry flow ---
@@ -1771,7 +1798,7 @@ async def test_subentry_timeline_template(hass: HomeAssistant) -> None:
                 CONF_SCALE: "logarithmic",
                 CONF_DECIMALS: 2,
                 CONF_SMOOTHING: True,
-                CONF_THRESHOLDS: "25:red:Hot",
+                CONF_THRESHOLDS: [{"value": 25.0, "color": "red", "label": "Hot"}],
                 CONF_HISTORY_PERIOD: 6,
             },
         ),
@@ -1815,7 +1842,12 @@ async def test_subentry_timeline_series_entities(hass: HomeAssistant) -> None:
         result["flow_id"],
         user_input=_mock_details_input(
             "timeline",
-            **{CONF_SERIES_ENTITIES: "sensor.bedroom_pm25, Office=sensor.office_pm25"},
+            **{
+                CONF_SERIES_ENTITIES: [
+                    {CONF_ENTITY_ID: "sensor.bedroom_pm25"},
+                    {CONF_LABEL: "Office", CONF_ENTITY_ID: "sensor.office_pm25"},
+                ]
+            },
         ),
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -2473,7 +2505,7 @@ def test_parse_widget_stat_rows_strict_list_length_caps() -> None:
         assert "invalid_stat_row" in str(exc.value), bad
 
 
-# --- _parse_log_columns / _serialize_log_columns ---
+# --- _parse_log_columns ---
 
 
 def test_parse_log_columns_attribute() -> None:
@@ -2517,12 +2549,55 @@ def test_parse_log_columns_empty() -> None:
     assert _parse_log_columns(None) == []
 
 
-def test_log_columns_round_trip() -> None:
-    """parse → serialize → parse yields the same list across every source kind."""
-    raw = "brightness, color_temp_kelvin|K, binary_sensor.door, sensor.temp:temperature, Door=binary_sensor.door"
-    parsed = _parse_log_columns(raw)
-    reparsed = _parse_log_columns(_serialize_log_columns(parsed))
-    assert reparsed == parsed
+def test_parse_log_columns_list_round_trip() -> None:
+    """A row list (what the editor submits) strict-parses to itself across source kinds."""
+    rows = [
+        {"attribute": "brightness"},
+        {"attribute": "color_temp_kelvin", CONF_UNIT: "K"},
+        {CONF_ENTITY_ID: "binary_sensor.door"},
+        {CONF_ENTITY_ID: "sensor.temp", "attribute": "temperature"},
+        {CONF_LABEL: "Door", CONF_ENTITY_ID: "binary_sensor.door"},
+    ]
+    parsed = _parse_log_columns(rows, strict=True)
+    assert parsed == rows
+    assert _parse_log_columns(parsed, strict=True) == rows
+
+
+def test_parse_log_columns_strict_list_source_semantics() -> None:
+    """The three source modes survive strict parsing with their keys intact."""
+    # tracked-entity attribute: attribute only, no entity_id.
+    assert _parse_log_columns([{"attribute": "brightness"}], strict=True) == [{"attribute": "brightness"}]
+    # companion state: entity_id only, no attribute.
+    assert _parse_log_columns([{CONF_ENTITY_ID: "binary_sensor.door"}], strict=True) == [
+        {CONF_ENTITY_ID: "binary_sensor.door"}
+    ]
+    # companion attribute: both.
+    assert _parse_log_columns([{CONF_ENTITY_ID: "sensor.t", "attribute": "temperature"}], strict=True) == [
+        {CONF_ENTITY_ID: "sensor.t", "attribute": "temperature"}
+    ]
+
+
+def test_parse_log_columns_strict_list_rejects_sourceless_row() -> None:
+    """A row with neither entity nor attribute bounces with invalid_log_column."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_log_columns([{CONF_LABEL: "Bright"}], strict=True)
+    assert exc.value.path == [CONF_LOG_COLUMNS]
+    assert "invalid_log_column" in str(exc.value)
+
+
+def test_parse_log_columns_strict_list_label_cap() -> None:
+    """A label past LOG_COLUMN_LABEL_MAX bounces with invalid_log_column."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_log_columns([{CONF_LABEL: "x" * (LOG_COLUMN_LABEL_MAX + 1), "attribute": "brightness"}], strict=True)
+    assert "invalid_log_column" in str(exc.value)
+
+
+def test_parse_log_columns_strict_list_too_many() -> None:
+    """More than LOG_MAX_COLUMNS rows bounces instead of silently truncating."""
+    rows = [{"attribute": f"a{i}"} for i in range(LOG_MAX_COLUMNS + 1)]
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_log_columns(rows, strict=True)
+    assert "too_many_log_columns" in str(exc.value)
 
 
 def test_parse_entity_input_log_emits_columns() -> None:
@@ -2536,7 +2611,7 @@ def test_parse_entity_input_log_emits_columns() -> None:
     ]
 
 
-# --- _parse_series_entities / _serialize_series_entities / labels ---
+# --- _parse_series_entities / labels ---
 
 
 def test_parse_series_entities_state_and_attribute() -> None:
@@ -2565,12 +2640,32 @@ def test_parse_series_entities_empty() -> None:
     assert _parse_series_entities(None) == []
 
 
-def test_series_entities_round_trip() -> None:
-    """parse (labels frozen) then serialize then parse is stable."""
-    raw = "Bedroom=sensor.bedroom, Set=climate.hvac:temperature, sensor.plain"
-    resolved = _resolve_series_entity_labels(_parse_series_entities(raw), None)
-    reparsed = _parse_series_entities(_serialize_series_entities(resolved))
-    assert reparsed == resolved
+def test_parse_series_entities_list_round_trip() -> None:
+    """A resolved series list (what reconfigure feeds back) strict-parses to itself."""
+    rows = [
+        {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom"},
+        {CONF_LABEL: "Set", CONF_ENTITY_ID: "climate.hvac", "attribute": "temperature"},
+    ]
+    parsed = _parse_series_entities(rows, strict=True)
+    assert parsed == rows
+    assert _parse_series_entities(parsed, strict=True) == rows
+
+
+def test_parse_series_entities_strict_list_rejects_missing_entity() -> None:
+    """A row without an entity bounces with invalid_series_entity under strict parsing."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_series_entities([{CONF_LABEL: "Air"}], strict=True)
+    assert exc.value.path == [CONF_SERIES_ENTITIES]
+    assert "invalid_series_entity" in str(exc.value)
+
+
+def test_parse_series_entities_strict_list_label_cap() -> None:
+    """A label past TIMELINE_SERIES_LABEL_MAX bounces with invalid_series_entity."""
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_series_entities(
+            [{CONF_LABEL: "x" * (TIMELINE_SERIES_LABEL_MAX + 1), CONF_ENTITY_ID: "sensor.a"}], strict=True
+        )
+    assert "invalid_series_entity" in str(exc.value)
 
 
 def test_resolve_series_labels_defaults_to_friendly_name() -> None:
@@ -2636,6 +2731,18 @@ def test_parse_entity_input_too_many_series() -> None:
     """The attribute map plus series entities may not exceed TIMELINE_MAX_SERIES."""
     series = ", ".join(f"a{i}=L{i}" for i in range(6))
     entities = ", ".join(f"L{i}=sensor.s{i}" for i in range(6))
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_entity_input(
+            _base_user_input(**{CONF_TEMPLATE: "timeline", CONF_SERIES: series, CONF_SERIES_ENTITIES: entities})
+        )
+    assert exc.value.path == [CONF_SERIES_ENTITIES]
+    assert "too_many_series" in str(exc.value)
+
+
+def test_parse_entity_input_too_many_series_row_list() -> None:
+    """The combined cap also counts row-editor series entities (no per-list truncation)."""
+    series = ", ".join(f"a{i}=L{i}" for i in range(6))
+    entities = [{CONF_LABEL: f"L{i}", CONF_ENTITY_ID: f"sensor.s{i}"} for i in range(6)]
     with pytest.raises(vol.Invalid) as exc:
         _parse_entity_input(
             _base_user_input(**{CONF_TEMPLATE: "timeline", CONF_SERIES: series, CONF_SERIES_ENTITIES: entities})
@@ -3036,38 +3143,76 @@ async def test_flow_board_tiles_persist_color_and_url(hass: HomeAssistant) -> No
 
 
 async def test_flow_invalid_series_entity(hass: HomeAssistant) -> None:
-    """A bare word (no entity_id) as a series entity bounces."""
+    """A series row with no entity bounces on the series_entities field."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_entity_subentry(
         hass,
         entry,
         template="timeline",
-        details_overrides={CONF_SERIES_ENTITIES: "brightness"},
+        details_overrides={CONF_SERIES_ENTITIES: [{CONF_LABEL: "Air"}]},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_SERIES_ENTITIES: "invalid_series_entity"}
+
+
+async def test_flow_series_entity_empty_entity_string_bounces_cleanly(hass: HomeAssistant) -> None:
+    """A row with an empty entity string yields our invalid_series_entity.
+
+    The entity_id sub-field is a text selector so the empty string reaches the parse
+    layer instead of a raw untranslated schema-side rejection.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_SERIES_ENTITIES: [{CONF_LABEL: "Air", CONF_ENTITY_ID: ""}]},
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_SERIES_ENTITIES: "invalid_series_entity"}
 
 
 async def test_flow_invalid_log_column(hass: HomeAssistant) -> None:
-    """A column entry with an empty source bounces."""
+    """A column row with neither entity nor attribute bounces."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_entity_subentry(
         hass,
         entry,
         template="log",
-        details_overrides={CONF_LOG_COLUMNS: "Label="},
+        details_overrides={CONF_LOG_COLUMNS: [{CONF_LABEL: "Empty"}]},
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_LOG_COLUMNS: "invalid_log_column"}
+
+
+async def test_flow_log_columns_source_modes_persist(hass: HomeAssistant) -> None:
+    """The three log-column source modes create the subentry with keys intact."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    columns = [
+        {"attribute": "brightness"},
+        {CONF_ENTITY_ID: "binary_sensor.door"},
+        {CONF_LABEL: "Temp", CONF_ENTITY_ID: "sensor.t", "attribute": "temperature", CONF_UNIT: "C"},
+    ]
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="log",
+        details_overrides={CONF_LOG_COLUMNS: columns},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    stored = next(iter(entry.subentries.values())).data
+    assert stored[CONF_LOG_COLUMNS] == columns
 
 
 async def test_flow_too_many_log_columns(hass: HomeAssistant) -> None:
     """More than LOG_MAX_COLUMNS columns bounces."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
-    columns = ", ".join(f"sensor.s{i}" for i in range(LOG_MAX_COLUMNS + 1))
+    columns = [{CONF_ENTITY_ID: f"sensor.s{i}"} for i in range(LOG_MAX_COLUMNS + 1)]
     result = await _add_entity_subentry(
         hass,
         entry,
@@ -3079,31 +3224,61 @@ async def test_flow_too_many_log_columns(hass: HomeAssistant) -> None:
 
 
 async def test_flow_invalid_threshold(hass: HomeAssistant) -> None:
-    """A threshold that does not start with a number bounces."""
+    """A threshold row with no value bounces on the thresholds field."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_entity_subentry(
         hass,
         entry,
         template="timeline",
-        details_overrides={CONF_THRESHOLDS: "abc:red:Hot"},
+        details_overrides={CONF_THRESHOLDS: [{"color": "red", "label": "Hot"}]},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_THRESHOLDS: "invalid_threshold"}
+
+
+async def test_flow_threshold_label_over_cap(hass: HomeAssistant) -> None:
+    """A threshold label past the server cap bounces (per-row length enforced)."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_THRESHOLDS: [{"value": 25.0, "label": "x" * (THRESHOLD_LABEL_MAX + 1)}]},
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_THRESHOLDS: "invalid_threshold"}
 
 
 async def test_flow_too_many_thresholds(hass: HomeAssistant) -> None:
-    """More than 5 thresholds bounces instead of silently truncating."""
+    """More than THRESHOLDS_MAX thresholds bounces instead of silently truncating."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    rows = [{"value": float(i)} for i in range(THRESHOLDS_MAX + 1)]
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="timeline",
+        details_overrides={CONF_THRESHOLDS: rows},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_THRESHOLDS: "too_many_thresholds"}
+
+
+async def test_flow_thresholds_persist_through_row_editor(hass: HomeAssistant) -> None:
+    """A timeline created through the threshold row editor stores value/color/label."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_entity_subentry(
         hass,
         entry,
         template="timeline",
-        details_overrides={CONF_THRESHOLDS: "1, 2, 3, 4, 5, 6"},
+        details_overrides={CONF_THRESHOLDS: [{"value": 25.0, "color": "red", "label": "Hot"}, {"value": 18.0}]},
     )
-    assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_THRESHOLDS: "too_many_thresholds"}
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    stored = next(iter(entry.subentries.values())).data
+    assert stored[CONF_THRESHOLDS] == [{"value": 25.0, "color": "red", "label": "Hot"}, {"value": 18.0}]
 
 
 async def test_flow_invalid_number_nan_gauge(hass: HomeAssistant) -> None:
@@ -3147,7 +3322,10 @@ async def test_flow_primary_series_matching_configured_label_passes(hass: HomeAs
         hass,
         entry,
         template="timeline",
-        details_overrides={CONF_SERIES_ENTITIES: "Air=sensor.air_quality", CONF_PRIMARY_SERIES: "Air"},
+        details_overrides={
+            CONF_SERIES_ENTITIES: [{CONF_LABEL: "Air", CONF_ENTITY_ID: "sensor.air_quality"}],
+            CONF_PRIMARY_SERIES: "Air",
+        },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     data = next(iter(entry.subentries.values())).data
@@ -3350,8 +3528,10 @@ def _reconfigure_details_defaults(result: dict) -> dict:
     """Every rehydrated default from a reconfigure details form, in nested shape.
 
     Submitting this unchanged is what opening reconfigure and pressing Save
-    without editing does: the stored lists come back as serialized strings, and
-    each section's defaults come back nested under its key (the shape HA submits).
+    without editing does: structured fields (tiles, stat_rows, series_entities,
+    thresholds, log_columns) come back as their stored lists via the row editors,
+    the remaining key=value fields come back as serialized strings, and each
+    section's defaults come back nested under its key (the shape HA submits).
     """
     out: dict = {}
     for key, value in result["data_schema"].schema.items():

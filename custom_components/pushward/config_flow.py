@@ -139,6 +139,7 @@ from .const import (
     DISMISSAL_TTL_MIN,
     DOMAIN,
     LIVE_PROGRESS_TEMPLATES,
+    LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
     MAX_LONG_TEXT_LEN,
     MAX_SEVERITY_LABEL_LEN,
@@ -157,6 +158,8 @@ from .const import (
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
+    THRESHOLD_LABEL_MAX,
+    THRESHOLDS_MAX,
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
     TOTAL_STEPS_MAX,
@@ -266,6 +269,63 @@ _WIDGET_STAT_ROWS_SELECTOR = ObjectSelector(
             CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
             CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
             CONF_VALUE_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field=CONF_LABEL,
+        description_field=CONF_ENTITY_ID,
+    )
+)
+
+# Timeline series entities (each row binds a separate entity as a named line). Same
+# text-field-for-entity rationale as the board tiles above: an empty entity string
+# reaches the parse layer as our translated invalid_series_entity instead of a raw
+# schema-side rejection. The stored dicts use the bare "attribute" key (not
+# CONF_VALUE_ATTRIBUTE), matching _parse_series_entities / content_mapper.
+_ROW_NUMBER_ANY = {"number": {"mode": "box", "step": "any"}}
+
+_SERIES_ENTITIES_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
+            CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
+            "attribute": {"label": "Attribute", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field=CONF_LABEL,
+        description_field=CONF_ENTITY_ID,
+    )
+)
+
+# Timeline thresholds: a numeric value (number box so the frontend shows a numeric
+# field), an optional named/hex color (the same custom_value select as the tile
+# color), and an optional short label. A row with no value key is skipped by the
+# ObjectSelector and rejected as invalid_threshold in the parse layer.
+_THRESHOLDS_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            "value": {"label": "Value", "selector": _ROW_NUMBER_ANY},
+            "color": {"label": "Color", "selector": _ROW_NAMED_COLOR},
+            "label": {"label": "Label", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field="label",
+        description_field="value",
+    )
+)
+
+# Log columns: label, an optional entity, an optional attribute, and an optional
+# unit. Entity is a text field (leaving it empty is the common bare-attribute case,
+# which an entity selector would reject with a raw untranslated error). Source
+# semantics are governed by the parse layer: empty entity + attribute = a tracked-
+# entity attribute; entity + empty attribute = another entity's state; both = that
+# entity's attribute.
+_LOG_COLUMNS_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
+            CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
+            "attribute": {"label": "Attribute", "selector": _ROW_TEXT},
             CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
         },
         multiple=True,
@@ -859,14 +919,10 @@ def _details_schema(
                 default=d.get(CONF_SERIES, ""),
             )
         ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
-        # Bind separate entities as named series (mirrors the board-tile string).
-        # Format: '[Label=]entity_id[:attribute]' comma-separated.
-        fields[
-            vol.Optional(
-                CONF_SERIES_ENTITIES,
-                default=d.get(CONF_SERIES_ENTITIES, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # Bind separate entities as named series (a row editor): each row is a
+        # label (optional; defaults to the entity's friendly name), an entity, and
+        # an optional attribute. A legacy comma string is still accepted.
+        fields[_object_rows_key(CONF_SERIES_ENTITIES, d, required=False)] = _SERIES_ENTITIES_SELECTOR
         fields[
             vol.Optional(
                 CONF_UNITS,
@@ -916,12 +972,9 @@ def _details_schema(
                 default=d.get(CONF_SMOOTHING, False),
             )
         ] = BooleanSelector()
-        fields[
-            vol.Optional(
-                CONF_THRESHOLDS,
-                default=d.get(CONF_THRESHOLDS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # Threshold reference lines (a row editor): value + optional color + label.
+        # A legacy 'value:color:label' comma string is still accepted.
+        fields[_object_rows_key(CONF_THRESHOLDS, d, required=False)] = _THRESHOLDS_SELECTOR
         fields[
             vol.Optional(
                 CONF_HISTORY_PERIOD,
@@ -941,16 +994,12 @@ def _details_schema(
         # (step 1) drives start/end; tiles read the companion entities.
         fields[_object_rows_key(CONF_TILES, d, required=True)] = _BOARD_TILES_SELECTOR
     if template == "log":
-        # Optional extra columns composed into each line's text. Freeform string
-        # mirroring the board-tile format: '[Label=]source[|unit]' comma-separated,
-        # where source is a tracked-entity attribute (brightness), another entity's
-        # state (binary_sensor.door), or another entity's attribute (sensor.t:temp).
-        fields[
-            vol.Optional(
-                CONF_LOG_COLUMNS,
-                default=d.get(CONF_LOG_COLUMNS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # Optional extra columns composed into each line's text (a row editor). Each
+        # row is a label, an optional entity, an optional attribute, and an optional
+        # unit: an attribute with no entity reads the tracked entity; an entity with
+        # no attribute reads that entity's state; both read that entity's attribute.
+        # A legacy '[Label=]source[|unit]' comma string is still accepted.
+        fields[_object_rows_key(CONF_LOG_COLUMNS, d, required=False)] = _LOG_COLUMNS_SELECTOR
         # Optional attribute on the tracked entity supplying each line's level
         # (info/warn/error); the line text is the formatted state.
         fields[
@@ -1314,23 +1363,59 @@ def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
     return tiles[:BOARD_MAX_TILES]
 
 
-def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
-    """Parse log columns from a string ('[Label=]source[|unit], ...') or list.
+def _strict_log_column(item: object) -> dict:
+    """Validate + normalize one log-column row dict, raising on any problem.
 
-    Mirrors ``_parse_board_tiles``. Capped at LOG_MAX_COLUMNS. ``source`` disambiguates:
+    A column reads a source: an attribute of the tracked entity (entity empty,
+    attribute set), another entity's state (entity set, attribute empty), or that
+    entity's attribute (both set). A row carrying neither is meaningless and bounces
+    with invalid_log_column; the label is capped at LOG_COLUMN_LABEL_MAX. Returns a
+    column carrying only the non-empty storage keys.
+    """
+    if not isinstance(item, dict):
+        raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+    entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
+    attr = str(item.get("attribute", "") or "").strip()
+    if not entity_id and not attr:
+        raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+    label = str(item.get(CONF_LABEL, "") or "").strip()
+    unit = str(item.get(CONF_UNIT, "") or "").strip()
+    if len(label) > LOG_COLUMN_LABEL_MAX:
+        raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+    column: dict = {}
+    if label:
+        column[CONF_LABEL] = label
+    if entity_id:
+        column[CONF_ENTITY_ID] = entity_id
+    if attr:
+        column["attribute"] = attr
+    if unit:
+        column[CONF_UNIT] = unit
+    return column
+
+
+def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse log columns from a row-editor list (or the legacy comma string).
+
+    From the form each row is a dict with the storage keys: ``{label?, entity_id?,
+    attribute?, unit?}``. The legacy string form ('[Label=]source[|unit], ...') stays
+    accepted for stored-string edge cases and non-form callers. Capped at
+    LOG_MAX_COLUMNS. ``source`` disambiguates in the string form:
       - ``brightness`` (no dot)            an attribute of the tracked entity
       - ``binary_sensor.door`` (has a dot) another entity's state
       - ``sensor.temp:temperature``        another entity's attribute
-    ``|`` splits off an optional unit suffix; ``=`` splits off an optional label.
-    Each parsed column is ``{label?, entity_id?, attribute?, unit?}``. Lenient
-    (default) skips malformed entries and truncates past the cap; strict (form
-    paths) raises invalid_log_column / too_many_log_columns instead.
+    Lenient (default) skips malformed rows/entries and truncates past the cap; strict
+    (form paths) raises invalid_log_column / too_many_log_columns (and applies the
+    label length cap) instead.
     """
     if isinstance(raw, list):
-        cols = [c for c in raw if isinstance(c, dict) and (c.get(CONF_ENTITY_ID) or c.get("attribute"))]
-        if strict and len(cols) > LOG_MAX_COLUMNS:
+        if not strict:
+            kept = [c for c in raw if isinstance(c, dict) and (c.get(CONF_ENTITY_ID) or c.get("attribute"))]
+            return kept[:LOG_MAX_COLUMNS]
+        columns = [_strict_log_column(item) for item in raw]
+        if len(columns) > LOG_MAX_COLUMNS:
             raise vol.Invalid("too_many_log_columns", path=[CONF_LOG_COLUMNS])
-        return cols[:LOG_MAX_COLUMNS]
+        return columns
     if not isinstance(raw, str) or not raw.strip():
         return []
     columns: list[dict] = []
@@ -1375,47 +1460,49 @@ def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
     return columns[:LOG_MAX_COLUMNS]
 
 
-def _serialize_log_columns(columns: list[dict]) -> str:
-    """Serialize log columns back to '[Label=]source[|unit], ...' for editing."""
-    parts: list[str] = []
-    for column in columns or []:
-        if not isinstance(column, dict):
-            continue
-        entity_id = column.get(CONF_ENTITY_ID) or ""
-        attr = column.get("attribute") or ""
-        if entity_id and attr:
-            source = f"{entity_id}:{attr}"
-        elif entity_id:
-            source = entity_id
-        elif attr:
-            source = attr
-        else:
-            continue
-        s = source
-        label = column.get(CONF_LABEL) or ""
-        if label:
-            s = f"{label}={s}"
-        unit = column.get(CONF_UNIT) or ""
-        if unit:
-            s = f"{s}|{unit}"
-        parts.append(s)
-    return ", ".join(parts)
+def _strict_series_entity(item: object) -> dict:
+    """Validate + normalize one timeline series-entity row dict, raising on any problem.
+
+    The entity is required (a series binds a separate entity); the optional label is
+    capped at TIMELINE_SERIES_LABEL_MAX. The label is left raw here and frozen later
+    by ``_resolve_series_entity_labels``. Returns a series carrying only the non-empty
+    storage keys.
+    """
+    if not isinstance(item, dict):
+        raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
+    entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
+    if not entity_id:
+        raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
+    attr = str(item.get("attribute", "") or "").strip()
+    label = str(item.get(CONF_LABEL, "") or "").strip()
+    if len(label) > TIMELINE_SERIES_LABEL_MAX:
+        raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
+    series: dict = {CONF_ENTITY_ID: entity_id}
+    if attr:
+        series["attribute"] = attr
+    if label:
+        series[CONF_LABEL] = label
+    return series
 
 
 def _parse_series_entities(raw: object, *, strict: bool = False) -> list[dict]:
-    """Parse timeline series entities from a string ('[Label=]entity_id[:attribute], ...') or list.
+    """Parse timeline series entities from a row-editor list (or the legacy comma string).
 
-    Mirrors ``_parse_board_tiles``. Each series binds a separate entity as a line:
-    the entity's state, or one of its attributes ('entity_id:attribute'). ``source``
-    must be an entity_id (contains a dot); a bare word is not a series. Lenient
-    (default) skips a bare word; strict (form paths) raises invalid_series_entity.
-    The optional label is left raw here and frozen later by
-    ``_resolve_series_entity_labels``. Capped at TIMELINE_MAX_SERIES. Each parsed
-    series is ``{label?, entity_id, attribute?}``.
+    From the form each row is a dict with the storage keys: ``{label?, entity_id,
+    attribute?}``. The legacy string form ('[Label=]entity_id[:attribute], ...') stays
+    accepted for stored-string edge cases and non-form callers; in that form ``source``
+    must be an entity_id (contains a dot) and a bare word is not a series. The optional
+    label is left raw here and frozen later by ``_resolve_series_entity_labels``. The
+    lenient (default) list/string path skips malformed rows and truncates past
+    TIMELINE_MAX_SERIES; strict (form paths) raises invalid_series_entity per row and
+    leaves the over-cap check to the combined series + series_entities guard in
+    ``_parse_entity_input`` (so a lone over-cap list still trips too_many_series).
     """
     if isinstance(raw, list):
-        series = [s for s in raw if isinstance(s, dict) and s.get(CONF_ENTITY_ID)]
-        return series[:TIMELINE_MAX_SERIES]
+        if not strict:
+            series = [s for s in raw if isinstance(s, dict) and s.get(CONF_ENTITY_ID)]
+            return series[:TIMELINE_MAX_SERIES]
+        return [_strict_series_entity(item) for item in raw]
     if not isinstance(raw, str) or not raw.strip():
         return []
     result: list[dict] = []
@@ -1453,24 +1540,6 @@ def _parse_series_entities(raw: object, *, strict: bool = False) -> list[dict]:
         if len(result) >= TIMELINE_MAX_SERIES:
             break
     return result
-
-
-def _serialize_series_entities(series_entities: list[dict]) -> str:
-    """Serialize timeline series entities back to '[Label=]entity_id[:attribute], ...' for editing."""
-    parts: list[str] = []
-    for series in series_entities or []:
-        if not isinstance(series, dict):
-            continue
-        entity_id = series.get(CONF_ENTITY_ID) or ""
-        if not entity_id:
-            continue
-        source = entity_id
-        attr = series.get("attribute") or ""
-        if attr:
-            source = f"{entity_id}:{attr}"
-        label = series.get(CONF_LABEL) or ""
-        parts.append(f"{label}={source}" if label else source)
-    return ", ".join(parts)
 
 
 def _entity_friendly_name(hass: HomeAssistant | None, entity_id: str) -> str:
@@ -1619,11 +1688,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         known_labels = _timeline_series_labels(series, series_entities, entity_id, hass)
         if primary_series not in known_labels:
             raise vol.Invalid("unknown_primary_series", path=[CONF_PRIMARY_SERIES])
-    thresholds_raw = user_input.get(CONF_THRESHOLDS, "")
-    if isinstance(thresholds_raw, str):
-        thresholds = _parse_thresholds(thresholds_raw, strict=True)
-    else:
-        thresholds = thresholds_raw or []
+    thresholds = _parse_thresholds(user_input.get(CONF_THRESHOLDS, ""), strict=True)
     history_period_raw = user_input.get(CONF_HISTORY_PERIOD, DEFAULT_HISTORY_PERIOD)
 
     # Board tiles: a board needs at least one tile to render.
@@ -1877,12 +1942,8 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             series = current.get(CONF_SERIES)
             if isinstance(series, dict):
                 current[CONF_SERIES] = _serialize_key_value_pairs(series)
-            series_entities = current.get(CONF_SERIES_ENTITIES)
-            if isinstance(series_entities, list):
-                current[CONF_SERIES_ENTITIES] = _serialize_series_entities(series_entities)
-            thresholds = current.get(CONF_THRESHOLDS)
-            if isinstance(thresholds, list):
-                current[CONF_THRESHOLDS] = _serialize_thresholds(thresholds)
+            # series_entities and thresholds stay lists: their ObjectSelector row
+            # editors rehydrate from the stored list directly.
             step_labels = current.get(CONF_STEP_LABELS)
             if isinstance(step_labels, dict):
                 current[CONF_STEP_LABELS] = _serialize_key_value_pairs(step_labels)
@@ -1898,10 +1959,8 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             units = current.get(CONF_UNITS)
             if isinstance(units, dict):
                 current[CONF_UNITS] = _serialize_key_value_pairs(units)
-            # tiles stay a list: the ObjectSelector row editor rehydrates from it directly.
-            log_columns = current.get(CONF_LOG_COLUMNS)
-            if isinstance(log_columns, list):
-                current[CONF_LOG_COLUMNS] = _serialize_log_columns(log_columns)
+            # tiles and log_columns stay lists: their ObjectSelector row editors
+            # rehydrate from the stored list directly.
             self._details_defaults = current
             return await self.async_step_details()
 
@@ -2534,19 +2593,65 @@ def _serialize_key_value_pairs(pairs: dict[str, str]) -> str:
     return ", ".join(f"{k}={v}" for k, v in pairs.items())
 
 
-def _parse_thresholds(value: str, *, strict: bool = False) -> list[dict]:
-    """Parse 'value:color:label, ...' into threshold dicts.
+def _is_number(value: object) -> bool:
+    """True for a real int/float (a JSON bool is not a number here)."""
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
 
-    Format: value[:color[:label]], ...
-    Example: '25:red:Hot, 18:blue:Cold, 20'
 
-    Lenient (default) skips a non-numeric value and truncates past 5; strict
-    (form paths) raises invalid_threshold / too_many_thresholds instead.
+def _strict_threshold(item: object) -> dict:
+    """Validate + normalize one timeline threshold row dict, raising on any problem.
+
+    The value is required and must parse to a finite number; the optional color must
+    be a named colour or hex, and the optional label is capped at THRESHOLD_LABEL_MAX.
+    Returns a threshold carrying only the non-empty storage keys.
     """
-    if not value:
+    if not isinstance(item, dict):
+        raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
+    raw_value = item.get("value")
+    if raw_value is None or (isinstance(raw_value, str) and not raw_value.strip()):
+        raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
+    try:
+        value = float(raw_value)
+    except (TypeError, ValueError):
+        raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS]) from None
+    if not math.isfinite(value):
+        raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
+    color = str(item.get("color", "") or "").strip()
+    label = str(item.get("label", "") or "").strip()
+    if color and not is_valid_color(color):
+        raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
+    if len(label) > THRESHOLD_LABEL_MAX:
+        raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
+    threshold: dict = {"value": value}
+    if color:
+        threshold["color"] = color
+    if label:
+        threshold["label"] = label
+    return threshold
+
+
+def _parse_thresholds(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse timeline thresholds from a row-editor list (or the legacy comma string).
+
+    From the form each row is a dict with the storage keys: ``{value, color?, label?}``.
+    The legacy string form ('value[:color[:label]], ...', e.g. '25:red:Hot, 20') stays
+    accepted for stored-string edge cases and non-form callers. Capped at THRESHOLDS_MAX.
+    Lenient (default) skips a non-numeric value and truncates past the cap; strict
+    (form paths) raises invalid_threshold / too_many_thresholds (and applies the colour
+    rule and label length cap) instead.
+    """
+    if isinstance(raw, list):
+        if not strict:
+            kept = [t for t in raw if isinstance(t, dict) and _is_number(t.get("value"))]
+            return kept[:THRESHOLDS_MAX]
+        thresholds = [_strict_threshold(item) for item in raw]
+        if len(thresholds) > THRESHOLDS_MAX:
+            raise vol.Invalid("too_many_thresholds", path=[CONF_THRESHOLDS])
+        return thresholds
+    if not isinstance(raw, str) or not raw.strip():
         return []
     result: list[dict] = []
-    for entry in value.split(","):
+    for entry in raw.split(","):
         parts = [p.strip() for p in entry.strip().split(":")]
         if not parts or not parts[0]:
             if strict and entry.strip():
@@ -2563,23 +2668,6 @@ def _parse_thresholds(value: str, *, strict: bool = False) -> list[dict]:
         if len(parts) > 2 and parts[2]:
             threshold["label"] = parts[2]
         result.append(threshold)
-    if strict and len(result) > 5:
+    if strict and len(result) > THRESHOLDS_MAX:
         raise vol.Invalid("too_many_thresholds", path=[CONF_THRESHOLDS])
-    return result[:5]
-
-
-def _serialize_thresholds(thresholds: list[dict]) -> str:
-    """Serialize threshold dicts back to 'value:color:label, ...' text for editing."""
-    if not thresholds:
-        return ""
-    parts: list[str] = []
-    for t in thresholds:
-        s = str(t.get("value", ""))
-        color = t.get("color", "")
-        label = t.get("label", "")
-        if color or label:
-            s += f":{color}"
-        if label:
-            s += f":{label}"
-        parts.append(s)
-    return ", ".join(parts)
+    return result[:THRESHOLDS_MAX]

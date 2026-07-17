@@ -51,6 +51,8 @@ from custom_components.pushward.const import (
     SNOOZE_SECONDS_MIN,
     SOUNDS,
     TEMPLATES,
+    THRESHOLD_LABEL_MAX,
+    THRESHOLDS_MAX,
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
     TOTAL_STEPS_MAX,
@@ -79,8 +81,6 @@ ACTIVITY_UNIT_MAX = 32  # config_flow caps gauge/timeline unit at 32
 STEP_LABEL_MAX = 32
 STEP_ROW_MIN = 1
 STEP_ROW_MAX = 10
-THRESHOLD_LABEL_MAX = 12
-THRESHOLDS_MAX = 5
 TIMELINE_DECIMALS_MIN = 0
 TIMELINE_DECIMALS_MAX = 10
 # Promoted to const.py (single source of truth); aliased here for the assertions
