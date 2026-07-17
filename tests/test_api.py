@@ -475,6 +475,10 @@ def test_parse_retry_after_clamped_to_max():
     # Empty / unparseable headers fall back to 0 (caller then uses its own backoff).
     assert parse("") == 0
     assert parse("not-a-date") == 0
+    # NaN parses via float() but must be rejected: asyncio.sleep(nan) corrupts the loop timer.
+    assert parse("nan") == 0
+    # A negative delay clamps to 0 rather than sleeping a nonsensical negative time.
+    assert parse("-5") == 0
 
 
 @patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)

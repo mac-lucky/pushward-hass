@@ -431,9 +431,16 @@ class PushWardApiClient:
         if not header:
             return 0
         try:
-            return min(float(header), RETRY_MAX_DELAY)
+            value = float(header)
         except ValueError:
             pass
+        else:
+            # NaN parses cleanly and slips past a `<= 0` guard downstream, so
+            # asyncio.sleep(nan) would corrupt the loop timer heap. Reject it here;
+            # negatives clamp to 0 (caller falls back to backoff), inf clamps to max.
+            if value != value:
+                return 0
+            return min(max(0.0, value), RETRY_MAX_DELAY)
         try:
             dt = parsedate_to_datetime(header)
             delta = dt.timestamp() - time.time()
