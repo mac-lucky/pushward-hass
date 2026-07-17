@@ -378,13 +378,45 @@ async def test_update_404_recreates_activity(hass: HomeAssistant) -> None:
 
     api.create_activity.assert_awaited_once()
     assert api.update_activity.await_count == 2
-    assert tracked.recreate_attempted is True
+    # The retry push landed, so the 404 streak is over and the guard is re-armed
+    # immediately (reset on the successful recreate push) rather than staying latched.
+    assert tracked.recreate_attempted is False
 
-    # A subsequent clean send re-arms the self-heal flag.
+    # A subsequent clean send keeps the flag re-armed.
     api.update_activity.side_effect = None
     await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 43})
     assert tracked.recreate_attempted is False
 
+    await manager.async_stop()
+
+
+async def test_update_404_recreate_rearms_on_redeletion(hass: HomeAssistant) -> None:
+    """A recreate that sticks re-arms the guard so a later re-deletion self-heals again.
+
+    Regression for the flag never resetting on the recreate path: without the reset, a
+    second server-side deletion (with no clean push between) would be skipped forever
+    and the activity would stay dead for the rest of the job.
+    """
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager, tracked = await _start_active(hass, api, config, off_attrs={"progress": 0}, on_attrs={"progress": 1})
+
+    # Streak 1: PATCH 404s, recreate + retry PATCH succeeds -> guard re-armed.
+    api.update_activity.side_effect = [PushWardNotFoundError("gone", status_code=404), None]
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 42})
+    api.create_activity.assert_awaited_once()
+    assert tracked.recreate_attempted is False
+
+    # Streak 2: deleted AGAIN, no clean push between -> the recreate must fire a 2nd time.
+    api.create_activity.reset_mock()
+    api.update_activity.reset_mock()
+    api.update_activity.side_effect = [PushWardNotFoundError("gone", status_code=404), None]
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 43})
+    api.create_activity.assert_awaited_once()
+    assert api.update_activity.await_count == 2
+    assert tracked.recreate_attempted is False
+
+    api.update_activity.side_effect = None
     await manager.async_stop()
 
 

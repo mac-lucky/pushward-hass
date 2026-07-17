@@ -428,6 +428,11 @@ class WidgetManager:
                     tracked.recreate_attempted = True
                     _LOGGER.debug("Widget %s missing server-side on update; recreating", slug)
                     await self._create_widget(tracked, content)
+                    # The recreate push landed, so the 404 streak is over: re-arm the
+                    # guard (reset on the next successful push) so a later re-deletion
+                    # self-heals again instead of 404ing forever. If _create_widget had
+                    # raised, the error guard would swallow it and leave the flag True.
+                    tracked.recreate_attempted = False
                 else:
                     tracked.recreate_attempted = False
 

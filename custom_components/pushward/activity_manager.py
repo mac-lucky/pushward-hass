@@ -842,6 +842,11 @@ class ActivityManager:
                 _LOGGER.debug("Activity %s missing server-side on update; recreating", slug)
                 await self._create_activity(entity_id, tracked.config)
                 await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
+                # The retry push landed, so the 404 streak is over: re-arm the guard
+                # (reset on the next successful push) so a later re-deletion self-heals
+                # again instead of 404ing forever. If the retry push had 404'd, it would
+                # have propagated out of this branch and left the flag True.
+                tracked.recreate_attempted = False
             else:
                 tracked.recreate_attempted = False
             self._clear_forbidden_notification(slug)

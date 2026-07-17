@@ -418,8 +418,13 @@ async def test_cache_survives_restart(hass: HomeAssistant) -> None:
     await manager2.async_stop()
 
 
-async def test_patch_404_recreates_only_once(hass: HomeAssistant) -> None:
-    """A 404 streak recreates once; a successful PATCH re-arms the self-heal."""
+async def test_patch_404_recreate_rearms_on_redeletion(hass: HomeAssistant) -> None:
+    """A recreate that sticks re-arms the guard so a later re-deletion self-heals again.
+
+    Regression for the flag never resetting on the recreate path: without the reset a
+    second out-of-band deletion (no clean PATCH between) would be skipped forever and the
+    widget would stay dead.
+    """
     api = _mock_api()
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
@@ -429,26 +434,55 @@ async def test_patch_404_recreates_only_once(hass: HomeAssistant) -> None:
     api.reset_mock()
     api.patch_widget = AsyncMock(side_effect=PushWardNotFoundError("widget not found", status_code=404))
 
+    # First deletion: PATCH 404s, recreate POST succeeds -> guard re-armed.
     hass.states.async_set("sensor.users", "43")
     await hass.async_block_till_done()
     api.create_widget.assert_awaited_once()
+    assert manager._tracked["ha-users"].recreate_attempted is False
 
-    # Still 404ing: no second recreate on the next change.
+    # Deleted AGAIN with no clean PATCH between -> the recreate must fire a 2nd time.
     hass.states.async_set("sensor.users", "44")
     await hass.async_block_till_done()
-    api.create_widget.assert_awaited_once()
+    assert api.create_widget.await_count == 2
+    assert manager._tracked["ha-users"].recreate_attempted is False
 
-    # A successful PATCH resets the guard...
+    # A successful PATCH keeps the guard re-armed.
     api.patch_widget = AsyncMock()
     hass.states.async_set("sensor.users", "45")
     await hass.async_block_till_done()
     api.patch_widget.assert_awaited_once()
+    assert manager._tracked["ha-users"].recreate_attempted is False
 
-    # ...so a fresh out-of-band deletion self-heals again.
+    await manager.async_stop()
+
+
+async def test_patch_404_recreate_guard_holds_when_create_fails(hass: HomeAssistant) -> None:
+    """The one-recreate-per-streak guard still holds when the recreate POST itself fails.
+
+    If the recreate POST raises (server still refusing), the flag stays latched so the
+    next 404 does not hammer the server with another create attempt.
+    """
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()  # initial create succeeds -> created=True
+    api.reset_mock()
     api.patch_widget = AsyncMock(side_effect=PushWardNotFoundError("widget not found", status_code=404))
-    hass.states.async_set("sensor.users", "46")
+    api.create_widget = AsyncMock(side_effect=PushWardApiError("server down", status_code=500))
+
+    # PATCH 404s, the recreate POST also fails -> guard stays latched.
+    hass.states.async_set("sensor.users", "43")
     await hass.async_block_till_done()
-    assert api.create_widget.await_count == 2
+    assert api.create_widget.await_count == 1
+    assert manager._tracked["ha-users"].recreate_attempted is True
+
+    # Next 404: no second create attempt while the guard is latched.
+    hass.states.async_set("sensor.users", "44")
+    await hass.async_block_till_done()
+    assert api.create_widget.await_count == 1
+    assert api.patch_widget.await_count == 2
 
     await manager.async_stop()
 
