@@ -122,24 +122,28 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Progress Entity / Attribute | 0–100 progress, optionally from a separate entity |
 | Remaining Time Entity / Attribute | Seconds remaining (countdown), with smart time parsing |
 | Total Steps / Current Step Entity / Attribute | Steps tracking, optionally from a separate entity |
+| Step Details | One row per step: label, row height (1-10), relative width, and color (steps template) |
 | Severity | critical, warning, or info (alert template) |
 | Value Entity / Attribute | Numeric value (gauge/timeline), optionally from a separate entity |
 | Min / Max Value | Gauge range bounds (default: 0–100) |
 | Unit | Display unit (e.g. °C, %) |
-| Series | Attribute->label mapping for a multi-series timeline |
-| Series Entities | `[Label=]entity_id[:attribute]`, comma-separated, max 10 total - bind separate entities as timeline lines |
+| Series | Rows mapping a tracked-entity attribute to a series label (multi-series timeline) |
+| Series Entities | Rows binding a separate entity as a timeline line (entity, optional attribute and label), max 10 total |
 | Primary Series | Label of the series shown as the headline value and used for the compact high/low range; empty = the tracked entity's own series (or the first configured one) |
-| Scale / Decimal Places / Smooth Lines / Thresholds | Timeline sparkline options |
+| Per-Series Units | Rows mapping a series label to its unit (timeline template) |
+| Scale / Decimal Places / Smooth Lines / Thresholds | Timeline sparkline options (Thresholds is a row table: value, optional color, optional label) |
 | Back-History Period | Minutes of history to seed the sparkline on start (0–1440) |
-| Board Tiles | `Label=entity_id[:attribute[:unit[:icon]]]`, comma-separated, max 4 (board template) |
-| Log Columns | `[Label=]source[\|unit]`, comma-separated, max 6 — extra values appended to each log line (log template) |
+| Board Tiles | Rows binding a separate entity to a tile (label, entity, attribute, unit, icon, color, URL), max 4 (board template) |
+| Log Columns | Rows adding extra values to each log line (label, entity, attribute, unit), max 6 (log template) |
 | Log Level Attribute | Attribute supplying each line's `info`/`warn`/`error` level (log template) |
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
-| State Labels | Custom state→label mapping (e.g. `on=Running, off=Stopped`) |
+| State Labels | Rows giving custom display text per state (a state and its label, e.g. `on` shows `Running`) |
 | Completion Message | Text shown at end (default: "Complete") |
 | Accent / Background / Text Color (+ Attribute) | Static hex / named color, or an entity attribute |
 | URL / Secondary URL | Deep-link URLs, http/https (steps/alert templates) |
 | Ended TTL / Stale TTL | Auto-delete-after-end / auto-end-after-idle, 1–2592000 s |
+
+Board tiles, stat rows, series entities, thresholds, log columns, state labels, the timeline series and per-series units maps, and the per-step details are all edited as row tables in the UI (add a row per entry). Stored configs and non-form callers keep working: the older comma-separated string forms for these fields are still accepted on input.
 
 #### Reading values from separate entities
 
@@ -155,17 +159,10 @@ By default every value (remaining time, progress, subtitle, gauge value, current
 
 A **timeline** can plot up to **10 named series** on one chart, each its own line, color, and unit. There are two ways to supply them, and they combine:
 
-- **Series** maps attributes of the tracked entity to labels (`current_temperature=Indoor, target_temperature=Set`).
-- **Series Entities** binds *separate* entities as lines, so values from unrelated sensors share one chart (a PM2.5 sensor per room, solar arrays, etc.). Configure it as a comma-separated list:
+- **Series** is a row table, one row per attribute of the tracked entity, mapping the attribute to a series label.
+- **Series Entities** is a row table that binds *separate* entities as lines, so values from unrelated sensors share one chart (a PM2.5 sensor per room, solar arrays, etc.). Each row takes an **entity** (required; its state, or an **attribute** you name) and an optional **label**. Left off, the label defaults to the entity's friendly name (with the attribute name appended for attribute sources so two attributes of one entity stay distinct). Labels are frozen when you save (the server merges series by label), truncated to 32 chars, and de-duplicated with a numeric suffix.
 
-```
-[Label=]entity_id[:attribute]
-```
-
-- **entity_id** (required) reads that entity's state; append `:attribute` to read one of its attributes instead.
-- **Label** (optional, before `=`) names the line. Left off, it defaults to the entity's friendly name (with the attribute name appended for attribute sources so two attributes of one entity stay distinct). Labels are frozen when you save (the server merges series by label), truncated to 32 chars, and de-duplicated with a numeric suffix.
-
-Example: `sensor.bedroom_pm25, Office=sensor.office_pm25, sensor.living_room_pm25`. Each series entity is tracked as a companion, so a change to any one re-samples the chart while the anchor entity owns start/end. Units auto-default from each state-sourced entity's `unit_of_measurement`; the **Per-Series Units** field overrides them. Numeric attributes in the 0-255 range (e.g. `brightness`) are rescaled to 0-100. The 10-line cap covers Series and Series Entities combined; the server and iOS app already render multi-series timelines, so this is a Home Assistant configuration option only.
+Each series entity is tracked as a companion, so a change to any one re-samples the chart while the anchor entity owns start/end. Units auto-default from each state-sourced entity's `unit_of_measurement`; the **Per-Series Units** table (a series label and its unit per row) overrides them. Numeric attributes in the 0-255 range (e.g. `brightness`) are rescaled to 0-100. The 10-line cap covers Series and Series Entities combined; the server and iOS app already render multi-series timelines, so this is a Home Assistant configuration option only.
 
 #### Timeline sparkline backfill
 
@@ -178,35 +175,29 @@ For attribute-based history the integration keeps its own in-memory ring buffer 
 
 #### Board tiles (multi-entity)
 
-A **board** shows a compact grid of **1–4 tiles**, each reading a *separate* entity. The **anchor entity** (step 1) still owns the activity lifecycle through its start/end states; the tiles supply the displayed values, and a change to any tile entity refreshes the board while it is active. Configure tiles in the **Board Tiles** field as a comma-separated list:
+A **board** shows a compact grid of **1–4 tiles**, each reading a *separate* entity. The **anchor entity** (step 1) still owns the activity lifecycle through its start/end states; the tiles supply the displayed values, and a change to any tile entity refreshes the board while it is active. Add one row per tile in the **Board Tiles** table:
 
-```
-Label=entity_id[:attribute[:unit[:icon]]]
-```
+- **Label** (required, ≤32 chars) and **Entity** (required) are the minimum.
+- **Attribute** (optional) reads that attribute instead of the entity state.
+- **Unit** (optional, ≤8 chars), **Icon** (optional — an SF Symbol like `cpu.fill` or an MDI icon like `mdi:thermometer`), **Color** (optional named or hex), and **URL** (optional per-tile tap target) follow.
 
-- **Label** (required, ≤32 chars) and **entity_id** (required) are the minimum.
-- **attribute** (optional) reads that attribute instead of the entity state; leave the segment empty (`Label=entity::°C`) to skip it.
-- **unit** (optional, ≤8 chars) and **icon** (optional — an SF Symbol like `cpu.fill` or an MDI icon like `mdi:thermometer`) follow.
-
-Example: `Temp=sensor.living_room_temp:temperature:°C, Door=binary_sensor.front_door, CPU=sensor.cpu:::mdi:cpu-64`. Each tile **value** is rendered as text (so `Open`, `On`, and numbers all work) and capped at 16 chars. Tiles whose entity is unavailable are skipped.
+Each tile **value** is rendered as text (so `Open`, `On`, and numbers all work) and capped at 16 chars. Tiles whose entity is unavailable are skipped.
 
 #### Log lines
 
 A **log** shows a newest-first list of up to **20 lines**. The integration appends one line on every state change of the tracked entity (the line **text** is the formatted state, honoring State Labels), accumulating a rolling buffer that is injected into each push and persisted across restarts in `.storage/pushward.history.<entry_id>`. Set the optional **Log Level Attribute** to an attribute holding `info`, `warn`, or `error` to tag each line's severity. (The server also keeps a longer scrollable backlog server-side; the integration never sends it.)
 
-Consecutive lines with identical text are collapsed, so attribute-only churn (a light's brightness settling while its state stays `on`) would otherwise show only a bare `On`. Use **Log Columns** to append extra values to each line so it carries *what* changed — attributes of the tracked entity and/or values from other entities. Configure it as a comma-separated list (max 6 columns):
+Consecutive lines with identical text are collapsed, so attribute-only churn (a light's brightness settling while its state stays `on`) would otherwise show only a bare `On`. Use the **Log Columns** table to append extra values to each line so it carries *what* changed — attributes of the tracked entity and/or values from other entities. Add one row per column (max 6), each with an optional **Label** and **Unit** plus a source:
 
-```
-[Label=]source[|unit]
-```
+- **Entity** empty, **Attribute** set reads that attribute of the tracked entity (`brightness`).
+- **Entity** set, **Attribute** empty reads that entity's state (`binary_sensor.door`).
+- **Entity** and **Attribute** both set reads that attribute of the other entity.
 
-- **source** is one of: a bare attribute of the tracked entity (`brightness`), another entity's state (`binary_sensor.door`), or another entity's attribute (`sensor.temp:temperature`).
-- **Label** (optional, before `=`) renders the column as `Label: value`.
-- **unit** (optional, after `|`) is appended to the value as a literal suffix (no conversion).
+**Label** (optional) renders the column as `Label: value`; **Unit** (optional) is appended to the value as a literal suffix (no conversion).
 
 Each line's text is the state label followed by ` · ` and each resolved column. Values are raw Home Assistant values (e.g. `brightness` is 0–255). Columns whose source is missing or unavailable are skipped; if every column resolves empty (e.g. the lamp is off so `brightness` is absent) the line falls back to just the state label. Other-entity columns are tracked as companions, so a change in any one appends a new composed line while the tracked entity still owns start/end.
 
-Example for a lamp — `color_temp_kelvin|K, brightness` renders lines like `On · 4000K · 153`, and a brightness change now produces a distinct line instead of collapsing into the previous `On`.
+Example for a lamp — a `K`-suffixed column reading `color_temp_kelvin` plus a bare `brightness` column render lines like `On · 4000K · 153`, and a brightness change now produces a distinct line instead of collapsing into the previous `On`.
 
 ### Add a tracked widget
 
@@ -229,7 +220,7 @@ A two-step flow mirroring entities. **Step 1** picks the entity, a widget templa
 | Unit | Display unit (value/progress/gauge) |
 | Min / Max Value | Gauge range bounds (default: 0–100) |
 | Severity | "", info, warning, critical, success (status template) |
-| Stat Rows | `Label=entity_id[:attribute[:unit]]`, comma-separated, max 6 (stat_list) |
+| Stat Rows | Rows binding a separate entity to a stat (label, entity, attribute, unit), max 6 (stat_list) |
 | Label / Label Attribute | Static label or an entity attribute |
 | Subtitle Attribute | Subtitle text from an attribute |
 | Icon / Icon Attribute | Static MDI/SF Symbol or an entity attribute |
