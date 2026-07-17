@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, State, callback
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
@@ -199,24 +199,6 @@ _INTEGRATION_KEY_SCHEMA = vol.Schema(
 _TTL_MIN = 1
 _TTL_MAX = 2592000  # 30 days
 
-# translation_key -> the ordered wire values each SelectSelector renders. The
-# `selector.<key>.options` block in every translations/<lang>.json must carry a
-# label for every value here (guarded by test_config_flow_translations). Keep the
-# keys in sync with the translation_key= passed on each SelectSelectorConfig below.
-SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
-    "activity_template": tuple(TEMPLATES),
-    "severity": tuple(SEVERITIES),
-    "timeline_scale": tuple(SCALES),
-    "sound": ("", *SOUNDS),
-    "widget_template": tuple(WIDGET_TEMPLATES),
-    "value_scale": tuple(VALUE_SCALES),
-    "widget_severity": tuple(WIDGET_SEVERITIES),
-    "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
-    # Nested inside the board-tile ObjectSelector (per-tile color); custom_value
-    # also accepts a hex string. Reused by the timeline thresholds editor later.
-    "named_color": tuple(NAMED_COLORS),
-}
-
 # Object-selector row editors for the two Required structured fields (board tiles,
 # widget stat_rows). Field keys equal the stored dict keys so a stored list feeds
 # straight back as the editor's value on reconfigure - no serialize/parse round
@@ -399,6 +381,11 @@ _STEPS_EDITOR_SELECTOR = ObjectSelector(
         description_field="weight",
     )
 )
+
+
+# Free-form numeric box (any step) reused by the gauge min/max fields on both the
+# entity and widget detail forms.
+_NUMBER_BOX_ANY = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
 
 
 def _object_rows_key(conf_key: str, current: dict, *, required: bool) -> vol.Marker:
@@ -603,6 +590,17 @@ def _flatten_section_input(user_input: dict, section_keys) -> dict:
     return flat
 
 
+def _sections_to_expand(
+    sections_def: dict[str, tuple[str, ...]],
+    toplevel: set[str] | frozenset[str],
+    errors: dict,
+) -> set[str]:
+    """Name the sections to render open: any whose non-top-level fields hold a
+    validation error, so the field that failed is revealed rather than collapsed."""
+    error_keys = set(errors)
+    return {sec for sec, fs in sections_def.items() if error_keys & (set(fs) - toplevel)}
+
+
 async def _validate_integration_key(
     hass: HomeAssistant,
     key: str,
@@ -711,6 +709,20 @@ _GAUGE_DEVICE_CLASSES = frozenset(
 )
 
 
+def _is_gauge_like(state_obj: State, domain: str) -> bool:
+    """True when a sensor/number entity reads as a gauge.
+
+    A gauge-friendly entity has a measurement/total state_class or one of the
+    gauge device classes. Shared by both template suggesters.
+    """
+    if domain not in ("sensor", "number"):
+        return False
+    attrs = state_obj.attributes
+    return (
+        attrs.get("state_class") in ("measurement", "total") or attrs.get("device_class", "") in _GAUGE_DEVICE_CLASSES
+    )
+
+
 def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
     """Suggest the best template for an entity based on domain/device_class/state_class."""
     if not entity_id or hass is None:
@@ -727,12 +739,8 @@ def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
     if state_obj is None:
         return "generic"
 
-    attrs = state_obj.attributes
-    if domain in ("sensor", "number"):
-        if attrs.get("state_class") in ("measurement", "total"):
-            return "gauge"
-        if attrs.get("device_class", "") in _GAUGE_DEVICE_CLASSES:
-            return "gauge"
+    if _is_gauge_like(state_obj, domain):
+        return "gauge"
 
     return "generic"
 
@@ -754,12 +762,8 @@ def _suggest_widget_template(hass: HomeAssistant | None, entity_id: str) -> str:
     if state_obj is None:
         return WIDGET_TEMPLATE_VALUE
 
-    attrs = state_obj.attributes
-    if domain in ("sensor", "number"):
-        if attrs.get("state_class") in ("measurement", "total"):
-            return WIDGET_TEMPLATE_GAUGE
-        if attrs.get("device_class", "") in _GAUGE_DEVICE_CLASSES:
-            return WIDGET_TEMPLATE_GAUGE
+    if _is_gauge_like(state_obj, domain):
+        return WIDGET_TEMPLATE_GAUGE
 
     return WIDGET_TEMPLATE_VALUE
 
@@ -814,25 +818,10 @@ def _details_schema(
     bg_color_key = _color_vol_key(CONF_BACKGROUND_COLOR, d)
     text_color_key = _color_vol_key(CONF_TEXT_COLOR, d)
 
-    # TTL defaults: only set default when valid value exists
-    ended_ttl_val = d.get(CONF_ENDED_TTL)
-    ended_ttl_key = (
-        vol.Optional(CONF_ENDED_TTL, default=ended_ttl_val)
-        if ended_ttl_val is not None
-        else vol.Optional(CONF_ENDED_TTL)
-    )
-    stale_ttl_val = d.get(CONF_STALE_TTL)
-    stale_ttl_key = (
-        vol.Optional(CONF_STALE_TTL, default=stale_ttl_val)
-        if stale_ttl_val is not None
-        else vol.Optional(CONF_STALE_TTL)
-    )
-    dismissal_ttl_val = d.get(CONF_DISMISSAL_TTL)
-    dismissal_ttl_key = (
-        vol.Optional(CONF_DISMISSAL_TTL, default=dismissal_ttl_val)
-        if dismissal_ttl_val is not None
-        else vol.Optional(CONF_DISMISSAL_TTL)
-    )
+    # TTL defaults: only set a default when a value is stored
+    ended_ttl_key = _ttl_key(CONF_ENDED_TTL, d)
+    stale_ttl_key = _ttl_key(CONF_STALE_TTL, d)
+    dismissal_ttl_key = _ttl_key(CONF_DISMISSAL_TTL, d)
 
     fields: dict = {}
 
@@ -939,13 +928,13 @@ def _details_schema(
                 CONF_MIN_VALUE,
                 default=d.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE),
             )
-        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
+        ] = _NUMBER_BOX_ANY
         fields[
             vol.Required(
                 CONF_MAX_VALUE,
                 default=d.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE),
             )
-        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
+        ] = _NUMBER_BOX_ANY
         fields[
             vol.Optional(
                 CONF_UNIT,
@@ -1640,6 +1629,26 @@ def _resolve_series_entity_labels(series_entities: list[dict], hass: HomeAssista
     return resolved
 
 
+def _series_label_sources(series: object, series_entities: object) -> list[str]:
+    """Ordered series labels drawn from a CONF_SERIES map (or its row-editor rows on
+    reconfigure) and each CONF_SERIES_ENTITIES row.
+
+    The single source for both the primary_series dropdown options and the known-
+    label validation set, keeping the two in lockstep (this exact label-derivation
+    has drifted between paths and caused incidents before). Not de-duplicated -
+    callers dedup or set-wrap as they need.
+    """
+    labels: list[str] = []
+    if isinstance(series, dict):
+        labels.extend(str(v) for v in series.values() if v)
+    elif isinstance(series, list):
+        labels.extend(str(row[CONF_LABEL]) for row in series if isinstance(row, dict) and row.get(CONF_LABEL))
+    for entry in series_entities or []:
+        if isinstance(entry, dict) and entry.get(CONF_LABEL):
+            labels.append(str(entry[CONF_LABEL]))
+    return labels
+
+
 def _timeline_series_labels(
     series: dict, series_entities: list[dict], entity_id: str, hass: HomeAssistant | None
 ) -> set[str]:
@@ -1650,8 +1659,7 @@ def _timeline_series_labels(
     single default series labelled with the tracked entity's friendly name (see
     _get_timeline_values).
     """
-    labels: set[str] = set(series.values())
-    labels.update(s[CONF_LABEL] for s in series_entities if s.get(CONF_LABEL))
+    labels: set[str] = set(_series_label_sources(series, series_entities))
     if not series and not series_entities:
         labels.add(_entity_friendly_name(hass, entity_id))
     return labels
@@ -1664,24 +1672,7 @@ def _primary_series_options(config: dict) -> list[str]:
     reconfigure) and each resolved CONF_SERIES_ENTITIES label, de-duplicated in
     order. Empty on a fresh add, which is fine: custom_value lets the user type one.
     """
-    options: list[str] = []
-    series = config.get(CONF_SERIES)
-    if isinstance(series, dict):
-        options.extend(str(v) for v in series.values() if v)
-    elif isinstance(series, list):
-        for row in series:
-            if isinstance(row, dict) and row.get(CONF_LABEL):
-                options.append(str(row[CONF_LABEL]))
-    for entry in config.get(CONF_SERIES_ENTITIES) or []:
-        if isinstance(entry, dict) and entry.get(CONF_LABEL):
-            options.append(str(entry[CONF_LABEL]))
-    seen: set[str] = set()
-    result: list[str] = []
-    for label in options:
-        if label not in seen:
-            seen.add(label)
-            result.append(label)
-    return result
+    return list(dict.fromkeys(_series_label_sources(config.get(CONF_SERIES), config.get(CONF_SERIES_ENTITIES))))
 
 
 def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> dict:
@@ -2045,7 +2036,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         defaults = self._details_defaults if self._is_reconfigure else None
         # Reveal any section that holds a field that failed validation.
         toplevel = _entity_toplevel_fields(template)
-        expand = {sec for sec, fs in ENTITY_SECTIONS.items() if set(errors) & (set(fs) - toplevel)}
+        expand = _sections_to_expand(ENTITY_SECTIONS, toplevel, errors)
         schema = _details_schema(entity_id, template, defaults=defaults, hass=self.hass, expand=expand)
         if errors and user_input is not None:
             # Re-fill the form with what the user just submitted instead of dropping it.
@@ -2153,13 +2144,13 @@ def _widget_details_schema(
                 CONF_MIN_VALUE,
                 default=d.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE),
             )
-        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
+        ] = _NUMBER_BOX_ANY
         fields[
             vol.Required(
                 CONF_MAX_VALUE,
                 default=d.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE),
             )
-        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step="any"))
+        ] = _NUMBER_BOX_ANY
 
     if template == WIDGET_TEMPLATE_STATUS:
         fields[
@@ -2483,7 +2474,7 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                 )
 
         defaults = self._details_defaults if self._is_reconfigure else None
-        expand = {sec for sec, fs in WIDGET_SECTIONS.items() if set(errors) & (set(fs) - _WIDGET_TOPLEVEL)}
+        expand = _sections_to_expand(WIDGET_SECTIONS, _WIDGET_TOPLEVEL, errors)
         schema = _widget_details_schema(entity_id, template, defaults=defaults, expand=expand)
         if errors and user_input is not None:
             # Re-fill the form with what the user just submitted instead of dropping it.
@@ -2519,6 +2510,12 @@ def _color_vol_key(conf_key: str, current: dict) -> vol.Optional:
     return vol.Optional(conf_key, default=rgb) if rgb is not None else vol.Optional(conf_key)
 
 
+def _ttl_key(conf_key: str, current: dict) -> vol.Optional:
+    """Build a vol.Optional key for a TTL NumberSelector, setting a default only when one is stored."""
+    value = current.get(conf_key)
+    return vol.Optional(conf_key, default=value) if value is not None else vol.Optional(conf_key)
+
+
 def _entity_source_key(conf_key: str, current: dict) -> vol.Optional:
     """Build a vol.Optional key for a companion-entity EntitySelector.
 
@@ -2538,63 +2535,43 @@ def _parse_csv(value: str) -> list[str]:
     return [s.strip() for s in value.split(",") if s.strip()]
 
 
-def _parse_int_list(value: str, *, strict: bool = False) -> list[int]:
-    """Parse '1,2,3' into [1, 2, 3].
-
-    Lenient (default) silently skips non-integer tokens; strict (form paths)
-    raises invalid_step_rows, since a dropped token shifts every later row by one.
-    """
+def _parse_int_list(value: str) -> list[int]:
+    """Parse '1,2,3' into [1, 2, 3], silently skipping non-integer tokens."""
     result: list[int] = []
     for token in _parse_csv(value):
         try:
             result.append(int(token))
         except ValueError:
-            if strict:
-                raise vol.Invalid("invalid_step_rows", path=[CONF_STEP_ROWS]) from None
+            continue
     return result
 
 
-def _parse_float_list(value: str, *, strict: bool = False) -> list[float]:
+def _parse_float_list(value: str) -> list[float]:
     """Parse '1, 2.5, 3' into [1.0, 2.5, 3.0], skipping tokens float() rejects.
 
-    "nan" and "inf" are not among them - float() takes both. Lenient (default)
-    keeps them; _clean_step_weights drops them before they reach the server.
-    Strict (form paths) rejects any unparseable, non-finite, or non-positive
-    weight with invalid_step_weights - a weight is a relative step size, so zero
-    or negative has no meaning.
+    "nan" and "inf" are not among them - float() takes both, so they are kept;
+    _clean_step_weights drops them before they reach the server.
     """
     result: list[float] = []
     for token in _parse_csv(value):
         try:
-            parsed = float(token)
+            result.append(float(token))
         except ValueError:
-            if strict:
-                raise vol.Invalid("invalid_step_weights", path=[CONF_STEP_WEIGHTS]) from None
             continue
-        if strict and (not math.isfinite(parsed) or parsed <= 0):
-            raise vol.Invalid("invalid_step_weights", path=[CONF_STEP_WEIGHTS])
-        result.append(parsed)
     return result
 
 
-def _parse_color_list(value: str, *, strict: bool = False) -> list[str]:
+def _parse_color_list(value: str) -> list[str]:
     """Parse 'red,,blue' into ['red', '', 'blue'], keeping empty entries.
 
     Positional, unlike _parse_csv: the server matches step_colors to steps by
     index and requires exactly total_steps entries, so dropping the empty token
     that leaves a step on the accent color would shift every later color by one
-    and fail the length check. Strict (form paths) rejects a non-empty token that
-    is neither a named color nor 6/8-digit hex with invalid_step_colors; blank
-    tokens stay legal (positional slots).
+    and fail the length check.
     """
     if not value:
         return []
-    tokens = [s.strip() for s in value.split(",")]
-    if strict:
-        for token in tokens:
-            if token and not is_valid_color(token):
-                raise vol.Invalid("invalid_step_colors", path=[CONF_STEP_COLORS])
-    return tokens
+    return [s.strip() for s in value.split(",")]
 
 
 def _parse_state_labels(value: str) -> dict[str, str]:
@@ -2803,7 +2780,7 @@ def _strict_threshold(item: object) -> dict:
     if not isinstance(item, dict):
         raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
     raw_value = item.get("value")
-    if raw_value is None or (isinstance(raw_value, str) and not raw_value.strip()):
+    if _blank(raw_value):
         raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
     try:
         value = float(raw_value)

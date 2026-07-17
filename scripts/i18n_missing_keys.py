@@ -21,6 +21,8 @@ from pathlib import Path
 TRANSLATIONS = Path(__file__).resolve().parent.parent / "custom_components" / "pushward" / "translations"
 
 
+# CI twin: tests/test_services_yaml.py::_flatten_keys must flatten identically;
+# keep the two in sync if the flatten semantics change.
 def flatten(node: object, prefix: str = "") -> set[str]:
     keys: set[str] = set()
     if isinstance(node, dict):

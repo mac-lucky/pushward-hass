@@ -1886,15 +1886,10 @@ async def test_subentry_timeline_series_entities(hass: HomeAssistant) -> None:
 # --- _details_schema new field tests ---
 
 
-def _schema_keys(schema: vol.Schema) -> set[str]:
-    """Extract string key names from a voluptuous schema, recursing into sections."""
-    return _flow_schema_keys(schema)
-
-
 def test_details_schema_common_has_sound_background_text_color() -> None:
     """Common fields sound, background_color*, and text_color* appear in all templates."""
     schema = _details_schema("binary_sensor.foo", "generic", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_SOUND in keys
     assert CONF_BACKGROUND_COLOR in keys
     assert CONF_BACKGROUND_COLOR_ATTRIBUTE in keys
@@ -1905,7 +1900,7 @@ def test_details_schema_common_has_sound_background_text_color() -> None:
 def test_details_schema_countdown_has_warning_threshold_and_alarm() -> None:
     """Countdown template includes warning_threshold and alarm fields."""
     schema = _details_schema("binary_sensor.foo", "countdown", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_WARNING_THRESHOLD in keys
     assert CONF_ALARM in keys
 
@@ -1913,45 +1908,45 @@ def test_details_schema_countdown_has_warning_threshold_and_alarm() -> None:
 def test_details_schema_steps_has_steps_editor() -> None:
     """Steps template exposes the unified per-step editor (not the four raw fields)."""
     schema = _details_schema("binary_sensor.foo", "steps", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_STEPS_EDITOR in keys
     assert not ({CONF_STEP_LABELS, CONF_STEP_ROWS, CONF_STEP_WEIGHTS, CONF_STEP_COLORS} & keys)
 
 
 def test_details_schema_widget_progress_has_value_scale() -> None:
     """Only the progress widget gets the percent-vs-fraction dropdown."""
-    keys = _schema_keys(_widget_details_schema("sensor.foo", WIDGET_TEMPLATE_PROGRESS, defaults={}))
+    keys = _flow_schema_keys(_widget_details_schema("sensor.foo", WIDGET_TEMPLATE_PROGRESS, defaults={}))
     assert CONF_VALUE_SCALE in keys
 
-    keys = _schema_keys(_widget_details_schema("sensor.foo", WIDGET_TEMPLATE_GAUGE, defaults={}))
+    keys = _flow_schema_keys(_widget_details_schema("sensor.foo", WIDGET_TEMPLATE_GAUGE, defaults={}))
     assert CONF_VALUE_SCALE not in keys
 
 
 def test_details_schema_alert_has_fired_at_attribute() -> None:
     """Alert template includes fired_at_attribute field."""
     schema = _details_schema("binary_sensor.foo", "alert", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_FIRED_AT_ATTRIBUTE in keys
 
 
 def test_details_schema_timeline_has_units() -> None:
     """Timeline template includes units field."""
     schema = _details_schema("sensor.temp", "timeline", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_UNITS in keys
 
 
 def test_details_schema_board_has_tiles() -> None:
     """Board template includes the tiles field."""
     schema = _details_schema("binary_sensor.foo", "board", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_TILES in keys
 
 
 def test_details_schema_log_has_log_level_attribute() -> None:
     """Log template includes the log_level_attribute field."""
     schema = _details_schema("binary_sensor.foo", "log", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_LOG_LEVEL_ATTRIBUTE in keys
 
 
@@ -2758,7 +2753,7 @@ def test_parse_entity_input_too_many_series_row_list() -> None:
 def test_details_schema_timeline_has_series_entities() -> None:
     """Timeline template includes the series_entities field."""
     schema = _details_schema("sensor.temp", "timeline", defaults={})
-    keys = _schema_keys(schema)
+    keys = _flow_schema_keys(schema)
     assert CONF_SERIES_ENTITIES in keys
 
 
@@ -2974,11 +2969,6 @@ async def _add_widget_subentry(
     )
 
 
-def _steps_rows(*rows: dict) -> list[dict]:
-    """Build steps-editor rows; each arg is a per-step {label?, row?, weight?, color?}."""
-    return list(rows)
-
-
 async def test_flow_step_length_mismatch(hass: HomeAssistant) -> None:
     """An editor row count != total_steps bounces on the steps editor."""
     entry = _mock_entry()
@@ -2987,7 +2977,7 @@ async def test_flow_step_length_mismatch(hass: HomeAssistant) -> None:
         hass,
         entry,
         template="steps",
-        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEPS_EDITOR: _steps_rows({"weight": 1}, {"weight": 2})},
+        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEPS_EDITOR: [{"weight": 1}, {"weight": 2}]},
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {CONF_STEPS_EDITOR: "step_length_mismatch"}
@@ -3003,7 +2993,7 @@ async def test_flow_invalid_step_weights_non_positive(hass: HomeAssistant) -> No
         template="steps",
         details_overrides={
             CONF_TOTAL_STEPS: 3,
-            CONF_STEPS_EDITOR: _steps_rows({"weight": 1}, {"weight": 0}, {"weight": 2}),
+            CONF_STEPS_EDITOR: [{"weight": 1}, {"weight": 0}, {"weight": 2}],
         },
     )
     assert result["type"] is FlowResultType.FORM
@@ -3020,7 +3010,7 @@ async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
         template="steps",
         details_overrides={
             CONF_TOTAL_STEPS: 3,
-            CONF_STEPS_EDITOR: _steps_rows({"color": "red"}, {"color": "chartreuse"}, {"color": "blue"}),
+            CONF_STEPS_EDITOR: [{"color": "red"}, {"color": "chartreuse"}, {"color": "blue"}],
         },
     )
     assert result["type"] is FlowResultType.FORM
@@ -3401,11 +3391,11 @@ async def test_flow_valid_step_lists_pass(hass: HomeAssistant) -> None:
         template="steps",
         details_overrides={
             CONF_TOTAL_STEPS: 3,
-            CONF_STEPS_EDITOR: _steps_rows(
+            CONF_STEPS_EDITOR: [
                 {CONF_LABEL: "Build", "row": 1, "weight": 1, "color": "red"},
                 {CONF_LABEL: "Test", "row": 2, "weight": 2.5},
                 {CONF_LABEL: "Deploy", "row": 3, "weight": 1, "color": "#00ff00"},
-            ),
+            ],
         },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -3420,7 +3410,7 @@ async def test_flow_error_preserves_submitted_dsl(hass: HomeAssistant) -> None:
     """A bounced steps editor re-renders the form pre-filled with the typed rows."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
-    rows = _steps_rows({"weight": 1}, {"weight": 0}, {"weight": 2})
+    rows = [{"weight": 1}, {"weight": 0}, {"weight": 2}]
     result = await _add_entity_subentry(
         hass,
         entry,
@@ -3561,8 +3551,6 @@ def test_primary_series_options_empty_on_add() -> None:
 
 def _primary_series_selector(schema: vol.Schema):
     """Find the primary_series SelectSelector inside the timeline_options section."""
-    from homeassistant.data_entry_flow import section
-
     for value in schema.schema.values():
         if isinstance(value, section):
             for ik, iv in value.schema.schema.items():
@@ -3603,26 +3591,15 @@ async def test_reconfigure_primary_series_dropdown_lists_stored_labels(hass: Hom
 
 def test_strict_parsers_lenient_by_default_but_raise_when_strict() -> None:
     """Existing non-form callers keep silent-skip behavior; strict=True raises."""
-    # _parse_int_list
+    # _parse_int_list stays lenient (silent-skip); step-row strict validation
+    # lives in _decompose_steps_rows, not here.
     assert _parse_int_list("1, x, 3") == [1, 3]
-    with pytest.raises(vol.Invalid) as exc:
-        _parse_int_list("1, x, 3", strict=True)
-    assert "invalid_step_rows" in str(exc.value)
 
-    # _parse_float_list keeps inf/nan and zero lenient; strict rejects them
+    # _parse_float_list keeps inf/nan and zero lenient
     assert _parse_float_list("1, 0, 2") == [1.0, 0.0, 2.0]
-    for bad in ("1, 0, 2", "1, -2, 3", "1, inf, 3", "1, nan, 3", "1, x, 3"):
-        with pytest.raises(vol.Invalid) as exc:
-            _parse_float_list(bad, strict=True)
-        assert "invalid_step_weights" in str(exc.value), bad
 
-    # _parse_color_list
+    # _parse_color_list keeps empty positional slots
     assert _parse_color_list("red, chartreuse") == ["red", "chartreuse"]
-    with pytest.raises(vol.Invalid) as exc:
-        _parse_color_list("red, chartreuse", strict=True)
-    assert "invalid_step_colors" in str(exc.value)
-    # blank slots stay legal under strict; a hex value is accepted
-    assert _parse_color_list("red, , #00ff00", strict=True) == ["red", "", "#00ff00"]
 
     # _parse_thresholds
     assert _parse_thresholds("abc") == []
@@ -3674,20 +3651,13 @@ def _reconfigure_details_defaults(result: dict) -> dict:
     thresholds, log_columns) come back as their stored lists via the row editors,
     the remaining key=value fields come back as serialized strings, and each
     section's defaults come back nested under its key (the shape HA submits).
+
+    Composed from the same two helpers the flat/nest tests use: pull every baked-in
+    default flat, then reshape it into the schema's section layout (every section
+    key present, empty when it has no defaulted field).
     """
-    out: dict = {}
-    for key, value in result["data_schema"].schema.items():
-        key_name = key.schema if isinstance(key, vol.Marker) else key
-        if isinstance(value, section):
-            # Include the section key even when empty so its Required marker is satisfied.
-            out[key_name] = {
-                (ikey.schema if isinstance(ikey, vol.Marker) else ikey): ikey.default()
-                for ikey in value.schema.schema
-                if getattr(ikey, "default", vol.UNDEFINED) is not vol.UNDEFINED
-            }
-        elif getattr(key, "default", vol.UNDEFINED) is not vol.UNDEFINED:
-            out[key_name] = key.default()
-    return out
+    schema = result["data_schema"]
+    return _nest_for_schema(schema, _all_field_defaults(schema))
 
 
 @pytest.mark.parametrize(
@@ -3798,7 +3768,7 @@ async def test_details_error_expands_only_the_offending_section(hass: HomeAssist
         template="steps",
         details_overrides={
             CONF_TOTAL_STEPS: 3,
-            CONF_STEPS_EDITOR: _steps_rows({"weight": 1}, {"weight": 0}, {"weight": 2}),
+            CONF_STEPS_EDITOR: [{"weight": 1}, {"weight": 0}, {"weight": 2}],
         },
     )
     assert result["type"] is FlowResultType.FORM

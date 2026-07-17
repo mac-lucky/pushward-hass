@@ -12,7 +12,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from datetime import timedelta
 from functools import partial
@@ -163,12 +163,7 @@ class WidgetManager:
         # mid-boot coalesces via the dirty flag instead of racing a second create
         # for the same slug (the listener above is already attached).
         if pending:
-            tasks = []
-            for tracked in pending:
-                task = self._hass.async_create_task(self._initial_sync(tracked))
-                tracked.pending_task = task
-                task.add_done_callback(partial(self._on_send_done, tracked))
-                tasks.append(task)
+            tasks = [self._claim_slot(tracked, self._initial_sync(tracked)) for tracked in pending]
             await asyncio.gather(*tasks, return_exceptions=True)
 
         # Rewrite the cache only when its key set differs from the new tracked
@@ -314,12 +309,22 @@ class WidgetManager:
         self._spawn_send(tracked)
 
     @callback
-    def _spawn_send(self, tracked: TrackedWidget, *, force: bool = False) -> asyncio.Task:
-        """Run _send_update as the widget's single in-flight task."""
-        task = self._hass.async_create_task(self._send_update(tracked, force=force))
+    def _claim_slot(self, tracked: TrackedWidget, coro: Coroutine[Any, Any, None]) -> asyncio.Task:
+        """Run coro as the widget's single in-flight task.
+
+        Sets pending_task and wires the done-callback so a change landing mid-send
+        coalesces via the dirty flag instead of racing a second send for the same slug.
+        Shared by _spawn_send and the async_start initial-sync fan-out.
+        """
+        task = self._hass.async_create_task(coro)
         tracked.pending_task = task
         task.add_done_callback(partial(self._on_send_done, tracked))
         return task
+
+    @callback
+    def _spawn_send(self, tracked: TrackedWidget, *, force: bool = False) -> asyncio.Task:
+        """Run _send_update as the widget's single in-flight task."""
+        return self._claim_slot(tracked, self._send_update(tracked, force=force))
 
     def _on_send_done(self, tracked: TrackedWidget, task: asyncio.Task) -> None:
         if tracked.pending_task is not task:

@@ -15,6 +15,7 @@ Without this the frontend falls back to the bare option value ("stat_list",
 
 from __future__ import annotations
 
+import functools
 import json
 from pathlib import Path
 
@@ -24,18 +25,58 @@ from homeassistant.helpers.selector import ObjectSelector, SelectSelector
 
 from custom_components.pushward.config_flow import (
     ENTITY_SECTIONS,
-    SELECT_TRANSLATION_KEYS,
     WIDGET_SECTIONS,
     _details_schema,
     _entity_template_schema,
     _widget_details_schema,
     _widget_step1_schema,
 )
-from custom_components.pushward.const import TEMPLATES, WIDGET_TEMPLATES
+from custom_components.pushward.const import (
+    NAMED_COLORS,
+    SCALES,
+    SEVERITIES,
+    SOUNDS,
+    TEMPLATES,
+    VALUE_SCALES,
+    WIDGET_SEVERITIES,
+    WIDGET_TEMPLATES,
+    WIDGET_TRIGGER_MODES,
+)
 
 _TRANSLATIONS = Path(__file__).parent.parent / "custom_components" / "pushward" / "translations"
 
+# translation_key -> the ordered wire values each SelectSelector renders. The
+# `selector.<key>.options` block in every translations/<lang>.json must carry a
+# label for every value here. This hand-written frozen literal is asserted
+# identical to the mapping derived from the live schemas
+# (_translation_keys_in_schemas), so a new translated dropdown can't drift out of
+# the registry silently. It lives in the test because production has no reader.
+SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
+    "activity_template": tuple(TEMPLATES),
+    "severity": tuple(SEVERITIES),
+    "timeline_scale": tuple(SCALES),
+    "sound": ("", *SOUNDS),
+    "widget_template": tuple(WIDGET_TEMPLATES),
+    "value_scale": tuple(VALUE_SCALES),
+    "widget_severity": tuple(WIDGET_SEVERITIES),
+    "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
+    "named_color": tuple(NAMED_COLORS),
+}
 
+
+@functools.cache
+def _locale_files() -> tuple[tuple[str, dict], ...]:
+    """Read + parse every translations/<lang>.json once, shared across the locale sweeps."""
+    return tuple((p.name, json.loads(p.read_text())) for p in sorted(_TRANSLATIONS.glob("*.json")))
+
+
+@functools.cache
+def _en_translations() -> dict:
+    """The parsed en.json (the reference locale for label-presence checks)."""
+    return dict(_locale_files())["en.json"]
+
+
+@functools.cache
 def _translation_keys_in_schemas() -> dict[str, tuple[str, ...]]:
     """Every translated dropdown across both subentry flows: translation_key -> options.
 
@@ -98,17 +139,17 @@ def test_registry_option_values_match_the_selector() -> None:
 
 
 def test_every_locale_has_complete_selector_options() -> None:
-    """Every locale carries a label for every wire value of every registered dropdown."""
-    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
-        data = json.loads(locale_file.read_text())
+    """Every locale carries a label for every wire value of every rendered dropdown."""
+    keys = _translation_keys_in_schemas()
+    for name, data in _locale_files():
         selector = data.get("selector", {})
-        for key, values in SELECT_TRANSLATION_KEYS.items():
+        for key, values in keys.items():
             options = selector.get(key, {}).get("options", {})
             missing = [v for v in values if v not in options]
-            assert not missing, f"{locale_file.name}: selector.{key}.options missing {missing}"
+            assert not missing, f"{name}: selector.{key}.options missing {missing}"
             # Guard against blank labels: a "" label renders as the raw value.
             blank = [v for v in values if not str(options.get(v, "")).strip()]
-            assert not blank, f"{locale_file.name}: selector.{key}.options blank for {blank}"
+            assert not blank, f"{name}: selector.{key}.options blank for {blank}"
 
 
 # ---------------------------------------------------------------------------
@@ -122,107 +163,68 @@ def test_every_locale_has_complete_selector_options() -> None:
 
 # Frozen, hand-maintained per-template field sets (every field the pre-section
 # flat form rendered). Recomputed by hand only when a template gains/loses a
-# field; a drift here means the section refactor dropped or duplicated one.
+# field; a drift here means the section refactor dropped or duplicated one. Each
+# template is COMMON | its own specific fields - both halves stay hand-written
+# literals so the snapshot/guard property is preserved.
+_ENTITY_COMMON: set[str] = {
+    "start_states",
+    "end_states",
+    "subtitle_entity",
+    "subtitle_attribute",
+    "slug",
+    "activity_name",
+    "icon",
+    "icon_attribute",
+    "priority",
+    "sound",
+    "update_interval",
+    "state_labels",
+    "accent_color",
+    "accent_color_attribute",
+    "background_color",
+    "background_color_attribute",
+    "text_color",
+    "text_color_attribute",
+    "tap_action_url",
+    "tap_action_foreground",
+    "ended_ttl",
+    "stale_ttl",
+    "dismissal_ttl",
+}
+
 ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
-    "generic": {
-        "start_states",
-        "end_states",
+    "generic": _ENTITY_COMMON
+    | {
         "progress_entity",
         "progress_attribute",
         "remaining_time_entity",
         "remaining_time_attribute",
         "live_progress",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
     },
-    "countdown": {
-        "start_states",
-        "end_states",
+    "countdown": _ENTITY_COMMON
+    | {
         "remaining_time_entity",
         "remaining_time_attribute",
         "completion_message",
         "warning_threshold",
         "alarm",
         "snooze_seconds",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
     },
-    "alert": {
-        "start_states",
-        "end_states",
+    "alert": _ENTITY_COMMON
+    | {
         "severity",
         "severity_label",
         "fired_at_entity",
         "fired_at_attribute",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
         "url",
         "url_foreground",
         "url_title",
         "secondary_url",
         "secondary_url_foreground",
         "secondary_url_title",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
     },
-    "steps": {
-        "start_states",
-        "end_states",
+    "steps": _ENTITY_COMMON
+    | {
         "progress_entity",
         "progress_attribute",
         "remaining_time_entity",
@@ -232,67 +234,23 @@ ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
         "current_step_entity",
         "current_step_attribute",
         "steps_editor",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
         "url",
         "url_foreground",
         "url_title",
         "secondary_url",
         "secondary_url_foreground",
         "secondary_url_title",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
     },
-    "gauge": {
-        "start_states",
-        "end_states",
+    "gauge": _ENTITY_COMMON
+    | {
         "value_entity",
         "value_attribute",
         "min_value",
         "max_value",
         "unit",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
     },
-    "timeline": {
-        "start_states",
-        "end_states",
+    "timeline": _ENTITY_COMMON
+    | {
         "series",
         "series_entities",
         "units",
@@ -305,175 +263,38 @@ ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
         "smoothing",
         "thresholds",
         "history_period",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
     },
-    "board": {
-        "start_states",
-        "end_states",
-        "tiles",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
-    },
-    "log": {
-        "start_states",
-        "end_states",
+    "board": _ENTITY_COMMON | {"tiles"},
+    "log": _ENTITY_COMMON
+    | {
         "log_columns",
         "log_level_attribute",
-        "subtitle_entity",
-        "subtitle_attribute",
-        "slug",
-        "activity_name",
-        "icon",
-        "icon_attribute",
-        "priority",
-        "sound",
-        "update_interval",
-        "state_labels",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "background_color_attribute",
-        "text_color",
-        "text_color_attribute",
-        "tap_action_url",
-        "tap_action_foreground",
-        "ended_ttl",
-        "stale_ttl",
-        "dismissal_ttl",
     },
 }
 
+_WIDGET_COMMON: set[str] = {
+    "widget_name",
+    "label",
+    "label_attribute",
+    "subtitle_attribute",
+    "icon",
+    "icon_attribute",
+    "accent_color",
+    "accent_color_attribute",
+    "background_color",
+    "text_color",
+    "tap_action_url",
+    "tap_action_foreground",
+    "widget_trigger_mode",
+    "widget_poll_interval",
+}
+
 WIDGET_FROZEN_FIELDS: dict[str, set[str]] = {
-    "value": {
-        "widget_name",
-        "value_attribute",
-        "unit",
-        "label",
-        "label_attribute",
-        "subtitle_attribute",
-        "icon",
-        "icon_attribute",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "text_color",
-        "tap_action_url",
-        "tap_action_foreground",
-        "widget_trigger_mode",
-        "widget_poll_interval",
-    },
-    "progress": {
-        "widget_name",
-        "value_attribute",
-        "unit",
-        "value_scale",
-        "label",
-        "label_attribute",
-        "subtitle_attribute",
-        "icon",
-        "icon_attribute",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "text_color",
-        "tap_action_url",
-        "tap_action_foreground",
-        "widget_trigger_mode",
-        "widget_poll_interval",
-    },
-    "gauge": {
-        "widget_name",
-        "value_attribute",
-        "unit",
-        "min_value",
-        "max_value",
-        "label",
-        "label_attribute",
-        "subtitle_attribute",
-        "icon",
-        "icon_attribute",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "text_color",
-        "tap_action_url",
-        "tap_action_foreground",
-        "widget_trigger_mode",
-        "widget_poll_interval",
-    },
-    "status": {
-        "widget_name",
-        "severity",
-        "label",
-        "label_attribute",
-        "subtitle_attribute",
-        "icon",
-        "icon_attribute",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "text_color",
-        "tap_action_url",
-        "tap_action_foreground",
-        "widget_trigger_mode",
-        "widget_poll_interval",
-    },
-    "stat_list": {
-        "widget_name",
-        "stat_rows",
-        "label",
-        "label_attribute",
-        "subtitle_attribute",
-        "icon",
-        "icon_attribute",
-        "accent_color",
-        "accent_color_attribute",
-        "background_color",
-        "text_color",
-        "tap_action_url",
-        "tap_action_foreground",
-        "widget_trigger_mode",
-        "widget_poll_interval",
-    },
+    "value": _WIDGET_COMMON | {"value_attribute", "unit"},
+    "progress": _WIDGET_COMMON | {"value_attribute", "unit", "value_scale"},
+    "gauge": _WIDGET_COMMON | {"value_attribute", "unit", "min_value", "max_value"},
+    "status": _WIDGET_COMMON | {"severity"},
+    "stat_list": _WIDGET_COMMON | {"stat_rows"},
 }
 
 
@@ -516,39 +337,32 @@ def test_widget_sections_cover_frozen_field_set() -> None:
 
 def test_every_entity_section_has_a_name_in_all_locales() -> None:
     """Each entity section key carries a sections.<key>.name in every locale (raw key otherwise)."""
-    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
-        data = json.loads(locale_file.read_text())
+    for name, data in _locale_files():
         sections = data["config_subentries"]["tracked_entity"]["step"]["details"]["sections"]
         for key in ENTITY_SECTIONS:
-            assert str(sections.get(key, {}).get("name", "")).strip(), (
-                f"{locale_file.name}: entity section {key} has no name"
-            )
+            assert str(sections.get(key, {}).get("name", "")).strip(), f"{name}: entity section {key} has no name"
 
 
 def test_every_widget_section_has_a_name_in_all_locales() -> None:
     """Each widget section key carries a sections.<key>.name in every locale."""
-    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
-        data = json.loads(locale_file.read_text())
+    for name, data in _locale_files():
         sections = data["config_subentries"]["tracked_widget"]["step"]["details"]["sections"]
         for key in WIDGET_SECTIONS:
-            assert str(sections.get(key, {}).get("name", "")).strip(), (
-                f"{locale_file.name}: widget section {key} has no name"
-            )
+            assert str(sections.get(key, {}).get("name", "")).strip(), f"{name}: widget section {key} has no name"
 
 
 def test_data_sources_section_has_a_description_in_all_locales() -> None:
     """The data_sources section gets a one-line description (only section that does)."""
-    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
-        data = json.loads(locale_file.read_text())
+    for name, data in _locale_files():
         sections = data["config_subentries"]["tracked_entity"]["step"]["details"]["sections"]
         assert str(sections["data_sources"].get("description", "")).strip(), (
-            f"{locale_file.name}: data_sources section has no description"
+            f"{name}: data_sources section has no description"
         )
 
 
 def test_entity_sectioned_fields_labelled_under_their_section_in_en() -> None:
     """Every entity section field has its data + data_description entry under that section in en.json."""
-    en = json.loads((_TRANSLATIONS / "en.json").read_text())
+    en = _en_translations()
     sections = en["config_subentries"]["tracked_entity"]["step"]["details"]["sections"]
     for sec, fields in ENTITY_SECTIONS.items():
         data = sections[sec].get("data", {})
@@ -560,7 +374,7 @@ def test_entity_sectioned_fields_labelled_under_their_section_in_en() -> None:
 
 def test_widget_sectioned_fields_labelled_under_their_section_in_en() -> None:
     """Every widget section field has its data + data_description entry under that section in en.json."""
-    en = json.loads((_TRANSLATIONS / "en.json").read_text())
+    en = _en_translations()
     sections = en["config_subentries"]["tracked_widget"]["step"]["details"]["sections"]
     for sec, fields in WIDGET_SECTIONS.items():
         data = sections[sec].get("data", {})
@@ -572,7 +386,7 @@ def test_widget_sectioned_fields_labelled_under_their_section_in_en() -> None:
 
 def test_remaining_time_labelled_both_top_level_and_in_data_sources_en() -> None:
     """remaining_time is top-level on countdown and sectioned on generic/steps, so it needs a label in both."""
-    en = json.loads((_TRANSLATIONS / "en.json").read_text())
+    en = _en_translations()
     details = en["config_subentries"]["tracked_entity"]["step"]["details"]
     for field in ("remaining_time_entity", "remaining_time_attribute"):
         assert field in details["data"], f"en: top-level data missing {field}"
