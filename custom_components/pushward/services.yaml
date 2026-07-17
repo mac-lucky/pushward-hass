@@ -758,6 +758,10 @@ update_activity_steps:
             number:
               min: 0
               mode: box
+        duration:
+          example: "30m"
+          selector:
+            text:
     action_buttons:
       collapsed: true
       fields:

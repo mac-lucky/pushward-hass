@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL di rimozione",
           "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
+        },
+        "duration": {
+          "name": "Durata",
+          "description": "Alternativa imposta-e-dimentica a Data di fine: secondi (>=1) o una stringa di durata come \"1h30m\". Il server riancora inizio/fine al momento attuale. Invia Durata oppure Data di fine — se entrambe sono impostate prevale Durata."
         }
       },
       "sections": {

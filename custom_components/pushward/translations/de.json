@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL für Entfernung",
           "description": "Sekunden, die die beendete Aktivität auf dem Sperrbildschirm verbleibt, bevor sie entfernt wird. 0 entfernt sie sofort bei Ende."
+        },
+        "duration": {
+          "name": "Dauer",
+          "description": "Bequeme Alternative zum Enddatum: Sekunden (>=1) oder eine Dauer-Zeichenkette wie \"1h30m\". Der Server verankert Start/Ende neu auf jetzt. Entweder Dauer oder Enddatum senden – bei beiden gewinnt die Dauer."
         }
       },
       "sections": {

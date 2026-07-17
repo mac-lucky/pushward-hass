@@ -778,6 +778,39 @@ async def test_deprecated_update_activity_forwards_ttls(hass: HomeAssistant) -> 
     assert "ended_ttl" not in call[0][2]
 
 
+async def test_update_activity_steps_forwards_duration(hass: HomeAssistant) -> None:
+    """The steps action carries duration into content (re-anchors the live-progress window)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_steps",
+        {"slug": "s", "state": "ongoing", "total_steps": 3, "current_step": 2, "duration": "30m"},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "steps"
+    assert content["duration"] == "30m"
+
+
+async def test_update_activity_steps_rejects_invalid_duration(hass: HomeAssistant) -> None:
+    """A non-positive / malformed steps duration is rejected the same way countdown's is."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad in ("0", "-5", "abc"):
+        with pytest.raises(vol.MultipleInvalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "update_activity_steps",
+                {"slug": "s", "state": "ongoing", "duration": bad},
+                blocking=True,
+            )
+    api.update_activity.assert_not_awaited()
+
+
 async def test_update_activity_countdown_forwards_fields(hass: HomeAssistant) -> None:
     """Countdown-specific fields go into content; sound/priority stay top-level kwargs."""
     api = _mock_api()

@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL penghapusan",
           "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
+        },
+        "duration": {
+          "name": "Durasi",
+          "description": "Alternatif atur-sekali untuk Tanggal Berakhir: detik (>=1) atau string durasi seperti \"1h30m\". Server menyetel ulang awal/akhir ke sekarang. Kirim Durasi atau Tanggal Berakhir — Durasi menang jika keduanya disetel."
         }
       },
       "sections": {

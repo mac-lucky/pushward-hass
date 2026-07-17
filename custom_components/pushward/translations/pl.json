@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL usunięcia",
           "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
+        },
+        "duration": {
+          "name": "Czas trwania",
+          "description": "Bezobsługowa alternatywa dla Daty zakończenia: sekundy (>=1) lub ciąg czasu trwania, np. „1h30m”. Serwer ponownie zakotwicza początek/koniec na teraz. Wyślij Czas trwania albo Datę zakończenia — przy obu ustawionych wygrywa Czas trwania."
         }
       },
       "sections": {

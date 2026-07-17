@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL de remoção",
           "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
+        },
+        "duration": {
+          "name": "Duração",
+          "description": "Alternativa do tipo \"defina e esqueça\" à Data de término: segundos (>=1) ou uma string de duração como \"1h30m\". O servidor reancora início/fim para agora. Envie a Duração ou a Data de término — a Duração prevalece se ambas forem definidas."
         }
       },
       "sections": {

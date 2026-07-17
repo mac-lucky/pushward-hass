@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "Dismissal TTL",
           "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
+        },
+        "duration": {
+          "name": "Duration",
+          "description": "Set-and-forget alternative to End Date: seconds (>=1) or a duration string like \"1h30m\". The server re-anchors start/end to now. Send either Duration or End Date — Duration wins if both are set."
         }
       },
       "sections": {

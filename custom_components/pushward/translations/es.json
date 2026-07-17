@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL de eliminación",
           "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
+        },
+        "duration": {
+          "name": "Duración",
+          "description": "Alternativa de tipo «configurar y olvidar» a Fecha de fin: segundos (>=1) o una cadena de duración como \"1h30m\". El servidor reancla el inicio/fin al momento actual. Envía Duración o Fecha de fin; si ambas se establecen, Duración tiene prioridad."
         }
       },
       "sections": {

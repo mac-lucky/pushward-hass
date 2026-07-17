@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL de eliminare",
           "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
+        },
+        "duration": {
+          "name": "Durată",
+          "description": "Alternativă „setează și uită” la Data de încheiere: secunde (>=1) sau un șir de durată precum „1h30m”. Serverul reancorează începutul/sfârșitul la momentul curent. Trimiteți fie Durata, fie Data de încheiere — Durata are prioritate dacă ambele sunt setate."
         }
       },
       "sections": {

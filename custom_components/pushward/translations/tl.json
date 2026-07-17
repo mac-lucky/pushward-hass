@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL ng pag-alis",
           "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
+        },
+        "duration": {
+          "name": "Tagal",
+          "description": "Set-and-forget na alternatibo sa End Date: segundo (>=1) o duration string tulad ng \"1h30m\". Muling ini-anchor ng server ang start/end sa ngayon. Magpadala ng alinman sa Tagal o End Date — mananaig ang Tagal kung pareho silang nakatakda."
         }
       },
       "sections": {

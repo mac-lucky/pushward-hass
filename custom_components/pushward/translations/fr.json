@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL de suppression",
           "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
+        },
+        "duration": {
+          "name": "Durée",
+          "description": "Alternative « à configurer et oublier » à la Date de fin : des secondes (>=1) ou une chaîne de durée comme « 1h30m ». Le serveur réancre le début/la fin sur maintenant. Envoyez soit la Durée, soit la Date de fin — la Durée l'emporte si les deux sont définies."
         }
       },
       "sections": {

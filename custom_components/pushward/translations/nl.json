@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL voor verwijderen",
           "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
+        },
+        "duration": {
+          "name": "Duur",
+          "description": "Instellen-en-vergeten alternatief voor einddatum: seconden (>=1) of een duurtekst zoals \"1h30m\". De server verankert start/einde opnieuw op nu. Verstuur óf Duur óf Einddatum — Duur wint als beide zijn ingesteld."
         }
       },
       "sections": {

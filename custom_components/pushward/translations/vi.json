@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "TTL gỡ bỏ",
           "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
+        },
+        "duration": {
+          "name": "Thời lượng",
+          "description": "Tùy chọn thay thế cho Ngày kết thúc, đặt một lần là xong: số giây (>=1) hoặc một chuỗi thời lượng như \"1h30m\". Máy chủ neo lại thời điểm bắt đầu/kết thúc về hiện tại. Gửi Thời lượng hoặc Ngày kết thúc — Thời lượng được ưu tiên nếu cả hai cùng được đặt."
         }
       },
       "sections": {

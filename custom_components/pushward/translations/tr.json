@@ -618,6 +618,10 @@
         "dismissal_ttl": {
           "name": "Kaldırma TTL'si",
           "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
+        },
+        "duration": {
+          "name": "Süre",
+          "description": "Bitiş Tarihi'ne kur-ve-unut alternatifi: saniye (>=1) veya \"1h30m\" gibi bir süre dizesi. Sunucu başlangıç/bitişi şimdiye yeniden sabitler. Süre veya Bitiş Tarihi'nden birini gönderin — ikisi de ayarlanırsa Süre öncelik kazanır."
         }
       },
       "sections": {
