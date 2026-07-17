@@ -85,6 +85,10 @@ CONF_STEP_ROWS = "step_rows"
 # 400s; an empty step_colors entry falls back to accent_color.
 CONF_STEP_WEIGHTS = "step_weights"
 CONF_STEP_COLORS = "step_colors"
+# Steps template: a form-only key. The config flow edits every step as one row
+# ({label, row, weight, color}) in a single editor and decomposes the rows into the
+# four stored keys above; nothing persists under CONF_STEPS_EDITOR.
+CONF_STEPS_EDITOR = "steps_editor"
 CONF_FIRED_AT_ATTRIBUTE = "fired_at_attribute"
 CONF_UNITS = "units"
 # Board template: 1-4 tiles, each bound to a separate entity. Stored as a list of

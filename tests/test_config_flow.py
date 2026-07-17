@@ -16,9 +16,13 @@ from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import (
     ENTITY_SECTIONS,
     WIDGET_SECTIONS,
+    _compose_steps_rows,
+    _decompose_steps_rows,
     _details_schema,
     _flatten_section_input,
     _hex_to_rgb,
+    _kv_rows_to_map,
+    _map_to_kv_rows,
     _parse_board_tiles,
     _parse_color_list,
     _parse_csv,
@@ -31,10 +35,9 @@ from custom_components.pushward.config_flow import (
     _parse_thresholds,
     _parse_widget_input,
     _parse_widget_stat_rows,
+    _primary_series_options,
     _resolve_series_entity_labels,
     _rgb_to_hex,
-    _serialize_csv,
-    _serialize_float_list,
     _suggest_widget_template,
     _validate_integration_key,
     _widget_details_schema,
@@ -95,6 +98,7 @@ from custom_components.pushward.const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_STEP_WEIGHTS,
+    CONF_STEPS_EDITOR,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
@@ -264,7 +268,7 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
         data[CONF_MAX_VALUE] = 100.0
         data[CONF_UNIT] = ""
     if template == "timeline":
-        data[CONF_SERIES] = ""
+        data[CONF_SERIES] = []
         data[CONF_VALUE_ATTRIBUTE] = ""
         data[CONF_UNIT] = ""
         data[CONF_SCALE] = "linear"
@@ -283,7 +287,7 @@ def _mock_details_input(template: str = "generic", **overrides) -> dict:
 
     # Common optional fields
     data[CONF_SUBTITLE_ATTRIBUTE] = ""
-    data[CONF_STATE_LABELS] = ""
+    data[CONF_STATE_LABELS] = []
     if template == "countdown":
         data[CONF_COMPLETION_MESSAGE] = ""
     data[CONF_ACCENT_COLOR_ATTRIBUTE] = ""
@@ -1369,16 +1373,29 @@ def test_parse_csv(csv_str: str, expected: list[str]) -> None:
 
 
 async def test_subentry_add_entity_with_state_labels(hass: HomeAssistant) -> None:
-    """State labels are parsed from CSV and stored as dict."""
+    """State-label rows are stored as a {state: label} dict."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
     result = await _add_entity_subentry(
-        hass, entry, details_overrides={CONF_STATE_LABELS: "heating=Warming Up, idle=Standby"}
+        hass,
+        entry,
+        details_overrides={
+            CONF_STATE_LABELS: [
+                {"state": "heating", CONF_LABEL: "Warming Up"},
+                {"state": "idle", CONF_LABEL: "Standby"},
+            ]
+        },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_STATE_LABELS] == {"heating": "Warming Up", "idle": "Standby"}
+
+
+async def test_subentry_add_entity_state_labels_legacy_string_still_parses() -> None:
+    """A stored/legacy 'state=Label, ...' string still decomposes into the dict."""
+    result = _parse_entity_input(_base_user_input(**{CONF_STATE_LABELS: "heating=Warming Up, idle=Standby"}))
+    assert result[CONF_STATE_LABELS] == {"heating": "Warming Up", "idle": "Standby"}
 
 
 async def test_subentry_add_entity_with_subtitle_attribute(hass: HomeAssistant) -> None:
@@ -1563,11 +1580,11 @@ async def test_subentry_reconfigure_clearing_remaining_time_attr(hass: HomeAssis
     assert entry.subentries[subentry_id].data[CONF_REMAINING_TIME_ATTR] == ""
 
 
-async def test_subentry_reconfigure_prefills_step_weights_and_colors_as_text(hass: HomeAssistant) -> None:
-    """Stored lists must render back as CSV text: the details field is a str schema.
+async def test_subentry_reconfigure_prefills_steps_editor_rows(hass: HomeAssistant) -> None:
+    """Stored step keys compose back into one editor row per step on reconfigure.
 
-    Without the serialize step the raw list reaches a str default, so the user
-    sees "[1.0, 2.5, 1.0]" and reparsing wipes their config.
+    Without the compose step the four stored keys would have no form field, so the
+    per-step config would silently vanish from the reconfigure dialog.
     """
     entry = _mock_entry(
         subentries_data=[
@@ -1588,10 +1605,13 @@ async def test_subentry_reconfigure_prefills_step_weights_and_colors_as_text(has
     )
     assert result["step_id"] == "details"
 
-    # step_weights/step_colors now live in the steps_options section; recurse for their defaults.
+    # steps_editor lives in the steps_options section; recurse for its default rows.
     defaults = _all_field_defaults(result["data_schema"])
-    assert defaults[CONF_STEP_WEIGHTS] == "1, 2.5, 1"
-    assert defaults[CONF_STEP_COLORS] == "green, , red"
+    assert defaults[CONF_STEPS_EDITOR] == [
+        {"weight": 1.0, "color": "green"},
+        {"weight": 2.5},
+        {"weight": 1.0, "color": "red"},
+    ]
 
 
 async def test_subentry_reconfigure_clearing_steps_attrs(hass: HomeAssistant) -> None:
@@ -1793,7 +1813,10 @@ async def test_subentry_timeline_template(hass: HomeAssistant) -> None:
         user_input=_mock_details_input(
             "timeline",
             **{
-                CONF_SERIES: "current_temperature=Current, target_temperature=Target",
+                CONF_SERIES: [
+                    {"attribute": "current_temperature", CONF_LABEL: "Current"},
+                    {"attribute": "target_temperature", CONF_LABEL: "Target"},
+                ],
                 CONF_UNIT: "\u00b0C",
                 CONF_SCALE: "logarithmic",
                 CONF_DECIMALS: 2,
@@ -1887,20 +1910,12 @@ def test_details_schema_countdown_has_warning_threshold_and_alarm() -> None:
     assert CONF_ALARM in keys
 
 
-def test_details_schema_steps_has_step_labels_and_rows() -> None:
-    """Steps template includes step_labels and step_rows fields."""
+def test_details_schema_steps_has_steps_editor() -> None:
+    """Steps template exposes the unified per-step editor (not the four raw fields)."""
     schema = _details_schema("binary_sensor.foo", "steps", defaults={})
     keys = _schema_keys(schema)
-    assert CONF_STEP_LABELS in keys
-    assert CONF_STEP_ROWS in keys
-
-
-def test_details_schema_steps_has_step_weights_and_colors() -> None:
-    """Steps template exposes the per-step width and color fields."""
-    schema = _details_schema("binary_sensor.foo", "steps", defaults={})
-    keys = _schema_keys(schema)
-    assert CONF_STEP_WEIGHTS in keys
-    assert CONF_STEP_COLORS in keys
+    assert CONF_STEPS_EDITOR in keys
+    assert not ({CONF_STEP_LABELS, CONF_STEP_ROWS, CONF_STEP_WEIGHTS, CONF_STEP_COLORS} & keys)
 
 
 def test_details_schema_widget_progress_has_value_scale() -> None:
@@ -1973,13 +1988,6 @@ def test_parse_float_list_empty_string_returns_empty() -> None:
     assert _parse_float_list("") == []
 
 
-def test_float_list_round_trips_through_serialize() -> None:
-    """Reconfigure re-renders the stored list as text, so the pair must round-trip."""
-    assert _serialize_float_list([1.0, 2.5, 3.0]) == "1, 2.5, 3"
-    assert _parse_float_list(_serialize_float_list([1.0, 2.5, 3.0])) == [1.0, 2.5, 3.0]
-    assert _serialize_float_list([]) == ""
-
-
 def test_parse_color_list_keeps_empty_entries() -> None:
     """Colors are positional, so an omitted one must hold its slot, not collapse the list."""
     assert _parse_color_list("red,,blue") == ["red", "", "blue"]
@@ -1999,10 +2007,6 @@ def test_parse_color_list_trailing_comma_adds_a_slot() -> None:
 
 def test_parse_color_list_empty_string_returns_empty() -> None:
     assert _parse_color_list("") == []
-
-
-def test_color_list_round_trips_through_serialize() -> None:
-    assert _parse_color_list(_serialize_csv(["red", "", "blue"])) == ["red", "", "blue"]
 
 
 # --- _parse_entity_input new field tests ---
@@ -2970,55 +2974,23 @@ async def _add_widget_subentry(
     )
 
 
+def _steps_rows(*rows: dict) -> list[dict]:
+    """Build steps-editor rows; each arg is a per-step {label?, row?, weight?, color?}."""
+    return list(rows)
+
+
 async def test_flow_step_length_mismatch(hass: HomeAssistant) -> None:
-    """A step list whose length != total_steps bounces on that field."""
+    """An editor row count != total_steps bounces on the steps editor."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_entity_subentry(
         hass,
         entry,
         template="steps",
-        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_WEIGHTS: "1, 2"},
+        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEPS_EDITOR: _steps_rows({"weight": 1}, {"weight": 2})},
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEP_WEIGHTS: "step_length_mismatch"}
-
-
-async def test_flow_step_length_mismatch_groups_every_offending_field(hass: HomeAssistant) -> None:
-    """rows, weights, and colors that all mismatch light up together in one raise."""
-    entry = _mock_entry()
-    entry.add_to_hass(hass)
-    result = await _add_entity_subentry(
-        hass,
-        entry,
-        template="steps",
-        details_overrides={
-            CONF_TOTAL_STEPS: 3,
-            CONF_STEP_ROWS: "1, 2",
-            CONF_STEP_WEIGHTS: "1, 2",
-            CONF_STEP_COLORS: "red, blue",
-        },
-    )
-    assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {
-        CONF_STEP_ROWS: "step_length_mismatch",
-        CONF_STEP_WEIGHTS: "step_length_mismatch",
-        CONF_STEP_COLORS: "step_length_mismatch",
-    }
-
-
-async def test_flow_invalid_step_rows(hass: HomeAssistant) -> None:
-    """A non-integer step row bounces instead of shifting every later row."""
-    entry = _mock_entry()
-    entry.add_to_hass(hass)
-    result = await _add_entity_subentry(
-        hass,
-        entry,
-        template="steps",
-        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_ROWS: "1, x, 3"},
-    )
-    assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEP_ROWS: "invalid_step_rows"}
+    assert result["errors"] == {CONF_STEPS_EDITOR: "step_length_mismatch"}
 
 
 async def test_flow_invalid_step_weights_non_positive(hass: HomeAssistant) -> None:
@@ -3029,10 +3001,13 @@ async def test_flow_invalid_step_weights_non_positive(hass: HomeAssistant) -> No
         hass,
         entry,
         template="steps",
-        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_WEIGHTS: "1, 0, 2"},
+        details_overrides={
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEPS_EDITOR: _steps_rows({"weight": 1}, {"weight": 0}, {"weight": 2}),
+        },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEP_WEIGHTS: "invalid_step_weights"}
+    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_weights"}
 
 
 async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
@@ -3043,10 +3018,13 @@ async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
         hass,
         entry,
         template="steps",
-        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_COLORS: "red, chartreuse, blue"},
+        details_overrides={
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEPS_EDITOR: _steps_rows({"color": "red"}, {"color": "chartreuse"}, {"color": "blue"}),
+        },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEP_COLORS: "invalid_step_colors"}
+    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_colors"}
 
 
 async def test_flow_invalid_tile(hass: HomeAssistant) -> None:
@@ -3414,7 +3392,7 @@ async def test_flow_stat_row_unit_over_cap(hass: HomeAssistant) -> None:
 
 
 async def test_flow_valid_step_lists_pass(hass: HomeAssistant) -> None:
-    """Correct-length, well-formed step lists create the subentry unchanged."""
+    """A full editor (one row per step) decomposes into the four stored step keys."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
     result = await _add_entity_subentry(
@@ -3423,37 +3401,201 @@ async def test_flow_valid_step_lists_pass(hass: HomeAssistant) -> None:
         template="steps",
         details_overrides={
             CONF_TOTAL_STEPS: 3,
-            CONF_STEP_ROWS: "1, 2, 3",
-            CONF_STEP_WEIGHTS: "1, 2.5, 1",
-            CONF_STEP_COLORS: "red, , #00ff00",
+            CONF_STEPS_EDITOR: _steps_rows(
+                {CONF_LABEL: "Build", "row": 1, "weight": 1, "color": "red"},
+                {CONF_LABEL: "Test", "row": 2, "weight": 2.5},
+                {CONF_LABEL: "Deploy", "row": 3, "weight": 1, "color": "#00ff00"},
+            ),
         },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     data = next(iter(entry.subentries.values())).data
+    assert data[CONF_STEP_LABELS] == {"1": "Build", "2": "Test", "3": "Deploy"}
     assert data[CONF_STEP_ROWS] == [1, 2, 3]
     assert data[CONF_STEP_WEIGHTS] == [1.0, 2.5, 1.0]
     assert data[CONF_STEP_COLORS] == ["red", "", "#00ff00"]
 
 
 async def test_flow_error_preserves_submitted_dsl(hass: HomeAssistant) -> None:
-    """A bounced step list re-renders the form pre-filled with what was typed."""
+    """A bounced steps editor re-renders the form pre-filled with the typed rows."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
+    rows = _steps_rows({"weight": 1}, {"weight": 0}, {"weight": 2})
     result = await _add_entity_subentry(
         hass,
         entry,
         template="steps",
         details_overrides={
             CONF_TOTAL_STEPS: 3,
-            CONF_STEP_WEIGHTS: "1, 0, 2",
+            CONF_STEPS_EDITOR: rows,
             CONF_ACTIVITY_NAME: "My Steps",
         },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEP_WEIGHTS: "invalid_step_weights"}
+    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_weights"}
     suggested = _suggested_values(result)
-    assert suggested[CONF_STEP_WEIGHTS] == "1, 0, 2"
+    assert suggested[CONF_STEPS_EDITOR] == rows
     assert suggested[CONF_ACTIVITY_NAME] == "My Steps"
+
+
+# --- Phase 6: unified steps editor + k/v map row editors + primary_series dropdown ---
+
+
+def test_decompose_steps_rows_full() -> None:
+    """A row per step decomposes into 1-based labels and positional row/weight/color lists."""
+    rows = [
+        {CONF_LABEL: "Build", "row": 1, "weight": 1, "color": "red"},
+        {CONF_LABEL: "Test", "row": 2, "weight": 2.5, "color": ""},
+        {CONF_LABEL: "Deploy", "row": 3, "weight": 1, "color": "#00ff00"},
+    ]
+    out = _decompose_steps_rows(rows, 3, strict=True)
+    assert out[CONF_STEP_LABELS] == {"1": "Build", "2": "Test", "3": "Deploy"}
+    assert out[CONF_STEP_ROWS] == [1, 2, 3]
+    assert out[CONF_STEP_WEIGHTS] == [1.0, 2.5, 1.0]
+    assert out[CONF_STEP_COLORS] == ["red", "", "#00ff00"]
+
+
+def test_decompose_steps_rows_blank_colors_stay_positional() -> None:
+    """A blank color holds its slot so later colors don't shift onto the wrong step."""
+    rows = [{"color": "red"}, {"color": ""}, {"color": "blue"}]
+    out = _decompose_steps_rows(rows, 3, strict=True)
+    assert out[CONF_STEP_COLORS] == ["red", "", "blue"]
+    # No labels/rows/weights were set, so those stay empty.
+    assert out[CONF_STEP_LABELS] == {}
+    assert out[CONF_STEP_ROWS] == []
+    assert out[CONF_STEP_WEIGHTS] == []
+
+
+def test_decompose_steps_rows_row_and_weight_are_all_or_none() -> None:
+    """A partial row/weight column is dropped whole (the server needs total_steps entries)."""
+    rows = [{"row": 1, "weight": 1}, {"weight": 2}, {"row": 3, "weight": 1}]
+    out = _decompose_steps_rows(rows, 3, strict=True)
+    assert out[CONF_STEP_ROWS] == []  # middle row has no height
+    assert out[CONF_STEP_WEIGHTS] == [1.0, 2.0, 1.0]  # every row has a weight
+
+
+def test_decompose_steps_rows_empty_never_mismatches() -> None:
+    """Zero rows is always valid, even when total_steps is set."""
+    assert _decompose_steps_rows([], 5, strict=True) == {
+        CONF_STEP_LABELS: {},
+        CONF_STEP_ROWS: [],
+        CONF_STEP_WEIGHTS: [],
+        CONF_STEP_COLORS: [],
+    }
+
+
+def test_decompose_steps_rows_length_mismatch_strict() -> None:
+    """A non-zero row count != total_steps raises step_length_mismatch on the editor field."""
+    with pytest.raises(vol.Invalid) as exc:
+        _decompose_steps_rows([{"weight": 1}, {"weight": 2}], 3, strict=True)
+    assert exc.value.path == [CONF_STEPS_EDITOR]
+    assert "step_length_mismatch" in str(exc.value)
+
+
+def test_decompose_steps_rows_lenient_skips_length_check() -> None:
+    """Non-strict (non-form) decompose keeps whatever rows it is given."""
+    out = _decompose_steps_rows([{CONF_LABEL: "Only"}], 4, strict=False)
+    assert out[CONF_STEP_LABELS] == {"1": "Only"}
+
+
+def test_steps_rows_compose_decompose_round_trip() -> None:
+    """compose(stored) then decompose(rows) returns the original four stored keys."""
+    stored = {
+        CONF_TOTAL_STEPS: 3,
+        CONF_STEP_LABELS: {"1": "Build", "3": "Deploy"},
+        CONF_STEP_ROWS: [1, 2, 3],
+        CONF_STEP_WEIGHTS: [1.0, 2.5, 1.0],
+        CONF_STEP_COLORS: ["red", "", "blue"],
+    }
+    rows = _compose_steps_rows(stored)
+    assert rows == [
+        {CONF_LABEL: "Build", "row": 1, "weight": 1.0, "color": "red"},
+        {"row": 2, "weight": 2.5},
+        {CONF_LABEL: "Deploy", "row": 3, "weight": 1.0, "color": "blue"},
+    ]
+    back = _decompose_steps_rows(rows, 3, strict=True)
+    assert back[CONF_STEP_LABELS] == stored[CONF_STEP_LABELS]
+    assert back[CONF_STEP_ROWS] == stored[CONF_STEP_ROWS]
+    assert back[CONF_STEP_WEIGHTS] == stored[CONF_STEP_WEIGHTS]
+    assert back[CONF_STEP_COLORS] == stored[CONF_STEP_COLORS]
+
+
+def test_compose_steps_rows_empty_when_no_step_config() -> None:
+    """A steps config with no per-step data composes to an empty editor."""
+    assert _compose_steps_rows({CONF_TOTAL_STEPS: 3}) == []
+
+
+def test_kv_rows_to_map_and_back() -> None:
+    """Row list <-> dict adapters round-trip and skip half-filled rows."""
+    rows = [{"state": "on", CONF_LABEL: "Running"}, {"state": "off", CONF_LABEL: "Idle"}]
+    assert _kv_rows_to_map(rows, "state", CONF_LABEL) == {"on": "Running", "off": "Idle"}
+    assert _map_to_kv_rows({"on": "Running", "off": "Idle"}, "state", CONF_LABEL) == rows
+    # A row missing either side is skipped.
+    assert _kv_rows_to_map([{"state": "on"}, {CONF_LABEL: "x"}], "state", CONF_LABEL) == {}
+
+
+def test_kv_rows_to_map_accepts_legacy_string() -> None:
+    """The legacy 'k=v, k2=v2' string still decomposes (stored-string edge cases)."""
+    assert _kv_rows_to_map("on=Running, off=Idle", "state", CONF_LABEL) == {"on": "Running", "off": "Idle"}
+    assert _kv_rows_to_map({"on": "Running"}, "state", CONF_LABEL) == {"on": "Running"}
+
+
+def test_primary_series_options_from_series_and_entities() -> None:
+    """The dropdown lists series-map labels plus resolved series-entity labels, de-duped."""
+    config = {
+        CONF_SERIES: [{"attribute": "temp", CONF_LABEL: "Indoor"}, {"attribute": "hum", CONF_LABEL: "Humidity"}],
+        CONF_SERIES_ENTITIES: [{CONF_LABEL: "Outdoor", CONF_ENTITY_ID: "sensor.out"}, {CONF_LABEL: "Indoor"}],
+    }
+    assert _primary_series_options(config) == ["Indoor", "Humidity", "Outdoor"]
+
+
+def test_primary_series_options_from_stored_dict() -> None:
+    """A stored CONF_SERIES dict (not yet row-adapted) also yields its label values."""
+    assert _primary_series_options({CONF_SERIES: {"temp": "Indoor"}}) == ["Indoor"]
+
+
+def test_primary_series_options_empty_on_add() -> None:
+    """A fresh add has no configured series, so the dropdown starts empty (custom_value)."""
+    assert _primary_series_options({}) == []
+
+
+def _primary_series_selector(schema: vol.Schema):
+    """Find the primary_series SelectSelector inside the timeline_options section."""
+    from homeassistant.data_entry_flow import section
+
+    for value in schema.schema.values():
+        if isinstance(value, section):
+            for ik, iv in value.schema.schema.items():
+                name = ik.schema if isinstance(ik, vol.Marker) else ik
+                if name == CONF_PRIMARY_SERIES:
+                    return iv
+    raise AssertionError("primary_series selector not found")
+
+
+async def test_reconfigure_primary_series_dropdown_lists_stored_labels(hass: HomeAssistant) -> None:
+    """On reconfigure the primary_series dropdown offers the stored series labels."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(
+                template="timeline",
+                series={"current_temperature": "Indoor"},
+                series_entities=[{CONF_LABEL: "Outdoor", CONF_ENTITY_ID: "sensor.out"}],
+                primary_series="Indoor",
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_ENTITY_ID: "sensor.temp", CONF_TEMPLATE: "timeline"}),
+    )
+    assert result["step_id"] == "details"
+    selector = _primary_series_selector(result["data_schema"])
+    assert list(selector.config["options"]) == ["Indoor", "Outdoor"]
+    assert selector.config["custom_value"] is True
 
 
 # --- strict= is opt-in: the low-level parsers stay lenient for non-form callers ---
@@ -3649,15 +3791,18 @@ async def test_details_error_expands_only_the_offending_section(hass: HomeAssist
     """A validation error inside a collapsed section re-renders that section open, others shut."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
-    # step_weights lives in the steps_options section; a non-positive weight raises there.
+    # steps_editor lives in the steps_options section; a non-positive weight raises there.
     result = await _add_entity_subentry(
         hass,
         entry,
         template="steps",
-        details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEP_WEIGHTS: "1, 0, 2"},
+        details_overrides={
+            CONF_TOTAL_STEPS: 3,
+            CONF_STEPS_EDITOR: _steps_rows({"weight": 1}, {"weight": 0}, {"weight": 2}),
+        },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEP_WEIGHTS: "invalid_step_weights"}
+    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_weights"}
 
     collapsed = _section_collapsed(result["data_schema"])
     assert "steps_options" in collapsed

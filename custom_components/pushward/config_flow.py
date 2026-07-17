@@ -97,6 +97,7 @@ from .const import (
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_STEP_WEIGHTS,
+    CONF_STEPS_EDITOR,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
@@ -334,6 +335,71 @@ _LOG_COLUMNS_SELECTOR = ObjectSelector(
     )
 )
 
+# Two-column key/value map editors. Storage stays the existing {key: value} dicts;
+# small lossless adapters (_kv_rows_to_map / _map_to_kv_rows) sit between these rows
+# and the stored dict, and _kv_rows_to_map still accepts a legacy 'k=v, k2=v2'
+# string so stored-string edge cases and non-form callers keep working.
+_STATE_LABELS_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            "state": {"label": "State", "selector": _ROW_TEXT},
+            CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field="state",
+        description_field=CONF_LABEL,
+    )
+)
+
+# Timeline series attribute map: each row maps an attribute of the tracked entity to
+# a series label (stored as {attribute: label}).
+_SERIES_MAP_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            "attribute": {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field="attribute",
+        description_field=CONF_LABEL,
+    )
+)
+
+# Timeline per-series units: each row maps a series label to its unit (stored as
+# {series_label: unit}).
+_UNITS_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            "series": {"label": "Series", "selector": _ROW_TEXT},
+            CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field="series",
+        description_field=CONF_UNIT,
+    )
+)
+
+# Unified steps editor: one row per step in step order. A form-only field
+# (CONF_STEPS_EDITOR) decomposed in _parse_entity_input into the four stored step
+# keys, so the storage shape and content_mapper are untouched. Row height is a 1-10
+# number; weight is any positive number; color is a named/hex value (blank leaves
+# that step on the accent color). The row count must be 0 or exactly total_steps.
+_ROW_STEP_NUMBER = {"number": {"min": 1, "max": 10, "mode": "box"}}
+
+_STEPS_EDITOR_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_LABEL: {"label": "Label", "selector": _ROW_TEXT},
+            "row": {"label": "Row", "selector": _ROW_STEP_NUMBER},
+            "weight": {"label": "Weight", "selector": _ROW_NUMBER_ANY},
+            "color": {"label": "Color", "selector": _ROW_NAMED_COLOR},
+        },
+        multiple=True,
+        label_field=CONF_LABEL,
+        description_field="weight",
+    )
+)
+
 
 def _object_rows_key(conf_key: str, current: dict, *, required: bool) -> vol.Marker:
     """Build the vol key for an ObjectSelector row list.
@@ -371,12 +437,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_SERIES,
         CONF_LOG_LEVEL_ATTRIBUTE,
     ),
-    "steps_options": (
-        CONF_STEP_LABELS,
-        CONF_STEP_ROWS,
-        CONF_STEP_WEIGHTS,
-        CONF_STEP_COLORS,
-    ),
+    "steps_options": (CONF_STEPS_EDITOR,),
     "timeline_options": (
         CONF_UNITS,
         CONF_PRIMARY_SERIES,
@@ -836,30 +897,9 @@ def _details_schema(
                 description={"suggested_value": d.get(CONF_CURRENT_STEP_ATTR, "")},
             )
         ] = attr_selector
-        fields[
-            vol.Optional(
-                CONF_STEP_LABELS,
-                default=d.get(CONF_STEP_LABELS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
-        fields[
-            vol.Optional(
-                CONF_STEP_ROWS,
-                default=d.get(CONF_STEP_ROWS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
-        fields[
-            vol.Optional(
-                CONF_STEP_WEIGHTS,
-                default=d.get(CONF_STEP_WEIGHTS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
-        fields[
-            vol.Optional(
-                CONF_STEP_COLORS,
-                default=d.get(CONF_STEP_COLORS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+        # One row per step (label / row height / weight / color) in step order. A
+        # legacy per-key comma string is still accepted by _parse_entity_input.
+        fields[_object_rows_key(CONF_STEPS_EDITOR, d, required=False)] = _STEPS_EDITOR_SELECTOR
     if template == "alert":
         fields[
             vol.Optional(
@@ -913,28 +953,32 @@ def _details_schema(
             )
         ] = vol.All(str, vol.Length(max=32))
     if template == "timeline":
-        fields[
-            vol.Optional(
-                CONF_SERIES,
-                default=d.get(CONF_SERIES, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # Map attributes of the tracked entity to named series (a two-column row
+        # editor: attribute -> label). A legacy 'attr=Label, ...' string is still accepted.
+        fields[_object_rows_key(CONF_SERIES, d, required=False)] = _SERIES_MAP_SELECTOR
         # Bind separate entities as named series (a row editor): each row is a
         # label (optional; defaults to the entity's friendly name), an entity, and
         # an optional attribute. A legacy comma string is still accepted.
         fields[_object_rows_key(CONF_SERIES_ENTITIES, d, required=False)] = _SERIES_ENTITIES_SELECTOR
-        fields[
-            vol.Optional(
-                CONF_UNITS,
-                default=d.get(CONF_UNITS, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        # Per-series unit overrides (a two-column row editor: series label -> unit).
+        # A legacy 'Series=unit, ...' string is still accepted.
+        fields[_object_rows_key(CONF_UNITS, d, required=False)] = _UNITS_SELECTOR
+        # Primary series: pick from the configured series labels, or type a custom
+        # value. Options are the stored labels on reconfigure and empty on first add
+        # (custom_value lets the user type one before any series is saved); the
+        # authoritative check stays unknown_primary_series in _parse_entity_input.
         fields[
             vol.Optional(
                 CONF_PRIMARY_SERIES,
                 default=d.get(CONF_PRIMARY_SERIES, ""),
             )
-        ] = vol.All(str, vol.Length(max=32))
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=_primary_series_options(d),
+                custom_value=True,
+                mode=SelectSelectorMode.DROPDOWN,
+            )
+        )
         fields[_entity_source_key(CONF_VALUE_ENTITY, d)] = entity_selector
         fields[
             vol.Optional(
@@ -1064,12 +1108,9 @@ def _details_schema(
             description={"suggested_value": d.get(CONF_SUBTITLE_ATTRIBUTE, "")},
         )
     ] = attr_selector
-    fields[
-        vol.Optional(
-            CONF_STATE_LABELS,
-            default=d.get(CONF_STATE_LABELS, ""),
-        )
-    ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+    # Custom display text per state (a two-column row editor: state -> label). A
+    # legacy 'state=Label, ...' string is still accepted by _parse_entity_input.
+    fields[_object_rows_key(CONF_STATE_LABELS, d, required=False)] = _STATE_LABELS_SELECTOR
     if template == "countdown":
         fields[
             vol.Optional(
@@ -1616,6 +1657,33 @@ def _timeline_series_labels(
     return labels
 
 
+def _primary_series_options(config: dict) -> list[str]:
+    """Series labels offered by the primary_series dropdown (custom_value still allows typing).
+
+    Sourced from the stored CONF_SERIES map values (or its row-editor rows on
+    reconfigure) and each resolved CONF_SERIES_ENTITIES label, de-duplicated in
+    order. Empty on a fresh add, which is fine: custom_value lets the user type one.
+    """
+    options: list[str] = []
+    series = config.get(CONF_SERIES)
+    if isinstance(series, dict):
+        options.extend(str(v) for v in series.values() if v)
+    elif isinstance(series, list):
+        for row in series:
+            if isinstance(row, dict) and row.get(CONF_LABEL):
+                options.append(str(row[CONF_LABEL]))
+    for entry in config.get(CONF_SERIES_ENTITIES) or []:
+        if isinstance(entry, dict) and entry.get(CONF_LABEL):
+            options.append(str(entry[CONF_LABEL]))
+    seen: set[str] = set()
+    result: list[str] = []
+    for label in options:
+        if label not in seen:
+            seen.add(label)
+            result.append(label)
+    return result
+
+
 def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> dict:
     """Normalize user input into an entity config dict.
 
@@ -1675,9 +1743,8 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
 
     min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == "gauge")
 
-    # Parse timeline fields
-    series_raw = user_input.get(CONF_SERIES, "")
-    series = _parse_state_labels(series_raw) if isinstance(series_raw, str) else series_raw or {}
+    # Parse timeline fields (series map: attribute -> label)
+    series = _kv_rows_to_map(user_input.get(CONF_SERIES, ""), "attribute", CONF_LABEL)
     series_entities = _resolve_series_entity_labels(
         _parse_series_entities(user_input.get(CONF_SERIES_ENTITIES, ""), strict=True), hass
     )
@@ -1696,26 +1763,12 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     if template == "board" and not tiles:
         raise vol.Invalid("tiles_required", path=[CONF_TILES])
 
-    # Step lists: reject malformed tokens, then hold the manager's contract that
-    # any configured list must have exactly total_steps entries (the server
+    # Steps: the unified editor submits one row per step, decomposed here into the
+    # four stored keys. The row count must be 0 or exactly total_steps (the server
     # drops a wrong-length list, so surface it here rather than silently).
-    step_rows = _parse_int_list(user_input.get(CONF_STEP_ROWS, ""), strict=True)
-    step_weights = _parse_float_list(user_input.get(CONF_STEP_WEIGHTS, ""), strict=True)
-    step_colors = _parse_color_list(user_input.get(CONF_STEP_COLORS, ""), strict=True)
+    total_steps = int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS))
+    step_fields = _steps_fields_from_input(user_input, total_steps, strict=template == "steps")
     log_columns = _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, ""), strict=True)
-    if template == "steps":
-        total_steps = int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS))
-        mismatched = [
-            field
-            for field, parsed in (
-                (CONF_STEP_ROWS, step_rows),
-                (CONF_STEP_WEIGHTS, step_weights),
-                (CONF_STEP_COLORS, step_colors),
-            )
-            if parsed and len(parsed) != total_steps
-        ]
-        if mismatched:
-            raise vol.Invalid("step_length_mismatch", path=mismatched)
 
     return {
         CONF_ENTITY_ID: entity_id,
@@ -1735,7 +1788,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_LIVE_PROGRESS: bool(user_input.get(CONF_LIVE_PROGRESS, False)),
         CONF_SUBTITLE_ATTRIBUTE: user_input.get(CONF_SUBTITLE_ATTRIBUTE, ""),
         CONF_SUBTITLE_ENTITY: user_input.get(CONF_SUBTITLE_ENTITY, ""),
-        CONF_STATE_LABELS: _parse_state_labels(user_input.get(CONF_STATE_LABELS, "")),
+        CONF_STATE_LABELS: _kv_rows_to_map(user_input.get(CONF_STATE_LABELS, ""), "state", CONF_LABEL),
         CONF_COMPLETION_MESSAGE: user_input.get(CONF_COMPLETION_MESSAGE, ""),
         CONF_TOTAL_STEPS: int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)),
         CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
@@ -1776,13 +1829,13 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_SNOOZE_SECONDS: int(user_input[CONF_SNOOZE_SECONDS])
         if user_input.get(CONF_SNOOZE_SECONDS) is not None
         else None,
-        CONF_STEP_LABELS: _parse_state_labels(user_input.get(CONF_STEP_LABELS, "")),
-        CONF_STEP_ROWS: step_rows,
-        CONF_STEP_WEIGHTS: step_weights,
-        CONF_STEP_COLORS: step_colors,
+        CONF_STEP_LABELS: step_fields[CONF_STEP_LABELS],
+        CONF_STEP_ROWS: step_fields[CONF_STEP_ROWS],
+        CONF_STEP_WEIGHTS: step_fields[CONF_STEP_WEIGHTS],
+        CONF_STEP_COLORS: step_fields[CONF_STEP_COLORS],
         CONF_FIRED_AT_ATTRIBUTE: user_input.get(CONF_FIRED_AT_ATTRIBUTE, ""),
         CONF_FIRED_AT_ENTITY: user_input.get(CONF_FIRED_AT_ENTITY, ""),
-        CONF_UNITS: _parse_state_labels(user_input.get(CONF_UNITS, "")),
+        CONF_UNITS: _kv_rows_to_map(user_input.get(CONF_UNITS, ""), "series", CONF_UNIT),
         CONF_BACKGROUND_COLOR: _rgb_to_hex(user_input.get(CONF_BACKGROUND_COLOR)),
         CONF_BACKGROUND_COLOR_ATTRIBUTE: user_input.get(CONF_BACKGROUND_COLOR_ATTRIBUTE, ""),
         CONF_TEXT_COLOR: _rgb_to_hex(user_input.get(CONF_TEXT_COLOR)),
@@ -1934,33 +1987,23 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         if user_input is not None:
             self._step1_input = user_input
             self._is_reconfigure = True
-            # Prepare defaults for step 2 from existing config
+            # Prepare defaults for step 2 from existing config. The map fields
+            # (state_labels, series, units) rehydrate their two-column row editors
+            # from the stored dict; the unified steps editor composes one row per
+            # step from the four stored step keys, which stay untouched in storage.
             current = dict(subentry.data)
             labels = current.get(CONF_STATE_LABELS)
             if isinstance(labels, dict):
-                current[CONF_STATE_LABELS] = _serialize_key_value_pairs(labels)
+                current[CONF_STATE_LABELS] = _map_to_kv_rows(labels, "state", CONF_LABEL)
             series = current.get(CONF_SERIES)
             if isinstance(series, dict):
-                current[CONF_SERIES] = _serialize_key_value_pairs(series)
-            # series_entities and thresholds stay lists: their ObjectSelector row
-            # editors rehydrate from the stored list directly.
-            step_labels = current.get(CONF_STEP_LABELS)
-            if isinstance(step_labels, dict):
-                current[CONF_STEP_LABELS] = _serialize_key_value_pairs(step_labels)
-            step_rows = current.get(CONF_STEP_ROWS)
-            if isinstance(step_rows, list):
-                current[CONF_STEP_ROWS] = _serialize_csv(step_rows)
-            step_weights = current.get(CONF_STEP_WEIGHTS)
-            if isinstance(step_weights, list):
-                current[CONF_STEP_WEIGHTS] = _serialize_float_list(step_weights)
-            step_colors = current.get(CONF_STEP_COLORS)
-            if isinstance(step_colors, list):
-                current[CONF_STEP_COLORS] = _serialize_csv(step_colors)
+                current[CONF_SERIES] = _map_to_kv_rows(series, "attribute", CONF_LABEL)
             units = current.get(CONF_UNITS)
             if isinstance(units, dict):
-                current[CONF_UNITS] = _serialize_key_value_pairs(units)
-            # tiles and log_columns stay lists: their ObjectSelector row editors
-            # rehydrate from the stored list directly.
+                current[CONF_UNITS] = _map_to_kv_rows(units, "series", CONF_UNIT)
+            current[CONF_STEPS_EDITOR] = _compose_steps_rows(current)
+            # series_entities, thresholds, tiles and log_columns stay lists: their
+            # ObjectSelector row editors rehydrate from the stored list directly.
             self._details_defaults = current
             return await self.async_step_details()
 
@@ -2511,15 +2554,6 @@ def _parse_int_list(value: str, *, strict: bool = False) -> list[int]:
     return result
 
 
-def _serialize_csv(values: list) -> str:
-    """Serialize a list to '1, 2, 3' text for UI editing.
-
-    Positional callers keep their empty entries as bare separators:
-    ['red', '', 'blue'] -> 'red, , blue'.
-    """
-    return ", ".join(str(v) for v in values) if values else ""
-
-
 def _parse_float_list(value: str, *, strict: bool = False) -> list[float]:
     """Parse '1, 2.5, 3' into [1.0, 2.5, 3.0], skipping tokens float() rejects.
 
@@ -2541,13 +2575,6 @@ def _parse_float_list(value: str, *, strict: bool = False) -> list[float]:
             raise vol.Invalid("invalid_step_weights", path=[CONF_STEP_WEIGHTS])
         result.append(parsed)
     return result
-
-
-def _serialize_float_list(values: list[float]) -> str:
-    """Serialize a list of floats to '1, 2.5, 3' text, without a trailing '.0'."""
-    if not values:
-        return ""
-    return ", ".join(str(int(v)) if float(v).is_integer() else str(v) for v in values)
 
 
 def _parse_color_list(value: str, *, strict: bool = False) -> list[str]:
@@ -2586,11 +2613,179 @@ def _parse_state_labels(value: str) -> dict[str, str]:
     return result
 
 
-def _serialize_key_value_pairs(pairs: dict[str, str]) -> str:
-    """Serialize a dict to 'key=value, key2=value2' text for UI editing."""
-    if not pairs:
-        return ""
-    return ", ".join(f"{k}={v}" for k, v in pairs.items())
+def _kv_rows_to_map(raw: object, key_field: str, value_field: str) -> dict[str, str]:
+    """Adapt a two-column row editor (or a legacy 'k=v, k2=v2' string) into a {k: v} dict.
+
+    Each row is {key_field: k, value_field: v}; rows missing either side are skipped.
+    The legacy string branch defers to _parse_state_labels so stored-string edge cases
+    and non-form callers keep working; an already-stored dict passes through.
+    """
+    if isinstance(raw, list):
+        result: dict[str, str] = {}
+        for row in raw:
+            if not isinstance(row, dict):
+                continue
+            key = str(row.get(key_field, "") or "").strip()
+            value = str(row.get(value_field, "") or "").strip()
+            if key and value:
+                result[key] = value
+        return result
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, str):
+        return _parse_state_labels(raw)
+    return {}
+
+
+def _map_to_kv_rows(mapping: object, key_field: str, value_field: str) -> list[dict]:
+    """Adapt a stored {k: v} dict into two-column editor rows for reconfigure prefill."""
+    if not isinstance(mapping, dict):
+        return []
+    return [{key_field: k, value_field: v} for k, v in mapping.items()]
+
+
+def _blank(value: object) -> bool:
+    """True for a missing/empty editor cell (None or an all-whitespace string)."""
+    return value is None or (isinstance(value, str) and not value.strip())
+
+
+def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False) -> dict:
+    """Split the unified steps-editor rows into the four stored step keys.
+
+    Each row is one step in order: {label?, row?, weight?, color?}. Returns
+    {step_labels: {str(i): label}, step_rows: [...], step_weights: [...],
+    step_colors: [...]}. In strict (form) mode the row count must be 0 or exactly
+    total_steps (step_length_mismatch otherwise). row/weight are all-or-none across
+    rows - a partial column is dropped, since the server needs exactly total_steps
+    entries; color keeps a positional blank for each uncolored row.
+    """
+    empty = {CONF_STEP_LABELS: {}, CONF_STEP_ROWS: [], CONF_STEP_WEIGHTS: [], CONF_STEP_COLORS: []}
+    if not isinstance(raw, list):
+        return empty
+    rows = [r for r in raw if isinstance(r, dict)]
+    if not rows:
+        return empty
+    if strict and len(rows) != total_steps:
+        raise vol.Invalid("step_length_mismatch", path=[CONF_STEPS_EDITOR])
+
+    labels: dict[str, str] = {}
+    row_heights: list[int] = []
+    weights: list[float] = []
+    colors: list[str] = []
+    have_rows = True
+    have_weights = True
+    have_color = False
+
+    for index, row in enumerate(rows, start=1):
+        label = str(row.get(CONF_LABEL, "") or "").strip()
+        if label:
+            labels[str(index)] = label
+
+        row_val = row.get("row")
+        if _blank(row_val):
+            have_rows = False
+        else:
+            try:
+                row_heights.append(int(float(row_val)))
+            except (TypeError, ValueError):
+                if strict:
+                    raise vol.Invalid("invalid_step_rows", path=[CONF_STEPS_EDITOR]) from None
+                have_rows = False
+
+        weight_val = row.get("weight")
+        if _blank(weight_val):
+            have_weights = False
+        else:
+            try:
+                weight = float(weight_val)
+            except (TypeError, ValueError):
+                if strict:
+                    raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR]) from None
+                have_weights = False
+            else:
+                if strict and (not math.isfinite(weight) or weight <= 0):
+                    raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR])
+                weights.append(weight)
+
+        color = str(row.get("color", "") or "").strip()
+        if color:
+            if strict and not is_valid_color(color):
+                raise vol.Invalid("invalid_step_colors", path=[CONF_STEPS_EDITOR])
+            have_color = True
+        colors.append(color)
+
+    return {
+        CONF_STEP_LABELS: labels,
+        CONF_STEP_ROWS: row_heights if have_rows else [],
+        CONF_STEP_WEIGHTS: weights if have_weights else [],
+        CONF_STEP_COLORS: colors if have_color else [],
+    }
+
+
+def _compose_steps_rows(config: dict) -> list[dict]:
+    """Compose unified steps-editor rows from the four stored step keys.
+
+    One row per step, ordered: label from step_labels[str(i)], row/weight/color
+    positional. Returns [] when none of the four keys hold data (nothing to edit).
+    The row count covers every configured position so nothing stored is hidden.
+    """
+    labels = config.get(CONF_STEP_LABELS) or {}
+    rows = config.get(CONF_STEP_ROWS) or []
+    weights = config.get(CONF_STEP_WEIGHTS) or []
+    colors = config.get(CONF_STEP_COLORS) or []
+    if not (labels or rows or weights or colors):
+        return []
+    label_max = 0
+    if isinstance(labels, dict):
+        label_max = max((int(k) for k in labels if str(k).isdigit()), default=0)
+    total = max(
+        int(config.get(CONF_TOTAL_STEPS) or DEFAULT_TOTAL_STEPS),
+        len(rows),
+        len(weights),
+        len(colors),
+        label_max,
+    )
+    out: list[dict] = []
+    for i in range(1, total + 1):
+        row: dict = {}
+        label = labels.get(str(i)) if isinstance(labels, dict) else None
+        if label:
+            row[CONF_LABEL] = label
+        if i - 1 < len(rows):
+            row["row"] = rows[i - 1]
+        if i - 1 < len(weights):
+            row["weight"] = weights[i - 1]
+        if i - 1 < len(colors) and colors[i - 1]:
+            row["color"] = colors[i - 1]
+        out.append(row)
+    return out
+
+
+def _steps_fields_from_input(user_input: dict, total_steps: int, *, strict: bool) -> dict:
+    """Resolve the four stored step keys from the form editor or legacy input.
+
+    The steps form submits one row per step under CONF_STEPS_EDITOR, decomposed here.
+    When that key is absent (non-form callers, stored-string edge cases) the four
+    legacy keys are read leniently instead, so older callers keep working.
+    """
+    if CONF_STEPS_EDITOR in user_input:
+        return _decompose_steps_rows(user_input[CONF_STEPS_EDITOR], total_steps, strict=strict)
+    labels_raw = user_input.get(CONF_STEP_LABELS, "")
+    return {
+        CONF_STEP_LABELS: labels_raw if isinstance(labels_raw, dict) else _parse_state_labels(labels_raw),
+        CONF_STEP_ROWS: _legacy_step_list(user_input.get(CONF_STEP_ROWS, ""), _parse_int_list),
+        CONF_STEP_WEIGHTS: _legacy_step_list(user_input.get(CONF_STEP_WEIGHTS, ""), _parse_float_list),
+        CONF_STEP_COLORS: _legacy_step_list(user_input.get(CONF_STEP_COLORS, ""), _parse_color_list),
+    }
+
+
+def _legacy_step_list(raw: object, parser) -> list:
+    """Parse one legacy step list leniently, passing an already-stored list through."""
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, str):
+        return parser(raw)
+    return []
 
 
 def _is_number(value: object) -> bool:
