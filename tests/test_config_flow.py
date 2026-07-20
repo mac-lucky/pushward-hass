@@ -127,6 +127,7 @@ from custom_components.pushward.const import (
     DEFAULT_VALUE_SCALE,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
+    HISTORY_PERIOD_MAX,
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
@@ -2068,6 +2069,19 @@ async def test_subentry_timeline_template(hass: HomeAssistant) -> None:
     assert subentry_data[CONF_SMOOTHING] is True
     assert subentry_data[CONF_THRESHOLDS] == [{"value": 25.0, "color": "red", "label": "Hot"}]
     assert subentry_data[CONF_HISTORY_PERIOD] == 6
+
+
+def test_timeline_history_period_allows_multi_day() -> None:
+    """The timeline history window accepts a multi-day value and enforces the cap.
+
+    Regression guard for the old 1-day (1440-minute) ceiling: the downsample seed
+    path only matters because the window can now exceed a day.
+    """
+    schema = _details_schema("binary_sensor.washer", "timeline", defaults={})
+    base = _all_field_defaults(schema)
+    schema(_nest_for_schema(schema, {**base, CONF_HISTORY_PERIOD: 10000}))  # ~7 d, must validate
+    with pytest.raises(vol.Invalid):
+        schema(_nest_for_schema(schema, {**base, CONF_HISTORY_PERIOD: HISTORY_PERIOD_MAX + 1}))
 
 
 async def test_subentry_timeline_series_entities(hass: HomeAssistant) -> None:

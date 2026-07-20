@@ -15,6 +15,7 @@ from typing import Any, Literal
 
 import aiohttp
 from homeassistant.components import persistent_notification
+from homeassistant.components.sensor import ATTR_STATE_CLASS
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, HomeAssistant, State, callback
@@ -23,6 +24,7 @@ from homeassistant.helpers.event import (
     async_track_state_change_event,
 )
 from homeassistant.helpers.storage import Store
+from homeassistant.util import dt as dt_util
 
 from .api import (
     PushWardApiClient,
@@ -57,6 +59,7 @@ from .const import (
     CONF_UPDATE_INTERVAL,
     CONF_VALUE_ENTITY,
     END_DELAY_SECONDS,
+    HISTORY_SEED_MAX,
     LOG_MAX_LINES,
 )
 from .content_mapper import (
@@ -68,7 +71,14 @@ from .content_mapper import (
     map_content,
 )
 
+# Live ring-buffer depth per tracked entity; independent of HISTORY_SEED_MAX
+# (const) - an in-RAM sample bound vs the wire seed cap, equal at 300 by chance.
 _HISTORY_BUFFER_MAX = 300
+# Statistics-seed period cutoff (minutes). 5-minute short-term stats share raw-state
+# retention (purged at purge_keep_days, which users often lower), so use them only
+# for recent windows; past this, read never-purged hourly stats so a multi-day
+# window stays fully covered regardless of retention.
+_STATS_SHORT_TERM_MAX_MINUTES = 1440  # 24 h
 _HISTORY_STORAGE_VERSION = 1
 _HISTORY_SAVE_DELAY_S = 30
 _HISTORY_SAMPLES_KEY = "samples"
@@ -130,6 +140,27 @@ def _same_log_line(head: dict | None, line: dict) -> bool:
 
 def _forbidden_notification_id(slug: str) -> str:
     return f"pushward_forbidden_{slug}"
+
+
+def _downsample_evenly(points: list[dict], max_points: int) -> list[dict]:
+    """Reduce a time-sorted point list to at most max_points.
+
+    Keeps the first and last sample and spreads the rest evenly across the span.
+    A tail slice would collapse a wide window to its most recent samples, so a
+    multi-day seed would arrive showing only the last few hours. Even sampling
+    keeps the full time range; the server does the final downsample that fits the
+    push payload.
+    """
+    count = len(points)
+    if count <= max_points:
+        return points
+    if max_points <= 2:
+        return [points[0], points[-1]][:max_points]
+    # count > max_points forces step > 1, so round(i * step) comes out unique and
+    # ascending across i (and i == max_points - 1 maps to the last index) - no
+    # dedup or re-sort needed.
+    step = (count - 1) / (max_points - 1)
+    return [points[round(i * step)] for i in range(max_points)]
 
 
 def history_storage_key(entry_id: str) -> str:
@@ -682,8 +713,8 @@ class ActivityManager:
                 history[label] = [by_ts[ts] for ts in sorted(by_ts)]
 
         for key in history:
-            if len(history[key]) > _HISTORY_BUFFER_MAX:
-                history[key] = history[key][-_HISTORY_BUFFER_MAX:]
+            if len(history[key]) > HISTORY_SEED_MAX:
+                history[key] = _downsample_evenly(history[key], HISTORY_SEED_MAX)
 
         _LOGGER.debug(
             "History seed %s: period=%dm buffer=%d series=%d points=%d",
@@ -697,27 +728,107 @@ class ActivityManager:
         return history if history else None
 
     async def _recorder_states(self, entity_ids: list[str], period_minutes: int) -> dict[str, list[dict]]:
-        """Batch-query the recorder for several entities' numeric state history.
+        """Batch-query history for several entities' numeric points.
 
-        Returns ``{entity_id: [{timestamp, value}, ...]}`` (ascending) with one
-        entry per entity that yielded parseable numeric points. Only numeric-state
-        entities seed this way; HA 2024.8+ strips attributes from the recorder, so
-        attribute-sourced series fall back to the live ring buffer.
+        Entities with a ``state_class`` read from long-term statistics (5-minute
+        buckets): pre-aggregated and row-bounded, so a fast-changing sensor over a
+        multi-day window never materializes its full raw series. Entities without
+        one read raw recorder states. Both return ``{entity_id: [{timestamp,
+        value}, ...]}`` ascending; entities that yield nothing are absent and seed
+        from the live ring buffer instead. Mirrors HA's own history UI, which
+        gates on the same ``state_class`` attribute.
         """
         if not entity_ids:
             return {}
 
+        stats_ids: list[str] = []
+        raw_ids: list[str] = []
+        for entity_id in entity_ids:
+            state = self._hass.states.get(entity_id)
+            if state and state.attributes.get(ATTR_STATE_CLASS):
+                stats_ids.append(entity_id)
+            else:
+                raw_ids.append(entity_id)
+
+        result: dict[str, list[dict]] = {}
+        if stats_ids:
+            result.update(await self._statistics_points(stats_ids, period_minutes))
+        if raw_ids:
+            result.update(await self._raw_recorder_points(raw_ids, period_minutes))
+        return result
+
+    async def _statistics_points(self, entity_ids: list[str], period_minutes: int) -> dict[str, list[dict]]:
+        """Read long-term statistics for state_class entities.
+
+        ``statistics_during_period`` returns pre-aggregated buckets keyed by
+        statistic_id (the entity_id for a sensor), each carrying a float epoch
+        ``start`` plus ``mean`` (measurement) or ``state`` (total /
+        total_increasing). Bounded by bucket count, not by write frequency.
+        """
+        try:
+            from homeassistant.components.recorder.statistics import statistics_during_period
+        except ImportError:
+            return {}
+
+        from homeassistant.helpers.recorder import get_instance
+
+        now = dt_util.utcnow()
+        start = now - timedelta(minutes=period_minutes)
+        period = "5minute" if period_minutes <= _STATS_SHORT_TERM_MAX_MINUTES else "hour"
+
+        try:
+            stats = await get_instance(self._hass).async_add_executor_job(
+                partial(
+                    statistics_during_period,
+                    self._hass,
+                    start,
+                    now,
+                    set(entity_ids),
+                    period,
+                    None,
+                    {"mean", "state"},
+                )
+            )
+        except Exception:
+            _LOGGER.debug("Failed to query statistics for %s", entity_ids, exc_info=True)
+            return {}
+
+        result: dict[str, list[dict]] = {}
+        for entity_id in entity_ids:
+            points: list[dict] = []
+            for row in stats.get(entity_id, []):
+                start_ts = row.get("start")
+                value = row.get("mean")
+                if value is None:  # total / total_increasing have no mean
+                    value = row.get("state")
+                if start_ts is None or value is None:
+                    continue
+                with contextlib.suppress(ValueError, TypeError):
+                    points.append({"timestamp": int(start_ts), "value": float(value)})
+            if points:
+                result[entity_id] = points
+        return result
+
+    async def _raw_recorder_points(self, entity_ids: list[str], period_minutes: int) -> dict[str, list[dict]]:
+        """Read raw recorder states for entities without long-term statistics.
+
+        HA 2024.8+ strips attributes from the recorder, so attribute-sourced
+        series can't seed this way and fall back to the live ring buffer.
+        """
         try:
             from homeassistant.components.recorder.history import get_significant_states
         except ImportError:
             return {}
 
         from homeassistant.helpers.recorder import get_instance
-        from homeassistant.util import dt as dt_util
 
         now = dt_util.utcnow()
         start = now - timedelta(minutes=period_minutes)
 
+        # Only {timestamp, value} is needed, and the window can span up to 10 days:
+        # significant_changes_only skips redundant same-value re-writes at the SQL
+        # layer (a numeric chart wants transitions), and no_attributes skips the
+        # attributes join we never read, keeping a long-window query cheap.
         try:
             states = await get_instance(self._hass).async_add_executor_job(
                 partial(
@@ -726,7 +837,8 @@ class ActivityManager:
                     start,
                     now,
                     list(entity_ids),
-                    significant_changes_only=False,
+                    significant_changes_only=True,
+                    no_attributes=True,
                 )
             )
         except Exception:
@@ -737,7 +849,7 @@ class ActivityManager:
         for entity_id in entity_ids:
             points: list[dict] = []
             for state_obj in states.get(entity_id, []):
-                if state_obj.state in ("unavailable", "unknown"):
+                if state_obj.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
                     continue
                 with contextlib.suppress(ValueError, TypeError):
                     points.append(

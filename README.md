@@ -165,7 +165,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Primary Series | Label of the series shown as the headline value and used for the compact high/low range; empty = the tracked entity's own series (or the first configured one) |
 | Per-Series Units | Rows mapping a series label to its unit (timeline template) |
 | Scale / Decimal Places / Smooth Lines / Thresholds | Timeline sparkline options (Thresholds is a row table: value, optional color, optional label) |
-| Back-History Period | Minutes of history to seed the sparkline on start (0-1440) |
+| Back-History Period | Minutes of history to seed the sparkline on start (0-14400, up to 10 days; numeric sensors pull from the recorder, bounded by its retention). Points are downsampled evenly to keep the full span. |
 | Board Tiles | Rows binding a separate entity to a tile (label, entity, attribute, unit, icon, color, URL), max 4 (board template) |
 | Log Columns | Rows adding extra values to each log line (label, entity, attribute, unit), max 6 (log template) |
 | Log Level Attribute | Attribute supplying each line's `info`/`warn`/`error` level (log template) |

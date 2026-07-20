@@ -175,6 +175,16 @@ DISMISSAL_TTL_MAX = 14400
 # Mirrors the server's ended_ttl / stale_ttl bounds (services.yaml declares the same).
 ACTIVITY_TTL_MIN = 1
 ACTIVITY_TTL_MAX = 2592000  # 30 d
+# Timeline back-history window (minutes) the UI offers when seeding the sparkline
+# on start. Matches the recorder's default 10-day retention (purge_keep_days),
+# which is a floor: the nightly purge anchors its cutoff to the last run, so the
+# DB always holds at least this many days and a full 10-day window seeds out of
+# the box. Real depth is shorter only if the user lowered purge_keep_days or
+# excluded the entity, in which case the seed just comes back with fewer points.
+HISTORY_PERIOD_MAX = 14400  # 10 d
+# Per-series seed points are downsampled to at most this many before sending,
+# keeping the full time span. Mirrors the server's own per-series cap of 300 points.
+HISTORY_SEED_MAX = 300
 
 # Free-text input length caps.
 MAX_TEXT_LEN = 255

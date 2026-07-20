@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import itertools
 import logging
 import time
 from datetime import timedelta
@@ -18,6 +19,7 @@ from custom_components.pushward.activity_manager import (
     ActivityManager,
     TrackedEntity,
     _companion_entity_ids,
+    _downsample_evenly,
     _forbidden_notification_id,
 )
 from custom_components.pushward.api import (
@@ -47,6 +49,8 @@ from custom_components.pushward.const import (
     CONF_UNIT,
     CONF_UPDATE_INTERVAL,
     CONF_VALUE_ENTITY,
+    HISTORY_PERIOD_MAX,
+    HISTORY_SEED_MAX,
     LOG_MAX_LINES,
 )
 
@@ -1712,12 +1716,225 @@ async def test_recorder_states_returns_points_per_entity(hass: HomeAssistant) ->
     # sensor.b yields no parseable points, so it is absent from the result map.
     assert result == {"sensor.a": [{"timestamp": t0, "value": 40.0}, {"timestamp": t0 + 180, "value": 41.5}]}
 
+    # Pin the two query flags: only value transitions, no attribute join. Reverting
+    # significant_changes_only to False (or dropping no_attributes) is a silent
+    # perf/correctness regression over the 10-day window that this catches.
+    called = instance.async_add_executor_job.await_args.args[0]
+    assert called.func.__name__ == "get_significant_states"
+    assert called.keywords["significant_changes_only"] is True
+    assert called.keywords["no_attributes"] is True
+
 
 async def test_recorder_states_empty_for_no_entities(hass: HomeAssistant) -> None:
     """No recorder-eligible entities means no recorder query at all."""
     api = _mock_api()
     manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
     assert await manager._recorder_states([], 30) == {}
+
+
+async def test_recorder_states_statistics_for_state_class_sensor(hass: HomeAssistant) -> None:
+    """A sensor with a state_class reads bounded 5-minute long-term statistics
+    (mean per bucket), not raw states - so a fast sensor over a 10-day window
+    never materializes its full raw series."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"state_class": "measurement"})
+
+    t0 = int(time.time()) - 900
+    rows = {"sensor.power": [{"start": float(t0), "mean": 40.0}, {"start": float(t0 + 300), "mean": 41.5}]}
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(return_value=rows)
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        result = await manager._recorder_states(["sensor.power"], 30)
+
+    assert result == {"sensor.power": [{"timestamp": t0, "value": 40.0}, {"timestamp": t0 + 300, "value": 41.5}]}
+    called = instance.async_add_executor_job.await_args.args[0]
+    assert called.func.__name__ == "statistics_during_period"
+    _hass, _start, _end, ids, period, _units, types = called.args
+    assert set(ids) == {"sensor.power"}
+    assert period == "5minute"  # a sub-day window uses short-term buckets
+    assert types == {"mean", "state"}
+
+
+async def test_recorder_states_statistics_total_uses_state(hass: HomeAssistant) -> None:
+    """total / total_increasing sensors have no mean, so the bucket 'state' value
+    seeds the series instead."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+    hass.states.async_set("sensor.energy", "5.0", {"state_class": "total_increasing"})
+
+    t0 = int(time.time()) - 600
+    rows = {"sensor.energy": [{"start": float(t0), "mean": None, "state": 5.0}]}
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(return_value=rows)
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        result = await manager._recorder_states(["sensor.energy"], 30)
+
+    assert result == {"sensor.energy": [{"timestamp": t0, "value": 5.0}]}
+
+
+async def test_recorder_states_statistics_hourly_for_multi_day_window(hass: HomeAssistant) -> None:
+    """A multi-day window reads never-purged hourly stats, not 5-minute buckets
+    (which share raw-state retention and could be purged at the old edge)."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"state_class": "measurement"})
+
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(return_value={})
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        await manager._recorder_states(["sensor.power"], 5000)  # > 24 h
+
+    period = instance.async_add_executor_job.await_args.args[0].args[4]
+    assert period == "hour"
+
+
+async def test_recorder_states_mixed_routes_each_and_merges(hass: HomeAssistant) -> None:
+    """One state_class entity -> statistics, one plain-state entity -> raw states,
+    both merged. Pins the gate: a sensor with a state but no state_class uses raw."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"state_class": "measurement"})
+    hass.states.async_set("sensor.plain", "7.0", {})  # has state, no state_class
+
+    t0 = int(time.time()) - 900
+    stats_rows = {"sensor.power": [{"start": float(t0), "mean": 40.0}]}
+    raw_rows = {"sensor.plain": [_recorder_state("7.0", t0 + 60)]}
+
+    def _dispatch(job):
+        return stats_rows if job.func.__name__ == "statistics_during_period" else raw_rows
+
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(side_effect=_dispatch)
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        result = await manager._recorder_states(["sensor.power", "sensor.plain"], 30)
+
+    assert result == {
+        "sensor.power": [{"timestamp": t0, "value": 40.0}],
+        "sensor.plain": [{"timestamp": t0 + 60, "value": 7.0}],
+    }
+    by_func = {c.args[0].func.__name__: c.args[0] for c in instance.async_add_executor_job.await_args_list}
+    assert set(by_func) == {"statistics_during_period", "get_significant_states"}
+    assert set(by_func["statistics_during_period"].args[3]) == {"sensor.power"}
+    assert list(by_func["get_significant_states"].args[3]) == ["sensor.plain"]
+
+
+async def test_recorder_states_statistics_empty_falls_back(hass: HomeAssistant) -> None:
+    """A state_class entity with no statistics buckets is absent from the result,
+    so its series seeds from the live ring buffer instead."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"state_class": "measurement"})
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(return_value={})
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        assert await manager._recorder_states(["sensor.power"], 30) == {}
+
+
+async def test_recorder_states_statistics_skips_bad_buckets(hass: HomeAssistant) -> None:
+    """Buckets with no value, a missing start, or a non-coercible field are dropped,
+    not emitted and not raised; a fractional start truncates to whole seconds."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"state_class": "measurement"})
+    t0 = int(time.time()) - 600
+    rows = {
+        "sensor.power": [
+            {"start": float(t0), "mean": None, "state": None},  # no value -> skip
+            {"mean": 1.0},  # missing start -> skip (no KeyError)
+            {"start": "bad", "mean": 2.0},  # non-coercible start -> suppressed
+            {"start": float(t0 + 300) + 0.9, "mean": 41.5},  # fractional -> truncates
+        ]
+    }
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(return_value=rows)
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        result = await manager._recorder_states(["sensor.power"], 30)
+
+    assert result == {"sensor.power": [{"timestamp": t0 + 300, "value": 41.5}]}
+
+
+def test_downsample_evenly_preserves_span_and_endpoints() -> None:
+    """A dense multi-day series is thinned to the cap without losing its range.
+
+    The old tail slice kept only the newest points, so a multi-day seed collapsed
+    to the last few hours. Even sampling keeps the first and last timestamp and
+    spreads the rest across the full width, leaving the server to refine the wire
+    payload.
+    """
+    points = [{"timestamp": i, "value": float(i)} for i in range(2000)]
+
+    kept = _downsample_evenly(points, 300)
+
+    stamps = [p["timestamp"] for p in kept]
+    assert len(kept) == 300  # exactly the cap: step > 1 means no round() collisions
+    assert kept[0] is points[0]
+    assert kept[-1] is points[-1]
+    assert stamps == sorted(stamps)
+    assert stamps[-1] - stamps[0] == 1999  # the full span, not just the tail
+    # Endpoints + span alone don't catch interior clustering: bounding every gap
+    # means a sampler that keeps the ends but bunches the middle fails here.
+    gaps = [b - a for a, b in itertools.pairwise(stamps)]
+    assert max(gaps) <= 10
+
+
+def test_downsample_evenly_passthrough_under_cap() -> None:
+    """Series below the cap are returned untouched (same object, no copy)."""
+    points = [{"timestamp": i, "value": float(i)} for i in range(50)]
+    assert _downsample_evenly(points, 300) is points
+
+
+def test_downsample_evenly_at_exact_cap_is_passthrough() -> None:
+    """count == max_points is the boundary: returned as-is, not thinned."""
+    points = [{"timestamp": i, "value": float(i)} for i in range(300)]
+    assert _downsample_evenly(points, 300) is points
+
+
+def test_downsample_evenly_just_over_cap() -> None:
+    """One past the cap still yields exactly max_points with endpoints intact."""
+    points = [{"timestamp": i, "value": float(i)} for i in range(301)]
+    kept = _downsample_evenly(points, 300)
+    assert len(kept) == 300
+    assert kept[0] is points[0]
+    assert kept[-1] is points[-1]
+
+
+def test_downsample_evenly_tiny_caps_keep_endpoints() -> None:
+    """The max_points <= 2 branch keeps the endpoints (or just the first)."""
+    points = [{"timestamp": i, "value": float(i)} for i in range(10)]
+    assert [p["timestamp"] for p in _downsample_evenly(points, 2)] == [0, 9]
+    assert [p["timestamp"] for p in _downsample_evenly(points, 1)] == [0]
+
+
+async def test_seed_timeline_recorder_over_cap_preserves_span(hass: HomeAssistant) -> None:
+    """A recorder series wider than the cap is downsampled to <= HISTORY_SEED_MAX
+    while keeping the old..new span, not just the newest points.
+
+    Guards the actual behavior change at the call site: reverting to the old tail
+    slice would still pass every _downsample_evenly unit test but fail here.
+    """
+    api = _mock_api()
+    config = _timeline_numeric_config(**{CONF_HISTORY_PERIOD: HISTORY_PERIOD_MAX})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    hass.states.async_set("sensor.power", "42.0", {"friendly_name": "Grid Power"})
+    await manager.async_start()
+
+    total = HISTORY_PERIOD_MAX * 60
+    base = int(time.time()) - total
+    dense = [{"timestamp": base + i * (total // 1999), "value": float(i)} for i in range(2000)]
+    manager._recorder_states = AsyncMock(return_value={"sensor.power": dense})
+    history = await manager._seed_timeline_history("sensor.power", config, {})
+
+    series = history["Grid Power"]
+    stamps = [p["timestamp"] for p in series]
+    assert len(series) <= HISTORY_SEED_MAX
+    assert stamps == sorted(stamps)
+    assert stamps[0] == base  # oldest recorder point kept; a tail slice would start near now
+    # Even coverage end-to-end, not endpoints-plus-a-cluster: bound every interior gap.
+    gaps = [b - a for a, b in itertools.pairwise(stamps)]
+    assert max(gaps) <= total // 100
+
+    await manager.async_stop()
 
 
 async def test_timeline_series_entity_subscribed_and_refreshes(hass: HomeAssistant) -> None:

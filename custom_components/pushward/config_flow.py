@@ -145,6 +145,7 @@ from .const import (
     DISMISSAL_TTL_MAX,
     DISMISSAL_TTL_MIN,
     DOMAIN,
+    HISTORY_PERIOD_MAX,
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
@@ -992,7 +993,7 @@ def _details_schema(
         ] = NumberSelector(
             NumberSelectorConfig(
                 min=0,
-                max=1440,
+                max=HISTORY_PERIOD_MAX,
                 mode=NumberSelectorMode.BOX,
                 unit_of_measurement="minutes",
             )
