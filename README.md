@@ -339,6 +339,8 @@ implied by the action name; you no longer pass a `template` field.
 | `remaining_time` | No | Seconds remaining |
 | `sound` | No | default, chime, alert, success, warning, bell, ding, buzz, notification |
 | `priority` | No | Per-update priority override (0-10) |
+| `ended_ttl` | No | Seconds after end before auto-delete (1-2592000) |
+| `stale_ttl` | No | Seconds of inactivity before auto-end (1-2592000) |
 | `dismissal_ttl` | No | Seconds after end before auto-dismiss from the Lock Screen (0-14400) |
 | `url` / `secondary_url` | No | Tap-target URLs (http(s) **or** a custom scheme like `homeassistant://`) |
 | `tap_action` | No | Whole-activity tap target / silent webhook as an object; see [Action objects](#action-objects) |
@@ -367,7 +369,7 @@ implied by the action name; you no longer pass a `template` field.
 > **`board` / `log` use a lean schema.** They render no progress bar and no whole-activity
 > button slots, so `update_activity_board` and `update_activity_log` accept only the labels
 > (`state_text`, `subtitle`, `icon`), appearance (`completion_message`, the colors, `sound`,
-> `priority`, `dismissal_ttl`), the whole-activity `tap_action`, and their template field
+> `priority`, the TTLs `ended_ttl`/`stale_ttl`/`dismissal_ttl`), the whole-activity `tap_action`, and their template field
 > (`tiles` / `lines`), **not** `progress`, `remaining_time`, `url`, `secondary_url`,
 > `url_action`, or `secondary_url_action` (board tap targets are per-tile via each tile's
 > `url_action`). `tiles` is a list of 1-4 objects
@@ -422,7 +424,8 @@ Send a push notification.
 | `title` | Yes | Notification title |
 | `body` | Yes | Notification body text |
 | `subtitle` | No | Subtitle below the title |
-| `level` | No | iOS interruption level: passive, active, time-sensitive |
+| `level` | No | iOS interruption level: passive, active, time-sensitive, critical |
+| `volume` | No | Alert volume 0.0-1.0, applied only when `level` is critical |
 | `thread_id` | No | Groups notifications in Notification Center |
 | `collapse_id` | No | APNs dedup key, replaces same-key notification (max 64 chars) |
 | `source` / `source_display_name` | No | Grouping ID + label in the PushWard inbox |
@@ -549,7 +552,7 @@ Requires Python **3.13.2+**. CI also runs **HACS validation** and **hassfest** o
 ## CI/CD & Releases
 
 - **CI** (`.github/workflows/ci.yml`): HACS validation, hassfest, ruff lint+format, and pytest with coverage on every push/PR.
-- **Releases**: the integration version lives in `custom_components/pushward/manifest.json` (currently **0.37.0**). Bump it and push a matching **`v*`** git tag; CI builds the changelog and creates the GitHub release automatically. **Do not create releases manually.** HACS only sees GitHub releases, and `hide_default_branch: true` is set in `hacs.json`.
+- **Releases**: the integration version lives in `custom_components/pushward/manifest.json` (currently **0.38.0**). Bump it and push a matching **`v*`** git tag; CI builds the changelog and creates the GitHub release automatically. **Do not create releases manually.** HACS only sees GitHub releases, and `hide_default_branch: true` is set in `hacs.json`.
 
 ## Server compatibility
 
