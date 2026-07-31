@@ -1,4 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>mac-lucky/actions-shared-workflows"]
+  "extends": ["github>mac-lucky/actions-shared-workflows"],
+  "packageRules": [
+    {
+      "description": "hassfest is pinned to master per HA convention; keep it unpinned to a digest",
+      "matchPackageNames": ["home-assistant/actions"],
+      "pinDigests": false
+    }
+  ]
 }
