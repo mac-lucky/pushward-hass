@@ -12,8 +12,8 @@ jobs:
     name: HACS Validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: hacs/action@main
+      - uses: actions/checkout@v7
+      - uses: hacs/action@22.5.0
         with:
           category: integration
 
@@ -21,7 +21,8 @@ jobs:
     name: Hassfest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
+      # HA ecosystem convention: this one rides @master, not a pinned tag.
       - uses: home-assistant/actions/hassfest@master
 
   lint:
@@ -30,18 +31,18 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref || github.ref_name }}
-      - uses: astral-sh/ruff-action@v4.0.0
+      - uses: astral-sh/ruff-action@v4.1.0
         with:
           args: check custom_components/ tests/
           version: latest
-      - uses: astral-sh/ruff-action@v4.0.0
+      - uses: astral-sh/ruff-action@v4.1.0
         with:
           args: format custom_components/ tests/
           version: latest
-      - uses: stefanzweifel/git-auto-commit-action@v7
+      - uses: stefanzweifel/git-auto-commit-action@v7.2.0
         with:
           commit_message: "style: auto-format with ruff"
 
@@ -49,11 +50,11 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v9.0.0
         with:
           version: "latest"
       - run: uv sync --frozen
@@ -67,12 +68,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Build changelog
         id: changelog
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v6.2.3
         with:
           mode: "COMMIT"
           configurationJson: |
