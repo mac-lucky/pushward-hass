@@ -1649,7 +1649,7 @@
             "slug": "Slug del widget"
           },
           "data_description": {
-            "widget_template": "Layout del widget. Usa `value` per un singolo numero, `progress` per una barra 0–1, `gauge` per un valore in un intervallo, `status` per un badge di gravità o `stat_list` per un massimo di 6 righe.",
+            "widget_template": "Layout del widget: `value` per un singolo numero, `progress` per una barra, `gauge` per un valore in un intervallo, `status` per un badge di gravità, `stat_list` per un massimo di 6 righe, `trend` per uno sparkline, `countdown` per una data, `battery` per anelli dei dispositivi, `schedule` per una timeline oraria, `flow` per ciò che entra e ciò che esce.",
             "slug": "Identificatore univoco per questo widget. Lascia vuoto per generarlo automaticamente dall'ID dell'entità."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Valore minimo",
             "max_value": "Valore massimo",
             "severity": "Gravità",
-            "stat_rows": "Righe statistiche"
+            "stat_rows": "Righe statistiche",
+            "history_period": "Cronologia trend (minuti)",
+            "start_date_attribute": "Attributo data di inizio",
+            "end_date_attribute": "Attributo data di fine",
+            "expired_text": "Testo dopo la scadenza",
+            "battery_devices": "Dispositivi",
+            "schedule_attributes": "Attributi dei periodi",
+            "schedule_start_key": "Chiave di inizio periodo",
+            "schedule_value_key": "Chiave del valore del periodo",
+            "schedule_low_max": "Massimo della fascia bassa",
+            "schedule_high_min": "Minimo della fascia alta",
+            "flow_nodes": "Nodi del flusso"
           },
           "data_description": {
             "widget_name": "Nome visualizzato mostrato nel selettore di widget di iOS. Per impostazione predefinita usa il nome descrittivo dell'entità.",
@@ -1685,7 +1696,18 @@
             "min_value": "Valore minimo dell'intervallo dell'indicatore.",
             "max_value": "Valore massimo dell'intervallo dell'indicatore.",
             "severity": "Gravità dello stato (info, warning, critical, success).",
-            "stat_rows": "Fino a 6 righe, ognuna collega un'entità distinta: etichetta, entità e, in opzione, attributo e unità. È ancora accettata una stringa separata da virgole. Regola la densità delle righe per ogni widget nell'app PushWard."
+            "stat_rows": "Fino a 6 righe, ognuna collega un'entità distinta: etichetta, entità e, in opzione, attributo e unità. È ancora accettata una stringa separata da virgole. Regola la densità delle righe per ogni widget nell'app PushWard.",
+            "history_period": "Quanta cronologia caricare dal recorder all'avvio dello sparkline. 0 salta il precaricamento e il grafico si riempie man mano che l'entità cambia.",
+            "start_date_attribute": "Attributo dell'entità con l'inizio della finestra. Facoltativo; su progress fa avanzare la barra sul dispositivo tra un push e l'altro.",
+            "end_date_attribute": "Attributo dell'entità con la fine della finestra. Lascia vuoto per usare lo stato dell'entità, finishes_at di un timer o end_time di un calendario.",
+            "expired_text": "Mostrato una volta passata la data di fine, invece di contare in avanti. Massimo 64 caratteri.",
+            "battery_devices": "Fino a 8 anelli, ciascuno legato a un'entità separata: nome, entità e, facoltativamente, attributo del livello, entità di ricarica, icona e colore.",
+            "schedule_attributes": "Attributi separati da virgola contenenti elenchi di periodi, letti in quest'ordine. Nordpool pubblica raw_today, raw_tomorrow.",
+            "schedule_start_key": "Chiave con il timestamp di inizio di ogni periodo in quegli elenchi.",
+            "schedule_value_key": "Chiave con il valore di ogni periodo in quegli elenchi.",
+            "schedule_low_max": "I valori pari o inferiori finiscono nella fascia bassa. Lascia vuote entrambe le soglie perché l'app ricavi le fasce dall'intervallo inviato.",
+            "schedule_high_min": "I valori pari o superiori finiscono nella fascia alta. Deve stare sopra il massimo della fascia bassa.",
+            "flow_nodes": "Una riga per nodo. Lo slot decide dove viene disegnato: fino a 3 ingressi, più un'uscita, un accumulo e uno scambio. La portata arriva dall'entità, con il segno che scegli tu."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Attributo etichetta",
                 "subtitle_attribute": "Attributo sottotitolo",
                 "icon": "Icona",
-                "icon_attribute": "Attributo icona"
+                "icon_attribute": "Attributo icona",
+                "subtitle_timer_entity": "Entità del timer",
+                "subtitle_timer_attribute": "Attributo del timer",
+                "subtitle_timer_style": "Stile del timer"
               },
               "data_description": {
                 "label": "Etichetta statica mostrata sul widget. Lascia vuoto per derivarla dall'entità.",
                 "label_attribute": "Attributo dell'entità usato come etichetta. Ha la precedenza sull'etichetta statica.",
                 "subtitle_attribute": "Attributo dell'entità mostrato come sottotitolo del widget.",
                 "icon": "Icona statica. Sono supportati i nomi SF Symbols e MDI.",
-                "icon_attribute": "Attributo dell'entità per un'icona dinamica. Ha la precedenza sull'icona statica."
+                "icon_attribute": "Attributo dell'entità per un'icona dinamica. Ha la precedenza sull'icona statica.",
+                "subtitle_timer_entity": "Mostra il sottotitolo come conto alla rovescia o cronometro ancorato alla data di questa entità. Lascia vuoto per leggere l'entità del widget stesso.",
+                "subtitle_timer_attribute": "Attributo con la data. Lascia vuoto per usare lo stato dell'entità.",
+                "subtitle_timer_style": "Il timer scorre come 01:23:45; relativo mostra unità grossolane come 2 min."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Modalità di attivazione",
-                "widget_poll_interval": "Intervallo di polling (secondi)"
+                "widget_poll_interval": "Intervallo di polling (secondi)",
+                "widget_stale_after": "Obsoleto dopo (secondi)"
               },
               "data_description": {
                 "widget_trigger_mode": "Come vengono attivati gli aggiornamenti. `event` reagisce alle modifiche di stato; `poll` rivaluta a intervalli fissi.",
-                "widget_poll_interval": "Intervallo tra i polling (10–3600 secondi). Usato solo quando la modalità di attivazione è `poll`."
+                "widget_poll_interval": "Intervallo tra i polling (10–3600 secondi). Usato solo quando la modalità di attivazione è `poll`.",
+                "widget_stale_after": "Secondi dall'ultimo aggiornamento prima che l'app mostri il widget come obsoleto. Lascia vuoto per non marcarlo mai. Un heartbeat rinvia a metà di questo intervallo per tenerlo aggiornato e ogni heartbeat consuma un aggiornamento widget dalla tua quota, quindi 3600 o più è l'intervallo sensato."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "È necessaria almeno una riga statistica per il modello stat_list.",
         "invalid_stat_row": "Ogni riga deve essere label=entity_id (es. Users=sensor.user_count).",
         "too_many_stat_rows": "Un elenco di statistiche supporta al massimo 6 righe.",
-        "invalid_number": "Inserisci un numero valido."
+        "invalid_number": "Inserisci un numero valido.",
+        "invalid_battery_device": "Ogni riga dispositivo richiede un'entità. Nome massimo 32 caratteri, icona massimo 128, colore come colore con nome o esadecimale.",
+        "too_many_battery_devices": "Un widget batteria supporta al massimo 8 dispositivi.",
+        "battery_devices_required": "Il modello battery richiede almeno un dispositivo.",
+        "invalid_flow_node": "Ogni riga del flusso richiede uno slot e un'entità. Nome massimo 32 caratteri, icona massimo 128, colore come colore con nome o esadecimale.",
+        "too_many_flow_inputs": "Un widget flusso supporta al massimo 3 ingressi.",
+        "duplicate_flow_slot": "Una sola uscita, un solo accumulo e un solo scambio. Usa input per il resto.",
+        "flow_nodes_required": "Il modello flow richiede almeno un nodo.",
+        "invalid_schedule_thresholds": "Il massimo della fascia bassa deve stare sotto il minimo della fascia alta."
       },
       "abort": {
         "already_configured": "Esiste già un widget con questo slug.",
@@ -1827,7 +1865,12 @@
         "progress": "Avanzamento",
         "gauge": "Indicatore",
         "status": "Stato",
-        "stat_list": "Elenco statistiche"
+        "stat_list": "Elenco statistiche",
+        "trend": "Trend",
+        "countdown": "Conto alla rovescia",
+        "battery": "Batteria",
+        "schedule": "Programma",
+        "flow": "Flusso"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Ciano",
         "mint": "Menta",
         "brown": "Marrone"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Timer",
+        "relative": "Relativo"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Ingresso",
+        "output": "Uscita",
+        "storage": "Accumulo",
+        "exchange": "Scambio"
       }
     }
   }

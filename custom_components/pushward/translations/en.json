@@ -1649,7 +1649,7 @@
             "slug": "Widget Slug"
           },
           "data_description": {
-            "widget_template": "Widget layout. Use `value` for a single number, `progress` for a 0–1 bar, `gauge` for a value-in-range, `status` for a severity badge, or `stat_list` for up to 6 rows.",
+            "widget_template": "Widget layout: `value` for a single number, `progress` for a bar, `gauge` for a value in range, `status` for a severity badge, `stat_list` for up to 6 rows, `trend` for a sparkline, `countdown` for a date, `battery` for device rings, `schedule` for an hourly timeline, `flow` for what comes in and goes out.",
             "slug": "Unique identifier for this widget. Leave empty to auto-generate from entity ID."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Minimum Value",
             "max_value": "Maximum Value",
             "severity": "Severity",
-            "stat_rows": "Stat Rows"
+            "stat_rows": "Stat Rows",
+            "history_period": "Trend History (minutes)",
+            "start_date_attribute": "Start Date Attribute",
+            "end_date_attribute": "End Date Attribute",
+            "expired_text": "Expired Text",
+            "battery_devices": "Devices",
+            "schedule_attributes": "Period Attributes",
+            "schedule_start_key": "Period Start Key",
+            "schedule_value_key": "Period Value Key",
+            "schedule_low_max": "Low Band Maximum",
+            "schedule_high_min": "High Band Minimum",
+            "flow_nodes": "Flow Nodes"
           },
           "data_description": {
             "widget_name": "Display name shown in the iOS widget picker. Defaults to the entity's friendly name.",
@@ -1685,7 +1696,18 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "severity": "Status severity (info, warning, critical, success).",
-            "stat_rows": "Up to 6 rows, each binding a separate entity: label, entity, plus optional attribute and unit. A comma-separated string is still accepted. Configure row density per widget in the PushWard app."
+            "stat_rows": "Up to 6 rows, each binding a separate entity: label, entity, plus optional attribute and unit. A comma-separated string is still accepted. Configure row density per widget in the PushWard app.",
+            "history_period": "How far back to seed the sparkline from the recorder when the widget starts. 0 skips the seed and the chart fills in as the entity changes.",
+            "start_date_attribute": "Entity attribute holding the start of the window. Optional; on progress it makes the bar advance on device between pushes.",
+            "end_date_attribute": "Entity attribute holding the end of the window. Leave empty to use the entity's own state, a timer's finishes_at, or a calendar's end_time.",
+            "expired_text": "Shown once the end date passes, instead of counting up. Max 64 characters.",
+            "battery_devices": "Up to 8 rings, each binding a separate entity: name, entity, plus optional level attribute, charging entity, icon and color.",
+            "schedule_attributes": "Comma-separated attributes holding period lists, read in order. Nordpool publishes raw_today, raw_tomorrow.",
+            "schedule_start_key": "Key holding each period's start timestamp inside those lists.",
+            "schedule_value_key": "Key holding each period's value inside those lists.",
+            "schedule_low_max": "Values at or below this land in the low band. Leave both thresholds empty to let the app derive the bands from the posted range.",
+            "schedule_high_min": "Values at or above this land in the high band. Must be above the low band maximum.",
+            "flow_nodes": "One row per node. Slot decides where it renders: up to 3 inputs, plus one output, storage and exchange. The rate comes from the entity, signed by your own convention."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Label Attribute",
                 "subtitle_attribute": "Subtitle Attribute",
                 "icon": "Icon",
-                "icon_attribute": "Icon Attribute"
+                "icon_attribute": "Icon Attribute",
+                "subtitle_timer_entity": "Timer Entity",
+                "subtitle_timer_attribute": "Timer Attribute",
+                "subtitle_timer_style": "Timer Style"
               },
               "data_description": {
                 "label": "Static label shown on the widget. Leave empty to derive from the entity.",
                 "label_attribute": "Entity attribute used as the label. Overrides the static label.",
                 "subtitle_attribute": "Entity attribute shown as the widget subtitle.",
                 "icon": "Static icon. SF Symbols and MDI names supported.",
-                "icon_attribute": "Entity attribute for a dynamic icon. Overrides the static icon."
+                "icon_attribute": "Entity attribute for a dynamic icon. Overrides the static icon.",
+                "subtitle_timer_entity": "Render the subtitle as a live countdown or count-up anchored on this entity's date. Leave empty to read the widget's own entity.",
+                "subtitle_timer_attribute": "Attribute holding the date. Leave empty to use the entity's state.",
+                "subtitle_timer_style": "Timer ticks like 01:23:45; relative shows coarse units like 2 min."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Trigger Mode",
-                "widget_poll_interval": "Poll Interval (seconds)"
+                "widget_poll_interval": "Poll Interval (seconds)",
+                "widget_stale_after": "Stale After (seconds)"
               },
               "data_description": {
                 "widget_trigger_mode": "How updates are triggered. `event` reacts to state changes; `poll` re-evaluates on a fixed interval.",
-                "widget_poll_interval": "Interval between polls (10–3600 seconds). Only used when trigger mode is `poll`."
+                "widget_poll_interval": "Interval between polls (10–3600 seconds). Only used when trigger mode is `poll`.",
+                "widget_stale_after": "Seconds after the last update before the app renders the widget as stale. Leave empty to never mark it stale. A heartbeat re-sends at half this interval to keep it fresh, and each heartbeat spends one widget update from your quota, so 3600 or more is the sensible range."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "At least one stat row is required for the stat_list template.",
         "invalid_stat_row": "Each row must be label=entity_id (e.g. Users=sensor.user_count).",
         "too_many_stat_rows": "A stat list supports at most 6 rows.",
-        "invalid_number": "Enter a valid number."
+        "invalid_number": "Enter a valid number.",
+        "invalid_battery_device": "Each device row needs an entity. Name max 32 characters, icon max 128, color must be a named color or hex.",
+        "too_many_battery_devices": "A battery widget supports at most 8 devices.",
+        "battery_devices_required": "At least one device is required for the battery template.",
+        "invalid_flow_node": "Each flow row needs a slot and an entity. Name max 32 characters, icon max 128, color must be a named color or hex.",
+        "too_many_flow_inputs": "A flow widget supports at most 3 inputs.",
+        "duplicate_flow_slot": "Only one output, storage and exchange node each. Use input for the rest.",
+        "flow_nodes_required": "At least one node is required for the flow template.",
+        "invalid_schedule_thresholds": "Low band maximum must be below high band minimum."
       },
       "abort": {
         "already_configured": "A widget with this slug already exists.",
@@ -1827,7 +1865,12 @@
         "progress": "Progress",
         "gauge": "Gauge",
         "status": "Status",
-        "stat_list": "Stat list"
+        "stat_list": "Stat list",
+        "trend": "Trend",
+        "countdown": "Countdown",
+        "battery": "Battery",
+        "schedule": "Schedule",
+        "flow": "Flow"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Cyan",
         "mint": "Mint",
         "brown": "Brown"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Timer",
+        "relative": "Relative"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Input",
+        "output": "Output",
+        "storage": "Storage",
+        "exchange": "Exchange"
       }
     }
   }

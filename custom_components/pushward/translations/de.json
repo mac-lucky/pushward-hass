@@ -1649,7 +1649,7 @@
             "slug": "Widget-Slug"
           },
           "data_description": {
-            "widget_template": "Widget-Layout. `value` für eine einzelne Zahl, `progress` für eine 0–1-Leiste, `gauge` für einen Wert in einem Bereich, `status` für ein Schweregrad-Abzeichen oder `stat_list` für bis zu 6 Zeilen verwenden.",
+            "widget_template": "Widget-Layout: `value` für eine einzelne Zahl, `progress` für einen Balken, `gauge` für einen Wert in einem Bereich, `status` für ein Schweregrad-Abzeichen, `stat_list` für bis zu 6 Zeilen, `trend` für eine Sparkline, `countdown` für ein Datum, `battery` für Geräte-Ringe, `schedule` für eine stündliche Zeitleiste, `flow` für Zu- und Abfluss.",
             "slug": "Eindeutige Kennung für dieses Widget. Leer lassen, um aus der Entitäts-ID automatisch zu generieren."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Minimalwert",
             "max_value": "Maximalwert",
             "severity": "Schweregrad",
-            "stat_rows": "Statistikzeilen"
+            "stat_rows": "Statistikzeilen",
+            "history_period": "Trendverlauf (Minuten)",
+            "start_date_attribute": "Attribut für Startdatum",
+            "end_date_attribute": "Attribut für Enddatum",
+            "expired_text": "Text nach Ablauf",
+            "battery_devices": "Geräte",
+            "schedule_attributes": "Zeitraum-Attribute",
+            "schedule_start_key": "Schlüssel für Zeitraumstart",
+            "schedule_value_key": "Schlüssel für Zeitraumwert",
+            "schedule_low_max": "Maximum für niedriges Band",
+            "schedule_high_min": "Minimum für hohes Band",
+            "flow_nodes": "Fluss-Knoten"
           },
           "data_description": {
             "widget_name": "Anzeigename in der iOS-Widget-Auswahl. Standardmäßig der Anzeigename der Entität.",
@@ -1685,7 +1696,18 @@
             "min_value": "Minimalwert für den Gauge-Bereich.",
             "max_value": "Maximalwert für den Gauge-Bereich.",
             "severity": "Schweregrad des Status (info, warning, critical, success).",
-            "stat_rows": "Bis zu 6 Zeilen, jede bindet eine eigene Entität: Bezeichnung, Entität sowie optional Attribut und Einheit. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Die Zeilendichte lässt sich je Widget in der PushWard-App einstellen."
+            "stat_rows": "Bis zu 6 Zeilen, jede bindet eine eigene Entität: Bezeichnung, Entität sowie optional Attribut und Einheit. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Die Zeilendichte lässt sich je Widget in der PushWard-App einstellen.",
+            "history_period": "Wie weit zurück die Sparkline beim Start aus dem Recorder befüllt wird. 0 überspringt das Vorbefüllen, das Diagramm füllt sich dann mit jeder Änderung.",
+            "start_date_attribute": "Entitätsattribut mit dem Anfang des Zeitfensters. Optional; bei progress läuft der Balken damit auf dem Gerät weiter, ohne neue Pushes.",
+            "end_date_attribute": "Entitätsattribut mit dem Ende des Zeitfensters. Leer lassen, um den Zustand der Entität, finishes_at eines Timers oder end_time eines Kalenders zu verwenden.",
+            "expired_text": "Wird nach Ablauf des Enddatums angezeigt, statt hochzuzählen. Maximal 64 Zeichen.",
+            "battery_devices": "Bis zu 8 Ringe, jeder an eine eigene Entität gebunden: Name, Entität sowie optional Ladestand-Attribut, Lade-Entität, Symbol und Farbe.",
+            "schedule_attributes": "Kommagetrennte Attribute mit Zeitraumlisten, in dieser Reihenfolge gelesen. Nordpool liefert raw_today, raw_tomorrow.",
+            "schedule_start_key": "Schlüssel mit dem Startzeitpunkt jedes Zeitraums in diesen Listen.",
+            "schedule_value_key": "Schlüssel mit dem Wert jedes Zeitraums in diesen Listen.",
+            "schedule_low_max": "Werte bis einschließlich hier landen im niedrigen Band. Beide Schwellen leer lassen, damit die App die Bänder aus dem gesendeten Bereich ableitet.",
+            "schedule_high_min": "Werte ab hier landen im hohen Band. Muss über dem Maximum des niedrigen Bands liegen.",
+            "flow_nodes": "Eine Zeile pro Knoten. Der Slot bestimmt die Darstellung: bis zu 3 Eingänge plus je ein Ausgang, Speicher und Austausch. Die Rate kommt aus der Entität, das Vorzeichen legst du selbst fest."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Beschriftungs-Attribut",
                 "subtitle_attribute": "Untertitel-Attribut",
                 "icon": "Symbol",
-                "icon_attribute": "Symbol-Attribut"
+                "icon_attribute": "Symbol-Attribut",
+                "subtitle_timer_entity": "Timer-Entität",
+                "subtitle_timer_attribute": "Timer-Attribut",
+                "subtitle_timer_style": "Timer-Stil"
               },
               "data_description": {
                 "label": "Statische Beschriftung auf dem Widget. Leer lassen, um aus der Entität abzuleiten.",
                 "label_attribute": "Entitätsattribut, das als Beschriftung verwendet wird. Überschreibt die statische Beschriftung.",
                 "subtitle_attribute": "Entitätsattribut, das als Untertitel des Widgets angezeigt wird.",
                 "icon": "Statisches Symbol. SF Symbols und MDI-Namen werden unterstützt.",
-                "icon_attribute": "Entitätsattribut für ein dynamisches Symbol. Überschreibt das statische Symbol."
+                "icon_attribute": "Entitätsattribut für ein dynamisches Symbol. Überschreibt das statische Symbol.",
+                "subtitle_timer_entity": "Zeigt den Untertitel als laufenden Countdown oder Zeitzähler ab dem Datum dieser Entität. Leer lassen, um die Entität des Widgets zu verwenden.",
+                "subtitle_timer_attribute": "Attribut mit dem Datum. Leer lassen, um den Zustand der Entität zu verwenden.",
+                "subtitle_timer_style": "Timer tickt wie 01:23:45; relativ zeigt grobe Einheiten wie 2 Min."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Auslösemodus",
-                "widget_poll_interval": "Abfrageintervall (Sekunden)"
+                "widget_poll_interval": "Abfrageintervall (Sekunden)",
+                "widget_stale_after": "Veraltet nach (Sekunden)"
               },
               "data_description": {
                 "widget_trigger_mode": "Wie Updates ausgelöst werden. `event` reagiert auf Zustandsänderungen; `poll` wertet in festem Intervall neu aus.",
-                "widget_poll_interval": "Intervall zwischen Abfragen (10–3600 Sekunden). Wird nur verwendet, wenn der Auslösemodus `poll` ist."
+                "widget_poll_interval": "Intervall zwischen Abfragen (10–3600 Sekunden). Wird nur verwendet, wenn der Auslösemodus `poll` ist.",
+                "widget_stale_after": "Sekunden nach der letzten Aktualisierung, bis die App das Widget als veraltet darstellt. Leer lassen, damit es nie als veraltet gilt. Ein Heartbeat sendet auf der Hälfte dieses Intervalls erneut und verbraucht dabei jeweils eine Widget-Aktualisierung aus deinem Kontingent, daher sind 3600 oder mehr sinnvoll."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "Für die Vorlage 'stat_list' ist mindestens eine Statistikzeile erforderlich.",
         "invalid_stat_row": "Jede Zeile muss label=entity_id sein (z. B. Users=sensor.user_count).",
         "too_many_stat_rows": "Eine Statistikliste unterstützt höchstens 6 Zeilen.",
-        "invalid_number": "Geben Sie eine gültige Zahl ein."
+        "invalid_number": "Geben Sie eine gültige Zahl ein.",
+        "invalid_battery_device": "Jede Geräte-Zeile braucht eine Entität. Name maximal 32 Zeichen, Symbol maximal 128, Farbe als benannte Farbe oder Hex.",
+        "too_many_battery_devices": "Ein Batterie-Widget unterstützt höchstens 8 Geräte.",
+        "battery_devices_required": "Für die Vorlage battery ist mindestens ein Gerät erforderlich.",
+        "invalid_flow_node": "Jede Fluss-Zeile braucht einen Slot und eine Entität. Name maximal 32 Zeichen, Symbol maximal 128, Farbe als benannte Farbe oder Hex.",
+        "too_many_flow_inputs": "Ein Fluss-Widget unterstützt höchstens 3 Eingänge.",
+        "duplicate_flow_slot": "Jeweils nur ein Ausgang, Speicher und Austausch. Für alles Weitere input verwenden.",
+        "flow_nodes_required": "Für die Vorlage flow ist mindestens ein Knoten erforderlich.",
+        "invalid_schedule_thresholds": "Das Maximum des niedrigen Bands muss unter dem Minimum des hohen Bands liegen."
       },
       "abort": {
         "already_configured": "Ein Widget mit diesem Slug existiert bereits.",
@@ -1827,7 +1865,12 @@
         "progress": "Fortschritt",
         "gauge": "Messanzeige",
         "status": "Status",
-        "stat_list": "Statistikliste"
+        "stat_list": "Statistikliste",
+        "trend": "Trend",
+        "countdown": "Countdown",
+        "battery": "Batterie",
+        "schedule": "Zeitplan",
+        "flow": "Fluss"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Cyan",
         "mint": "Mint",
         "brown": "Braun"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Timer",
+        "relative": "Relativ"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Eingang",
+        "output": "Ausgang",
+        "storage": "Speicher",
+        "exchange": "Austausch"
       }
     }
   }

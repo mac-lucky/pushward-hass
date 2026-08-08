@@ -1649,7 +1649,7 @@
             "slug": "Widget Slug'ı"
           },
           "data_description": {
-            "widget_template": "Widget düzeni. Tek bir sayı için `value`, 0–1 çubuğu için `progress`, aralıktaki bir değer için `gauge`, önem rozeti için `status` veya en fazla 6 satır için `stat_list` kullanın.",
+            "widget_template": "Widget düzeni: tek bir sayı için `value`, çubuk için `progress`, aralıktaki bir değer için `gauge`, önem rozeti için `status`, en fazla 6 satır için `stat_list`, mini grafik için `trend`, tarih için `countdown`, cihaz halkaları için `battery`, saatlik zaman çizelgesi için `schedule`, giren ve çıkan için `flow`.",
             "slug": "Bu widget için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Minimum Değer",
             "max_value": "Maksimum Değer",
             "severity": "Önem Derecesi",
-            "stat_rows": "İstatistik Satırları"
+            "stat_rows": "İstatistik Satırları",
+            "history_period": "Trend geçmişi (dakika)",
+            "start_date_attribute": "Başlangıç tarihi özniteliği",
+            "end_date_attribute": "Bitiş tarihi özniteliği",
+            "expired_text": "Süre dolunca gösterilecek metin",
+            "battery_devices": "Cihazlar",
+            "schedule_attributes": "Dönem öznitelikleri",
+            "schedule_start_key": "Dönem başlangıç anahtarı",
+            "schedule_value_key": "Dönem değer anahtarı",
+            "schedule_low_max": "Düşük bandın üst sınırı",
+            "schedule_high_min": "Yüksek bandın alt sınırı",
+            "flow_nodes": "Akış düğümleri"
           },
           "data_description": {
             "widget_name": "iOS widget seçicide gösterilen görünen ad. Varsayılan olarak varlığın kolay adıdır.",
@@ -1685,7 +1696,18 @@
             "min_value": "Gösterge aralığı için minimum değer.",
             "max_value": "Gösterge aralığı için maksimum değer.",
             "severity": "Durum önem derecesi (info, warning, critical, success).",
-            "stat_rows": "En fazla 6 satır; her biri ayrı bir varlığa bağlanır: etiket, varlık ve isteğe bağlı olarak öznitelik ve birim. Virgülle ayrılmış metin de kabul edilir. Satır yoğunluğunu her widget için PushWard uygulamasından ayarlayın."
+            "stat_rows": "En fazla 6 satır; her biri ayrı bir varlığa bağlanır: etiket, varlık ve isteğe bağlı olarak öznitelik ve birim. Virgülle ayrılmış metin de kabul edilir. Satır yoğunluğunu her widget için PushWard uygulamasından ayarlayın.",
+            "history_period": "Widget başlarken mini grafiğin kayıt cihazından ne kadar geriye doldurulacağı. 0 doldurmayı atlar ve grafik varlık değiştikçe dolar.",
+            "start_date_attribute": "Pencerenin başlangıcını taşıyan varlık özniteliği. İsteğe bağlı; progress şablonunda çubuğun gönderiler arasında cihazda ilerlemesini sağlar.",
+            "end_date_attribute": "Pencerenin bitişini taşıyan varlık özniteliği. Varlığın kendi durumunu, bir zamanlayıcının finishes_at değerini veya bir takvimin end_time değerini kullanmak için boş bırakın.",
+            "expired_text": "Bitiş tarihi geçtiğinde yukarı saymak yerine gösterilir. En fazla 64 karakter.",
+            "battery_devices": "En fazla 8 halka; her biri ayrı bir varlığa bağlanır: ad, varlık ve isteğe bağlı seviye özniteliği, şarj varlığı, simge ve renk.",
+            "schedule_attributes": "Dönem listeleri taşıyan, virgülle ayrılmış öznitelikler; bu sırayla okunur. Nordpool raw_today, raw_tomorrow yayınlar.",
+            "schedule_start_key": "Bu listelerde her dönemin başlangıç zaman damgasını taşıyan anahtar.",
+            "schedule_value_key": "Bu listelerde her dönemin değerini taşıyan anahtar.",
+            "schedule_low_max": "Bu değere eşit veya altındaki değerler düşük banda düşer. Uygulamanın bantları gönderilen aralıktan türetmesi için her iki eşiği de boş bırakın.",
+            "schedule_high_min": "Bu değere eşit veya üstündeki değerler yüksek banda düşer. Düşük bandın üst sınırından büyük olmalıdır.",
+            "flow_nodes": "Her düğüm için bir satır. Yuva nerede çizileceğini belirler: en fazla 3 giriş, ayrıca birer çıkış, depolama ve takas. Hız varlıktan gelir, işaret kuralını siz belirlersiniz."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Etiket Özniteliği",
                 "subtitle_attribute": "Alt Başlık Özniteliği",
                 "icon": "Simge",
-                "icon_attribute": "Simge Özniteliği"
+                "icon_attribute": "Simge Özniteliği",
+                "subtitle_timer_entity": "Zamanlayıcı varlığı",
+                "subtitle_timer_attribute": "Zamanlayıcı özniteliği",
+                "subtitle_timer_style": "Zamanlayıcı stili"
               },
               "data_description": {
                 "label": "Widget'ta gösterilen statik etiket. Varlıktan türetmek için boş bırakın.",
                 "label_attribute": "Etiket olarak kullanılan varlık özniteliği. Statik etiketi geçersiz kılar.",
                 "subtitle_attribute": "Widget alt başlığı olarak gösterilen varlık özniteliği.",
                 "icon": "Statik simge. SF Symbols ve MDI adları desteklenir.",
-                "icon_attribute": "Dinamik bir simge için varlık özniteliği. Statik simgeyi geçersiz kılar."
+                "icon_attribute": "Dinamik bir simge için varlık özniteliği. Statik simgeyi geçersiz kılar.",
+                "subtitle_timer_entity": "Alt başlığı bu varlığın tarihine dayanan canlı bir geri veya ileri sayım olarak gösterir. Widget'ın kendi varlığını okumak için boş bırakın.",
+                "subtitle_timer_attribute": "Tarihi taşıyan öznitelik. Varlığın durumunu kullanmak için boş bırakın.",
+                "subtitle_timer_style": "Zamanlayıcı 01:23:45 gibi ilerler; göreli stil 2 dk gibi kaba birimler gösterir."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Tetikleme Modu",
-                "widget_poll_interval": "Yoklama Aralığı (saniye)"
+                "widget_poll_interval": "Yoklama Aralığı (saniye)",
+                "widget_stale_after": "Şu süreden sonra eskir (saniye)"
               },
               "data_description": {
                 "widget_trigger_mode": "Güncellemelerin nasıl tetiklendiği. `event` durum değişikliklerine tepki verir; `poll` sabit bir aralıkta yeniden değerlendirir.",
-                "widget_poll_interval": "Yoklamalar arasındaki aralık (10–3600 saniye). Yalnızca tetikleme modu `poll` olduğunda kullanılır."
+                "widget_poll_interval": "Yoklamalar arasındaki aralık (10–3600 saniye). Yalnızca tetikleme modu `poll` olduğunda kullanılır.",
+                "widget_stale_after": "Uygulamanın widget'ı eskimiş göstermesine kadar son güncellemeden sonra geçen saniye. Hiç eskimiş işaretlenmemesi için boş bırakın. Bir kalp atışı bu aralığın yarısında yeniden gönderim yapar ve her atış kotanızdan bir widget güncellemesi harcar, bu yüzden makul aralık 3600 ve üzeridir."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "stat_list şablonu için en az bir istatistik satırı gereklidir.",
         "invalid_stat_row": "Her satır label=entity_id biçiminde olmalıdır (örn. Users=sensor.user_count).",
         "too_many_stat_rows": "Bir istatistik listesi en fazla 6 satır destekler.",
-        "invalid_number": "Geçerli bir sayı girin."
+        "invalid_number": "Geçerli bir sayı girin.",
+        "invalid_battery_device": "Her cihaz satırı bir varlık gerektirir. Ad en fazla 32 karakter, simge en fazla 128, renk adlandırılmış renk veya hex olmalı.",
+        "too_many_battery_devices": "Bir pil widget'ı en fazla 8 cihaz destekler.",
+        "battery_devices_required": "battery şablonu için en az bir cihaz gerekir.",
+        "invalid_flow_node": "Her akış satırı bir yuva ve bir varlık gerektirir. Ad en fazla 32 karakter, simge en fazla 128, renk adlandırılmış renk veya hex olmalı.",
+        "too_many_flow_inputs": "Bir akış widget'ı en fazla 3 giriş destekler.",
+        "duplicate_flow_slot": "Çıkış, depolama ve takastan yalnızca birer tane. Geri kalanlar için input kullanın.",
+        "flow_nodes_required": "flow şablonu için en az bir düğüm gerekir.",
+        "invalid_schedule_thresholds": "Düşük bandın üst sınırı, yüksek bandın alt sınırından küçük olmalıdır."
       },
       "abort": {
         "already_configured": "Bu slug'a sahip bir widget zaten var.",
@@ -1827,7 +1865,12 @@
         "progress": "İlerleme",
         "gauge": "Gösterge",
         "status": "Durum",
-        "stat_list": "İstatistik listesi"
+        "stat_list": "İstatistik listesi",
+        "trend": "Trend",
+        "countdown": "Geri sayım",
+        "battery": "Pil",
+        "schedule": "Program",
+        "flow": "Akış"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Camgöbeği",
         "mint": "Nane",
         "brown": "Kahverengi"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Zamanlayıcı",
+        "relative": "Göreli"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Giriş",
+        "output": "Çıkış",
+        "storage": "Depolama",
+        "exchange": "Takas"
       }
     }
   }

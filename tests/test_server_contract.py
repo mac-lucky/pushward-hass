@@ -9,6 +9,7 @@ documented rule rejects a concrete violating payload.
 from __future__ import annotations
 
 import time
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -21,6 +22,12 @@ from .server_contract import (
     assert_valid_sound,
     assert_valid_widget_content,
 )
+
+
+def _iso(**delta) -> str:
+    """An RFC 3339 timestamp offset from now, for the widget date-bounded fields."""
+    return (datetime.now(UTC) + timedelta(**delta)).isoformat()
+
 
 # --- minimal valid payload factories ---------------------------------------
 
@@ -310,14 +317,54 @@ def test_valid_live_progress_payloads_pass() -> None:
         ({"severity": "warning", "label": "Armed"}, "status"),
         ({"stat_rows": [{"label": "Temp", "value": "21.4", "unit": "°C"}]}, "stat_list"),
         ({"value": 1.0, "severity": None, "trend": None}, "value"),  # null == absent (no annotation)
+        ({"value": 12.0, "points": [10.0, 11.0, 12.0]}, "trend"),
+        ({"value": 12.0, "points": [10.0, 12.0], "min_value": 0.0, "max_value": 20.0}, "trend"),
+        ({"end_date": _iso(hours=2), "expired_text": "Out now"}, "countdown"),
+        ({"start_date": _iso(hours=-1), "end_date": _iso(hours=2)}, "progress"),
+        ({"devices": [{"name": "Phone", "level": 64.0, "charging": True}]}, "battery"),
+        (
+            {
+                "periods": [
+                    {"start": _iso(hours=1), "value": 0.4, "level": "low"},
+                    {"start": _iso(hours=2), "value": 0.9, "level": "high"},
+                ]
+            },
+            "schedule",
+        ),
+        ({"flow": {"inputs": [{"rate": 3200.0}], "storage": {"rate": -450.0, "level": 72.0}}}, "flow"),
+        ({"value": 1.0, "subtitle_timer": {"date": _iso(minutes=30), "style": "relative"}}, "value"),
+        (
+            {"stat_rows": [{"label": "Next", "value": "18:00", "timer": {"date": _iso(hours=3)}}]},
+            "stat_list",
+        ),
     ],
-    ids=["value", "value_empty", "progress", "gauge", "status", "stat_list", "null_severity_trend"],
+    ids=[
+        "value",
+        "value_empty",
+        "progress",
+        "gauge",
+        "status",
+        "stat_list",
+        "null_severity_trend",
+        "trend",
+        "trend_bounded",
+        "countdown",
+        "progress_date_window",
+        "battery",
+        "schedule",
+        "flow",
+        "subtitle_timer",
+        "stat_row_timer",
+    ],
 )
 def test_valid_widget_payloads_pass(content, template) -> None:
     assert_valid_widget_content(content, template)
 
 
 # --- widgets: violations are rejected --------------------------------------
+
+# One literal timestamp reused, so the two periods really do collide.
+_SAME_START = _iso(hours=1)
 
 _WIDGET_INVALID = [
     pytest.param({}, "progress", id="progress_missing_value"),
@@ -345,6 +392,67 @@ _WIDGET_INVALID = [
     pytest.param({"stat_rows": [{"label": "L", "value": "1", "unit": "x" * 17}]}, "stat_list", id="stat_row_unit_long"),
     pytest.param({}, "bogus", id="widget_bad_template"),
     pytest.param(["x"], "value", id="widget_content_not_dict"),
+    # --- 1.6 templates ---
+    pytest.param({"points": [1.0, 2.0]}, "trend", id="trend_missing_value"),
+    pytest.param({"value": 1.0}, "trend", id="trend_missing_points"),
+    pytest.param({"value": 1.0, "points": [1.0]}, "trend", id="trend_one_point"),
+    pytest.param({"value": 1.0, "points": [float(i) for i in range(49)]}, "trend", id="trend_too_many_points"),
+    pytest.param({"value": 1.0, "points": [1.0, float("nan")]}, "trend", id="trend_point_not_finite"),
+    pytest.param(
+        {"value": 1.0, "points": [1.0, 2.0], "min_value": 9.0, "max_value": 1.0}, "trend", id="trend_min_ge_max"
+    ),
+    pytest.param({}, "countdown", id="countdown_missing_end_date"),
+    pytest.param({"end_date": "not-a-date"}, "countdown", id="countdown_unparseable_date"),
+    pytest.param({"end_date": _iso(days=800)}, "countdown", id="countdown_beyond_horizon"),
+    pytest.param({"end_date": "1999-06-01T00:00:00+00:00"}, "countdown", id="countdown_below_floor"),
+    pytest.param({"end_date": _iso(hours=1), "start_date": _iso(hours=5)}, "countdown", id="countdown_start_after_end"),
+    pytest.param({"end_date": _iso(hours=2), "expired_text": "x" * 65}, "countdown", id="countdown_expired_too_long"),
+    pytest.param({"devices": []}, "battery", id="battery_no_devices"),
+    pytest.param({"devices": [{"level": 50.0}]}, "battery", id="battery_missing_name"),
+    pytest.param({"devices": [{"name": "P", "level": None}]}, "battery", id="battery_missing_level"),
+    pytest.param({"devices": [{"name": "P", "level": 140.0}]}, "battery", id="battery_level_out_of_range"),
+    pytest.param({"devices": [{"name": "x" * 33, "level": 1.0}]}, "battery", id="battery_name_too_long"),
+    pytest.param({"devices": [{"name": "P", "level": 1.0, "icon": "x" * 129}]}, "battery", id="battery_icon_long"),
+    pytest.param({"devices": [{"name": "P", "level": 1.0, "color": "chartreuse"}]}, "battery", id="battery_bad_color"),
+    pytest.param({"devices": [{"name": f"d{i}", "level": 1.0} for i in range(9)]}, "battery", id="battery_too_many"),
+    pytest.param({"periods": []}, "schedule", id="schedule_no_periods"),
+    pytest.param({"periods": [{"start": _iso(hours=1)}]}, "schedule", id="schedule_missing_value"),
+    pytest.param(
+        {"periods": [{"start": _iso(hours=2), "value": 1.0}, {"start": _iso(hours=1), "value": 2.0}]},
+        "schedule",
+        id="schedule_not_increasing",
+    ),
+    pytest.param(
+        {"periods": [{"start": _SAME_START, "value": 1.0}, {"start": _SAME_START, "value": 2.0}]},
+        "schedule",
+        id="schedule_duplicate_start",
+    ),
+    pytest.param(
+        {"periods": [{"start": _iso(hours=1), "value": 1.0, "level": "urgent"}]}, "schedule", id="schedule_bad_level"
+    ),
+    pytest.param(
+        {"periods": [{"start": _iso(hours=i), "value": 1.0} for i in range(1, 51)]},
+        "schedule",
+        id="schedule_too_many",
+    ),
+    pytest.param({"flow": {}}, "flow", id="flow_no_slots"),
+    pytest.param({"flow": {"output": {"total": 1.0}}}, "flow", id="flow_missing_rate"),
+    pytest.param({"flow": {"output": {"rate": 1.0, "total": -1.0}}}, "flow", id="flow_negative_total"),
+    pytest.param({"flow": {"storage": {"rate": 1.0, "level": 140.0}}}, "flow", id="flow_level_out_of_range"),
+    pytest.param({"flow": {"inputs": [{"rate": float(i)} for i in range(4)]}}, "flow", id="flow_too_many_inputs"),
+    pytest.param({"flow": {"output": {"rate": 1.0, "name": "x" * 33}}}, "flow", id="flow_name_too_long"),
+    pytest.param({"value": 1.0, "subtitle_timer": {"date": "nope"}}, "value", id="timer_bad_date"),
+    pytest.param(
+        {"value": 1.0, "subtitle_timer": {"date": _iso(hours=1), "style": "ticking"}}, "value", id="timer_bad_style"
+    ),
+    pytest.param(
+        {"stat_rows": [{"label": "L", "value": "1", "timer": {"date": _iso(days=900)}}]},
+        "stat_list",
+        id="stat_row_timer_beyond_horizon",
+    ),
+    # Collection rules run for EVERY template, not just the one that renders them:
+    # a PATCH replaces arrays wholesale, so a half-built element still gets stored.
+    pytest.param({"value": 1.0, "devices": [{"level": 1.0}]}, "value", id="collections_checked_off_template"),
 ]
 
 

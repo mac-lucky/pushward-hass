@@ -1649,7 +1649,7 @@
             "slug": "ウィジェットスラッグ"
           },
           "data_description": {
-            "widget_template": "ウィジェットのレイアウト。単一の数値には `value`、0〜1 のバーには `progress`、範囲内の値には `gauge`、重大度バッジには `status`、最大 6 行には `stat_list` を使用します。",
+            "widget_template": "ウィジェットのレイアウト: 数値ひとつなら `value`、バーなら `progress`、範囲内の値なら `gauge`、重要度バッジなら `status`、最大 6 行なら `stat_list`、スパークラインなら `trend`、日時なら `countdown`、デバイスのリングなら `battery`、1 時間ごとのタイムラインなら `schedule`、出入りを見るなら `flow`。",
             "slug": "このウィジェットの一意の識別子。空白のままにするとエンティティ ID から自動生成されます。"
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "最小値",
             "max_value": "最大値",
             "severity": "重大度",
-            "stat_rows": "統計行"
+            "stat_rows": "統計行",
+            "history_period": "トレンド履歴（分）",
+            "start_date_attribute": "開始日時の属性",
+            "end_date_attribute": "終了日時の属性",
+            "expired_text": "期限切れ後のテキスト",
+            "battery_devices": "デバイス",
+            "schedule_attributes": "期間の属性",
+            "schedule_start_key": "期間の開始キー",
+            "schedule_value_key": "期間の値キー",
+            "schedule_low_max": "低帯域の上限",
+            "schedule_high_min": "高帯域の下限",
+            "flow_nodes": "フローのノード"
           },
           "data_description": {
             "widget_name": "iOS のウィジェット選択画面に表示される表示名。デフォルトはエンティティのフレンドリー名です。",
@@ -1685,7 +1696,18 @@
             "min_value": "gauge 範囲の最小値。",
             "max_value": "gauge 範囲の最大値。",
             "severity": "ステータスの重大度（info、warning、critical、success）。",
-            "stat_rows": "最大6行。各行は個別のエンティティに紐付きます: ラベル、エンティティ、任意で属性と単位。カンマ区切りの文字列も引き続き使用できます。行の密度は PushWard アプリでウィジェットごとに設定できます。"
+            "stat_rows": "最大6行。各行は個別のエンティティに紐付きます: ラベル、エンティティ、任意で属性と単位。カンマ区切りの文字列も引き続き使用できます。行の密度は PushWard アプリでウィジェットごとに設定できます。",
+            "history_period": "ウィジェット開始時にレコーダーからスパークラインへ読み込む過去の長さ。0 なら読み込みを行わず、エンティティの変化に応じてグラフが埋まります。",
+            "start_date_attribute": "期間の開始を保持するエンティティ属性。任意です。progress ではこれによりバーがプッシュ間もデバイス上で進みます。",
+            "end_date_attribute": "期間の終了を保持するエンティティ属性。空欄にすると、エンティティ自身の状態、タイマーの finishes_at、カレンダーの end_time を使います。",
+            "expired_text": "終了日時を過ぎたら、カウントアップの代わりに表示されます。最大 64 文字。",
+            "battery_devices": "最大 8 個のリング。それぞれ別のエンティティに紐付きます: 名前、エンティティ、任意で残量属性、充電エンティティ、アイコン、色。",
+            "schedule_attributes": "期間リストを保持する属性をカンマ区切りで、この順に読み込みます。Nordpool は raw_today、raw_tomorrow を公開します。",
+            "schedule_start_key": "それらのリスト内で各期間の開始タイムスタンプを保持するキー。",
+            "schedule_value_key": "それらのリスト内で各期間の値を保持するキー。",
+            "schedule_low_max": "この値以下は低帯域になります。両方のしきい値を空欄にすると、送信した範囲からアプリが帯域を導き出します。",
+            "schedule_high_min": "この値以上は高帯域になります。低帯域の上限より大きくしてください。",
+            "flow_nodes": "ノードごとに 1 行。スロットが描画位置を決めます: 入力は最大 3 つ、加えて出力・蓄積・やり取りが各 1 つ。レートはエンティティから読み、符号の意味は自分で決めます。"
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "ラベル属性",
                 "subtitle_attribute": "サブタイトル属性",
                 "icon": "アイコン",
-                "icon_attribute": "アイコン属性"
+                "icon_attribute": "アイコン属性",
+                "subtitle_timer_entity": "タイマーのエンティティ",
+                "subtitle_timer_attribute": "タイマーの属性",
+                "subtitle_timer_style": "タイマーのスタイル"
               },
               "data_description": {
                 "label": "ウィジェットに表示される静的ラベル。空白のままにするとエンティティから取得します。",
                 "label_attribute": "ラベルとして使用するエンティティ属性。静的ラベルより優先されます。",
                 "subtitle_attribute": "ウィジェットのサブタイトルとして表示するエンティティ属性。",
                 "icon": "静的アイコン。SF Symbols と MDI 名に対応しています。",
-                "icon_attribute": "動的アイコン用のエンティティ属性。静的アイコンより優先されます。"
+                "icon_attribute": "動的アイコン用のエンティティ属性。静的アイコンより優先されます。",
+                "subtitle_timer_entity": "このエンティティの日時を起点に、サブタイトルをリアルタイムのカウントダウン／カウントアップとして表示します。空欄ならウィジェット自身のエンティティを読みます。",
+                "subtitle_timer_attribute": "日時を保持する属性。空欄ならエンティティの状態を使います。",
+                "subtitle_timer_style": "timer は 01:23:45 のように刻み、relative は「2 分」のような粗い単位で表示します。"
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "トリガーモード",
-                "widget_poll_interval": "ポーリング間隔（秒）"
+                "widget_poll_interval": "ポーリング間隔（秒）",
+                "widget_stale_after": "この秒数で古くなる"
               },
               "data_description": {
                 "widget_trigger_mode": "更新がトリガーされる方法。`event` は状態変化に反応し、`poll` は一定間隔で再評価します。",
-                "widget_poll_interval": "ポーリングの間隔（10〜3600 秒）。トリガーモードが `poll` の場合にのみ使用されます。"
+                "widget_poll_interval": "ポーリングの間隔（10〜3600 秒）。トリガーモードが `poll` の場合にのみ使用されます。",
+                "widget_stale_after": "最後の更新から何秒でアプリがウィジェットを古い表示にするか。空欄なら古い扱いにしません。ハートビートがこの間隔の半分ごとに再送して鮮度を保ちますが、1 回ごとにウィジェット更新のクォータを 1 消費するため、3600 以上が現実的な範囲です。"
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "stat_list テンプレートには少なくとも 1 つの統計行が必要です。",
         "invalid_stat_row": "各行は label=entity_id の形式で指定してください（例: Users=sensor.user_count）。",
         "too_many_stat_rows": "統計リストは最大6行まで対応しています。",
-        "invalid_number": "有効な数値を入力してください。"
+        "invalid_number": "有効な数値を入力してください。",
+        "invalid_battery_device": "デバイスの各行にはエンティティが必要です。名前は最大 32 文字、アイコンは最大 128 文字、色は名前付きの色か 16 進数で指定してください。",
+        "too_many_battery_devices": "バッテリーウィジェットのデバイスは最大 8 台です。",
+        "battery_devices_required": "battery テンプレートには最低 1 台のデバイスが必要です。",
+        "invalid_flow_node": "フローの各行にはスロットとエンティティが必要です。名前は最大 32 文字、アイコンは最大 128 文字、色は名前付きの色か 16 進数で指定してください。",
+        "too_many_flow_inputs": "フローウィジェットの入力は最大 3 つです。",
+        "duplicate_flow_slot": "出力・蓄積・やり取りは各 1 つだけです。残りは input を使ってください。",
+        "flow_nodes_required": "flow テンプレートには最低 1 つのノードが必要です。",
+        "invalid_schedule_thresholds": "低帯域の上限は高帯域の下限より小さくしてください。"
       },
       "abort": {
         "already_configured": "このスラッグのウィジェットはすでに存在します。",
@@ -1827,7 +1865,12 @@
         "progress": "進捗",
         "gauge": "ゲージ",
         "status": "ステータス",
-        "stat_list": "統計リスト"
+        "stat_list": "統計リスト",
+        "trend": "トレンド",
+        "countdown": "カウントダウン",
+        "battery": "バッテリー",
+        "schedule": "スケジュール",
+        "flow": "フロー"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "シアン",
         "mint": "ミント",
         "brown": "茶"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "タイマー",
+        "relative": "相対表示"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "入力",
+        "output": "出力",
+        "storage": "蓄積",
+        "exchange": "やり取り"
       }
     }
   }

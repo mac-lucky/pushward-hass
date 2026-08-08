@@ -53,16 +53,20 @@ from custom_components.pushward.const import (
     CONF_ALARM,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
+    CONF_BATTERY_DEVICES,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
     CONF_DISMISSAL_TTL,
+    CONF_END_DATE_ATTRIBUTE,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
+    CONF_EXPIRED_TEXT,
     CONF_FIRED_AT_ATTRIBUTE,
     CONF_FIRED_AT_ENTITY,
+    CONF_FLOW_NODES,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -80,6 +84,11 @@ from custom_components.pushward.const import (
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SCALE,
+    CONF_SCHEDULE_ATTRIBUTES,
+    CONF_SCHEDULE_HIGH_MIN,
+    CONF_SCHEDULE_LOW_MAX,
+    CONF_SCHEDULE_START_KEY,
+    CONF_SCHEDULE_VALUE_KEY,
     CONF_SECONDARY_URL,
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
@@ -101,6 +110,7 @@ from custom_components.pushward.const import (
     CONF_STEPS_EDITOR,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
+    CONF_SUBTITLE_TIMER_STYLE,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
@@ -121,9 +131,13 @@ from custom_components.pushward.const import (
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    DEFAULT_SCHEDULE_START_KEY,
+    DEFAULT_SCHEDULE_VALUE_KEY,
     DEFAULT_SERVER_URL,
+    DEFAULT_SUBTITLE_TIMER_STYLE,
     DEFAULT_VALUE_SCALE,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
@@ -141,13 +155,21 @@ from custom_components.pushward.const import (
     TIMELINE_SERIES_LABEL_MAX,
     VALUE_SCALE_PERCENT,
     WIDGET_MAX_STAT_ROWS,
+    WIDGET_STALE_AFTER_MAX,
+    WIDGET_STALE_AFTER_MIN,
     WIDGET_STAT_LABEL_MAX,
     WIDGET_STAT_UNIT_MAX,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_COUNTDOWN,
+    WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
+    WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_STATUS,
+    WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
+    WIDGET_TEMPLATES,
     WIDGET_TRIGGER_EVENT,
     WIDGET_TRIGGER_POLL,
     validate_url,
@@ -4193,3 +4215,222 @@ async def test_reconfigure_round_trip_preserves_widget_stat_rows(hass: HomeAssis
     )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
+
+
+# ----- 1.6 widget templates: parse + schema round trips -----
+
+
+def test_parse_widget_input_trend_bounds_stay_unset() -> None:
+    """A blank trend bound must persist as None, not as the gauge's 0/100 default."""
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_TREND})
+    result = _parse_widget_input(_widget_details(**{CONF_HISTORY_PERIOD: 1440}), step1)
+    assert result[CONF_MIN_VALUE] is None
+    assert result[CONF_MAX_VALUE] is None
+    assert result[CONF_HISTORY_PERIOD] == 1440
+
+
+def test_parse_widget_input_trend_bounds_ordered() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_TREND})
+    result = _parse_widget_input(_widget_details(**{CONF_MIN_VALUE: 0, CONF_MAX_VALUE: 50}), step1)
+    assert (result[CONF_MIN_VALUE], result[CONF_MAX_VALUE]) == (0.0, 50.0)
+
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_MIN_VALUE: 50, CONF_MAX_VALUE: 10}), step1)
+    assert exc.value.path == [CONF_MIN_VALUE]
+
+
+def test_parse_widget_input_countdown_keeps_expired_text() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_COUNTDOWN})
+    details = _widget_details(**{CONF_END_DATE_ATTRIBUTE: "finishes_at", CONF_EXPIRED_TEXT: "Out now"})
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_END_DATE_ATTRIBUTE] == "finishes_at"
+    assert result[CONF_EXPIRED_TEXT] == "Out now"
+
+
+def test_parse_widget_input_battery_rows_round_trip() -> None:
+    rows = [{"name": "Phone", "entity_id": "sensor.phone", "charging_entity": "binary_sensor.chg"}]
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY})
+    result = _parse_widget_input(_widget_details(**{CONF_BATTERY_DEVICES: rows}), step1)
+    assert result[CONF_BATTERY_DEVICES] == rows
+    # Reconfigure feeds the stored list straight back in.
+    assert (
+        _parse_widget_input(_widget_details(**{CONF_BATTERY_DEVICES: result[CONF_BATTERY_DEVICES]}), step1)[
+            CONF_BATTERY_DEVICES
+        ]
+        == rows
+    )
+
+
+def test_parse_widget_input_battery_requires_rows() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_BATTERY_DEVICES: []}), step1)
+    assert str(exc.value.msg) == "battery_devices_required"
+
+
+@pytest.mark.parametrize(
+    "row",
+    [
+        pytest.param({"name": "No entity"}, id="missing_entity"),
+        pytest.param({"name": "x" * 33, "entity_id": "sensor.a"}, id="name_too_long"),
+        pytest.param({"entity_id": "sensor.a", "icon": "x" * 129}, id="icon_too_long"),
+        pytest.param({"entity_id": "sensor.a", "color": "chartreuse"}, id="bad_color"),
+    ],
+)
+def test_parse_widget_input_invalid_battery_device(row) -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_BATTERY_DEVICES: [row]}), step1)
+    assert str(exc.value.msg) == "invalid_battery_device"
+
+
+def test_parse_widget_input_too_many_battery_devices() -> None:
+    rows = [{"entity_id": f"sensor.b{i}"} for i in range(9)]
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_BATTERY_DEVICES: rows}), step1)
+    assert str(exc.value.msg) == "too_many_battery_devices"
+
+
+def test_parse_widget_input_flow_nodes_round_trip() -> None:
+    rows = [
+        {"slot": "input", "entity_id": "sensor.solar", "name": "Solar"},
+        {"slot": "output", "entity_id": "sensor.house"},
+    ]
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW})
+    result = _parse_widget_input(_widget_details(**{CONF_FLOW_NODES: rows}), step1)
+    assert result[CONF_FLOW_NODES] == rows
+
+
+def test_parse_widget_input_flow_requires_nodes() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_FLOW_NODES: []}), step1)
+    assert str(exc.value.msg) == "flow_nodes_required"
+
+
+@pytest.mark.parametrize(
+    "row,code",
+    [
+        pytest.param({"entity_id": "sensor.a"}, "invalid_flow_node", id="missing_slot"),
+        pytest.param({"slot": "sideways", "entity_id": "sensor.a"}, "invalid_flow_node", id="unknown_slot"),
+        pytest.param({"slot": "input"}, "invalid_flow_node", id="missing_entity"),
+    ],
+)
+def test_parse_widget_input_invalid_flow_node(row, code) -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_FLOW_NODES: [row]}), step1)
+    assert str(exc.value.msg) == code
+
+
+def test_parse_widget_input_too_many_flow_inputs() -> None:
+    rows = [{"slot": "input", "entity_id": f"sensor.i{i}"} for i in range(4)]
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_FLOW_NODES: rows}), step1)
+    assert str(exc.value.msg) == "too_many_flow_inputs"
+
+
+def test_parse_widget_input_duplicate_flow_slot() -> None:
+    rows = [
+        {"slot": "storage", "entity_id": "sensor.a"},
+        {"slot": "storage", "entity_id": "sensor.b"},
+    ]
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW})
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_FLOW_NODES: rows}), step1)
+    assert str(exc.value.msg) == "duplicate_flow_slot"
+
+
+def test_parse_widget_input_schedule_attributes_split_from_csv() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE})
+    details = _widget_details(**{CONF_SCHEDULE_ATTRIBUTES: "raw_today, raw_tomorrow"})
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_SCHEDULE_ATTRIBUTES] == ["raw_today", "raw_tomorrow"]
+    assert result[CONF_SCHEDULE_START_KEY] == DEFAULT_SCHEDULE_START_KEY
+    assert result[CONF_SCHEDULE_VALUE_KEY] == DEFAULT_SCHEDULE_VALUE_KEY
+
+
+def test_parse_widget_input_schedule_thresholds_ordered() -> None:
+    step1 = _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE})
+    ok = _parse_widget_input(_widget_details(**{CONF_SCHEDULE_LOW_MAX: 0.1, CONF_SCHEDULE_HIGH_MIN: 0.5}), step1)
+    assert (ok[CONF_SCHEDULE_LOW_MAX], ok[CONF_SCHEDULE_HIGH_MIN]) == (0.1, 0.5)
+
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(_widget_details(**{CONF_SCHEDULE_LOW_MAX: 0.9, CONF_SCHEDULE_HIGH_MIN: 0.2}), step1)
+    assert str(exc.value.msg) == "invalid_schedule_thresholds"
+    assert exc.value.path == [CONF_SCHEDULE_LOW_MAX]
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        pytest.param("", None, id="blank_means_never_stale"),
+        pytest.param(3600, 3600, id="in_range"),
+        pytest.param(5, WIDGET_STALE_AFTER_MIN, id="clamped_up"),
+        pytest.param(999999999, WIDGET_STALE_AFTER_MAX, id="clamped_down"),
+        pytest.param("nonsense", None, id="unparseable_means_unset"),
+    ],
+)
+def test_parse_widget_input_stale_after(raw, expected) -> None:
+    result = _parse_widget_input(_widget_details(**{CONF_WIDGET_STALE_AFTER: raw}), _widget_step1())
+    assert result[CONF_WIDGET_STALE_AFTER] == expected
+
+
+def test_parse_widget_input_subtitle_timer_style_coerced() -> None:
+    result = _parse_widget_input(_widget_details(**{CONF_SUBTITLE_TIMER_STYLE: "TICKING"}), _widget_step1())
+    assert result[CONF_SUBTITLE_TIMER_STYLE] == DEFAULT_SUBTITLE_TIMER_STYLE
+    relative = _parse_widget_input(_widget_details(**{CONF_SUBTITLE_TIMER_STYLE: "relative"}), _widget_step1())
+    assert relative[CONF_SUBTITLE_TIMER_STYLE] == "relative"
+
+
+def test_parse_widget_stat_rows_accepts_timer_style() -> None:
+    rows = [{"label": "Next", "entity_id": "sensor.next", "timer_style": "relative"}]
+    assert _parse_widget_stat_rows(rows, strict=True) == rows
+    with pytest.raises(vol.Invalid):
+        _parse_widget_stat_rows([{"label": "L", "entity_id": "sensor.a", "timer_style": "wrong"}], strict=True)
+
+
+def test_parse_widget_stat_rows_lenient_drops_bad_timer_style() -> None:
+    """A legacy/hand-written bad style loses the key, not the whole row."""
+    rows = [{"label": "L", "entity_id": "sensor.a", "timer_style": "wrong"}]
+    assert _parse_widget_stat_rows(rows) == [{"label": "L", "entity_id": "sensor.a"}]
+
+
+@pytest.mark.parametrize("template", WIDGET_TEMPLATES)
+def test_widget_details_schema_builds_for_every_template(template) -> None:
+    """Every template renders a schema, and every new row editor rehydrates its stored list."""
+    stored = {
+        CONF_BATTERY_DEVICES: [{"name": "Phone", "entity_id": "sensor.phone"}],
+        CONF_FLOW_NODES: [{"slot": "input", "entity_id": "sensor.solar"}],
+        CONF_SCHEDULE_ATTRIBUTES: ["raw_today", "raw_tomorrow"],
+    }
+    schema = _widget_details_schema("sensor.users", template, defaults=stored)
+    keys = {k.schema if isinstance(k, vol.Marker) else k for k in schema.schema}
+    assert CONF_WIDGET_NAME in keys
+    if template == WIDGET_TEMPLATE_BATTERY:
+        marker = next(k for k in schema.schema if getattr(k, "schema", None) == CONF_BATTERY_DEVICES)
+        assert marker.default() == stored[CONF_BATTERY_DEVICES]
+    if template == WIDGET_TEMPLATE_FLOW:
+        marker = next(k for k in schema.schema if getattr(k, "schema", None) == CONF_FLOW_NODES)
+        assert marker.default() == stored[CONF_FLOW_NODES]
+    if template == WIDGET_TEMPLATE_SCHEDULE:
+        # The stored list is a CSV string in the form.
+        marker = next(k for k in schema.schema if getattr(k, "schema", None) == CONF_SCHEDULE_ATTRIBUTES)
+        assert marker.default() == "raw_today, raw_tomorrow"
+
+
+@pytest.mark.parametrize(
+    "entity_id,attributes,expected",
+    [
+        pytest.param("timer.laundry", {}, WIDGET_TEMPLATE_COUNTDOWN, id="timer_domain"),
+        pytest.param("input_datetime.alarm", {}, WIDGET_TEMPLATE_COUNTDOWN, id="input_datetime_domain"),
+        pytest.param("calendar.bins", {}, WIDGET_TEMPLATE_COUNTDOWN, id="calendar_domain"),
+        pytest.param("sensor.next_bus", {"device_class": "timestamp"}, WIDGET_TEMPLATE_COUNTDOWN, id="timestamp"),
+        pytest.param("sensor.phone_battery", {"device_class": "battery"}, WIDGET_TEMPLATE_BATTERY, id="battery"),
+    ],
+)
+def test_suggest_widget_template_new_templates(hass, entity_id, attributes, expected) -> None:
+    hass.states.async_set(entity_id, "42", attributes)
+    assert _suggest_widget_template(hass, entity_id) == expected

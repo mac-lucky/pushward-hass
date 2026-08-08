@@ -1649,7 +1649,7 @@
             "slug": "Slug widget"
           },
           "data_description": {
-            "widget_template": "Aspectul widget-ului. Folosiți `value` pentru un singur număr, `progress` pentru o bară 0–1, `gauge` pentru o valoare într-un interval, `status` pentru o insignă de severitate sau `stat_list` pentru până la 6 rânduri.",
+            "widget_template": "Aspectul widgetului: `value` pentru un singur număr, `progress` pentru o bară, `gauge` pentru o valoare într-un interval, `status` pentru o insignă de gravitate, `stat_list` pentru până la 6 rânduri, `trend` pentru un grafic mic, `countdown` pentru o dată, `battery` pentru inele de dispozitive, `schedule` pentru o cronologie pe ore, `flow` pentru ce intră și ce iese.",
             "slug": "Identificator unic pentru acest widget. Lăsați gol pentru a-l genera automat din ID-ul entității."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Valoare minimă",
             "max_value": "Valoare maximă",
             "severity": "Severitate",
-            "stat_rows": "Rânduri statistici"
+            "stat_rows": "Rânduri statistici",
+            "history_period": "Istoric tendință (minute)",
+            "start_date_attribute": "Atribut dată de început",
+            "end_date_attribute": "Atribut dată de sfârșit",
+            "expired_text": "Text după expirare",
+            "battery_devices": "Dispozitive",
+            "schedule_attributes": "Atribute de perioadă",
+            "schedule_start_key": "Cheia de început a perioadei",
+            "schedule_value_key": "Cheia valorii perioadei",
+            "schedule_low_max": "Maximul benzii joase",
+            "schedule_high_min": "Minimul benzii înalte",
+            "flow_nodes": "Noduri de flux"
           },
           "data_description": {
             "widget_name": "Numele afișat în selectorul de widget-uri din iOS. Implicit, numele prietenos al entității.",
@@ -1685,7 +1696,18 @@
             "min_value": "Valoarea minimă pentru intervalul gauge.",
             "max_value": "Valoarea maximă pentru intervalul gauge.",
             "severity": "Severitatea stării (info, warning, critical, success).",
-            "stat_rows": "Până la 6 rânduri, fiecare legat de o entitate separată: etichetă, entitate și, opțional, atribut și unitate. Un șir separat prin virgule este încă acceptat. Densitatea rândurilor se reglează per widget în aplicația PushWard."
+            "stat_rows": "Până la 6 rânduri, fiecare legat de o entitate separată: etichetă, entitate și, opțional, atribut și unitate. Un șir separat prin virgule este încă acceptat. Densitatea rândurilor se reglează per widget în aplicația PushWard.",
+            "history_period": "Cât istoric se încarcă din recorder la pornirea graficului. 0 sare peste încărcare, iar graficul se umple pe măsură ce entitatea se schimbă.",
+            "start_date_attribute": "Atributul entității cu începutul ferestrei. Opțional; la progress face bara să avanseze pe dispozitiv între trimiteri.",
+            "end_date_attribute": "Atributul entității cu sfârșitul ferestrei. Lasă gol pentru a folosi starea entității, finishes_at al unui timer sau end_time al unui calendar.",
+            "expired_text": "Se afișează după trecerea datei de sfârșit, în loc să numere în sus. Maximum 64 de caractere.",
+            "battery_devices": "Până la 8 inele, fiecare legat de o entitate separată: nume, entitate și, opțional, atribut de nivel, entitate de încărcare, pictogramă și culoare.",
+            "schedule_attributes": "Atribute separate prin virgulă care conțin liste de perioade, citite în această ordine. Nordpool publică raw_today, raw_tomorrow.",
+            "schedule_start_key": "Cheia care conține marcajul de început al fiecărei perioade din acele liste.",
+            "schedule_value_key": "Cheia care conține valoarea fiecărei perioade din acele liste.",
+            "schedule_low_max": "Valorile mai mici sau egale intră în banda joasă. Lasă ambele praguri goale pentru ca aplicația să deducă benzile din intervalul trimis.",
+            "schedule_high_min": "Valorile mai mari sau egale intră în banda înaltă. Trebuie să fie peste maximul benzii joase.",
+            "flow_nodes": "Un rând pentru fiecare nod. Slotul decide unde apare: până la 3 intrări, plus câte o ieșire, un stocaj și un schimb. Rata vine din entitate, cu semnul ales de tine."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Atribut etichetă",
                 "subtitle_attribute": "Atribut subtitrare",
                 "icon": "Pictogramă",
-                "icon_attribute": "Atribut pictogramă"
+                "icon_attribute": "Atribut pictogramă",
+                "subtitle_timer_entity": "Entitatea cronometrului",
+                "subtitle_timer_attribute": "Atributul cronometrului",
+                "subtitle_timer_style": "Stilul cronometrului"
               },
               "data_description": {
                 "label": "Etichetă statică afișată pe widget. Lăsați gol pentru a o deriva din entitate.",
                 "label_attribute": "Atributul entității folosit ca etichetă. Suprascrie eticheta statică.",
                 "subtitle_attribute": "Atributul entității afișat ca subtitrare a widget-ului.",
                 "icon": "Pictogramă statică. Sunt acceptate denumiri SF Symbols și MDI.",
-                "icon_attribute": "Atributul entității pentru o pictogramă dinamică. Suprascrie pictograma statică."
+                "icon_attribute": "Atributul entității pentru o pictogramă dinamică. Suprascrie pictograma statică.",
+                "subtitle_timer_entity": "Afișează subtitlul ca o numărătoare inversă sau progresivă ancorată pe data acestei entități. Lasă gol pentru a citi entitatea widgetului.",
+                "subtitle_timer_attribute": "Atributul care conține data. Lasă gol pentru a folosi starea entității.",
+                "subtitle_timer_style": "Cronometrul curge ca 01:23:45; relativ afișează unități aproximative, precum 2 min."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Mod declanșare",
-                "widget_poll_interval": "Interval interogare (secunde)"
+                "widget_poll_interval": "Interval interogare (secunde)",
+                "widget_stale_after": "Învechit după (secunde)"
               },
               "data_description": {
                 "widget_trigger_mode": "Cum sunt declanșate actualizările. `event` reacționează la schimbările de stare; `poll` reevaluează la un interval fix.",
-                "widget_poll_interval": "Intervalul dintre interogări (10–3600 secunde). Folosit doar când modul de declanșare este `poll`."
+                "widget_poll_interval": "Intervalul dintre interogări (10–3600 secunde). Folosit doar când modul de declanșare este `poll`.",
+                "widget_stale_after": "Secunde de la ultima actualizare până când aplicația afișează widgetul ca învechit. Lasă gol pentru a nu-l marca niciodată. Un heartbeat retrimite la jumătatea acestui interval ca să-l mențină proaspăt, iar fiecare heartbeat consumă o actualizare de widget din cota ta, așa că 3600 sau mai mult este intervalul rezonabil."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "Cel puțin un rând de statistici este necesar pentru șablonul stat_list.",
         "invalid_stat_row": "Fiecare rând trebuie să fie label=entity_id (ex. Users=sensor.user_count).",
         "too_many_stat_rows": "O listă de statistici acceptă cel mult 6 rânduri.",
-        "invalid_number": "Introduceți un număr valid."
+        "invalid_number": "Introduceți un număr valid.",
+        "invalid_battery_device": "Fiecare rând de dispozitiv are nevoie de o entitate. Nume maximum 32 de caractere, pictogramă maximum 128, culoare ca nume de culoare sau hex.",
+        "too_many_battery_devices": "Un widget de baterie acceptă cel mult 8 dispozitive.",
+        "battery_devices_required": "Șablonul battery necesită cel puțin un dispozitiv.",
+        "invalid_flow_node": "Fiecare rând de flux are nevoie de un slot și o entitate. Nume maximum 32 de caractere, pictogramă maximum 128, culoare ca nume de culoare sau hex.",
+        "too_many_flow_inputs": "Un widget de flux acceptă cel mult 3 intrări.",
+        "duplicate_flow_slot": "Doar câte o ieșire, un stocaj și un schimb. Folosește input pentru restul.",
+        "flow_nodes_required": "Șablonul flow necesită cel puțin un nod.",
+        "invalid_schedule_thresholds": "Maximul benzii joase trebuie să fie sub minimul benzii înalte."
       },
       "abort": {
         "already_configured": "Există deja un widget cu acest slug.",
@@ -1827,7 +1865,12 @@
         "progress": "Progres",
         "gauge": "Indicator",
         "status": "Stare",
-        "stat_list": "Listă de statistici"
+        "stat_list": "Listă de statistici",
+        "trend": "Tendință",
+        "countdown": "Numărătoare inversă",
+        "battery": "Baterie",
+        "schedule": "Program",
+        "flow": "Flux"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Cyan",
         "mint": "Mentă",
         "brown": "Maro"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Cronometru",
+        "relative": "Relativ"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Intrare",
+        "output": "Ieșire",
+        "storage": "Stocaj",
+        "exchange": "Schimb"
       }
     }
   }

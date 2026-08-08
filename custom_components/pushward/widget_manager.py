@@ -12,6 +12,9 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+import math
+import time
+from collections import deque
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from datetime import timedelta
@@ -39,24 +42,46 @@ from .api import (
     PushWardWidgetPermissionError,
 )
 from .const import (
+    CONF_BATTERY_DEVICES,
+    CONF_CHARGING_ENTITY,
     CONF_ENTITY_ID,
+    CONF_FLOW_NODES,
+    CONF_HISTORY_PERIOD,
+    CONF_LEVEL_ENTITY,
     CONF_SLUG,
     CONF_STAT_ROWS,
+    CONF_SUBTITLE_TIMER_ENTITY,
+    CONF_TOTAL_ENTITY,
     CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     DEFAULT_WIDGET_POLL_INTERVAL,
+    DEFAULT_WIDGET_TREND_PERIOD,
+    WIDGET_GROUP_TEMPLATES,
+    WIDGET_MAX_TREND_POINTS,
+    WIDGET_MIN_TREND_POINTS,
+    WIDGET_STALE_AFTER_MAX,
+    WIDGET_STALE_AFTER_MIN,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_TREND,
+    WIDGET_TREND_BUFFER_MAX,
     WIDGET_TRIGGER_EVENT,
     WIDGET_TRIGGER_POLL,
 )
 from .content_mapper import lookup_registry_icon
-from .widget_mapper import map_widget_content, widget_name_from_config
+from .recorder_history import async_recorder_states, downsample_evenly
+from .widget_mapper import map_widget_content, read_numeric_value, widget_name_from_config
 
 _LOGGER = logging.getLogger(__name__)
 
 _WIDGET_STORAGE_VERSION = 1
 _WIDGET_PERMISSION_NOTIFICATION = "pushward_widget_permission"
+# Floor on the heartbeat tick. A stale_after at the 60 s minimum would otherwise
+# ask for a push every 30 s, which is already more than the quota is worth.
+_HEARTBEAT_MIN_INTERVAL = 30
 
 
 def _widget_storage_key(entry_id: str) -> str:
@@ -80,28 +105,81 @@ class TrackedWidget:
     created: bool = False
     unsub_state: Callable[[], None] | None = None
     unsub_poll: Callable[[], None] | None = None
+    unsub_heartbeat: Callable[[], None] | None = None
     registry_icon: str | None = None
     pending_task: asyncio.Task | None = field(default=None, repr=False)
     # A change landing while a send is in flight re-sends the newest state after.
     update_pending: bool = False
     # One recreate per 404 streak; reset on the next successful PATCH.
     recreate_attempted: bool = False
+    # monotonic() of the last create/PATCH that reached the server. Drives the
+    # heartbeat, which exists only to keep a stale_after widget from expiring.
+    last_synced: float = 0.0
+    # (epoch_seconds, value) samples backing the trend sparkline.
+    points_buffer: deque = field(default_factory=lambda: deque(maxlen=WIDGET_TREND_BUFFER_MAX))
+
+
+# Where each group template keeps its rows, and which per-row keys carry a
+# companion entity on top of the row's own entity_id. Keyed by
+# WIDGET_GROUP_TEMPLATES; the drift guard in the tests keeps the two aligned.
+_GROUP_ROW_SOURCES: dict[str, tuple[str, tuple[str, ...]]] = {
+    WIDGET_TEMPLATE_STAT_LIST: (CONF_STAT_ROWS, ()),
+    WIDGET_TEMPLATE_BATTERY: (CONF_BATTERY_DEVICES, (CONF_CHARGING_ENTITY,)),
+    WIDGET_TEMPLATE_FLOW: (CONF_FLOW_NODES, (CONF_TOTAL_ENTITY, CONF_LEVEL_ENTITY)),
+}
 
 
 def _entity_ids_for_widget(config: dict) -> list[str]:
     """Return all HA entity_ids the widget depends on for live updates."""
     template = config.get(CONF_WIDGET_TEMPLATE)
-    if template == WIDGET_TEMPLATE_STAT_LIST:
-        seen: list[str] = []
-        for row in config.get(CONF_STAT_ROWS) or []:
+    seen: list[str] = []
+
+    def add(entity_id: object) -> None:
+        if isinstance(entity_id, str) and entity_id and entity_id not in seen:
+            seen.append(entity_id)
+
+    if template in _GROUP_ROW_SOURCES:
+        rows_key, companion_keys = _GROUP_ROW_SOURCES[template]
+        for row in config.get(rows_key) or []:
             if not isinstance(row, dict):
                 continue
-            entity_id = row.get(CONF_ENTITY_ID)
-            if entity_id and entity_id not in seen:
-                seen.append(entity_id)
+            add(row.get(CONF_ENTITY_ID))
+            for key in companion_keys:
+                add(row.get(key))
         return seen
-    entity_id = config.get(CONF_ENTITY_ID)
-    return [entity_id] if entity_id else []
+
+    add(config.get(CONF_ENTITY_ID))
+    # A subtitle timer can be anchored on a different entity than the widget.
+    add(config.get(CONF_SUBTITLE_TIMER_ENTITY))
+    return seen
+
+
+def _stale_after(config: dict) -> int | None:
+    """Read the configured stale_after, clamped to the server's bounds."""
+    raw = config.get(CONF_WIDGET_STALE_AFTER)
+    if raw in (None, ""):
+        return None
+    try:
+        seconds = int(float(raw))
+    except (TypeError, ValueError):
+        return None
+    return max(WIDGET_STALE_AFTER_MIN, min(WIDGET_STALE_AFTER_MAX, seconds))
+
+
+def _trend_min_gap(config: dict) -> float:
+    """Seconds between two samples of an unchanged trend value.
+
+    Sized off the configured history window so a full buffer still spans it:
+    at the 48-point wire cap, one sample per window/48 is the coarsest useful
+    rate, and 60 s is the floor for a short window.
+    """
+    try:
+        period = int(config.get(CONF_HISTORY_PERIOD) or 0)
+    except (TypeError, ValueError):
+        period = 0
+    if period <= 0:
+        period = DEFAULT_WIDGET_TREND_PERIOD
+    return max(60.0, period * 60 / WIDGET_MAX_TREND_POINTS)
 
 
 def _extract_numeric(content: dict | None) -> float | None:
@@ -152,6 +230,7 @@ class WidgetManager:
             tracked.last_content = cached.get("content")
             tracked.created = bool(cached.get("created"))
             tracked.registry_icon = self._lookup_registry_icon(cfg)
+            self._restore_points(tracked, cached.get("points"))
             self._tracked[slug] = tracked
 
             self._subscribe(tracked)
@@ -242,6 +321,7 @@ class WidgetManager:
 
     def _subscribe(self, tracked: TrackedWidget) -> None:
         """Attach event-track or polling timer based on trigger mode."""
+        self._arm_heartbeat(tracked)
         mode = tracked.config.get(CONF_WIDGET_TRIGGER_MODE) or WIDGET_TRIGGER_EVENT
         if mode == WIDGET_TRIGGER_POLL:
             interval = max(
@@ -276,6 +356,27 @@ class WidgetManager:
         if tracked.unsub_poll:
             tracked.unsub_poll()
             tracked.unsub_poll = None
+        if tracked.unsub_heartbeat:
+            tracked.unsub_heartbeat()
+            tracked.unsub_heartbeat = None
+
+    def _arm_heartbeat(self, tracked: TrackedWidget) -> None:
+        """Keep a stale_after widget alive when its entity sits still.
+
+        Without this a widget bound to a rarely-changing entity crosses its own
+        stale threshold and iOS greys it out even though HA is perfectly healthy.
+        The tick re-PATCHes identical content, which the server treats as a no-op
+        that still re-stamps updated_at without sending a push.
+        """
+        stale_after = _stale_after(tracked.config)
+        if stale_after is None:
+            return
+        interval = max(_HEARTBEAT_MIN_INTERVAL, stale_after // 2)
+        tracked.unsub_heartbeat = async_track_time_interval(
+            self._hass,
+            partial(self._on_heartbeat, tracked.config[CONF_SLUG], interval),
+            interval=timedelta(seconds=interval),
+        )
 
     # ----- event/poll callbacks -----
 
@@ -295,6 +396,18 @@ class WidgetManager:
         if tracked is None:
             return
         self._schedule_update(tracked)
+
+    @callback
+    def _on_heartbeat(self, slug: str, interval: int, _now: Any) -> None:
+        tracked = self._tracked.get(slug)
+        if tracked is None or not tracked.created:
+            return
+        if tracked.pending_task is not None and not tracked.pending_task.done():
+            return
+        if time.monotonic() - tracked.last_synced < interval:
+            # A real update already refreshed updated_at inside this window.
+            return
+        self._spawn_send(tracked, force=True)
 
     @callback
     def _schedule_update(self, tracked: TrackedWidget) -> None:
@@ -350,6 +463,7 @@ class WidgetManager:
             template=cfg[CONF_WIDGET_TEMPLATE],
             content=content,
             push_throttle=self._compute_push_throttle(cfg),
+            stale_after=_stale_after(cfg),
         )
         tracked.created = True
 
@@ -362,11 +476,13 @@ class WidgetManager:
             _LOGGER.warning("Widget %s missing template; skipping create", slug)
             return
 
+        await self._seed_points(tracked)
         content = map_widget_content(
             self._hass,
             cfg,
             prev_value=_extract_numeric(tracked.last_content),
             registry_icon=tracked.registry_icon,
+            points=self._sample_points(tracked),
         )
 
         if content is None:
@@ -382,6 +498,7 @@ class WidgetManager:
         async with self._api_error_guard(slug, "creating"):
             await self._create_widget(tracked, content)
             tracked.last_content = content
+            tracked.last_synced = time.monotonic()
             self._clear_forbidden_notification(slug)
             self._schedule_cache_save()
 
@@ -397,6 +514,7 @@ class WidgetManager:
             cfg,
             prev_value=_extract_numeric(tracked.last_content),
             registry_icon=tracked.registry_icon,
+            points=self._sample_points(tracked),
         )
         if content is None:
             return
@@ -410,7 +528,11 @@ class WidgetManager:
                 # First successful render after a deferred initial POST.
                 await self._create_widget(tracked, content)
             else:
-                patch_body: dict = {"content": content}
+                # stale_after rides every PATCH, null included: the merge patch
+                # null-clears, so a widget created before the field existed (or
+                # one whose config lost it) converges instead of keeping a value
+                # HA no longer knows about.
+                patch_body: dict = {"content": content, "stale_after": _stale_after(cfg)}
                 push_throttle = self._compute_push_throttle(cfg)
                 if push_throttle is not None:
                     patch_body["push_throttle"] = push_throttle
@@ -437,8 +559,78 @@ class WidgetManager:
                     tracked.recreate_attempted = False
 
             tracked.last_content = content
+            tracked.last_synced = time.monotonic()
             self._clear_forbidden_notification(slug)
             self._schedule_cache_save()
+
+    # ----- trend points -----
+
+    @staticmethod
+    def _restore_points(tracked: TrackedWidget, raw: object) -> None:
+        """Rehydrate the trend buffer from the persisted [[ts, value], ...] list."""
+        if not isinstance(raw, list):
+            return
+        for item in raw:
+            if not isinstance(item, (list, tuple)) or len(item) != 2:
+                continue
+            try:
+                ts, value = float(item[0]), float(item[1])
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(ts) and math.isfinite(value):
+                tracked.points_buffer.append((ts, value))
+
+    async def _seed_points(self, tracked: TrackedWidget) -> None:
+        """Backfill a fresh trend buffer from the recorder.
+
+        Only on a cold buffer: a restored cache already spans the window, and
+        re-seeding would re-merge points the buffer has since aged out.
+        """
+        cfg = tracked.config
+        if cfg.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_TREND or tracked.points_buffer:
+            return
+        entity_id = cfg.get(CONF_ENTITY_ID)
+        try:
+            period = int(cfg.get(CONF_HISTORY_PERIOD) or 0)
+        except (TypeError, ValueError):
+            period = 0
+        if not entity_id or period <= 0:
+            return
+        history = await async_recorder_states(self._hass, [entity_id], period)
+        points = history.get(entity_id) or []
+        for point in downsample_evenly(points, WIDGET_TREND_BUFFER_MAX):
+            tracked.points_buffer.append((float(point["timestamp"]), float(point["value"])))
+        _LOGGER.debug("Widget %s seeded %d trend point(s)", cfg[CONF_SLUG], len(tracked.points_buffer))
+
+    def _sample_points(self, tracked: TrackedWidget) -> list[float] | None:
+        """Feed the trend buffer from live state and return the points to send."""
+        cfg = tracked.config
+        if cfg.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_TREND:
+            return None
+
+        state = self._hass.states.get(cfg.get(CONF_ENTITY_ID) or "")
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            value = read_numeric_value(state, cfg)
+            if value is not None and math.isfinite(value):
+                self._append_point(tracked, time.time(), value)
+
+        if len(tracked.points_buffer) < WIDGET_MIN_TREND_POINTS:
+            return None
+        return downsample_evenly([value for _ts, value in tracked.points_buffer], WIDGET_MAX_TREND_POINTS)
+
+    @staticmethod
+    def _append_point(tracked: TrackedWidget, ts: float, value: float) -> None:
+        """Record a sample, skipping a repeat of the same value inside the gap.
+
+        Without the dedup a poll-mode widget would fill all 300 slots with the
+        same number in minutes and the sparkline would flatline to a single dot.
+        """
+        buffer = tracked.points_buffer
+        if buffer:
+            last_ts, last_value = buffer[-1]
+            if value == last_value and ts - last_ts < _trend_min_gap(tracked.config):
+                return
+        buffer.append((ts, value))
 
     # ----- helpers -----
 
@@ -453,9 +645,9 @@ class WidgetManager:
         return None
 
     def _lookup_registry_icon(self, cfg: dict) -> str | None:
-        # stat_list widgets have no single anchoring entity; the static icon
-        # in cfg is the only icon path for that template.
-        if cfg.get(CONF_WIDGET_TEMPLATE) == WIDGET_TEMPLATE_STAT_LIST:
+        # stat_list / battery / flow have no single anchoring entity; the static
+        # icon in cfg is the only icon path for those templates.
+        if cfg.get(CONF_WIDGET_TEMPLATE) in WIDGET_GROUP_TEMPLATES:
             return None
         return lookup_registry_icon(self._hass, cfg.get(CONF_ENTITY_ID))
 
@@ -494,14 +686,18 @@ class WidgetManager:
     def _serialize_cache(self) -> dict:
         return {
             "widgets": {
-                slug: {
-                    "content": t.last_content,
-                    "created": t.created,
-                }
-                for slug, t in self._tracked.items()
-                if t.last_content is not None
+                slug: self._serialize_widget(t) for slug, t in self._tracked.items() if t.last_content is not None
             }
         }
+
+    @staticmethod
+    def _serialize_widget(tracked: TrackedWidget) -> dict:
+        entry: dict = {"content": tracked.last_content, "created": tracked.created}
+        if tracked.points_buffer:
+            # A trend restarting with an empty buffer would push a flat two-point
+            # line until it re-accumulates, so the sparkline survives a restart.
+            entry["points"] = [[ts, value] for ts, value in tracked.points_buffer]
+        return entry
 
     # ----- error handling -----
 

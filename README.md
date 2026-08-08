@@ -64,8 +64,9 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 
 - **Track any HA entity** as a PushWard Live Activity (Dynamic Island + Lock Screen)
 - **8 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log
-- **5 widget templates**: value, progress, gauge, status, stat_list (up to 6 entity rows)
-- **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval)
+- **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow
+- **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
+  staleness heartbeat that keeps a rarely-changing widget from greying out
 - **Account usage sensors**: notifications, Live Activity updates, widget updates, and emails consumed vs. plan limits, plus subscription tier
 - **Template auto-suggestion** picks the best activity template from entity domain and device class
 - **14 domain defaults**: pre-filled start/end states and a default icon per HA domain
@@ -253,10 +254,23 @@ A two-step flow mirroring entities. **Step 1** picks the entity, a widget templa
 | Template | Use case |
 |----------|----------|
 | `value` | A single numeric value |
-| `progress` | A value rendered as a progress bar |
+| `progress` | A value rendered as a progress bar, or a start/end window that advances on its own |
 | `gauge` | A value within a min/max range |
 | `status` | A label/icon status (optionally severity-colored) |
 | `stat_list` | Up to 6 rows, each bound to a **separate** entity |
+| `trend` | A sparkline of the last 2-48 samples plus the current value |
+| `countdown` | Counts down to a date, then shows your expired text |
+| `battery` | Up to 8 device rings, each bound to a **separate** entity |
+| `schedule` | Up to 48 periods on a timeline (hourly tariffs, delivery windows, shifts) |
+| `flow` | What comes in, what buffers it, what is traded, what consumes it |
+
+`countdown` here is the widget template, unrelated to the activity template of the same name.
+
+**The last five templates need the PushWard iOS app 1.6.0 or newer.** Older builds cannot decode
+them, and a single entry they cannot decode makes the entire widget list unavailable in the app
+until that widget is deleted -- not just the one new widget. Update every device on the account
+before adding one, especially if the account is shared with a device you have not opened in a while.
+The original five templates are unaffected.
 
 **Step 2** configures the widget (publishing widgets requires the `widgets` key permission).
 
@@ -270,16 +284,92 @@ A two-step flow mirroring entities. **Step 1** picks the entity, a widget templa
 | Unit | Display unit (value/progress/gauge) |
 | Min / Max Value | Gauge range bounds (default: 0-100) |
 | Severity | "", info, warning, critical, success (status template) |
-| Stat Rows | Rows binding a separate entity to a stat (label, entity, attribute, unit), max 6 (stat_list) |
+| Stat Rows | Rows binding a separate entity to a stat (label, entity, attribute, unit, timer), max 6 (stat_list) |
+| Trend History | Minutes of recorder history to seed the sparkline on start; 0 skips the seed (trend) |
+| Start / End Date Attribute | Attributes holding the window ends (countdown, progress) |
+| Expired Text | Shown once the end date passes, max 64 chars (countdown) |
+| Devices | Rows binding a separate entity to a battery ring, max 8 (battery) |
+| Period Attributes / Start Key / Value Key | Where to read the period arrays and their keys (schedule) |
+| Low Band Maximum / High Band Minimum | Optional band thresholds; leave both empty to let iOS derive them (schedule) |
+| Flow Nodes | Rows binding a separate entity to a slot, max 3 inputs (flow) |
 | Label / Label Attribute | Static label or an entity attribute |
 | Subtitle Attribute | Subtitle text from an attribute |
+| Timer Entity / Attribute / Style | Render the subtitle as a live countdown or count-up |
 | Icon / Icon Attribute | Static MDI/SF Symbol or an entity attribute |
 | Accent / Background / Text Color (+ Attribute) | Colors, static or from an attribute |
 | Tap Action URL / Foreground | Deep link opened when the widget is tapped |
 | Trigger Mode | `event` (state-change) or `poll` |
 | Poll Interval | Seconds between re-evaluations in poll mode (10-3600, default 60) |
+| Stale After | Seconds before iOS greys the widget out; blank = never (60-604800) |
 
 </details>
+
+#### Battery rings
+
+Each row binds one entity: **Name**, **Entity**, and optionally an **Attribute** (blank reads the state),
+a **Charging entity** (a binary sensor; `on` overlays the bolt), an **Icon** and a **Color**. Leave the name
+blank to fall back to the entity's friendly name. The level is clamped to 0-100, and a row whose entity is
+unavailable or non-numeric is skipped rather than failing the whole widget, so one flat sensor doesn't take
+the board down with it.
+
+#### Flow slots and signs
+
+A flow row's **Slot** decides where it renders: up to three `input` rows, plus one each of `output`,
+`storage` and `exchange`. `Rate` comes from the row's entity (or its attribute); `Total entity` supplies a
+cumulative total for the day and `Level entity` a 0-100 fill for a storage node.
+
+The sign convention is yours to choose, but the iOS rendering assumes the energy one: **exchange is positive
+inbound** (importing) and negative outbound (exporting), and **storage is positive while filling** and
+negative while draining. Nothing in the template is energy-specific though - water, data and money use the
+same four slots.
+
+#### Schedule periods
+
+**Period Attributes** is a comma-separated list of attributes on the tracked entity, each holding a list of
+period dicts. They are concatenated in the order given, sorted by start, and de-duplicated (a later array
+wins on a repeated start, which is what a tomorrow array overlapping today's tail wants). Nordpool is the
+usual source:
+
+```yaml
+Period Attributes: raw_today, raw_tomorrow
+Period Start Key:  start
+Period Value Key:  value
+```
+
+Set **Low Band Maximum** and **High Band Minimum** to colour the bands yourself; leave both empty and the app
+derives them from the range you posted. Past 48 periods the oldest are dropped first, keeping the period
+covering now plus everything after it.
+
+#### Trend history
+
+A trend widget needs at least two points before it can render, so a brand-new one defers its first push until
+a second sample arrives. Set **Trend History** to seed it from the recorder instead: entities with a
+`state_class` read pre-aggregated statistics, the rest read raw states. The buffer keeps up to 300 samples,
+downsampled to the 48 the wire allows, and persists across restarts so a reload doesn't flatten the chart.
+
+#### Self-advancing progress
+
+Give a `progress` widget a **Start Date Attribute** and an **End Date Attribute** and the bar advances on the
+device between pushes, with no quota cost. Send a value as well when you have one - older app builds only
+read the value.
+
+#### Timers
+
+**Timer Entity / Attribute / Style** renders the subtitle as a live countdown (future date) or count-up (past
+date), re-rendered by iOS itself rather than by a push. `timer` ticks like `01:23:45`; `relative` shows coarse
+units like `2 min`. Stat rows get the same treatment per row: set a row's **Timer** and, when its value parses
+as a date, it renders as a timer while the plain string stays as the fallback.
+
+#### Staleness and the heartbeat
+
+**Stale After** tells iOS how long after the last update the widget should render as stale. Because that
+clock keeps running even when nothing in HA changes, setting it also arms a heartbeat: every `stale_after / 2`
+seconds (minimum 30) the integration re-sends the current content. Identical content is a no-op server-side
+that re-stamps `updated_at` without pushing to the device.
+
+**Each heartbeat still spends one widget update from your quota**, so keep the value at 3600 or above unless
+you genuinely need a tighter freshness window - 3600 costs about 1,440 widget updates a month per widget.
+Leave the field blank and the widget is never marked stale and no heartbeat runs.
 
 How many `stat_list` rows are visible depends on the widget size. By default a medium or large Home Screen widget shows all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3, packing in up to 6 when every value is very short (for example a single status glyph). You can change Row Density per widget in the PushWard iOS app: Compact packs two columns to show up to 6 rows on any size (labels may truncate on the small placements), and Comfortable keeps a single column with larger rows. To see all 6 rows with full labels, use a medium or large widget, or set Compact.
 
@@ -587,6 +677,9 @@ Narrow to one area with `custom_components.pushward.api` (HTTP calls) or `custom
 - **`slug` doesn't match an existing activity**: create it first with `pushward.create_activity`.
 - **Wrong field for the chosen template**: see [which fields apply to which template](#pushwardupdate_activity_template).
 - **Widget never appears**: confirm the key has the `widgets` permission, and that the bound entity has a renderable value (value/progress/gauge widgets are skipped when the value isn't numeric).
+- **Trend widget stays empty**: it needs at least two points. Either wait for a second sample or set Trend History so it seeds from the recorder.
+- **Countdown widget never updates**: the end date has to parse. A `device_class: timestamp` sensor, a timer's `finishes_at` and a calendar's `end_time` all work out of the box; anything else needs the End Date Attribute pointed at an ISO-8601 or epoch value. Dates before 2000 or more than a year out are dropped rather than sent, so the widget keeps its last content.
+- **Widget greys out even though HA is fine**: that is Stale After doing its job on an entity that stopped changing. Raise it, or clear it to switch the staleness marker off entirely.
 
 ## Requirements & License
 

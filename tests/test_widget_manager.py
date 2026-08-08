@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
+from datetime import timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
+from homeassistant.util import dt as dt_util
+from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.pushward.api import (
     PushWardApiError,
@@ -17,20 +21,34 @@ from custom_components.pushward.api import (
     PushWardWidgetPermissionError,
 )
 from custom_components.pushward.const import (
+    CONF_BATTERY_DEVICES,
     CONF_ENTITY_ID,
+    CONF_FLOW_NODES,
+    CONF_HISTORY_PERIOD,
+    CONF_MAX_VALUE,
+    CONF_MIN_VALUE,
     CONF_SLUG,
     CONF_STAT_ROWS,
+    CONF_SUBTITLE_TIMER_ENTITY,
     CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    WIDGET_GROUP_TEMPLATES,
+    WIDGET_STALE_AFTER_MIN,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_POLL,
 )
 from custom_components.pushward.widget_manager import (
+    _GROUP_ROW_SOURCES,
     _WIDGET_PERMISSION_NOTIFICATION,
     WidgetManager,
+    _entity_ids_for_widget,
 )
 
 from .conftest import make_widget_config
@@ -656,3 +674,278 @@ async def test_push_failure_warns_once_per_streak(hass: HomeAssistant, caplog: p
     assert len(_warnings()) == 2
 
     await manager.async_stop()
+
+
+# ----- stale_after + heartbeat -----
+
+
+async def test_stale_after_on_create_and_patch(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    config = make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+    assert api.create_widget.call_args.kwargs["stale_after"] == 3600
+
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+    assert api.patch_widget.call_args.args[1]["stale_after"] == 3600
+
+    await manager.async_stop()
+
+
+async def test_stale_after_clamped_to_server_bounds(hass: HomeAssistant) -> None:
+    """A hand-written config past the bounds is nudged, not sent as-is (the server 422s it)."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [make_widget_config(**{CONF_WIDGET_STALE_AFTER: 5})], _mock_entry())
+    await manager.async_start()
+    assert api.create_widget.call_args.kwargs["stale_after"] == WIDGET_STALE_AFTER_MIN
+    await manager.async_stop()
+
+
+async def test_patch_clears_stale_after_when_unset(hass: HomeAssistant) -> None:
+    """An explicit null on every PATCH converges a row created before the field existed."""
+    api = _mock_api()
+    config = make_widget_config()
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+
+    body = api.patch_widget.call_args.args[1]
+    assert "stale_after" in body
+    assert body["stale_after"] is None
+
+    await manager.async_stop()
+
+
+async def test_heartbeat_armed_only_with_stale_after(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+
+    plain = WidgetManager(hass, api, [make_widget_config()], _mock_entry())
+    await plain.async_start()
+    assert plain._tracked["ha-users"].unsub_heartbeat is None
+    await plain.async_stop()
+
+    ticking = WidgetManager(hass, api, [make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})], _mock_entry())
+    await ticking.async_start()
+    tracked = ticking._tracked["ha-users"]
+    assert tracked.unsub_heartbeat is not None
+    await ticking.async_stop()
+    # async_stop detaches, so a later tick can't fire against a dead tracker.
+    assert tracked.unsub_heartbeat is None
+
+
+async def test_heartbeat_patches_despite_identical_content(hass: HomeAssistant) -> None:
+    """The whole point: an unchanged entity must still re-stamp updated_at."""
+    api = _mock_api()
+    config = make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+    api.patch_widget.assert_not_called()
+    tracked = manager._tracked["ha-users"]
+
+    # last_synced is monotonic, which async_fire_time_changed does not advance;
+    # backdating it is what makes the tick read as "nothing sent in a while".
+    for tick in (1, 2):
+        tracked.last_synced -= 100000
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=1801 * tick))
+        await hass.async_block_till_done()
+
+    # Content never changed, yet both ticks PATCHed: that is the whole point.
+    assert api.patch_widget.await_count == 2
+    await manager.async_stop()
+
+
+async def test_heartbeat_skipped_after_recent_send(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    config = make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})
+    hass.states.async_set("sensor.users", "42")
+
+    manager = WidgetManager(hass, api, [config], _mock_entry())
+    await manager.async_start()
+    # A real update just landed, so the tick has nothing to keep alive.
+    manager._tracked["ha-users"].last_synced = time.monotonic()
+
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=1801))
+    await hass.async_block_till_done()
+
+    api.patch_widget.assert_not_called()
+    await manager.async_stop()
+
+
+# ----- trend points -----
+
+
+def _trend_config(**overrides) -> dict:
+    base = {
+        CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_TREND,
+        CONF_SLUG: "ha-trend",
+        CONF_ENTITY_ID: "sensor.power",
+        CONF_MIN_VALUE: None,
+        CONF_MAX_VALUE: None,
+    }
+    base.update(overrides)
+    return make_widget_config(**base)
+
+
+async def test_trend_defers_create_until_two_points(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.power", "100")
+
+    manager = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    await manager.async_start()
+    # One sample is not a sparkline; the create defers like gauge does.
+    api.create_widget.assert_not_called()
+
+    hass.states.async_set("sensor.power", "120")
+    await hass.async_block_till_done()
+    api.create_widget.assert_awaited_once()
+    assert api.create_widget.call_args.kwargs["content"]["points"] == [100.0, 120.0]
+
+    await manager.async_stop()
+
+
+async def test_trend_buffer_dedupes_unchanged_value(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.power", "100")
+
+    manager = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    await manager.async_start()
+    tracked = manager._tracked["ha-trend"]
+
+    # Same value inside the gap window records nothing new.
+    manager._append_point(tracked, time.time() + 1, 100.0)
+    assert len(tracked.points_buffer) == 1
+    # A different value always records.
+    manager._append_point(tracked, time.time() + 2, 101.0)
+    assert len(tracked.points_buffer) == 2
+    # An unchanged value past the gap records again, so a flat line still has points.
+    manager._append_point(tracked, time.time() + 100000, 101.0)
+    assert len(tracked.points_buffer) == 3
+
+    await manager.async_stop()
+
+
+async def test_trend_points_persist_and_restore(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.power", "100")
+
+    manager = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    await manager.async_start()
+    hass.states.async_set("sensor.power", "120")
+    await hass.async_block_till_done()
+    cached = manager._serialize_cache()["widgets"]["ha-trend"]
+    assert cached["points"] == [[pytest.approx(ts), v] for ts, v in manager._tracked["ha-trend"].points_buffer]
+    await manager.async_stop()
+
+    manager2 = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    await manager2.async_start()
+    # The restored buffer is what keeps a restart from pushing a flat two-point line.
+    assert [v for _ts, v in manager2._tracked["ha-trend"].points_buffer] == [100.0, 120.0]
+    await manager2.async_stop()
+
+
+async def test_trend_seeds_from_recorder_when_history_configured(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.power", "130")
+    config = _trend_config(**{CONF_HISTORY_PERIOD: 60})
+
+    history = {"sensor.power": [{"timestamp": 1000 + i, "value": float(i)} for i in range(10)]}
+    with patch(
+        "custom_components.pushward.widget_manager.async_recorder_states",
+        AsyncMock(return_value=history),
+    ) as seed:
+        manager = WidgetManager(hass, api, [config], _mock_entry())
+        await manager.async_start()
+
+    seed.assert_awaited_once()
+    points = api.create_widget.call_args.kwargs["content"]["points"]
+    assert points[0] == 0.0
+    assert points[-1] == 130.0
+    await manager.async_stop()
+
+
+async def test_trend_seed_skipped_when_buffer_restored(hass: HomeAssistant) -> None:
+    """A restored cache already spans the window; re-seeding would re-merge aged-out points."""
+    api = _mock_api()
+    hass.states.async_set("sensor.power", "100")
+    config = _trend_config(**{CONF_HISTORY_PERIOD: 60})
+
+    with patch(
+        "custom_components.pushward.widget_manager.async_recorder_states",
+        AsyncMock(return_value={"sensor.power": [{"timestamp": 1, "value": 1.0}]}),
+    ):
+        manager = WidgetManager(hass, api, [config], _mock_entry())
+        await manager.async_start()
+        hass.states.async_set("sensor.power", "120")
+        await hass.async_block_till_done()
+        await manager.async_stop()
+
+        manager2 = WidgetManager(hass, api, [config], _mock_entry())
+        with patch("custom_components.pushward.widget_manager.async_recorder_states", AsyncMock()) as reseed:
+            await manager2.async_start()
+        reseed.assert_not_awaited()
+        await manager2.async_stop()
+
+
+# ----- subscription sets -----
+
+
+async def test_battery_subscribes_to_row_and_charging_entities(hass: HomeAssistant) -> None:
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [
+                {"name": "Phone", "entity_id": "sensor.phone", "charging_entity": "binary_sensor.phone_charging"}
+            ],
+        }
+    )
+    assert _entity_ids_for_widget(config) == ["sensor.phone", "binary_sensor.phone_charging"]
+
+
+async def test_flow_subscribes_to_rate_total_and_level_entities(hass: HomeAssistant) -> None:
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW,
+            CONF_FLOW_NODES: [
+                {
+                    "slot": "storage",
+                    "entity_id": "sensor.batt",
+                    "total_entity": "sensor.batt_total",
+                    "level_entity": "sensor.batt_soc",
+                }
+            ],
+        }
+    )
+    assert _entity_ids_for_widget(config) == ["sensor.batt", "sensor.batt_total", "sensor.batt_soc"]
+
+
+async def test_single_entity_template_subscribes_to_subtitle_timer_entity(hass: HomeAssistant) -> None:
+    config = make_widget_config(**{CONF_SUBTITLE_TIMER_ENTITY: "sensor.next_run"})
+    assert _entity_ids_for_widget(config) == ["sensor.users", "sensor.next_run"]
+
+
+async def test_battery_and_flow_skip_registry_icon(hass: HomeAssistant) -> None:
+    """No anchoring entity means no registry icon lookup - only the static config icon applies."""
+    api = _mock_api()
+    manager = WidgetManager(hass, api, [], _mock_entry())
+    for template in (WIDGET_TEMPLATE_BATTERY, WIDGET_TEMPLATE_FLOW, WIDGET_TEMPLATE_STAT_LIST):
+        assert manager._lookup_registry_icon(make_widget_config(**{CONF_WIDGET_TEMPLATE: template})) is None
+
+
+async def test_group_row_sources_cover_every_group_template(hass: HomeAssistant) -> None:
+    """Drift guard: a template added to WIDGET_GROUP_TEMPLATES needs a rows key here.
+
+    Without it _entity_ids_for_widget silently falls through to the single-entity
+    branch and the widget subscribes to nothing.
+    """
+    assert set(_GROUP_ROW_SOURCES) == set(WIDGET_GROUP_TEMPLATES)

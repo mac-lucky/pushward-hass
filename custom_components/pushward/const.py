@@ -139,6 +139,53 @@ CONF_STAT_ROWS = "stat_rows"
 # 0.0-1.0 fraction, but plenty of HA sensors report 0-100. Not CONF_SCALE, which
 # is the timeline chart's linear/log axis.
 CONF_VALUE_SCALE = "value_scale"
+# Seconds after the last successful push before iOS renders the widget as stale.
+# Setting it also arms the heartbeat in widget_manager (see WIDGET_STALE_AFTER_*).
+CONF_WIDGET_STALE_AFTER = "widget_stale_after"
+
+# countdown / self-advancing progress: attributes holding the RFC 3339 (or epoch)
+# window ends. An empty end-date attribute falls back to the entity's own state,
+# and to the per-domain default for timer / calendar entities.
+CONF_START_DATE_ATTRIBUTE = "start_date_attribute"
+CONF_END_DATE_ATTRIBUTE = "end_date_attribute"
+# Text replacing the countdown once end_date passes (server cap 64 runes).
+CONF_EXPIRED_TEXT = "expired_text"
+
+# Render the subtitle slot as a self-updating on-device timer. Available on every
+# single-entity template; the static subtitle stays as the older-client fallback.
+CONF_SUBTITLE_TIMER_ENTITY = "subtitle_timer_entity"
+CONF_SUBTITLE_TIMER_ATTRIBUTE = "subtitle_timer_attribute"
+CONF_SUBTITLE_TIMER_STYLE = "subtitle_timer_style"
+
+# battery template: up to WIDGET_MAX_BATTERY_DEVICES rows, each bound to a separate
+# entity ({name, entity_id, value_attribute?, charging_entity?, icon?, color?}).
+CONF_BATTERY_DEVICES = "battery_devices"
+# Display name inside a battery-device / flow-node row dict.
+CONF_NODE_NAME = "name"
+# Per-row binary entity whose "on" state overlays the charging bolt.
+CONF_CHARGING_ENTITY = "charging_entity"
+
+# schedule template: names of the tracked entity's attributes carrying period
+# arrays (Nordpool-style raw_today / raw_tomorrow). Arrays are concatenated in the
+# order listed, then sorted by start.
+CONF_SCHEDULE_ATTRIBUTES = "schedule_attributes"
+# Keys read out of each period dict inside those arrays.
+CONF_SCHEDULE_START_KEY = "schedule_start_key"
+CONF_SCHEDULE_VALUE_KEY = "schedule_value_key"
+DEFAULT_SCHEDULE_START_KEY = "start"
+DEFAULT_SCHEDULE_VALUE_KEY = "value"
+# Optional band thresholds: <= low_max is "low", >= high_min is "high", the rest
+# "medium". Leave both empty to let iOS derive bands from the posted range.
+CONF_SCHEDULE_LOW_MAX = "schedule_low_max"
+CONF_SCHEDULE_HIGH_MIN = "schedule_high_min"
+
+# flow template: one row per node ({slot, name?, entity_id, value_attribute?,
+# total_entity?, level_entity?, icon?, color?}).
+CONF_FLOW_NODES = "flow_nodes"
+CONF_FLOW_SLOT = "slot"
+# Per-row companion entities for a flow node's cumulative total and fill level.
+CONF_TOTAL_ENTITY = "total_entity"
+CONF_LEVEL_ENTITY = "level_entity"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
@@ -230,13 +277,35 @@ WIDGET_TEMPLATE_PROGRESS = "progress"
 WIDGET_TEMPLATE_GAUGE = "gauge"
 WIDGET_TEMPLATE_STATUS = "status"
 WIDGET_TEMPLATE_STAT_LIST = "stat_list"
+WIDGET_TEMPLATE_TREND = "trend"
+# NB: the widget "countdown" is a different enum from the activity template of the
+# same name (TEMPLATES above). Separate surfaces, separate lists - never merge them.
+WIDGET_TEMPLATE_COUNTDOWN = "countdown"
+WIDGET_TEMPLATE_BATTERY = "battery"
+WIDGET_TEMPLATE_SCHEDULE = "schedule"
+WIDGET_TEMPLATE_FLOW = "flow"
 WIDGET_TEMPLATES = [
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_STATUS,
     WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_TREND,
+    WIDGET_TEMPLATE_COUNTDOWN,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_SCHEDULE,
+    WIDGET_TEMPLATE_FLOW,
 ]
+
+# Templates built from per-row entities instead of one anchoring entity. They
+# have no state to read attribute overrides or a subtitle-timer date from, no
+# registry icon, and their subscription set comes from the rows. Config flow,
+# mapper and manager all branch on this one list.
+WIDGET_GROUP_TEMPLATES = (
+    WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_FLOW,
+)
 
 # Widget trigger modes
 WIDGET_TRIGGER_EVENT = "event"
@@ -257,6 +326,58 @@ WIDGET_UNIT_MAX = 32
 WIDGET_LABEL_MAX = 256
 WIDGET_SUBTITLE_MAX = 256
 WIDGET_NAME_MAX = 256
+
+# Collection caps for the 1.6 templates (mirror widget.go maxTrendPoints,
+# maxBatteryDevices, maxSchedulePeriods, maxFlowInputs and the element field tags).
+WIDGET_MIN_TREND_POINTS = 2
+WIDGET_MAX_TREND_POINTS = 48
+WIDGET_MAX_BATTERY_DEVICES = 8
+WIDGET_MAX_SCHEDULE_PERIODS = 48
+WIDGET_MAX_FLOW_INPUTS = 3
+WIDGET_EXPIRED_TEXT_MAX = 64
+# Shared by battery devices and flow nodes (server validateNodeChrome).
+WIDGET_NODE_NAME_MAX = 32
+WIDGET_NODE_ICON_MAX = 128
+
+# stale_after bounds (server WidgetStaleAfterMin / WidgetStaleAfterMax). Absent
+# means the widget is never demoted to stale.
+WIDGET_STALE_AFTER_MIN = 60
+WIDGET_STALE_AFTER_MAX = 604800
+
+# Widget date bounds. The floor is absolute (2000-01-01 UTC) exactly as the server
+# has it, so an aged start_date never becomes un-patchable. The horizon is the
+# server's 366 days minus a day: the server resolves "now" when the request lands,
+# so a date computed here at 366d would 422 on any wire delay.
+WIDGET_DATE_FLOOR_TS = 946684800
+WIDGET_DATE_HORIZON_DAYS = 365
+
+# Self-updating timer styles (server validTimerStyles). "" is a valid wire value
+# meaning "timer", but never send it: an empty option key breaks hassfest, so the
+# config flow only ever offers the two real styles.
+TIMER_STYLE_TIMER = "timer"
+TIMER_STYLE_RELATIVE = "relative"
+TIMER_STYLES = [TIMER_STYLE_TIMER, TIMER_STYLE_RELATIVE]
+DEFAULT_SUBTITLE_TIMER_STYLE = TIMER_STYLE_TIMER
+
+# Optional schedule period band (server validScheduleLevels). Empty = let the
+# client derive the band from the posted range.
+SCHEDULE_LEVELS = ("low", "medium", "high")
+
+# Flow slots (server WidgetFlow). Inputs is a list (up to WIDGET_MAX_FLOW_INPUTS);
+# the other three are single nodes.
+FLOW_SLOT_INPUT = "input"
+FLOW_SLOT_OUTPUT = "output"
+FLOW_SLOT_STORAGE = "storage"
+FLOW_SLOT_EXCHANGE = "exchange"
+FLOW_SLOTS = [FLOW_SLOT_INPUT, FLOW_SLOT_OUTPUT, FLOW_SLOT_STORAGE, FLOW_SLOT_EXCHANGE]
+
+# In-memory sparkline buffer for the trend template, persisted alongside the diff
+# cache. Sampled far denser than the 48 points the server takes so the downsample
+# keeps the full window rather than the last few minutes; same size as the
+# activity timeline buffer.
+WIDGET_TREND_BUFFER_MAX = 300
+# Default recorder seed window for a new trend widget (minutes).
+DEFAULT_WIDGET_TREND_PERIOD = 1440
 
 # Widget severities (mirrors server validWidgetSeverities)
 WIDGET_SEVERITIES = ["", "info", "warning", "critical", "success"]

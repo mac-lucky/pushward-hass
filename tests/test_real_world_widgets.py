@@ -9,26 +9,42 @@ contract via :mod:`tests.server_contract`.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, patch
+
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 
 from custom_components.pushward.const import (
+    CONF_BATTERY_DEVICES,
     CONF_ENTITY_ID,
+    CONF_EXPIRED_TEXT,
+    CONF_FLOW_NODES,
+    CONF_HISTORY_PERIOD,
     CONF_LABEL,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_SCHEDULE_ATTRIBUTES,
+    CONF_SCHEDULE_HIGH_MIN,
+    CONF_SCHEDULE_LOW_MAX,
     CONF_SEVERITY,
     CONF_SLUG,
     CONF_STAT_ROWS,
     CONF_UNIT,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_COUNTDOWN,
+    WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
+    WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_STATUS,
+    WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_POLL,
 )
@@ -476,5 +492,207 @@ async def test_status_widget_skips_patch_when_content_unchanged(hass: HomeAssist
     hass.states.async_set("alarm_control_panel.home", "armed_home", {"friendly_name": "Home Alarm"})
     await hass.async_block_till_done()
     api.patch_widget.assert_not_called()
+
+    await manager.async_stop()
+
+
+# ---------------------------------------------------------------------------
+# 1.6 templates: realistic sources
+# ---------------------------------------------------------------------------
+
+
+def _hours_from_now(hours: float) -> str:
+    return (datetime.now(UTC) + timedelta(hours=hours)).isoformat()
+
+
+def test_nordpool_hourly_price_schedule(hass: HomeAssistant) -> None:
+    """A Nordpool sensor publishes raw_today / raw_tomorrow arrays of hourly prices."""
+    top_of_hour = datetime.now(UTC).replace(minute=0, second=0, microsecond=0)
+    today = [
+        {"start": (top_of_hour + timedelta(hours=i)).isoformat(), "end": "", "value": round(0.35 + i * 0.05, 2)}
+        for i in range(6)
+    ]
+    tomorrow = [
+        {"start": (top_of_hour + timedelta(hours=6 + i)).isoformat(), "end": "", "value": round(0.9 - i * 0.1, 2)}
+        for i in range(6)
+    ]
+    hass.states.async_set(
+        "sensor.nordpool_kwh_pl",
+        "0.42",
+        {
+            "friendly_name": "Nordpool PL",
+            "unit_of_measurement": "PLN/kWh",
+            "raw_today": today,
+            "raw_tomorrow": tomorrow,
+        },
+    )
+    config = make_widget_config(
+        **{
+            CONF_ENTITY_ID: "sensor.nordpool_kwh_pl",
+            CONF_SLUG: "energy-price",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE,
+            CONF_SCHEDULE_ATTRIBUTES: ["raw_today", "raw_tomorrow"],
+            CONF_SCHEDULE_LOW_MAX: 0.45,
+            CONF_SCHEDULE_HIGH_MIN: 0.75,
+            CONF_UNIT: "PLN/kWh",
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert len(content["periods"]) == 12
+    assert content["periods"][0]["level"] == "low"
+    assert any(p["level"] == "high" for p in content["periods"])
+    assert content["unit"] == "PLN/kWh"
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_SCHEDULE)
+
+
+def test_home_energy_flow(hass: HomeAssistant) -> None:
+    """Solar in, battery buffering, grid export, house draw - the motivating flow case."""
+    hass.states.async_set("sensor.solar_power", "3240", {"unit_of_measurement": "W"})
+    hass.states.async_set("sensor.solar_energy_today", "18.4", {"unit_of_measurement": "kWh"})
+    hass.states.async_set("sensor.house_power", "1180", {"unit_of_measurement": "W"})
+    hass.states.async_set("sensor.battery_power", "-480", {"unit_of_measurement": "W"})
+    hass.states.async_set("sensor.battery_soc", "72", {"unit_of_measurement": "%"})
+    hass.states.async_set("sensor.grid_power", "-1580", {"unit_of_measurement": "W"})
+
+    config = make_widget_config(
+        **{
+            CONF_ENTITY_ID: "sensor.house_power",
+            CONF_SLUG: "home-energy",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW,
+            CONF_UNIT: "W",
+            CONF_FLOW_NODES: [
+                {
+                    "slot": "input",
+                    "name": "Solar",
+                    "entity_id": "sensor.solar_power",
+                    "total_entity": "sensor.solar_energy_today",
+                    "icon": "sun.max.fill",
+                    "color": "yellow",
+                },
+                {"slot": "output", "name": "House", "entity_id": "sensor.house_power"},
+                {
+                    "slot": "storage",
+                    "name": "Battery",
+                    "entity_id": "sensor.battery_power",
+                    "level_entity": "sensor.battery_soc",
+                },
+                {"slot": "exchange", "name": "Grid", "entity_id": "sensor.grid_power"},
+            ],
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    flow = content["flow"]
+    assert flow["inputs"][0]["total"] == 18.4
+    # Negative storage rate = draining; negative exchange = exporting.
+    assert flow["storage"]["rate"] == -480.0
+    assert flow["storage"]["level"] == 72.0
+    assert flow["exchange"]["rate"] == -1580.0
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_FLOW)
+
+
+def test_household_battery_board(hass: HomeAssistant) -> None:
+    """Companion-app and Zigbee battery sensors as one board of rings."""
+    hass.states.async_set("sensor.phone_battery_level", "64", {"device_class": "battery"})
+    hass.states.async_set("binary_sensor.phone_is_charging", "on", {"device_class": "battery_charging"})
+    hass.states.async_set("sensor.watch_battery_level", "18", {"device_class": "battery"})
+    hass.states.async_set("sensor.front_door_battery", "91", {"friendly_name": "Front Door Lock"})
+    hass.states.async_set("sensor.dead_sensor_battery", STATE_UNAVAILABLE)
+
+    config = make_widget_config(
+        **{
+            CONF_ENTITY_ID: "sensor.phone_battery_level",
+            CONF_SLUG: "batteries",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_LABEL: "Batteries",
+            CONF_BATTERY_DEVICES: [
+                {
+                    "name": "iPhone",
+                    "entity_id": "sensor.phone_battery_level",
+                    "charging_entity": "binary_sensor.phone_is_charging",
+                },
+                {"name": "Watch", "entity_id": "sensor.watch_battery_level", "color": "red"},
+                {"entity_id": "sensor.front_door_battery"},
+                {"name": "Broken", "entity_id": "sensor.dead_sensor_battery"},
+            ],
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert [d["name"] for d in content["devices"]] == ["iPhone", "Watch", "Front Door Lock"]
+    assert content["devices"][0]["charging"] is True
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_BATTERY)
+
+
+def test_ev_charge_countdown(hass: HomeAssistant) -> None:
+    """A wallbox exposes a finish-time timestamp; the widget counts down to it."""
+    hass.states.async_set(
+        "sensor.wallbox_charge_complete",
+        _hours_from_now(2.5),
+        {"friendly_name": "Charge complete", "device_class": "timestamp"},
+    )
+    config = make_widget_config(
+        **{
+            CONF_ENTITY_ID: "sensor.wallbox_charge_complete",
+            CONF_SLUG: "ev-charge",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_COUNTDOWN,
+            CONF_LABEL: "EV charge",
+            CONF_EXPIRED_TEXT: "Charged",
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert content["expired_text"] == "Charged"
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_COUNTDOWN)
+
+
+async def test_temperature_trend_over_the_day(hass: HomeAssistant) -> None:
+    """A trend widget seeds from the recorder, then keeps sampling as the sensor moves."""
+    hass.states.async_set(
+        "sensor.outdoor_temperature",
+        "19.5",
+        {"friendly_name": "Outdoor", "device_class": "temperature", "unit_of_measurement": "°C"},
+    )
+    config = make_widget_config(
+        **{
+            CONF_ENTITY_ID: "sensor.outdoor_temperature",
+            CONF_SLUG: "outdoor-temp",
+            CONF_WIDGET_NAME: "Outdoor",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_TREND,
+            CONF_UNIT: "°C",
+            CONF_HISTORY_PERIOD: 1440,
+            CONF_MIN_VALUE: None,
+            CONF_MAX_VALUE: None,
+            CONF_WIDGET_STALE_AFTER: 3600,
+        }
+    )
+    seed = {"sensor.outdoor_temperature": [{"timestamp": 1000 + i * 600, "value": 12.0 + i} for i in range(8)]}
+
+    api = make_widget_api()
+    with patch(
+        "custom_components.pushward.widget_manager.async_recorder_states",
+        AsyncMock(return_value=seed),
+    ):
+        manager = WidgetManager(hass, api, [config], make_mock_entry())
+        await manager.async_start()
+
+    created = api.create_widget.call_args.kwargs
+    assert created["stale_after"] == 3600
+    content = created["content"]
+    assert content["value"] == 19.5
+    assert content["points"][0] == 12.0
+    assert content["points"][-1] == 19.5
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_TREND)
+
+    hass.states.async_set("sensor.outdoor_temperature", "20.1")
+    await hass.async_block_till_done()
+    patched = api.patch_widget.call_args.args[1]["content"]
+    assert patched["points"][-1] == 20.1
+    assert_valid_widget_content(patched, WIDGET_TEMPLATE_TREND)
 
     await manager.async_stop()

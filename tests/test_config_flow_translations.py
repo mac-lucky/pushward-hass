@@ -33,11 +33,13 @@ from custom_components.pushward.config_flow import (
     _widget_step1_schema,
 )
 from custom_components.pushward.const import (
+    FLOW_SLOTS,
     NAMED_COLORS,
     SCALES,
     SEVERITIES,
     SOUNDS,
     TEMPLATES,
+    TIMER_STYLES,
     VALUE_SCALES,
     WIDGET_SEVERITIES,
     WIDGET_TEMPLATES,
@@ -63,6 +65,8 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "widget_severity": tuple(s for s in WIDGET_SEVERITIES if s),
     "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
     "named_color": tuple(NAMED_COLORS),
+    "timer_style": tuple(TIMER_STYLES),
+    "flow_slot": tuple(FLOW_SLOTS),
 }
 
 
@@ -292,14 +296,37 @@ _WIDGET_COMMON: set[str] = {
     "tap_action_foreground",
     "widget_trigger_mode",
     "widget_poll_interval",
+    "widget_stale_after",
+}
+
+# The subtitle timer needs a state to read a date off, so it is offered on every
+# template except the three built from per-row entities.
+_WIDGET_SINGLE = _WIDGET_COMMON | {
+    "subtitle_timer_entity",
+    "subtitle_timer_attribute",
+    "subtitle_timer_style",
 }
 
 WIDGET_FROZEN_FIELDS: dict[str, set[str]] = {
-    "value": _WIDGET_COMMON | {"value_attribute", "unit"},
-    "progress": _WIDGET_COMMON | {"value_attribute", "unit", "value_scale"},
-    "gauge": _WIDGET_COMMON | {"value_attribute", "unit", "min_value", "max_value"},
-    "status": _WIDGET_COMMON | {"severity"},
+    "value": _WIDGET_SINGLE | {"value_attribute", "unit"},
+    "progress": _WIDGET_SINGLE
+    | {"value_attribute", "unit", "value_scale", "start_date_attribute", "end_date_attribute"},
+    "gauge": _WIDGET_SINGLE | {"value_attribute", "unit", "min_value", "max_value"},
+    "status": _WIDGET_SINGLE | {"severity"},
     "stat_list": _WIDGET_COMMON | {"stat_rows"},
+    "trend": _WIDGET_SINGLE | {"value_attribute", "unit", "history_period", "min_value", "max_value"},
+    "countdown": _WIDGET_SINGLE | {"start_date_attribute", "end_date_attribute", "expired_text"},
+    "battery": _WIDGET_COMMON | {"battery_devices"},
+    "schedule": _WIDGET_SINGLE
+    | {
+        "unit",
+        "schedule_attributes",
+        "schedule_start_key",
+        "schedule_value_key",
+        "schedule_low_max",
+        "schedule_high_min",
+    },
+    "flow": _WIDGET_COMMON | {"unit", "flow_nodes"},
 }
 
 

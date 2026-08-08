@@ -1,17 +1,28 @@
 """Tests for the widget mapper."""
 
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
 
 import pytest
 
 from custom_components.pushward.const import (
+    CONF_BATTERY_DEVICES,
+    CONF_END_DATE_ATTRIBUTE,
     CONF_ENTITY_ID,
+    CONF_EXPIRED_TEXT,
+    CONF_FLOW_NODES,
     CONF_ICON,
     CONF_LABEL,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_SCHEDULE_ATTRIBUTES,
+    CONF_SCHEDULE_HIGH_MIN,
+    CONF_SCHEDULE_LOW_MAX,
     CONF_SEVERITY,
+    CONF_START_DATE_ATTRIBUTE,
     CONF_STAT_ROWS,
+    CONF_SUBTITLE_TIMER_ENTITY,
+    CONF_SUBTITLE_TIMER_STYLE,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_UNIT,
@@ -20,18 +31,29 @@ from custom_components.pushward.const import (
     CONF_WIDGET_TEMPLATE,
     VALUE_SCALE_FRACTION,
     VALUE_SCALE_PERCENT,
+    WIDGET_GROUP_TEMPLATES,
+    WIDGET_MAX_FLOW_INPUTS,
+    WIDGET_MAX_SCHEDULE_PERIODS,
     WIDGET_MAX_STAT_ROWS,
+    WIDGET_MAX_TREND_POINTS,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_COUNTDOWN,
+    WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
+    WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_STATUS,
+    WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
 )
 from custom_components.pushward.widget_mapper import (
+    _GROUP_MAPPERS,
     map_widget_content,
     widget_name_from_config,
 )
 from tests.conftest import make_mock_state, make_widget_config
+from tests.server_contract import assert_valid_widget_content
 
 
 def _make_hass(states: dict[str, MagicMock]) -> MagicMock:
@@ -548,3 +570,472 @@ def test_widget_tap_action_stat_list_template():
 
     content = map_widget_content(hass, config)
     assert content["tap_action"]["url"] == "homeassistant://navigate/lovelace/0"
+
+
+# ----- 1.6 templates -----
+
+
+def _iso_in(**delta) -> str:
+    return (datetime.now(UTC) + timedelta(**delta)).isoformat()
+
+
+def _trend_config(**overrides) -> dict:
+    base = {CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_TREND, CONF_MIN_VALUE: None, CONF_MAX_VALUE: None}
+    base.update(overrides)
+    return make_widget_config(**base)
+
+
+def test_trend_emits_value_and_points():
+    config = _trend_config(**{CONF_UNIT: "W"})
+    hass = _make_hass({"sensor.users": make_mock_state("120", entity_id="sensor.users")})
+
+    content = map_widget_content(hass, config, points=[100.0, 110.0, 120.0])
+
+    assert content["value"] == 120.0
+    assert content["points"] == [100.0, 110.0, 120.0]
+    # Optional bounds stay absent so the client auto-scales.
+    assert "min_value" not in content
+    assert "max_value" not in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_TREND)
+
+
+def test_trend_needs_two_points():
+    config = _trend_config()
+    hass = _make_hass({"sensor.users": make_mock_state("120", entity_id="sensor.users")})
+
+    assert map_widget_content(hass, config, points=[120.0]) is None
+    assert map_widget_content(hass, config, points=None) is None
+
+
+def test_trend_caps_points_at_48():
+    config = _trend_config()
+    hass = _make_hass({"sensor.users": make_mock_state("1", entity_id="sensor.users")})
+
+    content = map_widget_content(hass, config, points=[float(i) for i in range(200)])
+
+    assert len(content["points"]) == WIDGET_MAX_TREND_POINTS
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_TREND)
+
+
+def test_trend_drops_both_bounds_when_inverted():
+    config = _trend_config(**{CONF_MIN_VALUE: 50.0, CONF_MAX_VALUE: 10.0})
+    hass = _make_hass({"sensor.users": make_mock_state("30", entity_id="sensor.users")})
+
+    content = map_widget_content(hass, config, points=[10.0, 30.0])
+
+    assert "min_value" not in content
+    assert "max_value" not in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_TREND)
+
+
+def test_trend_keeps_valid_bounds():
+    config = _trend_config(**{CONF_MIN_VALUE: 0.0, CONF_MAX_VALUE: 100.0})
+    hass = _make_hass({"sensor.users": make_mock_state("30", entity_id="sensor.users")})
+
+    content = map_widget_content(hass, config, points=[10.0, 30.0])
+
+    assert content["min_value"] == 0.0
+    assert content["max_value"] == 100.0
+
+
+def test_countdown_reads_state_as_timestamp():
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_COUNTDOWN, CONF_EXPIRED_TEXT: "Done"})
+    state = make_mock_state(_iso_in(hours=3), entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+
+    content = map_widget_content(hass, config)
+
+    assert "end_date" in content
+    assert content["expired_text"] == "Done"
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_COUNTDOWN)
+
+
+def test_countdown_uses_timer_finishes_at_by_default():
+    config = make_widget_config(**{CONF_ENTITY_ID: "timer.laundry", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_COUNTDOWN})
+    state = make_mock_state("active", entity_id="timer.laundry", attributes={"finishes_at": _iso_in(minutes=45)})
+    hass = _make_hass({"timer.laundry": state})
+
+    content = map_widget_content(hass, config)
+
+    assert "end_date" in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_COUNTDOWN)
+
+
+def test_countdown_without_parseable_date_returns_none():
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_COUNTDOWN})
+    hass = _make_hass({"sensor.users": make_mock_state("not a date", entity_id="sensor.users")})
+
+    assert map_widget_content(hass, config) is None
+
+
+def test_countdown_omits_out_of_bounds_date():
+    """A date past the horizon is dropped rather than sent - one 422 kills the whole PATCH."""
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_COUNTDOWN})
+    hass = _make_hass({"sensor.users": make_mock_state(_iso_in(days=800), entity_id="sensor.users")})
+
+    assert map_widget_content(hass, config) is None
+
+
+def test_countdown_drops_start_date_after_end():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_COUNTDOWN,
+            CONF_START_DATE_ATTRIBUTE: "began",
+            CONF_END_DATE_ATTRIBUTE: "ends",
+        }
+    )
+    state = make_mock_state(
+        "on",
+        entity_id="sensor.users",
+        attributes={"began": _iso_in(hours=9), "ends": _iso_in(hours=2)},
+    )
+    hass = _make_hass({"sensor.users": state})
+
+    content = map_widget_content(hass, config)
+
+    assert "start_date" not in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_COUNTDOWN)
+
+
+def test_progress_date_pair_without_value():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS,
+            CONF_START_DATE_ATTRIBUTE: "began",
+            CONF_END_DATE_ATTRIBUTE: "ends",
+        }
+    )
+    state = make_mock_state(
+        "running",
+        entity_id="sensor.users",
+        attributes={"began": _iso_in(hours=-1), "ends": _iso_in(hours=2)},
+    )
+    hass = _make_hass({"sensor.users": state})
+
+    content = map_widget_content(hass, config)
+
+    # A non-numeric state used to skip the push entirely; the window now carries it.
+    # value is an explicit null, not an absent key - see the merge-patch test below.
+    assert content["value"] is None
+    assert content["start_date"] < content["end_date"]
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_PROGRESS)
+
+
+def test_progress_nulls_stale_value_when_window_takes_over():
+    """PATCH is an RFC 7396 merge: omitting value would preserve the stored fraction.
+
+    Regression for a bar frozen at its last numeric reading. Pre-1.6 app builds read
+    only `value`, so an omitted key left them rendering a stale percentage forever.
+    Every released build decodes `value` as optional (`value ?? 0`), so the explicit
+    null is safe and lands them on an empty bar instead.
+    """
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_PROGRESS,
+            CONF_START_DATE_ATTRIBUTE: "began",
+            CONF_END_DATE_ATTRIBUTE: "ends",
+        }
+    )
+    attrs = {"began": _iso_in(hours=-1), "ends": _iso_in(hours=2)}
+    hass = _make_hass({"sensor.users": make_mock_state("0.4", entity_id="sensor.users", attributes=attrs)})
+    numeric = map_widget_content(hass, config)
+    assert numeric["value"] == 0.4
+
+    # The entity goes non-numeric but stays available; the window still resolves.
+    hass = _make_hass({"sensor.users": make_mock_state("running", entity_id="sensor.users", attributes=attrs)})
+    cleared = map_widget_content(hass, config)
+
+    assert "value" in cleared, "an absent key would preserve the stored 0.4 server-side"
+    assert cleared["value"] is None
+    assert_valid_widget_content(cleared, WIDGET_TEMPLATE_PROGRESS)
+
+
+def test_group_mapper_table_covers_every_group_template():
+    """Drift guard: a template added to WIDGET_GROUP_TEMPLATES needs a mapper."""
+    assert set(_GROUP_MAPPERS) == set(WIDGET_GROUP_TEMPLATES)
+
+
+def test_battery_maps_rows_and_charging():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [
+                {"name": "Phone", "entity_id": "sensor.phone", "charging_entity": "binary_sensor.phone_charging"},
+                {"entity_id": "sensor.vacuum", "icon": "robot", "color": "green"},
+            ],
+        }
+    )
+    hass = _make_hass(
+        {
+            "sensor.phone": make_mock_state("64", entity_id="sensor.phone"),
+            "binary_sensor.phone_charging": make_mock_state("on", entity_id="binary_sensor.phone_charging"),
+            "sensor.vacuum": make_mock_state("18", entity_id="sensor.vacuum", attributes={"friendly_name": "Roomba"}),
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert content["devices"][0] == {"name": "Phone", "level": 64.0, "charging": True}
+    assert content["devices"][1] == {"name": "Roomba", "level": 18.0, "icon": "robot", "color": "green"}
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_BATTERY)
+
+
+def test_battery_skips_unavailable_rows_and_clamps_level():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [
+                {"name": "Gone", "entity_id": "sensor.missing"},
+                {"name": "Overfull", "entity_id": "sensor.odd"},
+            ],
+        }
+    )
+    hass = _make_hass({"sensor.odd": make_mock_state("140", entity_id="sensor.odd")})
+
+    content = map_widget_content(hass, config)
+
+    assert [d["name"] for d in content["devices"]] == ["Overfull"]
+    assert content["devices"][0]["level"] == 100.0
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_BATTERY)
+
+
+def test_battery_all_rows_unavailable_returns_none():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [{"name": "Gone", "entity_id": "sensor.missing"}],
+        }
+    )
+    assert map_widget_content(_make_hass({}), config) is None
+
+
+def _schedule_state(count: int = 4, start_hour_offset: int = 0) -> MagicMock:
+    base = datetime.now(UTC).replace(minute=0, second=0, microsecond=0) + timedelta(hours=start_hour_offset)
+    raw = [{"start": (base + timedelta(hours=i)).isoformat(), "value": 0.1 * i} for i in range(count)]
+    return make_mock_state("0.2", entity_id="sensor.users", attributes={"raw_today": raw})
+
+
+def test_schedule_maps_periods_with_bands():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE,
+            CONF_SCHEDULE_ATTRIBUTES: ["raw_today"],
+            CONF_SCHEDULE_LOW_MAX: 0.1,
+            CONF_SCHEDULE_HIGH_MIN: 0.25,
+            CONF_UNIT: "PLN/kWh",
+        }
+    )
+    hass = _make_hass({"sensor.users": _schedule_state()})
+
+    content = map_widget_content(hass, config)
+
+    assert [p["level"] for p in content["periods"]] == ["low", "low", "medium", "high"]
+    assert content["unit"] == "PLN/kWh"
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_SCHEDULE)
+
+
+def test_schedule_omits_level_without_thresholds():
+    config = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE, CONF_SCHEDULE_ATTRIBUTES: ["raw_today"]}
+    )
+    hass = _make_hass({"sensor.users": _schedule_state()})
+
+    content = map_widget_content(hass, config)
+
+    assert all("level" not in p for p in content["periods"])
+
+
+def test_schedule_dedupes_and_sorts_overlapping_arrays():
+    base = datetime.now(UTC).replace(minute=0, second=0, microsecond=0)
+    today = [{"start": (base + timedelta(hours=i)).isoformat(), "value": i} for i in range(3)]
+    # Tomorrow's array repeats the last hour of today with a corrected price.
+    tomorrow = [{"start": (base + timedelta(hours=2)).isoformat(), "value": 99}]
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE,
+            CONF_SCHEDULE_ATTRIBUTES: ["raw_today", "raw_tomorrow"],
+        }
+    )
+    state = make_mock_state("1", entity_id="sensor.users", attributes={"raw_today": today, "raw_tomorrow": tomorrow})
+
+    content = map_widget_content(_make_hass({"sensor.users": state}), config)
+
+    assert len(content["periods"]) == 3
+    assert content["periods"][-1]["value"] == 99
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_SCHEDULE)
+
+
+def test_schedule_truncates_to_cap_keeping_current_period():
+    config = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE, CONF_SCHEDULE_ATTRIBUTES: ["raw_today"]}
+    )
+    # 60 hourly periods starting 10 h ago: the cap must drop history, not the future.
+    hass = _make_hass({"sensor.users": _schedule_state(count=60, start_hour_offset=-10)})
+
+    content = map_widget_content(hass, config)
+
+    assert len(content["periods"]) == WIDGET_MAX_SCHEDULE_PERIODS
+    first = datetime.fromisoformat(content["periods"][0]["start"])
+    assert first <= datetime.now(UTC)
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_SCHEDULE)
+
+
+def test_schedule_without_usable_periods_returns_none():
+    config = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_SCHEDULE, CONF_SCHEDULE_ATTRIBUTES: ["raw_today"]}
+    )
+    state = make_mock_state("1", entity_id="sensor.users", attributes={"raw_today": [{"start": "junk", "value": 1}]})
+
+    assert map_widget_content(_make_hass({"sensor.users": state}), config) is None
+
+
+def test_flow_assembles_slots():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW,
+            CONF_UNIT: "W",
+            CONF_FLOW_NODES: [
+                {"slot": "input", "name": "Solar", "entity_id": "sensor.solar", "total_entity": "sensor.solar_today"},
+                {"slot": "output", "entity_id": "sensor.house"},
+                {"slot": "storage", "entity_id": "sensor.batt", "level_entity": "sensor.batt_soc"},
+                {"slot": "exchange", "entity_id": "sensor.grid"},
+            ],
+        }
+    )
+    hass = _make_hass(
+        {
+            "sensor.solar": make_mock_state("3200", entity_id="sensor.solar"),
+            "sensor.solar_today": make_mock_state("18.4", entity_id="sensor.solar_today"),
+            "sensor.house": make_mock_state("1100", entity_id="sensor.house"),
+            "sensor.batt": make_mock_state("-450", entity_id="sensor.batt"),
+            "sensor.batt_soc": make_mock_state("72", entity_id="sensor.batt_soc"),
+            "sensor.grid": make_mock_state("-1650", entity_id="sensor.grid"),
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    flow = content["flow"]
+    assert flow["inputs"] == [{"rate": 3200.0, "name": "Solar", "total": 18.4}]
+    assert flow["storage"]["level"] == 72.0
+    assert flow["exchange"]["rate"] == -1650.0
+    assert content["unit"] == "W"
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_FLOW)
+
+
+def test_flow_caps_inputs_and_skips_unavailable():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW,
+            CONF_FLOW_NODES: [{"slot": "input", "entity_id": f"sensor.in{i}"} for i in range(5)]
+            + [{"slot": "output", "entity_id": "sensor.gone"}],
+        }
+    )
+    hass = _make_hass({f"sensor.in{i}": make_mock_state(str(i * 100), entity_id=f"sensor.in{i}") for i in range(5)})
+
+    content = map_widget_content(hass, config)
+
+    assert len(content["flow"]["inputs"]) == WIDGET_MAX_FLOW_INPUTS
+    assert "output" not in content["flow"]
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_FLOW)
+
+
+def test_flow_drops_negative_total():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW,
+            CONF_FLOW_NODES: [{"slot": "output", "entity_id": "sensor.house", "total_entity": "sensor.broken"}],
+        }
+    )
+    hass = _make_hass(
+        {
+            "sensor.house": make_mock_state("900", entity_id="sensor.house"),
+            "sensor.broken": make_mock_state("-3", entity_id="sensor.broken"),
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert "total" not in content["flow"]["output"]
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_FLOW)
+
+
+def test_flow_all_nodes_unavailable_returns_none():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_FLOW,
+            CONF_FLOW_NODES: [{"slot": "output", "entity_id": "sensor.gone"}],
+        }
+    )
+    assert map_widget_content(_make_hass({}), config) is None
+
+
+def test_subtitle_timer_on_single_entity_template():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE,
+            CONF_SUBTITLE_TIMER_ENTITY: "sensor.next_run",
+            CONF_SUBTITLE_TIMER_STYLE: "relative",
+        }
+    )
+    hass = _make_hass(
+        {
+            "sensor.users": make_mock_state("7", entity_id="sensor.users"),
+            "sensor.next_run": make_mock_state(_iso_in(minutes=30), entity_id="sensor.next_run"),
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert content["subtitle_timer"]["style"] == "relative"
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_VALUE)
+
+
+def test_subtitle_timer_omitted_when_date_unusable():
+    config = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE, CONF_SUBTITLE_TIMER_ENTITY: "sensor.next_run"}
+    )
+    hass = _make_hass(
+        {
+            "sensor.users": make_mock_state("7", entity_id="sensor.users"),
+            "sensor.next_run": make_mock_state("unknown", entity_id="sensor.next_run"),
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert "subtitle_timer" not in content
+
+
+def test_stat_row_timer_keeps_string_value_fallback():
+    when = _iso_in(hours=4)
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+            CONF_STAT_ROWS: [{"label": "Next", "entity_id": "sensor.next", "timer_style": "timer"}],
+        }
+    )
+    hass = _make_hass({"sensor.next": make_mock_state(when, entity_id="sensor.next")})
+
+    content = map_widget_content(hass, config)
+
+    row = content["stat_rows"][0]
+    assert row["timer"]["style"] == "timer"
+    # The static string stays so older clients still render something.
+    assert row["value"]
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_STAT_LIST)
+
+
+def test_stat_row_timer_skipped_for_non_date_value():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+            CONF_STAT_ROWS: [{"label": "CPU", "entity_id": "sensor.cpu", "timer_style": "timer"}],
+        }
+    )
+    hass = _make_hass({"sensor.cpu": make_mock_state("42", entity_id="sensor.cpu")})
+
+    content = map_widget_content(hass, config)
+
+    assert "timer" not in content["stat_rows"][0]
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_STAT_LIST)

@@ -115,3 +115,40 @@ async def test_activity_403_still_uses_forbidden_error():
         await client.update_activity("slug", "ongoing", {})
     # Make sure it's NOT mis-routed to the widget subclass.
     assert not isinstance(ex.value, PushWardWidgetPermissionError)
+
+
+async def test_create_widget_sends_stale_after():
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.create_widget(
+        slug="ha-users",
+        name="Users",
+        template="value",
+        content={"value": 1.0},
+        stale_after=3600,
+    )
+    assert session.request.call_args[1]["json"]["stale_after"] == 3600
+
+
+async def test_create_widget_omits_stale_after_when_none():
+    resp = _mock_response(201)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.create_widget(slug="ha-users", name="Users", template="value", content={"value": 1.0})
+    assert "stale_after" not in session.request.call_args[1]["json"]
+
+
+async def test_patch_widget_passes_explicit_null_stale_after():
+    """The manager clears a stale_after by sending null; the client must not strip it."""
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.patch_widget("ha-users", {"content": {"value": 1.0}, "stale_after": None})
+
+    body = session.request.call_args[1]["json"]
+    assert "stale_after" in body
+    assert body["stale_after"] is None

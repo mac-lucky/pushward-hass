@@ -1649,7 +1649,7 @@
             "slug": "Slug Widget"
           },
           "data_description": {
-            "widget_template": "Tata letak widget. Gunakan `value` untuk satu angka, `progress` untuk bilah 0–1, `gauge` untuk nilai dalam rentang, `status` untuk lencana tingkat keparahan, atau `stat_list` untuk hingga 6 baris.",
+            "widget_template": "Tata letak widget: `value` untuk satu angka, `progress` untuk bilah, `gauge` untuk nilai dalam rentang, `status` untuk lencana tingkat keparahan, `stat_list` untuk maksimal 6 baris, `trend` untuk grafik mini, `countdown` untuk tanggal, `battery` untuk cincin perangkat, `schedule` untuk lini masa per jam, `flow` untuk yang masuk dan keluar.",
             "slug": "Pengidentifikasi unik untuk widget ini. Biarkan kosong untuk membuat otomatis dari ID entitas."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Nilai Minimum",
             "max_value": "Nilai Maksimum",
             "severity": "Tingkat Keparahan",
-            "stat_rows": "Baris Statistik"
+            "stat_rows": "Baris Statistik",
+            "history_period": "Riwayat tren (menit)",
+            "start_date_attribute": "Atribut tanggal mulai",
+            "end_date_attribute": "Atribut tanggal selesai",
+            "expired_text": "Teks setelah kedaluwarsa",
+            "battery_devices": "Perangkat",
+            "schedule_attributes": "Atribut periode",
+            "schedule_start_key": "Kunci awal periode",
+            "schedule_value_key": "Kunci nilai periode",
+            "schedule_low_max": "Maksimum pita rendah",
+            "schedule_high_min": "Minimum pita tinggi",
+            "flow_nodes": "Simpul aliran"
           },
           "data_description": {
             "widget_name": "Nama tampilan yang ditampilkan di pemilih widget iOS. Default ke nama ramah entitas.",
@@ -1685,7 +1696,18 @@
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "severity": "Tingkat keparahan status (info, warning, critical, success).",
-            "stat_rows": "Hingga 6 baris, masing-masing terikat ke entitas terpisah: label, entitas, serta atribut dan unit opsional. String yang dipisahkan koma masih diterima. Atur kepadatan baris per widget di aplikasi PushWard."
+            "stat_rows": "Hingga 6 baris, masing-masing terikat ke entitas terpisah: label, entitas, serta atribut dan unit opsional. String yang dipisahkan koma masih diterima. Atur kepadatan baris per widget di aplikasi PushWard.",
+            "history_period": "Seberapa jauh ke belakang grafik mini diisi dari recorder saat widget dimulai. 0 melewati pengisian dan grafik terisi seiring perubahan entitas.",
+            "start_date_attribute": "Atribut entitas berisi awal jendela waktu. Opsional; pada progress membuat bilah tetap maju di perangkat di antara pengiriman.",
+            "end_date_attribute": "Atribut entitas berisi akhir jendela waktu. Kosongkan untuk memakai status entitas, finishes_at sebuah timer, atau end_time sebuah kalender.",
+            "expired_text": "Ditampilkan setelah tanggal selesai lewat, alih-alih menghitung naik. Maksimal 64 karakter.",
+            "battery_devices": "Hingga 8 cincin, masing-masing terikat ke entitas terpisah: nama, entitas, plus atribut level, entitas pengisian, ikon, dan warna secara opsional.",
+            "schedule_attributes": "Atribut dipisahkan koma yang memuat daftar periode, dibaca berurutan. Nordpool menerbitkan raw_today, raw_tomorrow.",
+            "schedule_start_key": "Kunci berisi stempel waktu awal setiap periode di dalam daftar tersebut.",
+            "schedule_value_key": "Kunci berisi nilai setiap periode di dalam daftar tersebut.",
+            "schedule_low_max": "Nilai pada atau di bawah ini masuk pita rendah. Kosongkan kedua ambang agar aplikasi menurunkan pita dari rentang yang dikirim.",
+            "schedule_high_min": "Nilai pada atau di atas ini masuk pita tinggi. Harus di atas maksimum pita rendah.",
+            "flow_nodes": "Satu baris per simpul. Slot menentukan tempat tampilnya: hingga 3 masukan, plus masing-masing satu keluaran, penyimpanan, dan pertukaran. Laju berasal dari entitas, dengan tanda sesuai konvensi Anda."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Atribut Label",
                 "subtitle_attribute": "Atribut Subjudul",
                 "icon": "Ikon",
-                "icon_attribute": "Atribut Ikon"
+                "icon_attribute": "Atribut Ikon",
+                "subtitle_timer_entity": "Entitas timer",
+                "subtitle_timer_attribute": "Atribut timer",
+                "subtitle_timer_style": "Gaya timer"
               },
               "data_description": {
                 "label": "Label statis yang ditampilkan pada widget. Biarkan kosong untuk diturunkan dari entitas.",
                 "label_attribute": "Atribut entitas yang digunakan sebagai label. Menggantikan label statis.",
                 "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul widget.",
                 "icon": "Ikon statis. Mendukung nama SF Symbols dan MDI.",
-                "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis."
+                "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis.",
+                "subtitle_timer_entity": "Menampilkan subjudul sebagai hitung mundur atau hitung maju langsung berdasarkan tanggal entitas ini. Kosongkan untuk membaca entitas widget itu sendiri.",
+                "subtitle_timer_attribute": "Atribut yang memuat tanggal. Kosongkan untuk memakai status entitas.",
+                "subtitle_timer_style": "Timer berjalan seperti 01:23:45; relatif menampilkan satuan kasar seperti 2 mnt."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Mode Pemicu",
-                "widget_poll_interval": "Interval Polling (detik)"
+                "widget_poll_interval": "Interval Polling (detik)",
+                "widget_stale_after": "Usang setelah (detik)"
               },
               "data_description": {
                 "widget_trigger_mode": "Bagaimana pembaruan dipicu. `event` bereaksi terhadap perubahan status; `poll` mengevaluasi ulang pada interval tetap.",
-                "widget_poll_interval": "Interval antar polling (10–3600 detik). Hanya digunakan saat mode pemicu adalah `poll`."
+                "widget_poll_interval": "Interval antar polling (10–3600 detik). Hanya digunakan saat mode pemicu adalah `poll`.",
+                "widget_stale_after": "Detik setelah pembaruan terakhir sebelum aplikasi menampilkan widget sebagai usang. Kosongkan agar tidak pernah ditandai usang. Denyut mengirim ulang pada setengah interval ini agar tetap segar, dan tiap denyut memakai satu pembaruan widget dari kuota Anda, jadi 3600 atau lebih adalah rentang yang masuk akal."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "Minimal satu baris statistik diperlukan untuk templat stat_list.",
         "invalid_stat_row": "Setiap baris harus label=entity_id (mis. Users=sensor.user_count).",
         "too_many_stat_rows": "Daftar statistik mendukung maksimal 6 baris.",
-        "invalid_number": "Masukkan angka yang valid."
+        "invalid_number": "Masukkan angka yang valid.",
+        "invalid_battery_device": "Setiap baris perangkat memerlukan entitas. Nama maksimal 32 karakter, ikon maksimal 128, warna berupa nama warna atau hex.",
+        "too_many_battery_devices": "Widget baterai mendukung paling banyak 8 perangkat.",
+        "battery_devices_required": "Templat battery memerlukan setidaknya satu perangkat.",
+        "invalid_flow_node": "Setiap baris aliran memerlukan slot dan entitas. Nama maksimal 32 karakter, ikon maksimal 128, warna berupa nama warna atau hex.",
+        "too_many_flow_inputs": "Widget aliran mendukung paling banyak 3 masukan.",
+        "duplicate_flow_slot": "Hanya satu keluaran, penyimpanan, dan pertukaran masing-masing. Gunakan input untuk sisanya.",
+        "flow_nodes_required": "Templat flow memerlukan setidaknya satu simpul.",
+        "invalid_schedule_thresholds": "Maksimum pita rendah harus di bawah minimum pita tinggi."
       },
       "abort": {
         "already_configured": "Widget dengan slug ini sudah ada.",
@@ -1827,7 +1865,12 @@
         "progress": "Progres",
         "gauge": "Pengukur",
         "status": "Status",
-        "stat_list": "Daftar statistik"
+        "stat_list": "Daftar statistik",
+        "trend": "Tren",
+        "countdown": "Hitung mundur",
+        "battery": "Baterai",
+        "schedule": "Jadwal",
+        "flow": "Aliran"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Sian",
         "mint": "Mint",
         "brown": "Cokelat"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Timer",
+        "relative": "Relatif"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Masukan",
+        "output": "Keluaran",
+        "storage": "Penyimpanan",
+        "exchange": "Pertukaran"
       }
     }
   }

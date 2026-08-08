@@ -179,6 +179,7 @@ class PushWardApiClient:
         content: dict,
         *,
         push_throttle: int | None = None,
+        stale_after: int | None = None,
     ) -> None:
         """POST /widgets. Server upserts on slug — same slug overwrites in place.
 
@@ -193,6 +194,8 @@ class PushWardApiClient:
         }
         if push_throttle is not None:
             body["push_throttle"] = push_throttle
+        if stale_after is not None:
+            body["stale_after"] = stale_after
         await self._request_with_retry("POST", "/widgets", json=body)
 
     async def patch_widget(self, slug: str, body: dict) -> None:

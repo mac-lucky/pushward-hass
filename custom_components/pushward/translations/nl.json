@@ -1649,7 +1649,7 @@
             "slug": "Widget-slug"
           },
           "data_description": {
-            "widget_template": "Widgetindeling. Gebruik `value` voor een enkel getal, `progress` voor een 0–1-balk, `gauge` voor een waarde-binnen-bereik, `status` voor een ernst-badge, of `stat_list` voor maximaal 6 rijen.",
+            "widget_template": "Widgetindeling: `value` voor een enkel getal, `progress` voor een balk, `gauge` voor een waarde in een bereik, `status` voor een ernstbadge, `stat_list` voor maximaal 6 rijen, `trend` voor een sparkline, `countdown` voor een datum, `battery` voor apparaatringen, `schedule` voor een uurtijdlijn, `flow` voor wat binnenkomt en weggaat.",
             "slug": "Unieke identificatie voor deze widget. Laat leeg om automatisch te genereren op basis van de entiteits-ID."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Minimumwaarde",
             "max_value": "Maximumwaarde",
             "severity": "Ernst",
-            "stat_rows": "Statistiekrijen"
+            "stat_rows": "Statistiekrijen",
+            "history_period": "Trendgeschiedenis (minuten)",
+            "start_date_attribute": "Attribuut startdatum",
+            "end_date_attribute": "Attribuut einddatum",
+            "expired_text": "Tekst na afloop",
+            "battery_devices": "Apparaten",
+            "schedule_attributes": "Periode-attributen",
+            "schedule_start_key": "Sleutel periodestart",
+            "schedule_value_key": "Sleutel periodewaarde",
+            "schedule_low_max": "Maximum lage band",
+            "schedule_high_min": "Minimum hoge band",
+            "flow_nodes": "Stroomknooppunten"
           },
           "data_description": {
             "widget_name": "Weergavenaam in de iOS-widgetkiezer. Standaard de vriendelijke naam van de entiteit.",
@@ -1685,7 +1696,18 @@
             "min_value": "Minimumwaarde voor het meterbereik.",
             "max_value": "Maximumwaarde voor het meterbereik.",
             "severity": "Ernst van de status (info, warning, critical, success).",
-            "stat_rows": "Tot 6 rijen, elk gekoppeld aan een aparte entiteit: label, entiteit en optioneel attribuut en eenheid. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Stel de rijdichtheid per widget in de PushWard-app in."
+            "stat_rows": "Tot 6 rijen, elk gekoppeld aan een aparte entiteit: label, entiteit en optioneel attribuut en eenheid. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Stel de rijdichtheid per widget in de PushWard-app in.",
+            "history_period": "Hoe ver terug de sparkline bij de start uit de recorder wordt gevuld. 0 slaat het vullen over en de grafiek loopt vol naarmate de entiteit verandert.",
+            "start_date_attribute": "Entiteitsattribuut met het begin van het venster. Optioneel; bij progress loopt de balk hiermee op het apparaat door tussen pushes.",
+            "end_date_attribute": "Entiteitsattribuut met het einde van het venster. Laat leeg om de status van de entiteit, finishes_at van een timer of end_time van een agenda te gebruiken.",
+            "expired_text": "Wordt getoond zodra de einddatum voorbij is, in plaats van optellen. Maximaal 64 tekens.",
+            "battery_devices": "Tot 8 ringen, elk gekoppeld aan een eigen entiteit: naam, entiteit, plus optioneel niveau-attribuut, laadentiteit, pictogram en kleur.",
+            "schedule_attributes": "Kommagescheiden attributen met periodelijsten, in deze volgorde gelezen. Nordpool publiceert raw_today, raw_tomorrow.",
+            "schedule_start_key": "Sleutel met de starttijd van elke periode in die lijsten.",
+            "schedule_value_key": "Sleutel met de waarde van elke periode in die lijsten.",
+            "schedule_low_max": "Waarden tot en met dit getal vallen in de lage band. Laat beide drempels leeg om de app de banden uit het verzonden bereik te laten afleiden.",
+            "schedule_high_min": "Waarden vanaf dit getal vallen in de hoge band. Moet boven het maximum van de lage band liggen.",
+            "flow_nodes": "Een rij per knooppunt. De slot bepaalt waar het verschijnt: tot 3 ingangen plus een uitgang, opslag en uitwisseling. De snelheid komt uit de entiteit, met je eigen tekenafspraak."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Label-attribuut",
                 "subtitle_attribute": "Ondertitel-attribuut",
                 "icon": "Pictogram",
-                "icon_attribute": "Pictogram-attribuut"
+                "icon_attribute": "Pictogram-attribuut",
+                "subtitle_timer_entity": "Timerentiteit",
+                "subtitle_timer_attribute": "Timerattribuut",
+                "subtitle_timer_style": "Timerstijl"
               },
               "data_description": {
                 "label": "Statisch label op de widget. Laat leeg om af te leiden van de entiteit.",
                 "label_attribute": "Entiteitsattribuut dat als label wordt gebruikt. Overschrijft het statische label.",
                 "subtitle_attribute": "Entiteitsattribuut dat als ondertitel van de widget wordt getoond.",
                 "icon": "Statisch pictogram. SF Symbols- en MDI-namen worden ondersteund.",
-                "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Overschrijft het statische pictogram."
+                "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Overschrijft het statische pictogram.",
+                "subtitle_timer_entity": "Toont de ondertitel als een lopende aftel- of optelteller vanaf de datum van deze entiteit. Laat leeg om de eigen entiteit van de widget te lezen.",
+                "subtitle_timer_attribute": "Attribuut met de datum. Laat leeg om de status van de entiteit te gebruiken.",
+                "subtitle_timer_style": "Timer tikt als 01:23:45; relatief toont grove eenheden zoals 2 min."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Triggermodus",
-                "widget_poll_interval": "Pollinginterval (seconden)"
+                "widget_poll_interval": "Pollinginterval (seconden)",
+                "widget_stale_after": "Verouderd na (seconden)"
               },
               "data_description": {
                 "widget_trigger_mode": "Hoe updates worden getriggerd. `event` reageert op statuswijzigingen; `poll` evalueert opnieuw met een vast interval.",
-                "widget_poll_interval": "Interval tussen pollingacties (10–3600 seconden). Wordt alleen gebruikt als de triggermodus `poll` is."
+                "widget_poll_interval": "Interval tussen pollingacties (10–3600 seconden). Wordt alleen gebruikt als de triggermodus `poll` is.",
+                "widget_stale_after": "Seconden na de laatste update voordat de app de widget als verouderd toont. Laat leeg om die nooit als verouderd te markeren. Een heartbeat verstuurt op de helft van dit interval opnieuw en kost telkens een widget-update uit je quotum, dus 3600 of meer is het verstandige bereik."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "Voor het stat_list-sjabloon is minimaal één statistiekrij vereist.",
         "invalid_stat_row": "Elke rij moet label=entity_id zijn (bijv. Users=sensor.user_count).",
         "too_many_stat_rows": "Een statistiekenlijst ondersteunt maximaal 6 rijen.",
-        "invalid_number": "Voer een geldig getal in."
+        "invalid_number": "Voer een geldig getal in.",
+        "invalid_battery_device": "Elke apparaatrij heeft een entiteit nodig. Naam maximaal 32 tekens, pictogram maximaal 128, kleur als benoemde kleur of hex.",
+        "too_many_battery_devices": "Een batterijwidget ondersteunt maximaal 8 apparaten.",
+        "battery_devices_required": "Voor de sjabloon battery is minstens één apparaat vereist.",
+        "invalid_flow_node": "Elke stroomrij heeft een slot en een entiteit nodig. Naam maximaal 32 tekens, pictogram maximaal 128, kleur als benoemde kleur of hex.",
+        "too_many_flow_inputs": "Een stroomwidget ondersteunt maximaal 3 ingangen.",
+        "duplicate_flow_slot": "Slechts één uitgang, opslag en uitwisseling elk. Gebruik input voor de rest.",
+        "flow_nodes_required": "Voor de sjabloon flow is minstens één knooppunt vereist.",
+        "invalid_schedule_thresholds": "Het maximum van de lage band moet onder het minimum van de hoge band liggen."
       },
       "abort": {
         "already_configured": "Er bestaat al een widget met deze slug.",
@@ -1827,7 +1865,12 @@
         "progress": "Voortgang",
         "gauge": "Meter",
         "status": "Status",
-        "stat_list": "Statistiekenlijst"
+        "stat_list": "Statistiekenlijst",
+        "trend": "Trend",
+        "countdown": "Aftellen",
+        "battery": "Batterij",
+        "schedule": "Schema",
+        "flow": "Stroom"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Cyaan",
         "mint": "Mint",
         "brown": "Bruin"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Timer",
+        "relative": "Relatief"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Ingang",
+        "output": "Uitgang",
+        "storage": "Opslag",
+        "exchange": "Uitwisseling"
       }
     }
   }

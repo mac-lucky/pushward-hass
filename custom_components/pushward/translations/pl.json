@@ -1649,7 +1649,7 @@
             "slug": "Slug widżetu"
           },
           "data_description": {
-            "widget_template": "Układ widżetu. Użyj `value` dla pojedynczej liczby, `progress` dla paska 0–1, `gauge` dla wartości w zakresie, `status` dla odznaki istotności lub `stat_list` dla maks. 6 wierszy.",
+            "widget_template": "Układ widżetu: `value` dla jednej liczby, `progress` dla paska, `gauge` dla wartości w zakresie, `status` dla odznaki ważności, `stat_list` dla maksymalnie 6 wierszy, `trend` dla wykresu iskrowego, `countdown` dla daty, `battery` dla pierścieni urządzeń, `schedule` dla osi godzinowej, `flow` dla tego, co wpływa i wypływa.",
             "slug": "Unikalny identyfikator tego widżetu. Pozostaw puste, aby wygenerować automatycznie z identyfikatora encji."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Wartość minimalna",
             "max_value": "Wartość maksymalna",
             "severity": "Poziom istotności",
-            "stat_rows": "Wiersze statystyk"
+            "stat_rows": "Wiersze statystyk",
+            "history_period": "Historia trendu (minuty)",
+            "start_date_attribute": "Atrybut daty początkowej",
+            "end_date_attribute": "Atrybut daty końcowej",
+            "expired_text": "Tekst po wygaśnięciu",
+            "battery_devices": "Urządzenia",
+            "schedule_attributes": "Atrybuty okresów",
+            "schedule_start_key": "Klucz początku okresu",
+            "schedule_value_key": "Klucz wartości okresu",
+            "schedule_low_max": "Maksimum niskiego pasma",
+            "schedule_high_min": "Minimum wysokiego pasma",
+            "flow_nodes": "Węzły przepływu"
           },
           "data_description": {
             "widget_name": "Nazwa wyświetlana w selektorze widżetów iOS. Domyślnie przyjazna nazwa encji.",
@@ -1685,7 +1696,18 @@
             "min_value": "Wartość minimalna zakresu wskaźnika.",
             "max_value": "Wartość maksymalna zakresu wskaźnika.",
             "severity": "Istotność statusu (info, warning, critical, success).",
-            "stat_rows": "Do 6 wierszy, każdy powiązany z osobną encją: etykieta, encja oraz opcjonalnie atrybut i jednostka. Nadal akceptowany jest ciąg rozdzielony przecinkami. Gęstość wierszy ustawisz dla każdego widżetu w aplikacji PushWard."
+            "stat_rows": "Do 6 wierszy, każdy powiązany z osobną encją: etykieta, encja oraz opcjonalnie atrybut i jednostka. Nadal akceptowany jest ciąg rozdzielony przecinkami. Gęstość wierszy ustawisz dla każdego widżetu w aplikacji PushWard.",
+            "history_period": "Jak daleko wstecz wykres jest wypełniany z rejestratora przy starcie. 0 pomija wstępne wypełnienie, a wykres zapełnia się wraz ze zmianami encji.",
+            "start_date_attribute": "Atrybut encji z początkiem okna. Opcjonalny; przy progress pasek dzięki niemu przesuwa się na urządzeniu między wysyłkami.",
+            "end_date_attribute": "Atrybut encji z końcem okna. Zostaw puste, aby użyć stanu encji, finishes_at minutnika lub end_time kalendarza.",
+            "expired_text": "Pokazywany po minięciu daty końcowej, zamiast liczenia w górę. Maksymalnie 64 znaki.",
+            "battery_devices": "Do 8 pierścieni, każdy powiązany z osobną encją: nazwa, encja oraz opcjonalnie atrybut poziomu, encja ładowania, ikona i kolor.",
+            "schedule_attributes": "Atrybuty rozdzielone przecinkami zawierające listy okresów, czytane w tej kolejności. Nordpool publikuje raw_today, raw_tomorrow.",
+            "schedule_start_key": "Klucz z sygnaturą czasu początku każdego okresu w tych listach.",
+            "schedule_value_key": "Klucz z wartością każdego okresu w tych listach.",
+            "schedule_low_max": "Wartości mniejsze lub równe trafiają do niskiego pasma. Zostaw oba progi puste, aby aplikacja wyliczyła pasma z wysłanego zakresu.",
+            "schedule_high_min": "Wartości większe lub równe trafiają do wysokiego pasma. Musi być powyżej maksimum niskiego pasma.",
+            "flow_nodes": "Jeden wiersz na węzeł. Slot decyduje o miejscu: do 3 wejść oraz po jednym wyjściu, magazynie i wymianie. Tempo pochodzi z encji, ze znakiem według własnej konwencji."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Atrybut etykiety",
                 "subtitle_attribute": "Atrybut podtytułu",
                 "icon": "Ikona",
-                "icon_attribute": "Atrybut ikony"
+                "icon_attribute": "Atrybut ikony",
+                "subtitle_timer_entity": "Encja minutnika",
+                "subtitle_timer_attribute": "Atrybut minutnika",
+                "subtitle_timer_style": "Styl minutnika"
               },
               "data_description": {
                 "label": "Statyczna etykieta pokazywana na widżecie. Pozostaw puste, aby wyprowadzić z encji.",
                 "label_attribute": "Atrybut encji używany jako etykieta. Nadpisuje etykietę statyczną.",
                 "subtitle_attribute": "Atrybut encji pokazywany jako podtytuł widżetu.",
                 "icon": "Statyczna ikona. Obsługiwane nazwy SF Symbols i MDI.",
-                "icon_attribute": "Atrybut encji dla dynamicznej ikony. Nadpisuje statyczną ikonę."
+                "icon_attribute": "Atrybut encji dla dynamicznej ikony. Nadpisuje statyczną ikonę.",
+                "subtitle_timer_entity": "Pokazuje podtytuł jako żywe odliczanie w dół lub w górę zakotwiczone na dacie tej encji. Zostaw puste, aby użyć encji samego widżetu.",
+                "subtitle_timer_attribute": "Atrybut z datą. Zostaw puste, aby użyć stanu encji.",
+                "subtitle_timer_style": "Minutnik tyka jak 01:23:45; względny pokazuje przybliżone jednostki, np. 2 min."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Tryb wyzwalania",
-                "widget_poll_interval": "Interwał odpytywania (sekundy)"
+                "widget_poll_interval": "Interwał odpytywania (sekundy)",
+                "widget_stale_after": "Nieaktualny po (sekundy)"
               },
               "data_description": {
                 "widget_trigger_mode": "Sposób wyzwalania aktualizacji. `event` reaguje na zmiany stanu; `poll` ponownie oblicza w stałym interwale.",
-                "widget_poll_interval": "Interwał między odpytaniami (10–3600 sekund). Używany tylko, gdy tryb wyzwalania to `poll`."
+                "widget_poll_interval": "Interwał między odpytaniami (10–3600 sekund). Używany tylko, gdy tryb wyzwalania to `poll`.",
+                "widget_stale_after": "Sekundy od ostatniej aktualizacji, po których aplikacja pokazuje widżet jako nieaktualny. Zostaw puste, aby nigdy go tak nie oznaczać. Puls wysyła ponownie co połowę tego odstępu, aby utrzymać świeżość, a każdy puls zużywa jedną aktualizację widżetu z limitu, więc rozsądny zakres to 3600 lub więcej."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "Szablon stat_list wymaga co najmniej jednego wiersza statystyk.",
         "invalid_stat_row": "Każdy wiersz musi mieć postać label=entity_id (np. Users=sensor.user_count).",
         "too_many_stat_rows": "Lista statystyk obsługuje maksymalnie 6 wierszy.",
-        "invalid_number": "Wprowadź prawidłową liczbę."
+        "invalid_number": "Wprowadź prawidłową liczbę.",
+        "invalid_battery_device": "Każdy wiersz urządzenia wymaga encji. Nazwa maksymalnie 32 znaki, ikona maksymalnie 128, kolor jako nazwa koloru lub hex.",
+        "too_many_battery_devices": "Widżet baterii obsługuje najwyżej 8 urządzeń.",
+        "battery_devices_required": "Szablon battery wymaga co najmniej jednego urządzenia.",
+        "invalid_flow_node": "Każdy wiersz przepływu wymaga slotu i encji. Nazwa maksymalnie 32 znaki, ikona maksymalnie 128, kolor jako nazwa koloru lub hex.",
+        "too_many_flow_inputs": "Widżet przepływu obsługuje najwyżej 3 wejścia.",
+        "duplicate_flow_slot": "Tylko po jednym wyjściu, magazynie i wymianie. Dla reszty użyj input.",
+        "flow_nodes_required": "Szablon flow wymaga co najmniej jednego węzła.",
+        "invalid_schedule_thresholds": "Maksimum niskiego pasma musi być poniżej minimum wysokiego pasma."
       },
       "abort": {
         "already_configured": "Widżet z tym slugiem już istnieje.",
@@ -1827,7 +1865,12 @@
         "progress": "Postęp",
         "gauge": "Wskaźnik",
         "status": "Status",
-        "stat_list": "Lista statystyk"
+        "stat_list": "Lista statystyk",
+        "trend": "Trend",
+        "countdown": "Odliczanie",
+        "battery": "Bateria",
+        "schedule": "Harmonogram",
+        "flow": "Przepływ"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Cyjan",
         "mint": "Miętowy",
         "brown": "Brązowy"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Minutnik",
+        "relative": "Względny"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Wejście",
+        "output": "Wyjście",
+        "storage": "Magazyn",
+        "exchange": "Wymiana"
       }
     }
   }

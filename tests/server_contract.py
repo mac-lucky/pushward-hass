@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import math
 import time
+from datetime import datetime, timedelta
 from urllib.parse import urlparse
 
 from custom_components.pushward.const import (
@@ -47,6 +48,7 @@ from custom_components.pushward.const import (
     PRIORITY_MAX,
     PRIORITY_MIN,
     SCALES,
+    SCHEDULE_LEVELS,
     SEVERITIES,
     SNOOZE_SECONDS_MAX,
     SNOOZE_SECONDS_MIN,
@@ -59,10 +61,21 @@ from custom_components.pushward.const import (
     THRESHOLDS_MAX,
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
+    TIMER_STYLES,
     TOTAL_STEPS_MAX,
     WARNING_THRESHOLD_MAX,
+    WIDGET_DATE_FLOOR_TS,
+    WIDGET_DATE_HORIZON_DAYS,
+    WIDGET_EXPIRED_TEXT_MAX,
     WIDGET_LABEL_MAX,
+    WIDGET_MAX_BATTERY_DEVICES,
+    WIDGET_MAX_FLOW_INPUTS,
+    WIDGET_MAX_SCHEDULE_PERIODS,
     WIDGET_MAX_STAT_ROWS,
+    WIDGET_MAX_TREND_POINTS,
+    WIDGET_MIN_TREND_POINTS,
+    WIDGET_NODE_ICON_MAX,
+    WIDGET_NODE_NAME_MAX,
     WIDGET_SEVERITIES,
     WIDGET_STAT_LABEL_MAX,
     WIDGET_STAT_UNIT_MAX,
@@ -471,6 +484,142 @@ def _assert_log(content: dict, where: str) -> None:
         _fail(where, "log must not send log_backlog (server-owned field)")
 
 
+def _check_widget_date(value: object, field: str, where: str) -> datetime:
+    """Assert an RFC 3339 widget date inside the server's floor/horizon window."""
+    if not isinstance(value, str) or not value:
+        _fail(where, f"{field} must be an RFC 3339 timestamp string, got {value!r}")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        _fail(where, f"{field} is not a parseable RFC 3339 timestamp: {value!r}")
+    if parsed.tzinfo is None:
+        _fail(where, f"{field} must carry a UTC offset, got {value!r}")
+    ts = parsed.timestamp()
+    if ts < WIDGET_DATE_FLOOR_TS:
+        _fail(where, f"{field} predates the widget date floor (2000-01-01), got {value!r}")
+    horizon = (datetime.now(parsed.tzinfo) + timedelta(days=WIDGET_DATE_HORIZON_DAYS + 1)).timestamp()
+    if ts > horizon:
+        _fail(where, f"{field} is beyond the widget date horizon, got {value!r}")
+    return parsed
+
+
+def _check_timer(timer: object, field: str, where: str) -> None:
+    """Assert an optional self-updating timer slot: {date, style?}."""
+    if timer is None:
+        return
+    if not isinstance(timer, dict):
+        _fail(where, f"{field} must be an object, got {type(timer).__name__}")
+    _check_widget_date(timer.get("date"), f"{field}.date", where)
+    style = timer.get("style") or ""
+    if style not in TIMER_STYLES and style != "":
+        _fail(where, f"{field}.style must be one of {TIMER_STYLES}, got {style!r}")
+
+
+def _check_node(node: object, field: str, where: str, *, require_name: bool) -> None:
+    """Assert the presentation fields a battery device and a flow node share."""
+    name = node.get("name") if isinstance(node, dict) else None
+    if require_name and not str(name or "").strip():
+        _fail(where, f"{field}.name must not be empty")
+    _check_len(name, WIDGET_NODE_NAME_MAX, f"{field}.name", where)
+    _check_len(node.get("icon"), WIDGET_NODE_ICON_MAX, f"{field}.icon", where)
+    _check_color(node.get("color"), f"{field}.color", where)
+
+
+def _check_percent(value: object, field: str, where: str) -> None:
+    if not _is_finite_number(value):
+        _fail(where, f"{field} must be a finite number, got {value!r}")
+    if not (0 <= float(value) <= 100):
+        _fail(where, f"{field} must be between 0 and 100, got {value!r}")
+
+
+def _assert_widget_collections(content: dict, where: str) -> None:
+    """Bound every widget array/nested-object field, for EVERY template.
+
+    Mirrors the server's own validateCollections, which deliberately runs
+    template-agnostically: PATCH merges arrays wholesale, so a half-built element
+    stored under a template that ignores the field still breaks the iOS decode of
+    the whole widget list later.
+    """
+    points = content.get("points")
+    if points is not None:
+        if not isinstance(points, list):
+            _fail(where, f"points must be a list, got {type(points).__name__}")
+        if points and not (WIDGET_MIN_TREND_POINTS <= len(points) <= WIDGET_MAX_TREND_POINTS):
+            _fail(
+                where,
+                f"trend requires between {WIDGET_MIN_TREND_POINTS} and {WIDGET_MAX_TREND_POINTS} points, "
+                f"got {len(points)}",
+            )
+        for i, point in enumerate(points):
+            if not _is_finite_number(point):
+                _fail(where, f"points[{i}] must be a finite number, got {point!r}")
+
+    devices = content.get("devices")
+    if devices is not None:
+        if not isinstance(devices, list):
+            _fail(where, f"devices must be a list, got {type(devices).__name__}")
+        if len(devices) > WIDGET_MAX_BATTERY_DEVICES:
+            _fail(where, f"battery supports at most {WIDGET_MAX_BATTERY_DEVICES} devices, got {len(devices)}")
+        for i, device in enumerate(devices):
+            if not isinstance(device, dict):
+                _fail(where, f"devices[{i}] must be an object, got {type(device).__name__}")
+            _check_node(device, f"devices[{i}]", where, require_name=True)
+            _check_percent(device.get("level"), f"devices[{i}].level", where)
+
+    periods = content.get("periods")
+    if periods is not None:
+        if not isinstance(periods, list):
+            _fail(where, f"periods must be a list, got {type(periods).__name__}")
+        if len(periods) > WIDGET_MAX_SCHEDULE_PERIODS:
+            _fail(where, f"schedule supports at most {WIDGET_MAX_SCHEDULE_PERIODS} periods, got {len(periods)}")
+        previous: datetime | None = None
+        for i, period in enumerate(periods):
+            if not isinstance(period, dict):
+                _fail(where, f"periods[{i}] must be an object, got {type(period).__name__}")
+            start = _check_widget_date(period.get("start"), f"periods[{i}].start", where)
+            if previous is not None and start <= previous:
+                _fail(where, f"periods[{i}].start must be after periods[{i - 1}].start")
+            previous = start
+            if not _is_finite_number(period.get("value")):
+                _fail(where, f"periods[{i}].value must be a finite number, got {period.get('value')!r}")
+            level = period.get("level") or ""
+            if level and level not in SCHEDULE_LEVELS:
+                _fail(where, f"periods[{i}].level must be one of {SCHEDULE_LEVELS}, got {level!r}")
+
+    flow = content.get("flow")
+    if flow is not None:
+        if not isinstance(flow, dict):
+            _fail(where, f"flow must be an object, got {type(flow).__name__}")
+        inputs = flow.get("inputs") or []
+        if len(inputs) > WIDGET_MAX_FLOW_INPUTS:
+            _fail(where, f"flow supports at most {WIDGET_MAX_FLOW_INPUTS} inputs, got {len(inputs)}")
+        slots = [(f"flow.inputs[{i}]", node) for i, node in enumerate(inputs)]
+        slots += [(f"flow.{name}", flow[name]) for name in ("output", "storage", "exchange") if flow.get(name)]
+        for field, node in slots:
+            if not isinstance(node, dict):
+                _fail(where, f"{field} must be an object, got {type(node).__name__}")
+            if not _is_finite_number(node.get("rate")):
+                _fail(where, f"{field}.rate is required and must be finite, got {node.get('rate')!r}")
+            total = node.get("total")
+            if total is not None:
+                if not _is_finite_number(total):
+                    _fail(where, f"{field}.total must be a finite number, got {total!r}")
+                if float(total) < 0:
+                    _fail(where, f"{field}.total must not be negative, got {total!r}")
+            if node.get("level") is not None:
+                _check_percent(node.get("level"), f"{field}.level", where)
+            _check_node(node, field, where, require_name=False)
+
+    _check_len(content.get("expired_text"), WIDGET_EXPIRED_TEXT_MAX, "expired_text", where)
+    _check_timer(content.get("subtitle_timer"), "subtitle_timer", where)
+
+    start_date, end_date = content.get("start_date"), content.get("end_date")
+    parsed_start = _check_widget_date(start_date, "start_date", where) if start_date is not None else None
+    parsed_end = _check_widget_date(end_date, "end_date", where) if end_date is not None else None
+    if parsed_start is not None and parsed_end is not None and parsed_start >= parsed_end:
+        _fail(where, f"start_date ({start_date}) must be before end_date ({end_date})")
+
+
 def assert_valid_widget_content(content: dict, template: str | None = None, *, where: str = "widget") -> None:
     """Assert ``content`` satisfies the public widget content contract.
 
@@ -503,12 +652,42 @@ def assert_valid_widget_content(content: dict, template: str | None = None, *, w
     for field in ("tap_action", "url_action", "secondary_url_action"):
         _check_tap_action(content.get(field), field, where)
 
+    _assert_widget_collections(content, where)
+
     if template == "progress":
         value = content.get("value")
+        has_window = content.get("start_date") is not None and content.get("end_date") is not None
+        if value is None and not has_window:
+            _fail(where, "progress widget requires a value unless start_date and end_date are both set")
+        if value is not None:
+            if not _is_finite_number(value):
+                _fail(where, f"progress widget requires a finite value, got {value!r}")
+            if not (0.0 <= float(value) <= 1.0):
+                _fail(where, f"progress widget value must be in [0.0, 1.0], got {value!r}")
+    elif template == "trend":
+        value = content.get("value")
         if value is None or not _is_finite_number(value):
-            _fail(where, f"progress widget requires a finite value, got {value!r}")
-        if not (0.0 <= float(value) <= 1.0):
-            _fail(where, f"progress widget value must be in [0.0, 1.0], got {value!r}")
+            _fail(where, f"trend widget requires a finite value, got {value!r}")
+        if not content.get("points"):
+            _fail(where, "trend widget requires points")
+        min_v, max_v = content.get("min_value"), content.get("max_value")
+        if min_v is not None and max_v is not None and float(min_v) >= float(max_v):
+            _fail(where, f"trend widget min_value ({min_v}) must be less than max_value ({max_v})")
+    elif template == "countdown":
+        if content.get("end_date") is None:
+            _fail(where, "countdown widget requires end_date")
+    elif template == "battery":
+        if not content.get("devices"):
+            _fail(where, "battery widget requires at least one device")
+    elif template == "schedule":
+        if not content.get("periods"):
+            _fail(where, "schedule widget requires at least one period")
+    elif template == "flow":
+        flow = content.get("flow")
+        if not flow:
+            _fail(where, "flow widget requires a flow object")
+        if not any(flow.get(slot) for slot in ("inputs", "output", "storage", "exchange")):
+            _fail(where, "flow widget requires at least one of inputs, output, storage, or exchange")
     elif template == "gauge":
         value, min_v, max_v = content.get("value"), content.get("min_value"), content.get("max_value")
         for name, v in (("value", value), ("min_value", min_v), ("max_value", max_v)):
@@ -536,6 +715,7 @@ def assert_valid_widget_content(content: dict, template: str | None = None, *, w
             _check_len(row.get("label"), WIDGET_STAT_LABEL_MAX, f"stat_rows[{i}].label", where)
             _check_len(row.get("value"), WIDGET_STAT_VALUE_MAX, f"stat_rows[{i}].value", where)
             _check_len(row.get("unit"), WIDGET_STAT_UNIT_MAX, f"stat_rows[{i}].unit", where)
+            _check_timer(row.get("timer"), f"stat_rows[{i}].timer", where)
 
 
 def assert_valid_sound(sound: object, *, where: str = "sound") -> None:

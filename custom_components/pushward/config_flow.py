@@ -52,27 +52,35 @@ from .const import (
     CONF_ALARM,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
+    CONF_BATTERY_DEVICES,
+    CONF_CHARGING_ENTITY,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
     CONF_DISMISSAL_TTL,
+    CONF_END_DATE_ATTRIBUTE,
     CONF_END_STATES,
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
+    CONF_EXPIRED_TEXT,
     CONF_FIRED_AT_ATTRIBUTE,
     CONF_FIRED_AT_ENTITY,
+    CONF_FLOW_NODES,
+    CONF_FLOW_SLOT,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
     CONF_LABEL_ATTRIBUTE,
+    CONF_LEVEL_ENTITY,
     CONF_LIVE_PROGRESS,
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_NODE_NAME,
     CONF_PRIMARY_SERIES,
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
@@ -80,6 +88,11 @@ from .const import (
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SCALE,
+    CONF_SCHEDULE_ATTRIBUTES,
+    CONF_SCHEDULE_HIGH_MIN,
+    CONF_SCHEDULE_LOW_MAX,
+    CONF_SCHEDULE_START_KEY,
+    CONF_SCHEDULE_VALUE_KEY,
     CONF_SECONDARY_URL,
     CONF_SECONDARY_URL_FOREGROUND,
     CONF_SECONDARY_URL_TITLE,
@@ -94,6 +107,7 @@ from .const import (
     CONF_SNOOZE_SECONDS,
     CONF_SOUND,
     CONF_STALE_TTL,
+    CONF_START_DATE_ATTRIBUTE,
     CONF_START_STATES,
     CONF_STAT_ROWS,
     CONF_STATE_LABELS,
@@ -104,6 +118,9 @@ from .const import (
     CONF_STEPS_EDITOR,
     CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_ENTITY,
+    CONF_SUBTITLE_TIMER_ATTRIBUTE,
+    CONF_SUBTITLE_TIMER_ENTITY,
+    CONF_SUBTITLE_TIMER_STYLE,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_TEMPLATE,
@@ -113,6 +130,7 @@ from .const import (
     CONF_TILE_COLOR,
     CONF_TILE_URL_ACTION,
     CONF_TILES,
+    CONF_TOTAL_ENTITY,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
     CONF_UNITS,
@@ -126,6 +144,7 @@ from .const import (
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
+    CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     DANGEROUS_URL_SCHEMES,
@@ -135,16 +154,22 @@ from .const import (
     DEFAULT_MIN_VALUE,
     DEFAULT_PRIORITY,
     DEFAULT_SCALE,
+    DEFAULT_SCHEDULE_START_KEY,
+    DEFAULT_SCHEDULE_VALUE_KEY,
     DEFAULT_SERVER_URL,
     DEFAULT_SEVERITY,
+    DEFAULT_SUBTITLE_TIMER_STYLE,
     DEFAULT_TAP_ACTION_FOREGROUND,
     DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_VALUE_SCALE,
     DEFAULT_WIDGET_POLL_INTERVAL,
+    DEFAULT_WIDGET_TREND_PERIOD,
     DISMISSAL_TTL_MAX,
     DISMISSAL_TTL_MIN,
     DOMAIN,
+    FLOW_SLOT_INPUT,
+    FLOW_SLOTS,
     HISTORY_PERIOD_MAX,
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
@@ -173,22 +198,36 @@ from .const import (
     THRESHOLDS_MAX,
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
+    TIMER_STYLES,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
     VALUE_SCALES,
     WARNING_THRESHOLD_MAX,
+    WIDGET_EXPIRED_TEXT_MAX,
+    WIDGET_GROUP_TEMPLATES,
     WIDGET_LABEL_MAX,
+    WIDGET_MAX_BATTERY_DEVICES,
+    WIDGET_MAX_FLOW_INPUTS,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_NAME_MAX,
+    WIDGET_NODE_ICON_MAX,
+    WIDGET_NODE_NAME_MAX,
     WIDGET_POLL_INTERVAL_MAX,
     WIDGET_POLL_INTERVAL_MIN,
     WIDGET_SEVERITIES,
+    WIDGET_STALE_AFTER_MAX,
+    WIDGET_STALE_AFTER_MIN,
     WIDGET_STAT_LABEL_MAX,
     WIDGET_STAT_UNIT_MAX,
+    WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_COUNTDOWN,
+    WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
     WIDGET_TEMPLATE_PROGRESS,
+    WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_STATUS,
+    WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TEMPLATES,
     WIDGET_TRIGGER_EVENT,
@@ -253,6 +292,17 @@ _BOARD_TILES_SELECTOR = ObjectSelector(
     )
 )
 
+# Renders the row's value as a self-updating timer when the value parses as a
+# date. custom_value so an existing row without one submits unchanged.
+_ROW_TIMER_STYLE = {
+    "select": {
+        "options": list(TIMER_STYLES),
+        "custom_value": True,
+        "mode": "dropdown",
+        "translation_key": "timer_style",
+    }
+}
+
 _WIDGET_STAT_ROWS_SELECTOR = ObjectSelector(
     ObjectSelectorConfig(
         fields={
@@ -260,9 +310,57 @@ _WIDGET_STAT_ROWS_SELECTOR = ObjectSelector(
             CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
             CONF_VALUE_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
             CONF_UNIT: {"label": "Unit", "selector": _ROW_TEXT},
+            "timer_style": {"label": "Timer", "selector": _ROW_TIMER_STYLE},
         },
         multiple=True,
         label_field=CONF_LABEL,
+        description_field=CONF_ENTITY_ID,
+    )
+)
+
+# Battery rings. Entity, charging entity and the level attribute are text fields,
+# not entity/attribute selectors - see the note on _BOARD_TILES_SELECTOR above.
+_BATTERY_DEVICES_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_NODE_NAME: {"label": "Name", "selector": _ROW_TEXT},
+            CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
+            CONF_VALUE_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_CHARGING_ENTITY: {"label": "Charging entity", "selector": _ROW_TEXT},
+            CONF_ICON: {"label": "Icon", "selector": _ROW_ICON},
+            "color": {"label": "Color", "selector": _ROW_NAMED_COLOR},
+        },
+        multiple=True,
+        label_field=CONF_NODE_NAME,
+        description_field=CONF_ENTITY_ID,
+    )
+)
+
+_ROW_FLOW_SLOT = {
+    "select": {
+        "options": list(FLOW_SLOTS),
+        "custom_value": True,
+        "mode": "dropdown",
+        "translation_key": "flow_slot",
+    }
+}
+
+# Flow nodes. `slot` decides where the node renders: up to three inputs, one each
+# of output / storage / exchange.
+_FLOW_NODES_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_FLOW_SLOT: {"label": "Slot", "selector": _ROW_FLOW_SLOT},
+            CONF_NODE_NAME: {"label": "Name", "selector": _ROW_TEXT},
+            CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
+            CONF_VALUE_ATTRIBUTE: {"label": "Attribute", "selector": _ROW_TEXT},
+            CONF_TOTAL_ENTITY: {"label": "Total entity", "selector": _ROW_TEXT},
+            CONF_LEVEL_ENTITY: {"label": "Level entity", "selector": _ROW_TEXT},
+            CONF_ICON: {"label": "Icon", "selector": _ROW_ICON},
+            "color": {"label": "Color", "selector": _ROW_NAMED_COLOR},
+        },
+        multiple=True,
+        label_field=CONF_FLOW_SLOT,
         description_field=CONF_ENTITY_ID,
     )
 )
@@ -502,6 +600,9 @@ WIDGET_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_LABEL,
         CONF_LABEL_ATTRIBUTE,
         CONF_SUBTITLE_ATTRIBUTE,
+        CONF_SUBTITLE_TIMER_ENTITY,
+        CONF_SUBTITLE_TIMER_ATTRIBUTE,
+        CONF_SUBTITLE_TIMER_STYLE,
         CONF_ICON,
         CONF_ICON_ATTRIBUTE,
     ),
@@ -518,6 +619,7 @@ WIDGET_SECTIONS: dict[str, tuple[str, ...]] = {
     "refresh": (
         CONF_WIDGET_TRIGGER_MODE,
         CONF_WIDGET_POLL_INTERVAL,
+        CONF_WIDGET_STALE_AFTER,
     ),
 }
 
@@ -533,6 +635,17 @@ _WIDGET_TOPLEVEL: frozenset[str] = frozenset(
         CONF_MAX_VALUE,
         CONF_SEVERITY,
         CONF_STAT_ROWS,
+        CONF_HISTORY_PERIOD,
+        CONF_START_DATE_ATTRIBUTE,
+        CONF_END_DATE_ATTRIBUTE,
+        CONF_EXPIRED_TEXT,
+        CONF_BATTERY_DEVICES,
+        CONF_SCHEDULE_ATTRIBUTES,
+        CONF_SCHEDULE_START_KEY,
+        CONF_SCHEDULE_VALUE_KEY,
+        CONF_SCHEDULE_LOW_MAX,
+        CONF_SCHEDULE_HIGH_MIN,
+        CONF_FLOW_NODES,
     }
 )
 
@@ -754,6 +867,8 @@ def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
 
 # Domains whose primary state reads as an on/off-style status widget.
 _STATUS_WIDGET_DOMAINS = frozenset({"binary_sensor", "lock", "switch", "cover"})
+# Domains whose state or attributes are a point in time, not a measurement.
+_COUNTDOWN_WIDGET_DOMAINS = frozenset({"timer", "input_datetime", "calendar"})
 
 
 def _suggest_widget_template(hass: HomeAssistant | None, entity_id: str) -> str:
@@ -762,12 +877,20 @@ def _suggest_widget_template(hass: HomeAssistant | None, entity_id: str) -> str:
         return WIDGET_TEMPLATE_VALUE
 
     domain = _entity_domain(entity_id)
+    if domain in _COUNTDOWN_WIDGET_DOMAINS:
+        return WIDGET_TEMPLATE_COUNTDOWN
     if domain in _STATUS_WIDGET_DOMAINS:
         return WIDGET_TEMPLATE_STATUS
 
     state_obj = hass.states.get(entity_id)
     if state_obj is None:
         return WIDGET_TEMPLATE_VALUE
+
+    device_class = state_obj.attributes.get("device_class")
+    if device_class == "timestamp":
+        return WIDGET_TEMPLATE_COUNTDOWN
+    if device_class == "battery":
+        return WIDGET_TEMPLATE_BATTERY
 
     if _is_gauge_like(state_obj, domain):
         return WIDGET_TEMPLATE_GAUGE
@@ -2086,14 +2209,80 @@ def _widget_details_schema(
     ] = vol.All(str, vol.Length(max=WIDGET_NAME_MAX))
 
     # Template-specific
-    if template in (WIDGET_TEMPLATE_VALUE, WIDGET_TEMPLATE_PROGRESS, WIDGET_TEMPLATE_GAUGE):
-        fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
+    if template in (
+        WIDGET_TEMPLATE_VALUE,
+        WIDGET_TEMPLATE_PROGRESS,
+        WIDGET_TEMPLATE_GAUGE,
+        WIDGET_TEMPLATE_TREND,
+        WIDGET_TEMPLATE_SCHEDULE,
+        WIDGET_TEMPLATE_FLOW,
+    ):
+        if template not in (WIDGET_TEMPLATE_SCHEDULE, WIDGET_TEMPLATE_FLOW):
+            fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
         fields[
             vol.Optional(
                 CONF_UNIT,
                 default=d.get(CONF_UNIT, ""),
             )
         ] = vol.All(str, vol.Length(max=WIDGET_UNIT_MAX))
+
+    if template == WIDGET_TEMPLATE_TREND:
+        fields[
+            vol.Optional(
+                CONF_HISTORY_PERIOD,
+                default=d.get(CONF_HISTORY_PERIOD, DEFAULT_WIDGET_TREND_PERIOD),
+            )
+        ] = NumberSelector(
+            NumberSelectorConfig(
+                min=0,
+                max=HISTORY_PERIOD_MAX,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement="minutes",
+            )
+        )
+        fields[_opt_number_key(CONF_MIN_VALUE, d)] = _NUMBER_BOX_ANY
+        fields[_opt_number_key(CONF_MAX_VALUE, d)] = _NUMBER_BOX_ANY
+
+    if template in (WIDGET_TEMPLATE_COUNTDOWN, WIDGET_TEMPLATE_PROGRESS):
+        fields[_attr_suggest_key(CONF_END_DATE_ATTRIBUTE, d)] = attr_selector
+        fields[_attr_suggest_key(CONF_START_DATE_ATTRIBUTE, d)] = attr_selector
+
+    if template == WIDGET_TEMPLATE_COUNTDOWN:
+        fields[
+            vol.Optional(
+                CONF_EXPIRED_TEXT,
+                default=d.get(CONF_EXPIRED_TEXT, ""),
+            )
+        ] = vol.All(str, vol.Length(max=WIDGET_EXPIRED_TEXT_MAX))
+
+    if template == WIDGET_TEMPLATE_BATTERY:
+        fields[_object_rows_key(CONF_BATTERY_DEVICES, d, required=True)] = _BATTERY_DEVICES_SELECTOR
+
+    if template == WIDGET_TEMPLATE_SCHEDULE:
+        stored_attrs = d.get(CONF_SCHEDULE_ATTRIBUTES)
+        fields[
+            vol.Optional(
+                CONF_SCHEDULE_ATTRIBUTES,
+                default=", ".join(stored_attrs) if isinstance(stored_attrs, list) else (stored_attrs or ""),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_SCHEDULE_START_KEY,
+                default=d.get(CONF_SCHEDULE_START_KEY, DEFAULT_SCHEDULE_START_KEY),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+        fields[
+            vol.Optional(
+                CONF_SCHEDULE_VALUE_KEY,
+                default=d.get(CONF_SCHEDULE_VALUE_KEY, DEFAULT_SCHEDULE_VALUE_KEY),
+            )
+        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+        fields[_opt_number_key(CONF_SCHEDULE_LOW_MAX, d)] = _NUMBER_BOX_ANY
+        fields[_opt_number_key(CONF_SCHEDULE_HIGH_MIN, d)] = _NUMBER_BOX_ANY
+
+    if template == WIDGET_TEMPLATE_FLOW:
+        fields[_object_rows_key(CONF_FLOW_NODES, d, required=True)] = _FLOW_NODES_SELECTOR
 
     if template == WIDGET_TEMPLATE_PROGRESS:
         fields[
@@ -2151,6 +2340,29 @@ def _widget_details_schema(
     ] = vol.All(str, vol.Length(max=WIDGET_LABEL_MAX))
     fields[_attr_suggest_key(CONF_LABEL_ATTRIBUTE, d)] = attr_selector
     fields[_attr_suggest_key(CONF_SUBTITLE_ATTRIBUTE, d)] = attr_selector
+    if template not in WIDGET_GROUP_TEMPLATES:
+        # A subtitle timer needs a date to anchor on, which the group templates
+        # (no single state) have nowhere to read from. Top-level fields may use
+        # real selectors - the ObjectSelector sub-field restriction is not in play.
+        fields[
+            vol.Optional(
+                CONF_SUBTITLE_TIMER_ENTITY,
+                description={"suggested_value": d.get(CONF_SUBTITLE_TIMER_ENTITY, "")},
+            )
+        ] = EntitySelector(EntitySelectorConfig())
+        fields[_attr_suggest_key(CONF_SUBTITLE_TIMER_ATTRIBUTE, d)] = attr_selector
+        fields[
+            vol.Optional(
+                CONF_SUBTITLE_TIMER_STYLE,
+                default=d.get(CONF_SUBTITLE_TIMER_STYLE, DEFAULT_SUBTITLE_TIMER_STYLE),
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=TIMER_STYLES,
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key="timer_style",
+            )
+        )
     fields[_attr_suggest_key(CONF_ICON, d)] = IconSelector(IconSelectorConfig())
     fields[_attr_suggest_key(CONF_ICON_ATTRIBUTE, d)] = attr_selector
     fields[accent_key] = ColorRGBSelector()
@@ -2199,6 +2411,16 @@ def _widget_details_schema(
             unit_of_measurement="seconds",
         )
     )
+    # Optional with no default: an empty field means "never demote to stale",
+    # which is the pre-1.6 behaviour every existing widget already has.
+    fields[_ttl_key(CONF_WIDGET_STALE_AFTER, d)] = NumberSelector(
+        NumberSelectorConfig(
+            min=WIDGET_STALE_AFTER_MIN,
+            max=WIDGET_STALE_AFTER_MAX,
+            mode=NumberSelectorMode.BOX,
+            unit_of_measurement="seconds",
+        )
+    )
 
     return _sectioned_schema(fields, WIDGET_SECTIONS, _WIDGET_TOPLEVEL, expand or set())
 
@@ -2218,14 +2440,129 @@ def _strict_stat_row(item: object) -> dict:
         raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
     attr = str(item.get(CONF_VALUE_ATTRIBUTE, "") or "").strip()
     unit = str(item.get(CONF_UNIT, "") or "").strip()
+    timer_style = str(item.get("timer_style", "") or "").strip().lower()
     if len(label) > WIDGET_STAT_LABEL_MAX or len(unit) > WIDGET_STAT_UNIT_MAX:
+        raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
+    if timer_style and timer_style not in TIMER_STYLES:
         raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
     row: dict = {CONF_LABEL: label, CONF_ENTITY_ID: entity_id}
     if attr:
         row[CONF_VALUE_ATTRIBUTE] = attr
     if unit:
         row[CONF_UNIT] = unit
+    if timer_style:
+        row["timer_style"] = timer_style
     return row
+
+
+def _strict_node_chrome(item: dict, error: str, path_key: str) -> tuple[str, str, str]:
+    """Validate the name/icon/color a battery device and a flow node share.
+
+    The server bounds all three in one validateNodeChrome; the mapper mirrors
+    that in _node_chrome, and this is the strict form-side twin. Returns the
+    stripped trio so the caller only decides which keys to store.
+    """
+    name = str(item.get(CONF_NODE_NAME, "") or "").strip()
+    icon = str(item.get(CONF_ICON, "") or "").strip()
+    color = str(item.get("color", "") or "").strip()
+    if len(name) > WIDGET_NODE_NAME_MAX or len(icon) > WIDGET_NODE_ICON_MAX:
+        raise vol.Invalid(error, path=[path_key])
+    if color and not is_valid_color(color):
+        raise vol.Invalid(error, path=[path_key])
+    return name, icon, color
+
+
+def _strict_battery_row(item: object) -> dict:
+    """Validate + normalize one battery-device row, raising on any problem.
+
+    Only the entity is required: the name falls back to the entity's friendly
+    name at render time, which is what most people want anyway.
+    """
+    if not isinstance(item, dict):
+        raise vol.Invalid("invalid_battery_device", path=[CONF_BATTERY_DEVICES])
+    entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
+    if not entity_id:
+        raise vol.Invalid("invalid_battery_device", path=[CONF_BATTERY_DEVICES])
+    attr = str(item.get(CONF_VALUE_ATTRIBUTE, "") or "").strip()
+    charging = str(item.get(CONF_CHARGING_ENTITY, "") or "").strip()
+    name, icon, color = _strict_node_chrome(item, "invalid_battery_device", CONF_BATTERY_DEVICES)
+    row: dict = {CONF_ENTITY_ID: entity_id}
+    for key, value in (
+        (CONF_NODE_NAME, name),
+        (CONF_VALUE_ATTRIBUTE, attr),
+        (CONF_CHARGING_ENTITY, charging),
+        (CONF_ICON, icon),
+        ("color", color),
+    ):
+        if value:
+            row[key] = value
+    return row
+
+
+def _parse_battery_devices(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse battery devices from the row editor.
+
+    Lenient (load/reconfigure) skips malformed rows and truncates past the cap;
+    strict (form paths) raises the translated errors instead. Unlike stat_rows
+    there is no legacy comma-string form to keep working - the template is new.
+    """
+    if not isinstance(raw, list):
+        return []
+    if not strict:
+        kept = [r for r in raw if isinstance(r, dict) and r.get(CONF_ENTITY_ID)]
+        return kept[:WIDGET_MAX_BATTERY_DEVICES]
+    rows = [_strict_battery_row(item) for item in raw]
+    if len(rows) > WIDGET_MAX_BATTERY_DEVICES:
+        raise vol.Invalid("too_many_battery_devices", path=[CONF_BATTERY_DEVICES])
+    return rows
+
+
+def _strict_flow_node(item: object) -> dict:
+    """Validate + normalize one flow-node row, raising on any problem."""
+    if not isinstance(item, dict):
+        raise vol.Invalid("invalid_flow_node", path=[CONF_FLOW_NODES])
+    slot = str(item.get(CONF_FLOW_SLOT, "") or "").strip().lower()
+    entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
+    if slot not in FLOW_SLOTS or not entity_id:
+        raise vol.Invalid("invalid_flow_node", path=[CONF_FLOW_NODES])
+    attr = str(item.get(CONF_VALUE_ATTRIBUTE, "") or "").strip()
+    total = str(item.get(CONF_TOTAL_ENTITY, "") or "").strip()
+    level = str(item.get(CONF_LEVEL_ENTITY, "") or "").strip()
+    name, icon, color = _strict_node_chrome(item, "invalid_flow_node", CONF_FLOW_NODES)
+    row: dict = {CONF_FLOW_SLOT: slot, CONF_ENTITY_ID: entity_id}
+    for key, value in (
+        (CONF_NODE_NAME, name),
+        (CONF_VALUE_ATTRIBUTE, attr),
+        (CONF_TOTAL_ENTITY, total),
+        (CONF_LEVEL_ENTITY, level),
+        (CONF_ICON, icon),
+        ("color", color),
+    ):
+        if value:
+            row[key] = value
+    return row
+
+
+def _parse_flow_nodes(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse flow nodes from the row editor, enforcing the per-slot arity.
+
+    Three inputs is the server cap; output, storage and exchange are single
+    slots, so a second row claiming one is a config mistake worth naming rather
+    than silently dropping.
+    """
+    if not isinstance(raw, list):
+        return []
+    if not strict:
+        kept = [r for r in raw if isinstance(r, dict) and r.get(CONF_ENTITY_ID) and r.get(CONF_FLOW_SLOT)]
+        return kept
+    rows = [_strict_flow_node(item) for item in raw]
+    inputs = sum(1 for r in rows if r[CONF_FLOW_SLOT] == FLOW_SLOT_INPUT)
+    if inputs > WIDGET_MAX_FLOW_INPUTS:
+        raise vol.Invalid("too_many_flow_inputs", path=[CONF_FLOW_NODES])
+    singles = [r[CONF_FLOW_SLOT] for r in rows if r[CONF_FLOW_SLOT] != FLOW_SLOT_INPUT]
+    if len(set(singles)) != len(singles):
+        raise vol.Invalid("duplicate_flow_slot", path=[CONF_FLOW_NODES])
+    return rows
 
 
 def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
@@ -2240,7 +2577,15 @@ def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
     """
     if isinstance(raw, list):
         if not strict:
-            kept = [r for r in raw if isinstance(r, dict) and r.get(CONF_ENTITY_ID) and r.get(CONF_LABEL)]
+            kept = []
+            for row in raw:
+                if not (isinstance(row, dict) and row.get(CONF_ENTITY_ID) and row.get(CONF_LABEL)):
+                    continue
+                if row.get("timer_style") and str(row["timer_style"]).strip().lower() not in TIMER_STYLES:
+                    # Drop the bad key, not the row: the row still renders fine
+                    # as plain text without a timer.
+                    row = {k: v for k, v in row.items() if k != "timer_style"}
+                kept.append(row)
             return kept[:WIDGET_MAX_STAT_ROWS]
         rows = [_strict_stat_row(item) for item in raw]
         if len(rows) > WIDGET_MAX_STAT_ROWS:
@@ -2277,6 +2622,58 @@ def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
     return rows[:WIDGET_MAX_STAT_ROWS]
 
 
+def _optional_number(user_input: dict, key: str) -> float | None:
+    """Read a genuinely optional numeric field: None when left blank."""
+    raw = user_input.get(key)
+    if raw is None or (isinstance(raw, str) and not raw.strip()):
+        return None
+    try:
+        value = float(raw)
+    except (TypeError, ValueError) as err:
+        raise vol.Invalid("invalid_number", path=[key]) from err
+    if not math.isfinite(value):
+        raise vol.Invalid("invalid_number", path=[key])
+    return value
+
+
+def _coerce_trend_bounds(user_input: dict) -> tuple[float | None, float | None]:
+    """Trend chart bounds: both optional, ordered only when both are set.
+
+    Unlike the gauge, an unset bound means "let the client auto-scale" rather
+    than a default of 0-100, so the gauge's coercion cannot be reused.
+    """
+    min_v = _optional_number(user_input, CONF_MIN_VALUE)
+    max_v = _optional_number(user_input, CONF_MAX_VALUE)
+    if min_v is not None and max_v is not None and min_v >= max_v:
+        raise vol.Invalid("invalid_gauge_range", path=[CONF_MIN_VALUE])
+    return min_v, max_v
+
+
+def _coerce_schedule_thresholds(user_input: dict) -> tuple[float | None, float | None]:
+    """Schedule band thresholds: low_max must sit below high_min when both are set."""
+    low_max = _optional_number(user_input, CONF_SCHEDULE_LOW_MAX)
+    high_min = _optional_number(user_input, CONF_SCHEDULE_HIGH_MIN)
+    if low_max is not None and high_min is not None and low_max >= high_min:
+        raise vol.Invalid("invalid_schedule_thresholds", path=[CONF_SCHEDULE_LOW_MAX])
+    return low_max, high_min
+
+
+def _coerce_stale_after(raw: object) -> int | None:
+    """Clamp stale_after into the server's bounds; None when the field is empty.
+
+    Clamped rather than rejected: the NumberSelector already bounds the form, so
+    an out-of-range value only reaches here from hand-written YAML, where dropping
+    the whole config over it would be worse than nudging the number.
+    """
+    if raw is None or (isinstance(raw, str) and not raw.strip()):
+        return None
+    try:
+        seconds = int(float(raw))  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return max(WIDGET_STALE_AFTER_MIN, min(WIDGET_STALE_AFTER_MAX, seconds))
+
+
 def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     """Build the persisted subentry data from step-1 + step-2 inputs."""
     user_input = _flatten_section_input(user_input, WIDGET_SECTIONS)
@@ -2285,11 +2682,31 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     raw_slug = (step1.get(CONF_SLUG) or "").strip()
     slug = (normalize_slug(raw_slug) if raw_slug else "") or sanitize_slug(entity_id)
 
-    min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == WIDGET_TEMPLATE_GAUGE)
+    if template == WIDGET_TEMPLATE_TREND:
+        min_v, max_v = _coerce_trend_bounds(user_input)
+    else:
+        min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == WIDGET_TEMPLATE_GAUGE)
 
     stat_rows = _parse_widget_stat_rows(user_input.get(CONF_STAT_ROWS, ""), strict=True)
     if template == WIDGET_TEMPLATE_STAT_LIST and not stat_rows:
         raise vol.Invalid("stat_rows_required", path=[CONF_STAT_ROWS])
+
+    battery_devices = _parse_battery_devices(user_input.get(CONF_BATTERY_DEVICES), strict=True)
+    if template == WIDGET_TEMPLATE_BATTERY and not battery_devices:
+        raise vol.Invalid("battery_devices_required", path=[CONF_BATTERY_DEVICES])
+
+    flow_nodes = _parse_flow_nodes(user_input.get(CONF_FLOW_NODES), strict=True)
+    if template == WIDGET_TEMPLATE_FLOW and not flow_nodes:
+        raise vol.Invalid("flow_nodes_required", path=[CONF_FLOW_NODES])
+
+    low_max, high_min = _coerce_schedule_thresholds(user_input)
+
+    timer_style = str(user_input.get(CONF_SUBTITLE_TIMER_STYLE, "") or "").strip().lower()
+    if timer_style not in TIMER_STYLES:
+        timer_style = DEFAULT_SUBTITLE_TIMER_STYLE
+
+    history_period = int(user_input.get(CONF_HISTORY_PERIOD, 0) or 0)
+    history_period = max(0, min(HISTORY_PERIOD_MAX, history_period))
 
     poll_interval = int(user_input.get(CONF_WIDGET_POLL_INTERVAL, DEFAULT_WIDGET_POLL_INTERVAL))
     poll_interval = max(WIDGET_POLL_INTERVAL_MIN, min(WIDGET_POLL_INTERVAL_MAX, poll_interval))
@@ -2320,9 +2737,24 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
         CONF_VALUE_SCALE: value_scale,
         CONF_SEVERITY: user_input.get(CONF_SEVERITY, "") or "",
         CONF_STAT_ROWS: stat_rows,
+        CONF_HISTORY_PERIOD: history_period,
+        CONF_START_DATE_ATTRIBUTE: user_input.get(CONF_START_DATE_ATTRIBUTE, "") or "",
+        CONF_END_DATE_ATTRIBUTE: user_input.get(CONF_END_DATE_ATTRIBUTE, "") or "",
+        CONF_EXPIRED_TEXT: user_input.get(CONF_EXPIRED_TEXT, "") or "",
+        CONF_BATTERY_DEVICES: battery_devices,
+        CONF_SCHEDULE_ATTRIBUTES: _parse_csv(user_input.get(CONF_SCHEDULE_ATTRIBUTES, "") or ""),
+        CONF_SCHEDULE_START_KEY: user_input.get(CONF_SCHEDULE_START_KEY, "") or DEFAULT_SCHEDULE_START_KEY,
+        CONF_SCHEDULE_VALUE_KEY: user_input.get(CONF_SCHEDULE_VALUE_KEY, "") or DEFAULT_SCHEDULE_VALUE_KEY,
+        CONF_SCHEDULE_LOW_MAX: low_max,
+        CONF_SCHEDULE_HIGH_MIN: high_min,
+        CONF_FLOW_NODES: flow_nodes,
+        CONF_WIDGET_STALE_AFTER: _coerce_stale_after(user_input.get(CONF_WIDGET_STALE_AFTER)),
         CONF_LABEL: user_input.get(CONF_LABEL, "") or "",
         CONF_LABEL_ATTRIBUTE: user_input.get(CONF_LABEL_ATTRIBUTE, "") or "",
         CONF_SUBTITLE_ATTRIBUTE: user_input.get(CONF_SUBTITLE_ATTRIBUTE, "") or "",
+        CONF_SUBTITLE_TIMER_ENTITY: user_input.get(CONF_SUBTITLE_TIMER_ENTITY, "") or "",
+        CONF_SUBTITLE_TIMER_ATTRIBUTE: user_input.get(CONF_SUBTITLE_TIMER_ATTRIBUTE, "") or "",
+        CONF_SUBTITLE_TIMER_STYLE: timer_style,
         CONF_ICON: user_input.get(CONF_ICON, "") or "",
         CONF_ICON_ATTRIBUTE: user_input.get(CONF_ICON_ATTRIBUTE, "") or "",
         CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
@@ -2390,6 +2822,10 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                     current[CONF_STAT_ROWS],
                     {CONF_LABEL: WIDGET_STAT_LABEL_MAX, CONF_UNIT: WIDGET_STAT_UNIT_MAX},
                 )
+            node_caps = {CONF_NODE_NAME: WIDGET_NODE_NAME_MAX, CONF_ICON: WIDGET_NODE_ICON_MAX}
+            for rows_key in (CONF_BATTERY_DEVICES, CONF_FLOW_NODES):
+                if isinstance(current.get(rows_key), list):
+                    current[rows_key] = _truncate_row_fields(current[rows_key], node_caps)
             self._details_defaults = current
             return await self.async_step_details()
         current = dict(subentry.data)
@@ -2467,6 +2903,20 @@ def _ttl_key(conf_key: str, current: dict) -> vol.Optional:
     """Build a vol.Optional key for a TTL NumberSelector, setting a default only when one is stored."""
     value = current.get(conf_key)
     return vol.Optional(conf_key, default=value) if value is not None else vol.Optional(conf_key)
+
+
+def _opt_number_key(conf_key: str, current: dict) -> vol.Optional:
+    """Build a vol.Optional key for a genuinely optional number.
+
+    Prefills through ``suggested_value`` rather than ``default``: the gauge's
+    Required min/max pattern would make an untouched trend or schedule bound
+    submit a number, and "unset" is a meaningful state for both (the client
+    auto-scales, and iOS derives the schedule bands itself).
+    """
+    value = current.get(conf_key)
+    if value is None or value == "":
+        return vol.Optional(conf_key)
+    return vol.Optional(conf_key, description={"suggested_value": value})
 
 
 def _entity_source_key(conf_key: str, current: dict) -> vol.Optional:

@@ -1649,7 +1649,7 @@
             "slug": "Slug của widget"
           },
           "data_description": {
-            "widget_template": "Bố cục widget. Dùng `value` cho một số đơn, `progress` cho thanh 0–1, `gauge` cho giá trị trong khoảng, `status` cho huy hiệu mức độ nghiêm trọng, hoặc `stat_list` cho tối đa 6 hàng.",
+            "widget_template": "Bố cục widget: `value` cho một số, `progress` cho thanh tiến trình, `gauge` cho giá trị trong khoảng, `status` cho huy hiệu mức độ, `stat_list` cho tối đa 6 dòng, `trend` cho biểu đồ nhỏ, `countdown` cho một ngày, `battery` cho vòng thiết bị, `schedule` cho dòng thời gian theo giờ, `flow` cho những gì vào và ra.",
             "slug": "Định danh duy nhất cho widget này. Để trống để tự động tạo từ ID thực thể."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Giá trị tối thiểu",
             "max_value": "Giá trị tối đa",
             "severity": "Mức độ nghiêm trọng",
-            "stat_rows": "Hàng thống kê"
+            "stat_rows": "Hàng thống kê",
+            "history_period": "Lịch sử xu hướng (phút)",
+            "start_date_attribute": "Thuộc tính ngày bắt đầu",
+            "end_date_attribute": "Thuộc tính ngày kết thúc",
+            "expired_text": "Văn bản sau khi hết hạn",
+            "battery_devices": "Thiết bị",
+            "schedule_attributes": "Thuộc tính khoảng thời gian",
+            "schedule_start_key": "Khóa thời điểm bắt đầu",
+            "schedule_value_key": "Khóa giá trị khoảng",
+            "schedule_low_max": "Ngưỡng trên của dải thấp",
+            "schedule_high_min": "Ngưỡng dưới của dải cao",
+            "flow_nodes": "Nút luồng"
           },
           "data_description": {
             "widget_name": "Tên hiển thị trong bộ chọn widget trên iOS. Mặc định là tên thân thiện của thực thể.",
@@ -1685,7 +1696,18 @@
             "min_value": "Giá trị tối thiểu cho khoảng đồng hồ đo.",
             "max_value": "Giá trị tối đa cho khoảng đồng hồ đo.",
             "severity": "Mức độ nghiêm trọng của trạng thái (info, warning, critical, success).",
-            "stat_rows": "Tối đa 6 hàng, mỗi hàng liên kết một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính và đơn vị. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Điều chỉnh mật độ hàng cho từng widget trong ứng dụng PushWard."
+            "stat_rows": "Tối đa 6 hàng, mỗi hàng liên kết một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính và đơn vị. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Điều chỉnh mật độ hàng cho từng widget trong ứng dụng PushWard.",
+            "history_period": "Nạp bao nhiêu lịch sử từ recorder khi biểu đồ nhỏ khởi động. 0 bỏ qua việc nạp và biểu đồ tự đầy dần khi thực thể thay đổi.",
+            "start_date_attribute": "Thuộc tính thực thể chứa điểm bắt đầu của khoảng. Tùy chọn; với progress nó giúp thanh tiến trình tự chạy trên thiết bị giữa các lần gửi.",
+            "end_date_attribute": "Thuộc tính thực thể chứa điểm kết thúc của khoảng. Để trống để dùng trạng thái của thực thể, finishes_at của timer hoặc end_time của lịch.",
+            "expired_text": "Hiển thị khi đã qua ngày kết thúc, thay vì đếm lên. Tối đa 64 ký tự.",
+            "battery_devices": "Tối đa 8 vòng, mỗi vòng gắn với một thực thể riêng: tên, thực thể, kèm tùy chọn thuộc tính mức pin, thực thể sạc, biểu tượng và màu.",
+            "schedule_attributes": "Các thuộc tính cách nhau bằng dấu phẩy chứa danh sách khoảng, đọc theo thứ tự này. Nordpool công bố raw_today, raw_tomorrow.",
+            "schedule_start_key": "Khóa chứa dấu thời gian bắt đầu của mỗi khoảng trong các danh sách đó.",
+            "schedule_value_key": "Khóa chứa giá trị của mỗi khoảng trong các danh sách đó.",
+            "schedule_low_max": "Giá trị bằng hoặc thấp hơn rơi vào dải thấp. Để trống cả hai ngưỡng để ứng dụng tự suy ra dải từ khoảng dữ liệu đã gửi.",
+            "schedule_high_min": "Giá trị bằng hoặc cao hơn rơi vào dải cao. Phải lớn hơn ngưỡng trên của dải thấp.",
+            "flow_nodes": "Mỗi nút một dòng. Khe quyết định vị trí hiển thị: tối đa 3 đầu vào, cộng thêm một đầu ra, một kho và một trao đổi. Tốc độ lấy từ thực thể, dấu do bạn quy ước."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Thuộc tính nhãn",
                 "subtitle_attribute": "Thuộc tính phụ đề",
                 "icon": "Biểu tượng",
-                "icon_attribute": "Thuộc tính biểu tượng"
+                "icon_attribute": "Thuộc tính biểu tượng",
+                "subtitle_timer_entity": "Thực thể hẹn giờ",
+                "subtitle_timer_attribute": "Thuộc tính hẹn giờ",
+                "subtitle_timer_style": "Kiểu hẹn giờ"
               },
               "data_description": {
                 "label": "Nhãn tĩnh hiển thị trên widget. Để trống để lấy từ thực thể.",
                 "label_attribute": "Thuộc tính của thực thể được dùng làm nhãn. Ghi đè nhãn tĩnh.",
                 "subtitle_attribute": "Thuộc tính của thực thể hiển thị làm phụ đề widget.",
                 "icon": "Biểu tượng tĩnh. Hỗ trợ tên SF Symbols và MDI.",
-                "icon_attribute": "Thuộc tính của thực thể cho biểu tượng động. Ghi đè biểu tượng tĩnh."
+                "icon_attribute": "Thuộc tính của thực thể cho biểu tượng động. Ghi đè biểu tượng tĩnh.",
+                "subtitle_timer_entity": "Hiển thị phụ đề dưới dạng đếm ngược hoặc đếm lên trực tiếp neo theo ngày của thực thể này. Để trống để đọc thực thể của chính widget.",
+                "subtitle_timer_attribute": "Thuộc tính chứa ngày. Để trống để dùng trạng thái của thực thể.",
+                "subtitle_timer_style": "Kiểu timer chạy như 01:23:45; kiểu tương đối hiển thị đơn vị thô như 2 phút."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Chế độ kích hoạt",
-                "widget_poll_interval": "Khoảng thời gian thăm dò (giây)"
+                "widget_poll_interval": "Khoảng thời gian thăm dò (giây)",
+                "widget_stale_after": "Cũ sau (giây)"
               },
               "data_description": {
                 "widget_trigger_mode": "Cách cập nhật được kích hoạt. `event` phản ứng với thay đổi trạng thái; `poll` đánh giá lại theo khoảng thời gian cố định.",
-                "widget_poll_interval": "Khoảng thời gian giữa các lần thăm dò (10–3600 giây). Chỉ dùng khi chế độ kích hoạt là `poll`."
+                "widget_poll_interval": "Khoảng thời gian giữa các lần thăm dò (10–3600 giây). Chỉ dùng khi chế độ kích hoạt là `poll`.",
+                "widget_stale_after": "Số giây sau lần cập nhật cuối trước khi ứng dụng hiển thị widget là đã cũ. Để trống để không bao giờ đánh dấu. Nhịp tim gửi lại ở nửa khoảng này để giữ widget luôn mới, và mỗi nhịp tiêu tốn một lượt cập nhật widget trong hạn mức, nên 3600 trở lên là khoảng hợp lý."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "Cần ít nhất một hàng thống kê cho mẫu stat_list.",
         "invalid_stat_row": "Mỗi hàng phải theo dạng label=entity_id (vd. Users=sensor.user_count).",
         "too_many_stat_rows": "Danh sách thống kê hỗ trợ tối đa 6 hàng.",
-        "invalid_number": "Nhập một số hợp lệ."
+        "invalid_number": "Nhập một số hợp lệ.",
+        "invalid_battery_device": "Mỗi dòng thiết bị cần một thực thể. Tên tối đa 32 ký tự, biểu tượng tối đa 128, màu phải là tên màu hoặc mã hex.",
+        "too_many_battery_devices": "Widget pin hỗ trợ tối đa 8 thiết bị.",
+        "battery_devices_required": "Mẫu battery cần ít nhất một thiết bị.",
+        "invalid_flow_node": "Mỗi dòng luồng cần một khe và một thực thể. Tên tối đa 32 ký tự, biểu tượng tối đa 128, màu phải là tên màu hoặc mã hex.",
+        "too_many_flow_inputs": "Widget luồng hỗ trợ tối đa 3 đầu vào.",
+        "duplicate_flow_slot": "Chỉ một đầu ra, một kho và một trao đổi. Dùng input cho phần còn lại.",
+        "flow_nodes_required": "Mẫu flow cần ít nhất một nút.",
+        "invalid_schedule_thresholds": "Ngưỡng trên của dải thấp phải nhỏ hơn ngưỡng dưới của dải cao."
       },
       "abort": {
         "already_configured": "Đã tồn tại một widget với slug này.",
@@ -1827,7 +1865,12 @@
         "progress": "Tiến trình",
         "gauge": "Đồng hồ đo",
         "status": "Trạng thái",
-        "stat_list": "Danh sách thống kê"
+        "stat_list": "Danh sách thống kê",
+        "trend": "Xu hướng",
+        "countdown": "Đếm ngược",
+        "battery": "Pin",
+        "schedule": "Lịch trình",
+        "flow": "Luồng"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Lục lam",
         "mint": "Bạc hà",
         "brown": "Nâu"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Hẹn giờ",
+        "relative": "Tương đối"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Đầu vào",
+        "output": "Đầu ra",
+        "storage": "Kho",
+        "exchange": "Trao đổi"
       }
     }
   }

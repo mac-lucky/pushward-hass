@@ -1649,7 +1649,7 @@
             "slug": "小组件 Slug"
           },
           "data_description": {
-            "widget_template": "小组件布局。`value` 用于单个数字，`progress` 用于 0–1 进度条，`gauge` 用于范围内数值，`status` 用于严重程度徽章，`stat_list` 用于最多 6 行。",
+            "widget_template": "小组件布局：`value` 显示单个数字，`progress` 显示进度条，`gauge` 显示区间内的数值，`status` 显示严重程度徽章，`stat_list` 最多 6 行，`trend` 显示迷你折线图，`countdown` 显示日期，`battery` 显示设备圆环，`schedule` 显示按小时的时间轴，`flow` 显示进出流向。",
             "slug": "此小组件的唯一标识符。留空则根据实体 ID 自动生成。"
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "最小值",
             "max_value": "最大值",
             "severity": "严重程度",
-            "stat_rows": "统计行"
+            "stat_rows": "统计行",
+            "history_period": "趋势历史（分钟）",
+            "start_date_attribute": "开始日期属性",
+            "end_date_attribute": "结束日期属性",
+            "expired_text": "过期后显示的文本",
+            "battery_devices": "设备",
+            "schedule_attributes": "时段属性",
+            "schedule_start_key": "时段开始键",
+            "schedule_value_key": "时段数值键",
+            "schedule_low_max": "低档上限",
+            "schedule_high_min": "高档下限",
+            "flow_nodes": "流向节点"
           },
           "data_description": {
             "widget_name": "在 iOS 小组件选择器中显示的名称。默认使用实体的友好名称。",
@@ -1685,7 +1696,18 @@
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "severity": "状态严重程度（info、warning、critical、success）。",
-            "stat_rows": "最多 6 行，每行绑定一个单独的实体：标签、实体，以及可选的属性和单位。仍支持以逗号分隔的字符串。可在 PushWard 应用中按小组件设置行密度。"
+            "stat_rows": "最多 6 行，每行绑定一个单独的实体：标签、实体，以及可选的属性和单位。仍支持以逗号分隔的字符串。可在 PushWard 应用中按小组件设置行密度。",
+            "history_period": "小组件启动时从 recorder 回填迷你图的时间跨度。填 0 则跳过回填，图表随实体变化逐渐填满。",
+            "start_date_attribute": "存放时间窗起点的实体属性。可选；在 progress 模板下，进度条可据此在设备上自行推进，无需再次推送。",
+            "end_date_attribute": "存放时间窗终点的实体属性。留空则使用实体自身状态、计时器的 finishes_at 或日历的 end_time。",
+            "expired_text": "结束日期过后显示，而不是继续向上计时。最多 64 个字符。",
+            "battery_devices": "最多 8 个圆环，每个绑定一个独立实体：名称、实体，以及可选的电量属性、充电实体、图标和颜色。",
+            "schedule_attributes": "以逗号分隔的属性名，各自存放时段列表，按此顺序读取。Nordpool 提供 raw_today、raw_tomorrow。",
+            "schedule_start_key": "这些列表中存放每个时段开始时间戳的键。",
+            "schedule_value_key": "这些列表中存放每个时段数值的键。",
+            "schedule_low_max": "小于或等于此值的落入低档。两个阈值都留空，则由 App 依据所发送的范围自行划分档位。",
+            "schedule_high_min": "大于或等于此值的落入高档。必须高于低档上限。",
+            "flow_nodes": "每个节点一行。插槽决定绘制位置：最多 3 个输入，外加各一个输出、存储和交换。速率取自实体，正负号由你自行约定。"
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "标签属性",
                 "subtitle_attribute": "副标题属性",
                 "icon": "图标",
-                "icon_attribute": "图标属性"
+                "icon_attribute": "图标属性",
+                "subtitle_timer_entity": "计时器实体",
+                "subtitle_timer_attribute": "计时器属性",
+                "subtitle_timer_style": "计时器样式"
               },
               "data_description": {
                 "label": "显示在小组件上的静态标签。留空则从实体推导。",
                 "label_attribute": "用作标签的实体属性。会覆盖静态标签。",
                 "subtitle_attribute": "作为小组件副标题显示的实体属性。",
                 "icon": "静态图标。支持 SF Symbols 和 MDI 名称。",
-                "icon_attribute": "用于动态图标的实体属性。会覆盖静态图标。"
+                "icon_attribute": "用于动态图标的实体属性。会覆盖静态图标。",
+                "subtitle_timer_entity": "将副标题渲染为以该实体日期为基准的实时倒计时或正计时。留空则读取小组件自身的实体。",
+                "subtitle_timer_attribute": "存放日期的属性。留空则使用实体状态。",
+                "subtitle_timer_style": "timer 按 01:23:45 走秒；relative 显示“2 分钟”这类粗略单位。"
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "触发模式",
-                "widget_poll_interval": "轮询间隔（秒）"
+                "widget_poll_interval": "轮询间隔（秒）",
+                "widget_stale_after": "多久后视为过期（秒）"
               },
               "data_description": {
                 "widget_trigger_mode": "更新的触发方式。`event` 响应状态变化；`poll` 按固定间隔重新评估。",
-                "widget_poll_interval": "两次轮询之间的间隔（10–3600 秒）。仅在触发模式为 `poll` 时使用。"
+                "widget_poll_interval": "两次轮询之间的间隔（10–3600 秒）。仅在触发模式为 `poll` 时使用。",
+                "widget_stale_after": "上次更新之后多少秒，App 会把小组件显示为过期。留空则永不标记为过期。心跳会在该间隔的一半重发以保持新鲜，每次心跳都会消耗配额中的一次小组件更新，因此 3600 或更大才是合理范围。"
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "stat_list 模板至少需要一个统计行。",
         "invalid_stat_row": "每一行必须为 label=entity_id 格式（例如 Users=sensor.user_count）。",
         "too_many_stat_rows": "统计列表最多支持 6 行。",
-        "invalid_number": "请输入有效的数字。"
+        "invalid_number": "请输入有效的数字。",
+        "invalid_battery_device": "每一行设备都需要一个实体。名称最多 32 个字符，图标最多 128 个，颜色须为具名颜色或十六进制值。",
+        "too_many_battery_devices": "电池小组件最多支持 8 个设备。",
+        "battery_devices_required": "battery 模板至少需要一个设备。",
+        "invalid_flow_node": "每一行流向都需要插槽和实体。名称最多 32 个字符，图标最多 128 个，颜色须为具名颜色或十六进制值。",
+        "too_many_flow_inputs": "流向小组件最多支持 3 个输入。",
+        "duplicate_flow_slot": "输出、存储和交换各只能有一个。其余请使用 input。",
+        "flow_nodes_required": "flow 模板至少需要一个节点。",
+        "invalid_schedule_thresholds": "低档上限必须小于高档下限。"
       },
       "abort": {
         "already_configured": "已存在使用此 slug 的小组件。",
@@ -1827,7 +1865,12 @@
         "progress": "进度",
         "gauge": "仪表",
         "status": "状态",
-        "stat_list": "统计列表"
+        "stat_list": "统计列表",
+        "trend": "趋势",
+        "countdown": "倒计时",
+        "battery": "电池",
+        "schedule": "时段表",
+        "flow": "流向"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "青色",
         "mint": "薄荷色",
         "brown": "棕色"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "计时器",
+        "relative": "相对时间"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "输入",
+        "output": "输出",
+        "storage": "存储",
+        "exchange": "交换"
       }
     }
   }

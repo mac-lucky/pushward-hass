@@ -1649,7 +1649,7 @@
             "slug": "Widget Slug"
           },
           "data_description": {
-            "widget_template": "Layout ng widget. Gamitin ang `value` para sa iisang numero, `progress` para sa 0–1 bar, `gauge` para sa value-in-range, `status` para sa severity badge, o `stat_list` para sa hanggang 6 na row.",
+            "widget_template": "Layout ng widget: `value` para sa iisang numero, `progress` para sa bar, `gauge` para sa halaga sa loob ng saklaw, `status` para sa badge ng antas, `stat_list` para sa hanggang 6 na hilera, `trend` para sa sparkline, `countdown` para sa petsa, `battery` para sa mga singsing ng device, `schedule` para sa timeline kada oras, `flow` para sa pumapasok at lumalabas.",
             "slug": "Natatanging identifier para sa widget na ito. Iwanang blanko upang awtomatikong ma-generate mula sa entity ID."
           }
         },
@@ -1675,7 +1675,18 @@
             "min_value": "Pinakamababang Halaga",
             "max_value": "Pinakamataas na Halaga",
             "severity": "Severity",
-            "stat_rows": "Stat Rows"
+            "stat_rows": "Stat Rows",
+            "history_period": "Kasaysayan ng trend (minuto)",
+            "start_date_attribute": "Attribute ng petsa ng simula",
+            "end_date_attribute": "Attribute ng petsa ng pagtatapos",
+            "expired_text": "Teksto pagkatapos mag-expire",
+            "battery_devices": "Mga device",
+            "schedule_attributes": "Mga attribute ng panahon",
+            "schedule_start_key": "Key ng simula ng panahon",
+            "schedule_value_key": "Key ng halaga ng panahon",
+            "schedule_low_max": "Pinakamataas ng mababang banda",
+            "schedule_high_min": "Pinakamababa ng mataas na banda",
+            "flow_nodes": "Mga node ng daloy"
           },
           "data_description": {
             "widget_name": "Display name na ipinapakita sa iOS widget picker. Default sa friendly name ng entity.",
@@ -1685,7 +1696,18 @@
             "min_value": "Pinakamababang halaga para sa gauge range.",
             "max_value": "Pinakamataas na halaga para sa gauge range.",
             "severity": "Severity ng status (info, warning, critical, success).",
-            "stat_rows": "Hanggang 6 na hanay, bawat isa ay naka-ugnay sa hiwalay na entity: label, entity, at opsyonal na attribute at unit. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Itakda ang density ng hanay kada widget sa PushWard app."
+            "stat_rows": "Hanggang 6 na hanay, bawat isa ay naka-ugnay sa hiwalay na entity: label, entity, at opsyonal na attribute at unit. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Itakda ang density ng hanay kada widget sa PushWard app.",
+            "history_period": "Gaano kalayo pabalik kinukuha ang sparkline mula sa recorder kapag nagsimula ang widget. Ang 0 ay laktawan ang pagkuha at napupuno ang tsart habang nagbabago ang entity.",
+            "start_date_attribute": "Attribute ng entity na naglalaman ng simula ng window. Opsyonal; sa progress, dahil dito umuusad ang bar sa device sa pagitan ng mga push.",
+            "end_date_attribute": "Attribute ng entity na naglalaman ng dulo ng window. Iwanang blanko para gamitin ang state ng entity, ang finishes_at ng timer, o ang end_time ng kalendaryo.",
+            "expired_text": "Ipinapakita kapag lumipas na ang petsa ng pagtatapos, sa halip na magbilang pataas. Hanggang 64 na character.",
+            "battery_devices": "Hanggang 8 singsing, bawat isa nakatali sa hiwalay na entity: pangalan, entity, kasama ang opsyonal na attribute ng level, entity ng pag-charge, icon at kulay.",
+            "schedule_attributes": "Mga attribute na pinaghihiwalay ng kuwit na may listahan ng mga panahon, binabasa sa ganitong pagkakasunod. Naglalathala ang Nordpool ng raw_today, raw_tomorrow.",
+            "schedule_start_key": "Key na naglalaman ng timestamp ng simula ng bawat panahon sa mga listahang iyon.",
+            "schedule_value_key": "Key na naglalaman ng halaga ng bawat panahon sa mga listahang iyon.",
+            "schedule_low_max": "Ang mga halagang katumbas o mas mababa dito ay mapupunta sa mababang banda. Iwanang blanko ang dalawang threshold para ang app na ang kumuha ng mga banda mula sa ipinadalang saklaw.",
+            "schedule_high_min": "Ang mga halagang katumbas o mas mataas dito ay mapupunta sa mataas na banda. Dapat mas mataas ito kaysa sa pinakamataas ng mababang banda.",
+            "flow_nodes": "Isang hilera bawat node. Ang slot ang nagtatakda kung saan iginuguhit: hanggang 3 input, kasama ang tig-isang output, storage at exchange. Ang rate ay galing sa entity, at sa iyo ang tanda."
           },
           "sections": {
             "display_options": {
@@ -1695,14 +1717,20 @@
                 "label_attribute": "Attribute ng Label",
                 "subtitle_attribute": "Attribute ng Subtitle",
                 "icon": "Icon",
-                "icon_attribute": "Attribute ng Icon"
+                "icon_attribute": "Attribute ng Icon",
+                "subtitle_timer_entity": "Entity ng timer",
+                "subtitle_timer_attribute": "Attribute ng timer",
+                "subtitle_timer_style": "Estilo ng timer"
               },
               "data_description": {
                 "label": "Static na label na ipinapakita sa widget. Iwanang blanko upang kunin mula sa entity.",
                 "label_attribute": "Entity attribute na ginagamit bilang label. Ina-override ang static na label.",
                 "subtitle_attribute": "Entity attribute na ipinapakita bilang subtitle ng widget.",
                 "icon": "Static na icon. Sinusuportahan ang SF Symbols at MDI names.",
-                "icon_attribute": "Entity attribute para sa dynamic na icon. Ina-override ang static na icon."
+                "icon_attribute": "Entity attribute para sa dynamic na icon. Ina-override ang static na icon.",
+                "subtitle_timer_entity": "Ipinapakita ang subtitle bilang live na countdown o count-up na nakaangkla sa petsa ng entity na ito. Iwanang blanko para basahin ang sariling entity ng widget.",
+                "subtitle_timer_attribute": "Attribute na naglalaman ng petsa. Iwanang blanko para gamitin ang state ng entity.",
+                "subtitle_timer_style": "Ang timer ay tumatakbo tulad ng 01:23:45; ang relative ay nagpapakita ng magaspang na yunit tulad ng 2 min."
               }
             },
             "colors": {
@@ -1735,11 +1763,13 @@
               "name": "Refresh",
               "data": {
                 "widget_trigger_mode": "Trigger Mode",
-                "widget_poll_interval": "Poll Interval (segundo)"
+                "widget_poll_interval": "Poll Interval (segundo)",
+                "widget_stale_after": "Luma pagkatapos ng (segundo)"
               },
               "data_description": {
                 "widget_trigger_mode": "Kung paano nati-trigger ang mga update. Ang `event` ay tumutugon sa mga pagbabago ng state; ang `poll` ay muling sinusuri sa nakatakdang interval.",
-                "widget_poll_interval": "Interval sa pagitan ng mga poll (10–3600 na segundo). Ginagamit lamang kapag ang trigger mode ay `poll`."
+                "widget_poll_interval": "Interval sa pagitan ng mga poll (10–3600 na segundo). Ginagamit lamang kapag ang trigger mode ay `poll`.",
+                "widget_stale_after": "Segundo pagkatapos ng huling update bago ipakita ng app ang widget bilang luma. Iwanang blanko para hindi ito kailanman markahan. May heartbeat na muling nagpapadala sa kalahati ng agwat na ito para manatiling sariwa, at bawat heartbeat ay gumagamit ng isang widget update mula sa iyong quota, kaya 3600 pataas ang makatuwirang saklaw."
               }
             }
           }
@@ -1752,7 +1782,15 @@
         "stat_rows_required": "Kailangan ng kahit isang stat row para sa stat_list template.",
         "invalid_stat_row": "Ang bawat hilera ay dapat label=entity_id (hal. Users=sensor.user_count).",
         "too_many_stat_rows": "Ang isang stat list ay sumusuporta ng hanggang 6 na hilera.",
-        "invalid_number": "Maglagay ng wastong numero."
+        "invalid_number": "Maglagay ng wastong numero.",
+        "invalid_battery_device": "Kailangan ng entity sa bawat hilera ng device. Pangalan hanggang 32 character, icon hanggang 128, kulay bilang pangalan ng kulay o hex.",
+        "too_many_battery_devices": "Hanggang 8 device lang ang kayang suportahan ng battery widget.",
+        "battery_devices_required": "Kailangan ng kahit isang device para sa template na battery.",
+        "invalid_flow_node": "Kailangan ng slot at entity sa bawat hilera ng daloy. Pangalan hanggang 32 character, icon hanggang 128, kulay bilang pangalan ng kulay o hex.",
+        "too_many_flow_inputs": "Hanggang 3 input lang ang kayang suportahan ng flow widget.",
+        "duplicate_flow_slot": "Tig-isang output, storage at exchange lamang. Gamitin ang input para sa iba.",
+        "flow_nodes_required": "Kailangan ng kahit isang node para sa template na flow.",
+        "invalid_schedule_thresholds": "Dapat mas mababa ang pinakamataas ng mababang banda kaysa sa pinakamababa ng mataas na banda."
       },
       "abort": {
         "already_configured": "May widget na umiiral na sa slug na ito.",
@@ -1827,7 +1865,12 @@
         "progress": "Progreso",
         "gauge": "Panukat",
         "status": "Katayuan",
-        "stat_list": "Listahan ng estadistika"
+        "stat_list": "Listahan ng estadistika",
+        "trend": "Trend",
+        "countdown": "Countdown",
+        "battery": "Baterya",
+        "schedule": "Iskedyul",
+        "flow": "Daloy"
       }
     },
     "value_scale": {
@@ -1865,6 +1908,20 @@
         "cyan": "Cyan",
         "mint": "Mint",
         "brown": "Kayumanggi"
+      }
+    },
+    "timer_style": {
+      "options": {
+        "timer": "Timer",
+        "relative": "Relatibo"
+      }
+    },
+    "flow_slot": {
+      "options": {
+        "input": "Input",
+        "output": "Output",
+        "storage": "Storage",
+        "exchange": "Palitan"
       }
     }
   }
