@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "Dismissal TTL",
           "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
+        },
+        "image_url": {
+          "name": "Image URL",
+          "description": "https URL of a picture shown beside the icon. The iPhone downloads it directly, so it has to be reachable from the public internet; a LAN address will not load, but its ThumbHash still will."
+        },
+        "image_shape": {
+          "name": "Image Shape",
+          "description": "How the picture is framed: poster keeps a tall crop, square is the default, circle crops it round."
+        },
+        "image_thumbhash": {
+          "name": "Image ThumbHash",
+          "description": "Blurred inline preview drawn when the URL cannot be fetched, and the only tier that renders for an image on your LAN. Leave it empty to have one computed from the URL automatically, or use the Generate ThumbHash action to build one from any image Home Assistant can read."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Steps options",
           "description": "Only used by the steps template."
+        },
+        "image_options": {
+          "name": "Image",
+          "description": "Optional artwork shown beside the icon. Generic and steps templates only."
         },
         "alert_options": {
           "name": "Alert options",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "Dismissal TTL",
           "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
+        },
+        "image_url": {
+          "name": "Image URL",
+          "description": "https URL of a picture shown beside the icon. The iPhone downloads it directly, so it has to be reachable from the public internet; a LAN address will not load, but its ThumbHash still will."
+        },
+        "image_shape": {
+          "name": "Image Shape",
+          "description": "How the picture is framed: poster keeps a tall crop, square is the default, circle crops it round."
+        },
+        "image_thumbhash": {
+          "name": "Image ThumbHash",
+          "description": "Blurred inline preview drawn when the URL cannot be fetched, and the only tier that renders for an image on your LAN. Leave it empty to have one computed from the URL automatically, or use the Generate ThumbHash action to build one from any image Home Assistant can read."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Display, color & sound",
           "description": "Optional styling and per-update overrides. Apply to any template."
+        },
+        "image_options": {
+          "name": "Image",
+          "description": "Optional artwork shown beside the icon. Generic and steps templates only."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Duration",
           "description": "Set-and-forget alternative to End Date: seconds (>=1) or a duration string like \"1h30m\". The server re-anchors start/end to now. Send either Duration or End Date — Duration wins if both are set."
+        },
+        "image_url": {
+          "name": "Image URL",
+          "description": "https URL of a picture shown beside the icon. The iPhone downloads it directly, so it has to be reachable from the public internet; a LAN address will not load, but its ThumbHash still will."
+        },
+        "image_shape": {
+          "name": "Image Shape",
+          "description": "How the picture is framed: poster keeps a tall crop, square is the default, circle crops it round."
+        },
+        "image_thumbhash": {
+          "name": "Image ThumbHash",
+          "description": "Blurred inline preview drawn when the URL cannot be fetched, and the only tier that renders for an image on your LAN. Leave it empty to have one computed from the URL automatically, or use the Generate ThumbHash action to build one from any image Home Assistant can read."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Steps options",
           "description": "Only used by the steps template."
+        },
+        "image_options": {
+          "name": "Image",
+          "description": "Optional artwork shown beside the icon. Generic and steps templates only."
         },
         "action_buttons": {
           "name": "Action buttons",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Generate ThumbHash",
+      "description": "Compute the blurred inline preview for an image and return it, ready to paste into an activity or an entity's image settings.",
+      "fields": {
+        "image_url": {
+          "name": "Image URL",
+          "description": "http or https URL of the image. Anything Home Assistant can reach works, including a LAN camera the iPhone cannot see."
+        },
+        "image_path": {
+          "name": "Image Path",
+          "description": "Path to a local image file instead of a URL. The directory has to be allowlisted in configuration.yaml under allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "End Activity",
       "description": "End a PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "No PushWard widget matches slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Could not generate a ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "One row per step, in order. Each row sets an optional label, a row height (1-10), a relative width (positive number), and a color (named or hex; leave blank to keep the accent color). Add no rows, or exactly total_steps rows. Steps template only."
               }
             },
+            "image_options": {
+              "name": "Image",
+              "data": {
+                "image_url": "Image URL",
+                "image_shape": "Image Shape",
+                "image_thumbhash": "Image ThumbHash"
+              },
+              "data_description": {
+                "image_url": "https URL of a picture shown beside the icon. The iPhone downloads it directly, so it has to be reachable from the public internet; a LAN address will not load, but its ThumbHash still will.",
+                "image_shape": "How the picture is framed: poster keeps a tall crop, square is the default, circle crops it round.",
+                "image_thumbhash": "Blurred inline preview drawn when the URL cannot be fetched, and the only tier that renders for an image on your LAN. Leave it empty to have one computed from the URL automatically, or use the Generate ThumbHash action to build one from any image Home Assistant can read."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Each threshold must start with a number (e.g. 25:red:Hot).",
         "too_many_thresholds": "A timeline supports at most 5 thresholds.",
         "invalid_number": "Enter a valid number.",
-        "unknown_primary_series": "Primary series must match one of the configured series labels."
+        "unknown_primary_series": "Primary series must match one of the configured series labels.",
+        "invalid_image_url": "Image URL must be an https address with a host and no username or password.",
+        "invalid_image_shape": "Image shape must be poster, square, or circle.",
+        "invalid_image_thumbhash": "Image ThumbHash must be padded standard-alphabet base64, at most 64 characters. Use the Generate ThumbHash action to produce one."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",
@@ -1922,6 +2003,13 @@
         "output": "Output",
         "storage": "Storage",
         "exchange": "Exchange"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Poster",
+        "square": "Square",
+        "circle": "Circle"
       }
     }
   }

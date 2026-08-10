@@ -68,6 +68,7 @@ from .content_mapper import (
     map_completion_content,
     map_content,
 )
+from .image_hash import async_ensure_thumbhash
 from .recorder_history import async_recorder_states, downsample_evenly
 
 # Live ring-buffer depth per tracked entity; independent of HISTORY_SEED_MAX
@@ -619,6 +620,9 @@ class ActivityManager:
 
             # Replace the single current line with the accumulated log buffer.
             self._apply_log_lines(tracked, content)
+            # The first frame has to carry the hash too, else it differs from every
+            # later one and _send_update's equality check never suppresses anything.
+            await async_ensure_thumbhash(self._hass, content)
 
             sound = config.get(CONF_SOUND) or None
             await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
@@ -786,6 +790,10 @@ class ActivityManager:
         # than pushing an empty one — a tile returning re-renders it.
         if tracked.config.get(CONF_TEMPLATE) == "board" and not content.get("tiles"):
             return
+        # Before the equality check, not after: the previous frame was stored with its
+        # hash attached, so comparing a hash-less frame against it would report a
+        # change on every state update and defeat the dedup entirely.
+        await async_ensure_thumbhash(self._hass, content)
         if content == tracked.last_content:
             return
 
@@ -864,7 +872,9 @@ class ActivityManager:
         cancelled = False
         try:
             async with self._api_error_guard(slug, "ending"):
-                # Phase 1: show completion content (preserves last progress/subtitle)
+                # Phase 1: show completion content (preserves last progress/subtitle).
+                # No image work here: the completion frame omits the artwork and the
+                # merge patch leaves what the server already stored in place.
                 completion = map_completion_content(config, tracked.last_content)
                 try:
                     await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, completion)

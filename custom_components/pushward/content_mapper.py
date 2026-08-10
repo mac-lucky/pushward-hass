@@ -42,6 +42,9 @@ from .const import (
     CONF_FIRED_AT_ENTITY,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_IMAGE_SHAPE,
+    CONF_IMAGE_THUMBHASH,
+    CONF_IMAGE_URL,
     CONF_LABEL,
     CONF_LIVE_PROGRESS,
     CONF_LOG_COLUMNS,
@@ -97,6 +100,8 @@ from .const import (
     DEFAULT_TOTAL_STEPS,
     DEVICE_CLASS_ICONS,
     DOMAIN_DEFAULTS,
+    IMAGE_SHAPES,
+    IMAGE_TEMPLATES,
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_COLUMN_VALUE_MAX,
@@ -105,7 +110,10 @@ from .const import (
     MAX_SEVERITY_LABEL_LEN,
     NAMED_COLORS,
     TIMELINE_SERIES_LABEL_MAX,
+    is_valid_image_url,
+    is_valid_thumbhash,
     normalize_slug,
+    url_host,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -542,6 +550,41 @@ def _apply_steps_fields(
             content["step_colors"] = colors_list
 
 
+def _apply_image_fields(content: dict, entity_config: dict) -> None:
+    """Write the optional image trio into ``content``, for the templates that take it.
+
+    Nothing is emitted without a URL: the shape and the hash both describe an image,
+    and the server rejects the whole trio on a template with no image slot.
+
+    Both values are re-validated here even though the config flow already checked
+    them. A stored config predates any later tightening, and a single bad value would
+    otherwise 422 *every* push for that entity rather than just dropping the artwork.
+    """
+    if content.get("template") not in IMAGE_TEMPLATES:
+        return
+    url = (entity_config.get(CONF_IMAGE_URL) or "").strip()
+    if not url:
+        return
+    if not is_valid_image_url(url):
+        # The URL itself stays out of the log: a snapshot URL routinely carries
+        # credentials in its userinfo, and this line is emitted on every push.
+        _LOGGER.debug("Dropping an image_url for %s that the server would reject", url_host(url))
+        return
+    content["image_url"] = url
+
+    shape = entity_config.get(CONF_IMAGE_SHAPE) or ""
+    if shape in IMAGE_SHAPES:
+        content["image_shape"] = shape
+
+    thumbhash = (entity_config.get(CONF_IMAGE_THUMBHASH) or "").strip()
+    if not thumbhash:
+        return
+    if not is_valid_thumbhash(thumbhash):
+        _LOGGER.debug("Dropping an image_thumbhash the device could not decode")
+        return
+    content["image_thumbhash"] = thumbhash
+
+
 def _resolve_live_end(now: int, remaining: int | None, absolute_end: int | None) -> int | None:
     """Resolve the epoch live_progress animates toward, or None when nothing can.
 
@@ -765,6 +808,8 @@ def map_content(
             content["live_progress"] = True
             content["end_date"] = end
 
+    _apply_image_fields(content, entity_config)
+
     return content
 
 
@@ -832,6 +877,12 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         entity_config.get(CONF_LIVE_PROGRESS) or (last_content and last_content.get("live_progress"))
     ):
         content["live_progress"] = False
+
+    # The artwork is deliberately not restated here. Updates are RFC 7396 merge
+    # patches, so a key the patch omits keeps its stored value: the image survives the
+    # completion frame on its own, and re-sending it would mean re-hashing an image
+    # nothing is going to change. The shutdown end path never sent it either, so
+    # leaving it out is what makes all three end paths identical.
 
     if last_content:
         for key in _COMMON_CARRY_FIELDS:

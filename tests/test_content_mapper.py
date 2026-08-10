@@ -21,6 +21,9 @@ from custom_components.pushward.const import (
     CONF_FIRED_AT_ENTITY,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_IMAGE_SHAPE,
+    CONF_IMAGE_THUMBHASH,
+    CONF_IMAGE_URL,
     CONF_LABEL,
     CONF_LIVE_PROGRESS,
     CONF_LOG_COLUMNS,
@@ -62,6 +65,7 @@ from custom_components.pushward.const import (
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
+    IMAGE_THUMBHASH_MAX,
     MAX_SEVERITY_LABEL_LEN,
     TIMELINE_SERIES_LABEL_MAX,
     normalize_slug,
@@ -79,6 +83,8 @@ from custom_components.pushward.content_mapper import (
     sanitize_slug,
 )
 
+from .conftest import IMAGE_THUMBHASH as _THUMBHASH
+from .conftest import IMAGE_URL as _IMAGE_URL
 from .conftest import make_entity_config
 from .conftest import make_mock_state as _make_state
 from .server_contract import assert_valid_activity_content
@@ -3274,4 +3280,143 @@ def test_map_content_log_composes_columns():
     content = map_content(state, config, hass=_FakeHass({"sensor.cpu": cpu}))
 
     assert content["lines"][0]["text"] == "On · 4000K · 72"
+    assert_valid_activity_content(content)
+
+
+# --- image trio -------------------------------------------------------------
+
+
+@pytest.mark.parametrize("template", ["generic", "steps"])
+def test_map_content_emits_the_image_trio_on_its_templates(template):
+    """URL, shape and hash all reach the wire on the two templates with an image slot."""
+    state = _make_state("on")
+    config = {
+        CONF_TEMPLATE: template,
+        CONF_IMAGE_URL: _IMAGE_URL,
+        CONF_IMAGE_SHAPE: "poster",
+        CONF_IMAGE_THUMBHASH: _THUMBHASH,
+    }
+
+    content = map_content(state, config)
+
+    assert content["image_url"] == _IMAGE_URL
+    assert content["image_shape"] == "poster"
+    assert content["image_thumbhash"] == _THUMBHASH
+    assert_valid_activity_content(content)
+
+
+@pytest.mark.parametrize("template", ["countdown", "alert", "gauge", "timeline", "board", "log"])
+def test_map_content_drops_the_image_trio_off_its_templates(template):
+    """The server rejects the trio elsewhere, so a stale config must not leak it into a push."""
+    state = _make_state("on")
+    config = {
+        CONF_TEMPLATE: template,
+        CONF_IMAGE_URL: _IMAGE_URL,
+        CONF_IMAGE_SHAPE: "circle",
+        CONF_IMAGE_THUMBHASH: _THUMBHASH,
+        CONF_TILES: [{CONF_LABEL: "Kitchen", CONF_ENTITY_ID: "sensor.cpu"}],
+    }
+
+    content = map_content(state, config, hass=_FakeHass({"sensor.cpu": _make_state("72", {}, "sensor.cpu")}))
+
+    assert "image_url" not in content
+    assert "image_shape" not in content
+    assert "image_thumbhash" not in content
+
+
+def test_map_content_omits_the_shape_and_hash_without_a_url():
+    """Both describe an image; on their own they would frame nothing."""
+    state = _make_state("on")
+    config = {CONF_TEMPLATE: "generic", CONF_IMAGE_SHAPE: "circle", CONF_IMAGE_THUMBHASH: _THUMBHASH}
+
+    content = map_content(state, config)
+
+    assert "image_url" not in content
+    assert "image_shape" not in content
+    assert "image_thumbhash" not in content
+    assert_valid_activity_content(content)
+
+
+def test_map_content_omits_the_shape_when_it_is_unset():
+    """An unset shape stays off the wire; the server reads its absence as square."""
+    state = _make_state("on")
+    content = map_content(state, {CONF_TEMPLATE: "generic", CONF_IMAGE_URL: _IMAGE_URL, CONF_IMAGE_SHAPE: ""})
+
+    assert content["image_url"] == _IMAGE_URL
+    assert "image_shape" not in content
+    assert_valid_activity_content(content)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        pytest.param("http://example.com/a.jpg", id="plain_http"),
+        pytest.param("https:///a.jpg", id="no_host"),
+        pytest.param("https://user:pw@example.com/a.jpg", id="userinfo"),
+        pytest.param("ftp://example.com/a.jpg", id="wrong_scheme"),
+        pytest.param("not a url", id="garbage"),
+        # A bracketed non-IP host makes urlparse itself raise. Before the guard that
+        # ValueError escaped the mapper and took the whole push task down with it.
+        pytest.param("https://[camera]/snap.jpg", id="bracketed_host"),
+        pytest.param("https://@example.com/a.jpg", id="empty_userinfo"),
+        pytest.param("https://ex ample.com/a.jpg", id="space_in_host"),
+        pytest.param("https://example.com/a b.jpg", id="space_in_path"),
+        pytest.param("https://exa\x01mple.com/a.jpg", id="control_char"),
+        pytest.param("https://ex^ample.com/a.jpg", id="caret_in_host"),
+        pytest.param("https://ex%41mple.com/a.jpg", id="escape_in_host"),
+        pytest.param("https://example.com:port/a.jpg", id="non_numeric_port"),
+    ],
+)
+def test_map_content_drops_a_url_the_server_would_reject(url):
+    """A stored config predates later tightening; one bad URL must not 422 every push."""
+    state = _make_state("on")
+    content = map_content(state, {CONF_TEMPLATE: "generic", CONF_IMAGE_URL: url, CONF_IMAGE_SHAPE: "square"})
+
+    assert "image_url" not in content
+    assert "image_shape" not in content
+    assert_valid_activity_content(content)
+
+
+@pytest.mark.parametrize(
+    "thumbhash",
+    [
+        pytest.param("3gYKnZp4iHiAeHiHiHiId4B1CPe", id="unpadded"),
+        pytest.param("3gYKnZp4iHiAeHiHiHiId4B1CP_I", id="urlsafe_alphabet"),
+        pytest.param("A" * (IMAGE_THUMBHASH_MAX + 4), id="too_long"),
+    ],
+)
+def test_map_content_keeps_the_url_but_drops_an_unusable_hash(thumbhash):
+    """The URL still renders for phones that can reach it, so only the hash goes."""
+    state = _make_state("on")
+    config = {CONF_TEMPLATE: "generic", CONF_IMAGE_URL: _IMAGE_URL, CONF_IMAGE_THUMBHASH: thumbhash}
+
+    content = map_content(state, config)
+
+    assert content["image_url"] == _IMAGE_URL
+    assert "image_thumbhash" not in content
+    assert_valid_activity_content(content)
+
+
+@pytest.mark.parametrize("template", ["generic", "steps"])
+def test_map_completion_content_omits_the_artwork(template):
+    """Updates are RFC 7396 merge-patches, so an omitted key keeps its stored value.
+
+    The artwork therefore survives the completion frame without being restated, and
+    restating it would mean re-reading and re-hashing an image that cannot have
+    changed. Leaving it out is also what makes the shutdown end path - which never
+    did any image work - identical to this one.
+    """
+    config = {
+        CONF_TEMPLATE: template,
+        CONF_IMAGE_URL: _IMAGE_URL,
+        CONF_IMAGE_SHAPE: "circle",
+        CONF_IMAGE_THUMBHASH: _THUMBHASH,
+        CONF_TOTAL_STEPS: 3,
+    }
+
+    content = map_completion_content(config, {"progress": 0.8})
+
+    assert "image_url" not in content
+    assert "image_shape" not in content
+    assert "image_thumbhash" not in content
     assert_valid_activity_content(content)

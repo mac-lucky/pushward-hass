@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL de eliminación",
           "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
+        },
+        "image_url": {
+          "name": "URL de la imagen",
+          "description": "URL https de una imagen mostrada junto al icono. El iPhone la descarga por su cuenta, así que debe ser accesible desde internet; una dirección de la red local no cargará, pero su ThumbHash sí."
+        },
+        "image_shape": {
+          "name": "Forma de la imagen",
+          "description": "Cómo se recorta la imagen: poster mantiene un recorte vertical, square es el valor predeterminado y circle la recorta en redondo."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash de la imagen",
+          "description": "Vista previa difuminada incrustada que se dibuja cuando no se puede descargar la URL, y la única capa que se muestra para una imagen de tu red local. Déjalo vacío para calcularlo automáticamente a partir de la URL, o usa la acción Generate ThumbHash para crearlo desde cualquier imagen que Home Assistant pueda leer."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Opciones de steps",
           "description": "Solo para la plantilla steps."
+        },
+        "image_options": {
+          "name": "Imagen",
+          "description": "Ilustración opcional que se muestra junto al icono. Solo en las plantillas generic y steps."
         },
         "alert_options": {
           "name": "Opciones de alert",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL de eliminación",
           "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
+        },
+        "image_url": {
+          "name": "URL de la imagen",
+          "description": "URL https de una imagen mostrada junto al icono. El iPhone la descarga por su cuenta, así que debe ser accesible desde internet; una dirección de la red local no cargará, pero su ThumbHash sí."
+        },
+        "image_shape": {
+          "name": "Forma de la imagen",
+          "description": "Cómo se recorta la imagen: poster mantiene un recorte vertical, square es el valor predeterminado y circle la recorta en redondo."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash de la imagen",
+          "description": "Vista previa difuminada incrustada que se dibuja cuando no se puede descargar la URL, y la única capa que se muestra para una imagen de tu red local. Déjalo vacío para calcularlo automáticamente a partir de la URL, o usa la acción Generate ThumbHash para crearlo desde cualquier imagen que Home Assistant pueda leer."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Visualización, color y sonido",
           "description": "Estilo opcional y ajustes por actualización. Se aplican a cualquier plantilla."
+        },
+        "image_options": {
+          "name": "Imagen",
+          "description": "Ilustración opcional que se muestra junto al icono. Solo en las plantillas generic y steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Duración",
           "description": "Alternativa de tipo «configurar y olvidar» a Fecha de fin: segundos (>=1) o una cadena de duración como \"1h30m\". El servidor reancla el inicio/fin al momento actual. Envía Duración o Fecha de fin; si ambas se establecen, Duración tiene prioridad."
+        },
+        "image_url": {
+          "name": "URL de la imagen",
+          "description": "URL https de una imagen mostrada junto al icono. El iPhone la descarga por su cuenta, así que debe ser accesible desde internet; una dirección de la red local no cargará, pero su ThumbHash sí."
+        },
+        "image_shape": {
+          "name": "Forma de la imagen",
+          "description": "Cómo se recorta la imagen: poster mantiene un recorte vertical, square es el valor predeterminado y circle la recorta en redondo."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash de la imagen",
+          "description": "Vista previa difuminada incrustada que se dibuja cuando no se puede descargar la URL, y la única capa que se muestra para una imagen de tu red local. Déjalo vacío para calcularlo automáticamente a partir de la URL, o usa la acción Generate ThumbHash para crearlo desde cualquier imagen que Home Assistant pueda leer."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Opciones de steps",
           "description": "Solo para la plantilla steps."
+        },
+        "image_options": {
+          "name": "Imagen",
+          "description": "Ilustración opcional que se muestra junto al icono. Solo en las plantillas generic y steps."
         },
         "action_buttons": {
           "name": "Botones de acción",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Generar ThumbHash",
+      "description": "Calcula la vista previa difuminada de una imagen y la devuelve, lista para pegarla en una actividad o en los ajustes de imagen de una entidad.",
+      "fields": {
+        "image_url": {
+          "name": "URL de la imagen",
+          "description": "URL http o https de la imagen. Sirve cualquier cosa que Home Assistant pueda alcanzar, incluida una cámara de la red local que el iPhone no ve."
+        },
+        "image_path": {
+          "name": "Ruta de la imagen",
+          "description": "Ruta a un archivo de imagen local en lugar de una URL. El directorio debe estar permitido en configuration.yaml bajo allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "Finalizar actividad",
       "description": "Finalizar una PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Ningún widget de PushWard coincide con slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "No se pudo generar el ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Una fila por paso, en orden. Cada fila define una etiqueta opcional, una altura de fila (1-10), un ancho relativo (número positivo) y un color (con nombre o hex; dejar vacío para conservar el color de acento). Añade ninguna fila o exactamente total_steps filas. Solo para la plantilla steps."
               }
             },
+            "image_options": {
+              "name": "Imagen",
+              "data": {
+                "image_url": "URL de la imagen",
+                "image_shape": "Forma de la imagen",
+                "image_thumbhash": "ThumbHash de la imagen"
+              },
+              "data_description": {
+                "image_url": "URL https de una imagen mostrada junto al icono. El iPhone la descarga por su cuenta, así que debe ser accesible desde internet; una dirección de la red local no cargará, pero su ThumbHash sí.",
+                "image_shape": "Cómo se recorta la imagen: poster mantiene un recorte vertical, square es el valor predeterminado y circle la recorta en redondo.",
+                "image_thumbhash": "Vista previa difuminada incrustada que se dibuja cuando no se puede descargar la URL, y la única capa que se muestra para una imagen de tu red local. Déjalo vacío para calcularlo automáticamente a partir de la URL, o usa la acción Generate ThumbHash para crearlo desde cualquier imagen que Home Assistant pueda leer."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Cada umbral debe empezar con un número (p. ej. 25:red:Hot).",
         "too_many_thresholds": "Una línea de tiempo admite como máximo 5 umbrales.",
         "invalid_number": "Introduce un número válido.",
-        "unknown_primary_series": "La serie principal debe coincidir con una de las etiquetas de serie configuradas."
+        "unknown_primary_series": "La serie principal debe coincidir con una de las etiquetas de serie configuradas.",
+        "invalid_image_url": "La URL de la imagen debe ser una dirección https con host y sin usuario ni contraseña.",
+        "invalid_image_shape": "La forma de la imagen debe ser poster, square o circle.",
+        "invalid_image_thumbhash": "El ThumbHash de la imagen debe estar en base64 con alfabeto estándar y relleno, y tener 64 caracteres como máximo. Usa la acción Generate ThumbHash para generarlo."
       },
       "abort": {
         "already_configured": "Esta entidad ya está rastreada.",
@@ -1922,6 +2003,13 @@
         "output": "Salida",
         "storage": "Almacenamiento",
         "exchange": "Intercambio"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Póster",
+        "square": "Cuadrado",
+        "circle": "Círculo"
       }
     }
   }

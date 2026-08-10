@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "Kaldırma TTL'si",
           "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
+        },
+        "image_url": {
+          "name": "Görsel URL'si",
+          "description": "Simgenin yanında gösterilen görselin https adresi. iPhone bunu kendisi indirir, bu yüzden internetten erişilebilir olmalıdır; yerel ağdaki bir adres yüklenmez, ancak ThumbHash'i yüklenir."
+        },
+        "image_shape": {
+          "name": "Görsel biçimi",
+          "description": "Görselin nasıl kırpılacağı: poster dikey bir kırpma bırakır, square varsayılandır, circle yuvarlak kırpar."
+        },
+        "image_thumbhash": {
+          "name": "Görsel ThumbHash'i",
+          "description": "URL indirilemediğinde çizilen bulanık gömülü önizleme; yerel ağdaki bir görsel için görüntülenen tek katman budur. Otomatik olarak URL'den hesaplanması için boş bırakın veya Home Assistant'ın okuyabildiği herhangi bir görselden üretmek için Generate ThumbHash eylemini kullanın."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "steps seçenekleri",
           "description": "Yalnızca steps şablonu."
+        },
+        "image_options": {
+          "name": "Görsel",
+          "description": "Simgenin yanında gösterilen isteğe bağlı görsel. Yalnızca generic ve steps şablonlarında."
         },
         "alert_options": {
           "name": "alert seçenekleri",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "Kaldırma TTL'si",
           "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
+        },
+        "image_url": {
+          "name": "Görsel URL'si",
+          "description": "Simgenin yanında gösterilen görselin https adresi. iPhone bunu kendisi indirir, bu yüzden internetten erişilebilir olmalıdır; yerel ağdaki bir adres yüklenmez, ancak ThumbHash'i yüklenir."
+        },
+        "image_shape": {
+          "name": "Görsel biçimi",
+          "description": "Görselin nasıl kırpılacağı: poster dikey bir kırpma bırakır, square varsayılandır, circle yuvarlak kırpar."
+        },
+        "image_thumbhash": {
+          "name": "Görsel ThumbHash'i",
+          "description": "URL indirilemediğinde çizilen bulanık gömülü önizleme; yerel ağdaki bir görsel için görüntülenen tek katman budur. Otomatik olarak URL'den hesaplanması için boş bırakın veya Home Assistant'ın okuyabildiği herhangi bir görselden üretmek için Generate ThumbHash eylemini kullanın."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Görünüm, renk ve ses",
           "description": "İsteğe bağlı biçimlendirme ve güncelleme başına geçersiz kılmalar. Her şablona uygulanır."
+        },
+        "image_options": {
+          "name": "Görsel",
+          "description": "Simgenin yanında gösterilen isteğe bağlı görsel. Yalnızca generic ve steps şablonlarında."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Süre",
           "description": "Bitiş Tarihi'ne kur-ve-unut alternatifi: saniye (>=1) veya \"1h30m\" gibi bir süre dizesi. Sunucu başlangıç/bitişi şimdiye yeniden sabitler. Süre veya Bitiş Tarihi'nden birini gönderin — ikisi de ayarlanırsa Süre öncelik kazanır."
+        },
+        "image_url": {
+          "name": "Görsel URL'si",
+          "description": "Simgenin yanında gösterilen görselin https adresi. iPhone bunu kendisi indirir, bu yüzden internetten erişilebilir olmalıdır; yerel ağdaki bir adres yüklenmez, ancak ThumbHash'i yüklenir."
+        },
+        "image_shape": {
+          "name": "Görsel biçimi",
+          "description": "Görselin nasıl kırpılacağı: poster dikey bir kırpma bırakır, square varsayılandır, circle yuvarlak kırpar."
+        },
+        "image_thumbhash": {
+          "name": "Görsel ThumbHash'i",
+          "description": "URL indirilemediğinde çizilen bulanık gömülü önizleme; yerel ağdaki bir görsel için görüntülenen tek katman budur. Otomatik olarak URL'den hesaplanması için boş bırakın veya Home Assistant'ın okuyabildiği herhangi bir görselden üretmek için Generate ThumbHash eylemini kullanın."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "steps seçenekleri",
           "description": "Yalnızca steps şablonu."
+        },
+        "image_options": {
+          "name": "Görsel",
+          "description": "Simgenin yanında gösterilen isteğe bağlı görsel. Yalnızca generic ve steps şablonlarında."
         },
         "action_buttons": {
           "name": "Eylem düğmeleri",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "ThumbHash Oluştur",
+      "description": "Bir görselin bulanık önizlemesini hesaplar ve bir etkinliğe ya da bir varlığın görsel ayarlarına yapıştırmaya hazır şekilde döndürür.",
+      "fields": {
+        "image_url": {
+          "name": "Görsel URL'si",
+          "description": "Görselin http veya https adresi. Home Assistant'ın erişebildiği her şey işe yarar; iPhone'un göremediği yerel ağdaki bir kamera dahil."
+        },
+        "image_path": {
+          "name": "Görsel yolu",
+          "description": "URL yerine yerel bir görsel dosyasının yolu. Dizin, configuration.yaml içinde allowlist_external_dirs altında izinli olmalıdır."
+        }
+      }
+    },
     "end_activity": {
       "name": "Aktiviteyi Sonlandır",
       "description": "Bir PushWard Live Activity'yi sonlandır.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "slug={slug} entity_id={entity_id} ile eşleşen PushWard widget'ı yok."
+    },
+    "thumbhash_failed": {
+      "message": "ThumbHash oluşturulamadı: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Sırayla her adım için bir satır. Her satır isteğe bağlı bir etiket, satır yüksekliği (1-10), göreli genişlik (pozitif sayı) ve renk (adlı veya hex; boş bırakmak vurgu rengini korur) belirler. Hiç satır eklemeyin veya tam olarak total_steps satır ekleyin. Yalnızca steps şablonu."
               }
             },
+            "image_options": {
+              "name": "Görsel",
+              "data": {
+                "image_url": "Görsel URL'si",
+                "image_shape": "Görsel biçimi",
+                "image_thumbhash": "Görsel ThumbHash'i"
+              },
+              "data_description": {
+                "image_url": "Simgenin yanında gösterilen görselin https adresi. iPhone bunu kendisi indirir, bu yüzden internetten erişilebilir olmalıdır; yerel ağdaki bir adres yüklenmez, ancak ThumbHash'i yüklenir.",
+                "image_shape": "Görselin nasıl kırpılacağı: poster dikey bir kırpma bırakır, square varsayılandır, circle yuvarlak kırpar.",
+                "image_thumbhash": "URL indirilemediğinde çizilen bulanık gömülü önizleme; yerel ağdaki bir görsel için görüntülenen tek katman budur. Otomatik olarak URL'den hesaplanması için boş bırakın veya Home Assistant'ın okuyabildiği herhangi bir görselden üretmek için Generate ThumbHash eylemini kullanın."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Her eşik bir sayıyla başlamalıdır (örn. 25:red:Hot).",
         "too_many_thresholds": "Bir zaman çizelgesi en fazla 5 eşik destekler.",
         "invalid_number": "Geçerli bir sayı girin.",
-        "unknown_primary_series": "Birincil seri, yapılandırılmış seri etiketlerinden biriyle eşleşmelidir."
+        "unknown_primary_series": "Birincil seri, yapılandırılmış seri etiketlerinden biriyle eşleşmelidir.",
+        "invalid_image_url": "Görsel URL'si, ana makine içeren bir https adresi olmalı ve kullanıcı adı ya da parola içermemelidir.",
+        "invalid_image_shape": "Görsel biçimi poster, square veya circle olmalıdır.",
+        "invalid_image_thumbhash": "Görsel ThumbHash'i, standart alfabeli ve dolgulu base64 olmalı ve en fazla 64 karakter uzunluğunda olmalıdır. Üretmek için Generate ThumbHash eylemini kullanın."
       },
       "abort": {
         "already_configured": "Bu varlık zaten izleniyor.",
@@ -1922,6 +2003,13 @@
         "output": "Çıkış",
         "storage": "Depolama",
         "exchange": "Takas"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Poster",
+        "square": "Kare",
+        "circle": "Daire"
       }
     }
   }

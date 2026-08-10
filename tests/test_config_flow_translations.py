@@ -34,6 +34,7 @@ from custom_components.pushward.config_flow import (
 )
 from custom_components.pushward.const import (
     FLOW_SLOTS,
+    IMAGE_SHAPES,
     NAMED_COLORS,
     SCALES,
     SEVERITIES,
@@ -58,6 +59,7 @@ _CONFIG_FLOW = Path(__file__).parent.parent / "custom_components" / "pushward" /
 SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "activity_template": tuple(TEMPLATES),
     "severity": tuple(SEVERITIES),
+    "image_shape": tuple(IMAGE_SHAPES),
     "timeline_scale": tuple(SCALES),
     "sound": tuple(SOUNDS),
     "widget_template": tuple(WIDGET_TEMPLATES),
@@ -201,8 +203,13 @@ _ENTITY_COMMON: set[str] = {
     "dismissal_ttl",
 }
 
+# The image trio rides only on the templates the server gives an image slot
+# (IMAGE_TEMPLATES): generic and steps.
+_ENTITY_IMAGE: set[str] = {"image_url", "image_shape", "image_thumbhash"}
+
 ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
     "generic": _ENTITY_COMMON
+    | _ENTITY_IMAGE
     | {
         "progress_entity",
         "progress_attribute",
@@ -233,6 +240,7 @@ ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
         "secondary_url_title",
     },
     "steps": _ENTITY_COMMON
+    | _ENTITY_IMAGE
     | {
         "progress_entity",
         "progress_attribute",

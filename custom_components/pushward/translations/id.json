@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL penghapusan",
           "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
+        },
+        "image_url": {
+          "name": "URL gambar",
+          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+        },
+        "image_shape": {
+          "name": "Bentuk gambar",
+          "description": "Cara gambar dipotong: poster mempertahankan potongan vertikal, square adalah bawaan, circle memotong bulat."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash gambar",
+          "description": "Pratinjau buram tersemat yang digambar saat URL tidak bisa diunduh, dan satu-satunya lapisan yang tampil untuk gambar di jaringan lokal. Biarkan kosong agar dihitung otomatis dari URL, atau gunakan aksi Generate ThumbHash untuk membuatnya dari gambar apa pun yang bisa dibaca Home Assistant."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Opsi steps",
           "description": "Hanya untuk templat steps."
+        },
+        "image_options": {
+          "name": "Gambar",
+          "description": "Gambar opsional yang ditampilkan di samping ikon. Hanya untuk templat generic dan steps."
         },
         "alert_options": {
           "name": "Opsi alert",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL penghapusan",
           "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
+        },
+        "image_url": {
+          "name": "URL gambar",
+          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+        },
+        "image_shape": {
+          "name": "Bentuk gambar",
+          "description": "Cara gambar dipotong: poster mempertahankan potongan vertikal, square adalah bawaan, circle memotong bulat."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash gambar",
+          "description": "Pratinjau buram tersemat yang digambar saat URL tidak bisa diunduh, dan satu-satunya lapisan yang tampil untuk gambar di jaringan lokal. Biarkan kosong agar dihitung otomatis dari URL, atau gunakan aksi Generate ThumbHash untuk membuatnya dari gambar apa pun yang bisa dibaca Home Assistant."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Tampilan, warna & suara",
           "description": "Penataan opsional dan penggantian per pembaruan. Berlaku untuk templat apa pun."
+        },
+        "image_options": {
+          "name": "Gambar",
+          "description": "Gambar opsional yang ditampilkan di samping ikon. Hanya untuk templat generic dan steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Durasi",
           "description": "Alternatif atur-sekali untuk Tanggal Berakhir: detik (>=1) atau string durasi seperti \"1h30m\". Server menyetel ulang awal/akhir ke sekarang. Kirim Durasi atau Tanggal Berakhir — Durasi menang jika keduanya disetel."
+        },
+        "image_url": {
+          "name": "URL gambar",
+          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+        },
+        "image_shape": {
+          "name": "Bentuk gambar",
+          "description": "Cara gambar dipotong: poster mempertahankan potongan vertikal, square adalah bawaan, circle memotong bulat."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash gambar",
+          "description": "Pratinjau buram tersemat yang digambar saat URL tidak bisa diunduh, dan satu-satunya lapisan yang tampil untuk gambar di jaringan lokal. Biarkan kosong agar dihitung otomatis dari URL, atau gunakan aksi Generate ThumbHash untuk membuatnya dari gambar apa pun yang bisa dibaca Home Assistant."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Opsi steps",
           "description": "Hanya untuk templat steps."
+        },
+        "image_options": {
+          "name": "Gambar",
+          "description": "Gambar opsional yang ditampilkan di samping ikon. Hanya untuk templat generic dan steps."
         },
         "action_buttons": {
           "name": "Tombol tindakan",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Buat ThumbHash",
+      "description": "Menghitung pratinjau buram sebuah gambar dan mengembalikannya, siap ditempel ke aktivitas atau ke pengaturan gambar sebuah entitas.",
+      "fields": {
+        "image_url": {
+          "name": "URL gambar",
+          "description": "URL http atau https gambar. Apa pun yang bisa dijangkau Home Assistant bisa dipakai, termasuk kamera di jaringan lokal yang tidak terlihat oleh iPhone."
+        },
+        "image_path": {
+          "name": "Path gambar",
+          "description": "Path ke berkas gambar lokal sebagai pengganti URL. Direktorinya harus diizinkan di configuration.yaml pada allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "Akhiri Aktivitas",
       "description": "Akhiri PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Tidak ada widget PushWard yang cocok dengan slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Tidak dapat membuat ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Satu baris per langkah, berurutan. Setiap baris mengatur label opsional, tinggi baris (1-10), lebar relatif (angka positif), dan warna (nama atau hex; kosongkan untuk mempertahankan warna aksen). Tambahkan tanpa baris, atau tepat total_steps baris. Hanya template steps."
               }
             },
+            "image_options": {
+              "name": "Gambar",
+              "data": {
+                "image_url": "URL gambar",
+                "image_shape": "Bentuk gambar",
+                "image_thumbhash": "ThumbHash gambar"
+              },
+              "data_description": {
+                "image_url": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil.",
+                "image_shape": "Cara gambar dipotong: poster mempertahankan potongan vertikal, square adalah bawaan, circle memotong bulat.",
+                "image_thumbhash": "Pratinjau buram tersemat yang digambar saat URL tidak bisa diunduh, dan satu-satunya lapisan yang tampil untuk gambar di jaringan lokal. Biarkan kosong agar dihitung otomatis dari URL, atau gunakan aksi Generate ThumbHash untuk membuatnya dari gambar apa pun yang bisa dibaca Home Assistant."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Setiap ambang harus diawali angka (mis. 25:red:Hot).",
         "too_many_thresholds": "Satu timeline mendukung maksimal 5 ambang.",
         "invalid_number": "Masukkan angka yang valid.",
-        "unknown_primary_series": "Seri utama harus cocok dengan salah satu label seri yang dikonfigurasi."
+        "unknown_primary_series": "Seri utama harus cocok dengan salah satu label seri yang dikonfigurasi.",
+        "invalid_image_url": "URL gambar harus berupa alamat https dengan host, tanpa nama pengguna atau kata sandi.",
+        "invalid_image_shape": "Bentuk gambar harus poster, square, atau circle.",
+        "invalid_image_thumbhash": "ThumbHash gambar harus base64 alfabet standar dengan padding, maksimal 64 karakter. Gunakan aksi Generate ThumbHash untuk membuatnya."
       },
       "abort": {
         "already_configured": "Entitas ini sudah dilacak.",
@@ -1922,6 +2003,13 @@
         "output": "Keluaran",
         "storage": "Penyimpanan",
         "exchange": "Pertukaran"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Poster",
+        "square": "Persegi",
+        "circle": "Lingkaran"
       }
     }
   }

@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL de eliminare",
           "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
+        },
+        "image_url": {
+          "name": "URL imagine",
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+        },
+        "image_shape": {
+          "name": "Forma imaginii",
+          "description": "Cum este decupată imaginea: poster păstrează un cadru vertical, square este valoarea implicită, circle o decupează rotund."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash imagine",
+          "description": "Previzualizare neclară încorporată, desenată când adresa URL nu poate fi descărcată, și singurul nivel care apare pentru o imagine din rețeaua locală. Lăsați gol pentru a fi calculat automat din adresa URL sau folosiți acțiunea Generate ThumbHash pentru a-l crea din orice imagine pe care Home Assistant o poate citi."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Opțiuni steps",
           "description": "Numai pentru șablonul steps."
+        },
+        "image_options": {
+          "name": "Imagine",
+          "description": "Grafică opțională afișată lângă pictogramă. Doar pentru șabloanele generic și steps."
         },
         "alert_options": {
           "name": "Opțiuni alert",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL de eliminare",
           "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
+        },
+        "image_url": {
+          "name": "URL imagine",
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+        },
+        "image_shape": {
+          "name": "Forma imaginii",
+          "description": "Cum este decupată imaginea: poster păstrează un cadru vertical, square este valoarea implicită, circle o decupează rotund."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash imagine",
+          "description": "Previzualizare neclară încorporată, desenată când adresa URL nu poate fi descărcată, și singurul nivel care apare pentru o imagine din rețeaua locală. Lăsați gol pentru a fi calculat automat din adresa URL sau folosiți acțiunea Generate ThumbHash pentru a-l crea din orice imagine pe care Home Assistant o poate citi."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Afișare, culoare și sunet",
           "description": "Stilizare opțională și suprascrieri per actualizare. Se aplică oricărui șablon."
+        },
+        "image_options": {
+          "name": "Imagine",
+          "description": "Grafică opțională afișată lângă pictogramă. Doar pentru șabloanele generic și steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Durată",
           "description": "Alternativă „setează și uită” la Data de încheiere: secunde (>=1) sau un șir de durată precum „1h30m”. Serverul reancorează începutul/sfârșitul la momentul curent. Trimiteți fie Durata, fie Data de încheiere — Durata are prioritate dacă ambele sunt setate."
+        },
+        "image_url": {
+          "name": "URL imagine",
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+        },
+        "image_shape": {
+          "name": "Forma imaginii",
+          "description": "Cum este decupată imaginea: poster păstrează un cadru vertical, square este valoarea implicită, circle o decupează rotund."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash imagine",
+          "description": "Previzualizare neclară încorporată, desenată când adresa URL nu poate fi descărcată, și singurul nivel care apare pentru o imagine din rețeaua locală. Lăsați gol pentru a fi calculat automat din adresa URL sau folosiți acțiunea Generate ThumbHash pentru a-l crea din orice imagine pe care Home Assistant o poate citi."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Opțiuni steps",
           "description": "Numai pentru șablonul steps."
+        },
+        "image_options": {
+          "name": "Imagine",
+          "description": "Grafică opțională afișată lângă pictogramă. Doar pentru șabloanele generic și steps."
         },
         "action_buttons": {
           "name": "Butoane de acțiune",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Generați ThumbHash",
+      "description": "Calculează previzualizarea neclară a unei imagini și o returnează, gata de lipit într-o activitate sau în setările de imagine ale unei entități.",
+      "fields": {
+        "image_url": {
+          "name": "URL imagine",
+          "description": "Adresa http sau https a imaginii. Funcționează orice poate accesa Home Assistant, inclusiv o cameră din rețeaua locală pe care iPhone-ul nu o vede."
+        },
+        "image_path": {
+          "name": "Cale imagine",
+          "description": "Calea către un fișier imagine local în locul unei adrese URL. Directorul trebuie permis în configuration.yaml la allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "Finalizați activitatea",
       "description": "Finalizați un PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Niciun widget PushWard nu corespunde slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Nu s-a putut genera ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Un rând pe pas, în ordine. Fiecare rând setează o etichetă opțională, o înălțime de rând (1-10), o lățime relativă (număr pozitiv) și o culoare (denumită sau hex; lăsați gol pentru culoarea de accent). Adăugați niciun rând sau exact total_steps rânduri. Doar pentru șablonul steps."
               }
             },
+            "image_options": {
+              "name": "Imagine",
+              "data": {
+                "image_url": "URL imagine",
+                "image_shape": "Forma imaginii",
+                "image_thumbhash": "ThumbHash imagine"
+              },
+              "data_description": {
+                "image_url": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da.",
+                "image_shape": "Cum este decupată imaginea: poster păstrează un cadru vertical, square este valoarea implicită, circle o decupează rotund.",
+                "image_thumbhash": "Previzualizare neclară încorporată, desenată când adresa URL nu poate fi descărcată, și singurul nivel care apare pentru o imagine din rețeaua locală. Lăsați gol pentru a fi calculat automat din adresa URL sau folosiți acțiunea Generate ThumbHash pentru a-l crea din orice imagine pe care Home Assistant o poate citi."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Fiecare prag trebuie să înceapă cu un număr (ex. 25:red:Hot).",
         "too_many_thresholds": "O cronologie acceptă cel mult 5 praguri.",
         "invalid_number": "Introduceți un număr valid.",
-        "unknown_primary_series": "Seria principală trebuie să corespundă uneia dintre etichetele de serie configurate."
+        "unknown_primary_series": "Seria principală trebuie să corespundă uneia dintre etichetele de serie configurate.",
+        "invalid_image_url": "Adresa imaginii trebuie să fie https, cu gazdă și fără nume de utilizator sau parolă.",
+        "invalid_image_shape": "Forma imaginii trebuie să fie poster, square sau circle.",
+        "invalid_image_thumbhash": "ThumbHash-ul imaginii trebuie să fie base64 cu alfabet standard și umplutură, de cel mult 64 de caractere. Folosiți acțiunea Generate ThumbHash pentru a genera unul."
       },
       "abort": {
         "already_configured": "Această entitate este deja urmărită.",
@@ -1922,6 +2003,13 @@
         "output": "Ieșire",
         "storage": "Stocaj",
         "exchange": "Schimb"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Poster",
+        "square": "Pătrat",
+        "circle": "Cerc"
       }
     }
   }

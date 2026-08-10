@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL ng pag-alis",
           "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
+        },
+        "image_url": {
+          "name": "URL ng larawan",
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+        },
+        "image_shape": {
+          "name": "Hugis ng larawan",
+          "description": "Kung paano kina-crop ang larawan: patayong crop ang poster, default ang square, at bilog ang crop ng circle."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash ng larawan",
+          "description": "Malabong preview na nakalakip, ipinapakita kapag hindi ma-download ang URL, at ito lang ang lumalabas para sa larawan sa lokal mong network. Iwanang blangko para awtomatikong kalkulahin mula sa URL, o gamitin ang aksyong Generate ThumbHash para gumawa mula sa kahit anong larawang kayang basahin ng Home Assistant."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Mga opsyon ng steps",
           "description": "Para sa steps template lamang."
+        },
+        "image_options": {
+          "name": "Larawan",
+          "description": "Opsyonal na larawang ipinapakita sa tabi ng icon. Para lang sa mga template na generic at steps."
         },
         "alert_options": {
           "name": "Mga opsyon ng alert",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL ng pag-alis",
           "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
+        },
+        "image_url": {
+          "name": "URL ng larawan",
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+        },
+        "image_shape": {
+          "name": "Hugis ng larawan",
+          "description": "Kung paano kina-crop ang larawan: patayong crop ang poster, default ang square, at bilog ang crop ng circle."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash ng larawan",
+          "description": "Malabong preview na nakalakip, ipinapakita kapag hindi ma-download ang URL, at ito lang ang lumalabas para sa larawan sa lokal mong network. Iwanang blangko para awtomatikong kalkulahin mula sa URL, o gamitin ang aksyong Generate ThumbHash para gumawa mula sa kahit anong larawang kayang basahin ng Home Assistant."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Display, kulay at tunog",
           "description": "Opsyonal na estilo at mga override kada update. Naaangkop sa anumang template."
+        },
+        "image_options": {
+          "name": "Larawan",
+          "description": "Opsyonal na larawang ipinapakita sa tabi ng icon. Para lang sa mga template na generic at steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Tagal",
           "description": "Set-and-forget na alternatibo sa End Date: segundo (>=1) o duration string tulad ng \"1h30m\". Muling ini-anchor ng server ang start/end sa ngayon. Magpadala ng alinman sa Tagal o End Date — mananaig ang Tagal kung pareho silang nakatakda."
+        },
+        "image_url": {
+          "name": "URL ng larawan",
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+        },
+        "image_shape": {
+          "name": "Hugis ng larawan",
+          "description": "Kung paano kina-crop ang larawan: patayong crop ang poster, default ang square, at bilog ang crop ng circle."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash ng larawan",
+          "description": "Malabong preview na nakalakip, ipinapakita kapag hindi ma-download ang URL, at ito lang ang lumalabas para sa larawan sa lokal mong network. Iwanang blangko para awtomatikong kalkulahin mula sa URL, o gamitin ang aksyong Generate ThumbHash para gumawa mula sa kahit anong larawang kayang basahin ng Home Assistant."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Mga opsyon ng steps",
           "description": "Para sa steps template lamang."
+        },
+        "image_options": {
+          "name": "Larawan",
+          "description": "Opsyonal na larawang ipinapakita sa tabi ng icon. Para lang sa mga template na generic at steps."
         },
         "action_buttons": {
           "name": "Mga action button",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Gumawa ng ThumbHash",
+      "description": "Kinakalkula ang malabong preview ng isang larawan at ibinabalik ito, handang i-paste sa isang activity o sa mga setting ng larawan ng isang entity.",
+      "fields": {
+        "image_url": {
+          "name": "URL ng larawan",
+          "description": "http o https URL ng larawan. Gumagana ang kahit anong maabot ng Home Assistant, kasama ang camera sa lokal na network na hindi nakikita ng iPhone."
+        },
+        "image_path": {
+          "name": "Path ng larawan",
+          "description": "Path patungo sa lokal na image file sa halip na URL. Dapat pinapayagan ang direktoryo sa configuration.yaml sa ilalim ng allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "Tapusin ang Activity",
       "description": "Tapusin ang isang PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Walang PushWard widget na tumutugma sa slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Hindi makagawa ng ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Isang hilera bawat hakbang, ayon sa pagkakasunod. Bawat hilera ay nagtatakda ng opsyonal na label, taas ng hilera (1-10), kaugnay na lapad (positibong numero), at kulay (pangalan o hex; iwanang blangko para panatilihin ang accent na kulay). Magdagdag ng walang hilera, o eksaktong total_steps na hilera. Template na steps lamang."
               }
             },
+            "image_options": {
+              "name": "Larawan",
+              "data": {
+                "image_url": "URL ng larawan",
+                "image_shape": "Hugis ng larawan",
+                "image_thumbhash": "ThumbHash ng larawan"
+              },
+              "data_description": {
+                "image_url": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito.",
+                "image_shape": "Kung paano kina-crop ang larawan: patayong crop ang poster, default ang square, at bilog ang crop ng circle.",
+                "image_thumbhash": "Malabong preview na nakalakip, ipinapakita kapag hindi ma-download ang URL, at ito lang ang lumalabas para sa larawan sa lokal mong network. Iwanang blangko para awtomatikong kalkulahin mula sa URL, o gamitin ang aksyong Generate ThumbHash para gumawa mula sa kahit anong larawang kayang basahin ng Home Assistant."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Ang bawat threshold ay dapat magsimula sa numero (hal. 25:red:Hot).",
         "too_many_thresholds": "Ang isang timeline ay sumusuporta ng hanggang 5 threshold.",
         "invalid_number": "Maglagay ng wastong numero.",
-        "unknown_primary_series": "Ang pangunahing series ay dapat tumugma sa isa sa mga na-configure na label ng series."
+        "unknown_primary_series": "Ang pangunahing series ay dapat tumugma sa isa sa mga na-configure na label ng series.",
+        "invalid_image_url": "Dapat https address na may host ang URL ng larawan, at walang username o password.",
+        "invalid_image_shape": "Dapat poster, square, o circle ang hugis ng larawan.",
+        "invalid_image_thumbhash": "Dapat base64 na standard alphabet na may padding ang ThumbHash ng larawan, at hindi hihigit sa 64 na character. Gamitin ang aksyong Generate ThumbHash para makagawa."
       },
       "abort": {
         "already_configured": "Ang entity na ito ay naka-track na.",
@@ -1922,6 +2003,13 @@
         "output": "Output",
         "storage": "Storage",
         "exchange": "Palitan"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Poster",
+        "square": "Parisukat",
+        "circle": "Bilog"
       }
     }
   }

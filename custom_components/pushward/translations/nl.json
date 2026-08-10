@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL voor verwijderen",
           "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
+        },
+        "image_url": {
+          "name": "Afbeeldings-URL",
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+        },
+        "image_shape": {
+          "name": "Afbeeldingsvorm",
+          "description": "Hoe de afbeelding wordt bijgesneden: poster houdt een staande uitsnede, square is de standaard, circle snijdt rond bij."
+        },
+        "image_thumbhash": {
+          "name": "Afbeeldings-ThumbHash",
+          "description": "Vervaagde ingesloten voorvertoning die wordt getekend als de URL niet opgehaald kan worden, en de enige laag die verschijnt voor een afbeelding in je lokale netwerk. Laat leeg om hem automatisch uit de URL te berekenen, of gebruik de actie Generate ThumbHash om er een te maken van elke afbeelding die Home Assistant kan lezen."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "steps-opties",
           "description": "Alleen voor het sjabloon steps."
+        },
+        "image_options": {
+          "name": "Afbeelding",
+          "description": "Optionele afbeelding naast het pictogram. Alleen voor de sjablonen generic en steps."
         },
         "alert_options": {
           "name": "alert-opties",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL voor verwijderen",
           "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
+        },
+        "image_url": {
+          "name": "Afbeeldings-URL",
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+        },
+        "image_shape": {
+          "name": "Afbeeldingsvorm",
+          "description": "Hoe de afbeelding wordt bijgesneden: poster houdt een staande uitsnede, square is de standaard, circle snijdt rond bij."
+        },
+        "image_thumbhash": {
+          "name": "Afbeeldings-ThumbHash",
+          "description": "Vervaagde ingesloten voorvertoning die wordt getekend als de URL niet opgehaald kan worden, en de enige laag die verschijnt voor een afbeelding in je lokale netwerk. Laat leeg om hem automatisch uit de URL te berekenen, of gebruik de actie Generate ThumbHash om er een te maken van elke afbeelding die Home Assistant kan lezen."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Weergave, kleur & geluid",
           "description": "Optionele opmaak en overschrijvingen per update. Van toepassing op elk sjabloon."
+        },
+        "image_options": {
+          "name": "Afbeelding",
+          "description": "Optionele afbeelding naast het pictogram. Alleen voor de sjablonen generic en steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Duur",
           "description": "Instellen-en-vergeten alternatief voor einddatum: seconden (>=1) of een duurtekst zoals \"1h30m\". De server verankert start/einde opnieuw op nu. Verstuur óf Duur óf Einddatum — Duur wint als beide zijn ingesteld."
+        },
+        "image_url": {
+          "name": "Afbeeldings-URL",
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+        },
+        "image_shape": {
+          "name": "Afbeeldingsvorm",
+          "description": "Hoe de afbeelding wordt bijgesneden: poster houdt een staande uitsnede, square is de standaard, circle snijdt rond bij."
+        },
+        "image_thumbhash": {
+          "name": "Afbeeldings-ThumbHash",
+          "description": "Vervaagde ingesloten voorvertoning die wordt getekend als de URL niet opgehaald kan worden, en de enige laag die verschijnt voor een afbeelding in je lokale netwerk. Laat leeg om hem automatisch uit de URL te berekenen, of gebruik de actie Generate ThumbHash om er een te maken van elke afbeelding die Home Assistant kan lezen."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "steps-opties",
           "description": "Alleen voor het sjabloon steps."
+        },
+        "image_options": {
+          "name": "Afbeelding",
+          "description": "Optionele afbeelding naast het pictogram. Alleen voor de sjablonen generic en steps."
         },
         "action_buttons": {
           "name": "Actieknoppen",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "ThumbHash genereren",
+      "description": "Berekent de vervaagde voorvertoning van een afbeelding en geeft die terug, klaar om te plakken in een activiteit of in de afbeeldingsinstellingen van een entiteit.",
+      "fields": {
+        "image_url": {
+          "name": "Afbeeldings-URL",
+          "description": "http- of https-URL van de afbeelding. Alles wat Home Assistant kan bereiken werkt, ook een camera in het lokale netwerk die de iPhone niet ziet."
+        },
+        "image_path": {
+          "name": "Afbeeldingspad",
+          "description": "Pad naar een lokaal afbeeldingsbestand in plaats van een URL. De map moet in configuration.yaml onder allowlist_external_dirs zijn toegestaan."
+        }
+      }
+    },
     "end_activity": {
       "name": "Activiteit beëindigen",
       "description": "Beëindig een PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Geen PushWard-widget komt overeen met slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Kan geen ThumbHash genereren: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Eén rij per stap, op volgorde. Elke rij stelt een optioneel label, een rijhoogte (1-10), een relatieve breedte (positief getal) en een kleur (benoemd of hex; leeg laten voor de accentkleur) in. Voeg geen rijen toe, of precies total_steps rijen. Alleen voor het sjabloon steps."
               }
             },
+            "image_options": {
+              "name": "Afbeelding",
+              "data": {
+                "image_url": "Afbeeldings-URL",
+                "image_shape": "Afbeeldingsvorm",
+                "image_thumbhash": "Afbeeldings-ThumbHash"
+              },
+              "data_description": {
+                "image_url": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel.",
+                "image_shape": "Hoe de afbeelding wordt bijgesneden: poster houdt een staande uitsnede, square is de standaard, circle snijdt rond bij.",
+                "image_thumbhash": "Vervaagde ingesloten voorvertoning die wordt getekend als de URL niet opgehaald kan worden, en de enige laag die verschijnt voor een afbeelding in je lokale netwerk. Laat leeg om hem automatisch uit de URL te berekenen, of gebruik de actie Generate ThumbHash om er een te maken van elke afbeelding die Home Assistant kan lezen."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Elke drempel moet met een getal beginnen (bijv. 25:red:Hot).",
         "too_many_thresholds": "Een tijdlijn ondersteunt maximaal 5 drempels.",
         "invalid_number": "Voer een geldig getal in.",
-        "unknown_primary_series": "De primaire reeks moet overeenkomen met een van de geconfigureerde reekslabels."
+        "unknown_primary_series": "De primaire reeks moet overeenkomen met een van de geconfigureerde reekslabels.",
+        "invalid_image_url": "De afbeeldings-URL moet een https-adres met host zijn, zonder gebruikersnaam of wachtwoord.",
+        "invalid_image_shape": "De afbeeldingsvorm moet poster, square of circle zijn.",
+        "invalid_image_thumbhash": "De afbeeldings-ThumbHash moet base64 met standaardalfabet en opvulling zijn, maximaal 64 tekens. Gebruik de actie Generate ThumbHash om er een te maken."
       },
       "abort": {
         "already_configured": "Deze entiteit wordt al gevolgd.",
@@ -1922,6 +2003,13 @@
         "output": "Uitgang",
         "storage": "Opslag",
         "exchange": "Uitwisseling"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Poster",
+        "square": "Vierkant",
+        "circle": "Cirkel"
       }
     }
   }

@@ -1,8 +1,10 @@
 """Constants for the PushWard integration."""
 
+import base64
+import binascii
 import re
 from typing import NamedTuple
-from urllib.parse import urlparse
+from urllib.parse import ParseResult, urlparse
 
 import voluptuous as vol
 
@@ -33,6 +35,23 @@ LIVE_PROGRESS_TEMPLATES = ("generic", "steps")
 # progress bar toward 1.0 by end_date and show a counting-down ETA (server field
 # live_progress). On steps it fills the current step, not the whole run.
 CONF_LIVE_PROGRESS = "live_progress"
+# Templates that have an image slot (pushward-server Content.SupportsImage). The
+# server REJECTS the trio on every other template rather than ignoring it, so both
+# the config flow and the update schemas have to gate on this list or the push 422s.
+IMAGE_TEMPLATES = ("generic", "steps")
+# Optional artwork shown beside the icon on the templates above.
+#
+# image_url is fetched BY THE DEVICE, never by the server, and iOS refuses private
+# ranges: a LAN or Tailscale host silently renders nothing on the phone. Home
+# Assistant, on the other hand, sits inside that network, which is exactly why
+# computing image_thumbhash here is worth the round trip. The thumbhash is a ~25 byte
+# ThumbHash carried inline in the activity, so it renders whatever the URL does.
+CONF_IMAGE_URL = "image_url"
+CONF_IMAGE_SHAPE = "image_shape"
+CONF_IMAGE_THUMBHASH = "image_thumbhash"
+# Frame for the image slot; the server reads an omitted shape as square.
+IMAGE_SHAPES = ("poster", "square", "circle")
+DEFAULT_IMAGE_SHAPE = "square"
 CONF_ACCENT_COLOR = "accent_color"
 CONF_TOTAL_STEPS = "total_steps"
 CONF_CURRENT_STEP_ATTR = "current_step_attribute"
@@ -248,6 +267,11 @@ MAX_TAP_ACTION_HEADERS_LEN = 1024  # server maxTapActionHeadersBytes (sum of nam
 MAX_TEXT_INPUT_LABEL_LEN = 64
 # Gauge/timeline display-unit cap (mirrors the server's activity unit length).
 ACTIVITY_UNIT_MAX = 32
+# Image trio caps. The server aliases maxImageURLRunes to its tap-action URL cap, so
+# the alias here is the same deliberate one, not two limits that merely coincide.
+# A real ThumbHash is 25-27 bytes -> 36 base64 chars; 64 is the server's headroom.
+IMAGE_URL_MAX = MAX_URL_LEN
+IMAGE_THUMBHASH_MAX = 64
 
 # Tap-action / action-button HTTP routing — mirrors pushward-server action_validation.go.
 # method/headers/body are only valid on http(s) URLs; custom-scheme URLs (homeassistant://,
@@ -689,9 +713,37 @@ DEVICE_CLASS_ICONS: dict[str, str] = {
 }
 
 
+def _parse_url(value: str, field: str) -> ParseResult:
+    """``urlparse``, with its ValueError turned into a ``vol.Invalid``.
+
+    urlparse raises rather than returns on a bracketed host that is not an IP
+    (``https://[camera]/snap.jpg``). Every caller of these validators catches
+    ``vol.Invalid`` only, so a bare ValueError escapes: on the push path it kills the
+    whole task, and in the config flow it shows as "unknown error".
+    """
+    try:
+        return urlparse(value)
+    except ValueError as err:
+        raise vol.Invalid(f"{field} could not be parsed as a URL") from err
+
+
+def url_host(value: str) -> str:
+    """The host of a URL for a log line, or "?" when it cannot be parsed.
+
+    Logging a whole URL is not an option: a camera snapshot URL routinely carries
+    credentials in its userinfo, and these lines reach the Home Assistant log.
+    ``hostname`` drops the userinfo, and the parse failure is swallowed because a log
+    line must never be the thing that raises.
+    """
+    try:
+        return urlparse(value).hostname or "?"
+    except ValueError:
+        return "?"
+
+
 def validate_url(value: str) -> str:
     """Validate URL uses http or https scheme."""
-    parsed = urlparse(value)
+    parsed = _parse_url(value, "URL")
     if parsed.scheme not in ("http", "https"):
         raise vol.Invalid("URL must use http:// or https:// scheme")
     if not parsed.netloc:
@@ -711,7 +763,7 @@ def validate_tap_action_url(value: str) -> str:
         raise vol.Invalid("URL must be a non-empty string")
     if len(value) > MAX_URL_LEN:
         raise vol.Invalid(f"URL must be at most {MAX_URL_LEN} characters")
-    parsed = urlparse(value)
+    parsed = _parse_url(value, "URL")
     scheme = parsed.scheme.lower()
     if not scheme:
         raise vol.Invalid("URL must include a scheme (e.g. https:// or homeassistant://)")
@@ -720,6 +772,115 @@ def validate_tap_action_url(value: str) -> str:
     if scheme in ("http", "https") and not parsed.netloc:
         raise vol.Invalid("http(s) URL must include a host")
     return value
+
+
+# Characters a URL may never carry anywhere. urlparse keeps a raw space or control
+# byte and hands back something that looks parsed, while the server's Go net/url
+# refuses it - so without this the value passes here and 422s on the wire.
+_URL_FORBIDDEN_RE = re.compile(r"[\x00-\x20\x7f]")
+
+# What a host may contain: dot-separated labels of letters, digits and hyphens (an
+# IPv4 literal is a subset of that). Deliberately narrower than urlparse, which
+# returns '^', '|', '\' and raw percent-escapes as a perfectly good hostname.
+_URL_HOST_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
+_URL_HOST_RE = re.compile(rf"^{_URL_HOST_LABEL}(?:\.{_URL_HOST_LABEL})*\.?$")
+
+
+def _validate_url_host(parsed: ParseResult, field: str) -> None:
+    """Refuse a host or port the server would reject but urlparse accepts intact."""
+    if "@" in parsed.netloc:
+        # Checked on the netloc, not on ``parsed.username``: an empty userinfo
+        # ("https://@host/") parses to username == "", which is falsy, so the field
+        # would report no credentials while the server still refuses the URL.
+        raise vol.Invalid(f"{field} must not contain userinfo")
+    try:
+        # A non-numeric port raises on attribute access rather than parsing to None.
+        _ = parsed.port
+    except ValueError as err:
+        raise vol.Invalid(f"{field} must have a numeric port") from err
+    if parsed.netloc.startswith("["):
+        # A bracketed literal already passed urlparse's own IPv6 check.
+        return
+    if not _URL_HOST_RE.match(parsed.hostname or ""):
+        raise vol.Invalid(f"{field} host contains characters the server rejects")
+
+
+def validate_image_url(value: str) -> str:
+    """Validate an activity image URL the way the server does (ValidateWebURL https-only).
+
+    Stricter than ``validate_url``: the device downloads this URL and never
+    re-validates it, and activities are shareable, so plain http and embedded
+    credentials are both refused. Mirrors pushward-server validateImage.
+
+    The host and whitespace rules are stricter than urlparse alone because the two
+    parsers disagree: a URL with an inner space, a control byte, a percent-escape or
+    a '^' in the host, or a non-numeric port all survive urlparse and are then
+    rejected by the server, turning a form the user could have fixed into a 422 on
+    every push.
+    """
+    if not isinstance(value, str):
+        raise vol.Invalid("image_url must be a string")
+    if len(value) > IMAGE_URL_MAX:
+        raise vol.Invalid(f"image_url must be at most {IMAGE_URL_MAX} characters")
+    if _URL_FORBIDDEN_RE.search(value):
+        raise vol.Invalid("image_url must not contain whitespace or control characters")
+    parsed = _parse_url(value, "image_url")
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise vol.Invalid("image_url must be an https URL with a host")
+    _validate_url_host(parsed, "image_url")
+    return value
+
+
+def is_valid_image_url(value: object) -> bool:
+    """Return True if ``value`` is an image URL the server would accept.
+
+    The boolean twin of ``validate_image_url``, for the mapping path, which drops a
+    bad value rather than raising - matching how ``is_valid_color`` reads there.
+    """
+    if not isinstance(value, str):
+        return False
+    try:
+        validate_image_url(value)
+    except vol.Invalid:
+        return False
+    return True
+
+
+# Padded standard-alphabet base64: the only form Swift's Data(base64Encoded:) accepts.
+# Python's b64decode tolerates trailing data after the padding, so the shape is pinned
+# by the pattern first and only then handed to the decoder.
+_THUMBHASH_B64_RE = re.compile(r"^[A-Za-z0-9+/]+={0,2}$")
+
+
+def validate_thumbhash(value: str) -> str:
+    """Validate an image_thumbhash: padded standard-alphabet base64 within the cap.
+
+    A hash the device cannot decode fails silently on iOS (blank placeholder, no
+    error anywhere), so the same strictness as pushward-server validateImage applies
+    here rather than letting a malformed hash reach a phone.
+    """
+    if not isinstance(value, str):
+        raise vol.Invalid("image_thumbhash must be a string")
+    if len(value) > IMAGE_THUMBHASH_MAX:
+        raise vol.Invalid(f"image_thumbhash must be at most {IMAGE_THUMBHASH_MAX} characters")
+    if len(value) % 4 or not _THUMBHASH_B64_RE.match(value):
+        raise vol.Invalid("image_thumbhash must be padded standard-alphabet base64")
+    try:
+        base64.b64decode(value, validate=True)
+    except (binascii.Error, ValueError) as err:
+        raise vol.Invalid("image_thumbhash must be padded standard-alphabet base64") from err
+    return value
+
+
+def is_valid_thumbhash(value: object) -> bool:
+    """Return True if ``value`` is a thumbhash the server and iOS would both accept."""
+    if not isinstance(value, str):
+        return False
+    try:
+        validate_thumbhash(value)
+    except vol.Invalid:
+        return False
+    return True
 
 
 # RFC 7230 token: the only characters allowed in an HTTP header field-name.

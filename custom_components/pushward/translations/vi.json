@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL gỡ bỏ",
           "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
+        },
+        "image_url": {
+          "name": "URL hình ảnh",
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+        },
+        "image_shape": {
+          "name": "Hình dạng ảnh",
+          "description": "Cách cắt ảnh: poster giữ khung dọc, square là mặc định, circle cắt tròn."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash của ảnh",
+          "description": "Bản xem trước mờ nhúng sẵn, được vẽ khi không tải được URL, và là lớp duy nhất hiển thị cho ảnh trong mạng nội bộ. Để trống để tự động tính từ URL, hoặc dùng hành động Generate ThumbHash để tạo từ bất kỳ ảnh nào Home Assistant đọc được."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Tùy chọn steps",
           "description": "Chỉ dành cho mẫu steps."
+        },
+        "image_options": {
+          "name": "Hình ảnh",
+          "description": "Hình ảnh tùy chọn hiển thị bên cạnh biểu tượng. Chỉ dùng cho mẫu generic và steps."
         },
         "alert_options": {
           "name": "Tùy chọn alert",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL gỡ bỏ",
           "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
+        },
+        "image_url": {
+          "name": "URL hình ảnh",
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+        },
+        "image_shape": {
+          "name": "Hình dạng ảnh",
+          "description": "Cách cắt ảnh: poster giữ khung dọc, square là mặc định, circle cắt tròn."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash của ảnh",
+          "description": "Bản xem trước mờ nhúng sẵn, được vẽ khi không tải được URL, và là lớp duy nhất hiển thị cho ảnh trong mạng nội bộ. Để trống để tự động tính từ URL, hoặc dùng hành động Generate ThumbHash để tạo từ bất kỳ ảnh nào Home Assistant đọc được."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Hiển thị, màu sắc và âm thanh",
           "description": "Tùy chọn định kiểu và ghi đè theo từng cập nhật. Áp dụng cho mọi mẫu."
+        },
+        "image_options": {
+          "name": "Hình ảnh",
+          "description": "Hình ảnh tùy chọn hiển thị bên cạnh biểu tượng. Chỉ dùng cho mẫu generic và steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Thời lượng",
           "description": "Tùy chọn thay thế cho Ngày kết thúc, đặt một lần là xong: số giây (>=1) hoặc một chuỗi thời lượng như \"1h30m\". Máy chủ neo lại thời điểm bắt đầu/kết thúc về hiện tại. Gửi Thời lượng hoặc Ngày kết thúc — Thời lượng được ưu tiên nếu cả hai cùng được đặt."
+        },
+        "image_url": {
+          "name": "URL hình ảnh",
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+        },
+        "image_shape": {
+          "name": "Hình dạng ảnh",
+          "description": "Cách cắt ảnh: poster giữ khung dọc, square là mặc định, circle cắt tròn."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash của ảnh",
+          "description": "Bản xem trước mờ nhúng sẵn, được vẽ khi không tải được URL, và là lớp duy nhất hiển thị cho ảnh trong mạng nội bộ. Để trống để tự động tính từ URL, hoặc dùng hành động Generate ThumbHash để tạo từ bất kỳ ảnh nào Home Assistant đọc được."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Tùy chọn steps",
           "description": "Chỉ dành cho mẫu steps."
+        },
+        "image_options": {
+          "name": "Hình ảnh",
+          "description": "Hình ảnh tùy chọn hiển thị bên cạnh biểu tượng. Chỉ dùng cho mẫu generic và steps."
         },
         "action_buttons": {
           "name": "Nút hành động",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Tạo ThumbHash",
+      "description": "Tính bản xem trước mờ của một ảnh và trả về, sẵn sàng để dán vào hoạt động hoặc vào cài đặt hình ảnh của một thực thể.",
+      "fields": {
+        "image_url": {
+          "name": "URL hình ảnh",
+          "description": "URL http hoặc https của ảnh. Bất cứ thứ gì Home Assistant truy cập được đều dùng được, kể cả camera trong mạng nội bộ mà iPhone không thấy."
+        },
+        "image_path": {
+          "name": "Đường dẫn ảnh",
+          "description": "Đường dẫn tới tệp ảnh cục bộ thay cho URL. Thư mục phải được cho phép trong configuration.yaml ở allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "Kết Thúc Hoạt Động",
       "description": "Kết thúc PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Không có widget PushWard nào khớp với slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Không thể tạo ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Mỗi bước một hàng, theo thứ tự. Mỗi hàng đặt nhãn tùy chọn, chiều cao hàng (1-10), chiều rộng tương đối (số dương) và màu (tên hoặc hex; để trống giữ màu nhấn). Thêm không hàng nào, hoặc đúng total_steps hàng. Chỉ mẫu steps."
               }
             },
+            "image_options": {
+              "name": "Hình ảnh",
+              "data": {
+                "image_url": "URL hình ảnh",
+                "image_shape": "Hình dạng ảnh",
+                "image_thumbhash": "ThumbHash của ảnh"
+              },
+              "data_description": {
+                "image_url": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị.",
+                "image_shape": "Cách cắt ảnh: poster giữ khung dọc, square là mặc định, circle cắt tròn.",
+                "image_thumbhash": "Bản xem trước mờ nhúng sẵn, được vẽ khi không tải được URL, và là lớp duy nhất hiển thị cho ảnh trong mạng nội bộ. Để trống để tự động tính từ URL, hoặc dùng hành động Generate ThumbHash để tạo từ bất kỳ ảnh nào Home Assistant đọc được."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Mỗi ngưỡng phải bắt đầu bằng một số (vd. 25:red:Hot).",
         "too_many_thresholds": "Một dòng thời gian hỗ trợ tối đa 5 ngưỡng.",
         "invalid_number": "Nhập một số hợp lệ.",
-        "unknown_primary_series": "Chuỗi chính phải khớp với một trong các nhãn chuỗi đã cấu hình."
+        "unknown_primary_series": "Chuỗi chính phải khớp với một trong các nhãn chuỗi đã cấu hình.",
+        "invalid_image_url": "URL hình ảnh phải là địa chỉ https có tên máy chủ, không chứa tên người dùng hay mật khẩu.",
+        "invalid_image_shape": "Hình dạng ảnh phải là poster, square hoặc circle.",
+        "invalid_image_thumbhash": "ThumbHash của ảnh phải là base64 bảng chữ cái chuẩn có phần đệm, tối đa 64 ký tự. Dùng hành động Generate ThumbHash để tạo."
       },
       "abort": {
         "already_configured": "Thực thể này đã được theo dõi.",
@@ -1922,6 +2003,13 @@
         "output": "Đầu ra",
         "storage": "Kho",
         "exchange": "Trao đổi"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Áp phích",
+        "square": "Vuông",
+        "circle": "Tròn"
       }
     }
   }

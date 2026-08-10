@@ -1,6 +1,7 @@
 """Shared test fixtures for PushWard integration tests."""
 
 import time
+from contextlib import contextmanager
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
@@ -34,6 +35,9 @@ from custom_components.pushward.const import (
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_IMAGE_SHAPE,
+    CONF_IMAGE_THUMBHASH,
+    CONF_IMAGE_URL,
     CONF_LABEL,
     CONF_LABEL_ATTRIBUTE,
     CONF_LIVE_PROGRESS,
@@ -138,6 +142,9 @@ def make_entity_config(**overrides) -> dict:
         CONF_REMAINING_TIME_ATTR: "",
         CONF_REMAINING_TIME_ENTITY: "",
         CONF_LIVE_PROGRESS: False,
+        CONF_IMAGE_URL: "",
+        CONF_IMAGE_SHAPE: "",
+        CONF_IMAGE_THUMBHASH: "",
         CONF_SUBTITLE_ATTRIBUTE: "",
         CONF_SUBTITLE_ENTITY: "",
         CONF_STATE_LABELS: {},
@@ -372,6 +379,87 @@ def activity_updates(api: AsyncMock, wire_state: str) -> list[dict]:
         for call in api.update_activity.call_args_list
         if len(call.args) >= 3 and call.args[1] == wire_state
     ]
+
+
+# --- artwork / thumbhash -----------------------------------------------------
+#
+# Every layer that touches artwork mocks the same download the same way (the encoder
+# tests, the service tests and the manager tests), so the scaffolding lives here once.
+# This is also the only place that reaches for the private ``_thumbhash_from_bytes``.
+
+# A picture URL and a real 8x6 ThumbHash; tests/test_thumbhash.py pins where the hash
+# value comes from and asserts the encoder still produces it.
+IMAGE_URL = "https://example.com/cover.jpg"
+IMAGE_THUMBHASH = "3gYKnZp4iHiAeHiHiHiId4B1CPeI"
+
+
+def png_bytes(width: int = 20, height: int = 20, color: tuple = (200, 30, 90, 255)) -> bytes:
+    """A real single-colour PNG of the given size."""
+    from io import BytesIO
+
+    from PIL import Image
+
+    buffer = BytesIO()
+    Image.new("RGBA", (width, height), color).save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+def png_with_declared_size(width: int, height: int) -> bytes:
+    """A one-pixel PNG whose IHDR claims to be ``width`` x ``height``.
+
+    Real pixels at those dimensions are precisely the allocation the decode guard
+    exists to refuse, so the header lies and the body stays one pixel. Pillow reads
+    the size from that header without decoding, which is what the guard checks.
+    """
+    import zlib
+
+    base = png_bytes(1, 1)
+    # PNG layout: an 8-byte signature, then the IHDR chunk as a 4-byte length, a
+    # 4-byte type, 13 bytes of data (width, height, then five one-byte fields) and a
+    # CRC over type+data. Width and height are the first eight data bytes.
+    chunk = bytearray(base[12:29])
+    chunk[4:8] = width.to_bytes(4, "big")
+    chunk[8:12] = height.to_bytes(4, "big")
+    crc = zlib.crc32(bytes(chunk)).to_bytes(4, "big")
+    return base[:12] + bytes(chunk) + crc + base[33:]
+
+
+def expected_thumbhash(body: bytes) -> str:
+    """The hash the encoder produces for ``body``, to assert against a pushed frame."""
+    from custom_components.pushward.image_hash import _thumbhash_from_bytes
+
+    return _thumbhash_from_bytes(body)
+
+
+@contextmanager
+def patch_image_download(body: bytes, *, content_length: int | None = None):
+    """Patch the session the hashing path uses so a fetch returns ``body``.
+
+    Yields the mock session, so a test can assert how many fetches happened - or that
+    none did. ``content_length`` overrides the declared size, which is how a response
+    that lies about its length is simulated.
+    """
+    response = MagicMock()
+    response.status = 200
+    response.raise_for_status = MagicMock()
+    response.content_length = len(body) if content_length is None else content_length
+    response.content.read = AsyncMock(return_value=body)
+    context = MagicMock()
+    context.__aenter__ = AsyncMock(return_value=response)
+    context.__aexit__ = AsyncMock(return_value=False)
+    session = MagicMock()
+    session.get = MagicMock(return_value=context)
+    with patch("custom_components.pushward.image_hash.async_get_clientsession", return_value=session):
+        yield session
+
+
+@contextmanager
+def patch_image_fetch_failure(error: Exception | None = None):
+    """Patch the hashing path's session so every fetch raises. Yields the session."""
+    session = MagicMock()
+    session.get = MagicMock(side_effect=error or TimeoutError("too slow"))
+    with patch("custom_components.pushward.image_hash.async_get_clientsession", return_value=session):
+        yield session
 
 
 async def bump_state(

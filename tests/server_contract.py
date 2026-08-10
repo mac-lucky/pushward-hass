@@ -23,9 +23,13 @@ Usage::
 
 from __future__ import annotations
 
+import base64
+import binascii
 import math
+import re
 import time
 from datetime import datetime, timedelta
+from typing import NoReturn
 from urllib.parse import urlparse
 
 from custom_components.pushward.const import (
@@ -36,6 +40,9 @@ from custom_components.pushward.const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    IMAGE_SHAPES,
+    IMAGE_THUMBHASH_MAX,
+    IMAGE_URL_MAX,
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
@@ -109,7 +116,21 @@ MAX_CLOCK_SKEW = 5 * 60
 
 # Restated rather than imported from const.py: this module deliberately re-states
 # the public REST contract from the outside, not the integration's own view of it.
+# The caps these two gates enforce are imported above, so a limit still has exactly
+# one definition; only the template allowlists are written out again.
 LIVE_PROGRESS_TEMPLATES = ("generic", "steps")
+IMAGE_TEMPLATES = ("generic", "steps")
+
+# Padded standard-alphabet base64 - the only form Swift's Data(base64Encoded:) reads.
+_THUMBHASH_B64_RE = re.compile(r"[A-Za-z0-9+/]+={0,2}")
+
+# Written out here rather than imported so the contract still says what it says even
+# if const.py loosens: a URL carrying whitespace or a control byte, or a host outside
+# dot-separated letters/digits/hyphens, is refused by the server whatever urlparse
+# makes of it.
+_URL_FORBIDDEN_RE = re.compile(r"[\x00-\x20\x7f]")
+_URL_HOST_LABEL = r"[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
+_URL_HOST_RE = re.compile(rf"^{_URL_HOST_LABEL}(?:\.{_URL_HOST_LABEL})*\.?$")
 
 _HTTP_SCHEMES = ("http", "https")
 _TRENDS = ("", WIDGET_TREND_UP, WIDGET_TREND_DOWN, WIDGET_TREND_FLAT)
@@ -119,7 +140,7 @@ class PushWardContractError(AssertionError):
     """Raised when a content payload violates the public PushWard API contract."""
 
 
-def _fail(where: str, msg: str) -> None:
+def _fail(where: str, msg: str) -> NoReturn:
     prefix = f"[{where}] " if where else ""
     raise PushWardContractError(f"{prefix}{msg}")
 
@@ -217,6 +238,11 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     if content.get("live_progress") and template not in LIVE_PROGRESS_TEMPLATES:
         _fail(where, f"live_progress is only supported by {sorted(LIVE_PROGRESS_TEMPLATES)}, got {template!r}")
 
+    # Same shape of rule for the image trio, and checked here for the same reason:
+    # the per-template asserts below only run for the two templates that accept it,
+    # so a mapper leaking image_url onto alert would pass and then 422 in production.
+    _assert_image(content, where, template)
+
     if template == "generic":
         _assert_generic(content, where)
     elif template == "countdown":
@@ -233,6 +259,58 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
         _assert_board(content, where)
     elif template == "log":
         _assert_log(content, where)
+
+
+def _assert_image(content: dict, where: str, template: str) -> None:
+    """The optional image trio: generic/steps only, https URL, enum shape, base64 hash.
+
+    The server rejects these fields outright on a template with no image slot rather
+    than dropping them, so presence alone is a contract violation elsewhere.
+    """
+    url = content.get("image_url")
+    shape = content.get("image_shape")
+    thumbhash = content.get("image_thumbhash")
+    if all(value in (None, "") for value in (url, shape, thumbhash)):
+        return
+    if template not in IMAGE_TEMPLATES:
+        _fail(where, f"image fields are only supported by {sorted(IMAGE_TEMPLATES)}, got {template!r}")
+
+    if url not in (None, ""):
+        _check_len(url, IMAGE_URL_MAX, "image_url", where)
+        if _URL_FORBIDDEN_RE.search(str(url)):
+            _fail(where, f"image_url must not contain whitespace or control characters, got {url!r}")
+        try:
+            parsed = urlparse(str(url))
+        except ValueError:
+            # urlparse raises on a bracketed non-IP host ("https://[camera]/a.jpg").
+            # The contract has to fail on it, not error out of the assertion.
+            _fail(where, f"image_url could not be parsed as a URL, got {url!r}")
+        if parsed.scheme != "https" or not parsed.netloc:
+            _fail(where, f"image_url must be an https URL with a host, got {url!r}")
+        # The device fetches this and never re-validates it, so credentials in the
+        # URL would ride along to every phone the activity is shared with. Checked on
+        # the netloc: an empty userinfo ("https://@host/") leaves username == "".
+        if "@" in parsed.netloc:
+            _fail(where, f"image_url must not contain userinfo, got {url!r}")
+        try:
+            _ = parsed.port
+        except ValueError:
+            _fail(where, f"image_url must have a numeric port, got {url!r}")
+        if not parsed.netloc.startswith("[") and not _URL_HOST_RE.match(parsed.hostname or ""):
+            _fail(where, f"image_url host contains characters the server rejects, got {url!r}")
+
+    if shape not in (None, "") and shape not in IMAGE_SHAPES:
+        _fail(where, f"image_shape must be one of {list(IMAGE_SHAPES)}, got {shape!r}")
+
+    if thumbhash in (None, ""):
+        return
+    _check_len(thumbhash, IMAGE_THUMBHASH_MAX, "image_thumbhash", where)
+    if len(thumbhash) % 4 or not _THUMBHASH_B64_RE.fullmatch(str(thumbhash)):
+        _fail(where, f"image_thumbhash must be padded standard-alphabet base64, got {thumbhash!r}")
+    try:
+        base64.b64decode(thumbhash, validate=True)
+    except (binascii.Error, ValueError):
+        _fail(where, f"image_thumbhash must be padded standard-alphabet base64, got {thumbhash!r}")
 
 
 def _assert_live_progress(content: dict, where: str, template: str) -> None:

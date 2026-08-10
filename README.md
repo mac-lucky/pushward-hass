@@ -73,11 +73,13 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 - **Companion source entities**: read remaining time, progress, value, etc. from a *separate* entity
 - **Two-phase end** shows a completion state (green checkmark) before dismissing
 - **Live-progress ETA** fills the progress bar smoothly and counts down to a finish time (generic + steps)
+- **Activity artwork** beside the icon (generic + steps), with an inline ThumbHash computed here so a
+  picture that only Home Assistant can reach still renders on the phone
 - **Throttled updates** with content deduplication
 - **6-level icon fallback**: attribute -> config -> entity -> registry -> device class -> domain default
 - **Color support**: RGB, HSV, XY, Kelvin, named colors
 - **TTL controls**: auto-delete after end, auto-end on stale activity, auto-dismiss from the Lock Screen
-- **Services** for the whole surface: create/update/end/delete activities (with a per-template update action), send notifications, send email, refresh/delete widgets
+- **Services** for the whole surface: create/update/end/delete activities (with a per-template update action), send notifications, send email, refresh/delete widgets, generate a ThumbHash
 
 ## Prerequisites
 
@@ -154,6 +156,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Update Interval | Min seconds between updates (default: 5) |
 | Progress Entity / Attribute | 0-100 progress, optionally from a separate entity |
 | Live Progress ETA | Fill the progress bar smoothly and count down an ETA to the finish time, using the remaining-time source (generic/steps templates; on steps it fills the current step) |
+| Image URL / Shape / ThumbHash | Artwork beside the icon (generic/steps templates) - see [Activity images](#activity-images) |
 | Remaining Time Entity / Attribute | Seconds remaining (countdown), with smart time parsing |
 | Total Steps / Current Step Entity / Attribute | Steps tracking, optionally from a separate entity |
 | Step Details | One row per step: label, row height (1-10), relative width, and color (steps template) |
@@ -389,7 +392,7 @@ On premium, uncapped resources report `limit: unlimited`, and the notifications 
 
 ## Services
 
-All services live in the `pushward` domain. There are 16 in total: the eight below plus a per-template `update_activity_<template>` for each of the 8 activity templates (and the deprecated `update_activity` alias).
+All services live in the `pushward` domain. There are 17 in total: the nine below plus a per-template `update_activity_<template>` for each of the 8 activity templates (and the deprecated `update_activity` alias).
 
 ### `pushward.create_activity`
 
@@ -447,9 +450,9 @@ implied by the action name; you no longer pass a `template` field.
 
 | Action | Extra fields |
 |--------|--------------|
-| `update_activity_generic` | `live_progress` |
+| `update_activity_generic` | `live_progress`, `image_url`, `image_shape`, `image_thumbhash` |
 | `update_activity_countdown` | `end_date`, `duration`, `start_date`, `warning_threshold`, `alarm`, `snooze_seconds` |
-| `update_activity_steps` | `total_steps` (max 64), `current_step`, `step_labels`, `step_rows`, `step_weights`, `step_colors`, `duration`, `live_progress` |
+| `update_activity_steps` | `total_steps` (max 64), `current_step`, `step_labels`, `step_rows`, `step_weights`, `step_colors`, `duration`, `live_progress`, `image_url`, `image_shape`, `image_thumbhash` |
 | `update_activity_alert` | `severity`, `fired_at` |
 | `update_activity_gauge` | `value`, `min_value`, `max_value`, `unit` |
 | `update_activity_timeline` | `value`, `unit`, `units`, `scale`, `decimals`, `smoothing`, `thresholds`, `history` |
@@ -479,6 +482,43 @@ implied by the action name; you no longer pass a `template` field.
 > the finish time using the remaining-time source; on steps it fills the current step rather
 > than the whole run. It needs a remaining-time entity or attribute to anchor the ETA.
 
+#### Activity images
+
+`generic` and `steps` can show a picture beside the icon. The server rejects the image fields
+on every other template, so the per-template actions only expose them on those two.
+
+| Field | Description |
+|-------|-------------|
+| `image_url` | `https` URL, max 2048 chars, no embedded credentials |
+| `image_shape` | `poster`, `square` (default) or `circle` |
+| `image_thumbhash` | Padded standard-alphabet base64, max 64 chars |
+
+**The phone fetches `image_url` itself, and Home Assistant does not proxy it.** iOS refuses
+private ranges, so a LAN or Tailscale address loads nothing on the device even though it works
+fine from your Home Assistant box. That is what `image_thumbhash` is for: a ~25 byte
+[ThumbHash](https://evanw.github.io/thumbhash/) travelling inside the activity payload, drawn
+as a blurred placeholder with no network access at all. For a local image it is the only tier
+that ever appears on the phone.
+
+You rarely have to compute it. Whenever an activity carries `image_url` and no
+`image_thumbhash`, the integration downloads the image (5 s timeout, 2 MB cap), hashes it, and
+attaches the result, caching it per URL so repeated updates cost nothing. If the download
+fails, the activity goes out without a hash rather than failing, and the failure is remembered
+for ten minutes so a broken URL costs one request instead of one per push while an image host
+that comes back still recovers on its own.
+
+A cached hash is kept for 30 minutes. If the picture behind a URL changes -- a camera snapshot
+rewritten in place, say -- the blurred placeholder can therefore lag the real image by up to
+that long before the integration reads it again. Reloading the integration clears the cache
+immediately, and `pushward.generate_thumbhash` always fetches afresh.
+
+That automatic path follows `image_url`, which the server pins to `https`. For an image the
+server never sees at all -- a plain-http LAN camera, or a file on disk -- use the
+`pushward.generate_thumbhash` action below and paste the result into `image_thumbhash`.
+
+Switching an activity to another template clears any inherited image fields server-side, so
+no explicit cleanup is needed.
+
 `step_labels`, `step_rows`, `step_weights`, and `step_colors` are **ordered lists** (one entry
 per step, length must equal `total_steps`), e.g. `step_labels: ["Build", "Test", "Deploy"]`,
 `step_rows: [1, 1, 2]`.
@@ -487,6 +527,36 @@ per step, length must equal `total_steps`), e.g. `step_labels: ["Build", "Test",
 > field and collapsed sections) still works for backward compatibility but logs a deprecation
 > warning and will be removed in a future release. Switch automations to the template-specific
 > action above.
+
+### `pushward.generate_thumbhash`
+
+Compute the blurred inline preview for an image and return it. Pass exactly one source. This
+is a [response action](https://www.home-assistant.io/docs/scripts/service-calls/#use-templates-to-handle-response-data),
+so call it with `response_variable`.
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `image_url` | One of | `http` or `https` URL. Anything Home Assistant can reach, including a LAN camera the phone cannot see |
+| `image_path` | One of | Local file path instead of a URL. Its directory must be in `allowlist_external_dirs` |
+
+Returns `{"thumbhash": "..."}`.
+
+```yaml
+actions:
+  - action: pushward.generate_thumbhash
+    data:
+      image_url: "http://192.168.1.50/snapshot.jpg"
+    response_variable: preview
+  - action: pushward.update_activity_generic
+    data:
+      slug: front-door
+      state: ongoing
+      state_text: Motion detected
+      image_thumbhash: "{{ preview.thumbhash }}"
+```
+
+Unlike the automatic path, this reports why it failed instead of staying quiet -- you asked
+for a hash, so an unreachable image is an error.
 
 ### `pushward.end_activity`
 

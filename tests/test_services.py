@@ -25,6 +25,7 @@ from custom_components.pushward.const import (
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
     DOMAIN,
+    IMAGE_THUMBHASH_MAX,
     MAX_URL_LEN,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
@@ -32,7 +33,16 @@ from custom_components.pushward.const import (
 )
 from custom_components.pushward.widget_manager import WidgetManager
 
-from .conftest import make_usage_payload, make_widget_config
+from .conftest import (
+    IMAGE_THUMBHASH,
+    IMAGE_URL,
+    expected_thumbhash,
+    make_usage_payload,
+    make_widget_config,
+    patch_image_download,
+    patch_image_fetch_failure,
+    png_bytes,
+)
 from .server_contract import assert_valid_activity_content
 
 MOCK_INTEGRATION_KEY = "test-key-123"
@@ -2081,3 +2091,226 @@ async def test_send_email_api_error_becomes_home_assistant_error(hass: HomeAssis
             blocking=True,
         )
     assert not isinstance(exc.value, ServiceValidationError)
+
+
+# --- image trio + generate_thumbhash ----------------------------------------
+
+
+@pytest.mark.parametrize("template", ["generic", "steps"])
+async def test_update_activity_accepts_the_image_trio(hass: HomeAssistant, template: str) -> None:
+    """Both image-slot templates pass the trio through to the PATCH content untouched."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    data = {
+        "slug": "g",
+        "state": "ongoing",
+        "image_url": IMAGE_URL,
+        "image_shape": "poster",
+        "image_thumbhash": IMAGE_THUMBHASH,
+    }
+    if template == "steps":
+        data |= {"total_steps": 3, "current_step": 1}
+
+    await hass.services.async_call(DOMAIN, f"update_activity_{template}", data, blocking=True)
+
+    content = api.update_activity.call_args[0][2]
+    assert content["image_url"] == IMAGE_URL
+    assert content["image_shape"] == "poster"
+    assert content["image_thumbhash"] == IMAGE_THUMBHASH
+    assert_valid_activity_content(content, where=f"update_activity_{template} image")
+
+
+@pytest.mark.parametrize("template", ["generic", "steps"])
+@pytest.mark.parametrize("field", ["image_url", "image_shape", "image_thumbhash"])
+async def test_update_activity_passes_an_empty_image_field_through_as_a_clear(
+    hass: HomeAssistant, template: str, field: str
+) -> None:
+    """The server reads "" as "remove this".
+
+    Every image validator refuses "" on its own, so without an explicit carve-out an
+    automation could put artwork on an activity and never take it off again.
+    """
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    data = {"slug": "g", "state": "ongoing", field: ""}
+    if template == "steps":
+        data |= {"total_steps": 3, "current_step": 1}
+
+    await hass.services.async_call(DOMAIN, f"update_activity_{template}", data, blocking=True)
+
+    content = api.update_activity.call_args[0][2]
+    assert content[field] == ""
+    assert_valid_activity_content(content, where=f"update_activity_{template} cleared {field}")
+
+
+async def test_update_activity_treats_a_whitespace_only_image_url_as_a_clear(hass: HomeAssistant) -> None:
+    """A value trimmed to nothing is the same request as an empty one, as in the config flow."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN, "update_activity_generic", {"slug": "g", "state": "ongoing", "image_url": "   "}, blocking=True
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["image_url"] == ""
+    # An empty URL is not something to go and hash.
+    assert "image_thumbhash" not in content
+
+
+async def test_update_activity_trims_a_padded_image_url(hass: HomeAssistant) -> None:
+    """Stray whitespace around a pasted URL is trimmed, not rejected as a control char."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    body = png_bytes()
+    with patch_image_download(body):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "g", "state": "ongoing", "image_url": f"  {IMAGE_URL}  "},
+            blocking=True,
+        )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["image_url"] == IMAGE_URL
+    assert content["image_thumbhash"] == expected_thumbhash(body)
+
+
+@pytest.mark.parametrize("template", ["countdown", "alert", "gauge", "timeline", "board", "log"])
+async def test_update_activity_rejects_image_fields_off_their_templates(hass: HomeAssistant, template: str) -> None:
+    """The server 422s the trio elsewhere; the schema has to say so before the request."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            f"update_activity_{template}",
+            {"slug": "g", "state": "ongoing", "image_url": IMAGE_URL},
+            blocking=True,
+        )
+    api.update_activity.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        pytest.param("image_url", "http://example.com/a.jpg", id="url_not_https"),
+        pytest.param("image_url", "https:///a.jpg", id="url_no_host"),
+        pytest.param("image_url", "https://u:p@example.com/a.jpg", id="url_userinfo"),
+        pytest.param("image_shape", "oval", id="shape_not_in_enum"),
+        pytest.param("image_thumbhash", "3gYKnZp4iHiAeHiHiHiId4B1CPe", id="hash_unpadded"),
+        pytest.param("image_thumbhash", "A" * (IMAGE_THUMBHASH_MAX + 4), id="hash_too_long"),
+    ],
+)
+async def test_update_activity_rejects_invalid_image_values(hass: HomeAssistant, field: str, value: str) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "update_activity_generic", {"slug": "g", "state": "ongoing", field: value}, blocking=True
+        )
+    api.update_activity.assert_not_called()
+
+
+async def test_update_activity_derives_a_missing_thumbhash(hass: HomeAssistant) -> None:
+    """An automation naming a picture should not also have to hash it."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    body = png_bytes()
+    with patch_image_download(body):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "g", "state": "ongoing", "image_url": IMAGE_URL},
+            blocking=True,
+        )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["image_thumbhash"] == expected_thumbhash(body)
+    assert_valid_activity_content(content, where="update_activity_generic derived thumbhash")
+
+
+async def test_update_activity_still_pushes_when_hashing_fails(hass: HomeAssistant) -> None:
+    """A picture that cannot be fetched costs the artwork fallback, not the update."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with patch_image_fetch_failure():
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "g", "state": "ongoing", "image_url": IMAGE_URL},
+            blocking=True,
+        )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["image_url"] == IMAGE_URL
+    assert "image_thumbhash" not in content
+    assert_valid_activity_content(content, where="update_activity_generic failed thumbhash")
+
+
+async def test_generate_thumbhash_returns_a_hash_for_a_url(hass: HomeAssistant) -> None:
+    """Response-only action: it touches no activity and hands back a pasteable value."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    body = png_bytes(30, 20)
+    with patch_image_download(body):
+        result = await hass.services.async_call(
+            DOMAIN,
+            "generate_thumbhash",
+            {"image_url": "http://192.168.1.50/snapshot.jpg"},
+            blocking=True,
+            return_response=True,
+        )
+
+    assert result == {"thumbhash": expected_thumbhash(body)}
+    api.update_activity.assert_not_called()
+
+
+async def test_generate_thumbhash_returns_a_hash_for_a_path(hass: HomeAssistant, tmp_path) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    body = png_bytes()
+    target = tmp_path / "cover.png"
+    target.write_bytes(body)
+    with patch.object(hass.config, "is_allowed_path", return_value=True):
+        result = await hass.services.async_call(
+            DOMAIN, "generate_thumbhash", {"image_path": str(target)}, blocking=True, return_response=True
+        )
+
+    assert result == {"thumbhash": expected_thumbhash(body)}
+
+
+async def test_generate_thumbhash_reports_failures(hass: HomeAssistant) -> None:
+    """Unlike the automatic path, an explicit request has to say why it did not work."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with patch_image_fetch_failure(), pytest.raises(ServiceValidationError):
+        await hass.services.async_call(
+            DOMAIN, "generate_thumbhash", {"image_url": IMAGE_URL}, blocking=True, return_response=True
+        )
+
+
+async def test_generate_thumbhash_requires_exactly_one_source(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(DOMAIN, "generate_thumbhash", {}, blocking=True, return_response=True)
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "generate_thumbhash",
+            {"image_url": IMAGE_URL, "image_path": "/config/www/a.jpg"},
+            blocking=True,
+            return_response=True,
+        )

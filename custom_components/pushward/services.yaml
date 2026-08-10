@@ -160,6 +160,30 @@ update_activity:
           description: Animate the progress bar toward End Date between updates. Generic and steps templates; steps also needs Start Date.
           selector:
             boolean:
+    image_options:
+      collapsed: true
+      fields:
+        image_url:
+          name: Image URL
+          description: https URL of a picture shown beside the icon. The iPhone downloads it directly, so it must be reachable from the public internet - a LAN address will not load. Generic and steps templates only.
+          example: "https://example.com/cover.jpg"
+          selector:
+            text:
+        image_shape:
+          name: Image Shape
+          description: How the picture is framed. Defaults to square.
+          selector:
+            select:
+              options:
+                - "poster"
+                - "square"
+                - "circle"
+        image_thumbhash:
+          name: Image ThumbHash
+          description: Blurred inline preview rendered when the URL cannot be fetched - the only tier that shows for a LAN image. Left empty, it is computed from the URL automatically. Use the Generate ThumbHash action to build one from any image Home Assistant can read.
+          example: "3PcNNYSFeXh/d3eld0iHZoZgVwh2"
+          selector:
+            text:
     alert_options:
       collapsed: true
       fields:
@@ -423,6 +447,24 @@ update_activity_generic:
             number:
               min: 0
               mode: box
+    image_options:
+      collapsed: true
+      fields:
+        image_url:
+          example: "https://example.com/cover.jpg"
+          selector:
+            text:
+        image_shape:
+          selector:
+            select:
+              options:
+                - "poster"
+                - "square"
+                - "circle"
+        image_thumbhash:
+          example: "3PcNNYSFeXh/d3eld0iHZoZgVwh2"
+          selector:
+            text:
     action_buttons:
       collapsed: true
       fields:
@@ -760,6 +802,24 @@ update_activity_steps:
               mode: box
         duration:
           example: "30m"
+          selector:
+            text:
+    image_options:
+      collapsed: true
+      fields:
+        image_url:
+          example: "https://example.com/cover.jpg"
+          selector:
+            text:
+        image_shape:
+          selector:
+            select:
+              options:
+                - "poster"
+                - "square"
+                - "circle"
+        image_thumbhash:
+          example: "3PcNNYSFeXh/d3eld0iHZoZgVwh2"
           selector:
             text:
     action_buttons:
@@ -1567,6 +1627,23 @@ create_activity:
           min: 0
           max: 14400
           mode: box
+
+generate_thumbhash:
+  name: Generate ThumbHash
+  description: Compute the blurred inline preview for an image and return it, so it can be pasted into an activity or an entity's image settings.
+  fields:
+    image_url:
+      name: Image URL
+      description: http or https URL of the image. Anything Home Assistant can reach works, including a LAN camera the iPhone cannot see.
+      example: "http://192.168.1.50/snapshot.jpg"
+      selector:
+        text:
+    image_path:
+      name: Image Path
+      description: Path to a local image file instead of a URL. The directory must be allowlisted in configuration.yaml under allowlist_external_dirs.
+      example: "/config/www/cover.jpg"
+      selector:
+        text:
 
 end_activity:
   name: End Activity

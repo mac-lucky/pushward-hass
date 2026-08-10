@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "移除 TTL",
           "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
+        },
+        "image_url": {
+          "name": "图片 URL",
+          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+        },
+        "image_shape": {
+          "name": "图片形状",
+          "description": "图片的裁剪方式：poster 保留竖版裁剪，square 为默认值，circle 裁剪为圆形。"
+        },
+        "image_thumbhash": {
+          "name": "图片 ThumbHash",
+          "description": "无法获取 URL 时绘制的内嵌模糊预览，也是局域网图片唯一能显示的层级。留空可自动根据 URL 计算，或使用 Generate ThumbHash 动作从任意 Home Assistant 能读取的图片生成。"
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "steps 选项",
           "description": "仅适用于 steps 模板。"
+        },
+        "image_options": {
+          "name": "图片",
+          "description": "显示在图标旁边的可选图片。仅适用于 generic 和 steps 模板。"
         },
         "alert_options": {
           "name": "alert 选项",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "移除 TTL",
           "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
+        },
+        "image_url": {
+          "name": "图片 URL",
+          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+        },
+        "image_shape": {
+          "name": "图片形状",
+          "description": "图片的裁剪方式：poster 保留竖版裁剪，square 为默认值，circle 裁剪为圆形。"
+        },
+        "image_thumbhash": {
+          "name": "图片 ThumbHash",
+          "description": "无法获取 URL 时绘制的内嵌模糊预览，也是局域网图片唯一能显示的层级。留空可自动根据 URL 计算，或使用 Generate ThumbHash 动作从任意 Home Assistant 能读取的图片生成。"
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "显示、颜色和声音",
           "description": "可选样式和每次更新的覆盖项。适用于任何模板。"
+        },
+        "image_options": {
+          "name": "图片",
+          "description": "显示在图标旁边的可选图片。仅适用于 generic 和 steps 模板。"
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "时长",
           "description": "结束日期的“设置后无需管理”替代方案：秒数（>=1）或时长字符串，例如 \"1h30m\"。服务器会将开始/结束时间重新锚定到当前时间。请发送时长或结束日期之一——若两者都设置，则以时长为准。"
+        },
+        "image_url": {
+          "name": "图片 URL",
+          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+        },
+        "image_shape": {
+          "name": "图片形状",
+          "description": "图片的裁剪方式：poster 保留竖版裁剪，square 为默认值，circle 裁剪为圆形。"
+        },
+        "image_thumbhash": {
+          "name": "图片 ThumbHash",
+          "description": "无法获取 URL 时绘制的内嵌模糊预览，也是局域网图片唯一能显示的层级。留空可自动根据 URL 计算，或使用 Generate ThumbHash 动作从任意 Home Assistant 能读取的图片生成。"
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "steps 选项",
           "description": "仅适用于 steps 模板。"
+        },
+        "image_options": {
+          "name": "图片",
+          "description": "显示在图标旁边的可选图片。仅适用于 generic 和 steps 模板。"
         },
         "action_buttons": {
           "name": "操作按钮",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "生成 ThumbHash",
+      "description": "计算图片的模糊预览并返回，可直接粘贴到活动或实体的图片设置中。",
+      "fields": {
+        "image_url": {
+          "name": "图片 URL",
+          "description": "图片的 http 或 https 地址。只要 Home Assistant 能访问即可，包括 iPhone 看不到的局域网摄像头。"
+        },
+        "image_path": {
+          "name": "图片路径",
+          "description": "本地图片文件的路径，用于替代 URL。该目录必须在 configuration.yaml 的 allowlist_external_dirs 中被允许。"
+        }
+      }
+    },
     "end_activity": {
       "name": "结束活动",
       "description": "结束一个 PushWard Live Activity。",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "没有与 slug={slug} entity_id={entity_id} 匹配的 PushWard 小组件。"
+    },
+    "thumbhash_failed": {
+      "message": "无法生成 ThumbHash：{error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "每个步骤一行，按顺序排列。每行设置可选标签、行高（1-10）、相对宽度（正数）和颜色（名称或十六进制；留空则保持强调色）。请添加零行或正好 total_steps 行。仅适用于 steps 模板。"
               }
             },
+            "image_options": {
+              "name": "图片",
+              "data": {
+                "image_url": "图片 URL",
+                "image_shape": "图片形状",
+                "image_thumbhash": "图片 ThumbHash"
+              },
+              "data_description": {
+                "image_url": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。",
+                "image_shape": "图片的裁剪方式：poster 保留竖版裁剪，square 为默认值，circle 裁剪为圆形。",
+                "image_thumbhash": "无法获取 URL 时绘制的内嵌模糊预览，也是局域网图片唯一能显示的层级。留空可自动根据 URL 计算，或使用 Generate ThumbHash 动作从任意 Home Assistant 能读取的图片生成。"
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "每个阈值必须以数字开头（例如 25:red:Hot）。",
         "too_many_thresholds": "时间线最多支持 5 个阈值。",
         "invalid_number": "请输入有效的数字。",
-        "unknown_primary_series": "主系列必须与已配置的某个系列标签匹配。"
+        "unknown_primary_series": "主系列必须与已配置的某个系列标签匹配。",
+        "invalid_image_url": "图片 URL 必须是带主机名的 https 地址，且不能包含用户名或密码。",
+        "invalid_image_shape": "图片形状必须是 poster、square 或 circle。",
+        "invalid_image_thumbhash": "图片 ThumbHash 必须是标准字母表且带填充的 base64，最多 64 个字符。可使用 Generate ThumbHash 动作生成。"
       },
       "abort": {
         "already_configured": "此实体已被追踪。",
@@ -1922,6 +2003,13 @@
         "output": "输出",
         "storage": "存储",
         "exchange": "交换"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "海报",
+        "square": "正方形",
+        "circle": "圆形"
       }
     }
   }

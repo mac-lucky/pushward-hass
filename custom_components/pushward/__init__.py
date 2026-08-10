@@ -12,7 +12,7 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 from homeassistant.exceptions import (
     HomeAssistantError,
     ServiceValidationError,
@@ -45,6 +45,7 @@ from .const import (
     DISMISSAL_TTL_MAX,
     DISMISSAL_TTL_MIN,
     DOMAIN,
+    IMAGE_SHAPES,
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
@@ -53,6 +54,7 @@ from .const import (
     MAX_TAP_ACTION_ICON_LEN,
     MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_INPUT_LABEL_LEN,
+    MAX_URL_LEN,
     NOTIFICATION_LEVELS,
     PRIORITY_MAX,
     PRIORITY_MIN,
@@ -68,11 +70,20 @@ from .const import (
     usage_limit_issue_id,
     validate_action_headers,
     validate_duration,
+    validate_image_url,
     validate_slug,
     validate_tap_action_url,
+    validate_thumbhash,
     validate_url,
 )
 from .coordinator import PushWardUsageCoordinator
+from .image_hash import (
+    ThumbhashError,
+    async_ensure_thumbhash,
+    async_thumbhash_for_path,
+    async_thumbhash_for_url,
+    clear_thumbhash_cache,
+)
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,6 +98,7 @@ SERVICE_UPDATE_TEMPLATE_PREFIX = "update_activity_"
 SERVICE_CREATE_ACTIVITY = "create_activity"
 SERVICE_END_ACTIVITY = "end_activity"
 SERVICE_DELETE_ACTIVITY = "delete_activity"
+SERVICE_GENERATE_THUMBHASH = "generate_thumbhash"
 SERVICE_SEND_NOTIFICATION = "send_notification"
 SERVICE_SEND_EMAIL = "send_email"
 SERVICE_WIDGET_REFRESH = "widget_refresh"
@@ -210,6 +222,36 @@ _LIVE_PROGRESS_FIELDS = {
     vol.Optional("live_progress"): cv.boolean,
     vol.Optional("start_date"): vol.Coerce(int),
     vol.Optional("end_date"): vol.Coerce(int),
+}
+
+
+def _clearable(validator):
+    """Trim the value, and let an empty string through as an explicit clear.
+
+    The server reads "" on an image field as "remove this", which is the only way an
+    automation can take artwork off an activity again - and every image validator
+    refuses "" on its own, so without this the field could be set but never unset.
+    Trimming matches what the config flow does with the same three values.
+    """
+
+    def _validate(value):
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return ""
+        return validator(value)
+
+    return _validate
+
+
+# Optional artwork, accepted only by the templates in IMAGE_TEMPLATES (generic and
+# steps). The server rejects the trio on the others rather than ignoring it.
+# image_thumbhash is derived from image_url when the caller omits it, so an
+# automation only has to name the picture.
+_IMAGE_FIELDS = {
+    vol.Optional("image_url"): _clearable(validate_image_url),
+    vol.Optional("image_shape"): _clearable(vol.In(IMAGE_SHAPES)),
+    vol.Optional("image_thumbhash"): _clearable(validate_thumbhash),
 }
 _COUNTDOWN_TEMPLATE_FIELDS = {
     vol.Optional("end_date"): vol.Coerce(int),
@@ -344,9 +386,9 @@ def _update_template_schema(*template_fields: dict) -> vol.Schema:
 
 
 _UPDATE_TEMPLATE_SCHEMAS = {
-    "generic": _update_template_schema(_LIVE_PROGRESS_FIELDS),
+    "generic": _update_template_schema(_LIVE_PROGRESS_FIELDS, _IMAGE_FIELDS),
     "countdown": _update_template_schema(_COUNTDOWN_TEMPLATE_FIELDS),
-    "steps": _update_template_schema(_LIVE_PROGRESS_FIELDS, _STEPS_TEMPLATE_FIELDS),
+    "steps": _update_template_schema(_LIVE_PROGRESS_FIELDS, _STEPS_TEMPLATE_FIELDS, _IMAGE_FIELDS),
     "alert": _update_template_schema(_ALERT_TEMPLATE_FIELDS),
     "gauge": _update_template_schema(_GAUGE_TEMPLATE_FIELDS),
     "timeline": _update_template_schema(_TIMELINE_TEMPLATE_FIELDS),
@@ -360,6 +402,7 @@ _UPDATE_TEMPLATE_SCHEMAS = {
 SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
     {vol.Optional("template"): str},
     _LIVE_PROGRESS_FIELDS,
+    _IMAGE_FIELDS,
     _COUNTDOWN_TEMPLATE_FIELDS,
     _STEPS_TEMPLATE_FIELDS,
     _ALERT_TEMPLATE_FIELDS,
@@ -397,6 +440,22 @@ SCHEMA_DELETE_ACTIVITY = vol.Schema(
     {
         vol.Required("slug"): validate_slug,
     }
+)
+
+# Source for a one-off hash: an http(s) URL or a local file, exactly one of them.
+# Deliberately looser than the activity's own image_url, which the server pins to
+# https. The reason to hash here at all is that Home Assistant can read images the
+# phone cannot, and on a LAN those are usually plain http.
+SCHEMA_GENERATE_THUMBHASH = vol.All(
+    vol.Schema(
+        {
+            # Capped like every other URL the integration accepts: this one is
+            # fetched, and validate_url on its own has no length limit.
+            vol.Exclusive("image_url", "thumbhash_source"): vol.All(str, vol.Length(max=MAX_URL_LEN), validate_url),
+            vol.Exclusive("image_path", "thumbhash_source"): vol.All(str, vol.Length(min=1)),
+        }
+    ),
+    cv.has_at_least_one_key("image_url", "image_path"),
 )
 
 _MEDIA_TYPES = ("image", "video", "audio")
@@ -547,6 +606,9 @@ async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, templ
         content["state"] = content.pop("state_text")
     if template is not None:
         content["template"] = template
+    # An automation that names a picture should not also have to hash it; a failure
+    # here is silent and just leaves the activity relying on the URL alone.
+    await async_ensure_thumbhash(hass, content)
     with _surface_api_errors():
         await api.update_activity(
             slug,
@@ -614,6 +676,29 @@ async def _async_handle_delete_activity(hass: HomeAssistant, call: ServiceCall) 
     api = _get_api(hass)
     with _surface_api_errors():
         await api.delete_activity(call.data["slug"])
+
+
+async def _async_handle_generate_thumbhash(hass: HomeAssistant, call: ServiceCall) -> dict[str, str]:
+    """Handle the generate_thumbhash service call.
+
+    Response-only: it touches no activity, it just hands back a hash to paste into an
+    automation or an entity's image settings. Unlike the automatic path this reports
+    failures, because the user explicitly asked for a hash.
+    """
+    url = call.data.get("image_url")
+    path = call.data.get("image_path")
+    try:
+        if url:
+            thumbhash = await async_thumbhash_for_url(hass, url, use_cache=False)
+        else:
+            thumbhash = await async_thumbhash_for_path(hass, path)
+    except ThumbhashError as err:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="thumbhash_failed",
+            translation_placeholders={"error": str(err)},
+        ) from err
+    return {"thumbhash": thumbhash}
 
 
 _NOTIFICATION_FIELDS = [
@@ -750,6 +835,13 @@ def _register_services(hass: HomeAssistant) -> None:
         DOMAIN, SERVICE_DELETE_ACTIVITY, partial(_async_handle_delete_activity, hass), SCHEMA_DELETE_ACTIVITY
     )
     hass.services.async_register(
+        DOMAIN,
+        SERVICE_GENERATE_THUMBHASH,
+        partial(_async_handle_generate_thumbhash, hass),
+        SCHEMA_GENERATE_THUMBHASH,
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
         DOMAIN, SERVICE_SEND_NOTIFICATION, partial(_async_handle_send_notification, hass), SCHEMA_SEND_NOTIFICATION
     )
     hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)
@@ -847,6 +939,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # unload/reload — drop any outstanding ones so they don't linger after teardown.
     for resource in USAGE_LIMIT_RESOURCES:
         ir.async_delete_issue(hass, DOMAIN, usage_limit_issue_id(entry.entry_id, resource.used_key))
+
+    # Reloading is how a user asks the integration to look again, so the remembered
+    # image hashes go with everything else scoped to the entry.
+    clear_thumbhash_cache(hass)
 
     return True
 

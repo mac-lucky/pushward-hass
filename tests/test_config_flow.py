@@ -70,6 +70,9 @@ from custom_components.pushward.const import (
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_IMAGE_SHAPE,
+    CONF_IMAGE_THUMBHASH,
+    CONF_IMAGE_URL,
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
     CONF_LIVE_PROGRESS,
@@ -134,6 +137,7 @@ from custom_components.pushward.const import (
     CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    DEFAULT_IMAGE_SHAPE,
     DEFAULT_SCHEDULE_START_KEY,
     DEFAULT_SCHEDULE_VALUE_KEY,
     DEFAULT_SERVER_URL,
@@ -142,6 +146,8 @@ from custom_components.pushward.const import (
     DEFAULT_WIDGET_POLL_INTERVAL,
     DOMAIN,
     HISTORY_PERIOD_MAX,
+    IMAGE_TEMPLATES,
+    IMAGE_THUMBHASH_MAX,
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
@@ -149,6 +155,7 @@ from custom_components.pushward.const import (
     MAX_URL_LEN,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
+    TEMPLATES,
     THRESHOLD_LABEL_MAX,
     THRESHOLDS_MAX,
     TIMELINE_MAX_SERIES,
@@ -175,7 +182,7 @@ from custom_components.pushward.const import (
     validate_url,
 )
 
-from .conftest import make_entity_config, make_mock_state, make_widget_config
+from .conftest import IMAGE_THUMBHASH, IMAGE_URL, make_entity_config, make_mock_state, make_widget_config
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -4434,3 +4441,129 @@ def test_widget_details_schema_builds_for_every_template(template) -> None:
 def test_suggest_widget_template_new_templates(hass, entity_id, attributes, expected) -> None:
     hass.states.async_set(entity_id, "42", attributes)
     assert _suggest_widget_template(hass, entity_id) == expected
+
+
+# --- image trio ------------------------------------------------------------
+
+
+@pytest.mark.parametrize("template", IMAGE_TEMPLATES)
+def test_image_templates_offer_the_image_fields(template: str) -> None:
+    """Only generic and steps have an image slot server-side, and only they show one."""
+    schema_keys = _flow_schema_keys(_details_schema("binary_sensor.washer", template, {}))
+    assert CONF_IMAGE_URL in schema_keys
+    assert CONF_IMAGE_SHAPE in schema_keys
+    assert CONF_IMAGE_THUMBHASH in schema_keys
+
+
+@pytest.mark.parametrize("template", [t for t in TEMPLATES if t not in IMAGE_TEMPLATES])
+def test_other_templates_hide_the_image_fields(template: str) -> None:
+    """Offering them would let a user configure artwork the server then rejects."""
+    schema_keys = _flow_schema_keys(_details_schema("binary_sensor.washer", template, {}))
+    assert CONF_IMAGE_URL not in schema_keys
+    assert CONF_IMAGE_SHAPE not in schema_keys
+    assert CONF_IMAGE_THUMBHASH not in schema_keys
+
+
+def test_parse_entity_input_keeps_a_valid_image_trio() -> None:
+    result = _parse_entity_input(
+        _base_user_input(
+            **{
+                CONF_IMAGE_URL: f"  {IMAGE_URL}  ",
+                CONF_IMAGE_SHAPE: "poster",
+                CONF_IMAGE_THUMBHASH: IMAGE_THUMBHASH,
+            }
+        )
+    )
+    assert result[CONF_IMAGE_URL] == IMAGE_URL
+    assert result[CONF_IMAGE_SHAPE] == "poster"
+    assert result[CONF_IMAGE_THUMBHASH] == IMAGE_THUMBHASH
+
+
+def test_parse_entity_input_defaults_the_shape_to_square() -> None:
+    result = _parse_entity_input(_base_user_input(**{CONF_IMAGE_URL: IMAGE_URL}))
+    assert result[CONF_IMAGE_SHAPE] == DEFAULT_IMAGE_SHAPE
+    assert result[CONF_IMAGE_THUMBHASH] == ""
+
+
+def test_parse_entity_input_clears_the_trio_without_a_url() -> None:
+    """A shape or a hash with no image to frame would only confuse the next reader."""
+    result = _parse_entity_input(
+        _base_user_input(**{CONF_IMAGE_URL: "", CONF_IMAGE_SHAPE: "circle", CONF_IMAGE_THUMBHASH: IMAGE_THUMBHASH})
+    )
+    assert result[CONF_IMAGE_URL] == ""
+    assert result[CONF_IMAGE_SHAPE] == ""
+    assert result[CONF_IMAGE_THUMBHASH] == ""
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        pytest.param("http://example.com/a.jpg", id="plain_http"),
+        pytest.param("https:///a.jpg", id="no_host"),
+        pytest.param("https://u:p@example.com/a.jpg", id="userinfo"),
+        pytest.param("homeassistant://navigate/0", id="custom_scheme"),
+        # urlparse raises on a bracketed non-IP host. Before the guard the bare
+        # ValueError escaped this function and the form showed "unknown error".
+        pytest.param("https://[camera]/snap.jpg", id="bracketed_host"),
+        pytest.param("https://@example.com/a.jpg", id="empty_userinfo"),
+        pytest.param("https://ex ample.com/a.jpg", id="space_in_host"),
+        pytest.param("https://example.com/a b.jpg", id="space_in_path"),
+        pytest.param("https://exa\x01mple.com/a.jpg", id="control_char"),
+        pytest.param("https://ex^ample.com/a.jpg", id="caret_in_host"),
+        pytest.param("https://ex%41mple.com/a.jpg", id="escape_in_host"),
+        pytest.param("https://example.com:port/a.jpg", id="non_numeric_port"),
+    ],
+)
+def test_parse_entity_input_rejects_an_image_url_the_server_would_reject(url: str) -> None:
+    """The device fetches this URL, so it is https-only with no embedded credentials."""
+    with pytest.raises(vol.Invalid) as err:
+        _parse_entity_input(_base_user_input(**{CONF_IMAGE_URL: url}))
+    assert err.value.error_message == "invalid_image_url"
+    assert err.value.path == [CONF_IMAGE_URL]
+
+
+async def test_details_image_url_error_surfaces_and_reopens_the_image_section(hass: HomeAssistant) -> None:
+    """A bad image URL comes back as a translated field error with its section open.
+
+    The bracketed-host form is the one that used to escape ``_parse_entity_input`` as
+    a bare ValueError out of urlparse, which the flow reported as a generic unknown
+    error with no field attached and the section still collapsed over it.
+    """
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        details_overrides={CONF_IMAGE_URL: "https://[camera]/snap.jpg"},
+    )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_IMAGE_URL: "invalid_image_url"}
+
+    collapsed = _section_collapsed(result["data_schema"])
+    assert "image_options" in collapsed
+    assert collapsed["image_options"] is False, "the section holding the bad URL should render open"
+
+
+def test_parse_entity_input_rejects_an_unknown_image_shape() -> None:
+    with pytest.raises(vol.Invalid) as err:
+        _parse_entity_input(_base_user_input(**{CONF_IMAGE_URL: IMAGE_URL, CONF_IMAGE_SHAPE: "oval"}))
+    assert err.value.error_message == "invalid_image_shape"
+    assert err.value.path == [CONF_IMAGE_SHAPE]
+
+
+@pytest.mark.parametrize(
+    "thumbhash",
+    [
+        pytest.param("3gYKnZp4iHiAeHiHiHiId4B1CPe", id="unpadded"),
+        pytest.param("3gYKnZp4iHiAeHiHiHiId4B1CP_I", id="urlsafe_alphabet"),
+        pytest.param("A" * (IMAGE_THUMBHASH_MAX + 4), id="too_long"),
+    ],
+)
+def test_parse_entity_input_rejects_an_unusable_thumbhash(thumbhash: str) -> None:
+    """A hash iOS cannot decode fails silently on device, so it is refused here."""
+    with pytest.raises(vol.Invalid) as err:
+        _parse_entity_input(_base_user_input(**{CONF_IMAGE_URL: IMAGE_URL, CONF_IMAGE_THUMBHASH: thumbhash}))
+    assert err.value.error_message == "invalid_image_thumbhash"
+    assert err.value.path == [CONF_IMAGE_THUMBHASH]

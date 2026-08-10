@@ -71,6 +71,9 @@ from .const import (
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_IMAGE_SHAPE,
+    CONF_IMAGE_THUMBHASH,
+    CONF_IMAGE_URL,
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
     CONF_LABEL_ATTRIBUTE,
@@ -150,6 +153,7 @@ from .const import (
     DANGEROUS_URL_SCHEMES,
     DEFAULT_DECIMALS,
     DEFAULT_HISTORY_PERIOD,
+    DEFAULT_IMAGE_SHAPE,
     DEFAULT_MAX_VALUE,
     DEFAULT_MIN_VALUE,
     DEFAULT_PRIORITY,
@@ -171,6 +175,10 @@ from .const import (
     FLOW_SLOT_INPUT,
     FLOW_SLOTS,
     HISTORY_PERIOD_MAX,
+    IMAGE_SHAPES,
+    IMAGE_TEMPLATES,
+    IMAGE_THUMBHASH_MAX,
+    IMAGE_URL_MAX,
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
@@ -234,6 +242,8 @@ from .const import (
     WIDGET_TRIGGER_MODES,
     WIDGET_UNIT_MAX,
     normalize_slug,
+    validate_image_url,
+    validate_thumbhash,
 )
 from .content_mapper import get_domain_defaults, is_valid_color, sanitize_slug
 
@@ -530,6 +540,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_LOG_LEVEL_ATTRIBUTE,
     ),
     "steps_options": (CONF_STEPS_EDITOR,),
+    "image_options": (CONF_IMAGE_URL, CONF_IMAGE_SHAPE, CONF_IMAGE_THUMBHASH),
     "timeline_options": (
         CONF_UNITS,
         CONF_PRIMARY_SERIES,
@@ -992,6 +1003,36 @@ def _details_schema(
                 default=d.get(CONF_LIVE_PROGRESS, False),
             )
         ] = BooleanSelector()
+    if template in IMAGE_TEMPLATES:
+        # The device downloads image_url itself and will not touch a private host,
+        # so the URL is https-only here as it is server-side. The thumbhash is the
+        # tier that always renders; leaving it blank lets the integration derive one
+        # from the URL, and pushward.generate_thumbhash produces one from any image
+        # Home Assistant can read (including plain-http LAN cameras).
+        fields[
+            vol.Optional(
+                CONF_IMAGE_URL,
+                default=d.get(CONF_IMAGE_URL, ""),
+            )
+        ] = vol.All(str, vol.Length(max=IMAGE_URL_MAX))
+        fields[
+            vol.Optional(
+                CONF_IMAGE_SHAPE,
+                default=d.get(CONF_IMAGE_SHAPE) or DEFAULT_IMAGE_SHAPE,
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=list(IMAGE_SHAPES),
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key="image_shape",
+            )
+        )
+        fields[
+            vol.Optional(
+                CONF_IMAGE_THUMBHASH,
+                default=d.get(CONF_IMAGE_THUMBHASH, ""),
+            )
+        ] = vol.All(str, vol.Length(max=IMAGE_THUMBHASH_MAX))
     if template == "steps":
         fields[
             vol.Optional(
@@ -1346,6 +1387,36 @@ def _raise_url_errors(checks: list[tuple[str, str, bool]]) -> None:
     # Fall back to whatever code came in (future-proofing for new codes).
     code, fields = next(iter(grouped.items()))
     raise vol.Invalid(code, path=fields)
+
+
+def _parse_image_fields(user_input: dict) -> tuple[str, str, str]:
+    """Validate and normalize the image trio, returning (url, shape, thumbhash).
+
+    Both the URL and the hash are checked here rather than in the schema so the user
+    gets a translated form error instead of a raw voluptuous message, matching how
+    the other structured fields on this form report. An empty URL clears the whole
+    trio: a shape or a hash with nothing to frame would only ever confuse the next
+    person to open the form.
+    """
+    url = (user_input.get(CONF_IMAGE_URL) or "").strip()
+    if not url:
+        return "", "", ""
+    try:
+        validate_image_url(url)
+    except vol.Invalid as err:
+        raise vol.Invalid("invalid_image_url", path=[CONF_IMAGE_URL]) from err
+
+    shape = (user_input.get(CONF_IMAGE_SHAPE) or DEFAULT_IMAGE_SHAPE).strip()
+    if shape not in IMAGE_SHAPES:
+        raise vol.Invalid("invalid_image_shape", path=[CONF_IMAGE_SHAPE])
+
+    thumbhash = (user_input.get(CONF_IMAGE_THUMBHASH) or "").strip()
+    if thumbhash:
+        try:
+            validate_thumbhash(thumbhash)
+        except vol.Invalid as err:
+            raise vol.Invalid("invalid_image_thumbhash", path=[CONF_IMAGE_THUMBHASH]) from err
+    return url, shape, thumbhash
 
 
 def _coerce_gauge_range(user_input: dict, *, is_gauge: bool) -> tuple[float, float]:
@@ -1836,6 +1907,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     total_steps = int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS))
     step_fields = _steps_fields_from_input(user_input, total_steps, strict=template == "steps")
     log_columns = _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, ""), strict=True)
+    image_url, image_shape, image_thumbhash = _parse_image_fields(user_input)
 
     return {
         CONF_ENTITY_ID: entity_id,
@@ -1853,6 +1925,9 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
         CONF_REMAINING_TIME_ENTITY: user_input.get(CONF_REMAINING_TIME_ENTITY, ""),
         CONF_LIVE_PROGRESS: bool(user_input.get(CONF_LIVE_PROGRESS, False)),
+        CONF_IMAGE_URL: image_url,
+        CONF_IMAGE_SHAPE: image_shape,
+        CONF_IMAGE_THUMBHASH: image_thumbhash,
         CONF_SUBTITLE_ATTRIBUTE: user_input.get(CONF_SUBTITLE_ATTRIBUTE, ""),
         CONF_SUBTITLE_ENTITY: user_input.get(CONF_SUBTITLE_ENTITY, ""),
         CONF_STATE_LABELS: _kv_rows_to_map(user_input.get(CONF_STATE_LABELS, ""), "state", CONF_LABEL),

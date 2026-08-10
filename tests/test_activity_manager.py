@@ -34,6 +34,8 @@ from custom_components.pushward.const import (
     CONF_ENDED_TTL,
     CONF_ENTITY_ID,
     CONF_HISTORY_PERIOD,
+    CONF_IMAGE_SHAPE,
+    CONF_IMAGE_URL,
     CONF_LABEL,
     CONF_LOG_COLUMNS,
     CONF_PROGRESS_ATTRIBUTE,
@@ -54,7 +56,16 @@ from custom_components.pushward.const import (
     LOG_MAX_LINES,
 )
 
-from .conftest import activity_updates, bump_state, end_activity_via_state
+from .conftest import (
+    IMAGE_URL,
+    activity_updates,
+    bump_state,
+    end_activity_via_state,
+    expected_thumbhash,
+    patch_image_download,
+    patch_image_fetch_failure,
+    png_bytes,
+)
 from .conftest import make_entity_config as _entity_config
 from .server_contract import assert_valid_activity_content
 
@@ -2133,5 +2144,118 @@ async def test_push_failure_warns_once_per_streak(hass: HomeAssistant, caplog: p
     hass.states.async_set("binary_sensor.washer", "on", {"progress": 40})
     await hass.async_block_till_done()
     assert len(_warnings()) == 2
+
+    await manager.async_stop()
+
+
+# --- image thumbhash on the tracked-entity path ------------------------------
+
+
+async def test_configured_image_gets_a_derived_thumbhash(hass: HomeAssistant) -> None:
+    """A tracked entity pointing at a picture ships the inline fallback with it."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_IMAGE_URL: IMAGE_URL, CONF_IMAGE_SHAPE: "poster"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    body = png_bytes(16, 16)
+    with patch_image_download(body):
+        hass.states.async_set("binary_sensor.washer", "on")
+        await hass.async_block_till_done()
+
+    content = api.update_activity.call_args[0][2]
+    assert content["image_url"] == IMAGE_URL
+    assert content["image_shape"] == "poster"
+    assert content["image_thumbhash"] == expected_thumbhash(body)
+    assert_valid_activity_content(content, where="tracked entity image")
+
+    await manager.async_stop()
+
+
+async def test_derived_thumbhash_does_not_break_update_dedup(hass: HomeAssistant) -> None:
+    """The hash is attached before the equality check, so an unchanged state still dedups.
+
+    Attach it after and the stored frame carries a hash the freshly mapped one lacks,
+    so every state report would look like a change and push.
+    """
+    api = _mock_api()
+    config = _entity_config(**{CONF_IMAGE_URL: IMAGE_URL})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    with patch_image_download(png_bytes(16, 16)):
+        hass.states.async_set("binary_sensor.washer", "on")
+        await hass.async_block_till_done()
+        assert "image_thumbhash" in api.update_activity.call_args[0][2]
+
+        sent = api.update_activity.await_count
+        await manager._send_update("binary_sensor.washer")
+        assert api.update_activity.await_count == sent
+
+    await manager.async_stop()
+
+
+async def test_completion_frames_omit_the_image_and_do_not_refetch_it(hass: HomeAssistant) -> None:
+    """Merge-patch semantics: artwork the live frame sent stays put without restating.
+
+    An update is an RFC 7396 merge patch, so a key the patch leaves out keeps the
+    value the server already stored. Naming the trio again on the completion and
+    ended frames would buy nothing and cost a second read of a picture that cannot
+    have changed in the meantime.
+    """
+    api = _mock_api()
+    config = _entity_config(**{CONF_IMAGE_URL: IMAGE_URL})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    body = png_bytes(16, 16)
+    with patch_image_download(body) as session:
+        hass.states.async_set("binary_sensor.washer", "on")
+        await hass.async_block_till_done()
+        # The live frame is what puts the artwork on the server in the first place.
+        assert api.update_activity.call_args[0][2]["image_thumbhash"] == expected_thumbhash(body)
+
+        api.reset_mock()
+        session.get.reset_mock()
+        with patch(SLEEP_TARGET, new_callable=AsyncMock):
+            await manager._async_end_activity("binary_sensor.washer")
+
+        session.get.assert_not_called()
+
+    assert api.update_activity.call_args_list, "the end should push a completion and an ended frame"
+    for call in api.update_activity.call_args_list:
+        content = call[0][2]
+        assert "image_url" not in content
+        assert "image_shape" not in content
+        assert "image_thumbhash" not in content
+        assert_valid_activity_content(content, where="completion image")
+
+    await manager.async_stop()
+
+
+async def test_unreachable_image_does_not_block_the_activity(hass: HomeAssistant) -> None:
+    """The push has to land regardless; only the blurred fallback is lost."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_IMAGE_URL: IMAGE_URL})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    with patch_image_fetch_failure():
+        hass.states.async_set("binary_sensor.washer", "on")
+        await hass.async_block_till_done()
+
+    api.update_activity.assert_awaited()
+    content = api.update_activity.call_args[0][2]
+    assert content["image_url"] == IMAGE_URL
+    assert "image_thumbhash" not in content
+    assert_valid_activity_content(content, where="unreachable image")
 
     await manager.async_stop()

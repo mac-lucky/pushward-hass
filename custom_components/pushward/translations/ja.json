@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "削除TTL",
           "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
+        },
+        "image_url": {
+          "name": "画像 URL",
+          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+        },
+        "image_shape": {
+          "name": "画像の形",
+          "description": "画像の切り抜き方です。poster は縦長、square は既定、circle は円形に切り抜きます。"
+        },
+        "image_thumbhash": {
+          "name": "画像の ThumbHash",
+          "description": "URL を取得できないときに描画される、ぼかしの埋め込みプレビューです。LAN 上の画像で表示されるのはこれだけです。空欄にすると URL から自動で計算されます。Home Assistant が読める任意の画像から作るには Generate ThumbHash アクションを使ってください。"
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "steps オプション",
           "description": "steps テンプレートのみ。"
+        },
+        "image_options": {
+          "name": "画像",
+          "description": "アイコンの横に表示される任意の画像です。generic と steps テンプレートのみ。"
         },
         "alert_options": {
           "name": "alert オプション",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "削除TTL",
           "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
+        },
+        "image_url": {
+          "name": "画像 URL",
+          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+        },
+        "image_shape": {
+          "name": "画像の形",
+          "description": "画像の切り抜き方です。poster は縦長、square は既定、circle は円形に切り抜きます。"
+        },
+        "image_thumbhash": {
+          "name": "画像の ThumbHash",
+          "description": "URL を取得できないときに描画される、ぼかしの埋め込みプレビューです。LAN 上の画像で表示されるのはこれだけです。空欄にすると URL から自動で計算されます。Home Assistant が読める任意の画像から作るには Generate ThumbHash アクションを使ってください。"
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "表示・色・サウンド",
           "description": "任意のスタイルと更新ごとの上書き。すべてのテンプレートに適用されます。"
+        },
+        "image_options": {
+          "name": "画像",
+          "description": "アイコンの横に表示される任意の画像です。generic と steps テンプレートのみ。"
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "継続時間",
           "description": "終了日時の代わりに使える「設定したら任せる」方式: 秒数（1以上）または「1h30m」のような継続時間文字列。サーバーは開始/終了を現在時刻に再設定します。継続時間か終了日時のどちらかを指定してください。両方を設定した場合は継続時間が優先されます。"
+        },
+        "image_url": {
+          "name": "画像 URL",
+          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+        },
+        "image_shape": {
+          "name": "画像の形",
+          "description": "画像の切り抜き方です。poster は縦長、square は既定、circle は円形に切り抜きます。"
+        },
+        "image_thumbhash": {
+          "name": "画像の ThumbHash",
+          "description": "URL を取得できないときに描画される、ぼかしの埋め込みプレビューです。LAN 上の画像で表示されるのはこれだけです。空欄にすると URL から自動で計算されます。Home Assistant が読める任意の画像から作るには Generate ThumbHash アクションを使ってください。"
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "steps オプション",
           "description": "steps テンプレートのみ。"
+        },
+        "image_options": {
+          "name": "画像",
+          "description": "アイコンの横に表示される任意の画像です。generic と steps テンプレートのみ。"
         },
         "action_buttons": {
           "name": "アクションボタン",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "ThumbHash を生成",
+      "description": "画像のぼかしプレビューを計算して返します。アクティビティやエンティティの画像設定にそのまま貼り付けられます。",
+      "fields": {
+        "image_url": {
+          "name": "画像 URL",
+          "description": "画像の http または https URL です。iPhone からは見えない LAN 上のカメラを含め、Home Assistant が到達できるものなら何でも使えます。"
+        },
+        "image_path": {
+          "name": "画像のパス",
+          "description": "URL の代わりに使うローカル画像ファイルのパスです。ディレクトリは configuration.yaml の allowlist_external_dirs で許可されている必要があります。"
+        }
+      }
+    },
     "end_activity": {
       "name": "アクティビティを終了",
       "description": "PushWard Live Activityを終了します。",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "slug={slug} entity_id={entity_id} に一致する PushWard ウィジェットがありません。"
+    },
+    "thumbhash_failed": {
+      "message": "ThumbHash を生成できませんでした: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "ステップごとに1行、順番どおりに入力します。各行で任意のラベル、行の高さ（1-10）、相対的な幅（正の数）、色（名前または16進数。空欄でアクセントカラー）を設定します。行を追加しないか、ちょうど total_steps 行を追加してください。steps テンプレートのみ。"
               }
             },
+            "image_options": {
+              "name": "画像",
+              "data": {
+                "image_url": "画像 URL",
+                "image_shape": "画像の形",
+                "image_thumbhash": "画像の ThumbHash"
+              },
+              "data_description": {
+                "image_url": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。",
+                "image_shape": "画像の切り抜き方です。poster は縦長、square は既定、circle は円形に切り抜きます。",
+                "image_thumbhash": "URL を取得できないときに描画される、ぼかしの埋め込みプレビューです。LAN 上の画像で表示されるのはこれだけです。空欄にすると URL から自動で計算されます。Home Assistant が読める任意の画像から作るには Generate ThumbHash アクションを使ってください。"
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "各しきい値は数値で始める必要があります（例: 25:red:Hot）。",
         "too_many_thresholds": "タイムラインは最大5つのしきい値まで対応しています。",
         "invalid_number": "有効な数値を入力してください。",
-        "unknown_primary_series": "プライマリシリーズは、設定済みのシリーズラベルのいずれかと一致する必要があります。"
+        "unknown_primary_series": "プライマリシリーズは、設定済みのシリーズラベルのいずれかと一致する必要があります。",
+        "invalid_image_url": "画像 URL はホストを含む https アドレスで、ユーザー名とパスワードを含めることはできません。",
+        "invalid_image_shape": "画像の形は poster、square、circle のいずれかにしてください。",
+        "invalid_image_thumbhash": "画像の ThumbHash は標準アルファベットのパディング付き base64 で、64 文字以内にしてください。Generate ThumbHash アクションで生成できます。"
       },
       "abort": {
         "already_configured": "このエンティティはすでに追跡されています。",
@@ -1922,6 +2003,13 @@
         "output": "出力",
         "storage": "蓄積",
         "exchange": "やり取り"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "ポスター",
+        "square": "正方形",
+        "circle": "円形"
       }
     }
   }

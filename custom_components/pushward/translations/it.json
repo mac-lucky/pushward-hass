@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL di rimozione",
           "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
+        },
+        "image_url": {
+          "name": "URL dell'immagine",
+          "description": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
+        },
+        "image_shape": {
+          "name": "Forma dell'immagine",
+          "description": "Come viene ritagliata l'immagine: poster mantiene un taglio verticale, square è il valore predefinito, circle la ritaglia tonda."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash dell'immagine",
+          "description": "Anteprima sfocata incorporata, disegnata quando l'URL non può essere scaricato, e l'unico livello che compare per un'immagine sulla rete locale. Lascia vuoto per calcolarlo automaticamente dall'URL, oppure usa l'azione Generate ThumbHash per crearlo da qualsiasi immagine leggibile da Home Assistant."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Opzioni steps",
           "description": "Solo per il modello steps."
+        },
+        "image_options": {
+          "name": "Immagine",
+          "description": "Grafica opzionale mostrata accanto all'icona. Solo per i modelli generic e steps."
         },
         "alert_options": {
           "name": "Opzioni alert",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL di rimozione",
           "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
+        },
+        "image_url": {
+          "name": "URL dell'immagine",
+          "description": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
+        },
+        "image_shape": {
+          "name": "Forma dell'immagine",
+          "description": "Come viene ritagliata l'immagine: poster mantiene un taglio verticale, square è il valore predefinito, circle la ritaglia tonda."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash dell'immagine",
+          "description": "Anteprima sfocata incorporata, disegnata quando l'URL non può essere scaricato, e l'unico livello che compare per un'immagine sulla rete locale. Lascia vuoto per calcolarlo automaticamente dall'URL, oppure usa l'azione Generate ThumbHash per crearlo da qualsiasi immagine leggibile da Home Assistant."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Visualizzazione, colore e suono",
           "description": "Stile opzionale e sostituzioni per aggiornamento. Si applicano a qualsiasi modello."
+        },
+        "image_options": {
+          "name": "Immagine",
+          "description": "Grafica opzionale mostrata accanto all'icona. Solo per i modelli generic e steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Durata",
           "description": "Alternativa imposta-e-dimentica a Data di fine: secondi (>=1) o una stringa di durata come \"1h30m\". Il server riancora inizio/fine al momento attuale. Invia Durata oppure Data di fine — se entrambe sono impostate prevale Durata."
+        },
+        "image_url": {
+          "name": "URL dell'immagine",
+          "description": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
+        },
+        "image_shape": {
+          "name": "Forma dell'immagine",
+          "description": "Come viene ritagliata l'immagine: poster mantiene un taglio verticale, square è il valore predefinito, circle la ritaglia tonda."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash dell'immagine",
+          "description": "Anteprima sfocata incorporata, disegnata quando l'URL non può essere scaricato, e l'unico livello che compare per un'immagine sulla rete locale. Lascia vuoto per calcolarlo automaticamente dall'URL, oppure usa l'azione Generate ThumbHash per crearlo da qualsiasi immagine leggibile da Home Assistant."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Opzioni steps",
           "description": "Solo per il modello steps."
+        },
+        "image_options": {
+          "name": "Immagine",
+          "description": "Grafica opzionale mostrata accanto all'icona. Solo per i modelli generic e steps."
         },
         "action_buttons": {
           "name": "Pulsanti azione",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Genera ThumbHash",
+      "description": "Calcola l'anteprima sfocata di un'immagine e la restituisce, pronta da incollare in un'attività o nelle impostazioni immagine di un'entità.",
+      "fields": {
+        "image_url": {
+          "name": "URL dell'immagine",
+          "description": "URL http o https dell'immagine. Va bene tutto ciò che Home Assistant riesce a raggiungere, compresa una telecamera sulla rete locale che l'iPhone non vede."
+        },
+        "image_path": {
+          "name": "Percorso dell'immagine",
+          "description": "Percorso di un file immagine locale al posto di un URL. La cartella deve essere consentita in configuration.yaml sotto allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "Termina attività",
       "description": "Terminare una PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Nessun widget PushWard corrisponde a slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Impossibile generare il ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Una riga per passo, in ordine. Ogni riga imposta un'etichetta facoltativa, un'altezza riga (1-10), una larghezza relativa (numero positivo) e un colore (con nome o hex; lasciare vuoto per mantenere il colore d'accento). Aggiungi nessuna riga oppure esattamente total_steps righe. Solo per il modello steps."
               }
             },
+            "image_options": {
+              "name": "Immagine",
+              "data": {
+                "image_url": "URL dell'immagine",
+                "image_shape": "Forma dell'immagine",
+                "image_thumbhash": "ThumbHash dell'immagine"
+              },
+              "data_description": {
+                "image_url": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì.",
+                "image_shape": "Come viene ritagliata l'immagine: poster mantiene un taglio verticale, square è il valore predefinito, circle la ritaglia tonda.",
+                "image_thumbhash": "Anteprima sfocata incorporata, disegnata quando l'URL non può essere scaricato, e l'unico livello che compare per un'immagine sulla rete locale. Lascia vuoto per calcolarlo automaticamente dall'URL, oppure usa l'azione Generate ThumbHash per crearlo da qualsiasi immagine leggibile da Home Assistant."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Ogni soglia deve iniziare con un numero (es. 25:red:Hot).",
         "too_many_thresholds": "Una timeline supporta al massimo 5 soglie.",
         "invalid_number": "Inserisci un numero valido.",
-        "unknown_primary_series": "La serie principale deve corrispondere a una delle etichette di serie configurate."
+        "unknown_primary_series": "La serie principale deve corrispondere a una delle etichette di serie configurate.",
+        "invalid_image_url": "L'URL dell'immagine deve essere un indirizzo https con host, senza nome utente né password.",
+        "invalid_image_shape": "La forma dell'immagine deve essere poster, square o circle.",
+        "invalid_image_thumbhash": "Il ThumbHash dell'immagine deve essere in base64 con alfabeto standard e riempimento, al massimo 64 caratteri. Usa l'azione Generate ThumbHash per generarne uno."
       },
       "abort": {
         "already_configured": "Questa entità è già monitorata.",
@@ -1922,6 +2003,13 @@
         "output": "Uscita",
         "storage": "Accumulo",
         "exchange": "Scambio"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Poster",
+        "square": "Quadrato",
+        "circle": "Cerchio"
       }
     }
   }

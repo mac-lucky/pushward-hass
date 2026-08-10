@@ -31,9 +31,16 @@ from custom_components.pushward.const import (
     usage_limit_issue_id,
 )
 from custom_components.pushward.coordinator import PushWardUsageCoordinator, _format_reset
+from custom_components.pushward.image_hash import DATA_THUMBHASH_CACHE, async_thumbhash_for_url
 from custom_components.pushward.sensor import USAGE_SENSORS
 
-from .conftest import make_premium_usage_payload, make_usage_payload
+from .conftest import (
+    IMAGE_URL,
+    make_premium_usage_payload,
+    make_usage_payload,
+    patch_image_download,
+    png_bytes,
+)
 
 
 def _entry(unique_id: str = DOMAIN) -> MockConfigEntry:
@@ -194,6 +201,26 @@ async def test_unload_clears_outstanding_issue(hass: HomeAssistant) -> None:
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
     assert _issue(hass, entry, "notifications_used") is None
+
+
+async def test_unload_clears_the_thumbhash_cache(hass: HomeAssistant) -> None:
+    """Reloading is how a user asks for a fresh look, so remembered hashes go too."""
+    entry = _entry()
+    entry.add_to_hass(hass)
+    api = AsyncMock()
+    api.get_me = AsyncMock(return_value=make_usage_payload())
+
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    with patch_image_download(png_bytes()):
+        await async_thumbhash_for_url(hass, IMAGE_URL)
+    assert hass.data[DATA_THUMBHASH_CACHE]
+
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert DATA_THUMBHASH_CACHE not in hass.data
 
 
 # --- reset formatting ---

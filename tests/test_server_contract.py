@@ -13,7 +13,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from custom_components.pushward.const import LOG_LINE_TEXT_MAX
+from custom_components.pushward.const import IMAGE_SHAPES, IMAGE_THUMBHASH_MAX, LOG_LINE_TEXT_MAX, MAX_URL_LEN
 
 from .server_contract import (
     PushWardContractError,
@@ -22,6 +22,11 @@ from .server_contract import (
     assert_valid_sound,
     assert_valid_widget_content,
 )
+
+# A real 8x6 ThumbHash (21 bytes -> 28 padded base64 chars), and an image URL in the
+# only form the server accepts.
+THUMBHASH_OK = "3gYKnZp4iHiAeHiHiHiId4B1CPeI"
+IMAGE_OK = "https://example.com/cover.jpg"
 
 
 def _iso(**delta) -> str:
@@ -287,6 +292,41 @@ _ACTIVITY_INVALID = [
         lambda: _mut(valid_steps, live_progress=True, start_date=int(time.time()) - 60, end_date=int(time.time()) - 10),
         id="steps_lp_past_end",
     ),
+    # image trio: rejected outright off generic/steps, and the URL is the strict
+    # https-no-userinfo form because the device fetches it without re-checking.
+    pytest.param(lambda: _mut(valid_alert, image_url=IMAGE_OK), id="image_url_on_unsupported_template"),
+    pytest.param(lambda: _mut(valid_gauge, image_shape="circle"), id="image_shape_on_unsupported_template"),
+    pytest.param(lambda: _mut(valid_countdown, image_thumbhash=THUMBHASH_OK), id="image_hash_on_unsupported_template"),
+    pytest.param(lambda: _mut(valid_generic, image_url="http://example.com/a.jpg"), id="image_url_not_https"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https:///a.jpg"), id="image_url_no_host"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://u:p@example.com/a.jpg"), id="image_url_userinfo"),
+    # Forms urlparse accepts and the server 422s. Each one used to reach the wire.
+    pytest.param(lambda: _mut(valid_generic, image_url="https://@example.com/a.jpg"), id="image_url_empty_userinfo"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://[camera]/snap.jpg"), id="image_url_bracketed_host"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://ex ample.com/a.jpg"), id="image_url_space_in_host"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://example.com/a b.jpg"), id="image_url_space_in_path"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://exa\x01mple.com/a.jpg"), id="image_url_control_char"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://ex^ample.com/a.jpg"), id="image_url_caret_in_host"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://ex|ample.com/a.jpg"), id="image_url_pipe_in_host"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://ex\\ample.com/a.jpg"), id="image_url_backslash_host"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://ex%41mple.com/a.jpg"), id="image_url_escape_in_host"),
+    pytest.param(lambda: _mut(valid_generic, image_url="https://example.com:port/a.jpg"), id="image_url_bad_port"),
+    pytest.param(
+        lambda: _mut(valid_generic, image_url="https://example.com/" + "a" * MAX_URL_LEN), id="image_url_too_long"
+    ),
+    pytest.param(lambda: _mut(valid_generic, image_url=IMAGE_OK, image_shape="oval"), id="image_shape_not_in_enum"),
+    pytest.param(
+        lambda: _mut(valid_generic, image_url=IMAGE_OK, image_thumbhash="A" * (IMAGE_THUMBHASH_MAX + 1)),
+        id="image_thumbhash_too_long",
+    ),
+    pytest.param(
+        lambda: _mut(valid_generic, image_url=IMAGE_OK, image_thumbhash="3PcNNYSFeXh_d3el"),
+        id="image_thumbhash_urlsafe_alphabet",
+    ),
+    pytest.param(
+        lambda: _mut(valid_generic, image_url=IMAGE_OK, image_thumbhash="3PcNNYSFeXh"),
+        id="image_thumbhash_unpadded",
+    ),
 ]
 
 
@@ -294,6 +334,19 @@ _ACTIVITY_INVALID = [
 def test_invalid_activity_payloads_rejected(builder) -> None:
     with pytest.raises(PushWardContractError):
         assert_valid_activity_content(builder())
+
+
+def test_valid_image_payloads_pass() -> None:
+    """The trio on its two templates, with each shape and with the hash left out."""
+    for shape in IMAGE_SHAPES:
+        assert_valid_activity_content(_mut(valid_generic, image_url=IMAGE_OK, image_shape=shape))
+    assert_valid_activity_content(_mut(valid_steps, image_url=IMAGE_OK, image_thumbhash=THUMBHASH_OK))
+    # A URL on its own is complete: the server reads an absent shape as square, and
+    # the hash is an optional fallback, not a requirement.
+    assert_valid_activity_content(_mut(valid_generic, image_url=IMAGE_OK))
+    # Empty strings are how a stored-but-unset config comes through; they are not a
+    # trio "present", so they must not trip the unsupported-template gate either.
+    assert_valid_activity_content(_mut(valid_alert, image_url="", image_shape="", image_thumbhash=""))
 
 
 def test_valid_live_progress_payloads_pass() -> None:

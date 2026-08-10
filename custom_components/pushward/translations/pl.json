@@ -218,6 +218,18 @@
         "dismissal_ttl": {
           "name": "TTL usunięcia",
           "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
+        },
+        "image_url": {
+          "name": "URL obrazu",
+          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+        },
+        "image_shape": {
+          "name": "Kształt obrazu",
+          "description": "Sposób kadrowania obrazu: poster zachowuje kadr pionowy, square jest domyślne, circle przycina do koła."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash obrazu",
+          "description": "Rozmyty podgląd osadzony w aktywności, rysowany gdy nie da się pobrać adresu URL, i jedyna warstwa widoczna dla obrazu z sieci lokalnej. Zostaw puste, aby został wyliczony z adresu URL automatycznie, albo użyj akcji Generate ThumbHash, aby utworzyć go z dowolnego obrazu dostępnego dla Home Assistant."
         }
       },
       "sections": {
@@ -228,6 +240,10 @@
         "steps_options": {
           "name": "Opcje steps",
           "description": "Tylko szablon steps."
+        },
+        "image_options": {
+          "name": "Obraz",
+          "description": "Opcjonalna grafika wyświetlana obok ikony. Tylko szablony generic i steps."
         },
         "alert_options": {
           "name": "Opcje alert",
@@ -346,6 +362,18 @@
         "dismissal_ttl": {
           "name": "TTL usunięcia",
           "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
+        },
+        "image_url": {
+          "name": "URL obrazu",
+          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+        },
+        "image_shape": {
+          "name": "Kształt obrazu",
+          "description": "Sposób kadrowania obrazu: poster zachowuje kadr pionowy, square jest domyślne, circle przycina do koła."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash obrazu",
+          "description": "Rozmyty podgląd osadzony w aktywności, rysowany gdy nie da się pobrać adresu URL, i jedyna warstwa widoczna dla obrazu z sieci lokalnej. Zostaw puste, aby został wyliczony z adresu URL automatycznie, albo użyj akcji Generate ThumbHash, aby utworzyć go z dowolnego obrazu dostępnego dla Home Assistant."
         }
       },
       "sections": {
@@ -360,6 +388,10 @@
         "display_options": {
           "name": "Wyświetlanie, kolor i dźwięk",
           "description": "Opcjonalna stylizacja i nadpisania dla danej aktualizacji. Dotyczą każdego szablonu."
+        },
+        "image_options": {
+          "name": "Obraz",
+          "description": "Opcjonalna grafika wyświetlana obok ikony. Tylko szablony generic i steps."
         }
       }
     },
@@ -622,6 +654,18 @@
         "duration": {
           "name": "Czas trwania",
           "description": "Bezobsługowa alternatywa dla Daty zakończenia: sekundy (>=1) lub ciąg czasu trwania, np. „1h30m”. Serwer ponownie zakotwicza początek/koniec na teraz. Wyślij Czas trwania albo Datę zakończenia — przy obu ustawionych wygrywa Czas trwania."
+        },
+        "image_url": {
+          "name": "URL obrazu",
+          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+        },
+        "image_shape": {
+          "name": "Kształt obrazu",
+          "description": "Sposób kadrowania obrazu: poster zachowuje kadr pionowy, square jest domyślne, circle przycina do koła."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash obrazu",
+          "description": "Rozmyty podgląd osadzony w aktywności, rysowany gdy nie da się pobrać adresu URL, i jedyna warstwa widoczna dla obrazu z sieci lokalnej. Zostaw puste, aby został wyliczony z adresu URL automatycznie, albo użyj akcji Generate ThumbHash, aby utworzyć go z dowolnego obrazu dostępnego dla Home Assistant."
         }
       },
       "sections": {
@@ -632,6 +676,10 @@
         "steps_options": {
           "name": "Opcje steps",
           "description": "Tylko szablon steps."
+        },
+        "image_options": {
+          "name": "Obraz",
+          "description": "Opcjonalna grafika wyświetlana obok ikony. Tylko szablony generic i steps."
         },
         "action_buttons": {
           "name": "Przyciski akcji",
@@ -1197,6 +1245,20 @@
         }
       }
     },
+    "generate_thumbhash": {
+      "name": "Wygeneruj ThumbHash",
+      "description": "Oblicza rozmyty podgląd obrazu i zwraca go, gotowego do wklejenia w aktywności lub w ustawieniach obrazu encji.",
+      "fields": {
+        "image_url": {
+          "name": "URL obrazu",
+          "description": "Adres http lub https obrazu. Zadziała wszystko, co osiągnie Home Assistant, w tym kamera w sieci lokalnej, której iPhone nie widzi."
+        },
+        "image_path": {
+          "name": "Ścieżka do obrazu",
+          "description": "Ścieżka do lokalnego pliku obrazu zamiast adresu URL. Katalog musi być dozwolony w configuration.yaml w allowlist_external_dirs."
+        }
+      }
+    },
     "end_activity": {
       "name": "Zakończ Live Activity",
       "description": "Zakończ PushWard Live Activity.",
@@ -1345,6 +1407,9 @@
   "exceptions": {
     "widget_not_found": {
       "message": "Żaden widżet PushWard nie pasuje do slug={slug} entity_id={entity_id}."
+    },
+    "thumbhash_failed": {
+      "message": "Nie udało się wygenerować ThumbHash: {error}"
     }
   },
   "config": {
@@ -1497,6 +1562,19 @@
                 "steps_editor": "Jeden wiersz na krok, w kolejności. Każdy wiersz ustawia opcjonalną etykietę, wysokość wiersza (1-10), względną szerokość (liczba dodatnia) i kolor (nazwa lub hex; puste zachowuje kolor akcentu). Dodaj brak wierszy albo dokładnie total_steps wierszy. Tylko szablon steps."
               }
             },
+            "image_options": {
+              "name": "Obraz",
+              "data": {
+                "image_url": "URL obrazu",
+                "image_shape": "Kształt obrazu",
+                "image_thumbhash": "ThumbHash obrazu"
+              },
+              "data_description": {
+                "image_url": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem.",
+                "image_shape": "Sposób kadrowania obrazu: poster zachowuje kadr pionowy, square jest domyślne, circle przycina do koła.",
+                "image_thumbhash": "Rozmyty podgląd osadzony w aktywności, rysowany gdy nie da się pobrać adresu URL, i jedyna warstwa widoczna dla obrazu z sieci lokalnej. Zostaw puste, aby został wyliczony z adresu URL automatycznie, albo użyj akcji Generate ThumbHash, aby utworzyć go z dowolnego obrazu dostępnego dla Home Assistant."
+              }
+            },
             "timeline_options": {
               "name": "Timeline",
               "data": {
@@ -1628,7 +1706,10 @@
         "invalid_threshold": "Każdy próg musi zaczynać się od liczby (np. 25:red:Hot).",
         "too_many_thresholds": "Oś czasu obsługuje maksymalnie 5 progów.",
         "invalid_number": "Wprowadź prawidłową liczbę.",
-        "unknown_primary_series": "Seria podstawowa musi odpowiadać jednej ze skonfigurowanych etykiet serii."
+        "unknown_primary_series": "Seria podstawowa musi odpowiadać jednej ze skonfigurowanych etykiet serii.",
+        "invalid_image_url": "URL obrazu musi być adresem https z hostem, bez nazwy użytkownika i hasła.",
+        "invalid_image_shape": "Kształt obrazu musi mieć wartość poster, square lub circle.",
+        "invalid_image_thumbhash": "ThumbHash obrazu musi być zapisany w base64 (standardowy alfabet, z dopełnieniem) i mieć najwyżej 64 znaki. Użyj akcji Generate ThumbHash, aby go wygenerować."
       },
       "abort": {
         "already_configured": "Ta encja jest już śledzona.",
@@ -1922,6 +2003,13 @@
         "output": "Wyjście",
         "storage": "Magazyn",
         "exchange": "Wymiana"
+      }
+    },
+    "image_shape": {
+      "options": {
+        "poster": "Plakat",
+        "square": "Kwadrat",
+        "circle": "Koło"
       }
     }
   }
