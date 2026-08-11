@@ -45,6 +45,7 @@ from .const import (
     CONF_UNIT,
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_SCALE,
+    CONF_WIDGET_BATTERY_SORT,
     CONF_WIDGET_NAME,
     CONF_WIDGET_TEMPLATE,
     DEFAULT_MAX_VALUE,
@@ -58,6 +59,7 @@ from .const import (
     TIMER_STYLES,
     VALUE_SCALE_FRACTION,
     VALUE_SCALE_PERCENT,
+    WIDGET_BATTERY_SORT_KEYS,
     WIDGET_DATE_FLOOR_TS,
     WIDGET_DATE_HORIZON_DAYS,
     WIDGET_EXPIRED_TEXT_MAX,
@@ -644,6 +646,14 @@ def _map_battery(hass: HomeAssistant, config: dict) -> dict | None:
         return None
     content = _group_chrome(config)
     content["devices"] = devices
+    # The server reorders devices on write, so the ordering reaches every
+    # already-released app. Omitted when unset: merge-patch treats an absent key
+    # as "keep", and the setup POST replaces content wholesale, so turning the
+    # option back off clears it on the reload that follows the reconfigure.
+    # Copied per key so the module-level map is never handed out mutable.
+    sort = str(config.get(CONF_WIDGET_BATTERY_SORT, "") or "").strip()
+    if keys := WIDGET_BATTERY_SORT_KEYS.get(sort):
+        content["device_sort"] = [dict(key) for key in keys]
     return content
 
 

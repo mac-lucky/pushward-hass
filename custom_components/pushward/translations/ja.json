@@ -1801,7 +1801,8 @@
                 "icon_attribute": "アイコン属性",
                 "subtitle_timer_entity": "タイマーのエンティティ",
                 "subtitle_timer_attribute": "タイマーの属性",
-                "subtitle_timer_style": "タイマーのスタイル"
+                "subtitle_timer_style": "タイマーのスタイル",
+                "battery_sort": "デバイスの並び順"
               },
               "data_description": {
                 "label": "ウィジェットに表示される静的ラベル。空白のままにするとエンティティから取得します。",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "動的アイコン用のエンティティ属性。静的アイコンより優先されます。",
                 "subtitle_timer_entity": "このエンティティの日時を起点に、サブタイトルをリアルタイムのカウントダウン／カウントアップとして表示します。空欄ならウィジェット自身のエンティティを読みます。",
                 "subtitle_timer_attribute": "日時を保持する属性。空欄ならエンティティの状態を使います。",
-                "subtitle_timer_style": "timer は 01:23:45 のように刻み、relative は「2 分」のような粗い単位で表示します。"
+                "subtitle_timer_style": "timer は 01:23:45 のように刻み、relative は「2 分」のような粗い単位で表示します。",
+                "battery_sort": "デバイスを送信する順序です。小サイズのウィジェットは先頭 2 台、中サイズは先頭 4 台を表示するため、残量の少ない順に並べると注意が必要なデバイスが表示されたままになります。空欄なら上の行の並びをそのまま使います。"
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "ポスター",
         "square": "正方形",
         "circle": "円形"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "残量の少ない順",
+        "level_desc": "残量の多い順"
       }
     }
   }

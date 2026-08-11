@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Thuộc tính biểu tượng",
                 "subtitle_timer_entity": "Thực thể hẹn giờ",
                 "subtitle_timer_attribute": "Thuộc tính hẹn giờ",
-                "subtitle_timer_style": "Kiểu hẹn giờ"
+                "subtitle_timer_style": "Kiểu hẹn giờ",
+                "battery_sort": "Thứ tự thiết bị"
               },
               "data_description": {
                 "label": "Nhãn tĩnh hiển thị trên widget. Để trống để lấy từ thực thể.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Thuộc tính của thực thể cho biểu tượng động. Ghi đè biểu tượng tĩnh.",
                 "subtitle_timer_entity": "Hiển thị phụ đề dưới dạng đếm ngược hoặc đếm lên trực tiếp neo theo ngày của thực thể này. Để trống để đọc thực thể của chính widget.",
                 "subtitle_timer_attribute": "Thuộc tính chứa ngày. Để trống để dùng trạng thái của thực thể.",
-                "subtitle_timer_style": "Kiểu timer chạy như 01:23:45; kiểu tương đối hiển thị đơn vị thô như 2 phút."
+                "subtitle_timer_style": "Kiểu timer chạy như 01:23:45; kiểu tương đối hiển thị đơn vị thô như 2 phút.",
+                "battery_sort": "Thứ tự các thiết bị được gửi đi. Widget nhỏ hiển thị 2 thiết bị đầu tiên và widget vừa hiển thị 4 thiết bị đầu, nên sắp xếp theo pin thấp nhất giúp các thiết bị cần chú ý luôn hiển thị. Để trống để giữ nguyên thứ tự các hàng ở trên."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Áp phích",
         "square": "Vuông",
         "circle": "Tròn"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Pin thấp nhất trước",
+        "level_desc": "Pin cao nhất trước"
       }
     }
   }

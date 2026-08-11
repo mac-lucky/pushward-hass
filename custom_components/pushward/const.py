@@ -183,6 +183,11 @@ CONF_BATTERY_DEVICES = "battery_devices"
 CONF_NODE_NAME = "name"
 # Per-row binary entity whose "on" state overlays the charging bolt.
 CONF_CHARGING_ENTITY = "charging_entity"
+# Server-side ordering applied to the devices array before it is stored. Small
+# widgets render only the first 2 rows and medium the first 4, so "level_asc"
+# is what puts the emptiest devices where they are actually visible. Empty
+# keeps the configured row order.
+CONF_WIDGET_BATTERY_SORT = "battery_sort"
 
 # schedule template: names of the tracked entity's attributes carrying period
 # arrays (Nordpool-style raw_today / raw_tomorrow). Arrays are concatenated in the
@@ -362,6 +367,23 @@ WIDGET_EXPIRED_TEXT_MAX = 64
 # Shared by battery devices and flow nodes (server validateNodeChrome).
 WIDGET_NODE_NAME_MAX = 32
 WIDGET_NODE_ICON_MAX = 128
+
+# Battery device ordering. HA stores the fused dropdown value because a selector
+# cannot express a key list; widget_mapper assembles the wire shape, an array of
+# sort keys (mirror widget.go DeviceSortKey). "" means "keep the configured row
+# order", maps to no keys, and is never sent.
+WIDGET_BATTERY_SORT_KEYS = {
+    "level_asc": [{"field": "level", "direction": "asc"}],
+    "level_desc": [{"field": "level", "direction": "desc"}],
+}
+WIDGET_BATTERY_SORTS = ["", *WIDGET_BATTERY_SORT_KEYS]
+
+# device_sort bounds and vocabulary, for the contract assertions (server
+# maxDeviceSortKeys / validDeviceSortFields / validDeviceSortDirections). The
+# empty direction is accepted and read as ascending.
+WIDGET_MAX_DEVICE_SORT_KEYS = 2
+WIDGET_DEVICE_SORT_FIELDS = ["level", "name"]
+WIDGET_DEVICE_SORT_DIRECTIONS = ["", "asc", "desc"]
 
 # stale_after bounds (server WidgetStaleAfterMin / WidgetStaleAfterMax). Absent
 # means the widget is never demoted to stale.

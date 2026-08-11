@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Atributo de ícone",
                 "subtitle_timer_entity": "Entidade do temporizador",
                 "subtitle_timer_attribute": "Atributo do temporizador",
-                "subtitle_timer_style": "Estilo do temporizador"
+                "subtitle_timer_style": "Estilo do temporizador",
+                "battery_sort": "Ordem dos dispositivos"
               },
               "data_description": {
                 "label": "Rótulo estático mostrado no widget. Deixe vazio para derivar da entidade.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Atributo da entidade para um ícone dinâmico. Substitui o ícone estático.",
                 "subtitle_timer_entity": "Mostra o subtítulo como uma contagem regressiva ou progressiva ancorada na data desta entidade. Deixe vazio para ler a própria entidade do widget.",
                 "subtitle_timer_attribute": "Atributo com a data. Deixe vazio para usar o estado da entidade.",
-                "subtitle_timer_style": "O temporizador corre como 01:23:45; o relativo mostra unidades aproximadas como 2 min."
+                "subtitle_timer_style": "O temporizador corre como 01:23:45; o relativo mostra unidades aproximadas como 2 min.",
+                "battery_sort": "Ordem em que os dispositivos são enviados. Widgets pequenos mostram os 2 primeiros e os médios os 4 primeiros, então ordenar pela menor bateria mantém visíveis os dispositivos que precisam de atenção. Deixe vazio para manter a ordem das linhas acima."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Pôster",
         "square": "Quadrado",
         "circle": "Círculo"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Menor bateria primeiro",
+        "level_desc": "Maior bateria primeiro"
       }
     }
   }

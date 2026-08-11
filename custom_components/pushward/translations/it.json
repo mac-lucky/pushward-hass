@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Attributo icona",
                 "subtitle_timer_entity": "Entità del timer",
                 "subtitle_timer_attribute": "Attributo del timer",
-                "subtitle_timer_style": "Stile del timer"
+                "subtitle_timer_style": "Stile del timer",
+                "battery_sort": "Ordine dei dispositivi"
               },
               "data_description": {
                 "label": "Etichetta statica mostrata sul widget. Lascia vuoto per derivarla dall'entità.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Attributo dell'entità per un'icona dinamica. Ha la precedenza sull'icona statica.",
                 "subtitle_timer_entity": "Mostra il sottotitolo come conto alla rovescia o cronometro ancorato alla data di questa entità. Lascia vuoto per leggere l'entità del widget stesso.",
                 "subtitle_timer_attribute": "Attributo con la data. Lascia vuoto per usare lo stato dell'entità.",
-                "subtitle_timer_style": "Il timer scorre come 01:23:45; relativo mostra unità grossolane come 2 min."
+                "subtitle_timer_style": "Il timer scorre come 01:23:45; relativo mostra unità grossolane come 2 min.",
+                "battery_sort": "Ordine in cui i dispositivi vengono inviati. I widget piccoli mostrano i primi 2 e quelli medi i primi 4, quindi ordinare per batteria più bassa tiene in vista i dispositivi che richiedono attenzione. Lascia vuoto per mantenere l'ordine delle righe qui sopra."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Quadrato",
         "circle": "Cerchio"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Batteria più bassa prima",
+        "level_desc": "Batteria più alta prima"
       }
     }
   }

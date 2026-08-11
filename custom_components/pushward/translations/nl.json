@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Pictogram-attribuut",
                 "subtitle_timer_entity": "Timerentiteit",
                 "subtitle_timer_attribute": "Timerattribuut",
-                "subtitle_timer_style": "Timerstijl"
+                "subtitle_timer_style": "Timerstijl",
+                "battery_sort": "Apparaatvolgorde"
               },
               "data_description": {
                 "label": "Statisch label op de widget. Laat leeg om af te leiden van de entiteit.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Overschrijft het statische pictogram.",
                 "subtitle_timer_entity": "Toont de ondertitel als een lopende aftel- of optelteller vanaf de datum van deze entiteit. Laat leeg om de eigen entiteit van de widget te lezen.",
                 "subtitle_timer_attribute": "Attribuut met de datum. Laat leeg om de status van de entiteit te gebruiken.",
-                "subtitle_timer_style": "Timer tikt als 01:23:45; relatief toont grove eenheden zoals 2 min."
+                "subtitle_timer_style": "Timer tikt als 01:23:45; relatief toont grove eenheden zoals 2 min.",
+                "battery_sort": "Volgorde waarin de apparaten worden verzonden. Kleine widgets tonen de eerste 2 en middelgrote de eerste 4, dus sorteren op laagste batterijniveau houdt de apparaten zichtbaar die aandacht nodig hebben. Laat leeg om de volgorde van de rijen hierboven te behouden."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Vierkant",
         "circle": "Cirkel"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Laagste batterij eerst",
+        "level_desc": "Hoogste batterij eerst"
       }
     }
   }

@@ -73,9 +73,12 @@ from custom_components.pushward.const import (
     WARNING_THRESHOLD_MAX,
     WIDGET_DATE_FLOOR_TS,
     WIDGET_DATE_HORIZON_DAYS,
+    WIDGET_DEVICE_SORT_DIRECTIONS,
+    WIDGET_DEVICE_SORT_FIELDS,
     WIDGET_EXPIRED_TEXT_MAX,
     WIDGET_LABEL_MAX,
     WIDGET_MAX_BATTERY_DEVICES,
+    WIDGET_MAX_DEVICE_SORT_KEYS,
     WIDGET_MAX_FLOW_INPUTS,
     WIDGET_MAX_SCHEDULE_PERIODS,
     WIDGET_MAX_STAT_ROWS,
@@ -644,6 +647,27 @@ def _assert_widget_collections(content: dict, where: str) -> None:
             _check_node(device, f"devices[{i}]", where, require_name=True)
             _check_percent(device.get("level"), f"devices[{i}].level", where)
 
+    sort_keys = content.get("device_sort")
+    if sort_keys is not None:
+        if not isinstance(sort_keys, list):
+            _fail(where, f"device_sort must be a list, got {type(sort_keys).__name__}")
+        if len(sort_keys) > WIDGET_MAX_DEVICE_SORT_KEYS:
+            _fail(where, f"device_sort supports at most {WIDGET_MAX_DEVICE_SORT_KEYS} keys, got {len(sort_keys)}")
+        seen_sort_fields = set()
+        for i, key in enumerate(sort_keys):
+            if not isinstance(key, dict):
+                _fail(where, f"device_sort[{i}] must be an object, got {type(key).__name__}")
+            field = key.get("field")
+            if field not in WIDGET_DEVICE_SORT_FIELDS:
+                _fail(where, f"device_sort[{i}].field must be one of {WIDGET_DEVICE_SORT_FIELDS}, got {field!r}")
+            # An absent direction is read as ascending, so "" is a legal value.
+            direction = key.get("direction") or ""
+            if direction not in WIDGET_DEVICE_SORT_DIRECTIONS:
+                _fail(where, f"device_sort[{i}].direction must be one of asc/desc, got {direction!r}")
+            if field in seen_sort_fields:
+                _fail(where, f"device_sort[{i}].field duplicates an earlier key, got {field!r}")
+            seen_sort_fields.add(field)
+
     periods = content.get("periods")
     if periods is not None:
         if not isinstance(periods, list):
@@ -724,7 +748,6 @@ def assert_valid_widget_content(content: dict, template: str | None = None, *, w
     trend = content.get("trend") or ""
     if trend not in _TRENDS:
         _fail(where, f"widget trend must be one of up/down/flat, got {trend!r}")
-
     for field in ("accent_color", "background_color", "text_color"):
         _check_color(content.get(field), field, where)
     for field in ("tap_action", "url_action", "secondary_url_action"):

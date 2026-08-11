@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Atribut Ikon",
                 "subtitle_timer_entity": "Entitas timer",
                 "subtitle_timer_attribute": "Atribut timer",
-                "subtitle_timer_style": "Gaya timer"
+                "subtitle_timer_style": "Gaya timer",
+                "battery_sort": "Urutan perangkat"
               },
               "data_description": {
                 "label": "Label statis yang ditampilkan pada widget. Biarkan kosong untuk diturunkan dari entitas.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis.",
                 "subtitle_timer_entity": "Menampilkan subjudul sebagai hitung mundur atau hitung maju langsung berdasarkan tanggal entitas ini. Kosongkan untuk membaca entitas widget itu sendiri.",
                 "subtitle_timer_attribute": "Atribut yang memuat tanggal. Kosongkan untuk memakai status entitas.",
-                "subtitle_timer_style": "Timer berjalan seperti 01:23:45; relatif menampilkan satuan kasar seperti 2 mnt."
+                "subtitle_timer_style": "Timer berjalan seperti 01:23:45; relatif menampilkan satuan kasar seperti 2 mnt.",
+                "battery_sort": "Urutan pengiriman perangkat. Widget kecil menampilkan 2 perangkat pertama dan widget sedang 4 pertama, jadi mengurutkan dari baterai terendah membuat perangkat yang perlu perhatian tetap terlihat. Kosongkan untuk mempertahankan urutan baris di atas."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Persegi",
         "circle": "Lingkaran"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Baterai terendah dulu",
+        "level_desc": "Baterai tertinggi dulu"
       }
     }
   }

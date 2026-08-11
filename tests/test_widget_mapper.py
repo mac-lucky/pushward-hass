@@ -28,9 +28,11 @@ from custom_components.pushward.const import (
     CONF_UNIT,
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_SCALE,
+    CONF_WIDGET_BATTERY_SORT,
     CONF_WIDGET_TEMPLATE,
     VALUE_SCALE_FRACTION,
     VALUE_SCALE_PERCENT,
+    WIDGET_BATTERY_SORT_KEYS,
     WIDGET_GROUP_TEMPLATES,
     WIDGET_MAX_FLOW_INPUTS,
     WIDGET_MAX_SCHEDULE_PERIODS,
@@ -796,6 +798,80 @@ def test_battery_skips_unavailable_rows_and_clamps_level():
 
     assert [d["name"] for d in content["devices"]] == ["Overfull"]
     assert content["devices"][0]["level"] == 100.0
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_BATTERY)
+
+
+def test_battery_emits_sort_when_configured():
+    """The fused HA dropdown value becomes the server's array of sort keys.
+
+    A selector cannot express a key list, so the mapper assembles the wire shape
+    the same way _subtitle_timer does. The server does the reordering, which is
+    what makes this work on already-released apps: they render the stored array
+    as-is and slice a per-family prefix out of it.
+    """
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [
+                {"name": "Phone", "entity_id": "sensor.phone"},
+                {"name": "Watch", "entity_id": "sensor.watch"},
+            ],
+            CONF_WIDGET_BATTERY_SORT: "level_asc",
+        }
+    )
+    hass = _make_hass(
+        {
+            "sensor.phone": make_mock_state("64", entity_id="sensor.phone"),
+            "sensor.watch": make_mock_state("18", entity_id="sensor.watch"),
+        }
+    )
+
+    content = map_widget_content(hass, config)
+
+    assert content["device_sort"] == [{"field": "level", "direction": "asc"}]
+    # Row order is left exactly as configured - reordering is the server's job.
+    assert [d["name"] for d in content["devices"]] == ["Phone", "Watch"]
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_BATTERY)
+
+
+def test_battery_sort_keys_are_copied_per_call():
+    """The emitted keys must not alias the module-level map.
+
+    Mutating a shared dict would silently rewrite the mapping for every widget
+    on the next call.
+    """
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [{"name": "Phone", "entity_id": "sensor.phone"}],
+            CONF_WIDGET_BATTERY_SORT: "level_desc",
+        }
+    )
+    hass = _make_hass({"sensor.phone": make_mock_state("64", entity_id="sensor.phone")})
+
+    content = map_widget_content(hass, config)
+    content["device_sort"][0]["direction"] = "asc"
+
+    assert WIDGET_BATTERY_SORT_KEYS["level_desc"] == [{"field": "level", "direction": "desc"}]
+
+
+def test_battery_omits_sort_when_unset():
+    """Omitted, not empty - an empty array would still differ from an absent key.
+
+    See _map_battery: merge-patch reads an absent key as "keep", and the setup
+    POST replaces content wholesale, so unsetting the option clears it there.
+    """
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [{"name": "Phone", "entity_id": "sensor.phone"}],
+        }
+    )
+    hass = _make_hass({"sensor.phone": make_mock_state("64", entity_id="sensor.phone")})
+
+    content = map_widget_content(hass, config)
+
+    assert "device_sort" not in content
     assert_valid_widget_content(content, WIDGET_TEMPLATE_BATTERY)
 
 

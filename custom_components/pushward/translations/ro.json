@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Atribut pictogramă",
                 "subtitle_timer_entity": "Entitatea cronometrului",
                 "subtitle_timer_attribute": "Atributul cronometrului",
-                "subtitle_timer_style": "Stilul cronometrului"
+                "subtitle_timer_style": "Stilul cronometrului",
+                "battery_sort": "Ordinea dispozitivelor"
               },
               "data_description": {
                 "label": "Etichetă statică afișată pe widget. Lăsați gol pentru a o deriva din entitate.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Atributul entității pentru o pictogramă dinamică. Suprascrie pictograma statică.",
                 "subtitle_timer_entity": "Afișează subtitlul ca o numărătoare inversă sau progresivă ancorată pe data acestei entități. Lasă gol pentru a citi entitatea widgetului.",
                 "subtitle_timer_attribute": "Atributul care conține data. Lasă gol pentru a folosi starea entității.",
-                "subtitle_timer_style": "Cronometrul curge ca 01:23:45; relativ afișează unități aproximative, precum 2 min."
+                "subtitle_timer_style": "Cronometrul curge ca 01:23:45; relativ afișează unități aproximative, precum 2 min.",
+                "battery_sort": "Ordinea în care sunt trimise dispozitivele. Widgeturile mici arată primele 2 dispozitive, iar cele medii primele 4, așa că sortarea după bateria cea mai mică ține la vedere dispozitivele care au nevoie de atenție. Lasă gol pentru a păstra ordinea rândurilor de mai sus."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Pătrat",
         "circle": "Cerc"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Bateria cea mai mică prima",
+        "level_desc": "Bateria cea mai mare prima"
       }
     }
   }

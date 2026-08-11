@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Attribut d'icône",
                 "subtitle_timer_entity": "Entité du minuteur",
                 "subtitle_timer_attribute": "Attribut du minuteur",
-                "subtitle_timer_style": "Style du minuteur"
+                "subtitle_timer_style": "Style du minuteur",
+                "battery_sort": "Ordre des appareils"
               },
               "data_description": {
                 "label": "Libellé statique affiché sur le widget. Laisser vide pour le dériver de l'entité.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Attribut de l'entité pour une icône dynamique. Remplace l'icône statique.",
                 "subtitle_timer_entity": "Affiche le sous-titre comme un compte à rebours ou un chronomètre ancré sur la date de cette entité. Laissez vide pour lire l'entité du widget.",
                 "subtitle_timer_attribute": "Attribut portant la date. Laissez vide pour utiliser l'état de l'entité.",
-                "subtitle_timer_style": "Le minuteur égrène comme 01:23:45 ; le relatif affiche des unités grossières comme 2 min."
+                "subtitle_timer_style": "Le minuteur égrène comme 01:23:45 ; le relatif affiche des unités grossières comme 2 min.",
+                "battery_sort": "Ordre d'envoi des appareils. Les petits widgets affichent les 2 premiers et les moyens les 4 premiers ; trier par batterie la plus faible garde donc visibles les appareils qui demandent attention. Laissez vide pour conserver l'ordre des lignes ci-dessus."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Affiche",
         "square": "Carré",
         "circle": "Cercle"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Batterie la plus faible d'abord",
+        "level_desc": "Batterie la plus élevée d'abord"
       }
     }
   }

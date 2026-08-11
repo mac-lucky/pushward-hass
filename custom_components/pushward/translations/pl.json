@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Atrybut ikony",
                 "subtitle_timer_entity": "Encja minutnika",
                 "subtitle_timer_attribute": "Atrybut minutnika",
-                "subtitle_timer_style": "Styl minutnika"
+                "subtitle_timer_style": "Styl minutnika",
+                "battery_sort": "Kolejność urządzeń"
               },
               "data_description": {
                 "label": "Statyczna etykieta pokazywana na widżecie. Pozostaw puste, aby wyprowadzić z encji.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Atrybut encji dla dynamicznej ikony. Nadpisuje statyczną ikonę.",
                 "subtitle_timer_entity": "Pokazuje podtytuł jako żywe odliczanie w dół lub w górę zakotwiczone na dacie tej encji. Zostaw puste, aby użyć encji samego widżetu.",
                 "subtitle_timer_attribute": "Atrybut z datą. Zostaw puste, aby użyć stanu encji.",
-                "subtitle_timer_style": "Minutnik tyka jak 01:23:45; względny pokazuje przybliżone jednostki, np. 2 min."
+                "subtitle_timer_style": "Minutnik tyka jak 01:23:45; względny pokazuje przybliżone jednostki, np. 2 min.",
+                "battery_sort": "Kolejność, w jakiej urządzenia są wysyłane. Małe widżety pokazują 2 pierwsze, a średnie 4 pierwsze, więc sortowanie od najniższego poziomu baterii utrzymuje w widoku urządzenia wymagające uwagi. Zostaw puste, aby zachować kolejność wierszy powyżej."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Plakat",
         "square": "Kwadrat",
         "circle": "Koło"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Najniższy poziom baterii najpierw",
+        "level_desc": "Najwyższy poziom baterii najpierw"
       }
     }
   }

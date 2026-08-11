@@ -1801,7 +1801,8 @@
                 "icon_attribute": "图标属性",
                 "subtitle_timer_entity": "计时器实体",
                 "subtitle_timer_attribute": "计时器属性",
-                "subtitle_timer_style": "计时器样式"
+                "subtitle_timer_style": "计时器样式",
+                "battery_sort": "设备排序"
               },
               "data_description": {
                 "label": "显示在小组件上的静态标签。留空则从实体推导。",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "用于动态图标的实体属性。会覆盖静态图标。",
                 "subtitle_timer_entity": "将副标题渲染为以该实体日期为基准的实时倒计时或正计时。留空则读取小组件自身的实体。",
                 "subtitle_timer_attribute": "存放日期的属性。留空则使用实体状态。",
-                "subtitle_timer_style": "timer 按 01:23:45 走秒；relative 显示“2 分钟”这类粗略单位。"
+                "subtitle_timer_style": "timer 按 01:23:45 走秒；relative 显示“2 分钟”这类粗略单位。",
+                "battery_sort": "设备发送的顺序。小尺寸小组件显示前 2 个设备，中尺寸显示前 4 个，因此按电量从低到高排序可以让需要关注的设备保持可见。留空则保持上方各行的顺序。"
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "海报",
         "square": "正方形",
         "circle": "圆形"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "电量最低优先",
+        "level_desc": "电量最高优先"
       }
     }
   }

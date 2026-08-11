@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Icon Attribute",
                 "subtitle_timer_entity": "Timer Entity",
                 "subtitle_timer_attribute": "Timer Attribute",
-                "subtitle_timer_style": "Timer Style"
+                "subtitle_timer_style": "Timer Style",
+                "battery_sort": "Device Order"
               },
               "data_description": {
                 "label": "Static label shown on the widget. Leave empty to derive from the entity.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Entity attribute for a dynamic icon. Overrides the static icon.",
                 "subtitle_timer_entity": "Render the subtitle as a live countdown or count-up anchored on this entity's date. Leave empty to read the widget's own entity.",
                 "subtitle_timer_attribute": "Attribute holding the date. Leave empty to use the entity's state.",
-                "subtitle_timer_style": "Timer ticks like 01:23:45; relative shows coarse units like 2 min."
+                "subtitle_timer_style": "Timer ticks like 01:23:45; relative shows coarse units like 2 min.",
+                "battery_sort": "Order the devices are sent in. Small widgets show the first 2 and medium the first 4, so sorting by lowest battery keeps the devices that need attention visible. Leave empty to keep the order of the rows above."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Square",
         "circle": "Circle"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Lowest battery first",
+        "level_desc": "Highest battery first"
       }
     }
   }

@@ -145,6 +145,7 @@ from .const import (
     CONF_VALUE_ENTITY,
     CONF_VALUE_SCALE,
     CONF_WARNING_THRESHOLD,
+    CONF_WIDGET_BATTERY_SORT,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_STALE_AFTER,
@@ -211,6 +212,7 @@ from .const import (
     UPDATE_INTERVAL_MIN,
     VALUE_SCALES,
     WARNING_THRESHOLD_MAX,
+    WIDGET_BATTERY_SORTS,
     WIDGET_EXPIRED_TEXT_MAX,
     WIDGET_GROUP_TEMPLATES,
     WIDGET_LABEL_MAX,
@@ -616,6 +618,7 @@ WIDGET_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_SUBTITLE_TIMER_STYLE,
         CONF_ICON,
         CONF_ICON_ATTRIBUTE,
+        CONF_WIDGET_BATTERY_SORT,
     ),
     "colors": (
         CONF_ACCENT_COLOR,
@@ -2332,6 +2335,20 @@ def _widget_details_schema(
 
     if template == WIDGET_TEMPLATE_BATTERY:
         fields[_object_rows_key(CONF_BATTERY_DEVICES, d, required=True)] = _BATTERY_DEVICES_SELECTOR
+        # Small widgets show 2 of the rows above and medium 4, so ordering by
+        # level is what decides whether the ones running low are visible.
+        fields[
+            vol.Optional(
+                CONF_WIDGET_BATTERY_SORT,
+                default=d.get(CONF_WIDGET_BATTERY_SORT, ""),
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=WIDGET_BATTERY_SORTS,
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key="battery_sort",
+            )
+        )
 
     if template == WIDGET_TEMPLATE_SCHEDULE:
         stored_attrs = d.get(CONF_SCHEDULE_ATTRIBUTES)
@@ -2794,6 +2811,13 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     if value_scale not in VALUE_SCALES:
         value_scale = DEFAULT_VALUE_SCALE
 
+    # No `or ""` coalesce here, unlike the two blocks above: their default is
+    # non-empty, while "" is itself a member of WIDGET_BATTERY_SORTS, so a None
+    # falls through the allowlist check to the same place.
+    battery_sort = user_input.get(CONF_WIDGET_BATTERY_SORT)
+    if battery_sort not in WIDGET_BATTERY_SORTS:
+        battery_sort = ""
+
     tap_action_url = (user_input.get(CONF_TAP_ACTION_URL) or "").strip()
     tap_action_foreground = bool(user_input.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
     _raise_url_errors([(CONF_TAP_ACTION_URL, tap_action_url, tap_action_foreground)])
@@ -2817,6 +2841,7 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
         CONF_END_DATE_ATTRIBUTE: user_input.get(CONF_END_DATE_ATTRIBUTE, "") or "",
         CONF_EXPIRED_TEXT: user_input.get(CONF_EXPIRED_TEXT, "") or "",
         CONF_BATTERY_DEVICES: battery_devices,
+        CONF_WIDGET_BATTERY_SORT: battery_sort,
         CONF_SCHEDULE_ATTRIBUTES: _parse_csv(user_input.get(CONF_SCHEDULE_ATTRIBUTES, "") or ""),
         CONF_SCHEDULE_START_KEY: user_input.get(CONF_SCHEDULE_START_KEY, "") or DEFAULT_SCHEDULE_START_KEY,
         CONF_SCHEDULE_VALUE_KEY: user_input.get(CONF_SCHEDULE_VALUE_KEY, "") or DEFAULT_SCHEDULE_VALUE_KEY,

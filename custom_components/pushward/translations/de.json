@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Symbol-Attribut",
                 "subtitle_timer_entity": "Timer-Entität",
                 "subtitle_timer_attribute": "Timer-Attribut",
-                "subtitle_timer_style": "Timer-Stil"
+                "subtitle_timer_style": "Timer-Stil",
+                "battery_sort": "Gerätereihenfolge"
               },
               "data_description": {
                 "label": "Statische Beschriftung auf dem Widget. Leer lassen, um aus der Entität abzuleiten.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Entitätsattribut für ein dynamisches Symbol. Überschreibt das statische Symbol.",
                 "subtitle_timer_entity": "Zeigt den Untertitel als laufenden Countdown oder Zeitzähler ab dem Datum dieser Entität. Leer lassen, um die Entität des Widgets zu verwenden.",
                 "subtitle_timer_attribute": "Attribut mit dem Datum. Leer lassen, um den Zustand der Entität zu verwenden.",
-                "subtitle_timer_style": "Timer tickt wie 01:23:45; relativ zeigt grobe Einheiten wie 2 Min."
+                "subtitle_timer_style": "Timer tickt wie 01:23:45; relativ zeigt grobe Einheiten wie 2 Min.",
+                "battery_sort": "Reihenfolge, in der die Geräte gesendet werden. Kleine Widgets zeigen die ersten 2 und mittlere die ersten 4, deshalb hält eine Sortierung nach niedrigstem Ladestand die Geräte sichtbar, die Aufmerksamkeit brauchen. Leer lassen, um die Reihenfolge der Zeilen oben beizubehalten."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Quadrat",
         "circle": "Kreis"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Niedrigster Ladestand zuerst",
+        "level_desc": "Höchster Ladestand zuerst"
       }
     }
   }

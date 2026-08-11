@@ -42,6 +42,7 @@ from custom_components.pushward.const import (
     TEMPLATES,
     TIMER_STYLES,
     VALUE_SCALES,
+    WIDGET_BATTERY_SORTS,
     WIDGET_SEVERITIES,
     WIDGET_TEMPLATES,
     WIDGET_TRIGGER_MODES,
@@ -66,6 +67,7 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "value_scale": tuple(VALUE_SCALES),
     "widget_severity": tuple(s for s in WIDGET_SEVERITIES if s),
     "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
+    "battery_sort": tuple(s for s in WIDGET_BATTERY_SORTS if s),
     "named_color": tuple(NAMED_COLORS),
     "timer_style": tuple(TIMER_STYLES),
     "flow_slot": tuple(FLOW_SLOTS),
@@ -324,7 +326,7 @@ WIDGET_FROZEN_FIELDS: dict[str, set[str]] = {
     "stat_list": _WIDGET_COMMON | {"stat_rows"},
     "trend": _WIDGET_SINGLE | {"value_attribute", "unit", "history_period", "min_value", "max_value"},
     "countdown": _WIDGET_SINGLE | {"start_date_attribute", "end_date_attribute", "expired_text"},
-    "battery": _WIDGET_COMMON | {"battery_devices"},
+    "battery": _WIDGET_COMMON | {"battery_devices", "battery_sort"},
     "schedule": _WIDGET_SINGLE
     | {
         "unit",

@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Simge Özniteliği",
                 "subtitle_timer_entity": "Zamanlayıcı varlığı",
                 "subtitle_timer_attribute": "Zamanlayıcı özniteliği",
-                "subtitle_timer_style": "Zamanlayıcı stili"
+                "subtitle_timer_style": "Zamanlayıcı stili",
+                "battery_sort": "Cihaz sırası"
               },
               "data_description": {
                 "label": "Widget'ta gösterilen statik etiket. Varlıktan türetmek için boş bırakın.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Dinamik bir simge için varlık özniteliği. Statik simgeyi geçersiz kılar.",
                 "subtitle_timer_entity": "Alt başlığı bu varlığın tarihine dayanan canlı bir geri veya ileri sayım olarak gösterir. Widget'ın kendi varlığını okumak için boş bırakın.",
                 "subtitle_timer_attribute": "Tarihi taşıyan öznitelik. Varlığın durumunu kullanmak için boş bırakın.",
-                "subtitle_timer_style": "Zamanlayıcı 01:23:45 gibi ilerler; göreli stil 2 dk gibi kaba birimler gösterir."
+                "subtitle_timer_style": "Zamanlayıcı 01:23:45 gibi ilerler; göreli stil 2 dk gibi kaba birimler gösterir.",
+                "battery_sort": "Cihazların gönderilme sırası. Küçük widget'lar ilk 2, orta boy widget'lar ilk 4 cihazı gösterir; bu yüzden en düşük pil seviyesine göre sıralamak dikkat gerektiren cihazları görünür tutar. Yukarıdaki satırların sırasını korumak için boş bırakın."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Kare",
         "circle": "Daire"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Önce en düşük pil",
+        "level_desc": "Önce en yüksek pil"
       }
     }
   }

@@ -1801,7 +1801,8 @@
                 "icon_attribute": "Attribute ng Icon",
                 "subtitle_timer_entity": "Entity ng timer",
                 "subtitle_timer_attribute": "Attribute ng timer",
-                "subtitle_timer_style": "Estilo ng timer"
+                "subtitle_timer_style": "Estilo ng timer",
+                "battery_sort": "Ayos ng mga device"
               },
               "data_description": {
                 "label": "Static na label na ipinapakita sa widget. Iwanang blanko upang kunin mula sa entity.",
@@ -1811,7 +1812,8 @@
                 "icon_attribute": "Entity attribute para sa dynamic na icon. Ina-override ang static na icon.",
                 "subtitle_timer_entity": "Ipinapakita ang subtitle bilang live na countdown o count-up na nakaangkla sa petsa ng entity na ito. Iwanang blanko para basahin ang sariling entity ng widget.",
                 "subtitle_timer_attribute": "Attribute na naglalaman ng petsa. Iwanang blanko para gamitin ang state ng entity.",
-                "subtitle_timer_style": "Ang timer ay tumatakbo tulad ng 01:23:45; ang relative ay nagpapakita ng magaspang na yunit tulad ng 2 min."
+                "subtitle_timer_style": "Ang timer ay tumatakbo tulad ng 01:23:45; ang relative ay nagpapakita ng magaspang na yunit tulad ng 2 min.",
+                "battery_sort": "Ang pagkakasunod-sunod ng pagpapadala ng mga device. Ang maliliit na widget ay nagpapakita ng unang 2 at ang katamtaman ng unang 4, kaya ang pag-uuri mula sa pinakamababang baterya ang nagpapanatiling nakikita ang mga device na kailangan ng pansin. Iwanang blanko para panatilihin ang ayos ng mga hanay sa itaas."
               }
             },
             "colors": {
@@ -2010,6 +2012,12 @@
         "poster": "Poster",
         "square": "Parisukat",
         "circle": "Bilog"
+      }
+    },
+    "battery_sort": {
+      "options": {
+        "level_asc": "Pinakamababang baterya muna",
+        "level_desc": "Pinakamataas na baterya muna"
       }
     }
   }
