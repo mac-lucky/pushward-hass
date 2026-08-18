@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "تحديث النشاط (Media)",
+      "description": "تحديث Live Activity من نوع الوسائط في PushWard: بطاقة مشغّل عن بُعد مع صورة الغلاف وشريط تقدّم يتحرّك وأزرار تحكّم تستدعي خطاطيف الويب (webhooks) الخاصة بك.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "media_title": {
+          "name": "عنوان الوسائط",
+          "description": "المقطع أو الحلقة أو القناة المعروضة كسطر كبير في بطاقة المشغّل (128 حرفًا كحد أقصى). اسم النشاط هو الجهاز المصدر."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "الفنان أو البرنامج أو القناة المعروضة أسفل عنوان الوسائط."
+        },
+        "playback_state": {
+          "name": "حالة التشغيل",
+          "description": "playing أو paused أو stopped أو buffering. يتحرّك شريط التقدّم أثناء التشغيل فقط."
+        },
+        "position_seconds": {
+          "name": "الموضع",
+          "description": "موضع مؤشر التشغيل بالثواني لحظة أخذ العينة."
+        },
+        "duration_seconds": {
+          "name": "المدة",
+          "description": "الطول الكلي بالثواني (604800 كحد أقصى). اتركه فارغًا للبث المباشر: لا يُرسم شريط، لكن عدّاد الوقت المنقضي يستمر."
+        },
+        "position_at": {
+          "name": "وقت أخذ عينة الموضع",
+          "description": "طابع زمني Unix (بالثواني) لوقت أخذ عينة الموضع. الافتراضي هو الآن ويجب ألا يكون في المستقبل."
+        },
+        "volume": {
+          "name": "مستوى الصوت",
+          "description": "مستوى الصوت من 0.0 إلى 1.0، يُرسم كشريط رفيع بين زرّي الصوت."
+        },
+        "favorite": {
+          "name": "مفضّل",
+          "description": "يملأ زر القلب."
+        },
+        "controls": {
+          "name": "عناصر التحكّم",
+          "description": "أزرار التحكّم ككائن مفاتيحه هي الخانات: previous وplay_pause وplay وpause وnext وstop وfavorite وvolume_down وvolume_up، بالإضافة إلى extra (قائمة تضم حتى 3 أزرار مخصّصة لكلٍّ منها أيقونة). كل خانة هي url, title, icon, method, headers, body من دون مفتاح foreground على الإطلاق: عنوان http(s) هو دائمًا webhook صامت (POST افتراضيًا)، وعنوان بمخطط مخصّص يفتح ذلك التطبيق."
+        },
+        "image_url": {
+          "name": "رابط الصورة",
+          "description": "رابط https لصورة تظهر بجانب الأيقونة. يقوم iPhone بتنزيلها بنفسه، لذا يجب أن يكون الرابط متاحًا من الإنترنت؛ عنوان في الشبكة المحلية لن يُحمَّل، لكن ThumbHash الخاص به سيظهر."
+        },
+        "image_shape": {
+          "name": "شكل الصورة",
+          "description": "طريقة اقتصاص الصورة: poster يبقي اقتصاصًا طوليًا، وsquare هو الافتراضي، وcircle يقتصها دائرية."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash الصورة",
+          "description": "معاينة مضبّبة مضمّنة تُرسم عندما يتعذر تنزيل الرابط، وهي الطبقة الوحيدة التي تظهر لصورة على شبكتك المحلية. اتركه فارغًا ليُحسب تلقائيًا من الرابط، أو استخدم إجراء Generate ThumbHash لإنشائه من أي صورة يستطيع Home Assistant قراءتها."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: music.note، mdi:music)."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "ended_ttl": {
+          "name": "مدة البقاء بعد الإنهاء",
+          "description": "الثواني للاحتفاظ بالنشاط بعد إنهائه."
+        },
+        "stale_ttl": {
+          "name": "مدة البقاء قبل الإهمال",
+          "description": "الثواني قبل اعتبار النشاط قديماً."
+        },
+        "dismissal_ttl": {
+          "name": "TTL الإزالة",
+          "description": "عدد الثواني التي يبقى فيها النشاط المنتهي على شاشة القفل قبل إزالته. القيمة 0 تزيله فوراً عند الانتهاء."
+        }
+      }
+    },
     "create_activity": {
       "name": "إنشاء نشاط",
       "description": "إنشاء Live Activity جديد في PushWard.",
@@ -1913,7 +2023,8 @@
         "gauge": "مقياس",
         "timeline": "الجدول الزمني",
         "board": "لوحة",
-        "log": "سجل"
+        "log": "سجل",
+        "media": "وسائط"
       }
     },
     "severity": {

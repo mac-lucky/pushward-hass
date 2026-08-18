@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Cập Nhật Hoạt Động (Media)",
+      "description": "Cập nhật một Live Activity đa phương tiện của PushWard: thẻ trình phát từ xa với ảnh bìa, thanh tiến trình chạy và các nút điều khiển gọi tới webhook của riêng bạn.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Mã định danh slug của hoạt động."
+        },
+        "state": {
+          "name": "Trạng Thái",
+          "description": "Trạng thái hoạt động mong muốn."
+        },
+        "media_title": {
+          "name": "Tiêu Đề Phương Tiện",
+          "description": "Bài hát, tập hoặc kênh hiển thị ở dòng lớn của thẻ trình phát (tối đa 128 ký tự). Tên hoạt động là thiết bị nguồn."
+        },
+        "subtitle": {
+          "name": "Phụ Đề",
+          "description": "Nghệ sĩ, chương trình hoặc kênh hiển thị dưới tiêu đề phương tiện."
+        },
+        "playback_state": {
+          "name": "Trạng Thái Phát",
+          "description": "playing, paused, stopped hoặc buffering. Thanh tiến trình chỉ chạy khi playing."
+        },
+        "position_seconds": {
+          "name": "Vị Trí",
+          "description": "Vị trí phát tính bằng giây tại thời điểm lấy mẫu."
+        },
+        "duration_seconds": {
+          "name": "Thời Lượng",
+          "description": "Tổng độ dài tính bằng giây (tối đa 604800). Bỏ trống với luồng phát trực tiếp: không vẽ thanh, nhưng đồng hồ thời gian đã trôi qua vẫn chạy."
+        },
+        "position_at": {
+          "name": "Thời Điểm Lấy Mẫu Vị Trí",
+          "description": "Dấu thời gian Unix (giây) khi vị trí được lấy mẫu. Mặc định là bây giờ và không được ở tương lai."
+        },
+        "volume": {
+          "name": "Âm Lượng",
+          "description": "Mức âm lượng từ 0.0 đến 1.0, vẽ dưới dạng thanh mỏng giữa các nút âm lượng."
+        },
+        "favorite": {
+          "name": "Yêu Thích",
+          "description": "Tô đầy nút trái tim."
+        },
+        "controls": {
+          "name": "Điều Khiển",
+          "description": "Các nút điều khiển dưới dạng đối tượng với khóa là các vị trí: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, cùng extra (danh sách tối đa 3 nút tùy chỉnh, mỗi nút có một biểu tượng). Mỗi vị trí là url, title, icon, method, headers, body và không có khóa foreground: URL http(s) luôn là webhook im lặng (mặc định POST), còn URL có scheme tùy chỉnh sẽ mở ứng dụng đó."
+        },
+        "image_url": {
+          "name": "URL hình ảnh",
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+        },
+        "image_shape": {
+          "name": "Hình dạng ảnh",
+          "description": "Cách cắt ảnh: poster giữ khung dọc, square là mặc định, circle cắt tròn."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash của ảnh",
+          "description": "Bản xem trước mờ nhúng sẵn, được vẽ khi không tải được URL, và là lớp duy nhất hiển thị cho ảnh trong mạng nội bộ. Để trống để tự động tính từ URL, hoặc dùng hành động Generate ThumbHash để tạo từ bất kỳ ảnh nào Home Assistant đọc được."
+        },
+        "state_text": {
+          "name": "Văn Bản Trạng Thái",
+          "description": "Văn bản hiển thị làm trạng thái hoạt động."
+        },
+        "icon": {
+          "name": "Biểu Tượng",
+          "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Thông Báo Hoàn Thành",
+          "description": "Thông báo hiển thị khi hoạt động kết thúc."
+        },
+        "accent_color": {
+          "name": "Màu Nhấn",
+          "description": "Màu nhấn cho hoạt động. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "background_color": {
+          "name": "Màu Nền",
+          "description": "Màu nền Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "text_color": {
+          "name": "Màu Chữ",
+          "description": "Màu chữ Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "sound": {
+          "name": "Âm Thanh",
+          "description": "Tên âm thanh thông báo cho bản cập nhật. Để trống để dùng âm thanh hệ thống iOS."
+        },
+        "priority": {
+          "name": "Ưu tiên ghi đè",
+          "description": "Mức ưu tiên cho từng lần cập nhật (0-10). Chỉ ghi đè mức ưu tiên đã cấu hình của hoạt động cho lần đẩy này."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
+        }
+      }
+    },
     "create_activity": {
       "name": "Tạo Hoạt Động",
       "description": "Tạo PushWard Live Activity mới.",
@@ -1913,7 +2023,8 @@
         "gauge": "Đồng hồ đo",
         "timeline": "Dòng thời gian",
         "board": "Bảng",
-        "log": "Nhật ký"
+        "log": "Nhật ký",
+        "media": "Phương tiện"
       }
     },
     "severity": {

@@ -52,10 +52,16 @@ from custom_components.pushward.const import (
     MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_LEN,
     MAX_URL_LEN,
+    MEDIA_CONTROL_SLOTS,
+    MEDIA_DURATION_MAX,
+    MEDIA_EXTRA_CONTROLS_MAX,
+    MEDIA_TITLE_MAX,
+    PLAYBACK_STATES,
     PRIORITY_MAX,
     PRIORITY_MIN,
     SCALES,
     SCHEDULE_LEVELS,
+    SERVICE_TEMPLATES,
     SEVERITIES,
     SNOOZE_SECONDS_MAX,
     SNOOZE_SECONDS_MIN,
@@ -63,7 +69,6 @@ from custom_components.pushward.const import (
     STEP_LABEL_MAX,
     STEP_ROW_MAX,
     STEP_ROW_MIN,
-    TEMPLATES,
     THRESHOLD_LABEL_MAX,
     THRESHOLDS_MAX,
     TIMELINE_MAX_SERIES,
@@ -122,7 +127,18 @@ MAX_CLOCK_SKEW = 5 * 60
 # The caps these two gates enforce are imported above, so a limit still has exactly
 # one definition; only the template allowlists are written out again.
 LIVE_PROGRESS_TEMPLATES = ("generic", "steps")
-IMAGE_TEMPLATES = ("generic", "steps")
+IMAGE_TEMPLATES = ("generic", "steps", "media")
+# The media-only content fields; the server 422s them on every other template.
+MEDIA_FIELDS = (
+    "media_title",
+    "playback_state",
+    "position_seconds",
+    "duration_seconds",
+    "position_at",
+    "volume",
+    "favorite",
+    "controls",
+)
 
 # Padded standard-alphabet base64 - the only form Swift's Data(base64Encoded:) reads.
 _THUMBHASH_B64_RE = re.compile(r"[A-Za-z0-9+/]+={0,2}")
@@ -212,8 +228,8 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
         _fail(where, f"content must be a dict, got {type(content).__name__}")
 
     template = content.get("template")
-    if template not in TEMPLATES:
-        _fail(where, f"template {template!r} is not one of {TEMPLATES}")
+    if template not in SERVICE_TEMPLATES:
+        _fail(where, f"template {template!r} is not one of {SERVICE_TEMPLATES}")
 
     progress = content.get("progress", 0.0)
     if not _is_finite_number(progress) or not (0.0 <= float(progress) <= 1.0):
@@ -245,6 +261,8 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     # the per-template asserts below only run for the two templates that accept it,
     # so a mapper leaking image_url onto alert would pass and then 422 in production.
     _assert_image(content, where, template)
+    # And again for the media fields: media_title on a generic card is a 422, not a no-op.
+    _assert_media(content, where, template)
 
     if template == "generic":
         _assert_generic(content, where)
@@ -314,6 +332,79 @@ def _assert_image(content: dict, where: str, template: str) -> None:
         base64.b64decode(thumbhash, validate=True)
     except (binascii.Error, ValueError):
         _fail(where, f"image_thumbhash must be padded standard-alphabet base64, got {thumbhash!r}")
+
+
+def _check_media_control(action: object, field: str, where: str) -> None:
+    """One media control slot: a tap action that, on http(s), is a silent webhook.
+
+    The server runs the shared tap-action rules and then rejects foreground on an
+    http(s) control (it would open Safari on top of the player on every skip);
+    custom schemes open that app and foreground is left alone there.
+    """
+    if action is None:
+        return
+    _check_tap_action(action, field, where)
+    scheme = urlparse(str(action.get("url", ""))).scheme.lower()
+    if scheme in _HTTP_SCHEMES and action.get("foreground") is True:
+        _fail(where, f"{field}: media controls are always silent webhooks; foreground is not allowed")
+
+
+def _assert_media(content: dict, where: str, template: str) -> None:
+    """The media template's fields: media only, bounded, and controls as silent webhooks."""
+    # "" counts as absent, as it does for the image trio (a cleared field is not a leak).
+    present = [f for f in MEDIA_FIELDS if content.get(f) not in (None, "")]
+    if template != "media":
+        if present:
+            _fail(where, f"{present} are only supported by the 'media' template, got {template!r}")
+        return
+
+    _check_len(content.get("media_title"), MEDIA_TITLE_MAX, "media_title", where)
+    state = content.get("playback_state")
+    if state not in (None, "") and state not in PLAYBACK_STATES:
+        _fail(where, f"playback_state must be one of {list(PLAYBACK_STATES)}, got {state!r}")
+    position = content.get("position_seconds")
+    if position is not None and (not _is_finite_number(position) or float(position) < 0):
+        _fail(where, f"position_seconds must be a finite number >= 0, got {position!r}")
+    duration = content.get("duration_seconds")
+    if duration is not None and (not _is_finite_number(duration) or not (0 < float(duration) <= MEDIA_DURATION_MAX)):
+        _fail(where, f"duration_seconds must be a finite number in (0, {MEDIA_DURATION_MAX}], got {duration!r}")
+    position_at = content.get("position_at")
+    if position_at is not None:
+        if not _is_int(position_at) or position_at <= 0:
+            _fail(where, f"position_at must be a positive unix timestamp, got {position_at!r}")
+        if position_at > _now() + MAX_CLOCK_SKEW:
+            _fail(where, f"position_at must not be in the future, got {position_at}")
+    volume = content.get("volume")
+    if volume is not None and (not _is_finite_number(volume) or not (0.0 <= float(volume) <= 1.0)):
+        _fail(where, f"volume must be a finite number in [0.0, 1.0], got {volume!r}")
+    favorite = content.get("favorite")
+    if favorite is not None and not isinstance(favorite, bool):
+        _fail(where, f"favorite must be a bool, got {favorite!r}")
+
+    controls = content.get("controls")
+    if controls is None:
+        return
+    if not isinstance(controls, dict):
+        _fail(where, f"controls must be an object, got {type(controls).__name__}")
+    unknown = sorted(set(controls) - set(MEDIA_CONTROL_SLOTS) - {"extra"})
+    if unknown:
+        _fail(where, f"controls has unknown slot(s) {unknown}")
+    for slot in MEDIA_CONTROL_SLOTS:
+        _check_media_control(controls.get(slot), f"controls.{slot}", where)
+    extra = controls.get("extra")
+    if extra is None:
+        return
+    if not isinstance(extra, list):
+        _fail(where, f"controls.extra must be a list, got {type(extra).__name__}")
+    if len(extra) > MEDIA_EXTRA_CONTROLS_MAX:
+        _fail(where, f"controls.extra supports at most {MEDIA_EXTRA_CONTROLS_MAX} buttons, got {len(extra)}")
+    for i, action in enumerate(extra):
+        field = f"controls.extra[{i}]"
+        if not isinstance(action, dict):
+            _fail(where, f"{field} must be an object, got {type(action).__name__}")
+        _check_media_control(action, field, where)
+        if not action.get("icon"):
+            _fail(where, f"{field}.icon is required")
 
 
 def _assert_live_progress(content: dict, where: str, template: str) -> None:

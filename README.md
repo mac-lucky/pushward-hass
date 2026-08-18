@@ -63,7 +63,9 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 ## Features
 
 - **Track any HA entity** as a PushWard Live Activity (Dynamic Island + Lock Screen)
-- **8 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log
+- **9 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log, media
+  (media is service-only for now: drive it from `pushward.update_activity_media`; a tracked
+  `media_player` mapping comes next)
 - **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
@@ -140,6 +142,10 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | `timeline` | Sparkline chart, up to 10 named series from attributes or separate entities |
 | `board` | 1-4 tiles, each showing a value from a **separate** entity |
 | `log` | Newest-first list of log lines (up to 20), one per state change |
+
+The ninth template, `media` (a remote player card with cover art, a ticking scrubber and
+transport buttons), is not in this picker yet. It is available through the
+`pushward.update_activity_media` action; a tracked `media_player` mapping comes next.
 
 **Step 2** configures the details (fields vary by template).
 
@@ -392,7 +398,7 @@ On premium, uncapped resources report `limit: unlimited`, and the notifications 
 
 ## Services
 
-All services live in the `pushward` domain. There are 17 in total: the nine below plus a per-template `update_activity_<template>` for each of the 8 activity templates (and the deprecated `update_activity` alias).
+All services live in the `pushward` domain. There are 18 in total: the nine below plus a per-template `update_activity_<template>` for each of the 9 activity templates (and the deprecated `update_activity` alias).
 
 ### `pushward.create_activity`
 
@@ -412,8 +418,8 @@ Create a new activity.
 Push a content update to an existing activity. There is **one action per template**:
 `update_activity_generic`, `update_activity_countdown`, `update_activity_steps`,
 `update_activity_alert`, `update_activity_gauge`, `update_activity_timeline`,
-`update_activity_board`, `update_activity_log`, so the UI shows only the fields that template
-supports (Home Assistant cannot hide service fields based on another field's value, so a single
+`update_activity_board`, `update_activity_log`, `update_activity_media`, so the UI shows only
+the fields that template supports (Home Assistant cannot hide service fields based on another field's value, so a single
 action with collapsed sections would always surface every template's fields). The template is
 implied by the action name; you no longer pass a `template` field.
 
@@ -458,14 +464,16 @@ implied by the action name; you no longer pass a `template` field.
 | `update_activity_timeline` | `value`, `unit`, `units`, `scale`, `decimals`, `smoothing`, `thresholds`, `history` |
 | `update_activity_board` | `tiles` |
 | `update_activity_log` | `lines` |
+| `update_activity_media` | `media_title` (max 128), `playback_state`, `position_seconds`, `duration_seconds`, `position_at`, `volume`, `favorite`, `controls`, `image_url`, `image_shape`, `image_thumbhash` |
 
-> **`board` / `log` use a lean schema.** They render no progress bar and no whole-activity
-> button slots, so `update_activity_board` and `update_activity_log` accept only the labels
-> (`state_text`, `subtitle`, `icon`), appearance (`completion_message`, the colors, `sound`,
-> `priority`, the TTLs `ended_ttl`/`stale_ttl`/`dismissal_ttl`), the whole-activity `tap_action`, and their template field
-> (`tiles` / `lines`), **not** `progress`, `remaining_time`, `url`, `secondary_url`,
-> `url_action`, or `secondary_url_action` (board tap targets are per-tile via each tile's
-> `url_action`). `tiles` is a list of 1-4 objects
+> **`board` / `log` / `media` use a lean schema.** They render no progress bar and no
+> whole-activity button slots, so `update_activity_board`, `update_activity_log` and
+> `update_activity_media` accept only the labels (`state_text`, `subtitle`, `icon`), appearance
+> (`completion_message`, the colors, `sound`, `priority`, the TTLs
+> `ended_ttl`/`stale_ttl`/`dismissal_ttl`), the whole-activity `tap_action`, and their template
+> fields (`tiles` / `lines` / the media fields), **not** `progress`, `remaining_time`, `url`,
+> `secondary_url`, `url_action`, or `secondary_url_action` (board tap targets are per-tile via
+> each tile's `url_action`; media buttons live in `controls`). `tiles` is a list of 1-4 objects
 > `{ label, value, unit?, icon?, color?, trend?, url_action? }` (`value` is a string max 16
 > chars). `lines` is a list of 1-20 newest-first objects `{ text, at?, level? }` where `level`
 > is `info`/`warn`/`error`.
@@ -482,10 +490,43 @@ implied by the action name; you no longer pass a `template` field.
 > the finish time using the remaining-time source; on steps it fills the current step rather
 > than the whole run. It needs a remaining-time entity or attribute to anchor the ETA.
 
+> **`media`** is a remote player card: `media_title` is the big line (the activity name is the
+> source device, `subtitle` the artist or show), `playback_state` is `playing` / `paused` /
+> `stopped` / `buffering`, and the scrubber ticks on the phone from `position_seconds` as
+> sampled at `position_at` (unix seconds, defaults to now) while playing. Leave
+> `duration_seconds` (max 604800) out for a live stream. `volume` (0.0-1.0) draws a level bar
+> and `favorite` fills the heart. `controls` is an object keyed by slot: `previous`,
+> `play_pause`, `play`, `pause`, `next`, `stop`, `favorite`, `volume_down`, `volume_up`, plus
+> `extra` (a list of up to 3 custom buttons, each with an `icon`). Every slot is an
+> [action object](#action-objects) with no `foreground` key at all: an `http(s)` control is
+> always a silent webhook (`POST` when no `method` is given), and a custom-scheme URL opens
+> that app. A slot set to `null` removes that button again (`controls: null` removes them all;
+> the server merges the object). Send `play` and `pause` separately or one `play_pause`
+> toggle; the phone picks by `playback_state`. The phone needs PushWard 1.9.0 or newer to
+> render the card (older builds show a generic card).
+>
+> ```yaml
+> - action: pushward.update_activity_media
+>   data:
+>     slug: living-room-player
+>     state: ongoing
+>     media_title: Snooze
+>     subtitle: SZA
+>     playback_state: playing
+>     position_seconds: 47.5
+>     duration_seconds: 214
+>     image_url: https://example.com/cover.jpg
+>     controls:
+>       previous: { url: "https://ha.example.com/api/webhook/pw-prev" }
+>       play_pause: { url: "https://ha.example.com/api/webhook/pw-toggle" }
+>       next: { url: "https://ha.example.com/api/webhook/pw-next" }
+> ```
+
 #### Activity images
 
-`generic` and `steps` can show a picture beside the icon. The server rejects the image fields
-on every other template, so the per-template actions only expose them on those two.
+`generic`, `steps` and `media` can show a picture beside the icon (on `media` it is the cover
+art). The server rejects the image fields on every other template, so the per-template actions
+only expose them on those three.
 
 | Field | Description |
 |-------|-------------|

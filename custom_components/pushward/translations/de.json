@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Live Activity aktualisieren (Media)",
+      "description": "Eine PushWard-Media-Live-Activity aktualisieren: eine Fernbedienungs-Player-Karte mit Cover, laufendem Fortschrittsbalken und Transport-Buttons, die deine eigenen Webhooks aufrufen.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-Kennung der Live Activity."
+        },
+        "state": {
+          "name": "Zustand",
+          "description": "Gewünschter Zustand der Live Activity."
+        },
+        "media_title": {
+          "name": "Medientitel",
+          "description": "Titel, Folge oder Sender, angezeigt als große Zeile der Player-Karte (max. 128 Zeichen). Der Name der Live Activity ist das Quellgerät."
+        },
+        "subtitle": {
+          "name": "Untertitel",
+          "description": "Interpret, Sendung oder Sender, angezeigt unter dem Medientitel."
+        },
+        "playback_state": {
+          "name": "Wiedergabestatus",
+          "description": "playing, paused, stopped oder buffering. Der Fortschrittsbalken läuft nur bei playing."
+        },
+        "position_seconds": {
+          "name": "Position",
+          "description": "Abspielposition in Sekunden zum Zeitpunkt der Messung."
+        },
+        "duration_seconds": {
+          "name": "Dauer",
+          "description": "Gesamtlänge in Sekunden (max. 604800). Für einen Livestream weglassen: es wird kein Balken gezeichnet, die verstrichene Zeit läuft aber weiter."
+        },
+        "position_at": {
+          "name": "Zeitpunkt der Positionsmessung",
+          "description": "Unix-Zeitstempel (Sekunden), zu dem die Position gemessen wurde. Standard ist jetzt; darf nicht in der Zukunft liegen."
+        },
+        "volume": {
+          "name": "Lautstärke",
+          "description": "Lautstärke von 0.0 bis 1.0, gezeichnet als dünner Balken zwischen den Lautstärke-Buttons."
+        },
+        "favorite": {
+          "name": "Favorit",
+          "description": "Füllt den Herz-Button aus."
+        },
+        "controls": {
+          "name": "Steuerung",
+          "description": "Transport-Buttons als Objekt mit den Slots als Schlüssel: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up sowie extra (eine Liste von bis zu 3 eigenen Buttons, jeder mit Icon). Jeder Slot ist url, title, icon, method, headers, body ohne jeden foreground-Schlüssel: eine http(s)-URL ist immer ein stiller Webhook (standardmäßig POST), eine URL mit eigenem Schema öffnet diese App."
+        },
+        "image_url": {
+          "name": "Bild-URL",
+          "description": "https-Adresse eines Bildes, das neben dem Symbol angezeigt wird. Das iPhone lädt es selbst herunter, die Adresse muss also aus dem Internet erreichbar sein; eine Adresse im lokalen Netzwerk lädt nicht, ihr ThumbHash aber schon."
+        },
+        "image_shape": {
+          "name": "Bildform",
+          "description": "Zuschnitt des Bildes: poster behält einen hochformatigen Ausschnitt, square ist die Voreinstellung, circle schneidet rund zu."
+        },
+        "image_thumbhash": {
+          "name": "Bild-ThumbHash",
+          "description": "Unscharfe eingebettete Vorschau, die gezeichnet wird, wenn die URL nicht abrufbar ist, und die einzige Stufe, die ein Bild aus dem lokalen Netzwerk überhaupt anzeigt. Leer lassen, damit sie automatisch aus der URL berechnet wird, oder mit der Aktion Generate ThumbHash aus jedem Bild erzeugen, das Home Assistant lesen kann."
+        },
+        "state_text": {
+          "name": "Zustandstext",
+          "description": "Als Zustand angezeigter Text."
+        },
+        "icon": {
+          "name": "Symbol",
+          "description": "Name eines SF Symbols oder MDI-Symbols (z. B. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Abschlussnachricht",
+          "description": "Nachricht, die beim Beenden der Live Activity angezeigt wird."
+        },
+        "accent_color": {
+          "name": "Akzentfarbe",
+          "description": "Akzentfarbe für die Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "background_color": {
+          "name": "Hintergrundfarbe",
+          "description": "Hintergrundfarbe der Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "text_color": {
+          "name": "Textfarbe",
+          "description": "Textfarbe der Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "sound": {
+          "name": "Ton",
+          "description": "Benachrichtigungston, der bei diesem Update auf dem Gerät abgespielt wird."
+        },
+        "priority": {
+          "name": "Priorität überschreiben",
+          "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "ended_ttl": {
+          "name": "TTL nach Beendigung",
+          "description": "Sekunden, die die Live Activity nach dem Beenden erhalten bleibt."
+        },
+        "stale_ttl": {
+          "name": "TTL bei Inaktivität",
+          "description": "Sekunden, bevor die Live Activity als veraltet gilt."
+        },
+        "dismissal_ttl": {
+          "name": "TTL für Entfernung",
+          "description": "Sekunden, die die beendete Aktivität auf dem Sperrbildschirm verbleibt, bevor sie entfernt wird. 0 entfernt sie sofort bei Ende."
+        }
+      }
+    },
     "create_activity": {
       "name": "Live Activity erstellen",
       "description": "Eine neue PushWard Live Activity erstellen.",
@@ -1913,7 +2023,8 @@
         "gauge": "Messanzeige",
         "timeline": "Zeitverlauf",
         "board": "Tafel",
-        "log": "Protokoll"
+        "log": "Protokoll",
+        "media": "Medien"
       }
     },
     "severity": {

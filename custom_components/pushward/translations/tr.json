@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Aktiviteyi Güncelle (Media)",
+      "description": "Bir PushWard medya Live Activity'sini güncelle: kapak resmi, ilerleyen bir ilerleme çubuğu ve kendi webhook'larınızı çağıran taşıma düğmeleri olan bir uzak oynatıcı kartı.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "media_title": {
+          "name": "Medya Başlığı",
+          "description": "Oynatıcı kartının büyük satırı olarak gösterilen parça, bölüm veya kanal (en fazla 128 karakter). Aktivite adı kaynak cihazdır."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Medya başlığının altında gösterilen sanatçı, program veya kanal."
+        },
+        "playback_state": {
+          "name": "Oynatma Durumu",
+          "description": "playing, paused, stopped veya buffering. İlerleme çubuğu yalnızca playing durumunda ilerler."
+        },
+        "position_seconds": {
+          "name": "Konum",
+          "description": "Örneklendiği andaki oynatma konumu, saniye cinsinden."
+        },
+        "duration_seconds": {
+          "name": "Süre",
+          "description": "Toplam uzunluk, saniye cinsinden (en fazla 604800). Canlı yayın için boş bırakın: çubuk çizilmez ama geçen süre saati çalışmaya devam eder."
+        },
+        "position_at": {
+          "name": "Konum Örnekleme Zamanı",
+          "description": "Konumun örneklendiği Unix zaman damgası (saniye). Varsayılan şimdidir ve gelecekte olamaz."
+        },
+        "volume": {
+          "name": "Ses Düzeyi",
+          "description": "0.0 ile 1.0 arasında ses düzeyi, ses düğmelerinin arasında ince bir çubuk olarak çizilir."
+        },
+        "favorite": {
+          "name": "Favori",
+          "description": "Kalp düğmesini doldurur."
+        },
+        "controls": {
+          "name": "Kontroller",
+          "description": "Yuvaları anahtar olarak kullanan bir nesne biçiminde taşıma düğmeleri: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up ve extra (her biri simgeli en fazla 3 özel düğme listesi). Her yuva url, title, icon, method, headers, body biçimindedir ve foreground anahtarı yoktur: bir http(s) URL'si her zaman sessiz bir webhook'tur (varsayılan POST), özel şemalı bir URL ise o uygulamayı açar."
+        },
+        "image_url": {
+          "name": "Görsel URL'si",
+          "description": "Simgenin yanında gösterilen görselin https adresi. iPhone bunu kendisi indirir, bu yüzden internetten erişilebilir olmalıdır; yerel ağdaki bir adres yüklenmez, ancak ThumbHash'i yüklenir."
+        },
+        "image_shape": {
+          "name": "Görsel biçimi",
+          "description": "Görselin nasıl kırpılacağı: poster dikey bir kırpma bırakır, square varsayılandır, circle yuvarlak kırpar."
+        },
+        "image_thumbhash": {
+          "name": "Görsel ThumbHash'i",
+          "description": "URL indirilemediğinde çizilen bulanık gömülü önizleme; yerel ağdaki bir görsel için görüntülenen tek katman budur. Otomatik olarak URL'den hesaplanması için boş bırakın veya Home Assistant'ın okuyabildiği herhangi bir görselden üretmek için Generate ThumbHash eylemini kullanın."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Bu güncelleme için cihazda çalınan bildirim sesi."
+        },
+        "priority": {
+          "name": "Öncelik Geçersiz Kılma",
+          "description": "Güncelleme başına öncelik (0–10). Yalnızca bu push için aktivitenin yapılandırılmış önceliğini geçersiz kılar."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
+        }
+      }
+    },
     "create_activity": {
       "name": "Aktivite Oluştur",
       "description": "Yeni bir PushWard Live Activity oluştur.",
@@ -1913,7 +2023,8 @@
         "gauge": "Gösterge",
         "timeline": "Zaman çizelgesi",
         "board": "Pano",
-        "log": "Günlük"
+        "log": "Günlük",
+        "media": "Medya"
       }
     },
     "severity": {

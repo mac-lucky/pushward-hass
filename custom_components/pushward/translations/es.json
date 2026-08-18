@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Actualizar actividad (Media)",
+      "description": "Actualizar una Live Activity de medios de PushWard: una tarjeta de reproductor remoto con carátula, una barra de progreso en movimiento y botones de transporte que llaman a tus propios webhooks.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug de la actividad."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de actividad deseado."
+        },
+        "media_title": {
+          "name": "Título del medio",
+          "description": "Pista, episodio o canal mostrado como línea principal de la tarjeta del reproductor (máx. 128 caracteres). El nombre de la actividad es el dispositivo de origen."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Artista, programa o canal mostrado bajo el título del medio."
+        },
+        "playback_state": {
+          "name": "Estado de reproducción",
+          "description": "playing, paused, stopped o buffering. La barra de progreso solo avanza durante playing."
+        },
+        "position_seconds": {
+          "name": "Posición",
+          "description": "Posición del cabezal de reproducción en segundos en el momento de la muestra."
+        },
+        "duration_seconds": {
+          "name": "Duración",
+          "description": "Duración total en segundos (máx. 604800). Omítela para una emisión en directo: no se dibuja la barra, pero el reloj de tiempo transcurrido sigue corriendo."
+        },
+        "position_at": {
+          "name": "Momento de la muestra de posición",
+          "description": "Marca de tiempo Unix (segundos) de cuándo se tomó la posición. Por defecto es ahora y no puede estar en el futuro."
+        },
+        "volume": {
+          "name": "Volumen",
+          "description": "Nivel de volumen de 0.0 a 1.0, dibujado como una barra fina entre los botones de volumen."
+        },
+        "favorite": {
+          "name": "Favorito",
+          "description": "Rellena el botón de corazón."
+        },
+        "controls": {
+          "name": "Controles",
+          "description": "Botones de transporte como objeto con las ranuras como claves: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, más extra (una lista de hasta 3 botones personalizados, cada uno con icono). Cada ranura es url, title, icon, method, headers, body sin ninguna clave foreground: una URL http(s) es siempre un webhook silencioso (POST por defecto) y una URL con esquema personalizado abre esa app."
+        },
+        "image_url": {
+          "name": "URL de la imagen",
+          "description": "URL https de una imagen mostrada junto al icono. El iPhone la descarga por su cuenta, así que debe ser accesible desde internet; una dirección de la red local no cargará, pero su ThumbHash sí."
+        },
+        "image_shape": {
+          "name": "Forma de la imagen",
+          "description": "Cómo se recorta la imagen: poster mantiene un recorte vertical, square es el valor predeterminado y circle la recorta en redondo."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash de la imagen",
+          "description": "Vista previa difuminada incrustada que se dibuja cuando no se puede descargar la URL, y la única capa que se muestra para una imagen de tu red local. Déjalo vacío para calcularlo automáticamente a partir de la URL, o usa la acción Generate ThumbHash para crearlo desde cualquier imagen que Home Assistant pueda leer."
+        },
+        "state_text": {
+          "name": "Texto de estado",
+          "description": "Texto mostrado como estado de la actividad."
+        },
+        "icon": {
+          "name": "Icono",
+          "description": "Nombre de icono SF Symbol o MDI (p. ej. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Mensaje de finalización",
+          "description": "Mensaje mostrado cuando la actividad finaliza."
+        },
+        "accent_color": {
+          "name": "Color de acento",
+          "description": "Color de acento para la actividad. Hexadecimal (#RRGGBB) o nombre de color."
+        },
+        "background_color": {
+          "name": "Color de fondo",
+          "description": "Color de fondo de la Live Activity. Hexadecimal (#RRGGBB) o nombre de color."
+        },
+        "text_color": {
+          "name": "Color del texto",
+          "description": "Color del texto de la Live Activity. Hexadecimal (#RRGGBB) o nombre de color."
+        },
+        "tap_action": {
+          "name": "Acción al tocar",
+          "description": "Destino al tocar toda la actividad, como objeto: url (obligatorio), foreground opcional y, para una url http(s), un webhook silencioso mediante method/headers/body."
+        },
+        "sound": {
+          "name": "Sonido",
+          "description": "Sonido de notificación que se reproduce en el dispositivo con esta actualización."
+        },
+        "priority": {
+          "name": "Prioridad puntual",
+          "description": "Prioridad por actualización (0-10). Anula la prioridad configurada de la actividad solo para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL al finalizar",
+          "description": "Segundos para conservar la actividad tras su finalización."
+        },
+        "stale_ttl": {
+          "name": "TTL por inactividad",
+          "description": "Segundos antes de que la actividad se considere obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminación",
+          "description": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar."
+        }
+      }
+    },
     "create_activity": {
       "name": "Crear actividad",
       "description": "Crear una nueva PushWard Live Activity.",
@@ -1913,7 +2023,8 @@
         "gauge": "Indicador",
         "timeline": "Cronología",
         "board": "Panel",
-        "log": "Registro"
+        "log": "Registro",
+        "media": "Medios"
       }
     },
     "severity": {

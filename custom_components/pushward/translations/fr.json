@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Mettre à jour la Live Activity (Media)",
+      "description": "Mettre à jour une Live Activity média PushWard : une carte de lecteur distant avec pochette, barre de progression animée et boutons de transport qui appellent vos propres webhooks.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifiant slug de la Live Activity."
+        },
+        "state": {
+          "name": "État",
+          "description": "État souhaité de la Live Activity."
+        },
+        "media_title": {
+          "name": "Titre du média",
+          "description": "Piste, épisode ou chaîne affiché en grande ligne sur la carte du lecteur (128 caractères max). Le nom de la Live Activity est l'appareil source."
+        },
+        "subtitle": {
+          "name": "Sous-titre",
+          "description": "Artiste, émission ou chaîne affiché sous le titre du média."
+        },
+        "playback_state": {
+          "name": "État de lecture",
+          "description": "playing, paused, stopped ou buffering. La barre de progression n'avance que pendant playing."
+        },
+        "position_seconds": {
+          "name": "Position",
+          "description": "Position de la tête de lecture en secondes au moment de la mesure."
+        },
+        "duration_seconds": {
+          "name": "Durée",
+          "description": "Durée totale en secondes (604800 max). À omettre pour un flux en direct : aucune barre n'est dessinée, mais le temps écoulé continue de défiler."
+        },
+        "position_at": {
+          "name": "Horodatage de la position",
+          "description": "Horodatage Unix (secondes) de la mesure de la position. Par défaut maintenant ; ne doit pas être dans le futur."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Niveau de volume de 0.0 à 1.0, dessiné comme une fine barre entre les boutons de volume."
+        },
+        "favorite": {
+          "name": "Favori",
+          "description": "Remplit le bouton cœur."
+        },
+        "controls": {
+          "name": "Commandes",
+          "description": "Boutons de transport sous forme d'objet dont les clés sont les emplacements : previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, plus extra (une liste de 3 boutons personnalisés au maximum, chacun avec une icône). Chaque emplacement est url, title, icon, method, headers, body sans aucune clé foreground : une URL http(s) est toujours un webhook silencieux (POST par défaut) et une URL à schéma personnalisé ouvre cette application."
+        },
+        "image_url": {
+          "name": "URL de l'image",
+          "description": "URL https d'une image affichée à côté de l'icône. L'iPhone la télécharge lui-même, elle doit donc être accessible depuis internet ; une adresse du réseau local ne se chargera pas, contrairement à son ThumbHash."
+        },
+        "image_shape": {
+          "name": "Forme de l'image",
+          "description": "Cadrage de l'image : poster conserve un cadrage vertical, square est la valeur par défaut, circle la recadre en rond."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash de l'image",
+          "description": "Aperçu flou intégré, affiché quand l'URL ne peut pas être récupérée, et le seul niveau qui s'affiche pour une image de votre réseau local. Laissez vide pour le calculer automatiquement à partir de l'URL, ou utilisez l'action Generate ThumbHash pour le créer depuis n'importe quelle image accessible à Home Assistant."
+        },
+        "state_text": {
+          "name": "Texte d'état",
+          "description": "Texte affiché comme état de la Live Activity."
+        },
+        "icon": {
+          "name": "Icône",
+          "description": "Nom d'icône SF Symbol ou MDI (ex. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Message de fin",
+          "description": "Message affiché lorsque la Live Activity se termine."
+        },
+        "accent_color": {
+          "name": "Couleur d'accentuation",
+          "description": "Couleur d'accentuation de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "background_color": {
+          "name": "Couleur d'arrière-plan",
+          "description": "Couleur d'arrière-plan de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "text_color": {
+          "name": "Couleur du texte",
+          "description": "Couleur du texte de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "tap_action": {
+          "name": "Action d'appui",
+          "description": "Cible d'appui pour toute la Live Activity, sous forme d'objet : url (requis), foreground facultatif, et pour une url http(s) un webhook silencieux via method/headers/body."
+        },
+        "sound": {
+          "name": "Son",
+          "description": "Son de notification joué sur l'appareil pour cette mise à jour."
+        },
+        "priority": {
+          "name": "Priorité ponctuelle",
+          "description": "Priorité par mise à jour (0-10). Remplace la priorité configurée de la Live Activity pour ce push uniquement."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
+        }
+      }
+    },
     "create_activity": {
       "name": "Créer une Live Activity",
       "description": "Créer une nouvelle Live Activity PushWard.",
@@ -1913,7 +2023,8 @@
         "gauge": "Jauge",
         "timeline": "Chronologie",
         "board": "Tableau",
-        "log": "Journal"
+        "log": "Journal",
+        "media": "Média"
       }
     },
     "severity": {

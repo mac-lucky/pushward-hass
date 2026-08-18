@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Activiteit bijwerken (Media)",
+      "description": "Een PushWard media-Live Activity bijwerken: een afstandsbedieningskaart met albumhoes, een lopende voortgangsbalk en transportknoppen die je eigen webhooks aanroepen.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "media_title": {
+          "name": "Mediatitel",
+          "description": "Nummer, aflevering of zender, getoond als grote regel op de spelerkaart (max. 128 tekens). De naam van de activiteit is het bronapparaat."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Artiest, programma of zender, getoond onder de mediatitel."
+        },
+        "playback_state": {
+          "name": "Afspeelstatus",
+          "description": "playing, paused, stopped of buffering. De voortgangsbalk loopt alleen tijdens playing."
+        },
+        "position_seconds": {
+          "name": "Positie",
+          "description": "Afspeelpositie in seconden op het moment van meten."
+        },
+        "duration_seconds": {
+          "name": "Duur",
+          "description": "Totale lengte in seconden (max. 604800). Laat leeg voor een livestream: er wordt geen balk getekend, maar de verstreken tijd loopt door."
+        },
+        "position_at": {
+          "name": "Meetmoment van de positie",
+          "description": "Unix-tijdstempel (seconden) waarop de positie is gemeten. Standaard nu; mag niet in de toekomst liggen."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Volumeniveau van 0.0 tot 1.0, getekend als dunne balk tussen de volumeknoppen."
+        },
+        "favorite": {
+          "name": "Favoriet",
+          "description": "Vult de hartknop."
+        },
+        "controls": {
+          "name": "Bediening",
+          "description": "Transportknoppen als object met de slots als sleutels: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, plus extra (een lijst van maximaal 3 eigen knoppen, elk met een pictogram). Elke slot is url, title, icon, method, headers, body zonder foreground-sleutel: een http(s)-URL is altijd een stille webhook (standaard POST) en een URL met eigen schema opent die app."
+        },
+        "image_url": {
+          "name": "Afbeeldings-URL",
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+        },
+        "image_shape": {
+          "name": "Afbeeldingsvorm",
+          "description": "Hoe de afbeelding wordt bijgesneden: poster houdt een staande uitsnede, square is de standaard, circle snijdt rond bij."
+        },
+        "image_thumbhash": {
+          "name": "Afbeeldings-ThumbHash",
+          "description": "Vervaagde ingesloten voorvertoning die wordt getekend als de URL niet opgehaald kan worden, en de enige laag die verschijnt voor een afbeelding in je lokale netwerk. Laat leeg om hem automatisch uit de URL te berekenen, of gebruik de actie Generate ThumbHash om er een te maken van elke afbeelding die Home Assistant kan lezen."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0-10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activiteit aanmaken",
       "description": "Maak een nieuwe PushWard Live Activity aan.",
@@ -1913,7 +2023,8 @@
         "gauge": "Meter",
         "timeline": "Tijdlijn",
         "board": "Bord",
-        "log": "Logboek"
+        "log": "Logboek",
+        "media": "Media"
       }
     },
     "severity": {

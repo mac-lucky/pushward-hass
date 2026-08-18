@@ -18,7 +18,7 @@ from pathlib import Path
 
 import yaml
 
-from custom_components.pushward.const import TEMPLATES
+from custom_components.pushward.const import SERVICE_TEMPLATES
 
 _COMPONENT = Path(__file__).parent.parent / "custom_components" / "pushward"
 _SERVICES_YAML = _COMPONENT / "services.yaml"
@@ -77,7 +77,7 @@ def test_per_template_update_services_exist_without_template_field() -> None:
     template field would let the user contradict the service they called.
     """
     services = _services()
-    for template in TEMPLATES:
+    for template in SERVICE_TEMPLATES:
         name = f"update_activity_{template}"
         assert name in services, f"{name} missing from services.yaml"
         leaves = _leaf_fields(services[name])

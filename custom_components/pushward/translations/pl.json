@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Aktualizuj Live Activity (Media)",
+      "description": "Aktualizuj Live Activity typu media w PushWard: kartę zdalnego odtwarzacza z okładką, biegnącym paskiem postępu i przyciskami sterowania, które wywołują Twoje własne webhooki.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identyfikator slug Live Activity."
+        },
+        "state": {
+          "name": "Stan",
+          "description": "Żądany stan Live Activity."
+        },
+        "media_title": {
+          "name": "Tytuł mediów",
+          "description": "Utwór, odcinek lub kanał wyświetlany jako duży wiersz karty odtwarzacza (maks. 128 znaków). Nazwa Live Activity to urządzenie źródłowe."
+        },
+        "subtitle": {
+          "name": "Podtytuł",
+          "description": "Wykonawca, program lub kanał wyświetlany pod tytułem mediów."
+        },
+        "playback_state": {
+          "name": "Stan odtwarzania",
+          "description": "playing, paused, stopped lub buffering. Pasek postępu biegnie tylko w stanie playing."
+        },
+        "position_seconds": {
+          "name": "Pozycja",
+          "description": "Pozycja odtwarzania w sekundach w chwili pobrania próbki."
+        },
+        "duration_seconds": {
+          "name": "Czas trwania",
+          "description": "Całkowita długość w sekundach (maks. 604800). Pomiń dla transmisji na żywo: pasek nie jest rysowany, ale licznik czasu, który upłynął, nadal biegnie."
+        },
+        "position_at": {
+          "name": "Czas pobrania pozycji",
+          "description": "Znacznik czasu Unix (sekundy) pobrania pozycji. Domyślnie teraz; nie może być w przyszłości."
+        },
+        "volume": {
+          "name": "Głośność",
+          "description": "Poziom głośności od 0.0 do 1.0, rysowany jako cienki pasek między przyciskami głośności."
+        },
+        "favorite": {
+          "name": "Ulubione",
+          "description": "Wypełnia przycisk serca."
+        },
+        "controls": {
+          "name": "Sterowanie",
+          "description": "Przyciski sterowania jako obiekt z kluczami slotów: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up oraz extra (lista maks. 3 własnych przycisków, każdy z ikoną). Każdy slot to url, title, icon, method, headers, body bez żadnego klucza foreground: adres http(s) jest zawsze cichym webhookiem (domyślnie POST), a adres z własnym schematem otwiera tę aplikację."
+        },
+        "image_url": {
+          "name": "URL obrazu",
+          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+        },
+        "image_shape": {
+          "name": "Kształt obrazu",
+          "description": "Sposób kadrowania obrazu: poster zachowuje kadr pionowy, square jest domyślne, circle przycina do koła."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash obrazu",
+          "description": "Rozmyty podgląd osadzony w aktywności, rysowany gdy nie da się pobrać adresu URL, i jedyna warstwa widoczna dla obrazu z sieci lokalnej. Zostaw puste, aby został wyliczony z adresu URL automatycznie, albo użyj akcji Generate ThumbHash, aby utworzyć go z dowolnego obrazu dostępnego dla Home Assistant."
+        },
+        "state_text": {
+          "name": "Tekst stanu",
+          "description": "Tekst wyświetlany jako stan Live Activity."
+        },
+        "icon": {
+          "name": "Ikona",
+          "description": "Nazwa ikony SF Symbol lub MDI (np. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Komunikat zakończenia",
+          "description": "Komunikat wyświetlany po zakończeniu Live Activity."
+        },
+        "accent_color": {
+          "name": "Kolor akcentu",
+          "description": "Kolor akcentu dla Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "background_color": {
+          "name": "Kolor tła",
+          "description": "Kolor tła Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "text_color": {
+          "name": "Kolor tekstu",
+          "description": "Kolor tekstu Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "sound": {
+          "name": "Dźwięk",
+          "description": "Dźwięk powiadomienia odtwarzany na urządzeniu przy tej aktualizacji."
+        },
+        "priority": {
+          "name": "Nadpisanie priorytetu",
+          "description": "Priorytet dla pojedynczej aktualizacji (0-10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
+        }
+      }
+    },
     "create_activity": {
       "name": "Utwórz Live Activity",
       "description": "Utwórz nowy PushWard Live Activity.",
@@ -1913,7 +2023,8 @@
         "gauge": "Wskaźnik",
         "timeline": "Oś czasu",
         "board": "Tablica",
-        "log": "Dziennik"
+        "log": "Dziennik",
+        "media": "Media"
       }
     },
     "severity": {

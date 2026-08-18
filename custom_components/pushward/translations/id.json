@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Perbarui Aktivitas (Media)",
+      "description": "Perbarui Live Activity media PushWard: kartu pemutar jarak jauh dengan sampul, bilah kemajuan yang berjalan, dan tombol transport yang memanggil webhook Anda sendiri.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "media_title": {
+          "name": "Judul Media",
+          "description": "Lagu, episode, atau saluran yang ditampilkan sebagai baris besar pada kartu pemutar (maks. 128 karakter). Nama aktivitas adalah perangkat sumber."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Artis, acara, atau saluran yang ditampilkan di bawah judul media."
+        },
+        "playback_state": {
+          "name": "Status Pemutaran",
+          "description": "playing, paused, stopped, atau buffering. Bilah kemajuan hanya berjalan saat playing."
+        },
+        "position_seconds": {
+          "name": "Posisi",
+          "description": "Posisi pemutaran dalam detik pada saat diambil sampelnya."
+        },
+        "duration_seconds": {
+          "name": "Durasi",
+          "description": "Panjang total dalam detik (maks. 604800). Kosongkan untuk siaran langsung: tidak ada bilah yang digambar, tetapi jam waktu berjalan tetap berdetak."
+        },
+        "position_at": {
+          "name": "Waktu Sampel Posisi",
+          "description": "Stempel waktu Unix (detik) saat posisi diambil sampelnya. Default sekarang dan tidak boleh di masa depan."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Tingkat volume dari 0.0 hingga 1.0, digambar sebagai bilah tipis di antara tombol volume."
+        },
+        "favorite": {
+          "name": "Favorit",
+          "description": "Mengisi tombol hati."
+        },
+        "controls": {
+          "name": "Kontrol",
+          "description": "Tombol transport sebagai objek dengan slot sebagai kunci: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, ditambah extra (daftar hingga 3 tombol kustom, masing-masing dengan ikon). Setiap slot berupa url, title, icon, method, headers, body tanpa kunci foreground sama sekali: URL http(s) selalu berupa webhook senyap (POST secara default) dan URL skema kustom membuka aplikasi tersebut."
+        },
+        "image_url": {
+          "name": "URL gambar",
+          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+        },
+        "image_shape": {
+          "name": "Bentuk gambar",
+          "description": "Cara gambar dipotong: poster mempertahankan potongan vertikal, square adalah bawaan, circle memotong bulat."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash gambar",
+          "description": "Pratinjau buram tersemat yang digambar saat URL tidak bisa diunduh, dan satu-satunya lapisan yang tampil untuk gambar di jaringan lokal. Biarkan kosong agar dihitung otomatis dari URL, atau gunakan aksi Generate ThumbHash untuk membuatnya dari gambar apa pun yang bisa dibaca Home Assistant."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Override Prioritas",
+          "description": "Prioritas per pembaruan (0-10). Hanya menimpa prioritas yang dikonfigurasi pada aktivitas untuk push ini."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
+        }
+      }
+    },
     "create_activity": {
       "name": "Buat Aktivitas",
       "description": "Buat PushWard Live Activity baru.",
@@ -1913,7 +2023,8 @@
         "gauge": "Pengukur",
         "timeline": "Lini masa",
         "board": "Papan",
-        "log": "Log"
+        "log": "Log",
+        "media": "Media"
       }
     },
     "severity": {

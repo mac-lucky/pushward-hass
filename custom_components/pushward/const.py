@@ -38,7 +38,9 @@ CONF_LIVE_PROGRESS = "live_progress"
 # Templates that have an image slot (pushward-server Content.SupportsImage). The
 # server REJECTS the trio on every other template rather than ignoring it, so both
 # the config flow and the update schemas have to gate on this list or the push 422s.
-IMAGE_TEMPLATES = ("generic", "steps")
+# media is service-only for now (see SERVICE_TEMPLATES), so the config flow never
+# reaches it here; the update schema does.
+IMAGE_TEMPLATES = ("generic", "steps", "media")
 # Optional artwork shown beside the icon on the templates above.
 #
 # image_url is fetched BY THE DEVICE, never by the server, and iOS refuses private
@@ -297,8 +299,37 @@ SEVERITIES = ["critical", "warning", "info"]
 # "critical" is kept for backward compat — UI dropdown hides it until Apple approves entitlement
 NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
-# Templates
+# Templates offered by the tracked-entity config flow (each has a mapper).
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log"]
+# Templates with an update_activity_<template> action. media is a pass-through only:
+# there is no media_player mapping yet, so it stays out of TEMPLATES and the entity
+# flow, but automations can drive a media activity through the service.
+SERVICE_TEMPLATES = (*TEMPLATES, "media")
+
+# Media template caps (mirror pushward-server/internal/model/activity.go).
+# media_title is the big line of the player card (the activity name is the source
+# device, subtitle the artist/show). position_seconds is the playhead sampled at
+# position_at (unix seconds; the server stamps now when it is omitted) and the
+# device ticks the bar forward from there while playback_state is playing.
+MEDIA_TITLE_MAX = 128
+MEDIA_DURATION_MAX = 604800  # 7 d
+MEDIA_EXTRA_CONTROLS_MAX = 3
+PLAYBACK_STATES = ("playing", "paused", "stopped", "buffering")
+# Fixed transport slots of `controls`, in wire order. Each is a tap action; an
+# http(s) control is always a silent webhook (the server rejects foreground and
+# defaults the method to POST). play/pause are the split alternative to play_pause:
+# the device picks by playback_state and falls back to play_pause.
+MEDIA_CONTROL_SLOTS = (
+    "previous",
+    "play_pause",
+    "play",
+    "pause",
+    "next",
+    "stop",
+    "favorite",
+    "volume_down",
+    "volume_up",
+)
 
 # Widget templates (server: pushward-server/internal/model/widget.go)
 WIDGET_TEMPLATE_VALUE = "value"

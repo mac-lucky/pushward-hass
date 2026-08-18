@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Update Activity (Media)",
+      "description": "Update a PushWard media Live Activity: a remote player card with cover art, a ticking scrubber and transport buttons that call your own webhooks.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "media_title": {
+          "name": "Media Title",
+          "description": "Track, episode or channel shown as the big line of the player card (max 128 characters). The activity name is the source device."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Artist, show or channel shown under the media title."
+        },
+        "playback_state": {
+          "name": "Playback State",
+          "description": "playing, paused, stopped or buffering. The scrubber ticks only while playing."
+        },
+        "position_seconds": {
+          "name": "Position",
+          "description": "Playhead position in seconds at the moment it was sampled."
+        },
+        "duration_seconds": {
+          "name": "Duration",
+          "description": "Total length in seconds (max 604800). Leave it out for a live stream: no bar is drawn, but the elapsed clock still runs."
+        },
+        "position_at": {
+          "name": "Position Sampled At",
+          "description": "Unix timestamp (seconds) of when the position was sampled. Defaults to now and must not be in the future."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Volume level from 0.0 to 1.0, drawn as a thin bar between the volume buttons."
+        },
+        "favorite": {
+          "name": "Favorite",
+          "description": "Fills the heart button."
+        },
+        "controls": {
+          "name": "Controls",
+          "description": "Transport buttons as an object keyed by slot: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, plus extra (a list of up to 3 custom buttons, each with an icon). Every slot is url, title, icon, method, headers, body with no foreground key at all: an http(s) URL is always a silent webhook (POST by default) and a custom-scheme URL opens that app."
+        },
+        "image_url": {
+          "name": "Image URL",
+          "description": "https URL of a picture shown beside the icon. The iPhone downloads it directly, so it has to be reachable from the public internet; a LAN address will not load, but its ThumbHash still will."
+        },
+        "image_shape": {
+          "name": "Image Shape",
+          "description": "How the picture is framed: poster keeps a tall crop, square is the default, circle crops it round."
+        },
+        "image_thumbhash": {
+          "name": "Image ThumbHash",
+          "description": "Blurred inline preview drawn when the URL cannot be fetched, and the only tier that renders for an image on your LAN. Leave it empty to have one computed from the URL automatically, or use the Generate ThumbHash action to build one from any image Home Assistant can read."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
+        }
+      }
+    },
     "create_activity": {
       "name": "Create Activity",
       "description": "Create a new PushWard Live Activity.",
@@ -1913,7 +2023,8 @@
         "gauge": "Gauge",
         "timeline": "Timeline",
         "board": "Board",
-        "log": "Log"
+        "log": "Log",
+        "media": "Media"
       }
     },
     "severity": {

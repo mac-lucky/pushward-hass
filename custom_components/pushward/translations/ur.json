@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "سرگرمی اپڈیٹ کریں (Media)",
+      "description": "PushWard میڈیا Live Activity اپڈیٹ کریں: کور آرٹ، چلتی ہوئی پروگریس بار اور آپ کے اپنے webhooks کو کال کرنے والے ٹرانسپورٹ بٹنوں والا ایک ریموٹ پلیئر کارڈ۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "media_title": {
+          "name": "میڈیا عنوان",
+          "description": "پلیئر کارڈ کی بڑی سطر کے طور پر دکھایا جانے والا ٹریک، ایپیسوڈ یا چینل (زیادہ سے زیادہ 128 حروف)۔ سرگرمی کا نام ماخذ ڈیوائس ہے۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "میڈیا عنوان کے نیچے دکھایا جانے والا فنکار، شو یا چینل۔"
+        },
+        "playback_state": {
+          "name": "پلے بیک کی حالت",
+          "description": "playing، paused، stopped یا buffering۔ پروگریس بار صرف playing کے دوران چلتی ہے۔"
+        },
+        "position_seconds": {
+          "name": "پوزیشن",
+          "description": "نمونہ لینے کے لمحے پلے ہیڈ کی پوزیشن، سیکنڈوں میں۔"
+        },
+        "duration_seconds": {
+          "name": "دورانیہ",
+          "description": "کل لمبائی سیکنڈوں میں (زیادہ سے زیادہ 604800)۔ لائیو اسٹریم کے لیے خالی چھوڑیں: بار نہیں بنتی، لیکن گزرے ہوئے وقت کی گھڑی چلتی رہتی ہے۔"
+        },
+        "position_at": {
+          "name": "پوزیشن کے نمونے کا وقت",
+          "description": "پوزیشن کا نمونہ لینے کا Unix ٹائم اسٹیمپ (سیکنڈ)۔ ڈیفالٹ ابھی ہے اور مستقبل میں نہیں ہو سکتا۔"
+        },
+        "volume": {
+          "name": "والیوم",
+          "description": "0.0 سے 1.0 تک والیوم کی سطح، والیوم بٹنوں کے درمیان ایک پتلی بار کے طور پر بنائی جاتی ہے۔"
+        },
+        "favorite": {
+          "name": "پسندیدہ",
+          "description": "ہارٹ بٹن کو بھر دیتا ہے۔"
+        },
+        "controls": {
+          "name": "کنٹرولز",
+          "description": "سلاٹ کی کلیدوں والے آبجیکٹ کے طور پر ٹرانسپورٹ بٹن: previous، play_pause، play، pause، next، stop، favorite، volume_down، volume_up، اور extra (زیادہ سے زیادہ 3 حسبِ ضرورت بٹنوں کی فہرست، ہر ایک کے ساتھ آئیکن)۔ ہر سلاٹ url, title, icon, method, headers, body ہے اور اس میں کوئی foreground کلید نہیں ہوتی: http(s) URL ہمیشہ ایک خاموش webhook ہوتا ہے (ڈیفالٹ POST) اور کسٹم اسکیم URL اس ایپ کو کھولتا ہے۔"
+        },
+        "image_url": {
+          "name": "تصویر کا URL",
+          "description": "آئیکن کے ساتھ دکھائی جانے والی تصویر کا https پتہ۔ iPhone اسے خود ڈاؤن لوڈ کرتا ہے، اس لیے یہ انٹرنیٹ سے قابلِ رسائی ہونا چاہیے؛ مقامی نیٹ ورک کا پتہ لوڈ نہیں ہوگا، لیکن اس کا ThumbHash دکھائی دے گا۔"
+        },
+        "image_shape": {
+          "name": "تصویر کی شکل",
+          "description": "تصویر کس طرح کاٹی جاتی ہے: poster عمودی کٹاؤ رکھتا ہے، square طے شدہ ہے، اور circle گول کاٹتا ہے۔"
+        },
+        "image_thumbhash": {
+          "name": "تصویر کا ThumbHash",
+          "description": "دھندلا شامل شدہ پیش منظر، جو URL ڈاؤن لوڈ نہ ہونے پر دکھایا جاتا ہے، اور مقامی نیٹ ورک کی تصویر کے لیے یہی واحد سطح ہے جو نظر آتی ہے۔ خالی چھوڑ دیں تاکہ یہ URL سے خودکار طور پر شمار ہو جائے، یا Home Assistant جو بھی تصویر پڑھ سکے اس سے بنانے کے لیے Generate ThumbHash ایکشن استعمال کریں۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً music.note، mdi:music)۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کا رنگ۔ Hex (#RRGGBB) یا نامزد رنگ۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کے لیے پس منظر کا رنگ۔ Hex (#RRGGBB) یا نامزد رنگ۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کے لیے متن کا رنگ۔ Hex (#RRGGBB) یا نامزد رنگ۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے آلے پر بجائی جانے والی اطلاع کی آواز۔"
+        },
+        "priority": {
+          "name": "ترجیح کا اوور رائڈ",
+          "description": "فی اپڈیٹ ترجیح (0-10)۔ صرف اس پش کے لیے سرگرمی کی کنفیگر شدہ ترجیح کو اوور رائڈ کرتا ہے۔"
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "سرگرمی ختم ہونے کے بعد اسے برقرار رکھنے کے سیکنڈ۔"
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "سرگرمی کو پرانا سمجھے جانے سے پہلے کے سیکنڈ۔"
+        },
+        "dismissal_ttl": {
+          "name": "ہٹانے کی TTL",
+          "description": "ختم شدہ سرگرمی ہٹائے جانے سے پہلے لاک اسکرین پر کتنے سیکنڈ رہتی ہے۔ 0 اسے ختم ہوتے ہی فوراً ہٹا دیتا ہے۔"
+        }
+      }
+    },
     "create_activity": {
       "name": "سرگرمی بنائیں",
       "description": "نئی PushWard Live Activity بنائیں۔",
@@ -1913,7 +2023,8 @@
         "gauge": "گیج",
         "timeline": "ٹائم لائن",
         "board": "بورڈ",
-        "log": "لاگ"
+        "log": "لاگ",
+        "media": "میڈیا"
       }
     },
     "severity": {

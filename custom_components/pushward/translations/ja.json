@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "アクティビティを更新 (Media)",
+      "description": "PushWard のメディア Live Activity を更新します。カバーアート、進行するシークバー、独自の Webhook を呼び出すトランスポートボタンを備えたリモートプレーヤーカードです。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "media_title": {
+          "name": "メディアタイトル",
+          "description": "プレーヤーカードの大きな行に表示されるトラック、エピソード、チャンネル（最大128文字）。アクティビティ名はソースデバイスです。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "メディアタイトルの下に表示されるアーティスト、番組、チャンネル。"
+        },
+        "playback_state": {
+          "name": "再生状態",
+          "description": "playing、paused、stopped、buffering のいずれか。シークバーは playing 中のみ進みます。"
+        },
+        "position_seconds": {
+          "name": "再生位置",
+          "description": "サンプリング時点の再生位置（秒）。"
+        },
+        "duration_seconds": {
+          "name": "長さ",
+          "description": "全体の長さ（秒、最大604800）。ライブ配信では省略してください。バーは描画されませんが、経過時間は進み続けます。"
+        },
+        "position_at": {
+          "name": "再生位置のサンプリング時刻",
+          "description": "再生位置をサンプリングした Unix タイムスタンプ（秒）。既定は現在時刻で、未来の値は指定できません。"
+        },
+        "volume": {
+          "name": "音量",
+          "description": "0.0〜1.0 の音量レベル。音量ボタンの間に細いバーとして描画されます。"
+        },
+        "favorite": {
+          "name": "お気に入り",
+          "description": "ハートボタンを塗りつぶします。"
+        },
+        "controls": {
+          "name": "コントロール",
+          "description": "スロットをキーとするオブジェクト形式のトランスポートボタン: previous、play_pause、play、pause、next、stop、favorite、volume_down、volume_up、および extra（アイコン付きのカスタムボタン最大3個のリスト）。各スロットは url, title, icon, method, headers, body で、foreground キーはありません。http(s) URL は常にサイレント Webhook（既定は POST）になり、カスタムスキームの URL はそのアプリを開きます。"
+        },
+        "image_url": {
+          "name": "画像 URL",
+          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+        },
+        "image_shape": {
+          "name": "画像の形",
+          "description": "画像の切り抜き方です。poster は縦長、square は既定、circle は円形に切り抜きます。"
+        },
+        "image_thumbhash": {
+          "name": "画像の ThumbHash",
+          "description": "URL を取得できないときに描画される、ぼかしの埋め込みプレビューです。LAN 上の画像で表示されるのはこれだけです。空欄にすると URL から自動で計算されます。Home Assistant が読める任意の画像から作るには Generate ThumbHash アクションを使ってください。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: music.note, mdi:music）。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
+        }
+      }
+    },
     "create_activity": {
       "name": "アクティビティを作成",
       "description": "新しいPushWard Live Activityを作成します。",
@@ -1913,7 +2023,8 @@
         "gauge": "ゲージ",
         "timeline": "タイムライン",
         "board": "ボード",
-        "log": "ログ"
+        "log": "ログ",
+        "media": "メディア"
       }
     },
     "severity": {

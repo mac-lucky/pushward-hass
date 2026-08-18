@@ -27,8 +27,8 @@ from custom_components.pushward.const import (
     DOMAIN,
     IMAGE_THUMBHASH_MAX,
     MAX_URL_LEN,
+    SERVICE_TEMPLATES,
     SUBENTRY_TYPE_WIDGET,
-    TEMPLATES,
     validate_tap_action_url,
 )
 from custom_components.pushward.widget_manager import WidgetManager
@@ -663,21 +663,21 @@ async def test_update_activity_service_accepts_background_and_text_color(hass: H
 
 
 async def test_per_template_services_registered_and_persist(hass: HomeAssistant) -> None:
-    """All six update_activity_<template> services register on setup and persist after unload."""
+    """Every update_activity_<template> service registers on setup and persists after unload."""
     api = _mock_api()
     entry = await _setup_entry(hass, api)
 
-    for template in TEMPLATES:
+    for template in SERVICE_TEMPLATES:
         assert hass.services.has_service(DOMAIN, f"update_activity_{template}")
 
     await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
 
-    for template in TEMPLATES:
+    for template in SERVICE_TEMPLATES:
         assert hass.services.has_service(DOMAIN, f"update_activity_{template}")
 
 
-@pytest.mark.parametrize("template", TEMPLATES)
+@pytest.mark.parametrize("template", SERVICE_TEMPLATES)
 async def test_update_activity_template_injects_template(hass: HomeAssistant, template: str) -> None:
     """The service name implies the template; the handler injects it and remaps state_text -> state."""
     api = _mock_api()
@@ -698,7 +698,7 @@ async def test_update_activity_template_injects_template(hass: HomeAssistant, te
     assert "state_text" not in content
 
 
-@pytest.mark.parametrize("template", TEMPLATES)
+@pytest.mark.parametrize("template", SERVICE_TEMPLATES)
 async def test_per_template_keeps_sound_priority_top_level(hass: HomeAssistant, template: str) -> None:
     """Every template's schema accepts sound/priority and keeps them out of content."""
     api = _mock_api()
@@ -718,7 +718,7 @@ async def test_per_template_keeps_sound_priority_top_level(hass: HomeAssistant, 
     assert call.kwargs["priority"] == 7
 
 
-@pytest.mark.parametrize("template", TEMPLATES)
+@pytest.mark.parametrize("template", SERVICE_TEMPLATES)
 async def test_per_template_keeps_ttls_top_level(hass: HomeAssistant, template: str) -> None:
     """Every template's schema accepts the TTLs and passes them as kwargs, out of content."""
     api = _mock_api()
@@ -1371,10 +1371,10 @@ async def test_update_activity_countdown_rejects_zero_duration(hass: HomeAssista
 
 # --- universal action fields (all templates that render button slots) ---
 
-# board/log use a lean schema: only the whole-activity tap_action, no url /
+# board/log/media use a lean schema: only the whole-activity tap_action, no url /
 # secondary_url / url_action / secondary_url_action slots (board uses per-tile
-# url_action; log has no buttons).
-_UNIVERSAL_ACTION_TEMPLATES = [t for t in TEMPLATES if t not in ("board", "log")]
+# url_action; log has no buttons; media has its transport row).
+_UNIVERSAL_ACTION_TEMPLATES = [t for t in SERVICE_TEMPLATES if t not in ("board", "log", "media")]
 
 
 @pytest.mark.parametrize("template", _UNIVERSAL_ACTION_TEMPLATES)
@@ -2091,6 +2091,193 @@ async def test_send_email_api_error_becomes_home_assistant_error(hass: HomeAssis
             blocking=True,
         )
     assert not isinstance(exc.value, ServiceValidationError)
+
+
+# --- media (service-only pass-through) --------------------------------------
+
+_MEDIA_CONTROLS = {
+    "previous": {"url": "https://ha.example.com/api/webhook/pw-prev"},
+    "play_pause": {
+        "url": "https://ha.example.com/api/webhook/pw-toggle",
+        "method": "post",
+        "headers": {"Authorization": "Bearer secret"},
+        "body": '{"entity_id": "media_player.living_room"}',
+    },
+    "next": {"url": "https://ha.example.com/api/webhook/pw-next", "icon": "forward.fill"},
+    "favorite": {"url": "spotify://track/1"},
+    "volume_down": {"url": "https://ha.example.com/api/webhook/pw-vol-down"},
+    "volume_up": {"url": "https://ha.example.com/api/webhook/pw-vol-up"},
+    "extra": [
+        {"url": "https://ha.example.com/api/webhook/pw-shuffle", "icon": "shuffle", "title": "Shuffle"},
+        {"url": "https://ha.example.com/api/webhook/pw-repeat", "icon": "repeat"},
+    ],
+}
+
+
+async def test_update_activity_media_forwards_fields_and_nested_controls(hass: HomeAssistant) -> None:
+    """update_activity_media is a pass-through: every media field, the image trio and the
+    nested controls object reach the PATCH content unchanged, and the result is something the
+    server would accept."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    position_at = int(time.time()) - 5
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_media",
+        {
+            "slug": "living-room-player",
+            "state": "ongoing",
+            "media_title": "Snooze",
+            "subtitle": "SZA",
+            "playback_state": "playing",
+            "position_seconds": 47.5,
+            "duration_seconds": 214,
+            "position_at": position_at,
+            "volume": 0.35,
+            "favorite": True,
+            "image_url": IMAGE_URL,
+            "image_shape": "square",
+            "image_thumbhash": IMAGE_THUMBHASH,
+            "controls": _MEDIA_CONTROLS,
+        },
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    slug, state, content = api.update_activity.call_args[0]
+    assert (slug, state) == ("living-room-player", "ongoing")
+    assert content["template"] == "media"
+    assert content["media_title"] == "Snooze"
+    assert content["subtitle"] == "SZA"
+    assert content["playback_state"] == "playing"
+    assert content["position_seconds"] == 47.5
+    assert content["duration_seconds"] == 214
+    assert content["position_at"] == position_at
+    assert content["volume"] == 0.35
+    assert content["favorite"] is True
+    assert content["image_url"] == IMAGE_URL
+    assert content["image_shape"] == "square"
+    assert content["image_thumbhash"] == IMAGE_THUMBHASH
+    # The controls object arrives nested and intact: slot keys, headers/body on the
+    # webhook slots, the custom-scheme favorite, and the extra list in order. The only
+    # normalization is the method being upper-cased by the shared http-action schema.
+    controls = content["controls"]
+    assert set(controls) == set(_MEDIA_CONTROLS)
+    assert controls["previous"] == _MEDIA_CONTROLS["previous"]
+    assert controls["play_pause"] == {**_MEDIA_CONTROLS["play_pause"], "method": "POST"}
+    assert controls["next"] == _MEDIA_CONTROLS["next"]
+    assert controls["favorite"] == {"url": "spotify://track/1"}
+    assert controls["extra"] == _MEDIA_CONTROLS["extra"]
+    assert_valid_activity_content(content, where="update_activity_media")
+
+
+async def test_update_activity_media_forwards_null_controls_for_removal(hass: HomeAssistant) -> None:
+    """A null slot, a null extra list and a null controls object all reach the PATCH body as
+    JSON null: the server deep-merges controls, so null is the only way to remove a button
+    (or all of them) from Home Assistant again."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_media",
+        {"slug": "x", "state": "ongoing", "controls": {"stop": None, "extra": None, "next": _MEDIA_CONTROLS["next"]}},
+        blocking=True,
+    )
+    content = api.update_activity.call_args[0][2]
+    assert content["controls"] == {"stop": None, "extra": None, "next": _MEDIA_CONTROLS["next"]}
+    assert_valid_activity_content(content, where="update_activity_media null slot")
+
+    api.update_activity.reset_mock()
+    await hass.services.async_call(
+        DOMAIN, "update_activity_media", {"slug": "x", "state": "ongoing", "controls": None}, blocking=True
+    )
+    content = api.update_activity.call_args[0][2]
+    assert "controls" in content and content["controls"] is None
+    assert_valid_activity_content(content, where="update_activity_media null controls")
+
+
+@pytest.mark.parametrize(
+    "field", ["progress", "remaining_time", "url", "secondary_url", "url_action", "secondary_url_action"]
+)
+async def test_update_activity_media_uses_the_lean_schema(hass: HomeAssistant, field: str) -> None:
+    """Media renders none of the generic bar/button fields, so the action does not offer them."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    value = {"url": "https://example.com"} if field.endswith("_action") else "https://example.com"
+    if field in ("progress", "remaining_time"):
+        value = 1
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "update_activity_media", {"slug": "x", "state": "ongoing", field: value}, blocking=True
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_media_rejects_foreground_control(hass: HomeAssistant) -> None:
+    """A media control is always a silent webhook: foreground is not a key the schema knows,
+    so the call fails at validation instead of the server 422-ing every update."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid, match="foreground"):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_media",
+            {
+                "slug": "x",
+                "state": "ongoing",
+                "controls": {"next": {"url": "https://ha.example.com/api/webhook/pw-next", "foreground": True}},
+            },
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"media_title": "x" * 129},
+        {"playback_state": "rewinding"},
+        {"position_seconds": -1},
+        {"duration_seconds": 0},
+        {"duration_seconds": 604801},
+        {"position_at": 0},
+        {"volume": 1.5},
+        {"controls": {"shuffle": {"url": "https://ha.example.com/x"}}},
+        {"controls": {"extra": [{"url": "https://ha.example.com/x"}]}},
+        {"controls": {"extra": [{"url": "https://ha.example.com/x", "icon": "shuffle"}] * 4}},
+        {"controls": {"next": {"url": "homeassistant://navigate/x", "method": "POST"}}},
+    ],
+)
+async def test_update_activity_media_rejects_out_of_contract_values(hass: HomeAssistant, data: dict) -> None:
+    """The service schema mirrors the server's media bounds, so a bad value fails locally."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "update_activity_media", {"slug": "x", "state": "ongoing", **data}, blocking=True
+        )
+    api.update_activity.assert_not_awaited()
+
+
+@pytest.mark.parametrize("template", [t for t in SERVICE_TEMPLATES if t != "media"])
+async def test_media_fields_are_not_accepted_on_other_templates(hass: HomeAssistant, template: str) -> None:
+    """The server 422s media fields off the media template; the per-template schemas never offer them."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            f"update_activity_{template}",
+            {"slug": "x", "state": "ongoing", "media_title": "Snooze"},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
 
 
 # --- image trio + generate_thumbhash ----------------------------------------

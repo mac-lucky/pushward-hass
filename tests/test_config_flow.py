@@ -4446,7 +4446,12 @@ def test_suggest_widget_template_new_templates(hass, entity_id, attributes, expe
 # --- image trio ------------------------------------------------------------
 
 
-@pytest.mark.parametrize("template", IMAGE_TEMPLATES)
+# media has the image slot too, but it is service-only for now and never reaches the
+# tracked-entity flow, so the flow-level checks run over the flow's own templates.
+_FLOW_IMAGE_TEMPLATES = [t for t in IMAGE_TEMPLATES if t in TEMPLATES]
+
+
+@pytest.mark.parametrize("template", _FLOW_IMAGE_TEMPLATES)
 def test_image_templates_offer_the_image_fields(template: str) -> None:
     """Only generic and steps have an image slot server-side, and only they show one."""
     schema_keys = _flow_schema_keys(_details_schema("binary_sensor.washer", template, {}))

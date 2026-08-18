@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Activity अपडेट करा (Media)",
+      "description": "PushWard मीडिया Live Activity अपडेट करा: कव्हर आर्ट, चालणारा स्क्रबर आणि तुमचे स्वतःचे webhooks कॉल करणारी ट्रान्सपोर्ट बटणे असलेले रिमोट प्लेयर कार्ड.",
+      "fields": {
+        "slug": {
+          "name": "स्लग",
+          "description": "Activity चा slug ओळखकर्ता."
+        },
+        "state": {
+          "name": "स्थिती",
+          "description": "Activity ची इच्छित स्थिती."
+        },
+        "media_title": {
+          "name": "मीडिया शीर्षक",
+          "description": "प्लेयर कार्डच्या मोठ्या ओळीत दाखवला जाणारा ट्रॅक, भाग किंवा चॅनेल (कमाल 128 अक्षरे). Activity चे नाव म्हणजे स्रोत डिव्हाइस."
+        },
+        "subtitle": {
+          "name": "उपशीर्षक",
+          "description": "मीडिया शीर्षकाखाली दाखवला जाणारा कलाकार, कार्यक्रम किंवा चॅनेल."
+        },
+        "playback_state": {
+          "name": "प्लेबॅक स्थिती",
+          "description": "playing, paused, stopped किंवा buffering. स्क्रबर फक्त playing असताना चालतो."
+        },
+        "position_seconds": {
+          "name": "स्थिती",
+          "description": "नमुना घेतला त्या क्षणी प्लेहेडची स्थिती, सेकंदांमध्ये."
+        },
+        "duration_seconds": {
+          "name": "कालावधी",
+          "description": "एकूण लांबी सेकंदांमध्ये (कमाल 604800). लाइव्ह स्ट्रीमसाठी रिकामे ठेवा: बार काढला जात नाही, पण उलटलेल्या वेळेचे घड्याळ चालू राहते."
+        },
+        "position_at": {
+          "name": "स्थिती नमुन्याची वेळ",
+          "description": "स्थितीचा नमुना घेतल्याचा Unix टाइमस्टॅम्प (सेकंद). डीफॉल्ट आत्ता आहे आणि भविष्यातील असू शकत नाही."
+        },
+        "volume": {
+          "name": "आवाज",
+          "description": "0.0 ते 1.0 पर्यंतची आवाज पातळी, आवाजाच्या बटणांमध्ये पातळ बार म्हणून काढली जाते."
+        },
+        "favorite": {
+          "name": "आवडते",
+          "description": "हार्ट बटण भरते."
+        },
+        "controls": {
+          "name": "नियंत्रणे",
+          "description": "स्लॉटनुसार की असलेल्या ऑब्जेक्ट स्वरूपात ट्रान्सपोर्ट बटणे: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, आणि extra (कमाल 3 कस्टम बटणांची यादी, प्रत्येकाला आयकॉन). प्रत्येक स्लॉट url, title, icon, method, headers, body असतो आणि त्यात foreground की नसते: http(s) URL नेहमी सायलेंट webhook असते (डीफॉल्ट POST) आणि कस्टम-स्कीम URL ते अॅप उघडते."
+        },
+        "image_url": {
+          "name": "प्रतिमा URL",
+          "description": "चिन्हाशेजारी दाखवल्या जाणाऱ्या प्रतिमेचा https URL. iPhone ती स्वतः डाउनलोड करतो, त्यामुळे ती इंटरनेटवरून उपलब्ध असावी लागते; स्थानिक नेटवर्कमधील पत्ता लोड होणार नाही, पण त्याचा ThumbHash दिसेल."
+        },
+        "image_shape": {
+          "name": "प्रतिमेचा आकार",
+          "description": "प्रतिमा कशी कापली जाते: poster उभा क्रॉप ठेवतो, square हा डीफॉल्ट आहे आणि circle गोलाकार कापतो."
+        },
+        "image_thumbhash": {
+          "name": "प्रतिमेचा ThumbHash",
+          "description": "अस्पष्ट अंतर्भूत पूर्वावलोकन, जे URL डाउनलोड होऊ शकत नसेल तेव्हा दाखवले जाते आणि स्थानिक नेटवर्कमधील प्रतिमेसाठी हाच एकमेव स्तर दिसतो. रिकामे ठेवल्यास तो URL वरून आपोआप मोजला जातो, किंवा Home Assistant वाचू शकेल अशा कोणत्याही प्रतिमेपासून तयार करण्यासाठी Generate ThumbHash क्रिया वापरा."
+        },
+        "state_text": {
+          "name": "स्थिती मजकूर",
+          "description": "Activity च्या स्थितीत दाखवला जाणारा मजकूर."
+        },
+        "icon": {
+          "name": "आयकॉन",
+          "description": "SF Symbol किंवा MDI आयकॉनचे नाव (उदा. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "पूर्णता संदेश",
+          "description": "Activity समाप्त झाल्यावर दाखवला जाणारा संदेश."
+        },
+        "accent_color": {
+          "name": "Accent रंग",
+          "description": "Activity साठी accent रंग. Hex (#RRGGBB) किंवा नामित रंग."
+        },
+        "background_color": {
+          "name": "पार्श्वभूमी रंग",
+          "description": "Live Activity पार्श्वभूमी रंग. Hex (#RRGGBB) किंवा नामित रंग."
+        },
+        "text_color": {
+          "name": "मजकूर रंग",
+          "description": "Live Activity मजकूर रंग. Hex (#RRGGBB) किंवा नामित रंग."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "sound": {
+          "name": "ध्वनी",
+          "description": "या अपडेटसाठी डिव्हाइसवर वाजवला जाणारा सूचना ध्वनी."
+        },
+        "priority": {
+          "name": "प्राधान्य ओव्हरराइड",
+          "description": "प्रति-अपडेट प्राधान्य (0-10). फक्त या पुशसाठी activity च्या कॉन्फिगर केलेल्या प्राधान्याला ओव्हरराइड करते."
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त झाल्यानंतर ती किती सेकंद ठेवायची."
+        },
+        "stale_ttl": {
+          "name": "जुना TTL",
+          "description": "Activity जुनी मानली जाण्यापूर्वीचे सेकंद."
+        },
+        "dismissal_ttl": {
+          "name": "काढून टाकण्याची TTL",
+          "description": "संपलेली अ‍ॅक्टिव्हिटी काढून टाकण्यापूर्वी लॉक स्क्रीनवर किती सेकंद राहते. 0 दिल्यास ती संपताच लगेच काढून टाकली जाते."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activity तयार करा",
       "description": "नवीन PushWard Live Activity तयार करा.",
@@ -1913,7 +2023,8 @@
         "gauge": "गेज",
         "timeline": "कालरेखा",
         "board": "बोर्ड",
-        "log": "नोंद"
+        "log": "नोंद",
+        "media": "मीडिया"
       }
     },
     "severity": {

@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Atualizar Atividade (Media)",
+      "description": "Atualizar uma Live Activity de mídia do PushWard: um cartão de player remoto com capa, barra de progresso em andamento e botões de transporte que chamam seus próprios webhooks.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "media_title": {
+          "name": "Título da Mídia",
+          "description": "Faixa, episódio ou canal exibido como a linha principal do cartão do player (máx. 128 caracteres). O nome da atividade é o dispositivo de origem."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Artista, programa ou canal exibido abaixo do título da mídia."
+        },
+        "playback_state": {
+          "name": "Estado de Reprodução",
+          "description": "playing, paused, stopped ou buffering. A barra de progresso só avança durante playing."
+        },
+        "position_seconds": {
+          "name": "Posição",
+          "description": "Posição de reprodução em segundos no momento da amostragem."
+        },
+        "duration_seconds": {
+          "name": "Duração",
+          "description": "Duração total em segundos (máx. 604800). Omita para uma transmissão ao vivo: nenhuma barra é desenhada, mas o relógio de tempo decorrido continua correndo."
+        },
+        "position_at": {
+          "name": "Momento da Amostra de Posição",
+          "description": "Timestamp Unix (segundos) de quando a posição foi amostrada. O padrão é agora e não pode estar no futuro."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Nível de volume de 0.0 a 1.0, desenhado como uma barra fina entre os botões de volume."
+        },
+        "favorite": {
+          "name": "Favorito",
+          "description": "Preenche o botão de coração."
+        },
+        "controls": {
+          "name": "Controles",
+          "description": "Botões de transporte como um objeto com os slots como chaves: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, mais extra (uma lista de até 3 botões personalizados, cada um com um ícone). Cada slot é url, title, icon, method, headers, body sem nenhuma chave foreground: uma URL http(s) é sempre um webhook silencioso (POST por padrão) e uma URL de esquema personalizado abre esse app."
+        },
+        "image_url": {
+          "name": "URL da imagem",
+          "description": "URL https de uma imagem exibida ao lado do ícone. O iPhone baixa a imagem por conta própria, então ela precisa estar acessível pela internet; um endereço da rede local não vai carregar, mas o ThumbHash dela sim."
+        },
+        "image_shape": {
+          "name": "Formato da imagem",
+          "description": "Como a imagem é recortada: poster mantém um recorte vertical, square é o padrão e circle recorta em círculo."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash da imagem",
+          "description": "Prévia desfocada embutida, desenhada quando a URL não pode ser baixada, e a única camada que aparece para uma imagem da sua rede local. Deixe vazio para calculá-la automaticamente a partir da URL, ou use a ação Generate ThumbHash para criá-la de qualquer imagem que o Home Assistant consiga ler."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Cor de destaque para a atividade. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "tap_action": {
+          "name": "Ação de toque",
+          "description": "Alvo de toque da atividade inteira como um objeto: url (obrigatório), foreground opcional e, para uma url http(s), um webhook silencioso via method/headers/body."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
+        }
+      }
+    },
     "create_activity": {
       "name": "Criar Atividade",
       "description": "Criar uma nova PushWard Live Activity.",
@@ -1913,7 +2023,8 @@
         "gauge": "Medidor",
         "timeline": "Linha do tempo",
         "board": "Painel",
-        "log": "Registro"
+        "log": "Registro",
+        "media": "Mídia"
       }
     },
     "severity": {

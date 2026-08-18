@@ -111,6 +111,39 @@ def valid_log() -> dict:
     }
 
 
+def valid_media() -> dict:
+    return {
+        "template": "media",
+        "progress": 0.0,
+        "state": "Now Playing",
+        "accent_color": "pink",
+        "media_title": "Snooze",
+        "subtitle": "SZA",
+        "playback_state": "playing",
+        "position_seconds": 47.5,
+        "duration_seconds": 214.0,
+        "position_at": int(time.time()) - 2,
+        "volume": 0.35,
+        "favorite": True,
+        "image_url": IMAGE_OK,
+        "image_thumbhash": THUMBHASH_OK,
+        "controls": {
+            "previous": {"url": "https://ha.example.com/api/webhook/pw-prev"},
+            "play_pause": {"url": "https://ha.example.com/api/webhook/pw-toggle", "method": "POST"},
+            "next": {"url": "https://ha.example.com/api/webhook/pw-next"},
+            "favorite": {"url": "spotify://track/1"},
+            "extra": [{"url": "https://ha.example.com/api/webhook/pw-shuffle", "icon": "shuffle"}],
+        },
+    }
+
+
+def _controls(**changes) -> dict:
+    """The valid controls object with one slot replaced."""
+    c = valid_media()["controls"]
+    c.update(changes)
+    return c
+
+
 def _mut(factory, **changes) -> dict:
     d = factory()
     d.update(changes)
@@ -129,8 +162,18 @@ def _rm(factory, *keys) -> dict:
 
 @pytest.mark.parametrize(
     "factory",
-    [valid_generic, valid_countdown, valid_steps, valid_alert, valid_gauge, valid_timeline, valid_board, valid_log],
-    ids=["generic", "countdown", "steps", "alert", "gauge", "timeline", "board", "log"],
+    [
+        valid_generic,
+        valid_countdown,
+        valid_steps,
+        valid_alert,
+        valid_gauge,
+        valid_timeline,
+        valid_board,
+        valid_log,
+        valid_media,
+    ],
+    ids=["generic", "countdown", "steps", "alert", "gauge", "timeline", "board", "log", "media"],
 )
 def test_valid_activity_payloads_pass(factory) -> None:
     assert_valid_activity_content(factory())
@@ -327,6 +370,41 @@ _ACTIVITY_INVALID = [
         lambda: _mut(valid_generic, image_url=IMAGE_OK, image_thumbhash="3PcNNYSFeXh"),
         id="image_thumbhash_unpadded",
     ),
+    # media: its fields are a 422 on every other template, and on media each is bounded.
+    pytest.param(lambda: _mut(valid_generic, media_title="Snooze"), id="media_title_on_unsupported_template"),
+    pytest.param(lambda: _mut(valid_alert, playback_state="playing"), id="playback_state_on_unsupported_template"),
+    pytest.param(
+        lambda: _mut(valid_steps, controls={"next": {"url": IMAGE_OK}}), id="controls_on_unsupported_template"
+    ),
+    pytest.param(lambda: _mut(valid_media, media_title="x" * 129), id="media_title_too_long"),
+    pytest.param(lambda: _mut(valid_media, playback_state="rewinding"), id="playback_state_not_in_enum"),
+    pytest.param(lambda: _mut(valid_media, position_seconds=-0.5), id="position_negative"),
+    pytest.param(lambda: _mut(valid_media, position_seconds=float("nan")), id="position_nan"),
+    pytest.param(lambda: _mut(valid_media, duration_seconds=0), id="duration_zero"),
+    pytest.param(lambda: _mut(valid_media, duration_seconds=604801), id="duration_over_week"),
+    pytest.param(lambda: _mut(valid_media, position_at=0), id="position_at_zero"),
+    pytest.param(lambda: _mut(valid_media, position_at=int(time.time()) + 3600), id="position_at_in_future"),
+    pytest.param(lambda: _mut(valid_media, position_at=1.5), id="position_at_float"),
+    pytest.param(lambda: _mut(valid_media, volume=1.01), id="volume_over_one"),
+    pytest.param(lambda: _mut(valid_media, volume=-0.1), id="volume_negative"),
+    pytest.param(lambda: _mut(valid_media, favorite="yes"), id="favorite_not_bool"),
+    pytest.param(lambda: _mut(valid_media, controls=[]), id="controls_not_object"),
+    pytest.param(lambda: _mut(valid_media, controls=_controls(shuffle={"url": IMAGE_OK})), id="controls_unknown_slot"),
+    pytest.param(lambda: _mut(valid_media, controls=_controls(next={"title": "Next"})), id="control_missing_url"),
+    pytest.param(
+        lambda: _mut(valid_media, controls=_controls(next={"url": IMAGE_OK, "foreground": True})),
+        id="http_control_foreground",
+    ),
+    pytest.param(
+        lambda: _mut(valid_media, controls=_controls(stop={"url": "homeassistant://x", "method": "POST"})),
+        id="custom_scheme_control_with_method",
+    ),
+    pytest.param(
+        lambda: _mut(valid_media, controls=_controls(extra=[{"url": IMAGE_OK, "icon": "shuffle"}] * 4)),
+        id="too_many_extra_controls",
+    ),
+    pytest.param(lambda: _mut(valid_media, controls=_controls(extra=[{"url": IMAGE_OK}])), id="extra_control_no_icon"),
+    pytest.param(lambda: _mut(valid_media, controls=_controls(extra={"url": IMAGE_OK})), id="extra_not_list"),
 ]
 
 
@@ -347,6 +425,23 @@ def test_valid_image_payloads_pass() -> None:
     # Empty strings are how a stored-but-unset config comes through; they are not a
     # trio "present", so they must not trip the unsupported-template gate either.
     assert_valid_activity_content(_mut(valid_alert, image_url="", image_shape="", image_thumbhash=""))
+
+
+def test_valid_media_payloads_pass() -> None:
+    """Media edge shapes the server accepts: bare card, radio (no duration), custom-scheme
+    control with foreground, and an image on the media template."""
+    assert_valid_activity_content({"template": "media", "progress": 0.0})
+    assert_valid_activity_content(_rm(valid_media, "duration_seconds", "position_at", "volume", "favorite"))
+    for state in ("playing", "paused", "stopped", "buffering"):
+        assert_valid_activity_content(_mut(valid_media, playback_state=state))
+    # foreground is only refused on http(s) controls; a deep link opens that app anyway.
+    assert_valid_activity_content(
+        _mut(valid_media, controls=_controls(favorite={"url": "spotify://track/1", "foreground": True}))
+    )
+    assert_valid_activity_content(_mut(valid_media, controls={}))
+    assert_valid_activity_content(_mut(valid_media, image_shape="circle"))
+    # {"stop": null} is the merge-layer way to drop a slot; the contract reads it as absent.
+    assert_valid_activity_content(_mut(valid_media, controls=_controls(stop=None)))
 
 
 def test_valid_live_progress_payloads_pass() -> None:

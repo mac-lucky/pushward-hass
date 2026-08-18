@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "更新活动 (Media)",
+      "description": "更新 PushWard 媒体实时活动：一张带封面、走动进度条和调用你自己 Webhook 的播放控制按钮的远程播放器卡片。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "media_title": {
+          "name": "媒体标题",
+          "description": "显示为播放器卡片大字行的曲目、剧集或频道（最多 128 个字符）。活动名称为来源设备。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "显示在媒体标题下方的艺术家、节目或频道。"
+        },
+        "playback_state": {
+          "name": "播放状态",
+          "description": "playing、paused、stopped 或 buffering。进度条仅在 playing 时走动。"
+        },
+        "position_seconds": {
+          "name": "播放位置",
+          "description": "采样时刻的播放位置（秒）。"
+        },
+        "duration_seconds": {
+          "name": "时长",
+          "description": "总长度（秒，最多 604800）。直播流请留空：不绘制进度条，但已播放时间仍会继续计时。"
+        },
+        "position_at": {
+          "name": "位置采样时间",
+          "description": "采样播放位置时的 Unix 时间戳（秒）。默认为当前时间，且不能是未来时间。"
+        },
+        "volume": {
+          "name": "音量",
+          "description": "0.0 到 1.0 的音量级别，绘制为音量按钮之间的细条。"
+        },
+        "favorite": {
+          "name": "收藏",
+          "description": "填充心形按钮。"
+        },
+        "controls": {
+          "name": "控制按钮",
+          "description": "以插槽为键的对象形式的播放控制按钮：previous、play_pause、play、pause、next、stop、favorite、volume_down、volume_up，以及 extra（最多 3 个自定义按钮的列表，每个都需要图标）。每个插槽为 url, title, icon, method, headers, body，且没有 foreground 键：http(s) URL 始终是静默 Webhook（默认 POST），自定义 scheme 的 URL 则打开对应应用。"
+        },
+        "image_url": {
+          "name": "图片 URL",
+          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+        },
+        "image_shape": {
+          "name": "图片形状",
+          "description": "图片的裁剪方式：poster 保留竖版裁剪，square 为默认值，circle 裁剪为圆形。"
+        },
+        "image_thumbhash": {
+          "name": "图片 ThumbHash",
+          "description": "无法获取 URL 时绘制的内嵌模糊预览，也是局域网图片唯一能显示的层级。留空可自动根据 URL 计算，或使用 Generate ThumbHash 动作从任意 Home Assistant 能读取的图片生成。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 music.note、mdi:music）。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
+        }
+      }
+    },
     "create_activity": {
       "name": "创建活动",
       "description": "创建新的 PushWard Live Activity。",
@@ -1913,7 +2023,8 @@
         "gauge": "仪表",
         "timeline": "时间线",
         "board": "看板",
-        "log": "日志"
+        "log": "日志",
+        "media": "媒体"
       }
     },
     "severity": {

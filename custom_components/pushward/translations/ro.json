@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Actualizați activitatea (Media)",
+      "description": "Actualizați o Live Activity media PushWard: un card de player la distanță cu copertă, bară de progres în mișcare și butoane de transport care apelează propriile webhook-uri.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "media_title": {
+          "name": "Titlul media",
+          "description": "Piesa, episodul sau canalul afișat ca linie mare a cardului de player (max. 128 de caractere). Numele activității este dispozitivul sursă."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Artistul, emisiunea sau canalul afișat sub titlul media."
+        },
+        "playback_state": {
+          "name": "Starea redării",
+          "description": "playing, paused, stopped sau buffering. Bara de progres avansează doar în starea playing."
+        },
+        "position_seconds": {
+          "name": "Poziție",
+          "description": "Poziția de redare în secunde în momentul eșantionării."
+        },
+        "duration_seconds": {
+          "name": "Durată",
+          "description": "Lungimea totală în secunde (max. 604800). Omiteți pentru o transmisiune live: nu se desenează bara, dar ceasul timpului scurs continuă."
+        },
+        "position_at": {
+          "name": "Momentul eșantionării poziției",
+          "description": "Marcaj de timp Unix (secunde) al eșantionării poziției. Implicit acum; nu poate fi în viitor."
+        },
+        "volume": {
+          "name": "Volum",
+          "description": "Nivelul volumului de la 0.0 la 1.0, desenat ca o bară subțire între butoanele de volum."
+        },
+        "favorite": {
+          "name": "Favorit",
+          "description": "Umple butonul inimă."
+        },
+        "controls": {
+          "name": "Comenzi",
+          "description": "Butoane de transport ca obiect cu sloturile drept chei: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, plus extra (o listă de cel mult 3 butoane personalizate, fiecare cu o pictogramă). Fiecare slot este url, title, icon, method, headers, body fără nicio cheie foreground: un URL http(s) este întotdeauna un webhook silențios (POST implicit), iar un URL cu schemă personalizată deschide acea aplicație."
+        },
+        "image_url": {
+          "name": "URL imagine",
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+        },
+        "image_shape": {
+          "name": "Forma imaginii",
+          "description": "Cum este decupată imaginea: poster păstrează un cadru vertical, square este valoarea implicită, circle o decupează rotund."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash imagine",
+          "description": "Previzualizare neclară încorporată, desenată când adresa URL nu poate fi descărcată, și singurul nivel care apare pentru o imagine din rețeaua locală. Lăsați gol pentru a fi calculat automat din adresa URL sau folosiți acțiunea Generate ThumbHash pentru a-l crea din orice imagine pe care Home Assistant o poate citi."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Culoarea de accent pentru activitate. Hex (#RRGGBB) sau culoare numită."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. Hex (#RRGGBB) sau culoare numită."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. Hex (#RRGGBB) sau culoare numită."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Sunetul de notificare redat pe dispozitiv pentru această actualizare."
+        },
+        "priority": {
+          "name": "Suprascriere prioritate",
+          "description": "Prioritate per actualizare (0-10). Suprascrie prioritatea configurată a activității doar pentru acest push."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
+        }
+      }
+    },
     "create_activity": {
       "name": "Creați activitatea",
       "description": "Creați un nou PushWard Live Activity.",
@@ -1913,7 +2023,8 @@
         "gauge": "Indicator",
         "timeline": "Cronologie",
         "board": "Panou",
-        "log": "Jurnal"
+        "log": "Jurnal",
+        "media": "Media"
       }
     },
     "severity": {

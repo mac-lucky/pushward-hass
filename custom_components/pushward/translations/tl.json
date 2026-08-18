@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "I-update ang Activity (Media)",
+      "description": "I-update ang isang PushWard media Live Activity: isang remote player card na may cover art, tumatakbong progress bar, at mga transport button na tumatawag sa sarili mong mga webhook.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "media_title": {
+          "name": "Pamagat ng Media",
+          "description": "Track, episode, o channel na ipinapakita bilang malaking linya ng player card (max 128 na character). Ang pangalan ng activity ang source device."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Artist, palabas, o channel na ipinapakita sa ilalim ng pamagat ng media."
+        },
+        "playback_state": {
+          "name": "Estado ng Playback",
+          "description": "playing, paused, stopped, o buffering. Tumatakbo lang ang progress bar habang playing."
+        },
+        "position_seconds": {
+          "name": "Posisyon",
+          "description": "Posisyon ng playhead sa segundo sa sandaling kinuha ang sample."
+        },
+        "duration_seconds": {
+          "name": "Tagal",
+          "description": "Kabuuang haba sa segundo (max 604800). Iwanang blangko para sa live stream: walang bar na iguguhit, pero patuloy na tatakbo ang orasan ng lumipas na oras."
+        },
+        "position_at": {
+          "name": "Oras ng Sample ng Posisyon",
+          "description": "Unix timestamp (segundo) kung kailan kinuha ang posisyon. Default ay ngayon at hindi maaaring nasa hinaharap."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Antas ng volume mula 0.0 hanggang 1.0, iginuguhit bilang manipis na bar sa pagitan ng mga volume button."
+        },
+        "favorite": {
+          "name": "Paborito",
+          "description": "Pinupuno ang heart button."
+        },
+        "controls": {
+          "name": "Mga Kontrol",
+          "description": "Mga transport button bilang object na may mga slot bilang key: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, at extra (listahan ng hanggang 3 custom na button, bawat isa ay may icon). Ang bawat slot ay url, title, icon, method, headers, body na walang anumang foreground key: ang http(s) URL ay palaging isang tahimik na webhook (POST bilang default) at ang custom-scheme URL ay nagbubukas ng app na iyon."
+        },
+        "image_url": {
+          "name": "URL ng larawan",
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+        },
+        "image_shape": {
+          "name": "Hugis ng larawan",
+          "description": "Kung paano kina-crop ang larawan: patayong crop ang poster, default ang square, at bilog ang crop ng circle."
+        },
+        "image_thumbhash": {
+          "name": "ThumbHash ng larawan",
+          "description": "Malabong preview na nakalakip, ipinapakita kapag hindi ma-download ang URL, at ito lang ang lumalabas para sa larawan sa lokal mong network. Iwanang blangko para awtomatikong kalkulahin mula sa URL, o gamitin ang aksyong Generate ThumbHash para gumawa mula sa kahit anong larawang kayang basahin ng Home Assistant."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent na Kulay",
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Background color para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Tunog ng notification na tinutugtog sa device para sa update na ito."
+        },
+        "priority": {
+          "name": "Override ng Priyoridad",
+          "description": "Priyoridad kada update (0-10). Nino-override ang naka-configure na priyoridad ng activity para sa push na ito lamang."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
+        }
+      }
+    },
     "create_activity": {
       "name": "Lumikha ng Activity",
       "description": "Lumikha ng bagong PushWard Live Activity.",
@@ -1913,7 +2023,8 @@
         "gauge": "Panukat",
         "timeline": "Timeline",
         "board": "Board",
-        "log": "Log"
+        "log": "Log",
+        "media": "Media"
       }
     },
     "severity": {

@@ -33,6 +33,7 @@ update_activity:
             - "timeline"
             - "board"
             - "log"
+            - "media"
     progress:
       name: Progress
       description: Progress value between 0.0 and 1.0.
@@ -1527,6 +1528,159 @@ update_activity_log:
         text:
     tap_action:
       example: '{"url": "homeassistant://navigate/lovelace/0"}'
+      selector:
+        object:
+    sound:
+      example: "chime"
+      selector:
+        select:
+          options:
+            - "default"
+            - "chime"
+            - "alert"
+            - "success"
+            - "warning"
+            - "bell"
+            - "ding"
+            - "buzz"
+            - "notification"
+    priority:
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 10
+          mode: slider
+    ended_ttl:
+      example: 300
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    stale_ttl:
+      example: 1800
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    dismissal_ttl:
+      example: 60
+      selector:
+        number:
+          min: 0
+          max: 14400
+          mode: box
+
+update_activity_media:
+  fields:
+    slug:
+      required: true
+      example: "ha-living-room-player"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    media_title:
+      example: "Snooze"
+      selector:
+        text:
+    subtitle:
+      example: "SZA"
+      selector:
+        text:
+    playback_state:
+      example: "playing"
+      selector:
+        select:
+          options:
+            - "playing"
+            - "paused"
+            - "stopped"
+            - "buffering"
+    position_seconds:
+      example: 47.5
+      selector:
+        number:
+          min: 0
+          step: 0.1
+          mode: box
+    duration_seconds:
+      example: 214
+      selector:
+        number:
+          min: 1
+          max: 604800
+          step: 0.1
+          mode: box
+    position_at:
+      example: 1755500000
+      selector:
+        number:
+          min: 1
+          mode: box
+    volume:
+      example: 0.35
+      selector:
+        number:
+          min: 0.0
+          max: 1.0
+          step: 0.01
+          mode: slider
+    favorite:
+      selector:
+        boolean:
+    controls:
+      example: '{"previous": {"url": "https://ha.example.com/api/webhook/pw-prev"}, "play_pause": {"url": "https://ha.example.com/api/webhook/pw-toggle"}, "next": {"url": "https://ha.example.com/api/webhook/pw-next"}, "extra": [{"url": "https://ha.example.com/api/webhook/pw-shuffle", "icon": "shuffle", "title": "Shuffle"}]}'
+      selector:
+        object:
+    image_url:
+      example: "https://example.com/cover.jpg"
+      selector:
+        text:
+    image_shape:
+      selector:
+        select:
+          options:
+            - "poster"
+            - "square"
+            - "circle"
+    image_thumbhash:
+      example: "3PcNNYSFeXh/d3eld0iHZoZgVwh2"
+      selector:
+        text:
+    state_text:
+      example: "Now Playing"
+      selector:
+        text:
+    icon:
+      example: "music.note"
+      selector:
+        text:
+    completion_message:
+      example: "Playback stopped"
+      selector:
+        text:
+    accent_color:
+      example: "pink"
+      selector:
+        text:
+    background_color:
+      example: "#1a2b3c"
+      selector:
+        text:
+    text_color:
+      example: "#ffffff"
+      selector:
+        text:
+    tap_action:
+      example: '{"url": "homeassistant://navigate/media-browser"}'
       selector:
         object:
     sound:

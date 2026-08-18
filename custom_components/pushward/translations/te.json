@@ -1215,6 +1215,116 @@
         }
       }
     },
+    "update_activity_media": {
+      "name": "Activity అప్‌డేట్ చేయి (Media)",
+      "description": "PushWard మీడియా Live Activity ని అప్‌డేట్ చేయండి: కవర్ ఆర్ట్, కదిలే ప్రోగ్రెస్ బార్ మరియు మీ స్వంత webhookలను పిలిచే ట్రాన్స్‌పోర్ట్ బటన్లతో కూడిన రిమోట్ ప్లేయర్ కార్డ్.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "media_title": {
+          "name": "మీడియా శీర్షిక",
+          "description": "ప్లేయర్ కార్డ్ పెద్ద లైన్‌గా చూపబడే ట్రాక్, ఎపిసోడ్ లేదా ఛానెల్ (గరిష్టంగా 128 అక్షరాలు). Activity పేరు మూల పరికరం."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "మీడియా శీర్షిక కింద చూపబడే కళాకారుడు, షో లేదా ఛానెల్."
+        },
+        "playback_state": {
+          "name": "ప్లేబ్యాక్ స్థితి",
+          "description": "playing, paused, stopped లేదా buffering. ప్రోగ్రెస్ బార్ playing లో మాత్రమే కదులుతుంది."
+        },
+        "position_seconds": {
+          "name": "స్థానం",
+          "description": "నమూనా తీసిన క్షణంలో ప్లేహెడ్ స్థానం, సెకన్లలో."
+        },
+        "duration_seconds": {
+          "name": "వ్యవధి",
+          "description": "మొత్తం పొడవు సెకన్లలో (గరిష్టంగా 604800). లైవ్ స్ట్రీమ్ కోసం వదిలేయండి: బార్ గీయబడదు, కానీ గడిచిన సమయం గడియారం నడుస్తూనే ఉంటుంది."
+        },
+        "position_at": {
+          "name": "స్థానం నమూనా సమయం",
+          "description": "స్థానం నమూనా తీసిన Unix టైమ్‌స్టాంప్ (సెకన్లు). డిఫాల్ట్ ఇప్పుడు; భవిష్యత్తులో ఉండకూడదు."
+        },
+        "volume": {
+          "name": "వాల్యూమ్",
+          "description": "0.0 నుండి 1.0 వరకు వాల్యూమ్ స్థాయి, వాల్యూమ్ బటన్ల మధ్య సన్నని బార్‌గా గీయబడుతుంది."
+        },
+        "favorite": {
+          "name": "ఇష్టమైనది",
+          "description": "హార్ట్ బటన్‌ను నింపుతుంది."
+        },
+        "controls": {
+          "name": "నియంత్రణలు",
+          "description": "స్లాట్ కీలతో కూడిన ఆబ్జెక్ట్‌గా ట్రాన్స్‌పోర్ట్ బటన్లు: previous, play_pause, play, pause, next, stop, favorite, volume_down, volume_up, మరియు extra (గరిష్టంగా 3 కస్టమ్ బటన్ల జాబితా, ఒక్కొక్కదానికి ఒక చిహ్నం). ప్రతి స్లాట్ url, title, icon, method, headers, body మరియు అందులో foreground కీ ఉండదు: http(s) URL ఎల్లప్పుడూ నిశ్శబ్ద webhook (డిఫాల్ట్ POST), కస్టమ్-స్కీమ్ URL ఆ యాప్‌ను తెరుస్తుంది."
+        },
+        "image_url": {
+          "name": "చిత్రం URL",
+          "description": "చిహ్నం పక్కన చూపే చిత్రం యొక్క https చిరునామా. iPhone దీన్ని తానే డౌన్‌లోడ్ చేస్తుంది, కాబట్టి ఇది ఇంటర్నెట్ నుండి అందుబాటులో ఉండాలి; స్థానిక నెట్‌వర్క్ చిరునామా లోడ్ కాదు, కానీ దాని ThumbHash కనిపిస్తుంది."
+        },
+        "image_shape": {
+          "name": "చిత్రం ఆకారం",
+          "description": "చిత్రం ఎలా కత్తిరించబడుతుంది: poster నిలువు క్రాప్‌ను ఉంచుతుంది, square డిఫాల్ట్, circle గుండ్రంగా కత్తిరిస్తుంది."
+        },
+        "image_thumbhash": {
+          "name": "చిత్రం ThumbHash",
+          "description": "URL డౌన్‌లోడ్ కానప్పుడు గీయబడే అస్పష్టమైన అంతర్నిర్మిత ప్రివ్యూ, స్థానిక నెట్‌వర్క్‌లోని చిత్రానికి కనిపించే ఏకైక స్థాయి ఇదే. URL నుండి స్వయంచాలకంగా లెక్కించడానికి ఖాళీగా ఉంచండి, లేదా Home Assistant చదవగలిగే ఏ చిత్రం నుండైనా తయారు చేయడానికి Generate ThumbHash చర్యను ఉపయోగించండి."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. music.note, mdi:music)."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity కోసం నేపథ్య రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity కోసం టెక్స్ట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం పరికరంలో ప్లే చేయబడే నోటిఫికేషన్ సౌండ్."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత ఓవర్‌రైడ్",
+          "description": "ప్రతి-నవీకరణ ప్రాధాన్యత (0-10). ఈ పుష్ కోసం మాత్రమే activity యొక్క కాన్ఫిగర్ చేసిన ప్రాధాన్యతను ఓవర్‌రైడ్ చేస్తుంది."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Activity ముగించిన తర్వాత ఉంచే సెకన్లు."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Activity పాతదిగా పరిగణించబడే ముందు సెకన్లు."
+        },
+        "dismissal_ttl": {
+          "name": "తొలగింపు TTL",
+          "description": "ముగిసిన యాక్టివిటీ తొలగించబడే ముందు లాక్ స్క్రీన్‌పై ఎన్ని సెకన్లు ఉంటుందో. 0 అయితే ముగిసిన వెంటనే దాన్ని తొలగిస్తుంది."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activity సృష్టించు",
       "description": "కొత్త PushWard Live Activity సృష్టించండి.",
@@ -1913,7 +2023,8 @@
         "gauge": "గేజ్",
         "timeline": "కాలక్రమం",
         "board": "బోర్డు",
-        "log": "లాగ్"
+        "log": "లాగ్",
+        "media": "మీడియా"
       }
     },
     "severity": {

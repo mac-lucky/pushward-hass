@@ -55,16 +55,21 @@ from .const import (
     MAX_TAP_ACTION_TITLE_LEN,
     MAX_TEXT_INPUT_LABEL_LEN,
     MAX_URL_LEN,
+    MEDIA_CONTROL_SLOTS,
+    MEDIA_DURATION_MAX,
+    MEDIA_EXTRA_CONTROLS_MAX,
+    MEDIA_TITLE_MAX,
     NOTIFICATION_LEVELS,
+    PLAYBACK_STATES,
     PRIORITY_MAX,
     PRIORITY_MIN,
     SCALES,
+    SERVICE_TEMPLATES,
     SEVERITIES,
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TAP_ACTION_METHODS,
-    TEMPLATES,
     TIMELINE_SERIES_LABEL_MAX,
     USAGE_LIMIT_RESOURCES,
     usage_limit_issue_id,
@@ -92,8 +97,9 @@ PLATFORMS = [Platform.SENSOR]
 
 
 SERVICE_UPDATE_ACTIVITY = "update_activity"
-# Per-template update services (one per const.TEMPLATES) — the template is implied by the
-# service name, so the UI shows only that template's fields (HA can't hide fields by value).
+# Per-template update services (one per const.SERVICE_TEMPLATES) - the template is implied
+# by the service name, so the UI shows only that template's fields (HA can't hide fields by
+# value).
 SERVICE_UPDATE_TEMPLATE_PREFIX = "update_activity_"
 SERVICE_CREATE_ACTIVITY = "create_activity"
 SERVICE_END_ACTIVITY = "end_activity"
@@ -166,16 +172,29 @@ _TAP_ACTION_BASE = vol.Schema(
 )
 _TAP_ACTION_SCHEMA = vol.All(_TAP_ACTION_BASE, _validate_http_action_fields)
 
+# Button-facing label + SF Symbol, shared by the url_action slots and the media controls.
+_ACTION_LABEL_FIELDS = {
+    vol.Optional("title"): vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN)),
+    vol.Optional("icon"): vol.All(str, vol.Length(max=MAX_TAP_ACTION_ICON_LEN)),
+}
+
 # Tappable button (primary / secondary): tap-action routing plus a button label + SF Symbol.
-_URL_ACTION_SCHEMA = vol.All(
-    _TAP_ACTION_BASE.extend(
-        {
-            vol.Optional("title"): vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN)),
-            vol.Optional("icon"): vol.All(str, vol.Length(max=MAX_TAP_ACTION_ICON_LEN)),
-        }
-    ),
-    _validate_http_action_fields,
-)
+_URL_ACTION_SCHEMA = vol.All(_TAP_ACTION_BASE.extend(_ACTION_LABEL_FIELDS), _validate_http_action_fields)
+
+
+def _silent_action_schema(extra_fields: dict) -> vol.All:
+    """The tap-action shape with no `foreground` key, plus the given fields.
+
+    Built from _TAP_ACTION_BASE so a field added to the shared action shape reaches
+    these schemas too. Used for the media controls: an http(s) control is always a
+    silent webhook (the server rejects foreground and defaults the method to POST),
+    and a custom-scheme control opens that app, where foreground means nothing. A
+    caller sending it gets an unknown-key error at validation instead of a server 422.
+    """
+    fields = {key: validator for key, validator in _TAP_ACTION_BASE.schema.items() if str(key) != "foreground"}
+    fields.update(extra_fields)
+    return vol.All(vol.Schema(fields), _validate_http_action_fields)
+
 
 # Action fields the server accepts on EVERY activity template (content_schema.go
 # tapActionProperties). Legacy url/secondary_url strings sit alongside the richer
@@ -244,8 +263,8 @@ def _clearable(validator):
     return _validate
 
 
-# Optional artwork, accepted only by the templates in IMAGE_TEMPLATES (generic and
-# steps). The server rejects the trio on the others rather than ignoring it.
+# Optional artwork, accepted only by the templates in IMAGE_TEMPLATES (generic,
+# steps and media). The server rejects the trio on the others rather than ignoring it.
 # image_thumbhash is derived from image_url when the caller omits it, so an
 # automation only has to name the picture.
 _IMAGE_FIELDS = {
@@ -333,10 +352,45 @@ _LOG_LINE_SCHEMA = vol.Schema(
 _LOG_TEMPLATE_FIELDS = {
     vol.Optional("lines"): vol.All([_LOG_LINE_SCHEMA], vol.Length(min=1, max=LOG_MAX_LINES)),
 }
+# media: a remote player card. Every control slot is a silent tap action (see
+# _silent_action_schema); the custom `extra` buttons have no default glyph, so each needs
+# an icon. Slots, `extra` and `controls` itself accept null: on PATCH the server
+# deep-merges the object, so {"controls": {"stop": null}} is how an automation removes a
+# button again, {"controls": null} how it removes them all.
+_MEDIA_CONTROL_SCHEMA = _silent_action_schema(_ACTION_LABEL_FIELDS)
+_MEDIA_EXTRA_CONTROL_SCHEMA = _silent_action_schema(
+    {
+        **{key: validator for key, validator in _ACTION_LABEL_FIELDS.items() if str(key) != "icon"},
+        vol.Required("icon"): vol.All(str, vol.Length(min=1, max=MAX_TAP_ACTION_ICON_LEN)),
+    }
+)
+_MEDIA_CONTROLS_SCHEMA = vol.Schema(
+    {
+        **{vol.Optional(slot): vol.Any(None, _MEDIA_CONTROL_SCHEMA) for slot in MEDIA_CONTROL_SLOTS},
+        vol.Optional("extra"): vol.Any(
+            None, vol.All([_MEDIA_EXTRA_CONTROL_SCHEMA], vol.Length(max=MEDIA_EXTRA_CONTROLS_MAX))
+        ),
+    }
+)
+_MEDIA_TEMPLATE_FIELDS = {
+    vol.Optional("media_title"): vol.All(str, vol.Length(max=MEDIA_TITLE_MAX)),
+    vol.Optional("playback_state"): vol.In(PLAYBACK_STATES),
+    vol.Optional("position_seconds"): vol.All(vol.Coerce(float), vol.Range(min=0)),
+    vol.Optional("duration_seconds"): vol.All(
+        vol.Coerce(float), vol.Range(min=0, min_included=False, max=MEDIA_DURATION_MAX)
+    ),
+    # Unix seconds the position was sampled at; the server stamps now when omitted and
+    # rejects a value more than a few minutes in the future.
+    vol.Optional("position_at"): vol.All(vol.Coerce(int), vol.Range(min=1)),
+    vol.Optional("volume"): vol.All(vol.Coerce(float), vol.Range(min=0.0, max=1.0)),
+    vol.Optional("favorite"): cv.boolean,
+    vol.Optional("controls"): vol.Any(None, _MEDIA_CONTROLS_SCHEMA),
+}
 
-# Lean field groups for board/log: only the fields those templates actually render.
+# Lean field groups for board/log/media: only the fields those templates actually render.
 # Board/log have no progress bar, no remaining_time, and no whole-activity button slots
-# (board uses per-tile url_action; log has no buttons) — so those are deliberately absent.
+# (board uses per-tile url_action; log has no buttons; media has its own transport row and
+# draws neither url_action nor a progress value) - so those are deliberately absent.
 _BOARD_LOG_LABEL_FIELDS = {
     vol.Optional("state_text"): str,
     vol.Optional("subtitle"): str,
@@ -353,17 +407,17 @@ _BOARD_LOG_APPEARANCE_FIELDS = {
 _BOARD_LOG_ACTION_FIELDS = {vol.Optional("tap_action"): _TAP_ACTION_SCHEMA}  # whole-activity tap only
 
 
-def _board_log_schema(template_fields: dict) -> vol.Schema:
-    """Build a lean board/log update schema: only the fields those templates render."""
-    return vol.Schema(
-        {
-            **_UPDATE_TOPLEVEL_FIELDS,
-            **_BOARD_LOG_LABEL_FIELDS,
-            **_BOARD_LOG_APPEARANCE_FIELDS,
-            **_BOARD_LOG_ACTION_FIELDS,
-            **template_fields,
-        }
-    )
+def _lean_update_schema(*template_fields: dict) -> vol.Schema:
+    """Build a lean board/log/media update schema: only the fields those templates render."""
+    merged = {
+        **_UPDATE_TOPLEVEL_FIELDS,
+        **_BOARD_LOG_LABEL_FIELDS,
+        **_BOARD_LOG_APPEARANCE_FIELDS,
+        **_BOARD_LOG_ACTION_FIELDS,
+    }
+    for group in template_fields:
+        merged.update(group)
+    return vol.Schema(merged)
 
 
 def _update_template_schema(*template_fields: dict) -> vol.Schema:
@@ -392,9 +446,12 @@ _UPDATE_TEMPLATE_SCHEMAS = {
     "alert": _update_template_schema(_ALERT_TEMPLATE_FIELDS),
     "gauge": _update_template_schema(_GAUGE_TEMPLATE_FIELDS),
     "timeline": _update_template_schema(_TIMELINE_TEMPLATE_FIELDS),
-    # board/log use the lean schema (no progress / remaining_time / button slots).
-    "board": _board_log_schema(_BOARD_TEMPLATE_FIELDS),
-    "log": _board_log_schema(_LOG_TEMPLATE_FIELDS),
+    # board/log/media use the lean schema (no progress / remaining_time / button slots).
+    # The server accepts url_action on media but the player card never draws it, so the
+    # action does not offer it; media does have the image slot (cover art).
+    "board": _lean_update_schema(_BOARD_TEMPLATE_FIELDS),
+    "log": _lean_update_schema(_LOG_TEMPLATE_FIELDS),
+    "media": _lean_update_schema(_MEDIA_TEMPLATE_FIELDS, _IMAGE_FIELDS),
 }
 
 # The deprecated update_activity accepts every template's fields (plus an explicit
@@ -410,6 +467,7 @@ SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
     _TIMELINE_TEMPLATE_FIELDS,
     _BOARD_TEMPLATE_FIELDS,
     _LOG_TEMPLATE_FIELDS,
+    _MEDIA_TEMPLATE_FIELDS,
 )
 
 SCHEMA_CREATE_ACTIVITY = vol.Schema(
@@ -818,7 +876,7 @@ def _register_services(hass: HomeAssistant) -> None:
     hass.services.async_register(
         DOMAIN, SERVICE_UPDATE_ACTIVITY, partial(_async_handle_update_activity, hass), SCHEMA_UPDATE_ACTIVITY
     )
-    for template in TEMPLATES:
+    for template in SERVICE_TEMPLATES:
         hass.services.async_register(
             DOMAIN,
             f"{SERVICE_UPDATE_TEMPLATE_PREFIX}{template}",
