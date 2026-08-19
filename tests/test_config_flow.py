@@ -38,6 +38,7 @@ from custom_components.pushward.config_flow import (
     _primary_series_options,
     _resolve_series_entity_labels,
     _rgb_to_hex,
+    _suggest_template,
     _suggest_widget_template,
     _validate_integration_key,
     _widget_details_schema,
@@ -79,6 +80,9 @@ from custom_components.pushward.const import (
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
+    CONF_MEDIA_CONTROLS,
+    CONF_MEDIA_FAVORITE_SCRIPT,
+    CONF_MEDIA_TOKEN,
     CONF_MIN_VALUE,
     CONF_PRIMARY_SERIES,
     CONF_PRIORITY,
@@ -4446,14 +4450,9 @@ def test_suggest_widget_template_new_templates(hass, entity_id, attributes, expe
 # --- image trio ------------------------------------------------------------
 
 
-# media has the image slot too, but it is service-only for now and never reaches the
-# tracked-entity flow, so the flow-level checks run over the flow's own templates.
-_FLOW_IMAGE_TEMPLATES = [t for t in IMAGE_TEMPLATES if t in TEMPLATES]
-
-
-@pytest.mark.parametrize("template", _FLOW_IMAGE_TEMPLATES)
+@pytest.mark.parametrize("template", IMAGE_TEMPLATES)
 def test_image_templates_offer_the_image_fields(template: str) -> None:
-    """Only generic and steps have an image slot server-side, and only they show one."""
+    """Only the templates with an image slot server-side show the fields for one."""
     schema_keys = _flow_schema_keys(_details_schema("binary_sensor.washer", template, {}))
     assert CONF_IMAGE_URL in schema_keys
     assert CONF_IMAGE_SHAPE in schema_keys
@@ -4572,3 +4571,104 @@ def test_parse_entity_input_rejects_an_unusable_thumbhash(thumbhash: str) -> Non
         _parse_entity_input(_base_user_input(**{CONF_IMAGE_URL: IMAGE_URL, CONF_IMAGE_THUMBHASH: thumbhash}))
     assert err.value.error_message == "invalid_image_thumbhash"
     assert err.value.path == [CONF_IMAGE_THUMBHASH]
+
+
+# --- media template --------------------------------------------------------
+
+
+_MEDIA_CORE = {CONF_ENTITY_ID: "media_player.living_room", CONF_TEMPLATE: "media"}
+
+
+async def test_suggest_template_media_for_a_player(hass: HomeAssistant) -> None:
+    hass.states.async_set("media_player.living_room", "playing")
+    assert _suggest_template(hass, "media_player.living_room") == "media"
+
+
+async def test_add_media_subentry_mints_a_control_token(hass: HomeAssistant) -> None:
+    """The controls have to authenticate somehow, and the token is never a form field."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        core_overrides=_MEDIA_CORE,
+        details_overrides={CONF_MEDIA_FAVORITE_SCRIPT: "script.star_track"},
+        template="media",
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+    data = entry.subentries[next(iter(entry.subentries))].data
+    assert data[CONF_TEMPLATE] == "media"
+    assert data[CONF_MEDIA_CONTROLS] is True
+    assert data[CONF_MEDIA_FAVORITE_SCRIPT] == "script.star_track"
+    assert len(data[CONF_MEDIA_TOKEN]) >= 32
+
+
+async def test_other_templates_carry_no_control_token(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    await _add_entity_subentry(hass, entry)
+
+    assert entry.subentries[next(iter(entry.subentries))].data[CONF_MEDIA_TOKEN] == ""
+
+
+async def test_the_control_token_is_never_a_form_field(hass: HomeAssistant) -> None:
+    """The secret is minted and stored, not typed - a form field would render it."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY), context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**_MEDIA_CORE)
+    )
+    assert result["step_id"] == "details"
+
+    def field_names(schema):
+        names = set()
+        for key, value in schema.schema.items():
+            names.add(str(key.schema if hasattr(key, "schema") else key))
+            if hasattr(value, "schema") and hasattr(value.schema, "schema"):
+                names.update(str(k.schema if hasattr(k, "schema") else k) for k in value.schema.schema)
+        return names
+
+    assert CONF_MEDIA_TOKEN not in field_names(result["data_schema"])
+
+
+async def test_reconfigure_media_keeps_the_control_token(hass: HomeAssistant) -> None:
+    """Minting a new one would silently break the buttons on a card already pushed."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    await _add_entity_subentry(hass, entry, core_overrides=_MEDIA_CORE, template="media")
+    subentry_id = next(iter(entry.subentries))
+    token = entry.subentries[subentry_id].data[CONF_MEDIA_TOKEN]
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**_MEDIA_CORE),
+    )
+    assert result["step_id"] == "details"
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("media", **{CONF_MEDIA_CONTROLS: False}),
+    )
+    assert result["type"] is FlowResultType.ABORT
+
+    data = entry.subentries[subentry_id].data
+    assert data[CONF_MEDIA_TOKEN] == token
+    assert data[CONF_MEDIA_CONTROLS] is False
+
+
+def test_parse_entity_input_rejects_a_favorite_that_is_not_a_script() -> None:
+    with pytest.raises(vol.Invalid) as err:
+        _parse_entity_input(_base_user_input(**{CONF_TEMPLATE: "media", CONF_MEDIA_FAVORITE_SCRIPT: "light.kitchen"}))
+    assert err.value.msg == "invalid_favorite_script"
+
+
+def test_parse_entity_input_defaults_media_controls_on() -> None:
+    result = _parse_entity_input(_base_user_input(**{CONF_TEMPLATE: "media"}))
+    assert result[CONF_MEDIA_CONTROLS] is True
+    assert result[CONF_MEDIA_FAVORITE_SCRIPT] == ""

@@ -1672,6 +1672,17 @@
                 "steps_editor": "每个步骤一行，按顺序排列。每行设置可选标签、行高（1-10）、相对宽度（正数）和颜色（名称或十六进制；留空则保持强调色）。请添加零行或正好 total_steps 行。仅适用于 steps 模板。"
               }
             },
+            "media_options": {
+              "name": "播放器",
+              "data": {
+                "media_controls": "播放控制按钮",
+                "media_favorite_script": "收藏脚本"
+              },
+              "data_description": {
+                "media_controls": "在卡片上显示上一曲 / 播放-暂停 / 下一曲 / 停止 / 音量按钮，仅限于播放器所支持的范围。点击按钮会通过一个携带自身密钥（而非你的登录信息）的链接回调 Home Assistant，因此任何持有该通知的人都能控制这个播放器。如需仅展示的卡片，请关闭此项。仅适用于 media 模板。",
+                "media_favorite_script": "心形按钮运行的脚本（媒体播放器本身没有收藏功能）。留空则隐藏该按钮。仅适用于 media 模板。"
+              }
+            },
             "image_options": {
               "name": "图片",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "主系列必须与已配置的某个系列标签匹配。",
         "invalid_image_url": "图片 URL 必须是带主机名的 https 地址，且不能包含用户名或密码。",
         "invalid_image_shape": "图片形状必须是 poster、square 或 circle。",
-        "invalid_image_thumbhash": "图片 ThumbHash 必须是标准字母表且带填充的 base64，最多 64 个字符。可使用 Generate ThumbHash 动作生成。"
+        "invalid_image_thumbhash": "图片 ThumbHash 必须是标准字母表且带填充的 base64，最多 64 个字符。可使用 Generate ThumbHash 动作生成。",
+        "invalid_favorite_script": "收藏按钮必须指向一个 script 实体（script.something）。"
       },
       "abort": {
         "already_configured": "此实体已被追踪。",

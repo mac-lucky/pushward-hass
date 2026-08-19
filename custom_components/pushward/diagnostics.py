@@ -21,6 +21,7 @@ from .activity_manager import ActivityManager
 from .const import (
     CONF_ENTITY_ID,
     CONF_INTEGRATION_KEY,
+    CONF_MEDIA_TOKEN,
     CONF_SECONDARY_URL,
     CONF_SLUG,
     CONF_TAP_ACTION_URL,
@@ -31,12 +32,15 @@ from .const import (
 )
 from .widget_manager import WidgetManager
 
-# Never leak the integration key, nor user-supplied tap-action targets — webhook
-# URLs (config + rendered last_content) and any silent-webhook headers/body can
-# embed secrets/tokens. async_redact_data matches these keys recursively, so the
-# rendered tap_action/url_action dicts inside last_content are covered too.
+# Never leak the integration key, the media-control secret, nor user-supplied
+# tap-action targets - webhook URLs (config + rendered last_content) and any
+# silent-webhook headers/body can embed secrets/tokens. async_redact_data matches
+# these keys recursively, so the rendered tap_action/url_action dicts inside
+# last_content are covered too, and with them the token-bearing media control URLs
+# (each control is an action object keyed "url").
 TO_REDACT = {
     CONF_INTEGRATION_KEY,
+    CONF_MEDIA_TOKEN,
     CONF_TAP_ACTION_URL,
     CONF_URL,
     CONF_SECONDARY_URL,

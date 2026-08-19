@@ -1,6 +1,7 @@
 """Tests for the PushWard content mapper."""
 
 import time
+from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 
 import pytest
@@ -29,6 +30,7 @@ from custom_components.pushward.const import (
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
+    CONF_MEDIA_CONTROLS,
     CONF_MIN_VALUE,
     CONF_PRIMARY_SERIES,
     CONF_PROGRESS_ATTRIBUTE,
@@ -67,6 +69,9 @@ from custom_components.pushward.const import (
     CONF_WARNING_THRESHOLD,
     IMAGE_THUMBHASH_MAX,
     MAX_SEVERITY_LABEL_LEN,
+    MEDIA_DURATION_MAX,
+    MEDIA_POSITION_MAX_AGE,
+    MEDIA_TITLE_MAX,
     TIMELINE_SERIES_LABEL_MAX,
     normalize_slug,
     validate_slug,
@@ -82,6 +87,7 @@ from custom_components.pushward.content_mapper import (
     map_content,
     sanitize_slug,
 )
+from custom_components.pushward.media_control import EMITTED_CONTROL_SLOTS
 
 from .conftest import IMAGE_THUMBHASH as _THUMBHASH
 from .conftest import IMAGE_URL as _IMAGE_URL
@@ -3420,3 +3426,203 @@ def test_map_completion_content_omits_the_artwork(template):
     assert "image_shape" not in content
     assert "image_thumbhash" not in content
     assert_valid_activity_content(content)
+
+
+# --- media template ---------------------------------------------------------
+
+
+def _media_state(state: str = "playing", **attrs) -> object:
+    """A media_player State with the attributes a real player publishes."""
+    base = {
+        "friendly_name": "Living Room",
+        "media_title": "Snooze",
+        "media_artist": "SZA",
+        "media_duration": 214,
+        "media_position": 47,
+        "media_position_updated_at": datetime.now(UTC),
+        "volume_level": 0.35,
+    }
+    base.update(attrs)
+    return _make_state(state, base, entity_id="media_player.living_room")
+
+
+def test_media_maps_the_player_onto_the_card():
+    content = map_content(_media_state(), {CONF_TEMPLATE: "media"})
+
+    assert content["media_title"] == "Snooze"
+    assert content["subtitle"] == "SZA"
+    assert content["playback_state"] == "playing"
+    assert content["duration_seconds"] == 214
+    assert content["position_seconds"] == 47
+    assert content["position_at"] == pytest.approx(time.time(), abs=5)
+    assert content["volume"] == 0.35
+    assert content["progress"] == 0.0
+    assert_valid_activity_content(content, where="media")
+
+
+@pytest.mark.parametrize(
+    ("attrs", "expected"),
+    [
+        pytest.param({}, "Snooze", id="media_title"),
+        pytest.param({"media_title": None, "media_series_title": "The Wire"}, "The Wire", id="series_title"),
+        pytest.param({"media_title": "", "media_channel": "BBC 6 Music"}, "BBC 6 Music", id="channel"),
+        pytest.param({"media_title": None, "source": "HDMI 2"}, "HDMI 2", id="source"),
+    ],
+)
+def test_media_title_falls_through_the_attribute_chain(attrs, expected):
+    content = map_content(_media_state(**attrs), {CONF_TEMPLATE: "media"})
+    assert content["media_title"] == expected
+
+
+def test_media_title_absent_when_the_player_names_nothing():
+    """No invented title: the card still has the state line and the friendly name."""
+    state = _media_state(media_title=None, media_series_title=None, media_channel=None, source=None)
+    content = map_content(state, {CONF_TEMPLATE: "media"})
+
+    assert "media_title" not in content
+    assert content["subtitle"] == "SZA"
+    assert_valid_activity_content(content, where="media without a title")
+
+
+def test_media_title_is_truncated_to_the_server_cap():
+    content = map_content(_media_state(media_title="x" * 400), {CONF_TEMPLATE: "media"})
+    assert len(content["media_title"]) == MEDIA_TITLE_MAX
+    assert_valid_activity_content(content, where="long media title")
+
+
+@pytest.mark.parametrize(
+    ("attrs", "expected"),
+    [
+        pytest.param({}, "SZA", id="artist"),
+        pytest.param({"media_artist": None, "media_album_name": "SOS"}, "SOS", id="album"),
+        pytest.param({"media_artist": None, "app_name": "Spotify"}, "Spotify", id="app_name"),
+        pytest.param({"media_artist": None}, "Living Room", id="friendly_name_when_nothing_else"),
+    ],
+)
+def test_media_subtitle_falls_through_the_attribute_chain(attrs, expected):
+    content = map_content(_media_state(**attrs), {CONF_TEMPLATE: "media"})
+    assert content["subtitle"] == expected
+
+
+def test_media_subtitle_respects_a_configured_source():
+    """A user who pointed the subtitle somewhere keeps it; the artist only beats the default."""
+    state = _media_state(media_channel="BBC 6 Music")
+    content = map_content(state, {CONF_TEMPLATE: "media", CONF_SUBTITLE_ATTRIBUTE: "media_channel"})
+
+    assert content["subtitle"] == "BBC 6 Music"
+
+
+@pytest.mark.parametrize(
+    ("state", "expected"),
+    [
+        ("playing", "playing"),
+        ("paused", "paused"),
+        ("buffering", "buffering"),
+        ("idle", "stopped"),
+        ("standby", "stopped"),
+        ("on", "stopped"),
+    ],
+)
+def test_media_playback_state_maps_or_falls_back_to_stopped(state, expected):
+    content = map_content(_media_state(state), {CONF_TEMPLATE: "media"})
+    assert content["playback_state"] == expected
+
+
+def test_media_position_without_an_anchor_goes_out_alone():
+    """A position whose sample time the player never published still goes out.
+
+    The server stamps its receipt time for it AND clears any anchor inherited
+    from an earlier frame - the pair-or-nothing shape this replaced let a stored
+    anchor age past the merge validator's floor and 422 every later push.
+    """
+    state = _media_state("paused", media_position_updated_at=None)
+    content = map_content(state, {CONF_TEMPLATE: "media"})
+
+    assert content["position_seconds"] == 47
+    assert "position_at" not in content
+    assert content["duration_seconds"] == 214
+    assert_valid_activity_content(content, where="media without a position anchor")
+
+
+def test_media_sends_a_stale_playhead_without_its_anchor():
+    """A player paused since yesterday still reports when its playhead last moved.
+
+    Re-sending that stale anchor would 422 outright. Omitting the pair would be
+    worse: the server merge keeps a previously pushed position_at until a patch
+    overrides it, so the stored anchor would age past the validator's floor and
+    422 every later push - the end frames included. The position alone makes the
+    server re-stamp and drop the inherited anchor.
+    """
+    stale = datetime.now(UTC) - timedelta(seconds=MEDIA_POSITION_MAX_AGE + 60)
+    content = map_content(_media_state("paused", media_position_updated_at=stale), {CONF_TEMPLATE: "media"})
+
+    assert content["position_seconds"] == 47
+    assert "position_at" not in content
+
+
+def test_media_accepts_an_iso_string_anchor():
+    """Attributes survive a restore as strings, so the ISO form has to parse too."""
+    anchor = datetime.now(UTC) - timedelta(seconds=30)
+    content = map_content(_media_state(media_position_updated_at=anchor.isoformat()), {CONF_TEMPLATE: "media"})
+
+    assert content["position_at"] == int(anchor.timestamp())
+
+
+def test_media_clamps_an_anchor_from_a_fast_clock():
+    """A player whose clock runs ahead would stamp the future, which the server calls skew."""
+    ahead = datetime.now(UTC) + timedelta(hours=2)
+    content = map_content(_media_state(media_position_updated_at=ahead), {CONF_TEMPLATE: "media"})
+
+    assert content["position_at"] <= int(time.time())
+    assert_valid_activity_content(content, where="media with a fast clock")
+
+
+@pytest.mark.parametrize("duration", [0, -5, None, "unknown"])
+def test_media_omits_a_duration_that_is_not_a_length(duration):
+    content = map_content(_media_state(media_duration=duration), {CONF_TEMPLATE: "media"})
+    assert "duration_seconds" not in content
+
+
+def test_media_clamps_duration_and_position_to_the_server_cap():
+    state = _media_state(media_duration=999999999, media_position=999999999)
+    content = map_content(state, {CONF_TEMPLATE: "media"})
+
+    assert content["duration_seconds"] == MEDIA_DURATION_MAX
+    assert content["position_seconds"] == MEDIA_DURATION_MAX
+    assert_valid_activity_content(content, where="media over the duration cap")
+
+
+@pytest.mark.parametrize(
+    ("volume", "expected"),
+    [(0.35, 0.35), (1.4, 1.0), (-0.2, 0.0), ("0.5", 0.5)],
+)
+def test_media_volume_is_clamped_to_the_unit_range(volume, expected):
+    content = map_content(_media_state(volume_level=volume), {CONF_TEMPLATE: "media"})
+    assert content["volume"] == expected
+
+
+@pytest.mark.parametrize("volume", [None, "unavailable", float("nan")])
+def test_media_omits_an_unusable_volume(volume):
+    content = map_content(_media_state(volume_level=volume), {CONF_TEMPLATE: "media"})
+    assert "volume" not in content
+    assert_valid_activity_content(content, where="media without a volume")
+
+
+def test_media_nulls_every_control_without_hass():
+    """The mapper cannot build a callback URL on its own, and half a button is worse than none.
+
+    Explicit nulls rather than omission: the server deep-merges `controls`, so an
+    omitted slot would leave a previously pushed button on the card, dead.
+    """
+    content = map_content(_media_state(), {CONF_TEMPLATE: "media", CONF_MEDIA_CONTROLS: True})
+    assert set(content["controls"]) == set(EMITTED_CONTROL_SLOTS)
+    assert all(action is None for action in content["controls"].values())
+
+
+def test_media_completion_stops_the_scrubber():
+    """A finished card still claiming to play would tick its playhead forward forever."""
+    content = map_completion_content({CONF_TEMPLATE: "media"}, {"progress": 0.0, "media_title": "Snooze"})
+
+    assert content["playback_state"] == "stopped"
+    assert content["progress"] == 0.0
+    assert_valid_activity_content(content, where="media completion")

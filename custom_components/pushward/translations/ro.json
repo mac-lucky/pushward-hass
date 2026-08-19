@@ -1672,6 +1672,17 @@
                 "steps_editor": "Un rând pe pas, în ordine. Fiecare rând setează o etichetă opțională, o înălțime de rând (1-10), o lățime relativă (număr pozitiv) și o culoare (denumită sau hex; lăsați gol pentru culoarea de accent). Adăugați niciun rând sau exact total_steps rânduri. Doar pentru șablonul steps."
               }
             },
+            "media_options": {
+              "name": "Player",
+              "data": {
+                "media_controls": "Butoane de redare",
+                "media_favorite_script": "Script Favorite"
+              },
+              "data_description": {
+                "media_controls": "Afișează pe card butoanele anterior / redare-pauză / următor / stop / volum, limitate la ce suportă playerul. Apăsarea unuia apelează înapoi Home Assistant printr-un link care poartă propriul secret în loc de datele tale de autentificare, deci oricine deține notificarea poate controla acel player. Dezactivați pentru un card doar de afișare. Doar pentru șablonul media.",
+                "media_favorite_script": "Scriptul rulat de butonul inimă (playerele media nu au propriul favorit). Lăsați gol pentru a ascunde butonul. Doar pentru șablonul media."
+              }
+            },
             "image_options": {
               "name": "Imagine",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Seria principală trebuie să corespundă uneia dintre etichetele de serie configurate.",
         "invalid_image_url": "Adresa imaginii trebuie să fie https, cu gazdă și fără nume de utilizator sau parolă.",
         "invalid_image_shape": "Forma imaginii trebuie să fie poster, square sau circle.",
-        "invalid_image_thumbhash": "ThumbHash-ul imaginii trebuie să fie base64 cu alfabet standard și umplutură, de cel mult 64 de caractere. Folosiți acțiunea Generate ThumbHash pentru a genera unul."
+        "invalid_image_thumbhash": "ThumbHash-ul imaginii trebuie să fie base64 cu alfabet standard și umplutură, de cel mult 64 de caractere. Folosiți acțiunea Generate ThumbHash pentru a genera unul.",
+        "invalid_favorite_script": "Butonul favorite trebuie să indice o entitate script (script.something)."
       },
       "abort": {
         "already_configured": "Această entitate este deja urmărită.",

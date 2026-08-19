@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 import pytest
+from homeassistant.components.media_player import DATA_COMPONENT
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 
@@ -44,6 +45,9 @@ from custom_components.pushward.const import (
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
+    CONF_MEDIA_CONTROLS,
+    CONF_MEDIA_FAVORITE_SCRIPT,
+    CONF_MEDIA_TOKEN,
     CONF_MIN_VALUE,
     CONF_PRIMARY_SERIES,
     CONF_PRIORITY,
@@ -105,6 +109,7 @@ from custom_components.pushward.const import (
     CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    DEFAULT_MEDIA_CONTROLS,
     DEFAULT_SCHEDULE_START_KEY,
     DEFAULT_SCHEDULE_VALUE_KEY,
     DEFAULT_SUBTITLE_TIMER_STYLE,
@@ -198,6 +203,9 @@ def make_entity_config(**overrides) -> dict:
         CONF_TILES: [],
         CONF_LOG_LEVEL_ATTRIBUTE: "",
         CONF_LOG_COLUMNS: [],
+        CONF_MEDIA_CONTROLS: DEFAULT_MEDIA_CONTROLS,
+        CONF_MEDIA_FAVORITE_SCRIPT: "",
+        CONF_MEDIA_TOKEN: "",
     }
     config.update(overrides)
     return config
@@ -453,6 +461,29 @@ def patch_image_download(body: bytes, *, content_length: int | None = None):
     session.get = MagicMock(return_value=context)
     with patch("custom_components.pushward.image_hash.async_get_clientsession", return_value=session):
         yield session
+
+
+@contextmanager
+def patch_media_image(hass: HomeAssistant, body: bytes | None, *, error: Exception | None = None):
+    """Stand in for the media_player entity component so cover art resolves to ``body``.
+
+    The artwork is read off the entity object rather than fetched, so there is no
+    session to patch - the seam is the component registry the lookup goes through.
+    Yields the fake entity, so a test can count the reads.
+    """
+    entity = MagicMock()
+    entity.async_get_media_image = AsyncMock(return_value=(body, "image/png"), side_effect=error)
+    component = MagicMock()
+    component.get_entity = MagicMock(return_value=entity)
+    previous = hass.data.get(DATA_COMPONENT)
+    hass.data[DATA_COMPONENT] = component
+    try:
+        yield entity
+    finally:
+        if previous is None:
+            hass.data.pop(DATA_COMPONENT, None)
+        else:
+            hass.data[DATA_COMPONENT] = previous
 
 
 @contextmanager

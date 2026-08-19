@@ -64,8 +64,6 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 
 - **Track any HA entity** as a PushWard Live Activity (Dynamic Island + Lock Screen)
 - **9 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log, media
-  (media is service-only for now: drive it from `pushward.update_activity_media`; a tracked
-  `media_player` mapping comes next)
 - **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
@@ -75,8 +73,10 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 - **Companion source entities**: read remaining time, progress, value, etc. from a *separate* entity
 - **Two-phase end** shows a completion state (green checkmark) before dismissing
 - **Live-progress ETA** fills the progress bar smoothly and counts down to a finish time (generic + steps)
-- **Activity artwork** beside the icon (generic + steps), with an inline ThumbHash computed here so a
-  picture that only Home Assistant can reach still renders on the phone
+- **Activity artwork** beside the icon (generic + steps + media), with an inline ThumbHash computed
+  here so a picture that only Home Assistant can reach still renders on the phone
+- **Tracked media players** as a player card: cover art read off the entity, a scrubber that ticks
+  on the device, and transport buttons that call back into Home Assistant
 - **Throttled updates** with content deduplication
 - **6-level icon fallback**: attribute -> config -> entity -> registry -> device class -> domain default
 - **Color support**: RGB, HSV, XY, Kelvin, named colors
@@ -142,10 +142,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | `timeline` | Sparkline chart, up to 10 named series from attributes or separate entities |
 | `board` | 1-4 tiles, each showing a value from a **separate** entity |
 | `log` | Newest-first list of log lines (up to 20), one per state change |
-
-The ninth template, `media` (a remote player card with cover art, a ticking scrubber and
-transport buttons), is not in this picker yet. It is available through the
-`pushward.update_activity_media` action; a tracked `media_player` mapping comes next.
+| `media` | Player card for a `media_player`: cover art, a ticking scrubber, transport buttons |
 
 **Step 2** configures the details (fields vary by template).
 
@@ -162,7 +159,7 @@ transport buttons), is not in this picker yet. It is available through the
 | Update Interval | Min seconds between updates (default: 5) |
 | Progress Entity / Attribute | 0-100 progress, optionally from a separate entity |
 | Live Progress ETA | Fill the progress bar smoothly and count down an ETA to the finish time, using the remaining-time source (generic/steps templates; on steps it fills the current step) |
-| Image URL / Shape / ThumbHash | Artwork beside the icon (generic/steps templates) - see [Activity images](#activity-images) |
+| Image URL / Shape / ThumbHash | Artwork beside the icon (generic/steps/media templates) - see [Activity images](#activity-images). On a media player, leave it empty and the cover art fills in |
 | Remaining Time Entity / Attribute | Seconds remaining (countdown), with smart time parsing |
 | Total Steps / Current Step Entity / Attribute | Steps tracking, optionally from a separate entity |
 | Step Details | One row per step: label, row height (1-10), relative width, and color (steps template) |
@@ -179,6 +176,8 @@ transport buttons), is not in this picker yet. It is available through the
 | Board Tiles | Rows binding a separate entity to a tile (label, entity, attribute, unit, icon, color, URL), max 4 (board template) |
 | Log Columns | Rows adding extra values to each log line (label, entity, attribute, unit), max 6 (log template) |
 | Log Level Attribute | Attribute supplying each line's `info`/`warn`/`error` level (log template) |
+| Transport Buttons | Show previous/play-pause/next/stop/volume on the card, filtered to what the player supports (media template) |
+| Favorite Script | Script the heart button runs; hidden when empty (media template) |
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
 | State Labels | Rows giving custom display text per state (a state and its label, e.g. `on` shows `Running`) |
 | Completion Message | Text shown at end (default: "Complete") |
@@ -253,6 +252,57 @@ Consecutive lines with identical text are collapsed, so attribute-only churn (a 
 Each line's text is the state label followed by ` · ` and each resolved column. Values are raw Home Assistant values (e.g. `brightness` is 0-255). Columns whose source is missing or unavailable are skipped; if every column resolves empty (e.g. the lamp is off so `brightness` is absent) the line falls back to just the state label. Other-entity columns are tracked as companions, so a change in any one appends a new composed line while the tracked entity still owns start/end.
 
 Example for a lamp: a `K`-suffixed column reading `color_temp_kelvin` plus a bare `brightness` column render lines like `On · 4000K · 153`, and a brightness change now produces a distinct line instead of collapsing into the previous `On`.
+
+</details>
+
+<details>
+<summary><b>Tracked media players</b></summary>
+
+Pick a `media_player` in step 1 and the **media** template is suggested for it. The card shows the
+track title, the artist under it, the cover art, a scrubber the phone ticks forward on its own, and
+a row of transport buttons.
+
+Everything on it is read from the player's own attributes, so there is nothing to map:
+
+- **Title**: `media_title`, else `media_series_title`, else `media_channel`, else `source`.
+- **Subtitle**: `media_artist`, else `media_album_name`, else `app_name`. Setting a Subtitle Entity or Attribute overrides that chain.
+- **Scrubber**: `media_position` paired with `media_position_updated_at`, plus `media_duration`. The position is sent *with* the moment it was read, and iOS advances it from there while the state is playing - so the bar keeps moving between pushes. A player that reports a position but not the timestamp gets no scrubber rather than a wrong one, and a stale anchor (a player paused since yesterday) is dropped for the same reason.
+- **Volume**: `volume_level`.
+- **Playback state**: `playing`, `paused` and `buffering` map straight through; anything else reads as stopped.
+
+Start/end states default to **playing, buffering** and **off, idle, standby**. `paused` is
+deliberately in neither: while the card is up, pausing updates it rather than dismissing it, and
+while it is down, pausing starts nothing.
+
+**Cover art** comes from the player itself. `entity_picture` on a media player is usually a signed
+proxy path, which the phone can neither reach nor authenticate, so the integration reads the image
+bytes straight off the entity and sends a [ThumbHash](https://evanw.github.io/thumbhash/) inline
+with the activity. The picture path carries a per-track cache key, so a whole album costs one
+decode per track rather than one per push. Set an Image URL by hand and that picture wins instead.
+
+**Transport buttons** call back into Home Assistant. Each button carries a URL like
+`https://<your external URL>/api/pushward/media/<subentry>/next?token=<secret>`; pressing it POSTs
+silently (no app opens) and the integration runs `media_player.media_next_track` on the player. Only
+the buttons the player advertises through `supported_features` are sent, so a card never shows a
+button that would fail on press. `play_pause` needs both the play and pause capabilities, which is
+what Home Assistant's own `media_play_pause` service requires.
+
+Two things worth knowing before you leave the buttons on:
+
+- The callback **cannot** use your Home Assistant login: the request comes from the phone with only
+  what the notification carried. The per-player token in the URL is the whole credential, so anyone
+  who gets hold of that URL can drive that player - and run the favorite script, if you configured
+  one. Turn **Transport Buttons** off
+  for a display-only card; the endpoint then stops answering for that player too, and the next
+  update removes the buttons from cards already on a Lock Screen.
+- It needs an **https** URL Home Assistant knows about (Settings > System > Network) - the external
+  URL normally, though an https internal URL works for phones on the same network or a VPN. Without
+  one the buttons are simply left off and a warning is logged once; a plain-http URL counts as none,
+  because iOS refuses cleartext requests from the extension that fires these buttons.
+
+The **Favorite Script** option adds a heart button that runs a script you name - media players have
+no favorite of their own, so what "favorite" means is up to that script (starring the track in
+Spotify, adding it to a playlist, whatever the app supports).
 
 </details>
 
@@ -691,7 +741,9 @@ automation:
 
 ## Domain Defaults
 
-When adding an entity, start/end states are pre-filled from the entity's domain.
+When adding an entity, start/end states are pre-filled from the entity's domain. The defaults
+apply at add time only - a player tracked before 0.43.0 still carries the old media_player set
+(which ended the card on `paused`); open the subentry's reconfigure to pick up the new one.
 
 <details>
 <summary><b>Per-domain start/end states and default icon</b></summary>
@@ -704,7 +756,7 @@ When adding an entity, start/end states are pre-filled from the entity's domain.
 | fan | on | off | mdi:fan |
 | climate | heating, cooling | off, idle | mdi:thermostat |
 | vacuum | cleaning | docked, idle | mdi:robot-vacuum |
-| media_player | playing | off, idle, paused | mdi:cast |
+| media_player | playing, buffering | off, idle, standby | mdi:cast |
 | lock | unlocked | locked | mdi:lock |
 | cover | opening, closing | open, closed | mdi:window-open |
 | timer | active | idle, paused | mdi:timer-outline |

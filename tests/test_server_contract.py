@@ -13,7 +13,13 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from custom_components.pushward.const import IMAGE_SHAPES, IMAGE_THUMBHASH_MAX, LOG_LINE_TEXT_MAX, MAX_URL_LEN
+from custom_components.pushward.const import (
+    IMAGE_SHAPES,
+    IMAGE_THUMBHASH_MAX,
+    LOG_LINE_TEXT_MAX,
+    MAX_URL_LEN,
+    MEDIA_POSITION_MAX_AGE,
+)
 
 from .server_contract import (
     PushWardContractError,
@@ -384,6 +390,9 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_media, duration_seconds=604801), id="duration_over_week"),
     pytest.param(lambda: _mut(valid_media, position_at=0), id="position_at_zero"),
     pytest.param(lambda: _mut(valid_media, position_at=int(time.time()) + 3600), id="position_at_in_future"),
+    pytest.param(
+        lambda: _mut(valid_media, position_at=int(time.time()) - MEDIA_POSITION_MAX_AGE - 60), id="position_at_stale"
+    ),
     pytest.param(lambda: _mut(valid_media, position_at=1.5), id="position_at_float"),
     pytest.param(lambda: _mut(valid_media, volume=1.01), id="volume_over_one"),
     pytest.param(lambda: _mut(valid_media, volume=-0.1), id="volume_negative"),

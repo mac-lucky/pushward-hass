@@ -1672,6 +1672,17 @@
                 "steps_editor": "One row per step, in order. Each row sets an optional label, a row height (1-10), a relative width (positive number), and a color (named or hex; leave blank to keep the accent color). Add no rows, or exactly total_steps rows. Steps template only."
               }
             },
+            "media_options": {
+              "name": "Player",
+              "data": {
+                "media_controls": "Transport Buttons",
+                "media_favorite_script": "Favorite Script"
+              },
+              "data_description": {
+                "media_controls": "Show previous / play-pause / next / stop / volume buttons on the card, limited to what the player supports. Pressing one calls back into Home Assistant over a link that carries its own secret instead of your login, so anyone holding the notification can drive that player. Turn it off for a display-only card. Media template only.",
+                "media_favorite_script": "Script the heart button runs (media players have no favorite of their own). Leave empty to hide the button. Media template only."
+              }
+            },
             "image_options": {
               "name": "Image",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Primary series must match one of the configured series labels.",
         "invalid_image_url": "Image URL must be an https address with a host and no username or password.",
         "invalid_image_shape": "Image shape must be poster, square, or circle.",
-        "invalid_image_thumbhash": "Image ThumbHash must be padded standard-alphabet base64, at most 64 characters. Use the Generate ThumbHash action to produce one."
+        "invalid_image_thumbhash": "Image ThumbHash must be padded standard-alphabet base64, at most 64 characters. Use the Generate ThumbHash action to produce one.",
+        "invalid_favorite_script": "The favorite button must point at a script entity (script.something)."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",

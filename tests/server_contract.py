@@ -55,6 +55,7 @@ from custom_components.pushward.const import (
     MEDIA_CONTROL_SLOTS,
     MEDIA_DURATION_MAX,
     MEDIA_EXTRA_CONTROLS_MAX,
+    MEDIA_POSITION_MAX_AGE,
     MEDIA_TITLE_MAX,
     PLAYBACK_STATES,
     PRIORITY_MAX,
@@ -363,17 +364,26 @@ def _assert_media(content: dict, where: str, template: str) -> None:
     if state not in (None, "") and state not in PLAYBACK_STATES:
         _fail(where, f"playback_state must be one of {list(PLAYBACK_STATES)}, got {state!r}")
     position = content.get("position_seconds")
-    if position is not None and (not _is_finite_number(position) or float(position) < 0):
-        _fail(where, f"position_seconds must be a finite number >= 0, got {position!r}")
+    if position is not None and (not _is_finite_number(position) or not (0 <= float(position) <= MEDIA_DURATION_MAX)):
+        _fail(where, f"position_seconds must be a finite number in [0, {MEDIA_DURATION_MAX}], got {position!r}")
     duration = content.get("duration_seconds")
     if duration is not None and (not _is_finite_number(duration) or not (0 < float(duration) <= MEDIA_DURATION_MAX)):
         _fail(where, f"duration_seconds must be a finite number in (0, {MEDIA_DURATION_MAX}], got {duration!r}")
     position_at = content.get("position_at")
     if position_at is not None:
+        # A bare anchor says nothing: the server only ever stamps or clears it in
+        # response to a position_seconds, so a frame carrying position_at alone
+        # means the mapper broke its pairing rule.
+        if content.get("position_seconds") is None:
+            _fail(where, "position_at without position_seconds anchors nothing")
         if not _is_int(position_at) or position_at <= 0:
             _fail(where, f"position_at must be a positive unix timestamp, got {position_at!r}")
         if position_at > _now() + MAX_CLOCK_SKEW:
             _fail(where, f"position_at must not be in the future, got {position_at}")
+        # A playhead sampled half a day ago says nothing about where the track is
+        # now, and the server refuses to store one.
+        if position_at < _now() - MEDIA_POSITION_MAX_AGE:
+            _fail(where, f"position_at must be within the last {MEDIA_POSITION_MAX_AGE} seconds, got {position_at}")
     volume = content.get("volume")
     if volume is not None and (not _is_finite_number(volume) or not (0.0 <= float(volume) <= 1.0)):
         _fail(where, f"volume must be a finite number in [0.0, 1.0], got {volume!r}")

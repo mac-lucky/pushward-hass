@@ -1672,6 +1672,17 @@
                 "steps_editor": "Una fila por paso, en orden. Cada fila define una etiqueta opcional, una altura de fila (1-10), un ancho relativo (número positivo) y un color (con nombre o hex; dejar vacío para conservar el color de acento). Añade ninguna fila o exactamente total_steps filas. Solo para la plantilla steps."
               }
             },
+            "media_options": {
+              "name": "Reproductor",
+              "data": {
+                "media_controls": "Botones de reproducción",
+                "media_favorite_script": "Script de favorito"
+              },
+              "data_description": {
+                "media_controls": "Muestra en la tarjeta los botones de anterior / reproducir-pausa / siguiente / detener / volumen, limitados a lo que admita el reproductor. Al pulsar uno se llama de vuelta a Home Assistant mediante un enlace que lleva su propio secreto en lugar de tu inicio de sesión, así que cualquiera que tenga la notificación puede controlar ese reproductor. Desactívalo para una tarjeta solo de visualización. Solo para la plantilla media.",
+                "media_favorite_script": "Script que ejecuta el botón de corazón (los reproductores de medios no tienen favorito propio). Déjalo vacío para ocultar el botón. Solo para la plantilla media."
+              }
+            },
             "image_options": {
               "name": "Imagen",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "La serie principal debe coincidir con una de las etiquetas de serie configuradas.",
         "invalid_image_url": "La URL de la imagen debe ser una dirección https con host y sin usuario ni contraseña.",
         "invalid_image_shape": "La forma de la imagen debe ser poster, square o circle.",
-        "invalid_image_thumbhash": "El ThumbHash de la imagen debe estar en base64 con alfabeto estándar y relleno, y tener 64 caracteres como máximo. Usa la acción Generate ThumbHash para generarlo."
+        "invalid_image_thumbhash": "El ThumbHash de la imagen debe estar en base64 con alfabeto estándar y relleno, y tener 64 caracteres como máximo. Usa la acción Generate ThumbHash para generarlo.",
+        "invalid_favorite_script": "El botón de favorito debe apuntar a una entidad script (script.something)."
       },
       "abort": {
         "already_configured": "Esta entidad ya está rastreada.",

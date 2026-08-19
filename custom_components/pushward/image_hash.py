@@ -98,6 +98,36 @@ def _remember(cache: OrderedDict[str, tuple[str | None, float]], url: str, resul
         cache.popitem(last=False)
 
 
+def _cached(cache: OrderedDict[str, tuple[str | None, float]], key: str, label: str) -> str | None:
+    """The live cached hash for ``key``, or None when nothing usable is stored.
+
+    Raises when the live entry is a remembered failure. ``label`` is what the
+    message may name: a cache key is a URL or an ``entity_picture`` path, and both
+    can carry a credential that must not reach the log.
+    """
+    entry = cache.get(key)
+    if entry is None:
+        return None
+    result, expires_at = entry
+    if time.monotonic() >= expires_at:
+        del cache[key]
+        return None
+    cache.move_to_end(key)
+    if result is None:
+        raise ThumbhashError(f"a recent attempt to hash {label} failed; not retrying yet")
+    return result
+
+
+def cached_thumbhash(hass: HomeAssistant, key: str, label: str) -> str | None:
+    """The live cached hash for ``key``, computing and fetching nothing.
+
+    None means nothing usable is stored. Raises like ``_cached`` when a recent
+    attempt failed, so a caller can skip re-reading the source bytes entirely
+    instead of retrying a hash that just failed.
+    """
+    return _cached(_cache(hass), key, label)
+
+
 def clear_thumbhash_cache(hass: HomeAssistant) -> None:
     """Forget every remembered hash.
 
@@ -208,16 +238,8 @@ async def async_thumbhash_for_url(hass: HomeAssistant, url: str, *, use_cache: b
     a camera is not made to wait out the cooldown.
     """
     cache = _cache(hass)
-    entry = cache.get(url) if use_cache else None
-    if entry is not None:
-        result, expires_at = entry
-        if time.monotonic() < expires_at:
-            cache.move_to_end(url)
-            if result is not None:
-                return result
-            raise ThumbhashError(f"a recent attempt to hash {_safe_url(url)} failed; not retrying yet")
-        # Expired, so fall through and read the image again.
-        del cache[url]
+    if use_cache and (hit := _cached(cache, url, _safe_url(url))) is not None:
+        return hit
     try:
         data = await _async_download(hass, url)
         result = await hass.async_add_executor_job(_thumbhash_from_bytes, data)
@@ -225,6 +247,31 @@ async def async_thumbhash_for_url(hass: HomeAssistant, url: str, *, use_cache: b
         _remember(cache, url, None, FAILURE_RETRY_SECONDS)
         raise
     _remember(cache, url, result, SUCCESS_TTL_SECONDS)
+    return result
+
+
+async def async_thumbhash_for_bytes(hass: HomeAssistant, data: bytes, cache_key: str, label: str) -> str:
+    """ThumbHash image bytes already in hand, remembered under ``cache_key``.
+
+    For artwork Home Assistant hands over directly (a media_player's cover art)
+    there is nothing to download, but decoding is the expensive half and the same
+    track is re-pushed on every playhead update - so the result shares the cache
+    with the URL path. The key spaces overlap only when ``entity_picture`` is
+    itself an absolute URL, and then both names point at the same picture, so a
+    shared entry is correct rather than a collision.
+    """
+    cache = _cache(hass)
+    if (hit := _cached(cache, cache_key, label)) is not None:
+        return hit
+    if len(data) > MAX_IMAGE_BYTES:
+        _remember(cache, cache_key, None, FAILURE_RETRY_SECONDS)
+        raise ThumbhashError(f"{label} is larger than {MAX_IMAGE_BYTES} bytes")
+    try:
+        result = await hass.async_add_executor_job(_thumbhash_from_bytes, data)
+    except ThumbhashError:
+        _remember(cache, cache_key, None, FAILURE_RETRY_SECONDS)
+        raise
+    _remember(cache, cache_key, result, SUCCESS_TTL_SECONDS)
     return result
 
 

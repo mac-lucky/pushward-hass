@@ -2,12 +2,16 @@
   "domain": "pushward",
   "name": "PushWard",
   "after_dependencies": [
+    "media_player",
     "recorder"
   ],
   "codeowners": [
     "@mac-lucky"
   ],
   "config_flow": true,
+  "dependencies": [
+    "http"
+  ],
   "documentation": "https://github.com/mac-lucky/pushward-hass",
   "integration_type": "service",
   "iot_class": "cloud_polling",

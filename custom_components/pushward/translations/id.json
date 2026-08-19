@@ -1672,6 +1672,17 @@
                 "steps_editor": "Satu baris per langkah, berurutan. Setiap baris mengatur label opsional, tinggi baris (1-10), lebar relatif (angka positif), dan warna (nama atau hex; kosongkan untuk mempertahankan warna aksen). Tambahkan tanpa baris, atau tepat total_steps baris. Hanya template steps."
               }
             },
+            "media_options": {
+              "name": "Pemutar",
+              "data": {
+                "media_controls": "Tombol Kontrol Pemutaran",
+                "media_favorite_script": "Skrip Favorit"
+              },
+              "data_description": {
+                "media_controls": "Menampilkan tombol previous / play-pause / next / stop / volume pada kartu, dibatasi sesuai yang didukung pemutar. Menekan salah satu tombol akan memanggil kembali ke Home Assistant lewat tautan yang membawa rahasianya sendiri, bukan login Anda, sehingga siapa pun yang memegang notifikasi bisa mengendalikan pemutar itu. Nonaktifkan untuk kartu tampilan saja. Hanya templat media.",
+                "media_favorite_script": "Skrip yang dijalankan tombol hati (pemutar media tidak punya favorit sendiri). Kosongkan untuk menyembunyikan tombol. Hanya templat media."
+              }
+            },
             "image_options": {
               "name": "Gambar",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Seri utama harus cocok dengan salah satu label seri yang dikonfigurasi.",
         "invalid_image_url": "URL gambar harus berupa alamat https dengan host, tanpa nama pengguna atau kata sandi.",
         "invalid_image_shape": "Bentuk gambar harus poster, square, atau circle.",
-        "invalid_image_thumbhash": "ThumbHash gambar harus base64 alfabet standar dengan padding, maksimal 64 karakter. Gunakan aksi Generate ThumbHash untuk membuatnya."
+        "invalid_image_thumbhash": "ThumbHash gambar harus base64 alfabet standar dengan padding, maksimal 64 karakter. Gunakan aksi Generate ThumbHash untuk membuatnya.",
+        "invalid_favorite_script": "Tombol favorit harus mengarah ke entitas script (script.something)."
       },
       "abort": {
         "already_configured": "Entitas ini sudah dilacak.",

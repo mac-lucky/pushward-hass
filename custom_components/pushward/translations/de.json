@@ -1672,6 +1672,17 @@
                 "steps_editor": "Eine Zeile pro Schritt, in Reihenfolge. Jede Zeile legt eine optionale Beschriftung, eine Zeilenhöhe (1-10), eine relative Breite (positive Zahl) und eine Farbe (benannt oder Hex; leer lassen für die Akzentfarbe) fest. Entweder keine Zeilen oder genau total_steps Zeilen angeben. Nur für die Vorlage 'steps'."
               }
             },
+            "media_options": {
+              "name": "Player",
+              "data": {
+                "media_controls": "Wiedergabe-Schaltflächen",
+                "media_favorite_script": "Favoriten-Skript"
+              },
+              "data_description": {
+                "media_controls": "Zeigt Zurück-, Wiedergabe/Pause-, Weiter-, Stopp- und Lautstärke-Schaltflächen auf der Karte an, begrenzt auf das, was der Player unterstützt. Ein Tippen ruft über einen Link, der ein eigenes Geheimnis statt der Anmeldedaten trägt, in Home Assistant zurück, sodass jeder mit Zugriff auf die Benachrichtigung diesen Player steuern kann. Für eine reine Anzeigekarte ausschalten. Nur für die Vorlage 'media'.",
+                "media_favorite_script": "Skript, das die Herz-Schaltfläche ausführt (Media-Player haben keinen eigenen Favoriten). Leer lassen, um die Schaltfläche auszublenden. Nur für die Vorlage 'media'."
+              }
+            },
             "image_options": {
               "name": "Bild",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Die primäre Datenreihe muss einer der konfigurierten Datenreihen-Bezeichnungen entsprechen.",
         "invalid_image_url": "Die Bild-URL muss eine https-Adresse mit Host sein und darf keinen Benutzernamen und kein Passwort enthalten.",
         "invalid_image_shape": "Die Bildform muss poster, square oder circle sein.",
-        "invalid_image_thumbhash": "Der Bild-ThumbHash muss Base64 im Standardalphabet mit Auffüllung sein und höchstens 64 Zeichen lang. Mit der Aktion Generate ThumbHash lässt sich einer erzeugen."
+        "invalid_image_thumbhash": "Der Bild-ThumbHash muss Base64 im Standardalphabet mit Auffüllung sein und höchstens 64 Zeichen lang. Mit der Aktion Generate ThumbHash lässt sich einer erzeugen.",
+        "invalid_favorite_script": "Die Favoriten-Schaltfläche muss auf eine Skript-Entität verweisen (script.something)."
       },
       "abort": {
         "already_configured": "Diese Entität wird bereits verfolgt.",

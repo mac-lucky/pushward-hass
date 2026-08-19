@@ -38,8 +38,6 @@ CONF_LIVE_PROGRESS = "live_progress"
 # Templates that have an image slot (pushward-server Content.SupportsImage). The
 # server REJECTS the trio on every other template rather than ignoring it, so both
 # the config flow and the update schemas have to gate on this list or the push 422s.
-# media is service-only for now (see SERVICE_TEMPLATES), so the config flow never
-# reaches it here; the update schema does.
 IMAGE_TEMPLATES = ("generic", "steps", "media")
 # Optional artwork shown beside the icon on the templates above.
 #
@@ -132,6 +130,21 @@ CONF_LOG_LEVEL_ATTRIBUTE = "log_level_attribute"
 # entity's attribute (`sensor.temp:temperature`). Stored as a list of column dicts
 # ({label?, entity_id?, attribute?, unit?}); the config flow edits them as a string.
 CONF_LOG_COLUMNS = "log_columns"
+# Media template: emit the transport row (previous / play-pause / next / stop /
+# volume) as silent webhooks back into Home Assistant. Off means a display-only
+# player card.
+CONF_MEDIA_CONTROLS = "media_controls"
+# Media template: script entity the heart button runs. There is no favorite concept
+# in the media_player domain, so the button only appears once one is configured.
+CONF_MEDIA_FAVORITE_SCRIPT = "media_favorite_script"
+# Media template: per-subentry secret in the control URLs, generated when the
+# subentry is created and preserved across reconfigures. It is what authenticates
+# the callback - the endpoint cannot require a Home Assistant token, because the
+# request comes from the phone with only what the activity payload carried.
+CONF_MEDIA_TOKEN = "media_token"
+# Not stored: the manager's entity configs get the owning subentry's id injected at
+# load time so a control URL can name the subentry the callback has to look up.
+CONF_SUBENTRY_ID = "subentry_id"
 
 # Companion source entities — read a value from a SEPARATE entity instead of an
 # attribute of the tracked entity. Empty => use the tracked entity. When set,
@@ -227,6 +240,7 @@ DEFAULT_VALUE_SCALE = "auto"
 DEFAULT_DECIMALS = 1
 DEFAULT_HISTORY_PERIOD = 0
 DEFAULT_TAP_ACTION_FOREGROUND = True
+DEFAULT_MEDIA_CONTROLS = True
 
 # Validation ranges
 PRIORITY_MIN = 0
@@ -300,11 +314,11 @@ SEVERITIES = ["critical", "warning", "info"]
 NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
 # Templates offered by the tracked-entity config flow (each has a mapper).
-TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log"]
-# Templates with an update_activity_<template> action. media is a pass-through only:
-# there is no media_player mapping yet, so it stays out of TEMPLATES and the entity
-# flow, but automations can drive a media activity through the service.
-SERVICE_TEMPLATES = (*TEMPLATES, "media")
+TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log", "media"]
+# Templates with an update_activity_<template> action. Every template the flow
+# offers also has one; the two lists were only ever different while media was a
+# service-only pass-through.
+SERVICE_TEMPLATES = tuple(TEMPLATES)
 
 # Media template caps (mirror pushward-server/internal/model/activity.go).
 # media_title is the big line of the player card (the activity name is the source
@@ -314,6 +328,10 @@ SERVICE_TEMPLATES = (*TEMPLATES, "media")
 MEDIA_TITLE_MAX = 128
 MEDIA_DURATION_MAX = 604800  # 7 d
 MEDIA_EXTRA_CONTROLS_MAX = 3
+# How stale a position_at may be before the server rejects it (12 h). A paused
+# player keeps reporting the moment its playhead last moved, so an old anchor is
+# normal and has to be dropped here rather than 422 the whole push.
+MEDIA_POSITION_MAX_AGE = 43200
 PLAYBACK_STATES = ("playing", "paused", "stopped", "buffering")
 # Fixed transport slots of `controls`, in wire order. Each is a tap action; an
 # http(s) control is always a silent webhook (the server rejects foreground and
@@ -613,8 +631,11 @@ DOMAIN_DEFAULTS: dict[str, dict] = {
     },
     "media_player": {
         "icon": "mdi:cast",
-        "start_states": ["playing"],
-        "end_states": ["off", "idle", "paused"],
+        # paused is deliberately in neither list: while the card is up a pause is an
+        # update (it keeps showing what is loaded), and while it is down a pause
+        # starts nothing.
+        "start_states": ["playing", "buffering"],
+        "end_states": ["off", "idle", "standby"],
     },
     "lock": {
         "icon": "mdi:lock",

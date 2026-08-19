@@ -1672,6 +1672,17 @@
                 "steps_editor": "Eén rij per stap, op volgorde. Elke rij stelt een optioneel label, een rijhoogte (1-10), een relatieve breedte (positief getal) en een kleur (benoemd of hex; leeg laten voor de accentkleur) in. Voeg geen rijen toe, of precies total_steps rijen. Alleen voor het sjabloon steps."
               }
             },
+            "media_options": {
+              "name": "Speler",
+              "data": {
+                "media_controls": "Afspeelknoppen",
+                "media_favorite_script": "Favoriet-script"
+              },
+              "data_description": {
+                "media_controls": "Toont vorige / afspelen-pauze / volgende / stop / volume-knoppen op de kaart, beperkt tot wat de speler ondersteunt. Op een knop tikken roept Home Assistant aan via een link met een eigen geheim in plaats van je inloggegevens, dus iedereen met de melding kan die speler bedienen. Zet dit uit voor een kaart die alleen weergeeft. Alleen voor het sjabloon media.",
+                "media_favorite_script": "Script dat de hartknop uitvoert (mediaspelers hebben geen eigen favoriet). Laat leeg om de knop te verbergen. Alleen voor het sjabloon media."
+              }
+            },
             "image_options": {
               "name": "Afbeelding",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "De primaire reeks moet overeenkomen met een van de geconfigureerde reekslabels.",
         "invalid_image_url": "De afbeeldings-URL moet een https-adres met host zijn, zonder gebruikersnaam of wachtwoord.",
         "invalid_image_shape": "De afbeeldingsvorm moet poster, square of circle zijn.",
-        "invalid_image_thumbhash": "De afbeeldings-ThumbHash moet base64 met standaardalfabet en opvulling zijn, maximaal 64 tekens. Gebruik de actie Generate ThumbHash om er een te maken."
+        "invalid_image_thumbhash": "De afbeeldings-ThumbHash moet base64 met standaardalfabet en opvulling zijn, maximaal 64 tekens. Gebruik de actie Generate ThumbHash om er een te maken.",
+        "invalid_favorite_script": "De favorietknop moet naar een script-entiteit verwijzen (script.something)."
       },
       "abort": {
         "already_configured": "Deze entiteit wordt al gevolgd.",

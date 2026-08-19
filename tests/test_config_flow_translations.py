@@ -58,8 +58,6 @@ _CONFIG_FLOW = Path(__file__).parent.parent / "custom_components" / "pushward" /
 # (_translation_keys_in_schemas), so a new translated dropdown can't drift out of
 # the registry silently. It lives in the test because production has no reader.
 SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
-    # The "media" label every locale already carries under selector.activity_template
-    # is unreachable until the tracked-entity flow gains media (phase 2).
     "activity_template": tuple(TEMPLATES),
     "severity": tuple(SEVERITIES),
     "image_shape": tuple(IMAGE_SHAPES),
@@ -207,9 +205,8 @@ _ENTITY_COMMON: set[str] = {
     "dismissal_ttl",
 }
 
-# The image trio rides only on the templates the server gives an image slot
-# (IMAGE_TEMPLATES) that the entity flow offers: generic and steps. media has the slot
-# too but is service-only until phase 2.
+# The image trio rides on the templates the server gives an image slot to
+# (IMAGE_TEMPLATES): generic, steps and media.
 _ENTITY_IMAGE: set[str] = {"image_url", "image_shape", "image_thumbhash"}
 
 ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
@@ -291,6 +288,12 @@ ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
     | {
         "log_columns",
         "log_level_attribute",
+    },
+    "media": _ENTITY_COMMON
+    | _ENTITY_IMAGE
+    | {
+        "media_controls",
+        "media_favorite_script",
     },
 }
 

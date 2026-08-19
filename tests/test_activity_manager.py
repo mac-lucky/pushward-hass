@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from homeassistant.components.media_player import MediaPlayerEntityFeature
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
@@ -38,6 +39,9 @@ from custom_components.pushward.const import (
     CONF_IMAGE_URL,
     CONF_LABEL,
     CONF_LOG_COLUMNS,
+    CONF_MEDIA_CONTROLS,
+    CONF_MEDIA_FAVORITE_SCRIPT,
+    CONF_MEDIA_TOKEN,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SERIES_ENTITIES,
@@ -45,6 +49,7 @@ from custom_components.pushward.const import (
     CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_SUBENTRY_ID,
     CONF_SUBTITLE_ENTITY,
     CONF_TEMPLATE,
     CONF_TILES,
@@ -55,6 +60,7 @@ from custom_components.pushward.const import (
     HISTORY_SEED_MAX,
     LOG_MAX_LINES,
 )
+from custom_components.pushward.media_control import EMITTED_CONTROL_SLOTS
 
 from .conftest import (
     IMAGE_URL,
@@ -64,6 +70,7 @@ from .conftest import (
     expected_thumbhash,
     patch_image_download,
     patch_image_fetch_failure,
+    patch_media_image,
     png_bytes,
 )
 from .conftest import make_entity_config as _entity_config
@@ -2257,5 +2264,214 @@ async def test_unreachable_image_does_not_block_the_activity(hass: HomeAssistant
     assert content["image_url"] == IMAGE_URL
     assert "image_thumbhash" not in content
     assert_valid_activity_content(content, where="unreachable image")
+
+    await manager.async_stop()
+
+
+# ---------------------------------------------------------------------------
+# Media template tests
+# ---------------------------------------------------------------------------
+
+_MEDIA_ENTITY = "media_player.living_room"
+_MEDIA_PICTURE = "/api/media_player_proxy/media_player.living_room?token=abc123&cache=track1"
+_ALL_TRANSPORT = (
+    MediaPlayerEntityFeature.PREVIOUS_TRACK
+    | MediaPlayerEntityFeature.NEXT_TRACK
+    | MediaPlayerEntityFeature.PLAY
+    | MediaPlayerEntityFeature.PAUSE
+    | MediaPlayerEntityFeature.STOP
+    | MediaPlayerEntityFeature.VOLUME_STEP
+)
+
+
+def _media_config(**overrides):
+    """A tracked media_player: playing starts the card, off/idle/standby end it.
+
+    paused is in neither list on purpose - it keeps the card up and only changes
+    what it says.
+    """
+    return _entity_config(
+        **{
+            CONF_ENTITY_ID: _MEDIA_ENTITY,
+            CONF_SLUG: "ha-player",
+            CONF_TEMPLATE: "media",
+            CONF_START_STATES: ["playing", "buffering"],
+            CONF_END_STATES: ["off", "idle", "standby"],
+            CONF_SUBENTRY_ID: "sub-media",
+            CONF_MEDIA_TOKEN: "s3cret-token",
+            **overrides,
+        }
+    )
+
+
+def _media_attrs(**overrides) -> dict:
+    attrs = {
+        "friendly_name": "Living Room",
+        "media_title": "Snooze",
+        "media_artist": "SZA",
+        "media_duration": 214,
+        "media_position": 47,
+        "media_position_updated_at": dt_util.utcnow(),
+        "volume_level": 0.35,
+        "supported_features": _ALL_TRANSPORT,
+    }
+    attrs.update(overrides)
+    return attrs
+
+
+async def _start_player(hass: HomeAssistant, api: AsyncMock, config: dict, **attrs) -> ActivityManager:
+    """Start a manager with the player off, then set it playing."""
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    hass.states.async_set(_MEDIA_ENTITY, "off")
+    await manager.async_start()
+    hass.states.async_set(_MEDIA_ENTITY, "playing", _media_attrs(**attrs))
+    await hass.async_block_till_done()
+    return manager
+
+
+async def test_media_starts_playing_with_the_player_fields(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    manager = await _start_player(hass, api, _media_config())
+
+    api.create_activity.assert_awaited_once()
+    content = activity_updates(api, "ongoing")[-1]
+    assert content["template"] == "media"
+    assert content["media_title"] == "Snooze"
+    assert content["subtitle"] == "SZA"
+    assert content["playback_state"] == "playing"
+    assert content["duration_seconds"] == 214
+    assert content["position_seconds"] == 47
+    assert content["volume"] == 0.35
+    assert_valid_activity_content(content, where="media start")
+
+    await manager.async_stop()
+
+
+async def test_media_pause_updates_the_card_instead_of_ending_it(hass: HomeAssistant) -> None:
+    """paused is in neither state list: the card stays up saying paused."""
+    api = _mock_api()
+    manager = await _start_player(hass, api, _media_config())
+    api.reset_mock()
+
+    await bump_state(manager, hass, _MEDIA_ENTITY, _MEDIA_ENTITY, "paused", _media_attrs())
+
+    assert manager._tracked[_MEDIA_ENTITY].is_active
+    content = activity_updates(api, "ongoing")[-1]
+    assert content["playback_state"] == "paused"
+    assert not activity_updates(api, "ended")
+    assert_valid_activity_content(content, where="media paused")
+
+    await manager.async_stop()
+
+
+async def test_media_off_ends_the_activity_and_stops_the_scrubber(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    manager = await _start_player(hass, api, _media_config())
+    api.reset_mock()
+
+    await end_activity_via_state(manager, hass, _MEDIA_ENTITY, "off", {"friendly_name": "Living Room"})
+
+    ended = activity_updates(api, "ended")
+    assert ended, "expected an ENDED push when the player goes off"
+    assert ended[-1]["playback_state"] == "stopped"
+    assert not manager._tracked[_MEDIA_ENTITY].is_active
+    assert_valid_activity_content(ended[-1], where="media end")
+
+    await manager.async_stop()
+
+
+async def test_media_cover_art_ships_as_an_inline_thumbhash(hass: HomeAssistant) -> None:
+    """entity_picture is a proxy path the phone cannot fetch, so the bytes ride inline."""
+    api = _mock_api()
+    body = png_bytes(16, 16)
+
+    with patch_media_image(hass, body):
+        manager = await _start_player(hass, api, _media_config(), entity_picture=_MEDIA_PICTURE)
+
+    content = activity_updates(api, "ongoing")[-1]
+    assert content["image_thumbhash"] == expected_thumbhash(body)
+    assert content["image_shape"] == "square"
+    assert "image_url" not in content
+    assert_valid_activity_content(content, where="media artwork")
+
+    await manager.async_stop()
+
+
+async def test_media_artwork_does_not_break_update_dedup(hass: HomeAssistant) -> None:
+    """The hash is attached before the equality check, so an unchanged track still dedups."""
+    api = _mock_api()
+
+    with patch_media_image(hass, png_bytes(16, 16)):
+        manager = await _start_player(hass, api, _media_config(), entity_picture=_MEDIA_PICTURE)
+        assert "image_thumbhash" in activity_updates(api, "ongoing")[-1]
+
+        sent = api.update_activity.await_count
+        await manager._send_update(_MEDIA_ENTITY)
+        assert api.update_activity.await_count == sent
+
+    await manager.async_stop()
+
+
+async def test_media_unreadable_cover_art_does_not_block_the_push(hass: HomeAssistant) -> None:
+    """Artwork is decoration; whatever the player integration throws stays its problem."""
+    api = _mock_api()
+
+    with patch_media_image(hass, None, error=RuntimeError("cloud API is down")):
+        manager = await _start_player(hass, api, _media_config(), entity_picture=_MEDIA_PICTURE)
+
+    content = activity_updates(api, "ongoing")[-1]
+    assert "image_thumbhash" not in content
+    assert content["media_title"] == "Snooze"
+    assert_valid_activity_content(content, where="media without artwork")
+
+    await manager.async_stop()
+
+
+async def test_media_controls_follow_supported_features(hass: HomeAssistant) -> None:
+    """A button the player cannot drive would fail on press, so it is left out."""
+    api = _mock_api()
+    hass.config.external_url = "https://ha.example.com"
+    features = MediaPlayerEntityFeature.PREVIOUS_TRACK | MediaPlayerEntityFeature.NEXT_TRACK
+
+    manager = await _start_player(hass, api, _media_config(), supported_features=features)
+
+    content = activity_updates(api, "ongoing")[-1]
+    controls = content["controls"]
+    assert set(controls) == set(EMITTED_CONTROL_SLOTS)
+    assert {slot for slot, action in controls.items() if action is not None} == {"previous", "next"}
+    action = controls["next"]
+    assert action["url"].startswith("https://ha.example.com/api/pushward/media/sub-media/next?")
+    # Silent webhook: a foreground control would open Safari on every skip.
+    assert action["foreground"] is False
+    assert action["method"] == "POST"
+    assert_valid_activity_content(content, where="media controls")
+
+    await manager.async_stop()
+
+
+async def test_media_full_transport_adds_volume_and_favorite(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.config.external_url = "https://ha.example.com"
+    config = _media_config(**{CONF_MEDIA_FAVORITE_SCRIPT: "script.star_track"})
+
+    manager = await _start_player(hass, api, config)
+
+    controls = activity_updates(api, "ongoing")[-1]["controls"]
+    assert set(controls) == {"previous", "play_pause", "next", "stop", "favorite", "volume_down", "volume_up"}
+
+    await manager.async_stop()
+
+
+async def test_media_controls_nulled_when_switched_off(hass: HomeAssistant) -> None:
+    """Off means explicit nulls, not omission - the server deep-merges `controls`,
+    so an omitted slot would leave a previously pushed button on the card, dead."""
+    api = _mock_api()
+    hass.config.external_url = "https://ha.example.com"
+
+    manager = await _start_player(hass, api, _media_config(**{CONF_MEDIA_CONTROLS: False}))
+
+    controls = activity_updates(api, "ongoing")[-1]["controls"]
+    assert set(controls) == set(EMITTED_CONTROL_SLOTS)
+    assert all(action is None for action in controls.values())
 
     await manager.async_stop()

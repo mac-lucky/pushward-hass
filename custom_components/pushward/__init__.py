@@ -41,6 +41,7 @@ from .const import (
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     CONF_SLUG,
+    CONF_SUBENTRY_ID,
     DEFAULT_PRIORITY,
     DISMISSAL_TTL_MAX,
     DISMISSAL_TTL_MIN,
@@ -89,6 +90,7 @@ from .image_hash import (
     async_thumbhash_for_url,
     clear_thumbhash_cache,
 )
+from .media_control import async_register_media_control_view
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -919,7 +921,22 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     ``_get_api`` when no entry is configured.
     """
     _register_services(hass)
+    async_register_media_control_view(hass)
     return True
+
+
+def _entity_configs(entry: ConfigEntry) -> list[dict]:
+    """The tracked-entity configs, each tagged with the subentry that owns it.
+
+    The id is Home Assistant's and is never stored in the data, but a media control
+    URL has to name the subentry its callback then looks up - so it rides along on
+    the copy the manager works from.
+    """
+    return [
+        {**sub.data, CONF_SUBENTRY_ID: sub.subentry_id}
+        for sub in entry.subentries.values()
+        if sub.subentry_type == SUBENTRY_TYPE_ENTITY
+    ]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -934,7 +951,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = PushWardUsageCoordinator(hass, api, entry)
     await coordinator.async_config_entry_first_refresh()
 
-    entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
+    entities = _entity_configs(entry)
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
     manager = ActivityManager(hass, api, entities, entry)
     widget_manager = WidgetManager(hass, api, widgets, entry)
@@ -959,7 +976,7 @@ async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
     data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
     if data is None:
         return
-    entities = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_ENTITY]
+    entities = _entity_configs(entry)
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
     widget_manager: WidgetManager | None = data.get("widget_manager")
     reloads = [data["manager"].async_reload(entities)]

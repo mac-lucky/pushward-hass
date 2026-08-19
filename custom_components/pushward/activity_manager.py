@@ -69,6 +69,7 @@ from .content_mapper import (
     map_content,
 )
 from .image_hash import async_ensure_thumbhash
+from .media_control import async_ensure_media_artwork
 from .recorder_history import async_recorder_states, downsample_evenly
 
 # Live ring-buffer depth per tracked entity; independent of HISTORY_SEED_MAX
@@ -620,8 +621,9 @@ class ActivityManager:
 
             # Replace the single current line with the accumulated log buffer.
             self._apply_log_lines(tracked, content)
-            # The first frame has to carry the hash too, else it differs from every
+            # The first frame has to carry the artwork too, else it differs from every
             # later one and _send_update's equality check never suppresses anything.
+            await async_ensure_media_artwork(self._hass, current_state, config, content)
             await async_ensure_thumbhash(self._hass, content)
 
             sound = config.get(CONF_SOUND) or None
@@ -792,7 +794,9 @@ class ActivityManager:
             return
         # Before the equality check, not after: the previous frame was stored with its
         # hash attached, so comparing a hash-less frame against it would report a
-        # change on every state update and defeat the dedup entirely.
+        # change on every state update and defeat the dedup entirely. The player's
+        # cover art resolves first, so the URL it may have found gets a hash too.
+        await async_ensure_media_artwork(self._hass, current_state, tracked.config, content)
         await async_ensure_thumbhash(self._hass, content)
         if content == tracked.last_content:
             return

@@ -1672,6 +1672,17 @@
                 "steps_editor": "Mỗi bước một hàng, theo thứ tự. Mỗi hàng đặt nhãn tùy chọn, chiều cao hàng (1-10), chiều rộng tương đối (số dương) và màu (tên hoặc hex; để trống giữ màu nhấn). Thêm không hàng nào, hoặc đúng total_steps hàng. Chỉ mẫu steps."
               }
             },
+            "media_options": {
+              "name": "Trình Phát",
+              "data": {
+                "media_controls": "Nút Điều Khiển Phát",
+                "media_favorite_script": "Tập Lệnh Yêu Thích"
+              },
+              "data_description": {
+                "media_controls": "Hiển thị các nút trước / phát-tạm dừng / tiếp theo / dừng / âm lượng trên thẻ, giới hạn theo những gì trình phát hỗ trợ. Nhấn một nút sẽ gọi ngược về Home Assistant qua một liên kết mang bí mật riêng thay vì thông tin đăng nhập của bạn, vì vậy bất kỳ ai có thông báo đều có thể điều khiển trình phát đó. Tắt để có thẻ chỉ hiển thị. Chỉ dành cho mẫu media.",
+                "media_favorite_script": "Tập lệnh mà nút trái tim chạy (trình phát media không có mục yêu thích riêng). Để trống để ẩn nút. Chỉ dành cho mẫu media."
+              }
+            },
             "image_options": {
               "name": "Hình ảnh",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Chuỗi chính phải khớp với một trong các nhãn chuỗi đã cấu hình.",
         "invalid_image_url": "URL hình ảnh phải là địa chỉ https có tên máy chủ, không chứa tên người dùng hay mật khẩu.",
         "invalid_image_shape": "Hình dạng ảnh phải là poster, square hoặc circle.",
-        "invalid_image_thumbhash": "ThumbHash của ảnh phải là base64 bảng chữ cái chuẩn có phần đệm, tối đa 64 ký tự. Dùng hành động Generate ThumbHash để tạo."
+        "invalid_image_thumbhash": "ThumbHash của ảnh phải là base64 bảng chữ cái chuẩn có phần đệm, tối đa 64 ký tự. Dùng hành động Generate ThumbHash để tạo.",
+        "invalid_favorite_script": "Nút yêu thích phải trỏ đến một thực thể script (script.something)."
       },
       "abort": {
         "already_configured": "Thực thể này đã được theo dõi.",

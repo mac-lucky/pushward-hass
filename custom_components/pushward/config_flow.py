@@ -82,6 +82,9 @@ from .const import (
     CONF_LOG_COLUMNS,
     CONF_LOG_LEVEL_ATTRIBUTE,
     CONF_MAX_VALUE,
+    CONF_MEDIA_CONTROLS,
+    CONF_MEDIA_FAVORITE_SCRIPT,
+    CONF_MEDIA_TOKEN,
     CONF_MIN_VALUE,
     CONF_NODE_NAME,
     CONF_PRIMARY_SERIES,
@@ -156,6 +159,7 @@ from .const import (
     DEFAULT_HISTORY_PERIOD,
     DEFAULT_IMAGE_SHAPE,
     DEFAULT_MAX_VALUE,
+    DEFAULT_MEDIA_CONTROLS,
     DEFAULT_MIN_VALUE,
     DEFAULT_PRIORITY,
     DEFAULT_SCALE,
@@ -248,6 +252,7 @@ from .const import (
     validate_thumbhash,
 )
 from .content_mapper import get_domain_defaults, is_valid_color, sanitize_slug
+from .media_control import new_control_token
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -542,6 +547,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_LOG_LEVEL_ATTRIBUTE,
     ),
     "steps_options": (CONF_STEPS_EDITOR,),
+    "media_options": (CONF_MEDIA_CONTROLS, CONF_MEDIA_FAVORITE_SCRIPT),
     "image_options": (CONF_IMAGE_URL, CONF_IMAGE_SHAPE, CONF_IMAGE_THUMBHASH),
     "timeline_options": (
         CONF_UNITS,
@@ -606,6 +612,9 @@ _ENTITY_TOPLEVEL_EXTRA: dict[str, tuple[str, ...]] = {
     "timeline": (CONF_SERIES_ENTITIES, CONF_UNIT),
     "board": (CONF_TILES,),
     "log": (CONF_LOG_COLUMNS,),
+    # media reads everything it shows off the player itself; the two options it
+    # does have are both in the media_options section.
+    "media": (),
 }
 
 WIDGET_SECTIONS: dict[str, tuple[str, ...]] = {
@@ -868,6 +877,8 @@ def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
         return "countdown"
     if domain == "light":
         return "gauge"
+    if domain == "media_player":
+        return "media"
 
     state_obj = hass.states.get(entity_id)
     if state_obj is None:
@@ -1036,6 +1047,21 @@ def _details_schema(
                 default=d.get(CONF_IMAGE_THUMBHASH, ""),
             )
         ] = vol.All(str, vol.Length(max=IMAGE_THUMBHASH_MAX))
+    if template == "media":
+        # The transport row rides on a callback that cannot ask for a Home Assistant
+        # token, so anyone holding the pushed URL can drive the player. Turning this
+        # off leaves a display-only card and stops the endpoint answering for it.
+        fields[
+            vol.Optional(
+                CONF_MEDIA_CONTROLS,
+                default=d.get(CONF_MEDIA_CONTROLS, DEFAULT_MEDIA_CONTROLS),
+            )
+        ] = BooleanSelector()
+        # There is no favorite in the media_player domain, so the heart runs a
+        # script instead - whatever "star this track" means for the app playing it.
+        fields[_entity_source_key(CONF_MEDIA_FAVORITE_SCRIPT, d)] = EntitySelector(
+            EntitySelectorConfig(domain="script")
+        )
     if template == "steps":
         fields[
             vol.Optional(
@@ -1912,6 +1938,12 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     log_columns = _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, ""), strict=True)
     image_url, image_shape, image_thumbhash = _parse_image_fields(user_input)
 
+    # The picker already filters to scripts; a hand-written config can still name
+    # anything, and script.turn_on on a light would fail silently at press time.
+    favorite_script = (user_input.get(CONF_MEDIA_FAVORITE_SCRIPT) or "").strip()
+    if favorite_script and _entity_domain(favorite_script) != "script":
+        raise vol.Invalid("invalid_favorite_script", path=[CONF_MEDIA_FAVORITE_SCRIPT])
+
     return {
         CONF_ENTITY_ID: entity_id,
         CONF_SLUG: slug,
@@ -1988,6 +2020,8 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_TILES: tiles,
         CONF_LOG_LEVEL_ATTRIBUTE: user_input.get(CONF_LOG_LEVEL_ATTRIBUTE, ""),
         CONF_LOG_COLUMNS: log_columns,
+        CONF_MEDIA_CONTROLS: bool(user_input.get(CONF_MEDIA_CONTROLS, DEFAULT_MEDIA_CONTROLS)),
+        CONF_MEDIA_FAVORITE_SCRIPT: favorite_script,
     }
 
 
@@ -2083,6 +2117,20 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             SUBENTRY_TYPE_ENTITY: PushWardEntitySubentryFlow,
             SUBENTRY_TYPE_WIDGET: PushWardWidgetSubentryFlow,
         }
+
+
+def _media_control_token(entity_cfg: dict, existing: str | None) -> str:
+    """The control secret to store: kept for as long as the subentry stays media.
+
+    Deliberately not a form field. It is generated once when a media player is added
+    and then preserved, so reconfiguring a player does not invalidate the buttons on
+    a Live Activity that is already on someone's Lock Screen. Reconfiguring AWAY
+    from media drops it - a secret nothing can use any more has no business staying
+    in storage.
+    """
+    if entity_cfg.get(CONF_TEMPLATE) != "media":
+        return ""
+    return existing or new_control_token()
 
 
 class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
@@ -2198,12 +2246,14 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
                 if self._is_reconfigure:
                     entry = self._get_entry()
                     subentry = self._get_reconfigure_subentry()
+                    entity_cfg[CONF_MEDIA_TOKEN] = _media_control_token(entity_cfg, subentry.data.get(CONF_MEDIA_TOKEN))
                     return self.async_update_and_abort(
                         entry,
                         subentry,
                         data=entity_cfg,
                         title=entity_cfg[CONF_ACTIVITY_NAME],
                     )
+                entity_cfg[CONF_MEDIA_TOKEN] = _media_control_token(entity_cfg, None)
                 return self.async_create_entry(
                     title=entity_cfg[CONF_ACTIVITY_NAME],
                     data=entity_cfg,

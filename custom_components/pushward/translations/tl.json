@@ -1672,6 +1672,17 @@
                 "steps_editor": "Isang hilera bawat hakbang, ayon sa pagkakasunod. Bawat hilera ay nagtatakda ng opsyonal na label, taas ng hilera (1-10), kaugnay na lapad (positibong numero), at kulay (pangalan o hex; iwanang blangko para panatilihin ang accent na kulay). Magdagdag ng walang hilera, o eksaktong total_steps na hilera. Template na steps lamang."
               }
             },
+            "media_options": {
+              "name": "Player",
+              "data": {
+                "media_controls": "Mga Button ng Playback",
+                "media_favorite_script": "Favorite na Script"
+              },
+              "data_description": {
+                "media_controls": "Nagpapakita ng previous / play-pause / next / stop / volume na button sa card, limitado sa suportado ng player. Kapag pinindot ang isa, tumatawag ito pabalik sa Home Assistant sa pamamagitan ng link na may sariling secret sa halip na ang iyong login, kaya kahit sino na may hawak ng notification ay maaaring kontrolin ang player na iyon. I-off ito para sa card na pampakita lang. Media template lamang.",
+                "media_favorite_script": "Script na tinatakbo ng heart button (walang sariling favorite ang mga media player). Iwanang blangko para itago ang button. Media template lamang."
+              }
+            },
             "image_options": {
               "name": "Larawan",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Ang pangunahing series ay dapat tumugma sa isa sa mga na-configure na label ng series.",
         "invalid_image_url": "Dapat https address na may host ang URL ng larawan, at walang username o password.",
         "invalid_image_shape": "Dapat poster, square, o circle ang hugis ng larawan.",
-        "invalid_image_thumbhash": "Dapat base64 na standard alphabet na may padding ang ThumbHash ng larawan, at hindi hihigit sa 64 na character. Gamitin ang aksyong Generate ThumbHash para makagawa."
+        "invalid_image_thumbhash": "Dapat base64 na standard alphabet na may padding ang ThumbHash ng larawan, at hindi hihigit sa 64 na character. Gamitin ang aksyong Generate ThumbHash para makagawa.",
+        "invalid_favorite_script": "Dapat itumbok ng favorite button ang isang script entity (script.something)."
       },
       "abort": {
         "already_configured": "Ang entity na ito ay naka-track na.",

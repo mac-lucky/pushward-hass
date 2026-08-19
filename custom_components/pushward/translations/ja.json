@@ -1672,6 +1672,17 @@
                 "steps_editor": "ステップごとに1行、順番どおりに入力します。各行で任意のラベル、行の高さ（1-10）、相対的な幅（正の数）、色（名前または16進数。空欄でアクセントカラー）を設定します。行を追加しないか、ちょうど total_steps 行を追加してください。steps テンプレートのみ。"
               }
             },
+            "media_options": {
+              "name": "プレーヤー",
+              "data": {
+                "media_controls": "再生操作ボタン",
+                "media_favorite_script": "お気に入りスクリプト"
+              },
+              "data_description": {
+                "media_controls": "カードに前へ / 再生-一時停止 / 次へ / 停止 / 音量ボタンを表示します（プレーヤーが対応する範囲に限られます）。ボタンを押すと、ログイン情報の代わりに専用のシークレットを持つリンク経由で Home Assistant を呼び出すため、通知を持っている人なら誰でもそのプレーヤーを操作できます。表示専用のカードにするにはオフにしてください。media テンプレートのみ。",
+                "media_favorite_script": "ハートボタンで実行するスクリプトです（メディアプレーヤー自体にはお気に入りの概念がありません）。空欄にするとボタンは表示されません。media テンプレートのみ。"
+              }
+            },
             "image_options": {
               "name": "画像",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "プライマリシリーズは、設定済みのシリーズラベルのいずれかと一致する必要があります。",
         "invalid_image_url": "画像 URL はホストを含む https アドレスで、ユーザー名とパスワードを含めることはできません。",
         "invalid_image_shape": "画像の形は poster、square、circle のいずれかにしてください。",
-        "invalid_image_thumbhash": "画像の ThumbHash は標準アルファベットのパディング付き base64 で、64 文字以内にしてください。Generate ThumbHash アクションで生成できます。"
+        "invalid_image_thumbhash": "画像の ThumbHash は標準アルファベットのパディング付き base64 で、64 文字以内にしてください。Generate ThumbHash アクションで生成できます。",
+        "invalid_favorite_script": "お気に入りボタンは script エンティティ（script.something）を指定する必要があります。"
       },
       "abort": {
         "already_configured": "このエンティティはすでに追跡されています。",

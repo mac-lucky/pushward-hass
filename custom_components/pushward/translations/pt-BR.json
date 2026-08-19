@@ -1672,6 +1672,17 @@
                 "steps_editor": "Uma linha por etapa, em ordem. Cada linha define um rótulo opcional, uma altura de linha (1-10), uma largura relativa (número positivo) e uma cor (nome ou hex; deixe vazio para manter a cor de destaque). Adicione nenhuma linha ou exatamente total_steps linhas. Apenas para o modelo steps."
               }
             },
+            "media_options": {
+              "name": "Player",
+              "data": {
+                "media_controls": "Botões de reprodução",
+                "media_favorite_script": "Script de Favorito"
+              },
+              "data_description": {
+                "media_controls": "Mostra no cartão os botões anterior / play-pause / próxima / parar / volume, limitados ao que o player suportar. Tocar em um deles chama de volta o Home Assistant por um link que carrega seu próprio segredo em vez do seu login, então qualquer pessoa com a notificação pode controlar esse player. Desative para um cartão apenas de exibição. Apenas para o modelo media.",
+                "media_favorite_script": "Script executado pelo botão de coração (players de mídia não têm favorito próprio). Deixe vazio para ocultar o botão. Apenas para o modelo media."
+              }
+            },
             "image_options": {
               "name": "Imagem",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "A série principal deve corresponder a um dos rótulos de série configurados.",
         "invalid_image_url": "A URL da imagem precisa ser um endereço https com host e sem usuário ou senha.",
         "invalid_image_shape": "O formato da imagem precisa ser poster, square ou circle.",
-        "invalid_image_thumbhash": "O ThumbHash da imagem precisa estar em base64 com alfabeto padrão e preenchimento, com no máximo 64 caracteres. Use a ação Generate ThumbHash para gerar um."
+        "invalid_image_thumbhash": "O ThumbHash da imagem precisa estar em base64 com alfabeto padrão e preenchimento, com no máximo 64 caracteres. Use a ação Generate ThumbHash para gerar um.",
+        "invalid_favorite_script": "O botão de favorito precisa apontar para uma entidade script (script.something)."
       },
       "abort": {
         "already_configured": "Esta entidade já está sendo monitorada.",

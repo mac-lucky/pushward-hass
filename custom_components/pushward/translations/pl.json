@@ -1672,6 +1672,17 @@
                 "steps_editor": "Jeden wiersz na krok, w kolejności. Każdy wiersz ustawia opcjonalną etykietę, wysokość wiersza (1-10), względną szerokość (liczba dodatnia) i kolor (nazwa lub hex; puste zachowuje kolor akcentu). Dodaj brak wierszy albo dokładnie total_steps wierszy. Tylko szablon steps."
               }
             },
+            "media_options": {
+              "name": "Odtwarzacz",
+              "data": {
+                "media_controls": "Przyciski odtwarzania",
+                "media_favorite_script": "Skrypt ulubionych"
+              },
+              "data_description": {
+                "media_controls": "Pokazuje na karcie przyciski wstecz / odtwarzaj-pauza / dalej / stop / głośność, ograniczone do tego, co obsługuje odtwarzacz. Naciśnięcie przycisku wywołuje Home Assistant przez link niosący własny sekret zamiast Twojego logowania, więc każdy, kto ma powiadomienie, może sterować tym odtwarzaczem. Wyłącz dla karty tylko do wyświetlania. Tylko szablon media.",
+                "media_favorite_script": "Skrypt uruchamiany przez przycisk serca (odtwarzacze multimedialne nie mają własnych ulubionych). Pozostaw puste, aby ukryć przycisk. Tylko szablon media."
+              }
+            },
             "image_options": {
               "name": "Obraz",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Seria podstawowa musi odpowiadać jednej ze skonfigurowanych etykiet serii.",
         "invalid_image_url": "URL obrazu musi być adresem https z hostem, bez nazwy użytkownika i hasła.",
         "invalid_image_shape": "Kształt obrazu musi mieć wartość poster, square lub circle.",
-        "invalid_image_thumbhash": "ThumbHash obrazu musi być zapisany w base64 (standardowy alfabet, z dopełnieniem) i mieć najwyżej 64 znaki. Użyj akcji Generate ThumbHash, aby go wygenerować."
+        "invalid_image_thumbhash": "ThumbHash obrazu musi być zapisany w base64 (standardowy alfabet, z dopełnieniem) i mieć najwyżej 64 znaki. Użyj akcji Generate ThumbHash, aby go wygenerować.",
+        "invalid_favorite_script": "Przycisk ulubionych musi wskazywać encję script (script.something)."
       },
       "abort": {
         "already_configured": "Ta encja jest już śledzona.",

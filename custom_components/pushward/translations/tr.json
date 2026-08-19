@@ -1672,6 +1672,17 @@
                 "steps_editor": "Sırayla her adım için bir satır. Her satır isteğe bağlı bir etiket, satır yüksekliği (1-10), göreli genişlik (pozitif sayı) ve renk (adlı veya hex; boş bırakmak vurgu rengini korur) belirler. Hiç satır eklemeyin veya tam olarak total_steps satır ekleyin. Yalnızca steps şablonu."
               }
             },
+            "media_options": {
+              "name": "Oynatıcı",
+              "data": {
+                "media_controls": "Oynatma Düğmeleri",
+                "media_favorite_script": "Favori Betiği"
+              },
+              "data_description": {
+                "media_controls": "Kartta önceki / oynat-duraklat / sonraki / durdur / ses düzeyi düğmelerini gösterir; yalnızca oynatıcının desteklediği kadarıyla sınırlıdır. Birine dokunmak, girişiniz yerine kendi gizli anahtarını taşıyan bir bağlantı üzerinden Home Assistant'ı geri çağırır, bu yüzden bildirime sahip olan herkes o oynatıcıyı yönetebilir. Yalnızca görüntüleme amaçlı bir kart için kapatın. Yalnızca media şablonu.",
+                "media_favorite_script": "Kalp düğmesinin çalıştırdığı betik (medya oynatıcılarının kendine ait bir favorisi yoktur). Düğmeyi gizlemek için boş bırakın. Yalnızca media şablonu."
+              }
+            },
             "image_options": {
               "name": "Görsel",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "Birincil seri, yapılandırılmış seri etiketlerinden biriyle eşleşmelidir.",
         "invalid_image_url": "Görsel URL'si, ana makine içeren bir https adresi olmalı ve kullanıcı adı ya da parola içermemelidir.",
         "invalid_image_shape": "Görsel biçimi poster, square veya circle olmalıdır.",
-        "invalid_image_thumbhash": "Görsel ThumbHash'i, standart alfabeli ve dolgulu base64 olmalı ve en fazla 64 karakter uzunluğunda olmalıdır. Üretmek için Generate ThumbHash eylemini kullanın."
+        "invalid_image_thumbhash": "Görsel ThumbHash'i, standart alfabeli ve dolgulu base64 olmalı ve en fazla 64 karakter uzunluğunda olmalıdır. Üretmek için Generate ThumbHash eylemini kullanın.",
+        "invalid_favorite_script": "Favori düğmesi bir script varlığını göstermelidir (script.something)."
       },
       "abort": {
         "already_configured": "Bu varlık zaten izleniyor.",

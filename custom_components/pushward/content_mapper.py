@@ -7,6 +7,7 @@ import logging
 import math
 import re
 import time
+from datetime import UTC, datetime
 from urllib.parse import urlparse
 
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfTime
@@ -108,6 +109,9 @@ from .const import (
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     MAX_SEVERITY_LABEL_LEN,
+    MEDIA_DURATION_MAX,
+    MEDIA_POSITION_MAX_AGE,
+    MEDIA_TITLE_MAX,
     NAMED_COLORS,
     TIMELINE_SERIES_LABEL_MAX,
     is_valid_image_url,
@@ -115,6 +119,7 @@ from .const import (
     normalize_slug,
     url_host,
 )
+from .media_control import EMITTED_CONTROL_SLOTS, control_urls
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -550,6 +555,122 @@ def _apply_steps_fields(
             content["step_colors"] = colors_list
 
 
+# What the big line of the player card reads, in order of preference. A podcast or
+# a show carries no media_title, a radio stream carries neither, and a player idling
+# on an input carries only its source.
+_MEDIA_TITLE_ATTRS = ("media_title", "media_series_title", "media_channel", "source")
+# The line under it. Music gives an artist, a show gives the album/season field, and
+# a casting device at least names the app.
+_MEDIA_SUBTITLE_ATTRS = ("media_artist", "media_album_name", "app_name")
+# HA state -> wire playback_state. Everything else (off, idle, standby, whatever a
+# player invents) is stopped.
+_PLAYBACK_STATES = {"playing": "playing", "paused": "paused", "buffering": "buffering"}
+
+
+def _media_number(raw: object) -> float | None:
+    """A finite float from a player attribute, or None.
+
+    NaN and inf both survive float() and are both a 422 on the wire.
+    """
+    value = _coerce_scaled_value(raw, None)
+    return value if value is not None and math.isfinite(value) else None
+
+
+def _first_attr(state: State, names: tuple[str, ...]) -> str:
+    """The first non-empty attribute of ``names``, as text."""
+    for name in names:
+        value = state.attributes.get(name)
+        if value is not None and (text := str(value).strip()):
+            return text
+    return ""
+
+
+def _media_position(state: State, now: int) -> tuple[float, int | None] | None:
+    """The playhead sample as (position_seconds, position_at), or None.
+
+    Never a bare anchor: a position_at without its position says nothing. The
+    anchor half is None when the player's sample is missing or older than
+    MEDIA_POSITION_MAX_AGE - the position then goes out ALONE, which makes the
+    server stamp its receipt time AND clear any anchor inherited from an earlier
+    frame. That last part is load-bearing: the server merge keeps a stored
+    position_at until a patch overrides it, so omitting the pair here would let
+    an old anchor age past the validator's floor and 422 every later push,
+    the end frames included.
+    """
+    position = _media_number(state.attributes.get("media_position"))
+    if position is None or position < 0:
+        return None
+    position = min(position, MEDIA_DURATION_MAX)
+    raw_at = state.attributes.get("media_position_updated_at")
+    if isinstance(raw_at, datetime):
+        # A naive datetime reads as local time through .timestamp(), skewing the
+        # anchor by the UTC offset. HA convention is UTC everywhere, so that is
+        # what a naive value from a third-party integration is taken to mean.
+        at = int((raw_at if raw_at.tzinfo else raw_at.replace(tzinfo=UTC)).timestamp())
+    else:
+        at = _coerce_epoch(raw_at)
+    if at is None or at <= 0 or at < now - MEDIA_POSITION_MAX_AGE:
+        return position, None
+    # A player whose clock runs ahead would otherwise stamp the future, which the
+    # server rejects as skew.
+    return position, min(at, now)
+
+
+def _apply_media_fields(
+    content: dict,
+    entity_config: dict,
+    state: State,
+    hass: HomeAssistant | None,
+    *,
+    now: int,
+) -> None:
+    """Write the media template's player fields into ``content`` in place."""
+    if title := _first_attr(state, _MEDIA_TITLE_ATTRS):
+        content["media_title"] = title[:MEDIA_TITLE_MAX]
+
+    # The base subtitle is the friendly name unless the user pointed it somewhere.
+    # On a player the artist says more than "Living Room", so it wins - but only
+    # over that default, never over a configured source.
+    configured_subtitle = entity_config.get(CONF_SUBTITLE_ENTITY) or entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
+    if not configured_subtitle and (subtitle := _first_attr(state, _MEDIA_SUBTITLE_ATTRS)):
+        content["subtitle"] = subtitle
+
+    content["playback_state"] = _PLAYBACK_STATES.get(state.state, "stopped")
+
+    duration = _media_number(state.attributes.get("media_duration"))
+    if duration is not None and duration > 0:
+        duration = min(duration, MEDIA_DURATION_MAX)
+        content["duration_seconds"] = duration
+
+    if (sample := _media_position(state, now)) is not None:
+        position, position_at = sample
+        # A player over-reporting its playhead would draw the scrubber past the
+        # end; the device clamps too, but the wire should not carry the overshoot.
+        content["position_seconds"] = min(position, duration) if duration else position
+        if position_at is not None:
+            content["position_at"] = position_at
+
+    volume = _media_number(state.attributes.get("volume_level"))
+    if volume is not None:
+        content["volume"] = max(0.0, min(1.0, volume))
+
+    controls = {
+        slot: action
+        for slot, url in control_urls(hass, state, entity_config).items()
+        if (action := build_tap_action(url, foreground=False)) is not None
+    }
+    # Always the full slot map: the server deep-merges `controls`, so a slot this
+    # frame does not carry explicitly would keep an earlier frame's button alive
+    # on the card - dead, since this side stopped offering it. The nulls are what
+    # delete those buttons (controls toggled off, a capability lost mid-activity,
+    # the base URL going away).
+    content["controls"] = {slot: controls.get(slot) for slot in EMITTED_CONTROL_SLOTS}
+
+    # The player card draws a scrubber off position/duration, not the progress bar,
+    # and the server still wants the field in [0,1].
+    content["progress"] = 0.0
+
+
 def _apply_image_fields(content: dict, entity_config: dict) -> None:
     """Write the optional image trio into ``content``, for the templates that take it.
 
@@ -799,6 +920,8 @@ def map_content(
         # full ring buffer (newest-first) when one has accumulated.
         content["lines"] = [_build_log_line(state, entity_config, hass)]
         content["progress"] = 0.0
+    elif template == "media":
+        _apply_media_fields(content, entity_config, state, hass, now=now)
     elif template == "generic" and entity_config.get(CONF_LIVE_PROGRESS):
         # Opt-in: hand the end time to iOS so it interpolates the progress bar to
         # 1.0 by end_date and shows a counting-down ETA. False first, for the same
@@ -867,6 +990,12 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         # The server requires ≥1 line even on the ENDED frame — carry the last
         # rendered lines (newest-first) so the log doesn't blank out on completion.
         content["lines"] = last_content["lines"]
+    elif template == "media":
+        # Merge patch keeps the player fields the live frames already sent. The
+        # transport state is the exception: a finished card still claiming to be
+        # playing would tick its scrubber forward forever.
+        content["playback_state"] = "stopped"
+        content["progress"] = 0.0
 
     # The activity is done, so stop the opt-in ETA interpolation. Without this the
     # completion card keeps filling toward a deadline that no longer means anything.

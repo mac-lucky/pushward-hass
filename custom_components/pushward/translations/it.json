@@ -1672,6 +1672,17 @@
                 "steps_editor": "Una riga per passo, in ordine. Ogni riga imposta un'etichetta facoltativa, un'altezza riga (1-10), una larghezza relativa (numero positivo) e un colore (con nome o hex; lasciare vuoto per mantenere il colore d'accento). Aggiungi nessuna riga oppure esattamente total_steps righe. Solo per il modello steps."
               }
             },
+            "media_options": {
+              "name": "Lettore",
+              "data": {
+                "media_controls": "Pulsanti di riproduzione",
+                "media_favorite_script": "Script Preferiti"
+              },
+              "data_description": {
+                "media_controls": "Mostra sulla scheda i pulsanti precedente / play-pausa / successivo / stop / volume, limitati a ciò che il lettore supporta. Premerne uno richiama Home Assistant tramite un link che porta un proprio segreto invece delle tue credenziali, quindi chiunque abbia la notifica può controllare quel lettore. Disattivalo per una scheda di sola visualizzazione. Solo per il modello media.",
+                "media_favorite_script": "Script eseguito dal pulsante a cuore (i lettori multimediali non hanno un preferito proprio). Lascia vuoto per nascondere il pulsante. Solo per il modello media."
+              }
+            },
             "image_options": {
               "name": "Immagine",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "La serie principale deve corrispondere a una delle etichette di serie configurate.",
         "invalid_image_url": "L'URL dell'immagine deve essere un indirizzo https con host, senza nome utente né password.",
         "invalid_image_shape": "La forma dell'immagine deve essere poster, square o circle.",
-        "invalid_image_thumbhash": "Il ThumbHash dell'immagine deve essere in base64 con alfabeto standard e riempimento, al massimo 64 caratteri. Usa l'azione Generate ThumbHash per generarne uno."
+        "invalid_image_thumbhash": "Il ThumbHash dell'immagine deve essere in base64 con alfabeto standard e riempimento, al massimo 64 caratteri. Usa l'azione Generate ThumbHash per generarne uno.",
+        "invalid_favorite_script": "Il pulsante preferiti deve puntare a un'entità script (script.something)."
       },
       "abort": {
         "already_configured": "Questa entità è già monitorata.",

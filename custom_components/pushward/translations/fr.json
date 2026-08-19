@@ -1672,6 +1672,17 @@
                 "steps_editor": "Une ligne par étape, dans l'ordre. Chaque ligne définit un libellé facultatif, une hauteur de ligne (1-10), une largeur relative (nombre positif) et une couleur (nommée ou hex ; laisser vide pour conserver la couleur d'accentuation). Indiquez aucune ligne, ou exactement total_steps lignes. Modèle steps uniquement."
               }
             },
+            "media_options": {
+              "name": "Lecteur",
+              "data": {
+                "media_controls": "Boutons de lecture",
+                "media_favorite_script": "Script Favori"
+              },
+              "data_description": {
+                "media_controls": "Affiche les boutons précédent / lecture-pause / suivant / arrêt / volume sur la carte, limités à ce que prend en charge le lecteur. Appuyer sur l'un d'eux rappelle Home Assistant via un lien qui porte son propre secret plutôt que votre identifiant, donc quiconque possède la notification peut piloter ce lecteur. Désactivez-le pour une carte d'affichage seul. Modèle media uniquement.",
+                "media_favorite_script": "Script exécuté par le bouton cœur (les lecteurs multimédias n'ont pas de favori propre). Laissez vide pour masquer le bouton. Modèle media uniquement."
+              }
+            },
             "image_options": {
               "name": "Image",
               "data": {
@@ -1819,7 +1830,8 @@
         "unknown_primary_series": "La série principale doit correspondre à l'un des libellés de série configurés.",
         "invalid_image_url": "L'URL de l'image doit être une adresse https avec un hôte, sans nom d'utilisateur ni mot de passe.",
         "invalid_image_shape": "La forme de l'image doit être poster, square ou circle.",
-        "invalid_image_thumbhash": "Le ThumbHash de l'image doit être en base64 alphabet standard avec remplissage, et faire au plus 64 caractères. Utilisez l'action Generate ThumbHash pour en produire un."
+        "invalid_image_thumbhash": "Le ThumbHash de l'image doit être en base64 alphabet standard avec remplissage, et faire au plus 64 caractères. Utilisez l'action Generate ThumbHash pour en produire un.",
+        "invalid_favorite_script": "Le bouton favori doit pointer vers une entité script (script.something)."
       },
       "abort": {
         "already_configured": "Cette entité est déjà suivie.",
