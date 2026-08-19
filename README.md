@@ -1,4 +1,4 @@
-[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://hacs.xyz)
+[![HACS](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://hacs.xyz)
 [![Website](https://img.shields.io/badge/pushward.app-5B4FE5?style=for-the-badge&logo=safari&logoColor=white)](https://pushward.app)
 [![App Store](https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/id6759689999)
 
@@ -97,13 +97,13 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=mac-lucky&repository=pushward-hass&category=integration)
 
-One-click adds this custom repository to HACS; then install and restart. Or do it manually:
+PushWard is in the **default HACS store** - no custom repository needed. The button above opens it
+directly in HACS; then download and restart. Or do it manually:
 
 1. Open **HACS** in Home Assistant
-2. Click the three-dot menu (top right) > **Custom repositories**
-3. Add `https://github.com/mac-lucky/pushward-hass` with category **Integration**
-4. Search for **PushWard** and install
-5. **Restart Home Assistant**
+2. Search for **PushWard**
+3. Open it and click **Download**
+4. **Restart Home Assistant**
 
 ### Manual
 
@@ -805,7 +805,7 @@ Requires Python **3.13.2+**. CI also runs **HACS validation** and **hassfest** o
 ## CI/CD & Releases
 
 - **CI** (`.github/workflows/ci.yml`): HACS validation, hassfest, ruff lint+format, and pytest with coverage on every push/PR.
-- **Releases**: the integration version lives in `custom_components/pushward/manifest.json` (currently **0.38.0**). Bump it and push a matching **`v*`** git tag; CI builds the changelog and creates the GitHub release automatically. **Do not create releases manually.** HACS only sees GitHub releases, and `hide_default_branch: true` is set in `hacs.json`.
+- **Releases**: the integration version lives in `custom_components/pushward/manifest.json` (currently **0.43.0**). Bump it and push a matching **`v*`** git tag; CI builds the changelog and creates the GitHub release automatically. **Do not create releases manually.** HACS only sees GitHub releases, and `hide_default_branch: true` is set in `hacs.json`.
 
 ## Server compatibility
 
