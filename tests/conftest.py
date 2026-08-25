@@ -442,23 +442,32 @@ def expected_thumbhash(body: bytes) -> str:
 
 
 @contextmanager
-def patch_image_download(body: bytes, *, content_length: int | None = None):
+def patch_image_download(body: bytes, *, content_length: int | None = None, chunk_size: int | None = None):
     """Patch the session the hashing path uses so a fetch returns ``body``.
 
     Yields the mock session, so a test can assert how many fetches happened - or that
     none did. ``content_length`` overrides the declared size, which is how a response
-    that lies about its length is simulated.
+    that lies about its length is simulated. ``chunk_size`` splits the body the way a
+    real socket delivers it - ``readany`` hands out one piece per call, so the
+    download loop has to reassemble them. Each fetch gets a fresh response so a
+    cached-vs-refetched test still counts fetches, not chunks.
     """
-    response = MagicMock()
-    response.status = 200
-    response.raise_for_status = MagicMock()
-    response.content_length = len(body) if content_length is None else content_length
-    response.content.read = AsyncMock(return_value=body)
-    context = MagicMock()
-    context.__aenter__ = AsyncMock(return_value=response)
-    context.__aexit__ = AsyncMock(return_value=False)
+    size = chunk_size or len(body) or 1
+    chunks = [body[start : start + size] for start in range(0, len(body), size)]
+
+    def fetch(*_args, **_kwargs):
+        response = MagicMock()
+        response.status = 200
+        response.raise_for_status = MagicMock()
+        response.content_length = len(body) if content_length is None else content_length
+        response.content.readany = AsyncMock(side_effect=[*chunks, b""])
+        context = MagicMock()
+        context.__aenter__ = AsyncMock(return_value=response)
+        context.__aexit__ = AsyncMock(return_value=False)
+        return context
+
     session = MagicMock()
-    session.get = MagicMock(return_value=context)
+    session.get = MagicMock(side_effect=fetch)
     with patch("custom_components.pushward.image_hash.async_get_clientsession", return_value=session):
         yield session
 

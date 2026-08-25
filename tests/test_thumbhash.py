@@ -169,6 +169,20 @@ async def test_url_hash_matches_a_direct_encode(hass: HomeAssistant) -> None:
     assert result == expected_thumbhash(body)
 
 
+async def test_a_body_arriving_in_chunks_is_assembled_before_decoding(hass: HomeAssistant) -> None:
+    """StreamReader hands back whatever the socket has buffered, not the whole body.
+
+    A large image spanning several TCP segments used to be truncated at the first
+    chunk, so Pillow saw half a file and the user saw a decode error. The hash of a
+    chunked delivery must equal the hash of the same body in one piece.
+    """
+    body = png_bytes(300, 300)
+    assert len(body) > 512, "the fixture has to span several chunks or it is not testing anything"
+    with patch_image_download(body, chunk_size=512):
+        result = await async_thumbhash_for_url(hass, "https://example.com/large.png")
+    assert result == expected_thumbhash(body)
+
+
 async def test_url_result_is_cached_so_repeated_updates_do_not_refetch(hass: HomeAssistant) -> None:
     """Activities push the same artwork over and over; one download has to cover them."""
     with patch_image_download(png_bytes(20, 20)) as session:
@@ -244,6 +258,16 @@ async def test_oversized_download_is_refused_when_the_length_header_lied(hass: H
         pytest.raises(ThumbhashError, match="larger than"),
     ):
         await async_thumbhash_for_url(hass, "https://example.com/liar.png")
+
+
+async def test_an_oversized_chunked_body_hits_the_cap_not_the_decoder(hass: HomeAssistant) -> None:
+    """A lying header plus chunked delivery must still be refused as too large -
+    stopping at the first chunk would misreport it as an undecodable image."""
+    with (
+        patch_image_download(b"x" * (MAX_IMAGE_BYTES + 4096), content_length=10, chunk_size=64 * 1024),
+        pytest.raises(ThumbhashError, match="larger than"),
+    ):
+        await async_thumbhash_for_url(hass, "https://example.com/chunked-liar.png")
 
 
 async def test_empty_body_is_refused(hass: HomeAssistant) -> None:

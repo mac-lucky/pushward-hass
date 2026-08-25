@@ -213,9 +213,19 @@ async def _async_download(hass: HomeAssistant, url: str) -> bytes:
             declared = response.content_length
             if declared is not None and declared > MAX_IMAGE_BYTES:
                 raise ThumbhashError(f"{shown} declares {declared} bytes, over the {MAX_IMAGE_BYTES} byte limit")
-            # One byte past the cap is enough to tell "at the limit" from "over it"
-            # without buffering a response that lies about its length.
-            data = await response.content.read(MAX_IMAGE_BYTES + 1)
+            # Read chunk by chunk to EOF: a single StreamReader.read(n) returns
+            # whatever the socket happens to have buffered, not n bytes, so a body
+            # spanning several TCP segments would come back truncated. Kept at one
+            # byte past the cap, which is enough to tell "at the limit" from "over
+            # it" without buffering a response that lies about its length.
+            buffer = bytearray()
+            while len(buffer) <= MAX_IMAGE_BYTES:
+                chunk = await response.content.readany()
+                if not chunk:
+                    break
+                buffer += chunk
+                del buffer[MAX_IMAGE_BYTES + 1 :]
+            data = bytes(buffer)
     except (aiohttp.ClientError, TimeoutError, OSError) as err:
         raise ThumbhashError(f"could not fetch {shown}: {err}") from err
     if len(data) > MAX_IMAGE_BYTES:
