@@ -1616,7 +1616,7 @@
             "current_step_entity": "Citește pasul curent dintr-o entitate separată. Lăsați gol pentru a folosi entitatea urmărită.",
             "current_step_attribute": "Atributul entității care conține pasul curent ca număr întreg.",
             "severity": "Nivelul de severitate alert.",
-            "severity_label": "Suprascrie textul insignei Info/Warning/Critical afișat pe alertă. Lăsați gol pentru a folosi numele nivelului de severitate. Maximum 32 de caractere. Numai pentru șablonul alert.",
+            "severity_label": "Suprascrie textul insignei Info/Warning/Critical afișat pe alertă. Lăsați gol pentru a folosi numele nivelului de severitate. Maximum 40 de caractere. Numai pentru șablonul alert.",
             "min_value": "Valoarea minimă a intervalului gauge-ului.",
             "max_value": "Valoarea maximă a intervalului gauge-ului.",
             "unit": "Unitatea de afișare lângă valoare (ex. °C, %, kW). Maxim 32 de caractere.",

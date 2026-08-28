@@ -1616,7 +1616,7 @@
             "current_step_entity": "Lê a etapa atual de uma entidade separada. Deixe vazio para usar a entidade monitorada.",
             "current_step_attribute": "Atributo da entidade que contém a etapa atual como número inteiro.",
             "severity": "Nível de severidade do alert.",
-            "severity_label": "Substitua o texto do badge Info/Warning/Critical exibido no alert. Deixe vazio para usar o nome da severidade. Máximo de 32 caracteres. Apenas para o modelo alert.",
+            "severity_label": "Substitua o texto do badge Info/Warning/Critical exibido no alert. Deixe vazio para usar o nome da severidade. Máximo de 40 caracteres. Apenas para o modelo alert.",
             "min_value": "Valor mínimo para o intervalo do gauge.",
             "max_value": "Valor máximo para o intervalo do gauge.",
             "unit": "Unidade de exibição mostrada ao lado do valor (ex.: °C, %, kW). Máximo de 32 caracteres.",

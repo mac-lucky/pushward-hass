@@ -1616,7 +1616,7 @@
             "current_step_entity": "从单独的实体读取当前步骤。留空则使用被追踪实体。",
             "current_step_attribute": "以整数形式持有当前步骤的实体属性。",
             "severity": "alert 严重程度级别。",
-            "severity_label": "覆盖 alert 上显示的 Info/Warning/Critical 徽章文本。留空则使用严重程度名称。最多 32 个字符。仅适用于 alert 模板。",
+            "severity_label": "覆盖 alert 上显示的 Info/Warning/Critical 徽章文本。留空则使用严重程度名称。最多 40 个字符。仅适用于 alert 模板。",
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "unit": "值旁边显示的单位（例如 °C、%、kW）。最多 32 个字符。",

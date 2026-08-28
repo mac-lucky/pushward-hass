@@ -1616,7 +1616,7 @@
             "current_step_entity": "Đọc bước hiện tại từ một thực thể riêng. Để trống để dùng thực thể được theo dõi.",
             "current_step_attribute": "Thuộc tính thực thể chứa bước hiện tại dưới dạng số nguyên.",
             "severity": "Mức độ nghiêm trọng của alert.",
-            "severity_label": "Ghi đè văn bản huy hiệu Info/Warning/Critical hiển thị trên alert. Để trống để dùng tên mức độ nghiêm trọng. Tối đa 32 ký tự. Chỉ dành cho mẫu alert.",
+            "severity_label": "Ghi đè văn bản huy hiệu Info/Warning/Critical hiển thị trên alert. Để trống để dùng tên mức độ nghiêm trọng. Tối đa 40 ký tự. Chỉ dành cho mẫu alert.",
             "min_value": "Giá trị tối thiểu cho dải gauge.",
             "max_value": "Giá trị tối đa cho dải gauge.",
             "unit": "Đơn vị hiển thị bên cạnh giá trị (ví dụ: °C, %, kW). Tối đa 32 ký tự.",

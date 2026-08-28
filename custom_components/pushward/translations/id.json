@@ -1616,7 +1616,7 @@
             "current_step_entity": "Baca langkah saat ini dari entitas terpisah. Biarkan kosong untuk menggunakan entitas yang dilacak.",
             "current_step_attribute": "Atribut entitas yang menyimpan langkah saat ini sebagai bilangan bulat.",
             "severity": "Tingkat keparahan alert.",
-            "severity_label": "Timpa teks lencana Info/Warning/Critical yang ditampilkan pada alert. Kosongkan untuk menggunakan nama tingkat keparahan. Maks 32 karakter. Hanya templat alert.",
+            "severity_label": "Timpa teks lencana Info/Warning/Critical yang ditampilkan pada alert. Kosongkan untuk menggunakan nama tingkat keparahan. Maks 40 karakter. Hanya templat alert.",
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "unit": "Satuan tampilan yang ditampilkan di sebelah nilai (misalnya °C, %, kW). Maks 32 karakter.",

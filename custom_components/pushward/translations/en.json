@@ -1616,7 +1616,7 @@
             "current_step_entity": "Read the current step from a separate entity. Leave empty to use the tracked entity.",
             "current_step_attribute": "Attribute holding the current step as an integer (on the source entity, or the tracked entity if no source is set).",
             "severity": "Alert severity level.",
-            "severity_label": "Override the Info/Warning/Critical badge text shown on the alert. Leave empty to use the severity name. Max 32 characters. Alert template only.",
+            "severity_label": "Override the Info/Warning/Critical badge text shown on the alert. Leave empty to use the severity name. Max 40 characters. Alert template only.",
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "unit": "Display unit shown next to the value (e.g. °C, %, kW). Max 32 characters.",

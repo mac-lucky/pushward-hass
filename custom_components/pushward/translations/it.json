@@ -1616,7 +1616,7 @@
             "current_step_entity": "Legge il passaggio corrente da un'entità separata. Lascia vuoto per usare l'entità monitorata.",
             "current_step_attribute": "Attributo dell'entità che contiene il passo corrente come numero intero.",
             "severity": "Livello di gravità alert.",
-            "severity_label": "Sovrascrivi il testo del badge Info/Warning/Critical mostrato sull'alert. Lasciare vuoto per usare il nome della gravità. Massimo 32 caratteri. Solo per il modello alert.",
+            "severity_label": "Sovrascrivi il testo del badge Info/Warning/Critical mostrato sull'alert. Lasciare vuoto per usare il nome della gravità. Massimo 40 caratteri. Solo per il modello alert.",
             "min_value": "Valore minimo per l'intervallo del gauge.",
             "max_value": "Valore massimo per l'intervallo del gauge.",
             "unit": "Unità di visualizzazione mostrata accanto al valore (es. °C, %, kW). Massimo 32 caratteri.",

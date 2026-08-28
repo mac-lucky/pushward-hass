@@ -1616,7 +1616,7 @@
             "current_step_entity": "Lee el paso actual de una entidad distinta. Déjalo vacío para usar la entidad rastreada.",
             "current_step_attribute": "Atributo de la entidad que contiene el paso actual como número entero.",
             "severity": "Nivel de severidad del alert.",
-            "severity_label": "Sobrescribe el texto de la insignia Info/Warning/Critical mostrada en el alert. Dejar vacío para usar el nombre de la severidad. Máximo 32 caracteres. Solo para la plantilla alert.",
+            "severity_label": "Sobrescribe el texto de la insignia Info/Warning/Critical mostrada en el alert. Dejar vacío para usar el nombre de la severidad. Máximo 40 caracteres. Solo para la plantilla alert.",
             "min_value": "Valor mínimo del rango del gauge.",
             "max_value": "Valor máximo del rango del gauge.",
             "unit": "Unidad de visualización junto al valor (p. ej. °C, %, kW). Máximo 32 caracteres.",

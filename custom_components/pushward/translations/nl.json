@@ -1616,7 +1616,7 @@
             "current_step_entity": "Lees de huidige stap van een aparte entiteit. Laat leeg om de gevolgde entiteit te gebruiken.",
             "current_step_attribute": "Entiteitsattribuut met de huidige stap als geheel getal.",
             "severity": "alert-ernstniveau.",
-            "severity_label": "Overschrijf de Info/Warning/Critical-badgetekst die op de alert wordt getoond. Laat leeg om de ernstnaam te gebruiken. Max. 32 tekens. Alleen voor het sjabloon alert.",
+            "severity_label": "Overschrijf de Info/Warning/Critical-badgetekst die op de alert wordt getoond. Laat leeg om de ernstnaam te gebruiken. Max. 40 tekens. Alleen voor het sjabloon alert.",
             "min_value": "Minimumwaarde voor het gauge-bereik.",
             "max_value": "Maximumwaarde voor het gauge-bereik.",
             "unit": "Weergave-eenheid naast de waarde (bijv. °C, %, kW). Max. 32 tekens.",

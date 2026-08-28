@@ -1616,7 +1616,7 @@
             "current_step_entity": "Odczytuj bieżący krok z osobnej encji. Pozostaw puste, aby użyć śledzonej encji.",
             "current_step_attribute": "Atrybut encji przechowujący bieżący krok jako liczbę całkowitą.",
             "severity": "Poziom istotności dla szablonu alert.",
-            "severity_label": "Nadpisz tekst odznaki Info/Warning/Critical pokazywany na alercie. Pozostaw puste, aby użyć nazwy poziomu istotności. Maks. 32 znaki. Tylko szablon alert.",
+            "severity_label": "Nadpisz tekst odznaki Info/Warning/Critical pokazywany na alercie. Pozostaw puste, aby użyć nazwy poziomu istotności. Maks. 40 znaki. Tylko szablon alert.",
             "min_value": "Minimalna wartość zakresu gauge.",
             "max_value": "Maksymalna wartość zakresu gauge.",
             "unit": "Jednostka wyświetlana obok wartości (np. °C, %, kW). Maks. 32 znaki.",

@@ -1616,7 +1616,7 @@
             "current_step_entity": "別のエンティティから現在のステップを読み取ります。空白のままにすると追跡エンティティを使用します。",
             "current_step_attribute": "現在のステップを整数で保持するエンティティ属性。",
             "severity": "alert の重大度レベル。",
-            "severity_label": "alert に表示される Info/Warning/Critical バッジテキストを上書きします。空白のままにすると重大度名を使用します。最大 32 文字。alert テンプレートのみ。",
+            "severity_label": "alert に表示される Info/Warning/Critical バッジテキストを上書きします。空白のままにすると重大度名を使用します。最大 40 文字。alert テンプレートのみ。",
             "min_value": "gauge 範囲の最小値。",
             "max_value": "gauge 範囲の最大値。",
             "unit": "値の隣に表示される単位（例: °C, %, kW）。最大32文字。",

@@ -1616,7 +1616,7 @@
             "current_step_entity": "Lire l'étape actuelle depuis une entité distincte. Laisser vide pour utiliser l'entité suivie.",
             "current_step_attribute": "Attribut de l'entité contenant l'étape actuelle sous forme d'entier.",
             "severity": "Niveau de gravité de l'alert.",
-            "severity_label": "Remplacer le texte du badge Info/Warning/Critical affiché sur l'alert. Laisser vide pour utiliser le nom de la gravité. 32 caractères maximum. Modèle alert uniquement.",
+            "severity_label": "Remplacer le texte du badge Info/Warning/Critical affiché sur l'alert. Laisser vide pour utiliser le nom de la gravité. 40 caractères maximum. Modèle alert uniquement.",
             "min_value": "Valeur minimale de la plage du gauge.",
             "max_value": "Valeur maximale de la plage du gauge.",
             "unit": "Unité d'affichage indiquée à côté de la valeur (ex. °C, %, kW). 32 caractères maximum.",

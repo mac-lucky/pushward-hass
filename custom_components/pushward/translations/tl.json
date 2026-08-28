@@ -1616,7 +1616,7 @@
             "current_step_entity": "Basahin ang kasalukuyang hakbang mula sa hiwalay na entity. Iwanang blanko upang gamitin ang na-track na entity.",
             "current_step_attribute": "Attribute ng entity na nagtataglay ng kasalukuyang hakbang bilang integer.",
             "severity": "Antas ng kalubhaan ng alert.",
-            "severity_label": "I-override ang Info/Warning/Critical badge text na ipinapakita sa alert. Iwanan itong blangko para gamitin ang pangalan ng kalubhaan. Hanggang 32 na character. Para sa alert template lamang.",
+            "severity_label": "I-override ang Info/Warning/Critical badge text na ipinapakita sa alert. Iwanan itong blangko para gamitin ang pangalan ng kalubhaan. Hanggang 40 na character. Para sa alert template lamang.",
             "min_value": "Pinakamababang halaga para sa saklaw ng gauge.",
             "max_value": "Pinakamataas na halaga para sa saklaw ng gauge.",
             "unit": "Display na yunit na ipinapakita katabi ng halaga (hal. °C, %, kW). Hanggang 32 karakter.",

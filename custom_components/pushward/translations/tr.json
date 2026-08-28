@@ -1616,7 +1616,7 @@
             "current_step_entity": "Geçerli adımı ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın.",
             "current_step_attribute": "Geçerli adımı tamsayı olarak tutan varlık niteliği.",
             "severity": "alert önem düzeyi.",
-            "severity_label": "alert üzerinde gösterilen Info/Warning/Critical rozet metnini geçersiz kılar. Önem derecesi adını kullanmak için boş bırakın. En fazla 32 karakter. Yalnızca alert şablonu.",
+            "severity_label": "alert üzerinde gösterilen Info/Warning/Critical rozet metnini geçersiz kılar. Önem derecesi adını kullanmak için boş bırakın. En fazla 40 karakter. Yalnızca alert şablonu.",
             "min_value": "gauge aralığı için minimum değer.",
             "max_value": "gauge aralığı için maksimum değer.",
             "unit": "Değerin yanında gösterilen birim (örn. °C, %, kW). En fazla 32 karakter.",

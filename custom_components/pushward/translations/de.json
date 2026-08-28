@@ -1616,7 +1616,7 @@
             "current_step_entity": "Den aktuellen Schritt aus einer separaten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden.",
             "current_step_attribute": "Entitätsattribut, das den aktuellen Schritt als Ganzzahl enthält.",
             "severity": "Schweregrad des alert-Templates.",
-            "severity_label": "Überschreibt den auf dem Alert angezeigten Info-/Warnung-/Kritisch-Badge-Text. Leer lassen, um den Namen des Schweregrads zu verwenden. Max. 32 Zeichen. Nur für die Vorlage 'alert'.",
+            "severity_label": "Überschreibt den auf dem Alert angezeigten Info-/Warnung-/Kritisch-Badge-Text. Leer lassen, um den Namen des Schweregrads zu verwenden. Max. 40 Zeichen. Nur für die Vorlage 'alert'.",
             "min_value": "Minimalwert für den Gauge-Bereich.",
             "max_value": "Maximalwert für den Gauge-Bereich.",
             "unit": "Neben dem Wert angezeigte Einheit (z. B. °C, %, kW). Maximal 32 Zeichen.",

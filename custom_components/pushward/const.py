@@ -278,8 +278,10 @@ MAX_TEXT_LEN = 255
 MAX_LONG_TEXT_LEN = 1024
 MAX_URL_LEN = 2048
 MAX_SLUG_LEN = 128
-# Optional alert badge-text override; mirrors the server's 32-rune cap.
-MAX_SEVERITY_LABEL_LEN = 32
+# Optional alert badge-text override; mirrors the server's 40-rune cap. Sized
+# from the alert Lock Screen header, the one slot with no lineLimit and no scale
+# floor - it clipped near 45 on an iPhone 17, less on a narrower one.
+MAX_SEVERITY_LABEL_LEN = 40
 MAX_TAP_ACTION_TITLE_LEN = 64
 MAX_TAP_ACTION_ICON_LEN = 64
 MAX_TAP_ACTION_BODY_LEN = 1024  # server maxTapActionBodyRunes
