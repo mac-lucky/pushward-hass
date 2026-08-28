@@ -18,7 +18,7 @@ from pathlib import Path
 
 import yaml
 
-from custom_components.pushward.const import SERVICE_TEMPLATES
+from custom_components.pushward.const import MAX_SEVERITY_LABEL_LEN, SERVICE_TEMPLATES
 
 _COMPONENT = Path(__file__).parent.parent / "custom_components" / "pushward"
 _SERVICES_YAML = _COMPONENT / "services.yaml"
@@ -164,3 +164,47 @@ def test_every_locale_carries_every_en_key() -> None:
         extra = sorted(keys - en_keys)
         assert not missing, f"{locale_file.name}: missing {missing[:8]} (+{max(0, len(missing) - 8)} more)"
         assert not extra, f"{locale_file.name}: stale keys {extra[:8]} (+{max(0, len(extra) - 8)} more)"
+
+
+def test_severity_label_prose_matches_the_constant() -> None:
+    """Every locale's severity_label help text must quote the real cap.
+
+    The number lives in 25 files: the constant, plus one hand-translated
+    sentence per locale. Nothing generates them and HA's data_description JSON
+    has no interpolation, so a server-side cap change is a 25-file manual edit.
+    The first attempt at exactly that already left a stale comment behind, and a
+    missed locale silently tells a German user the limit is 32 when it is 40.
+
+    Bengali writes its numerals in Bengali digits, so compare on the translated
+    digit set rather than assuming ASCII.
+    """
+    bengali = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
+    want_ascii = str(MAX_SEVERITY_LABEL_LEN)
+    want_bengali = want_ascii.translate(bengali)
+
+    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
+        descriptions = _severity_label_descriptions(json.loads(locale_file.read_text()))
+        assert descriptions, f"{locale_file.name}: no severity_label description found"
+        for text in descriptions:
+            assert want_ascii in text or want_bengali in text, (
+                f"{locale_file.name}: severity_label help text does not mention {want_ascii}; it reads {text!r}"
+            )
+
+
+def _severity_label_descriptions(node: object) -> list[str]:
+    """Collect every severity_label value long enough to be help text.
+
+    The key also names a short field label ("Severity Label"), which carries no
+    number and must not be asserted on.
+    """
+    found: list[str] = []
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == "severity_label" and isinstance(value, str) and len(value) > 40:
+                found.append(value)
+            else:
+                found.extend(_severity_label_descriptions(value))
+    elif isinstance(node, list):
+        for value in node:
+            found.extend(_severity_label_descriptions(value))
+    return found
