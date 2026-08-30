@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL azione al tocco",
-                "tap_action_foreground": "Apri URL azione al tocco"
+                "tap_action_foreground": "Apri URL azione al tocco",
+                "url": "URL",
+                "url_foreground": "Apri URL pulsante primario",
+                "url_title": "Titolo pulsante primario",
+                "secondary_url": "URL secondario",
+                "secondary_url_foreground": "Apri URL pulsante secondario",
+                "secondary_url_title": "Titolo pulsante secondario"
               },
               "data_description": {
                 "tap_action_url": "URL facoltativo aperto toccando il widget. Supporta http(s) (apre Safari) o schemi personalizzati come homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Attivo: il tocco apre l'URL. Disattivo: webhook silenzioso (solo http(s)) — invia una POST in background."
+                "tap_action_foreground": "Attivo: il tocco apre l'URL. Disattivo: webhook silenzioso (solo http(s)) — invia una POST in background.",
+                "url": "URL del pulsante primario. Viene mostrato solo sui widget della schermata Home — le famiglie schermata di blocco, StandBy e Apple Watch non hanno spazio per i pulsanti e usano invece l'azione di tocco. Supporta http(s) o schemi personalizzati.",
+                "url_foreground": "Attivo: il tocco apre l'URL. Disattivo: webhook silenzioso (solo http(s)).",
+                "url_title": "Etichetta del pulsante primario (max 64 caratteri).",
+                "secondary_url": "URL del pulsante secondario. Mostrato solo sui widget medi e grandi; il widget piccolo ha spazio solo per il pulsante primario.",
+                "secondary_url_foreground": "Attivo: il tocco apre l'URL. Disattivo: webhook silenzioso (solo http(s)).",
+                "secondary_url_title": "Etichetta del pulsante secondario (max 64 caratteri)."
               }
             },
             "refresh": {

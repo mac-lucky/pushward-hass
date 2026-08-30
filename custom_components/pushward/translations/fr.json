@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL de l'action d'appui",
-                "tap_action_foreground": "Ouvrir l'URL de l'action d'appui"
+                "tap_action_foreground": "Ouvrir l'URL de l'action d'appui",
+                "url": "URL",
+                "url_foreground": "Ouvrir l'URL du bouton principal",
+                "url_title": "Titre du bouton principal",
+                "secondary_url": "URL secondaire",
+                "secondary_url_foreground": "Ouvrir l'URL du bouton secondaire",
+                "secondary_url_title": "Titre du bouton secondaire"
               },
               "data_description": {
                 "tap_action_url": "URL facultative ouverte lors d'un appui sur le widget. Prend en charge http(s) (ouvre Safari) ou des schémas personnalisés comme homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Activé : l'appui ouvre l'URL. Désactivé : webhook silencieux (http(s) uniquement) — déclenche une requête POST en arrière-plan."
+                "tap_action_foreground": "Activé : l'appui ouvre l'URL. Désactivé : webhook silencieux (http(s) uniquement) — déclenche une requête POST en arrière-plan.",
+                "url": "URL du bouton principal. Affichée uniquement sur les widgets de l'écran d'accueil — les familles écran verrouillé, StandBy et Apple Watch n'ont pas la place d'afficher des boutons et utilisent l'action d'appui à la place. Prend en charge http(s) ou des schémas personnalisés.",
+                "url_foreground": "Activé : l'appui ouvre l'URL. Désactivé : webhook silencieux (http(s) uniquement).",
+                "url_title": "Libellé du bouton principal (64 caractères maximum).",
+                "secondary_url": "URL du bouton secondaire. Affichée uniquement sur les widgets moyens et grands ; le petit widget n'a la place que pour le bouton principal.",
+                "secondary_url_foreground": "Activé : l'appui ouvre l'URL. Désactivé : webhook silencieux (http(s) uniquement).",
+                "secondary_url_title": "Libellé du bouton secondaire (64 caractères maximum)."
               }
             },
             "refresh": {

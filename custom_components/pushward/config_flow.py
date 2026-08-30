@@ -522,6 +522,21 @@ def _object_rows_key(conf_key: str, current: dict, *, required: bool) -> vol.Mar
     return marker(conf_key, default=default)
 
 
+# The tap-actions section is the same on both detail forms: the surface-wide tap
+# target plus the two button slots. Shared so the two can't drift apart -
+# _sections_to_expand reads these to decide which section opens on an error.
+_TAP_ACTION_SECTION_FIELDS: tuple[str, ...] = (
+    CONF_TAP_ACTION_URL,
+    CONF_TAP_ACTION_FOREGROUND,
+    CONF_URL,
+    CONF_URL_FOREGROUND,
+    CONF_URL_TITLE,
+    CONF_SECONDARY_URL,
+    CONF_SECONDARY_URL_FOREGROUND,
+    CONF_SECONDARY_URL_TITLE,
+)
+
+
 # Collapsible-section layout for the two subentry detail forms. Each field a
 # template renders lands in exactly one section here or stays top-level (the
 # tables below); the schema builders filter these per template and drop a section
@@ -576,16 +591,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_TEXT_COLOR,
         CONF_TEXT_COLOR_ATTRIBUTE,
     ),
-    "tap_actions": (
-        CONF_TAP_ACTION_URL,
-        CONF_TAP_ACTION_FOREGROUND,
-        CONF_URL,
-        CONF_URL_FOREGROUND,
-        CONF_URL_TITLE,
-        CONF_SECONDARY_URL,
-        CONF_SECONDARY_URL_FOREGROUND,
-        CONF_SECONDARY_URL_TITLE,
-    ),
+    "tap_actions": _TAP_ACTION_SECTION_FIELDS,
     "advanced": (
         CONF_ENDED_TTL,
         CONF_STALE_TTL,
@@ -635,10 +641,7 @@ WIDGET_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_BACKGROUND_COLOR,
         CONF_TEXT_COLOR,
     ),
-    "tap_actions": (
-        CONF_TAP_ACTION_URL,
-        CONF_TAP_ACTION_FOREGROUND,
-    ),
+    "tap_actions": _TAP_ACTION_SECTION_FIELDS,
     "refresh": (
         CONF_WIDGET_TRIGGER_MODE,
         CONF_WIDGET_POLL_INTERVAL,
@@ -921,6 +924,30 @@ def _suggest_widget_template(hass: HomeAssistant | None, entity_id: str) -> str:
         return WIDGET_TEMPLATE_GAUGE
 
     return WIDGET_TEMPLATE_VALUE
+
+
+# Per button slot: (url key, foreground key, title key), rendered in that order.
+_BUTTON_FIELD_KEYS: tuple[tuple[str, str, str], ...] = (
+    (CONF_URL, CONF_URL_FOREGROUND, CONF_URL_TITLE),
+    (CONF_SECONDARY_URL, CONF_SECONDARY_URL_FOREGROUND, CONF_SECONDARY_URL_TITLE),
+)
+
+
+def _add_button_action_fields(fields: dict, d: dict) -> None:
+    """Append the two button slots to an ordered detail-form ``fields`` mapping.
+
+    Shared by both detail forms so their button rows cannot drift: _sectioned_schema
+    partitions on the field name and preserves insertion order, so the same six
+    fields land in the same order inside each form's tap_actions section.
+    """
+    for url_key, foreground_key, title_key in _BUTTON_FIELD_KEYS:
+        fields[vol.Optional(url_key, default=d.get(url_key, ""))] = vol.All(str, vol.Length(max=MAX_URL_LEN))
+        fields[vol.Optional(foreground_key, default=d.get(foreground_key, DEFAULT_TAP_ACTION_FOREGROUND))] = (
+            BooleanSelector()
+        )
+        fields[vol.Optional(title_key, default=d.get(title_key, ""))] = vol.All(
+            str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN)
+        )
 
 
 def _details_schema(
@@ -1307,43 +1334,9 @@ def _details_schema(
             default=d.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
         )
     ] = BooleanSelector()
+    # Only the two templates that render a button row get the button slots.
     if template in ("steps", "alert"):
-        fields[
-            vol.Optional(
-                CONF_URL,
-                default=d.get(CONF_URL, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
-        fields[
-            vol.Optional(
-                CONF_URL_FOREGROUND,
-                default=d.get(CONF_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
-            )
-        ] = BooleanSelector()
-        fields[
-            vol.Optional(
-                CONF_URL_TITLE,
-                default=d.get(CONF_URL_TITLE, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN))
-        fields[
-            vol.Optional(
-                CONF_SECONDARY_URL,
-                default=d.get(CONF_SECONDARY_URL, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
-        fields[
-            vol.Optional(
-                CONF_SECONDARY_URL_FOREGROUND,
-                default=d.get(CONF_SECONDARY_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND),
-            )
-        ] = BooleanSelector()
-        fields[
-            vol.Optional(
-                CONF_SECONDARY_URL_TITLE,
-                default=d.get(CONF_SECONDARY_URL_TITLE, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN))
+        _add_button_action_fields(fields, d)
     fields[ended_ttl_key] = NumberSelector(
         NumberSelectorConfig(
             min=ACTIVITY_TTL_MIN,
@@ -1416,6 +1409,36 @@ def _raise_url_errors(checks: list[tuple[str, str, bool]]) -> None:
     # Fall back to whatever code came in (future-proofing for new codes).
     code, fields = next(iter(grouped.items()))
     raise vol.Invalid(code, path=fields)
+
+
+# Every action slot on a detail form: (url key, foreground key, title key or None
+# when the slot has no button label), in the order _raise_url_errors reports them.
+_ACTION_SLOTS: tuple[tuple[str, str, str | None], ...] = (
+    (CONF_TAP_ACTION_URL, CONF_TAP_ACTION_FOREGROUND, None),
+    (CONF_URL, CONF_URL_FOREGROUND, CONF_URL_TITLE),
+    (CONF_SECONDARY_URL, CONF_SECONDARY_URL_FOREGROUND, CONF_SECONDARY_URL_TITLE),
+)
+
+
+def _parse_action_slots(user_input: dict) -> dict:
+    """Read, strip and validate the surface-wide tap action plus both button slots.
+
+    Returns the storage keys ready to splice into a parser's return dict. Raises
+    `vol.Invalid` naming every field that failed the URL rules, so the form lights
+    all of them up at once.
+    """
+    parsed: dict = {}
+    checks: list[tuple[str, str, bool]] = []
+    for url_key, foreground_key, title_key in _ACTION_SLOTS:
+        url = (user_input.get(url_key) or "").strip()
+        foreground = bool(user_input.get(foreground_key, DEFAULT_TAP_ACTION_FOREGROUND))
+        parsed[url_key] = url
+        parsed[foreground_key] = foreground
+        if title_key is not None:
+            parsed[title_key] = (user_input.get(title_key) or "").strip()
+        checks.append((url_key, url, foreground))
+    _raise_url_errors(checks)
+    return parsed
 
 
 def _parse_image_fields(user_input: dict) -> tuple[str, str, str]:
@@ -1883,23 +1906,10 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     stale_ttl = user_input.get(CONF_STALE_TTL)
     dismissal_ttl = user_input.get(CONF_DISMISSAL_TTL)
 
-    # Validate URLs (allow http/https + custom schemes; silent mode requires http(s))
-    tap_action_url = user_input.get(CONF_TAP_ACTION_URL, "").strip()
-    tap_action_foreground = bool(user_input.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
-    url = user_input.get(CONF_URL, "").strip()
-    url_foreground = bool(user_input.get(CONF_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
-    url_title = user_input.get(CONF_URL_TITLE, "").strip()
-    secondary_url = user_input.get(CONF_SECONDARY_URL, "").strip()
-    secondary_url_foreground = bool(user_input.get(CONF_SECONDARY_URL_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
-    secondary_url_title = user_input.get(CONF_SECONDARY_URL_TITLE, "").strip()
-
-    _raise_url_errors(
-        [
-            (CONF_TAP_ACTION_URL, tap_action_url, tap_action_foreground),
-            (CONF_URL, url, url_foreground),
-            (CONF_SECONDARY_URL, secondary_url, secondary_url_foreground),
-        ]
-    )
+    # Validate URLs (allow http/https + custom schemes; silent mode requires http(s)).
+    # Parsed here rather than inline in the return so a bad URL still reports ahead
+    # of the structured-field checks below.
+    action_slots = _parse_action_slots(user_input)
 
     min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == "gauge")
 
@@ -1979,14 +1989,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_UNIT: user_input.get(CONF_UNIT, ""),
         CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
         CONF_ACCENT_COLOR_ATTRIBUTE: user_input.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
-        CONF_URL: url,
-        CONF_URL_FOREGROUND: url_foreground,
-        CONF_URL_TITLE: url_title,
-        CONF_SECONDARY_URL: secondary_url,
-        CONF_SECONDARY_URL_FOREGROUND: secondary_url_foreground,
-        CONF_SECONDARY_URL_TITLE: secondary_url_title,
-        CONF_TAP_ACTION_URL: tap_action_url,
-        CONF_TAP_ACTION_FOREGROUND: tap_action_foreground,
+        **action_slots,
         CONF_ENDED_TTL: int(ended_ttl) if ended_ttl is not None else None,
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
         CONF_DISMISSAL_TTL: int(dismissal_ttl) if dismissal_ttl is not None else None,
@@ -2526,6 +2529,11 @@ def _widget_details_schema(
         )
     ] = BooleanSelector()
 
+    # Button slots. Unlike the activity side there is no template gate: the server
+    # takes url_action / secondary_url_action on every widget template. iOS draws
+    # them on the Home Screen families only, which the field help says.
+    _add_button_action_fields(fields, d)
+
     # Trigger mode + interval. Optional (not Required) so the parser's own default
     # applies when the collapsed "refresh" section is submitted without touching it.
     fields[
@@ -2868,9 +2876,7 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     if battery_sort not in WIDGET_BATTERY_SORTS:
         battery_sort = ""
 
-    tap_action_url = (user_input.get(CONF_TAP_ACTION_URL) or "").strip()
-    tap_action_foreground = bool(user_input.get(CONF_TAP_ACTION_FOREGROUND, DEFAULT_TAP_ACTION_FOREGROUND))
-    _raise_url_errors([(CONF_TAP_ACTION_URL, tap_action_url, tap_action_foreground)])
+    action_slots = _parse_action_slots(user_input)
 
     return {
         CONF_ENTITY_ID: entity_id,
@@ -2911,8 +2917,7 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
         CONF_ACCENT_COLOR_ATTRIBUTE: user_input.get(CONF_ACCENT_COLOR_ATTRIBUTE, "") or "",
         CONF_BACKGROUND_COLOR: _rgb_to_hex(user_input.get(CONF_BACKGROUND_COLOR)),
         CONF_TEXT_COLOR: _rgb_to_hex(user_input.get(CONF_TEXT_COLOR)),
-        CONF_TAP_ACTION_URL: tap_action_url,
-        CONF_TAP_ACTION_FOREGROUND: tap_action_foreground,
+        **action_slots,
     }
 
 

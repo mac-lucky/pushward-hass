@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "ٹیپ ایکشن URL",
-                "tap_action_foreground": "ٹیپ ایکشن URL کھولیں"
+                "tap_action_foreground": "ٹیپ ایکشن URL کھولیں",
+                "url": "URL",
+                "url_foreground": "پرائمری بٹن URL کھولیں",
+                "url_title": "پرائمری بٹن کا عنوان",
+                "secondary_url": "ثانوی URL",
+                "secondary_url_foreground": "ثانوی بٹن URL کھولیں",
+                "secondary_url_title": "ثانوی بٹن کا عنوان"
               },
               "data_description": {
                 "tap_action_url": "اختیاری URL جو ویجٹ پر ٹیپ کرنے پر کھلتا ہے۔ http(s) (Safari کھولتا ہے) یا کسٹم اسکیمیں جیسے homeassistant://navigate/lovelace/0 سپورٹ کرتا ہے۔",
-                "tap_action_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s)) — پس منظر میں POST چلاتا ہے۔"
+                "tap_action_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s)) — پس منظر میں POST چلاتا ہے۔",
+                "url": "پرائمری بٹن کا URL۔ صرف ہوم اسکرین کے ویجٹس پر دکھایا جاتا ہے — لاک اسکرین، StandBy اور Apple Watch فیملیز میں بٹنوں کی گنجائش نہیں ہوتی اور وہ اس کے بجائے ٹیپ ایکشن استعمال کرتی ہیں۔ http(s) یا کسٹم اسکیمیں سپورٹ کرتا ہے۔",
+                "url_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s))۔",
+                "url_title": "پرائمری بٹن کا لیبل (زیادہ سے زیادہ 64 حروف)۔",
+                "secondary_url": "ثانوی بٹن کا URL۔ صرف درمیانے اور بڑے ویجٹس پر دکھایا جاتا ہے؛ چھوٹے ویجٹ میں صرف پرائمری بٹن کی گنجائش ہوتی ہے۔",
+                "secondary_url_foreground": "آن: ٹیپ سے URL کھلتا ہے۔ آف: خاموش webhook (صرف http(s))۔",
+                "secondary_url_title": "ثانوی بٹن کا لیبل (زیادہ سے زیادہ 64 حروف)۔"
               }
             },
             "refresh": {

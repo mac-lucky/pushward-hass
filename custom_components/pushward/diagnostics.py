@@ -34,10 +34,12 @@ from .widget_manager import WidgetManager
 
 # Never leak the integration key, the media-control secret, nor user-supplied
 # tap-action targets - webhook URLs (config + rendered last_content) and any
-# silent-webhook headers/body can embed secrets/tokens. async_redact_data matches
-# these keys recursively, so the rendered tap_action/url_action dicts inside
-# last_content are covered too, and with them the token-bearing media control URLs
-# (each control is an action object keyed "url").
+# silent-webhook headers/body can embed secrets/tokens. The URL keys are shared
+# by activity and widget subentries, so widget button targets are covered by the
+# same three entries. async_redact_data matches these keys recursively, so the
+# rendered tap_action/url_action dicts inside last_content are covered too, and
+# with them the token-bearing media control URLs (each control is an action
+# object keyed "url").
 TO_REDACT = {
     CONF_INTEGRATION_KEY,
     CONF_MEDIA_TOKEN,

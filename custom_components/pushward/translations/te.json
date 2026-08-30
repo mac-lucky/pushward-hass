@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "ట్యాప్ చర్య URL",
-                "tap_action_foreground": "ట్యాప్ చర్య URL తెరువు"
+                "tap_action_foreground": "ట్యాప్ చర్య URL తెరువు",
+                "url": "URL",
+                "url_foreground": "ప్రాథమిక బటన్ URL తెరువు",
+                "url_title": "ప్రాథమిక బటన్ శీర్షిక",
+                "secondary_url": "ద్వితీయ URL",
+                "secondary_url_foreground": "ద్వితీయ బటన్ URL తెరువు",
+                "secondary_url_title": "ద్వితీయ బటన్ శీర్షిక"
               },
               "data_description": {
                 "tap_action_url": "విడ్జెట్‌ను నొక్కినప్పుడు తెరిచే ఐచ్ఛిక URL. http(s) (Safari తెరుస్తుంది) లేదా homeassistant://navigate/lovelace/0 వంటి అనుకూల స్కీమ్‌లకు మద్దతు ఇస్తుంది.",
-                "tap_action_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే) — నేపథ్యంలో POST ను ఫైర్ చేస్తుంది."
+                "tap_action_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే) — నేపథ్యంలో POST ను ఫైర్ చేస్తుంది.",
+                "url": "ప్రాథమిక బటన్ URL. హోమ్ స్క్రీన్ విడ్జెట్‌లలో మాత్రమే కనిపిస్తుంది — లాక్ స్క్రీన్, StandBy మరియు Apple Watch కుటుంబాలలో బటన్‌లకు చోటు ఉండదు, వాటికి బదులుగా ట్యాప్ యాక్షన్ ఉపయోగించబడుతుంది. http(s) లేదా అనుకూల స్కీమ్‌లకు మద్దతు ఇస్తుంది.",
+                "url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
+                "url_title": "ప్రాథమిక బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు).",
+                "secondary_url": "ద్వితీయ బటన్ URL. మధ్యస్థ మరియు పెద్ద విడ్జెట్‌లలో మాత్రమే కనిపిస్తుంది; చిన్న విడ్జెట్‌లో ప్రాథమిక బటన్‌కు మాత్రమే చోటు ఉంటుంది.",
+                "secondary_url_foreground": "ఆన్: ట్యాప్ URL ను తెరుస్తుంది. ఆఫ్: నిశ్శబ్ద webhook (http(s) మాత్రమే).",
+                "secondary_url_title": "ద్వితీయ బటన్ లేబుల్ (గరిష్టంగా 64 అక్షరాలు)."
               }
             },
             "refresh": {

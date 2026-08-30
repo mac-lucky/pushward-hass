@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "タップアクションURL",
-                "tap_action_foreground": "タップアクションURLを開く"
+                "tap_action_foreground": "タップアクションURLを開く",
+                "url": "URL",
+                "url_foreground": "プライマリボタンURLを開く",
+                "url_title": "プライマリボタンのタイトル",
+                "secondary_url": "セカンダリURL",
+                "secondary_url_foreground": "セカンダリボタンURLを開く",
+                "secondary_url_title": "セカンダリボタンのタイトル"
               },
               "data_description": {
                 "tap_action_url": "ウィジェットをタップしたときに開く任意の URL。http(s)（Safari を開く）または homeassistant://navigate/lovelace/0 のようなカスタムスキームに対応しています。",
-                "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— バックグラウンドで POST を送信します。"
+                "tap_action_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）— バックグラウンドで POST を送信します。",
+                "url": "プライマリボタンの URL。ホーム画面のウィジェットにのみ表示されます — ロック画面、スタンバイ、Apple Watch のファミリーにはボタンを置く余地がなく、代わりにタップアクションを使います。http(s) またはカスタムスキームに対応しています。",
+                "url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+                "url_title": "プライマリボタンのラベル（最大 64 文字）。",
+                "secondary_url": "セカンダリボタンの URL。中サイズと大サイズのウィジェットにのみ表示されます。小サイズのウィジェットにはプライマリボタン分の余地しかありません。",
+                "secondary_url_foreground": "オン: タップで URL を開きます。オフ: サイレント Webhook（http(s) のみ）。",
+                "secondary_url_title": "セカンダリボタンのラベル（最大 64 文字）。"
               }
             },
             "refresh": {

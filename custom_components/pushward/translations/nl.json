@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "Tikactie-URL",
-                "tap_action_foreground": "Tikactie-URL openen"
+                "tap_action_foreground": "Tikactie-URL openen",
+                "url": "URL",
+                "url_foreground": "Primaire-knop-URL openen",
+                "url_title": "Titel primaire knop",
+                "secondary_url": "Secundaire URL",
+                "secondary_url_foreground": "Secundaire-knop-URL openen",
+                "secondary_url_title": "Titel secundaire knop"
               },
               "data_description": {
                 "tap_action_url": "Optionele URL die wordt geopend bij het tikken op de widget. Ondersteunt http(s) (opent Safari) of aangepaste schema's zoals homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST."
+                "tap_action_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)) — verstuurt op de achtergrond een POST.",
+                "url": "URL van de primaire knop. Wordt alleen op widgets op het beginscherm getoond — de families toegangsscherm, StandBy en Apple Watch hebben geen ruimte voor knoppen en gebruiken in plaats daarvan de tikactie. Ondersteunt http(s) of aangepaste schema's.",
+                "url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+                "url_title": "Label van de primaire knop (max. 64 tekens).",
+                "secondary_url": "URL van de secundaire knop. Wordt alleen op middelgrote en grote widgets getoond; de kleine widget heeft alleen ruimte voor de primaire knop.",
+                "secondary_url_foreground": "Aan: tikken opent de URL. Uit: stille webhook (alleen http(s)).",
+                "secondary_url_title": "Label van de secundaire knop (max. 64 tekens)."
               }
             },
             "refresh": {

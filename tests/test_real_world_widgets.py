@@ -27,10 +27,13 @@ from custom_components.pushward.const import (
     CONF_SCHEDULE_ATTRIBUTES,
     CONF_SCHEDULE_HIGH_MIN,
     CONF_SCHEDULE_LOW_MAX,
+    CONF_SECONDARY_URL,
     CONF_SEVERITY,
     CONF_SLUG,
     CONF_STAT_ROWS,
     CONF_UNIT,
+    CONF_URL,
+    CONF_URL_TITLE,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_STALE_AFTER,
@@ -378,6 +381,11 @@ async def test_temperature_widget_create_and_update_flow(hass: HomeAssistant) ->
             CONF_WIDGET_NAME: "Living Room",
             CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE,
             CONF_UNIT: "°C",
+            # Button slots ride the same create/PATCH bodies as everything else, so
+            # the contract assertions below cover the wire shape, not just the mapper.
+            CONF_URL: "https://ha.local/lovelace/climate",
+            CONF_URL_TITLE: "Open",
+            CONF_SECONDARY_URL: "homeassistant://navigate/lovelace/0",
         }
     )
     manager = WidgetManager(hass, api, [config], make_mock_entry())

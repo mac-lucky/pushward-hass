@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "Tap Action URL",
-                "tap_action_foreground": "Buksan ang Tap Action URL"
+                "tap_action_foreground": "Buksan ang Tap Action URL",
+                "url": "URL",
+                "url_foreground": "Buksan ang Primary Button URL",
+                "url_title": "Title ng Pangunahing Button",
+                "secondary_url": "Secondary URL",
+                "secondary_url_foreground": "Buksan ang Secondary Button URL",
+                "secondary_url_title": "Title ng Pangalawang Button"
               },
               "data_description": {
                 "tap_action_url": "Opsyonal na URL na bubuksan kapag tinap ang widget. Sumusuporta sa http(s) (bumubukas ng Safari) o custom schemes tulad ng homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background."
+                "tap_action_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang) — nagpapadala ng POST sa background.",
+                "url": "URL ng pangunahing button. Ipinapakita lamang sa mga widget sa Home Screen — walang puwang para sa mga button ang mga pamilyang Lock Screen, StandBy at Apple Watch, kaya tap action ang ginagamit nila. Sumusuporta sa http(s) o custom schemes.",
+                "url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+                "url_title": "Label ng pangunahing button (max 64 na character).",
+                "secondary_url": "URL ng pangalawang button. Ipinapakita lamang sa katamtaman at malalaking widget; sa maliit na widget ay may puwang lang para sa pangunahing button.",
+                "secondary_url_foreground": "Naka-on: binubuksan ng tap ang URL. Naka-off: silent webhook (http(s) lamang).",
+                "secondary_url_title": "Label ng pangalawang button (max 64 na character)."
               }
             },
             "refresh": {

@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL der Tippaktion",
-                "tap_action_foreground": "URL der Tippaktion öffnen"
+                "tap_action_foreground": "URL der Tippaktion öffnen",
+                "url": "URL",
+                "url_foreground": "URL der primären Schaltfläche öffnen",
+                "url_title": "Titel der primären Schaltfläche",
+                "secondary_url": "Sekundäre URL",
+                "secondary_url_foreground": "URL der sekundären Schaltfläche öffnen",
+                "secondary_url_title": "Titel der sekundären Schaltfläche"
               },
               "data_description": {
                 "tap_action_url": "Optionale URL, die beim Tippen auf das Widget geöffnet wird. Unterstützt http(s) (öffnet Safari) oder benutzerdefinierte Schemata wie homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)) – sendet im Hintergrund einen POST."
+                "tap_action_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)) – sendet im Hintergrund einen POST.",
+                "url": "URL der primären Schaltfläche. Wird nur auf Widgets des Home-Bildschirms angezeigt – die Familien Sperrbildschirm, StandBy und Apple Watch haben keinen Platz für Schaltflächen und verwenden stattdessen die Tippaktion. Unterstützt http(s) oder benutzerdefinierte Schemata.",
+                "url_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)).",
+                "url_title": "Beschriftung der primären Schaltfläche (max. 64 Zeichen).",
+                "secondary_url": "URL der sekundären Schaltfläche. Wird nur auf mittleren und großen Widgets angezeigt; das kleine Widget hat nur für die primäre Schaltfläche Platz.",
+                "secondary_url_foreground": "An: Tippen öffnet die URL. Aus: stiller Webhook (nur http(s)).",
+                "secondary_url_title": "Beschriftung der sekundären Schaltfläche (max. 64 Zeichen)."
               }
             },
             "refresh": {

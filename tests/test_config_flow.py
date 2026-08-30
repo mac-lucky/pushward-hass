@@ -2663,6 +2663,60 @@ def test_parse_widget_input_silent_requires_http() -> None:
     assert "silent_requires_http" in str(exc.value)
 
 
+def test_parse_widget_input_button_urls_persisted() -> None:
+    """Both button slots roundtrip through the widget parser, on any template."""
+    step1 = _widget_step1()
+    details = _widget_details(
+        **{
+            CONF_URL: "https://example.com/primary",
+            CONF_URL_FOREGROUND: True,
+            CONF_URL_TITLE: "Open",
+            CONF_SECONDARY_URL: "homeassistant://navigate/lovelace/0",
+            CONF_SECONDARY_URL_FOREGROUND: True,
+            CONF_SECONDARY_URL_TITLE: "Dashboard",
+        }
+    )
+    result = _parse_widget_input(details, step1)
+    assert result[CONF_URL] == "https://example.com/primary"
+    assert result[CONF_URL_TITLE] == "Open"
+    assert result[CONF_SECONDARY_URL] == "homeassistant://navigate/lovelace/0"
+    assert result[CONF_SECONDARY_URL_TITLE] == "Dashboard"
+
+
+def test_parse_widget_input_reports_every_bad_button_url_at_once() -> None:
+    """The three URL fields are validated as one batch, so the form lights up all of them."""
+    step1 = _widget_step1()
+    details = _widget_details(
+        **{
+            CONF_URL: "homeassistant://navigate/lovelace/0",
+            CONF_URL_FOREGROUND: False,
+            CONF_SECONDARY_URL: "homeassistant://navigate/lovelace/1",
+            CONF_SECONDARY_URL_FOREGROUND: False,
+        }
+    )
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(details, step1)
+    assert set(exc.value.path) == {CONF_URL, CONF_SECONDARY_URL}
+    assert "silent_requires_http" in str(exc.value)
+
+
+def test_parse_widget_input_silent_scheme_error_beats_invalid_url() -> None:
+    """Two different codes in one batch: the more specific one is reported first."""
+    step1 = _widget_step1()
+    details = _widget_details(
+        **{
+            CONF_URL: "homeassistant://navigate/lovelace/0",
+            CONF_URL_FOREGROUND: False,
+            CONF_SECONDARY_URL: "javascript:alert(1)",
+            CONF_SECONDARY_URL_FOREGROUND: True,
+        }
+    )
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_widget_input(details, step1)
+    assert "silent_requires_http" in str(exc.value)
+    assert set(exc.value.path) == {CONF_URL}
+
+
 def test_parse_widget_input_empty_tap_action_defaults() -> None:
     """Empty tap_action_url is stored as '' (no validation triggered)."""
     step1 = _widget_step1()

@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL Aksi Ketuk",
-                "tap_action_foreground": "Buka URL Aksi Ketuk"
+                "tap_action_foreground": "Buka URL Aksi Ketuk",
+                "url": "URL",
+                "url_foreground": "Buka URL Tombol Utama",
+                "url_title": "Judul Tombol Utama",
+                "secondary_url": "URL Sekunder",
+                "secondary_url_foreground": "Buka URL Tombol Sekunder",
+                "secondary_url_title": "Judul Tombol Sekunder"
               },
               "data_description": {
                 "tap_action_url": "URL opsional yang dibuka saat mengetuk widget. Mendukung http(s) (membuka Safari) atau skema khusus seperti homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang."
+                "tap_action_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)) — mengirim POST di latar belakang.",
+                "url": "URL tombol utama. Hanya tampil pada widget Layar Utama — keluarga Layar Terkunci, StandBy, dan Apple Watch tidak punya ruang untuk tombol dan memakai aksi ketuk sebagai gantinya. Mendukung http(s) atau skema khusus.",
+                "url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+                "url_title": "Label tombol utama (maks 64 karakter).",
+                "secondary_url": "URL tombol sekunder. Hanya tampil pada widget sedang dan besar; widget kecil hanya punya ruang untuk tombol utama.",
+                "secondary_url_foreground": "Aktif: ketukan membuka URL. Nonaktif: webhook senyap (hanya http(s)).",
+                "secondary_url_title": "Label tombol sekunder (maks 64 karakter)."
               }
             },
             "refresh": {

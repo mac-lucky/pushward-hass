@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "Tap Action URL",
-                "tap_action_foreground": "Open Tap Action URL"
+                "tap_action_foreground": "Open Tap Action URL",
+                "url": "Primary Button URL",
+                "url_foreground": "Open Primary Button URL",
+                "url_title": "Primary Button Title",
+                "secondary_url": "Secondary Button URL",
+                "secondary_url_foreground": "Open Secondary Button URL",
+                "secondary_url_title": "Secondary Button Title"
               },
               "data_description": {
                 "tap_action_url": "Optional URL opened when tapping the widget. Supports http(s) (opens Safari) or custom schemes like homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background."
+                "tap_action_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only) — fires a POST in the background.",
+                "url": "Primary button URL. Shown on Home Screen widgets only — the Lock Screen, StandBy and Apple Watch families have no room for buttons and use the tap action instead. Supports http(s) or custom schemes.",
+                "url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
+                "url_title": "Primary button label (max 64 characters).",
+                "secondary_url": "Secondary button URL. Shown on medium and large widgets only; the small widget has room for the primary button alone.",
+                "secondary_url_foreground": "On: tap opens the URL. Off: silent webhook (http(s) only).",
+                "secondary_url_title": "Secondary button label (max 64 characters)."
               }
             },
             "refresh": {

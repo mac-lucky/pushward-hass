@@ -18,6 +18,9 @@ from custom_components.pushward.const import (
     CONF_SCHEDULE_ATTRIBUTES,
     CONF_SCHEDULE_HIGH_MIN,
     CONF_SCHEDULE_LOW_MAX,
+    CONF_SECONDARY_URL,
+    CONF_SECONDARY_URL_FOREGROUND,
+    CONF_SECONDARY_URL_TITLE,
     CONF_SEVERITY,
     CONF_START_DATE_ATTRIBUTE,
     CONF_STAT_ROWS,
@@ -26,6 +29,9 @@ from custom_components.pushward.const import (
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
     CONF_UNIT,
+    CONF_URL,
+    CONF_URL_FOREGROUND,
+    CONF_URL_TITLE,
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_SCALE,
     CONF_WIDGET_BATTERY_SORT,
@@ -523,6 +529,88 @@ def test_widget_tap_action_gauge_template():
 
     content = map_widget_content(hass, config)
     assert content["tap_action"]["url"] == "homeassistant://navigate/lovelace/0"
+
+
+# --- Widget url_action / secondary_url_action ---
+#
+# The server takes both slots on every widget template (unlike the activity side,
+# which gates them on steps/alert), so these are wired with no template check.
+
+
+def test_widget_url_actions_foreground_http():
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE,
+            CONF_URL: "https://example.com/primary",
+            CONF_URL_FOREGROUND: True,
+            CONF_URL_TITLE: "Open",
+            CONF_SECONDARY_URL: "https://example.com/secondary",
+            CONF_SECONDARY_URL_FOREGROUND: True,
+            CONF_SECONDARY_URL_TITLE: "Details",
+        }
+    )
+    state = make_mock_state("42", entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+
+    content = map_widget_content(hass, config)
+    assert content["url_action"] == {
+        "url": "https://example.com/primary",
+        "foreground": True,
+        "title": "Open",
+    }
+    assert content["secondary_url_action"] == {
+        "url": "https://example.com/secondary",
+        "foreground": True,
+        "title": "Details",
+    }
+    # The contract check has teeth the mapper does not: URL/title caps, and the rule
+    # that method/headers/body may only ride an http(s) URL.
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_VALUE)
+
+
+def test_widget_url_actions_omitted_when_empty():
+    config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE})
+    state = make_mock_state("42", entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+
+    content = map_widget_content(hass, config)
+    assert "url_action" not in content
+    assert "secondary_url_action" not in content
+
+
+def test_widget_url_actions_on_group_chrome_stat_list():
+    """stat_list builds its chrome on a different path than the single-entity map."""
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+            CONF_STAT_ROWS: [{"label": "Users", "entity_id": "sensor.users"}],
+            CONF_URL: "https://example.com/primary",
+            CONF_URL_FOREGROUND: True,
+        }
+    )
+    state = make_mock_state("42", entity_id="sensor.users")
+    hass = _make_hass({"sensor.users": state})
+
+    content = map_widget_content(hass, config)
+    assert content["url_action"] == {"url": "https://example.com/primary", "foreground": True}
+
+
+def test_widget_url_actions_on_static_status_fallback():
+    """The unavailable-entity status fallback is a third content-building path."""
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STATUS,
+            CONF_SEVERITY: "critical",
+            CONF_LABEL: "Backup not running",
+            CONF_URL: "https://example.com/primary",
+            CONF_URL_FOREGROUND: True,
+        }
+    )
+    hass = _make_hass({})
+
+    content = map_widget_content(hass, config)
+    assert content is not None
+    assert content["url_action"] == {"url": "https://example.com/primary", "foreground": True}
 
 
 def test_widget_tap_action_status_template():

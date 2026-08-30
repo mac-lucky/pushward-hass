@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "टैप क्रिया URL",
-                "tap_action_foreground": "टैप क्रिया URL खोलें"
+                "tap_action_foreground": "टैप क्रिया URL खोलें",
+                "url": "URL",
+                "url_foreground": "प्राथमिक बटन URL खोलें",
+                "url_title": "प्राथमिक बटन शीर्षक",
+                "secondary_url": "द्वितीयक URL",
+                "secondary_url_foreground": "द्वितीयक बटन URL खोलें",
+                "secondary_url_title": "द्वितीयक बटन शीर्षक"
               },
               "data_description": {
                 "tap_action_url": "विजेट पर टैप करने पर खुलने वाला वैकल्पिक URL। http(s) (Safari खोलता है) या homeassistant://navigate/lovelace/0 जैसी कस्टम स्कीम का समर्थन करता है।",
-                "tap_action_foreground": "चालू: टैप URL खोलता है। बंद: साइलेंट वेबहुक (केवल http(s)) — बैकग्राउंड में एक POST भेजता है।"
+                "tap_action_foreground": "चालू: टैप URL खोलता है। बंद: साइलेंट वेबहुक (केवल http(s)) — बैकग्राउंड में एक POST भेजता है।",
+                "url": "प्राथमिक बटन URL। केवल होम स्क्रीन विजेट पर दिखाया जाता है — लॉक स्क्रीन, StandBy और Apple Watch फ़ैमिली में बटन के लिए जगह नहीं होती और वे इसके बजाय टैप ऐक्शन का उपयोग करती हैं। http(s) या कस्टम स्कीम का समर्थन करता है।",
+                "url_foreground": "चालू: टैप URL खोलता है। बंद: साइलेंट वेबहुक (केवल http(s))।",
+                "url_title": "प्राथमिक बटन लेबल (अधिकतम 64 अक्षर)।",
+                "secondary_url": "द्वितीयक बटन URL। केवल मध्यम और बड़े विजेट पर दिखता है; छोटे विजेट में सिर्फ़ प्राथमिक बटन की जगह होती है।",
+                "secondary_url_foreground": "चालू: टैप URL खोलता है। बंद: साइलेंट वेबहुक (केवल http(s))।",
+                "secondary_url_title": "द्वितीयक बटन लेबल (अधिकतम 64 अक्षर)।"
               }
             },
             "refresh": {

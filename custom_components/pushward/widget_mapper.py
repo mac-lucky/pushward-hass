@@ -93,7 +93,13 @@ from .const import (
     WIDGET_TREND_UP,
     WIDGET_UNIT_MAX,
 )
-from .content_mapper import add_tap_action, color_to_str, is_valid_color, resolve_color, resolve_icon
+from .content_mapper import (
+    add_all_tap_actions,
+    color_to_str,
+    is_valid_color,
+    resolve_color,
+    resolve_icon,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -314,7 +320,7 @@ def _group_chrome(config: dict) -> dict:
         content["label"] = _truncate(label, WIDGET_LABEL_MAX)
     for conf_key, out_key in _GROUP_COLORS:
         _apply_static_color(content, config, conf_key, out_key)
-    add_tap_action(content, config)
+    add_all_tap_actions(content, config)
     return content
 
 
@@ -376,7 +382,7 @@ def map_widget_content(
     if unit:
         content["unit"] = _truncate(unit, WIDGET_UNIT_MAX)
 
-    add_tap_action(content, config)
+    add_all_tap_actions(content, config)
 
     timer = _subtitle_timer(hass, state, config)
     if timer:
@@ -804,7 +810,7 @@ def _map_status_static(config: dict) -> dict:
     if icon:
         content["icon"] = str(icon)
     _apply_static_color(content, config, CONF_ACCENT_COLOR, "accent_color")
-    add_tap_action(content, config)
+    add_all_tap_actions(content, config)
     return content
 
 

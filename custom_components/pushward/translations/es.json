@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL de acción al tocar",
-                "tap_action_foreground": "Abrir la URL de acción al tocar"
+                "tap_action_foreground": "Abrir la URL de acción al tocar",
+                "url": "URL",
+                "url_foreground": "Abrir la URL del botón principal",
+                "url_title": "Título del botón principal",
+                "secondary_url": "URL secundaria",
+                "secondary_url_foreground": "Abrir la URL del botón secundario",
+                "secondary_url_title": "Título del botón secundario"
               },
               "data_description": {
                 "tap_action_url": "URL opcional que se abre al tocar el widget. Admite http(s) (abre Safari) o esquemas personalizados como homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano."
+                "tap_action_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)); envía un POST en segundo plano.",
+                "url": "URL del botón principal. Solo se muestra en los widgets de la pantalla de inicio; las familias de pantalla de bloqueo, StandBy y Apple Watch no tienen espacio para botones y usan la acción al tocar en su lugar. Admite http(s) o esquemas personalizados.",
+                "url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
+                "url_title": "Etiqueta del botón principal (máx. 64 caracteres).",
+                "secondary_url": "URL del botón secundario. Solo se muestra en los widgets medianos y grandes; el widget pequeño solo tiene espacio para el botón principal.",
+                "secondary_url_foreground": "Activado: al tocar se abre la URL. Desactivado: webhook silencioso (solo http(s)).",
+                "secondary_url_title": "Etiqueta del botón secundario (máx. 64 caracteres)."
               }
             },
             "refresh": {

@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL akcji dotknięcia",
-                "tap_action_foreground": "Otwórz URL akcji dotknięcia"
+                "tap_action_foreground": "Otwórz URL akcji dotknięcia",
+                "url": "URL",
+                "url_foreground": "Otwórz URL przycisku głównego",
+                "url_title": "Tytuł przycisku głównego",
+                "secondary_url": "Dodatkowy URL",
+                "secondary_url_foreground": "Otwórz URL przycisku dodatkowego",
+                "secondary_url_title": "Tytuł przycisku dodatkowego"
               },
               "data_description": {
                 "tap_action_url": "Opcjonalny adres URL otwierany po dotknięciu widżetu. Obsługuje http(s) (otwiera Safari) lub niestandardowe schematy, np. homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle."
+                "tap_action_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)) — wysyła żądanie POST w tle.",
+                "url": "URL przycisku głównego. Wyświetlany tylko na widżetach ekranu początkowego — rodziny ekranu blokady, StandBy i Apple Watch nie mają miejsca na przyciski i zamiast tego korzystają z akcji dotknięcia. Obsługuje http(s) lub niestandardowe schematy.",
+                "url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
+                "url_title": "Etykieta przycisku głównego (maks. 64 znaki).",
+                "secondary_url": "URL przycisku dodatkowego. Pokazywany tylko na widżetach średnich i dużych; mały widżet ma miejsce wyłącznie na przycisk główny.",
+                "secondary_url_foreground": "Włączone: dotknięcie otwiera adres URL. Wyłączone: cichy webhook (tylko http(s)).",
+                "secondary_url_title": "Etykieta przycisku dodatkowego (maks. 64 znaki)."
               }
             },
             "refresh": {

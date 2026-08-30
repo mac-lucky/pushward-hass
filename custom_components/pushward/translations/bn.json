@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "ট্যাপ অ্যাকশন URL",
-                "tap_action_foreground": "ট্যাপ অ্যাকশন URL খুলুন"
+                "tap_action_foreground": "ট্যাপ অ্যাকশন URL খুলুন",
+                "url": "URL",
+                "url_foreground": "প্রাইমারি বোতামের URL খুলুন",
+                "url_title": "প্রাইমারি বোতামের শিরোনাম",
+                "secondary_url": "সেকেন্ডারি URL",
+                "secondary_url_foreground": "সেকেন্ডারি বোতামের URL খুলুন",
+                "secondary_url_title": "সেকেন্ডারি বোতামের শিরোনাম"
               },
               "data_description": {
                 "tap_action_url": "উইজেটে ট্যাপ করলে খোলা ঐচ্ছিক URL। http(s) (Safari খোলে) অথবা homeassistant://navigate/lovelace/0 এর মতো কাস্টম স্কিম সমর্থন করে।",
-                "tap_action_foreground": "চালু: ট্যাপ URL খোলে। বন্ধ: সাইলেন্ট ওয়েবহুক (শুধু http(s)) — ব্যাকগ্রাউন্ডে একটি POST ফায়ার করে।"
+                "tap_action_foreground": "চালু: ট্যাপ URL খোলে। বন্ধ: সাইলেন্ট ওয়েবহুক (শুধু http(s)) — ব্যাকগ্রাউন্ডে একটি POST ফায়ার করে।",
+                "url": "প্রাইমারি বোতামের URL। শুধুমাত্র হোম স্ক্রিনের উইজেটে দেখানো হয় — লক স্ক্রিন, StandBy এবং Apple Watch পরিবারে বোতামের জায়গা নেই, সেগুলো এর বদলে ট্যাপ অ্যাকশন ব্যবহার করে। http(s) বা কাস্টম স্কিম সমর্থন করে।",
+                "url_foreground": "চালু: ট্যাপ URL খোলে। বন্ধ: সাইলেন্ট ওয়েবহুক (শুধু http(s))।",
+                "url_title": "প্রাইমারি বোতামের লেবেল (সর্বোচ্চ ৬৪ অক্ষর)।",
+                "secondary_url": "সেকেন্ডারি বোতামের URL। শুধুমাত্র মাঝারি ও বড় উইজেটে দেখানো হয়; ছোট উইজেটে কেবল প্রাইমারি বোতামের জায়গা থাকে।",
+                "secondary_url_foreground": "চালু: ট্যাপ URL খোলে। বন্ধ: সাইলেন্ট ওয়েবহুক (শুধু http(s))।",
+                "secondary_url_title": "সেকেন্ডারি বোতামের লেবেল (সর্বোচ্চ ৬৪ অক্ষর)।"
               }
             },
             "refresh": {

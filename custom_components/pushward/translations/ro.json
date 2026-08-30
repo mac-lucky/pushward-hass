@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL acțiune la atingere",
-                "tap_action_foreground": "Deschideți URL-ul acțiunii la atingere"
+                "tap_action_foreground": "Deschideți URL-ul acțiunii la atingere",
+                "url": "URL",
+                "url_foreground": "Deschideți URL-ul butonului principal",
+                "url_title": "Titlu buton principal",
+                "secondary_url": "URL secundar",
+                "secondary_url_foreground": "Deschideți URL-ul butonului secundar",
+                "secondary_url_title": "Titlu buton secundar"
               },
               "data_description": {
                 "tap_action_url": "URL opțional deschis la atingerea widget-ului. Acceptă http(s) (deschide Safari) sau scheme personalizate precum homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)) — declanșează un POST în fundal."
+                "tap_action_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)) — declanșează un POST în fundal.",
+                "url": "URL-ul butonului principal. Apare doar pe widgeturile de pe ecranul principal — familiile ecran de blocare, StandBy și Apple Watch nu au loc pentru butoane și folosesc în schimb acțiunea de atingere. Acceptă http(s) sau scheme personalizate.",
+                "url_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)).",
+                "url_title": "Eticheta butonului principal (maximum 64 de caractere).",
+                "secondary_url": "URL-ul butonului secundar. Apare doar pe widgeturile medii și mari; widgetul mic are loc doar pentru butonul principal.",
+                "secondary_url_foreground": "Activat: atingerea deschide URL-ul. Dezactivat: webhook silențios (doar http(s)).",
+                "secondary_url_title": "Eticheta butonului secundar (maximum 64 de caractere)."
               }
             },
             "refresh": {

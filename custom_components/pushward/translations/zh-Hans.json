@@ -1768,8 +1768,8 @@
                 "url_foreground": "打开主按钮 URL",
                 "url_title": "主按钮标题",
                 "secondary_url": "次要 URL",
-                "secondary_url_foreground": "打开次按钮 URL",
-                "secondary_url_title": "次按钮标题"
+                "secondary_url_foreground": "打开次要按钮 URL",
+                "secondary_url_title": "次要按钮标题"
               },
               "data_description": {
                 "tap_action_url": "点击 Live Activity 背景时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0（打开对应应用）。",
@@ -1779,7 +1779,7 @@
                 "url_title": "主按钮标签（最多 64 个字符）。",
                 "secondary_url": "Live Activity 的次要链接。仅适用于 steps 和 alert 模板。",
                 "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
-                "secondary_url_title": "次按钮标签（最多 64 个字符）。"
+                "secondary_url_title": "次要按钮标签（最多 64 个字符）。"
               }
             },
             "advanced": {
@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "点击动作 URL",
-                "tap_action_foreground": "打开点击动作 URL"
+                "tap_action_foreground": "打开点击动作 URL",
+                "url": "URL",
+                "url_foreground": "打开主按钮 URL",
+                "url_title": "主按钮标题",
+                "secondary_url": "次要 URL",
+                "secondary_url_foreground": "打开次要按钮 URL",
+                "secondary_url_title": "次要按钮标题"
               },
               "data_description": {
                 "tap_action_url": "点击小组件时打开的可选 URL。支持 http(s)（打开 Safari）或自定义协议，例如 homeassistant://navigate/lovelace/0。",
-                "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST。"
+                "tap_action_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）——在后台触发 POST。",
+                "url": "主按钮 URL。仅在主屏幕小组件上显示——锁定屏幕、待机显示和 Apple Watch 系列没有放置按钮的空间，改为使用点击动作。支持 http(s) 或自定义协议。",
+                "url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+                "url_title": "主按钮标签（最多 64 个字符）。",
+                "secondary_url": "次要按钮 URL。仅在中尺寸和大尺寸小组件上显示；小尺寸小组件只够放置主按钮。",
+                "secondary_url_foreground": "开启：点击打开 URL。关闭：静默 webhook（仅限 http(s)）。",
+                "secondary_url_title": "次要按钮标签（最多 64 个字符）。"
               }
             },
             "refresh": {

@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "عنوان URL لإجراء النقر",
-                "tap_action_foreground": "فتح عنوان URL لإجراء النقر"
+                "tap_action_foreground": "فتح عنوان URL لإجراء النقر",
+                "url": "الرابط",
+                "url_foreground": "فتح عنوان URL للزر الأساسي",
+                "url_title": "عنوان الزر الأساسي",
+                "secondary_url": "الرابط الثانوي",
+                "secondary_url_foreground": "فتح عنوان URL للزر الثانوي",
+                "secondary_url_title": "عنوان الزر الثانوي"
               },
               "data_description": {
                 "tap_action_url": "عنوان URL اختياري يُفتح عند النقر على الأداة. يدعم http(s) (يفتح Safari) أو مخططات مخصصة مثل homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط) — يُطلق طلب POST في الخلفية."
+                "tap_action_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط) — يُطلق طلب POST في الخلفية.",
+                "url": "عنوان URL للزر الأساسي. يظهر على أدوات الشاشة الرئيسية فقط — عائلات شاشة القفل و StandBy و Apple Watch لا تتّسع للأزرار وتستخدم إجراء النقر بدلاً منها. يدعم http(s) أو مخططات مخصصة.",
+                "url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
+                "url_title": "تسمية الزر الأساسي (64 حرفًا كحد أقصى).",
+                "secondary_url": "عنوان URL للزر الثانوي. يظهر على الأدوات المتوسطة والكبيرة فقط؛ الأداة الصغيرة تتّسع للزر الأساسي وحده.",
+                "secondary_url_foreground": "تشغيل: يفتح النقر عنوان URL. إيقاف: خطاف ويب صامت (http(s) فقط).",
+                "secondary_url_title": "تسمية الزر الثانوي (64 حرفًا كحد أقصى)."
               }
             },
             "refresh": {

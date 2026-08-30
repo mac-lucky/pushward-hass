@@ -253,7 +253,35 @@ _BUTTON_SLOTS: tuple[tuple[str, str, str, str], ...] = (
 )
 
 
-def _add_tap_actions(content: dict, entity_config: dict) -> None:
+def _add_button_actions(content: dict, config: dict) -> None:
+    """Attach url_action / secondary_url_action to content from the CONF_URL* keys.
+
+    The button slots have the same wire shape on both surfaces; the caller owns the
+    question of whether the surface renders them.
+    """
+    for slot_key, url_key, foreground_key, title_key in _BUTTON_SLOTS:
+        action = build_tap_action(
+            config.get(url_key, ""),
+            config.get(foreground_key, DEFAULT_TAP_ACTION_FOREGROUND),
+            config.get(title_key, ""),
+        )
+        if action is not None:
+            content[slot_key] = action
+
+
+def add_all_tap_actions(content: dict, config: dict) -> None:
+    """Attach the whole widget action set: tap_action plus both button slots.
+
+    This is the widget policy in one call - all three slots ride every widget
+    template, because the server accepts them everywhere. The activity policy is
+    deliberately a different function (`_add_activity_actions`): it gates the two
+    button slots on the steps/alert templates that draw a button row.
+    """
+    add_tap_action(content, config)
+    _add_button_actions(content, config)
+
+
+def _add_activity_actions(content: dict, entity_config: dict) -> None:
     """Add structured tap_action / url_action / secondary_url_action to content.
 
     tap_action is universal (every template); url_action and secondary_url_action
@@ -264,14 +292,7 @@ def _add_tap_actions(content: dict, entity_config: dict) -> None:
     if entity_config.get(CONF_TEMPLATE, "generic") not in ("steps", "alert"):
         return
 
-    for slot_key, url_key, foreground_key, title_key in _BUTTON_SLOTS:
-        action = build_tap_action(
-            entity_config.get(url_key, ""),
-            entity_config.get(foreground_key, DEFAULT_TAP_ACTION_FOREGROUND),
-            entity_config.get(title_key, ""),
-        )
-        if action is not None:
-            content[slot_key] = action
+    _add_button_actions(content, entity_config)
 
 
 def _resolve_device_class_icon(domain: str, device_class: str) -> str:
@@ -828,7 +849,7 @@ def map_content(
     if remaining is not None:
         content["remaining_time"] = remaining
 
-    _add_tap_actions(content, entity_config)
+    _add_activity_actions(content, entity_config)
 
     # Template-specific required fields
     template = content["template"]
@@ -954,7 +975,7 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         "accent_color": "green",
     }
 
-    _add_tap_actions(content, entity_config)
+    _add_activity_actions(content, entity_config)
 
     # Template-specific required fields for server validation
     template = content["template"]

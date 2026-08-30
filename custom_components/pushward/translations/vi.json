@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "URL hành động khi chạm",
-                "tap_action_foreground": "Mở URL hành động khi chạm"
+                "tap_action_foreground": "Mở URL hành động khi chạm",
+                "url": "URL",
+                "url_foreground": "Mở URL nút chính",
+                "url_title": "Tiêu đề nút chính",
+                "secondary_url": "URL Phụ",
+                "secondary_url_foreground": "Mở URL nút phụ",
+                "secondary_url_title": "Tiêu đề nút phụ"
               },
               "data_description": {
                 "tap_action_url": "URL tùy chọn được mở khi chạm vào widget. Hỗ trợ http(s) (mở Safari) hoặc scheme tùy chỉnh như homeassistant://navigate/lovelace/0.",
-                "tap_action_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)) — gửi một POST ở chế độ nền."
+                "tap_action_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)) — gửi một POST ở chế độ nền.",
+                "url": "URL nút chính. Chỉ hiển thị trên widget Màn hình chính — các nhóm Màn hình khóa, StandBy và Apple Watch không đủ chỗ cho nút nên dùng hành động chạm thay thế. Hỗ trợ http(s) hoặc scheme tùy chỉnh.",
+                "url_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)).",
+                "url_title": "Nhãn nút chính (tối đa 64 ký tự).",
+                "secondary_url": "URL nút phụ. Chỉ hiển thị trên widget vừa và lớn; widget nhỏ chỉ đủ chỗ cho nút chính.",
+                "secondary_url_foreground": "Bật: chạm mở URL. Tắt: webhook im lặng (chỉ http(s)).",
+                "secondary_url_title": "Nhãn nút phụ (tối đa 64 ký tự)."
               }
             },
             "refresh": {

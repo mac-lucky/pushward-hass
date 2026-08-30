@@ -254,6 +254,12 @@ def make_widget_config(**overrides) -> dict:
         CONF_TEXT_COLOR: "",
         CONF_TAP_ACTION_URL: "",
         CONF_TAP_ACTION_FOREGROUND: DEFAULT_TAP_ACTION_FOREGROUND,
+        CONF_URL: "",
+        CONF_URL_FOREGROUND: DEFAULT_TAP_ACTION_FOREGROUND,
+        CONF_URL_TITLE: "",
+        CONF_SECONDARY_URL: "",
+        CONF_SECONDARY_URL_FOREGROUND: DEFAULT_TAP_ACTION_FOREGROUND,
+        CONF_SECONDARY_URL_TITLE: "",
     }
     config.update(overrides)
     return config

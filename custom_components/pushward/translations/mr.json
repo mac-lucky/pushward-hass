@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "टॅप क्रिया URL",
-                "tap_action_foreground": "टॅप क्रिया URL उघडा"
+                "tap_action_foreground": "टॅप क्रिया URL उघडा",
+                "url": "URL",
+                "url_foreground": "प्राथमिक बटण URL उघडा",
+                "url_title": "प्राथमिक बटण शीर्षक",
+                "secondary_url": "दुय्यम URL",
+                "secondary_url_foreground": "दुय्यम बटण URL उघडा",
+                "secondary_url_title": "दुय्यम बटण शीर्षक"
               },
               "data_description": {
                 "tap_action_url": "विजेटवर टॅप केल्यावर उघडले जाणारे पर्यायी URL. http(s) (Safari उघडते) किंवा homeassistant://navigate/lovelace/0 सारख्या कस्टम स्कीम समर्थित.",
-                "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — पार्श्वभूमीत POST फायर करते."
+                "tap_action_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)) — पार्श्वभूमीत POST फायर करते.",
+                "url": "प्राथमिक बटण URL. फक्त होम स्क्रीन विजेटवर दिसते — लॉक स्क्रीन, StandBy आणि Apple Watch फॅमिलीमध्ये बटणांसाठी जागा नसते आणि त्याऐवजी त्या टॅप अ‍ॅक्शन वापरतात. http(s) किंवा कस्टम स्कीम समर्थित.",
+                "url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
+                "url_title": "प्राथमिक बटण लेबल (कमाल 64 अक्षरे).",
+                "secondary_url": "दुय्यम बटण URL. फक्त मध्यम आणि मोठ्या विजेटवर दिसते; लहान विजेटमध्ये फक्त प्राथमिक बटणासाठी जागा असते.",
+                "secondary_url_foreground": "चालू: टॅप URL उघडते. बंद: सायलेंट वेबहूक (फक्त http(s)).",
+                "secondary_url_title": "दुय्यम बटण लेबल (कमाल 64 अक्षरे)."
               }
             },
             "refresh": {

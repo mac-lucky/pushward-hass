@@ -1957,11 +1957,23 @@
               "name": "Tap actions",
               "data": {
                 "tap_action_url": "Dokunma Eylemi URL'si",
-                "tap_action_foreground": "Dokunma Eylemi URL'sini Aç"
+                "tap_action_foreground": "Dokunma Eylemi URL'sini Aç",
+                "url": "URL",
+                "url_foreground": "Birincil Düğme URL'sini Aç",
+                "url_title": "Birincil Düğme Başlığı",
+                "secondary_url": "İkincil URL",
+                "secondary_url_foreground": "İkincil Düğme URL'sini Aç",
+                "secondary_url_title": "İkincil Düğme Başlığı"
               },
               "data_description": {
                 "tap_action_url": "Widget'a dokunulduğunda açılan isteğe bağlı URL. http(s) (Safari'yi açar) veya homeassistant://navigate/lovelace/0 gibi özel şemaları destekler.",
-                "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — arka planda bir POST tetikler."
+                "tap_action_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)) — arka planda bir POST tetikler.",
+                "url": "Birincil düğme URL'si. Yalnızca Ana Ekran widget'larında gösterilir — Kilit Ekranı, StandBy ve Apple Watch aileleri düğmeler için yer bırakmaz ve onun yerine dokunma eylemini kullanır. http(s) veya özel şemaları destekler.",
+                "url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
+                "url_title": "Birincil düğme etiketi (en fazla 64 karakter).",
+                "secondary_url": "İkincil düğme URL'si. Yalnızca orta ve büyük widget'larda gösterilir; küçük widget'ta yalnızca birincil düğme için yer vardır.",
+                "secondary_url_foreground": "Açık: dokunma URL'yi açar. Kapalı: sessiz webhook (yalnızca http(s)).",
+                "secondary_url_title": "İkincil düğme etiketi (en fazla 64 karakter)."
               }
             },
             "refresh": {
