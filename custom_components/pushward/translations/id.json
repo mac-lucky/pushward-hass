@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Perbarui Aktivitas (Approval)",
+      "description": "Perbarui Live Activity persetujuan PushWard: kartu pertanyaan dengan 2-4 tombol jawaban yang memanggil webhook Anda sendiri atau merekam opsi yang diketuk di sisi server.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "options": {
+          "name": "Opsi",
+          "description": "Daftar 2-4 tombol jawaban. Masing-masing: id (wajib, maks. 64), title (wajib, maks. 24), serta opsional style (primary/secondary/destructive), icon (wajib bila ada 3 tombol atau lebih), url, method, headers, body. Url http(s) selalu berupa webhook senyap (default POST); opsi tanpa url direkam oleh server: ketukan pertama masuk ke bidang answer yang hanya-baca dan aktivitas berakhir. Mengirim ulang options memulai ronde baru."
+        },
+        "source": {
+          "name": "Sumber",
+          "description": "Lencana sumber yang ditampilkan di kepala kartu (maks. 24 karakter)."
+        },
+        "details": {
+          "name": "Detail",
+          "description": "Hingga 2 baris konteks sebagai daftar objek: label (wajib, maks. 24) dan value (wajib, maks. 64)."
+        },
+        "on_expire": {
+          "name": "Saat Kedaluwarsa",
+          "description": "Id opsi yang direkam server sebagai jawaban saat End Date terlewati, atau none untuk menonaktifkan. Membutuhkan End Date."
+        },
+        "end_date": {
+          "name": "Tanggal Akhir",
+          "description": "Stempel waktu Unix (detik) saat pertanyaan kedaluwarsa. Wajib bersama Saat Kedaluwarsa."
+        },
+        "state_text": {
+          "name": "Teks Status",
+          "description": "Teks yang ditampilkan sebagai status aktivitas. Inilah pertanyaan yang diajukan kartu."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Override Prioritas",
+          "description": "Prioritas per pembaruan (0-10). Hanya menimpa prioritas yang dikonfigurasi pada aktivitas untuk push ini."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
+        }
+      }
+    },
     "create_activity": {
       "name": "Buat Aktivitas",
       "description": "Buat PushWard Live Activity baru.",

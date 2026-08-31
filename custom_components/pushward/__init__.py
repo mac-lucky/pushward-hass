@@ -32,6 +32,15 @@ from .const import (
     ACTIVITY_STATES,
     ACTIVITY_TTL_MAX,
     ACTIVITY_TTL_MIN,
+    APPROVAL_DETAIL_LABEL_MAX,
+    APPROVAL_DETAIL_VALUE_MAX,
+    APPROVAL_DETAILS_MAX,
+    APPROVAL_OPTION_ID_PATTERN,
+    APPROVAL_OPTION_STYLES,
+    APPROVAL_OPTION_TITLE_MAX,
+    APPROVAL_OPTIONS_MAX,
+    APPROVAL_OPTIONS_MIN,
+    APPROVAL_SOURCE_MAX,
     BOARD_MAX_TILES,
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
@@ -389,6 +398,93 @@ _MEDIA_TEMPLATE_FIELDS = {
     vol.Optional("controls"): vol.Any(None, _MEDIA_CONTROLS_SCHEMA),
 }
 
+# approval: a question card with 2-4 answer buttons. An option is id+title plus an
+# optional style/icon and, like a media control, an optional silent tap action with
+# no foreground key at all: an http(s) url is always a silent webhook (POST when no
+# method is given) and a custom-scheme url opens that app. An option WITHOUT a url
+# gets a server-signed answer URL instead: the first tap is recorded in the
+# server-owned read-only `answer` field, pushed to every device, and the activity
+# ends shortly after. The server replaces options/details wholesale on update and
+# clears the stored answer whenever options are re-sent, so an automation sends
+# `options` only to start a new round.
+_APPROVAL_OPTION_ID_MSG = (
+    "option ids must start with a letter or digit and contain only letters, digits, "
+    "hyphens, or underscores (max 64 characters)"
+)
+_APPROVAL_OPTION_SCHEMA = vol.All(
+    vol.Schema(
+        {
+            vol.Required("id"): vol.Match(APPROVAL_OPTION_ID_PATTERN, msg=_APPROVAL_OPTION_ID_MSG),
+            vol.Required("title"): vol.All(str, vol.Length(min=1, max=APPROVAL_OPTION_TITLE_MAX)),
+            vol.Optional("style"): vol.In(APPROVAL_OPTION_STYLES),
+            vol.Optional("icon"): vol.All(str, vol.Length(min=1, max=MAX_TAP_ACTION_ICON_LEN)),
+            vol.Optional("url"): validate_tap_action_url,
+            **_HTTP_ACTION_FIELDS,
+        }
+    ),
+    _validate_http_action_fields,
+)
+
+
+def _validate_approval_options(options: list) -> list:
+    """Unique ids, and an icon on every option once there are three or more.
+
+    Three-plus buttons render icon-only on the card, which is why the server
+    requires the icon exactly then; two buttons render their titles.
+    """
+    ids = [option["id"] for option in options]
+    if len(set(ids)) != len(ids):
+        raise vol.Invalid("option ids must be unique")
+    if len(options) >= 3 and not all(option.get("icon") for option in options):
+        raise vol.Invalid("every option needs an icon when there are three or more options")
+    return options
+
+
+_APPROVAL_DETAIL_SCHEMA = vol.Schema(
+    {
+        vol.Required("label"): vol.All(vol.Coerce(str), vol.Length(min=1, max=APPROVAL_DETAIL_LABEL_MAX)),
+        vol.Required("value"): vol.All(vol.Coerce(str), vol.Length(min=1, max=APPROVAL_DETAIL_VALUE_MAX)),
+    }
+)
+
+_APPROVAL_TEMPLATE_FIELDS = {
+    vol.Optional("options"): vol.All(
+        [_APPROVAL_OPTION_SCHEMA],
+        vol.Length(min=APPROVAL_OPTIONS_MIN, max=APPROVAL_OPTIONS_MAX),
+        _validate_approval_options,
+    ),
+    vol.Optional("source"): vol.All(str, vol.Length(max=APPROVAL_SOURCE_MAX)),
+    # No minimum: details replace wholesale on update, so [] is the clearing form.
+    vol.Optional("details"): vol.All([_APPROVAL_DETAIL_SCHEMA], vol.Length(max=APPROVAL_DETAILS_MAX)),
+    # An option id, or "none" to disarm. At end_date the server records the named
+    # option as the answer (by: "expired"). The end_date pairing is checked in
+    # _validate_approval_update, and only when options ride the same call.
+    vol.Optional("on_expire"): vol.Any(
+        "none",
+        vol.Match(APPROVAL_OPTION_ID_PATTERN, msg='on_expire must be an option id or "none"'),
+    ),
+    vol.Optional("end_date"): vol.Coerce(int),
+}
+
+
+def _validate_approval_update(data: dict) -> dict:
+    """Cross-field approval rules checkable on this payload alone.
+
+    The server validates on_expire/end_date against the MERGED content, so a
+    payload may always pair on_expire with an already-stored end_date - even a
+    new round can inherit the deadline. That pairing is the server's call, not
+    ours. Options replace wholesale, so sent equals merged and the membership
+    rule (which skips "none") is the one rule checkable locally.
+    """
+    on_expire = data.get("on_expire")
+    options = data.get("options")
+    if not on_expire or not options:
+        return data
+    if on_expire != "none" and on_expire not in {o["id"] for o in options}:
+        raise vol.Invalid("on_expire must name one of the sent options")
+    return data
+
+
 # Lean field groups for board/log/media: only the fields those templates actually render.
 # Board/log have no progress bar, no remaining_time, and no whole-activity button slots
 # (board uses per-tile url_action; log has no buttons; media has its own transport row and
@@ -454,10 +550,16 @@ _UPDATE_TEMPLATE_SCHEMAS = {
     "board": _lean_update_schema(_BOARD_TEMPLATE_FIELDS),
     "log": _lean_update_schema(_LOG_TEMPLATE_FIELDS),
     "media": _lean_update_schema(_MEDIA_TEMPLATE_FIELDS, _IMAGE_FIELDS),
+    # approval renders its own answer buttons and no bar, so it is lean too; the
+    # server rejects url_action/secondary_url_action and alarm/snooze on it, and
+    # it has no image slot.
+    "approval": vol.All(_lean_update_schema(_APPROVAL_TEMPLATE_FIELDS), _validate_approval_update),
 }
 
 # The deprecated update_activity accepts every template's fields (plus an explicit
-# `template` selector) — i.e. the union of all per-template schemas.
+# `template` selector) - i.e. the union of all per-template schemas. The approval
+# cross-field validator deliberately rides only _UPDATE_TEMPLATE_SCHEMAS["approval"]:
+# end_date means something else on most of the templates merged into this union.
 SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
     {vol.Optional("template"): str},
     _LIVE_PROGRESS_FIELDS,
@@ -470,6 +572,7 @@ SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
     _BOARD_TEMPLATE_FIELDS,
     _LOG_TEMPLATE_FIELDS,
     _MEDIA_TEMPLATE_FIELDS,
+    _APPROVAL_TEMPLATE_FIELDS,
 )
 
 SCHEMA_CREATE_ACTIVITY = vol.Schema(

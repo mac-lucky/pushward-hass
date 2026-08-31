@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Aktiviteyi Güncelle (Approval)",
+      "description": "Bir PushWard onay Live Activity'sini günceller: kendi webhook'larınızı çağıran veya dokunulan seçeneği sunucu tarafında kaydeden 2-4 yanıt düğmeli bir soru kartı.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "options": {
+          "name": "Seçenekler",
+          "description": "2-4 yanıt düğmesinin listesi. Her biri: id (zorunlu, en fazla 64), title (zorunlu, en fazla 24) ve isteğe bağlı style (primary/secondary/destructive), icon (3 veya daha fazla düğmede zorunlu), url, method, headers, body. http(s) url her zaman sessiz bir webhook'tur (varsayılan POST); url'si olmayan seçeneği sunucu kaydeder: ilk dokunuş salt okunur answer alanına düşer ve aktivite sona erer. options'ı yeniden göndermek yeni bir tur başlatır."
+        },
+        "source": {
+          "name": "Kaynak",
+          "description": "Kart başlığında gösterilen kaynak rozeti (en fazla 24 karakter)."
+        },
+        "details": {
+          "name": "Ayrıntılar",
+          "description": "Nesne listesi olarak en fazla 2 bağlam satırı: label (zorunlu, en fazla 24) ve value (zorunlu, en fazla 64)."
+        },
+        "on_expire": {
+          "name": "Süre Dolunca",
+          "description": "Bitiş tarihi geçtiğinde sunucunun yanıt olarak kaydedeceği seçenek id'si veya devre dışı bırakmak için none. Bitiş tarihi gerektirir."
+        },
+        "end_date": {
+          "name": "Bitiş Tarihi",
+          "description": "Sorunun süresinin dolacağı Unix zaman damgası (saniye). Süre Dolunca ile birlikte zorunludur."
+        },
+        "state_text": {
+          "name": "Durum Metni",
+          "description": "Aktivite durumu olarak gösterilen metin. Kartın sorduğu soru budur."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Bu güncelleme için cihazda çalınan bildirim sesi."
+        },
+        "priority": {
+          "name": "Öncelik Geçersiz Kılma",
+          "description": "Güncelleme başına öncelik (0–10). Yalnızca bu push için aktivitenin yapılandırılmış önceliğini geçersiz kılar."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
+        }
+      }
+    },
     "create_activity": {
       "name": "Aktivite Oluştur",
       "description": "Yeni bir PushWard Live Activity oluştur.",

@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Aktualizuj Live Activity (Approval)",
+      "description": "Aktualizuje Live Activity zatwierdzenia PushWard: kartę z pytaniem i 2-4 przyciskami odpowiedzi, które wywołują Twoje webhooki lub zapisują wybraną opcję po stronie serwera.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identyfikator slug Live Activity."
+        },
+        "state": {
+          "name": "Stan",
+          "description": "Żądany stan Live Activity."
+        },
+        "options": {
+          "name": "Opcje",
+          "description": "Lista 2-4 przycisków odpowiedzi. Każdy: id (wymagane, maks. 64), title (wymagane, maks. 24) oraz opcjonalnie style (primary/secondary/destructive), icon (wymagane przy 3 lub więcej przyciskach), url, method, headers, body. Url http(s) to zawsze cichy webhook (domyślnie POST); opcję bez url zapisuje serwer: pierwsze dotknięcie trafia do pola answer tylko do odczytu, a aktywność się kończy. Ponowne wysłanie options rozpoczyna nową rundę."
+        },
+        "source": {
+          "name": "Źródło",
+          "description": "Znaczek źródła pokazywany w nagłówku karty (maks. 24 znaki)."
+        },
+        "details": {
+          "name": "Szczegóły",
+          "description": "Do 2 wierszy kontekstu jako lista obiektów: label (wymagane, maks. 24) i value (wymagane, maks. 64)."
+        },
+        "on_expire": {
+          "name": "Po wygaśnięciu",
+          "description": "Id opcji, którą serwer zapisze jako odpowiedź po upływie daty zakończenia, albo none, aby wyłączyć. Wymaga daty zakończenia."
+        },
+        "end_date": {
+          "name": "Data zakończenia",
+          "description": "Uniksowy znacznik czasu (sekundy), kiedy pytanie wygasa. Wymagany razem z Po wygaśnięciu."
+        },
+        "state_text": {
+          "name": "Tekst stanu",
+          "description": "Tekst wyświetlany jako stan Live Activity. To jest pytanie, które zadaje karta."
+        },
+        "subtitle": {
+          "name": "Podtytuł",
+          "description": "Tekst podtytułu wyświetlany w Live Activity."
+        },
+        "icon": {
+          "name": "Ikona",
+          "description": "Nazwa ikony SF Symbol lub MDI (np. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Komunikat zakończenia",
+          "description": "Komunikat wyświetlany po zakończeniu Live Activity."
+        },
+        "accent_color": {
+          "name": "Kolor akcentu",
+          "description": "Kolor akcentu dla Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "background_color": {
+          "name": "Kolor tła",
+          "description": "Kolor tła Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "text_color": {
+          "name": "Kolor tekstu",
+          "description": "Kolor tekstu Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "sound": {
+          "name": "Dźwięk",
+          "description": "Dźwięk powiadomienia odtwarzany na urządzeniu przy tej aktualizacji."
+        },
+        "priority": {
+          "name": "Nadpisanie priorytetu",
+          "description": "Priorytet dla pojedynczej aktualizacji (0-10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
+        }
+      }
+    },
     "create_activity": {
       "name": "Utwórz Live Activity",
       "description": "Utwórz nowy PushWard Live Activity.",

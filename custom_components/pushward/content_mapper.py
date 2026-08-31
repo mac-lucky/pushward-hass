@@ -23,6 +23,15 @@ from homeassistant.util.color import (
 from homeassistant.util.unit_conversion import DurationConverter
 
 from .const import (
+    APPROVAL_DETAIL_LABEL_MAX,
+    APPROVAL_DETAIL_VALUE_MAX,
+    APPROVAL_DETAILS_MAX,
+    APPROVAL_OPTION_ID_PATTERN,
+    APPROVAL_OPTION_STYLES,
+    APPROVAL_OPTION_TITLE_MAX,
+    APPROVAL_OPTIONS_MAX,
+    APPROVAL_OPTIONS_MIN,
+    APPROVAL_SOURCE_MAX,
     BOARD_MAX_TILES,
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
@@ -32,6 +41,9 @@ from .const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ALARM,
+    CONF_APPROVAL_DETAILS,
+    CONF_APPROVAL_OPTIONS,
+    CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
@@ -109,10 +121,12 @@ from .const import (
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     MAX_SEVERITY_LABEL_LEN,
+    MAX_TAP_ACTION_ICON_LEN,
     MEDIA_DURATION_MAX,
     MEDIA_POSITION_MAX_AGE,
     MEDIA_TITLE_MAX,
     NAMED_COLORS,
+    TAP_ACTION_METHODS,
     TIMELINE_SERIES_LABEL_MAX,
     is_valid_image_url,
     is_valid_thumbhash,
@@ -692,6 +706,94 @@ def _apply_media_fields(
     content["progress"] = 0.0
 
 
+_APPROVAL_OPTION_ID_RE = re.compile(APPROVAL_OPTION_ID_PATTERN)
+
+
+def _approval_wire_option(raw: object) -> dict | None:
+    """One configured answer button as its wire object, or None when unusable.
+
+    Lenient like the other row parsers: a row missing its id or title is skipped
+    rather than failing the whole push. An http(s) url makes the option a silent
+    webhook, so an empty method is filled to POST the way build_tap_action does;
+    a url-less option goes out bare and the server signs an answer URL into it.
+    """
+    if not isinstance(raw, dict):
+        return None
+    option_id = str(raw.get("id") or "").strip()
+    title = str(raw.get("title") or "").strip()
+    if not _APPROVAL_OPTION_ID_RE.match(option_id) or not title:
+        return None
+    option: dict = {"id": option_id, "title": title[:APPROVAL_OPTION_TITLE_MAX]}
+    style = str(raw.get("style") or "").strip()
+    if style in APPROVAL_OPTION_STYLES:
+        option["style"] = style
+    if icon := str(raw.get("icon") or "").strip():
+        option["icon"] = icon[:MAX_TAP_ACTION_ICON_LEN]
+    url = str(raw.get("url") or "").strip()
+    if not url:
+        return option
+    option["url"] = url
+    if urlparse(url).scheme.lower() in ("http", "https"):
+        method = str(raw.get("method") or "").strip().upper()
+        # An unknown or missing method falls back to POST, the way build_tap_action
+        # shapes its silent webhooks - lenient, this is the mapper path.
+        option["method"] = method if method in TAP_ACTION_METHODS else "POST"
+        headers = raw.get("headers")
+        if isinstance(headers, dict) and headers:
+            option["headers"] = {str(k): str(v) for k, v in headers.items()}
+        if body := str(raw.get("body") or ""):
+            option["body"] = body
+    return option
+
+
+def _apply_approval_fields(content: dict, entity_config: dict) -> None:
+    """Write the approval template's question-card fields into ``content`` in place.
+
+    ``options`` only goes out as a complete valid set: a partial list would 422
+    the whole push, and re-sending options starts a new round (the server clears
+    any answer it already recorded) - so nothing is emitted rather than something
+    wrong. The question itself rides the existing ``state`` text.
+    """
+    # Latent answer-wipe hazard, unreachable today: no config flow offers approval,
+    # so no tracked entity routes through here. If one ever does, every frame would
+    # re-send `options`, and the server clears the recorded answer on the key's mere
+    # presence (see the completion branch) - each update would wipe the one thing
+    # the card exists to record. Before the flow offers approval, this must emit
+    # options on the first frame only, AND the 404-recreate path in
+    # activity_manager._send_update must force a re-send: an approval create
+    # without options 422s.
+    configured = entity_config.get(CONF_APPROVAL_OPTIONS) or []
+    options = [o for o in map(_approval_wire_option, configured) if o is not None][:APPROVAL_OPTIONS_MAX]
+    ids = {o["id"] for o in options}
+    # Three or more buttons render icon-only on the card, so the server requires
+    # an icon on each as soon as a third option appears.
+    icons_ok = len(options) < 3 or all("icon" in o for o in options)
+    if len(options) >= APPROVAL_OPTIONS_MIN and len(ids) == len(options) and icons_ok:
+        content["options"] = options
+    elif configured:
+        _LOGGER.debug("Skipping incomplete approval options for %s", entity_config.get(CONF_ENTITY_ID))
+
+    if source := str(entity_config.get(CONF_APPROVAL_SOURCE) or "").strip():
+        content["source"] = source[:APPROVAL_SOURCE_MAX]
+
+    details = []
+    for raw in entity_config.get(CONF_APPROVAL_DETAILS) or []:
+        if not isinstance(raw, dict):
+            continue
+        label = str(raw.get("label") or "").strip()
+        value = str(raw.get("value") or "").strip()
+        if not label or not value:
+            continue
+        details.append({"label": label[:APPROVAL_DETAIL_LABEL_MAX], "value": value[:APPROVAL_DETAIL_VALUE_MAX]})
+        if len(details) == APPROVAL_DETAILS_MAX:
+            break
+    if details:
+        content["details"] = details
+
+    # The card has no progress bar; the server still wants the field in [0, 1].
+    content["progress"] = 0.0
+
+
 def _apply_image_fields(content: dict, entity_config: dict) -> None:
     """Write the optional image trio into ``content``, for the templates that take it.
 
@@ -943,6 +1045,8 @@ def map_content(
         content["progress"] = 0.0
     elif template == "media":
         _apply_media_fields(content, entity_config, state, hass, now=now)
+    elif template == "approval":
+        _apply_approval_fields(content, entity_config)
     elif template == "generic" and entity_config.get(CONF_LIVE_PROGRESS):
         # Opt-in: hand the end time to iOS so it interpolates the progress bar to
         # 1.0 by end_date and shows a counting-down ETA. False first, for the same
@@ -1016,6 +1120,12 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         # transport state is the exception: a finished card still claiming to be
         # playing would tick its scrubber forward forever.
         content["playback_state"] = "stopped"
+        content["progress"] = 0.0
+    elif template == "approval":
+        # The stored options/details survive the merge patch on their own, and
+        # re-sending options would clear the recorded answer - the one thing the
+        # completion screen is there to show. So nothing template-specific goes
+        # out beyond the flat progress the server requires.
         content["progress"] = 0.0
 
     # The activity is done, so stop the opt-in ETA interpolation. Without this the

@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Activiteit bijwerken (Approval)",
+      "description": "Werk een PushWard-goedkeurings-Live Activity bij: een vraagkaart met 2-4 antwoordknoppen die je eigen webhooks aanroepen of de aangetikte optie op de server vastleggen.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "options": {
+          "name": "Opties",
+          "description": "Lijst van 2-4 antwoordknoppen. Elk: id (verplicht, max. 64), title (verplicht, max. 24) en optioneel style (primary/secondary/destructive), icon (verplicht bij 3 of meer knoppen), url, method, headers, body. Een http(s)-url is altijd een stille webhook (standaard POST); een optie zonder url legt de server vast: de eerste tik belandt in het alleen-lezen veld answer en de activiteit eindigt. Options opnieuw sturen start een nieuwe ronde."
+        },
+        "source": {
+          "name": "Bron",
+          "description": "Bronbadge in de kop van de kaart (max. 24 tekens)."
+        },
+        "details": {
+          "name": "Details",
+          "description": "Maximaal 2 contextregels als lijst van objecten: label (verplicht, max. 24) en value (verplicht, max. 64)."
+        },
+        "on_expire": {
+          "name": "Bij verlopen",
+          "description": "Optie-id die de server als antwoord vastlegt zodra de einddatum verstrijkt, of none om uit te schakelen. Vereist de einddatum."
+        },
+        "end_date": {
+          "name": "Einddatum",
+          "description": "Unix-tijdstempel (seconden) waarop de vraag verloopt. Verplicht samen met Bij verlopen."
+        },
+        "state_text": {
+          "name": "Statustekst",
+          "description": "Tekst die wordt weergegeven als activiteitsstatus. Dit is de vraag die de kaart stelt."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0-10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activiteit aanmaken",
       "description": "Maak een nieuwe PushWard Live Activity aan.",

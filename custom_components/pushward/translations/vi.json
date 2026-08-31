@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Cập Nhật Hoạt Động (Approval)",
+      "description": "Cập nhật một Live Activity phê duyệt của PushWard: thẻ câu hỏi với 2-4 nút trả lời gọi webhook của riêng bạn hoặc ghi lại lựa chọn được nhấn ở phía máy chủ.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Mã định danh slug của hoạt động."
+        },
+        "state": {
+          "name": "Trạng Thái",
+          "description": "Trạng thái hoạt động mong muốn."
+        },
+        "options": {
+          "name": "Lựa Chọn",
+          "description": "Danh sách 2-4 nút trả lời. Mỗi nút: id (bắt buộc, tối đa 64), title (bắt buộc, tối đa 24) và tùy chọn style (primary/secondary/destructive), icon (bắt buộc khi có 3 nút trở lên), url, method, headers, body. Url http(s) luôn là webhook im lặng (mặc định POST); lựa chọn không có url sẽ do máy chủ ghi lại: lần nhấn đầu tiên vào trường answer chỉ đọc và hoạt động kết thúc. Gửi lại options sẽ bắt đầu vòng mới."
+        },
+        "source": {
+          "name": "Nguồn",
+          "description": "Huy hiệu nguồn hiển thị ở đầu thẻ (tối đa 24 ký tự)."
+        },
+        "details": {
+          "name": "Chi Tiết",
+          "description": "Tối đa 2 dòng ngữ cảnh dưới dạng danh sách đối tượng: label (bắt buộc, tối đa 24) và value (bắt buộc, tối đa 64)."
+        },
+        "on_expire": {
+          "name": "Khi Hết Hạn",
+          "description": "Id lựa chọn mà máy chủ ghi làm câu trả lời khi qua ngày kết thúc, hoặc none để tắt. Cần ngày kết thúc."
+        },
+        "end_date": {
+          "name": "Ngày Kết Thúc",
+          "description": "Dấu thời gian Unix (giây) khi câu hỏi hết hạn. Bắt buộc cùng với Khi Hết Hạn."
+        },
+        "state_text": {
+          "name": "Văn Bản Trạng Thái",
+          "description": "Văn bản hiển thị làm trạng thái hoạt động. Đây là câu hỏi mà thẻ đưa ra."
+        },
+        "subtitle": {
+          "name": "Phụ Đề",
+          "description": "Văn bản phụ đề hiển thị trên hoạt động."
+        },
+        "icon": {
+          "name": "Biểu Tượng",
+          "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Thông Báo Hoàn Thành",
+          "description": "Thông báo hiển thị khi hoạt động kết thúc."
+        },
+        "accent_color": {
+          "name": "Màu Nhấn",
+          "description": "Màu nhấn cho hoạt động. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "background_color": {
+          "name": "Màu Nền",
+          "description": "Màu nền Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "text_color": {
+          "name": "Màu Chữ",
+          "description": "Màu chữ Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "sound": {
+          "name": "Âm Thanh",
+          "description": "Tên âm thanh thông báo cho bản cập nhật. Để trống để dùng âm thanh hệ thống iOS."
+        },
+        "priority": {
+          "name": "Ưu tiên ghi đè",
+          "description": "Mức ưu tiên cho từng lần cập nhật (0-10). Chỉ ghi đè mức ưu tiên đã cấu hình của hoạt động cho lần đẩy này."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
+        }
+      }
+    },
     "create_activity": {
       "name": "Tạo Hoạt Động",
       "description": "Tạo PushWard Live Activity mới.",

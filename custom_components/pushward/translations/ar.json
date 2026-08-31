@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "تحديث النشاط (Approval)",
+      "description": "تحديث نشاط PushWard من نوع الموافقة: بطاقة سؤال بها 2-4 أزرار إجابة تستدعي Webhooks خاصة بك أو يسجل الخادم الخيار الذي تم النقر عليه.",
+      "fields": {
+        "slug": {
+          "name": "المعرّف",
+          "description": "معرّف النشاط."
+        },
+        "state": {
+          "name": "الحالة",
+          "description": "الحالة المطلوبة للنشاط."
+        },
+        "options": {
+          "name": "الخيارات",
+          "description": "قائمة من 2-4 أزرار إجابة. كل زر: id (مطلوب، 64 كحد أقصى)، title (مطلوب، 24 كحد أقصى)، واختياريًا style (primary/secondary/destructive)، icon (مطلوب عند وجود 3 أزرار أو أكثر)، url، method، headers، body. عنوان url من نوع http(s) يكون دائمًا Webhook صامتًا (POST افتراضيًا)؛ الخيار بدون url يسجله الخادم: أول نقرة تُحفظ في حقل answer للقراءة فقط ويُنهى النشاط. إعادة إرسال options تبدأ جولة جديدة."
+        },
+        "source": {
+          "name": "المصدر",
+          "description": "شارة المصدر الظاهرة في ترويسة البطاقة (24 حرفًا كحد أقصى)."
+        },
+        "details": {
+          "name": "التفاصيل",
+          "description": "حتى صفين من السياق كقائمة كائنات: label (مطلوب، 24 كحد أقصى) وvalue (مطلوب، 64 كحد أقصى)."
+        },
+        "on_expire": {
+          "name": "عند الانتهاء",
+          "description": "معرّف الخيار الذي يسجله الخادم كإجابة عند حلول تاريخ الانتهاء، أو none للتعطيل. يتطلب تاريخ الانتهاء."
+        },
+        "end_date": {
+          "name": "تاريخ الانتهاء",
+          "description": "طابع زمني Unix (بالثواني) لانتهاء صلاحية السؤال. مطلوب مع on_expire."
+        },
+        "state_text": {
+          "name": "نص الحالة",
+          "description": "النص الظاهر بوصفه حالة النشاط. هذا هو السؤال الذي تطرحه البطاقة."
+        },
+        "subtitle": {
+          "name": "العنوان الفرعي",
+          "description": "نص العنوان الفرعي الظاهر في النشاط."
+        },
+        "icon": {
+          "name": "الأيقونة",
+          "description": "اسم أيقونة SF Symbol أو MDI (مثال: questionmark.circle.fill، mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "رسالة الاكتمال",
+          "description": "الرسالة الظاهرة عند إنهاء النشاط."
+        },
+        "accent_color": {
+          "name": "لون التمييز",
+          "description": "لون التمييز للنشاط. Hex (#RRGGBB) أو اسم لون."
+        },
+        "background_color": {
+          "name": "لون الخلفية",
+          "description": "لون خلفية Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "text_color": {
+          "name": "لون النص",
+          "description": "لون نص Live Activity. Hex (#RRGGBB) أو اسم لون."
+        },
+        "tap_action": {
+          "name": "إجراء النقر",
+          "description": "هدف النقر على النشاط بأكمله ككائن: url (مطلوب)، وforeground اختياري، وبالنسبة لعنوان http(s) خطاف ويب صامت عبر method/headers/body."
+        },
+        "sound": {
+          "name": "الصوت",
+          "description": "صوت الإشعار الذي يُشغَّل على الجهاز لهذا التحديث."
+        },
+        "priority": {
+          "name": "تجاوز الأولوية",
+          "description": "أولوية لكل تحديث (0-10). تتجاوز أولوية النشاط المُهيَّأة لهذا الـ push فقط."
+        },
+        "ended_ttl": {
+          "name": "مدة البقاء بعد الإنهاء",
+          "description": "الثواني للاحتفاظ بالنشاط بعد إنهائه."
+        },
+        "stale_ttl": {
+          "name": "مدة البقاء قبل الإهمال",
+          "description": "الثواني قبل اعتبار النشاط قديماً."
+        },
+        "dismissal_ttl": {
+          "name": "TTL الإزالة",
+          "description": "عدد الثواني التي يبقى فيها النشاط المنتهي على شاشة القفل قبل إزالته. القيمة 0 تزيله فوراً عند الانتهاء."
+        }
+      }
+    },
     "create_activity": {
       "name": "إنشاء نشاط",
       "description": "إنشاء Live Activity جديد في PushWard.",

@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Activity अपडेट करा (Approval)",
+      "description": "PushWard मंजुरी Live Activity अपडेट करा: 2-4 उत्तर बटणे असलेले प्रश्न कार्ड, जे तुमचे स्वतःचे webhooks कॉल करतात किंवा टॅप केलेला पर्याय सर्व्हरवर नोंदवतात.",
+      "fields": {
+        "slug": {
+          "name": "स्लग",
+          "description": "Activity चा slug ओळखकर्ता."
+        },
+        "state": {
+          "name": "स्थिती",
+          "description": "Activity ची इच्छित स्थिती."
+        },
+        "options": {
+          "name": "पर्याय",
+          "description": "2-4 उत्तर बटणांची यादी. प्रत्येक: id (आवश्यक, कमाल 64), title (आवश्यक, कमाल 24), आणि ऐच्छिक style (primary/secondary/destructive), icon (3 किंवा अधिक बटणे असल्यास आवश्यक), url, method, headers, body. http(s) url नेहमी सायलेंट webhook असते (डीफॉल्ट POST); url नसलेला पर्याय सर्व्हर नोंदवतो: पहिला टॅप फक्त-वाचनीय answer फील्डमध्ये जातो आणि Activity संपते. options पुन्हा पाठवल्यास नवी फेरी सुरू होते."
+        },
+        "source": {
+          "name": "स्रोत",
+          "description": "कार्ड शीर्षलेखात दाखवला जाणारा स्रोत बॅज (कमाल 24 अक्षरे)."
+        },
+        "details": {
+          "name": "तपशील",
+          "description": "ऑब्जेक्टच्या यादीच्या स्वरूपात कमाल 2 संदर्भ ओळी: label (आवश्यक, कमाल 24) आणि value (आवश्यक, कमाल 64)."
+        },
+        "on_expire": {
+          "name": "मुदत संपल्यावर",
+          "description": "End Date उलटल्यावर सर्व्हर उत्तर म्हणून नोंदवेल तो पर्याय id, किंवा बंद करण्यासाठी none. End Date आवश्यक."
+        },
+        "end_date": {
+          "name": "समाप्ती तारीख",
+          "description": "प्रश्नाची मुदत संपण्याचा Unix टाइमस्टँप (सेकंद). On Expire सोबत आवश्यक."
+        },
+        "state_text": {
+          "name": "स्थिती मजकूर",
+          "description": "Activity च्या स्थितीत दाखवला जाणारा मजकूर. कार्ड हाच प्रश्न विचारते."
+        },
+        "subtitle": {
+          "name": "उपशीर्षक",
+          "description": "Activity वर दाखवला जाणारा उपशीर्षक मजकूर."
+        },
+        "icon": {
+          "name": "आयकॉन",
+          "description": "SF Symbol किंवा MDI आयकॉनचे नाव (उदा. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "पूर्णता संदेश",
+          "description": "Activity समाप्त झाल्यावर दाखवला जाणारा संदेश."
+        },
+        "accent_color": {
+          "name": "Accent रंग",
+          "description": "Activity साठी accent रंग. Hex (#RRGGBB) किंवा नामित रंग."
+        },
+        "background_color": {
+          "name": "पार्श्वभूमी रंग",
+          "description": "Live Activity पार्श्वभूमी रंग. Hex (#RRGGBB) किंवा नामित रंग."
+        },
+        "text_color": {
+          "name": "मजकूर रंग",
+          "description": "Live Activity मजकूर रंग. Hex (#RRGGBB) किंवा नामित रंग."
+        },
+        "tap_action": {
+          "name": "टॅप क्रिया",
+          "description": "संपूर्ण activity टॅप लक्ष्य एक ऑब्जेक्ट म्हणून: url (आवश्यक), पर्यायी foreground, आणि http(s) url साठी method/headers/body द्वारे सायलेंट वेबहूक."
+        },
+        "sound": {
+          "name": "ध्वनी",
+          "description": "या अपडेटसाठी डिव्हाइसवर वाजवला जाणारा सूचना ध्वनी."
+        },
+        "priority": {
+          "name": "प्राधान्य ओव्हरराइड",
+          "description": "प्रति-अपडेट प्राधान्य (0-10). फक्त या पुशसाठी activity च्या कॉन्फिगर केलेल्या प्राधान्याला ओव्हरराइड करते."
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त झाल्यानंतर ती किती सेकंद ठेवायची."
+        },
+        "stale_ttl": {
+          "name": "जुना TTL",
+          "description": "Activity जुनी मानली जाण्यापूर्वीचे सेकंद."
+        },
+        "dismissal_ttl": {
+          "name": "काढून टाकण्याची TTL",
+          "description": "संपलेली अ‍ॅक्टिव्हिटी काढून टाकण्यापूर्वी लॉक स्क्रीनवर किती सेकंद राहते. 0 दिल्यास ती संपताच लगेच काढून टाकली जाते."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activity तयार करा",
       "description": "नवीन PushWard Live Activity तयार करा.",

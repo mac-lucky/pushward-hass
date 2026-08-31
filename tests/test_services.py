@@ -1371,10 +1371,11 @@ async def test_update_activity_countdown_rejects_zero_duration(hass: HomeAssista
 
 # --- universal action fields (all templates that render button slots) ---
 
-# board/log/media use a lean schema: only the whole-activity tap_action, no url /
-# secondary_url / url_action / secondary_url_action slots (board uses per-tile
-# url_action; log has no buttons; media has its transport row).
-_UNIVERSAL_ACTION_TEMPLATES = [t for t in SERVICE_TEMPLATES if t not in ("board", "log", "media")]
+# board/log/media/approval use a lean schema: only the whole-activity tap_action, no
+# url / secondary_url / url_action / secondary_url_action slots (board uses per-tile
+# url_action; log has no buttons; media has its transport row; approval has its
+# answer buttons).
+_UNIVERSAL_ACTION_TEMPLATES = [t for t in SERVICE_TEMPLATES if t not in ("board", "log", "media", "approval")]
 
 
 @pytest.mark.parametrize("template", _UNIVERSAL_ACTION_TEMPLATES)
@@ -2275,6 +2276,192 @@ async def test_media_fields_are_not_accepted_on_other_templates(hass: HomeAssist
             DOMAIN,
             f"update_activity_{template}",
             {"slug": "x", "state": "ongoing", "media_title": "Snooze"},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+# --- approval ----------------------------------------------------------------
+
+_APPROVAL_OPTIONS = [
+    {
+        "id": "approve",
+        "title": "Approve",
+        "style": "primary",
+        "url": "https://ha.example.com/api/webhook/approve-gate",
+        "headers": {"Authorization": "Bearer secret"},
+        "body": '{"gate": "front"}',
+    },
+    # url-less: the server signs an answer URL into it and records the first tap
+    # in the server-owned `answer` field.
+    {"id": "deny", "title": "Deny", "style": "destructive"},
+]
+
+
+async def test_update_activity_approval_forwards_fields(hass: HomeAssistant) -> None:
+    """update_activity_approval is a pass-through: options, details, source and the
+    expiry pair reach the PATCH content unchanged, and the result is something the
+    server would accept. The question itself rides state_text -> state."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    end_date = int(time.time()) + 600
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_approval",
+        {
+            "slug": "gate-request",
+            "state": "ongoing",
+            "state_text": "Open the gate?",
+            "source": "Home Assistant",
+            "details": [
+                {"label": "Requested by", "value": "Front gate keypad"},
+                {"label": "Zone", "value": "Driveway"},
+            ],
+            "on_expire": "deny",
+            "end_date": end_date,
+            "options": _APPROVAL_OPTIONS,
+            "tap_action": {"url": "homeassistant://navigate/lovelace/0"},
+        },
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    slug, state, content = api.update_activity.call_args[0]
+    assert (slug, state) == ("gate-request", "ongoing")
+    assert content["template"] == "approval"
+    assert content["state"] == "Open the gate?"
+    assert content["source"] == "Home Assistant"
+    assert content["details"] == [
+        {"label": "Requested by", "value": "Front gate keypad"},
+        {"label": "Zone", "value": "Driveway"},
+    ]
+    assert content["on_expire"] == "deny"
+    assert content["end_date"] == end_date
+    # The options arrive nested and intact: the webhook option keeps its headers and
+    # body, and the url-less deny option stays bare for the server to sign.
+    assert content["options"] == _APPROVAL_OPTIONS
+    assert content["tap_action"] == {"url": "homeassistant://navigate/lovelace/0"}
+    assert_valid_activity_content(content, where="update_activity_approval")
+
+
+async def test_update_activity_approval_defers_merged_content_rules_to_server(hass: HomeAssistant) -> None:
+    """on_expire without options may pair with the already-stored end_date (the
+    server validates the pairing on the merged content), and details [] is the
+    wholesale clearing form: both pass local validation and go out unchanged."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_approval",
+        {"slug": "x", "state": "ongoing", "on_expire": "none", "details": []},
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    _, _, content = api.update_activity.call_args[0]
+    assert content["on_expire"] == "none"
+    assert content["details"] == []
+    assert_valid_activity_content(content, where="update_activity_approval")
+
+
+@pytest.mark.parametrize(
+    "field", ["progress", "remaining_time", "url", "secondary_url", "url_action", "secondary_url_action"]
+)
+async def test_update_activity_approval_uses_the_lean_schema(hass: HomeAssistant, field: str) -> None:
+    """Approval renders its own answer buttons and no bar, so the action offers neither."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    value = {"url": "https://example.com"} if field.endswith("_action") else "https://example.com"
+    if field in ("progress", "remaining_time"):
+        value = 1
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "update_activity_approval", {"slug": "x", "state": "ongoing", field: value}, blocking=True
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_approval_rejects_foreground_option(hass: HomeAssistant) -> None:
+    """An approval option is answered silently (or via deep link): foreground is not a
+    key the schema knows, so the call fails at validation instead of the server 422-ing."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid, match="foreground"):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_approval",
+            {
+                "slug": "x",
+                "state": "ongoing",
+                "options": [
+                    {"id": "a", "title": "A", "url": "https://ha.example.com/x", "foreground": True},
+                    {"id": "b", "title": "B"},
+                ],
+            },
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"options": _APPROVAL_OPTIONS[:1]},
+        {"options": [{"id": f"o{i}", "title": "T", "icon": "checkmark"} for i in range(5)]},
+        {"options": [{"id": "same", "title": "A"}, {"id": "same", "title": "B"}]},
+        {"options": [{"id": "-bad", "title": "A"}, {"id": "ok", "title": "B"}]},
+        # \Z, not $: Python's $ would wave "approve\n" through and the server 422s it
+        {"options": [{"id": "approve\n", "title": "A"}, {"id": "ok", "title": "B"}]},
+        {"options": [{"id": "a" * 65, "title": "A"}, {"id": "ok", "title": "B"}]},
+        {"options": [{"id": "a", "title": ""}, {"id": "b", "title": "B"}]},
+        {"options": [{"id": "a", "title": "x" * 25}, {"id": "b", "title": "B"}]},
+        {"options": [{"id": "a", "title": "A", "style": "danger"}, {"id": "b", "title": "B"}]},
+        # three or more buttons render icon-only, so each needs an icon then
+        {"options": [{"id": f"o{i}", "title": "T"} for i in range(3)]},
+        # HTTP routing keys need an http(s) url to route
+        {"options": [{"id": "a", "title": "A", "method": "POST"}, {"id": "b", "title": "B"}]},
+        {"options": [{"id": "a", "title": "A", "url": "homeassistant://x", "body": "x"}, {"id": "b", "title": "B"}]},
+        {"source": "x" * 25},
+        {"details": [{"label": "L", "value": "V"}] * 3},
+        {"details": [{"label": "L"}]},
+        # on_expire must name one of the options riding the same call; the
+        # end_date pairing is the server's (merged content may hold the deadline)
+        {
+            "on_expire": "missing",
+            "end_date": 1755500000,
+            "options": [{"id": "a", "title": "A"}, {"id": "b", "title": "B"}],
+        },
+        # answer is server-owned and not a key the schema knows
+        {"answer": {"option": "a", "at": 1755500000, "by": "user"}},
+    ],
+)
+async def test_update_activity_approval_rejects_out_of_contract_values(hass: HomeAssistant, data: dict) -> None:
+    """The service schema mirrors the server's approval bounds, so a bad value fails locally."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "update_activity_approval", {"slug": "x", "state": "ongoing", **data}, blocking=True
+        )
+    api.update_activity.assert_not_awaited()
+
+
+@pytest.mark.parametrize("template", [t for t in SERVICE_TEMPLATES if t != "approval"])
+async def test_approval_fields_are_not_accepted_on_other_templates(hass: HomeAssistant, template: str) -> None:
+    """The server 422s approval fields off the approval template; the per-template schemas never offer them."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            f"update_activity_{template}",
+            {"slug": "x", "state": "ongoing", "options": [{"id": "a", "title": "A"}, {"id": "b", "title": "B"}]},
             blocking=True,
         )
     api.update_activity.assert_not_awaited()

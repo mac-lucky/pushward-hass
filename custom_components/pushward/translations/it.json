@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Aggiorna attività (Approval)",
+      "description": "Aggiorna una Live Activity di approvazione PushWard: una scheda con una domanda e 2-4 pulsanti di risposta che chiamano i tuoi webhook o registrano sul server l'opzione toccata.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatore slug dell'attività."
+        },
+        "state": {
+          "name": "Stato",
+          "description": "Stato desiderato dell'attività."
+        },
+        "options": {
+          "name": "Opzioni",
+          "description": "Elenco di 2-4 pulsanti di risposta. Ciascuno: id (obbligatorio, max 64), title (obbligatorio, max 24) e facoltativi style (primary/secondary/destructive), icon (obbligatorio con 3 o più pulsanti), url, method, headers, body. Un url http(s) è sempre un webhook silenzioso (POST predefinito); un'opzione senza url viene registrata dal server: il primo tocco finisce nel campo answer di sola lettura e l'attività termina. Reinviare options avvia un nuovo giro."
+        },
+        "source": {
+          "name": "Origine",
+          "description": "Badge dell'origine mostrato nell'intestazione della scheda (max 24 caratteri)."
+        },
+        "details": {
+          "name": "Dettagli",
+          "description": "Fino a 2 righe di contesto come elenco di oggetti: label (obbligatorio, max 24) e value (obbligatorio, max 64)."
+        },
+        "on_expire": {
+          "name": "Alla scadenza",
+          "description": "Id dell'opzione che il server registra come risposta al superamento della data di fine, oppure none per disattivare. Richiede la data di fine."
+        },
+        "end_date": {
+          "name": "Data di fine",
+          "description": "Timestamp Unix (secondi) in cui la domanda scade. Obbligatorio insieme ad Alla scadenza."
+        },
+        "state_text": {
+          "name": "Testo stato",
+          "description": "Testo visualizzato come stato dell'attività. È la domanda che pone la scheda."
+        },
+        "subtitle": {
+          "name": "Sottotitolo",
+          "description": "Testo del sottotitolo visualizzato nell'attività."
+        },
+        "icon": {
+          "name": "Icona",
+          "description": "Nome icona SF Symbol o MDI (es. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Messaggio di completamento",
+          "description": "Messaggio visualizzato al termine dell'attività."
+        },
+        "accent_color": {
+          "name": "Colore accento",
+          "description": "Colore accento per l'attività. Esadecimale (#RRGGBB) o nome del colore."
+        },
+        "background_color": {
+          "name": "Colore sfondo",
+          "description": "Colore di sfondo della Live Activity. Esadecimale (#RRGGBB) o nome del colore."
+        },
+        "text_color": {
+          "name": "Colore testo",
+          "description": "Colore del testo della Live Activity. Esadecimale (#RRGGBB) o nome del colore."
+        },
+        "tap_action": {
+          "name": "Azione al tocco",
+          "description": "Bersaglio del tocco sull'intera attività come oggetto: url (obbligatorio), foreground facoltativo e, per un url http(s), un webhook silenzioso tramite method/headers/body."
+        },
+        "sound": {
+          "name": "Suono",
+          "description": "Suono di notifica riprodotto sul dispositivo per questo aggiornamento."
+        },
+        "priority": {
+          "name": "Priorità temporanea",
+          "description": "Priorità per singolo aggiornamento (0-10). Sostituisce la priorità configurata dell'attività solo per questo push."
+        },
+        "ended_ttl": {
+          "name": "TTL terminazione",
+          "description": "Secondi durante i quali conservare l'attività dopo la sua conclusione."
+        },
+        "stale_ttl": {
+          "name": "TTL inattività",
+          "description": "Secondi prima che l'attività venga considerata obsoleta."
+        },
+        "dismissal_ttl": {
+          "name": "TTL di rimozione",
+          "description": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine."
+        }
+      }
+    },
     "create_activity": {
       "name": "Crea attività",
       "description": "Creare una nuova PushWard Live Activity.",

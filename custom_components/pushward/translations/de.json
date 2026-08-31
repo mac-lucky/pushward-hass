@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Live Activity aktualisieren (Approval)",
+      "description": "Aktualisiert eine PushWard-Freigabe-Live-Activity: eine Fragekarte mit 2-4 Antwort-Buttons, die eigene Webhooks aufrufen oder die angetippte Option serverseitig aufzeichnen.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-Kennung der Live Activity."
+        },
+        "state": {
+          "name": "Zustand",
+          "description": "Gewünschter Zustand der Live Activity."
+        },
+        "options": {
+          "name": "Optionen",
+          "description": "Liste von 2-4 Antwort-Buttons. Je Button: id (erforderlich, max. 64), title (erforderlich, max. 24), optional style (primary/secondary/destructive), icon (ab 3 Buttons erforderlich), url, method, headers, body. Eine http(s)-URL ist immer ein stiller Webhook (Standard POST); eine Option ohne url zeichnet der Server auf: der erste Tipp landet im schreibgeschützten Feld answer und die Activity endet. Erneutes Senden von options startet eine neue Runde."
+        },
+        "source": {
+          "name": "Quelle",
+          "description": "Absender-Badge im Kartenkopf (max. 24 Zeichen)."
+        },
+        "details": {
+          "name": "Details",
+          "description": "Bis zu 2 Kontextzeilen als Liste von Objekten: label (erforderlich, max. 24) und value (erforderlich, max. 64)."
+        },
+        "on_expire": {
+          "name": "Bei Ablauf",
+          "description": "Options-id, die der Server beim Erreichen des Enddatums als Antwort aufzeichnet, oder none zum Deaktivieren. Erfordert das Enddatum."
+        },
+        "end_date": {
+          "name": "Enddatum",
+          "description": "Unix-Zeitstempel (Sekunden), zu dem die Frage abläuft. Erforderlich zusammen mit Bei Ablauf."
+        },
+        "state_text": {
+          "name": "Zustandstext",
+          "description": "Als Zustand angezeigter Text. Das ist die Frage, die die Karte stellt."
+        },
+        "subtitle": {
+          "name": "Untertitel",
+          "description": "Auf der Live Activity angezeigter Untertitel."
+        },
+        "icon": {
+          "name": "Symbol",
+          "description": "Name eines SF Symbols oder MDI-Symbols (z. B. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Abschlussnachricht",
+          "description": "Nachricht, die beim Beenden der Live Activity angezeigt wird."
+        },
+        "accent_color": {
+          "name": "Akzentfarbe",
+          "description": "Akzentfarbe für die Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "background_color": {
+          "name": "Hintergrundfarbe",
+          "description": "Hintergrundfarbe der Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "text_color": {
+          "name": "Textfarbe",
+          "description": "Textfarbe der Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
+        },
+        "tap_action": {
+          "name": "Tippaktion",
+          "description": "Tippziel der gesamten Live Activity als Objekt: url (erforderlich), optional foreground und – bei einer http(s)-URL – ein stiller Webhook über method/headers/body."
+        },
+        "sound": {
+          "name": "Ton",
+          "description": "Benachrichtigungston, der bei diesem Update auf dem Gerät abgespielt wird."
+        },
+        "priority": {
+          "name": "Priorität überschreiben",
+          "description": "Priorität pro Update (0–10). Überschreibt die konfigurierte Priorität der Live Activity nur für diesen Push."
+        },
+        "ended_ttl": {
+          "name": "TTL nach Beendigung",
+          "description": "Sekunden, die die Live Activity nach dem Beenden erhalten bleibt."
+        },
+        "stale_ttl": {
+          "name": "TTL bei Inaktivität",
+          "description": "Sekunden, bevor die Live Activity als veraltet gilt."
+        },
+        "dismissal_ttl": {
+          "name": "TTL für Entfernung",
+          "description": "Sekunden, die die beendete Aktivität auf dem Sperrbildschirm verbleibt, bevor sie entfernt wird. 0 entfernt sie sofort bei Ende."
+        }
+      }
+    },
     "create_activity": {
       "name": "Live Activity erstellen",
       "description": "Eine neue PushWard Live Activity erstellen.",

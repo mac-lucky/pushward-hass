@@ -17,6 +17,9 @@ from custom_components.pushward.const import (
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
     CONF_ALARM,
+    CONF_APPROVAL_DETAILS,
+    CONF_APPROVAL_OPTIONS,
+    CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
@@ -206,6 +209,9 @@ def make_entity_config(**overrides) -> dict:
         CONF_MEDIA_CONTROLS: DEFAULT_MEDIA_CONTROLS,
         CONF_MEDIA_FAVORITE_SCRIPT: "",
         CONF_MEDIA_TOKEN: "",
+        CONF_APPROVAL_OPTIONS: [],
+        CONF_APPROVAL_DETAILS: [],
+        CONF_APPROVAL_SOURCE: "",
     }
     config.update(overrides)
     return config

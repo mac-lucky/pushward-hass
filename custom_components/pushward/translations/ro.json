@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Actualizați activitatea (Approval)",
+      "description": "Actualizează o Live Activity de aprobare PushWard: un card cu o întrebare și 2-4 butoane de răspuns care apelează webhook-urile tale sau înregistrează pe server opțiunea atinsă.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "options": {
+          "name": "Opțiuni",
+          "description": "Listă de 2-4 butoane de răspuns. Fiecare: id (obligatoriu, max. 64), title (obligatoriu, max. 24) și opțional style (primary/secondary/destructive), icon (obligatoriu la 3 sau mai multe butoane), url, method, headers, body. Un url http(s) este întotdeauna un webhook silențios (implicit POST); o opțiune fără url este înregistrată de server: prima atingere ajunge în câmpul answer doar-citire și activitatea se încheie. Retrimiterea options începe o rundă nouă."
+        },
+        "source": {
+          "name": "Sursă",
+          "description": "Insigna sursei afișată în antetul cardului (max. 24 de caractere)."
+        },
+        "details": {
+          "name": "Detalii",
+          "description": "Până la 2 rânduri de context ca listă de obiecte: label (obligatoriu, max. 24) și value (obligatoriu, max. 64)."
+        },
+        "on_expire": {
+          "name": "La expirare",
+          "description": "Id-ul opțiunii pe care serverul o înregistrează ca răspuns când trece data de sfârșit, sau none pentru dezactivare. Necesită data de sfârșit."
+        },
+        "end_date": {
+          "name": "Dată de încheiere",
+          "description": "Marcaj de timp Unix (secunde) la care expiră întrebarea. Obligatoriu împreună cu La expirare."
+        },
+        "state_text": {
+          "name": "Text stare",
+          "description": "Textul afișat ca stare a activității. Aceasta este întrebarea pe care o pune cardul."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Culoarea de accent pentru activitate. Hex (#RRGGBB) sau culoare numită."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. Hex (#RRGGBB) sau culoare numită."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. Hex (#RRGGBB) sau culoare numită."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Sunetul de notificare redat pe dispozitiv pentru această actualizare."
+        },
+        "priority": {
+          "name": "Suprascriere prioritate",
+          "description": "Prioritate per actualizare (0-10). Suprascrie prioritatea configurată a activității doar pentru acest push."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
+        }
+      }
+    },
     "create_activity": {
       "name": "Creați activitatea",
       "description": "Creați un nou PushWard Live Activity.",

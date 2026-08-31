@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Activity अपडेट करें (Approval)",
+      "description": "PushWard अनुमोदन Live Activity अपडेट करें: 2-4 उत्तर बटनों वाला एक प्रश्न कार्ड, जो आपके अपने webhooks को कॉल करता है या टैप किए गए विकल्प को सर्वर पर दर्ज करता है।",
+      "fields": {
+        "slug": {
+          "name": "स्लग",
+          "description": "Activity का slug पहचानकर्ता।"
+        },
+        "state": {
+          "name": "स्थिति",
+          "description": "Activity की वांछित स्थिति।"
+        },
+        "options": {
+          "name": "विकल्प",
+          "description": "2-4 उत्तर बटनों की सूची। प्रत्येक: id (आवश्यक, अधिकतम 64), title (आवश्यक, अधिकतम 24), और वैकल्पिक style (primary/secondary/destructive), icon (3 या अधिक बटन होने पर आवश्यक), url, method, headers, body। http(s) url हमेशा एक साइलेंट webhook होता है (डिफ़ॉल्ट POST); url के बिना विकल्प को सर्वर दर्ज करता है: पहला टैप केवल-पढ़ने योग्य answer फ़ील्ड में जाता है और Activity समाप्त हो जाती है। options दोबारा भेजने से नया दौर शुरू होता है।"
+        },
+        "source": {
+          "name": "स्रोत",
+          "description": "कार्ड हेडर में दिखाया जाने वाला स्रोत बैज (अधिकतम 24 अक्षर)।"
+        },
+        "details": {
+          "name": "विवरण",
+          "description": "ऑब्जेक्ट की सूची के रूप में अधिकतम 2 संदर्भ पंक्तियाँ: label (आवश्यक, अधिकतम 24) और value (आवश्यक, अधिकतम 64)।"
+        },
+        "on_expire": {
+          "name": "समाप्ति पर",
+          "description": "वह विकल्प id जिसे End Date बीतने पर सर्वर उत्तर के रूप में दर्ज करता है, या निष्क्रिय करने के लिए none। End Date आवश्यक है।"
+        },
+        "end_date": {
+          "name": "समाप्ति तिथि",
+          "description": "Unix टाइमस्टैम्प (सेकंड) जब प्रश्न की समय-सीमा समाप्त होती है। On Expire के साथ आवश्यक।"
+        },
+        "state_text": {
+          "name": "स्थिति पाठ",
+          "description": "Activity की स्थिति के रूप में दिखाया जाने वाला पाठ। यही वह प्रश्न है जो कार्ड पूछता है।"
+        },
+        "subtitle": {
+          "name": "उपशीर्षक",
+          "description": "Activity पर दिखाया जाने वाला उपशीर्षक पाठ।"
+        },
+        "icon": {
+          "name": "आइकन",
+          "description": "SF Symbol या MDI आइकन नाम (जैसे questionmark.circle.fill, mdi:help-circle)।"
+        },
+        "completion_message": {
+          "name": "पूर्णता संदेश",
+          "description": "Activity समाप्त होने पर दिखाया जाने वाला संदेश।"
+        },
+        "accent_color": {
+          "name": "Accent रंग",
+          "description": "Activity के लिए accent रंग। Hex (#RRGGBB) या नामित रंग।"
+        },
+        "background_color": {
+          "name": "पृष्ठभूमि रंग",
+          "description": "Live Activity के लिए पृष्ठभूमि रंग। Hex (#RRGGBB) या नामित रंग।"
+        },
+        "text_color": {
+          "name": "पाठ रंग",
+          "description": "Live Activity के लिए पाठ रंग। Hex (#RRGGBB) या नामित रंग।"
+        },
+        "tap_action": {
+          "name": "टैप क्रिया",
+          "description": "पूरी एक्टिविटी का टैप लक्ष्य, एक ऑब्जेक्ट के रूप में: url (आवश्यक), वैकल्पिक foreground, और http(s) url के लिए method/headers/body के ज़रिए एक साइलेंट वेबहुक।"
+        },
+        "sound": {
+          "name": "ध्वनि",
+          "description": "इस अपडेट के लिए डिवाइस पर बजाई जाने वाली सूचना ध्वनि।"
+        },
+        "priority": {
+          "name": "प्राथमिकता ओवरराइड",
+          "description": "प्रति-अपडेट प्राथमिकता (0-10)। केवल इस पुश के लिए Activity की कॉन्फ़िगर की गई प्राथमिकता को ओवरराइड करती है।"
+        },
+        "ended_ttl": {
+          "name": "समाप्त TTL",
+          "description": "Activity समाप्त होने के बाद उसे रखने के सेकंड।"
+        },
+        "stale_ttl": {
+          "name": "पुराना TTL",
+          "description": "Activity को stale मानने से पहले के सेकंड।"
+        },
+        "dismissal_ttl": {
+          "name": "हटाने की TTL",
+          "description": "समाप्त गतिविधि हटाए जाने से पहले लॉक स्क्रीन पर कितने सेकंड तक बनी रहती है। 0 इसे समाप्ति पर तुरंत हटा देता है।"
+        }
+      }
+    },
     "create_activity": {
       "name": "Activity बनाएं",
       "description": "नई PushWard Live Activity बनाएं।",

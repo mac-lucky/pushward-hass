@@ -34,6 +34,14 @@ from urllib.parse import urlparse
 
 from custom_components.pushward.const import (
     ACTIVITY_UNIT_MAX,
+    APPROVAL_DETAIL_LABEL_MAX,
+    APPROVAL_DETAIL_VALUE_MAX,
+    APPROVAL_DETAILS_MAX,
+    APPROVAL_OPTION_STYLES,
+    APPROVAL_OPTION_TITLE_MAX,
+    APPROVAL_OPTIONS_MAX,
+    APPROVAL_OPTIONS_MIN,
+    APPROVAL_SOURCE_MAX,
     BOARD_MAX_TILES,
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
@@ -140,6 +148,14 @@ MEDIA_FIELDS = (
     "favorite",
     "controls",
 )
+# The approval-only content fields; the server 422s them on every other template.
+# `answer` (who tapped what, when) is server-owned and a violation even on
+# approval itself, so it rides the leak tuple AND gets a key-presence check there.
+APPROVAL_FIELDS = ("options", "source", "details", "on_expire", "answer")
+# Restated rather than imported, like the template allowlists above: the same
+# leading-alphanumeric / [a-zA-Z0-9_-] / 64-char rule as an activity slug.
+# \Z, not $: Python's $ also matches before a trailing newline; the server's does not.
+_APPROVAL_OPTION_ID_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}\Z")
 
 # Padded standard-alphabet base64 - the only form Swift's Data(base64Encoded:) reads.
 _THUMBHASH_B64_RE = re.compile(r"[A-Za-z0-9+/]+={0,2}")
@@ -264,6 +280,8 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     _assert_image(content, where, template)
     # And again for the media fields: media_title on a generic card is a 422, not a no-op.
     _assert_media(content, where, template)
+    # And the approval fields, for the same reason.
+    _assert_approval(content, where, template)
 
     if template == "generic":
         _assert_generic(content, where)
@@ -415,6 +433,115 @@ def _assert_media(content: dict, where: str, template: str) -> None:
         _check_media_control(action, field, where)
         if not action.get("icon"):
             _fail(where, f"{field}.icon is required")
+
+
+def _check_approval_option(option: object, field: str, where: str) -> None:
+    """One answer button: id+title, bounded, and any url routed like a media control."""
+    if not isinstance(option, dict):
+        _fail(where, f"{field} must be an object, got {type(option).__name__}")
+    option_id = option.get("id")
+    if not isinstance(option_id, str) or not _APPROVAL_OPTION_ID_RE.match(option_id):
+        _fail(where, f"{field}.id must match {_APPROVAL_OPTION_ID_RE.pattern}, got {option_id!r}")
+    title = option.get("title")
+    if not title or not str(title).strip():
+        _fail(where, f"{field}.title is required")
+    _check_len(title, APPROVAL_OPTION_TITLE_MAX, f"{field}.title", where)
+    style = option.get("style")
+    if style not in (None, "") and style not in APPROVAL_OPTION_STYLES:
+        _fail(where, f"{field}.style must be one of {list(APPROVAL_OPTION_STYLES)}, got {style!r}")
+    _check_len(option.get("icon"), MAX_TAP_ACTION_ICON_LEN, f"{field}.icon", where)
+    url = option.get("url")
+    if url in (None, ""):
+        # A url-less option is answered through a server-signed URL; the HTTP
+        # routing keys would have nothing to route.
+        for key in ("method", "headers", "body", "foreground"):
+            # Truthiness, not presence: `foreground: false` or empty headers carry
+            # nothing to route, and the server's checks are length-based.
+            if option.get(key):
+                _fail(where, f"{field}.{key} requires a url")
+        return
+    _check_len(url, MAX_URL_LEN, f"{field}.url", where)
+    scheme = urlparse(str(url)).scheme.lower()
+    if scheme in _HTTP_SCHEMES:
+        if option.get("foreground") is True:
+            _fail(where, f"{field}: an http(s) option is always a silent webhook; foreground is not allowed")
+    elif any(option.get(k) for k in ("method", "headers", "body")):
+        _fail(where, f"{field} sets method/headers/body but url scheme {scheme!r} is not http(s)")
+
+
+def _assert_approval(content: dict, where: str, template: str) -> None:
+    """The approval template's fields: approval only, bounded, answer server-owned."""
+    # "" counts as absent, as it does for the image trio, and so do [] and {}:
+    # the server's presence checks are length-based, a cleared field is not a leak.
+    present = [f for f in APPROVAL_FIELDS if content.get(f) not in (None, "", [], {})]
+    if template != "approval":
+        if present:
+            _fail(where, f"{present} are only supported by the 'approval' template, got {template!r}")
+        return
+
+    if "answer" in content:
+        _fail(where, "approval must not send answer (server-owned field)")
+    # The card renders its own answer buttons and no button row or alarm; the
+    # server rejects these outright on this template rather than ignoring them.
+    for field in ("url_action", "secondary_url_action", "alarm", "snooze_seconds"):
+        if content.get(field) is not None:
+            _fail(where, f"{field} is not supported by the 'approval' template")
+
+    options = content.get("options")
+    if options is not None:
+        if not isinstance(options, list):
+            _fail(where, f"options must be a list, got {type(options).__name__}")
+        if not (APPROVAL_OPTIONS_MIN <= len(options) <= APPROVAL_OPTIONS_MAX):
+            _fail(
+                where,
+                f"approval requires {APPROVAL_OPTIONS_MIN}-{APPROVAL_OPTIONS_MAX} options, got {len(options)}",
+            )
+        for i, option in enumerate(options):
+            _check_approval_option(option, f"options[{i}]", where)
+        ids = [option.get("id") for option in options]
+        if len(set(ids)) != len(ids):
+            _fail(where, f"option ids must be unique, got {ids}")
+        # Three or more buttons render icon-only, so each needs an icon then.
+        if len(options) >= 3 and not all(option.get("icon") for option in options):
+            _fail(where, "every option needs an icon when there are three or more options")
+
+    _check_len(content.get("source"), APPROVAL_SOURCE_MAX, "source", where)
+
+    details = content.get("details")
+    if details is not None:
+        if not isinstance(details, list):
+            _fail(where, f"details must be a list, got {type(details).__name__}")
+        # [] is accepted: details replace wholesale, so an empty list is the
+        # clearing form, not a violation.
+        if len(details) > APPROVAL_DETAILS_MAX:
+            _fail(where, f"details supports at most {APPROVAL_DETAILS_MAX} rows, got {len(details)}")
+        for i, row in enumerate(details):
+            if not isinstance(row, dict):
+                _fail(where, f"details[{i}] must be an object, got {type(row).__name__}")
+            # label and value are the same shape: a required, capped string.
+            for key, cap in (("label", APPROVAL_DETAIL_LABEL_MAX), ("value", APPROVAL_DETAIL_VALUE_MAX)):
+                text = row.get(key)
+                if not text or not str(text).strip():
+                    _fail(where, f"details[{i}].{key} is required")
+                _check_len(text, cap, f"details[{i}].{key}", where)
+
+    end_date = content.get("end_date")
+    if end_date is not None:
+        if not _is_int(end_date) or end_date <= 0:
+            _fail(where, f"approval end_date must be a positive timestamp, got {end_date!r}")
+        if end_date > _now() + MAX_FUTURE_OFFSET:
+            _fail(where, f"approval end_date must be within 5 years of now, got {end_date}")
+
+    on_expire = content.get("on_expire")
+    if on_expire not in (None, ""):
+        if on_expire != "none" and (not isinstance(on_expire, str) or not _APPROVAL_OPTION_ID_RE.match(on_expire)):
+            _fail(where, f'on_expire must be an option id or "none", got {on_expire!r}')
+        # The server checks the end_date pairing on the MERGED content, and even
+        # a new round may inherit the stored deadline - that check is the
+        # server's alone. Options replace wholesale, so sent equals merged and
+        # membership is the one locally checkable rule ("none" skips it).
+        if on_expire != "none" and options and on_expire not in [option.get("id") for option in options]:
+            _fail(where, f"on_expire {on_expire!r} must name one of the sent options")
 
 
 def _assert_live_progress(content: dict, where: str, template: str) -> None:

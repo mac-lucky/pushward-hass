@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "سرگرمی اپڈیٹ کریں (Approval)",
+      "description": "PushWard منظوری Live Activity اپڈیٹ کریں: 2-4 جوابی بٹنوں والا سوالیہ کارڈ، جو آپ کے اپنے webhooks کو کال کرتے ہیں یا ٹیپ کیا گیا اختیار سرور پر درج کرتے ہیں۔",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "سرگرمی کی slug شناخت۔"
+        },
+        "state": {
+          "name": "حالت",
+          "description": "سرگرمی کی مطلوبہ حالت۔"
+        },
+        "options": {
+          "name": "اختیارات",
+          "description": "2-4 جوابی بٹنوں کی فہرست۔ ہر ایک: id (لازمی، زیادہ سے زیادہ 64)، title (لازمی، زیادہ سے زیادہ 24)، اور اختیاری style (primary/secondary/destructive)، icon (3 یا زیادہ بٹن ہونے پر لازمی)، url، method، headers، body۔ http(s) url ہمیشہ خاموش webhook ہوتا ہے (ڈیفالٹ POST)؛ url کے بغیر اختیار کو سرور درج کرتا ہے: پہلا ٹیپ صرف پڑھنے والے answer فیلڈ میں جاتا ہے اور سرگرمی ختم ہو جاتی ہے۔ options دوبارہ بھیجنے سے نیا دور شروع ہوتا ہے۔"
+        },
+        "source": {
+          "name": "ماخذ",
+          "description": "کارڈ کے ہیڈر میں دکھایا جانے والا ماخذ بیج (زیادہ سے زیادہ 24 حروف)۔"
+        },
+        "details": {
+          "name": "تفصیلات",
+          "description": "آبجیکٹس کی فہرست کے طور پر زیادہ سے زیادہ 2 سیاق و سباق کی قطاریں: label (لازمی، زیادہ سے زیادہ 24) اور value (لازمی، زیادہ سے زیادہ 64)۔"
+        },
+        "on_expire": {
+          "name": "میعاد ختم ہونے پر",
+          "description": "وہ اختیار id جسے End Date گزرنے پر سرور جواب کے طور پر درج کرتا ہے، یا غیر فعال کرنے کے لیے none۔ End Date درکار ہے۔"
+        },
+        "end_date": {
+          "name": "اختتام کی تاریخ",
+          "description": "Unix ٹائم اسٹیمپ (سیکنڈ) جب سوال کی میعاد ختم ہوتی ہے۔ On Expire کے ساتھ لازمی۔"
+        },
+        "state_text": {
+          "name": "حالت کا متن",
+          "description": "سرگرمی کی حالت کے طور پر دکھایا جانے والا متن۔ یہی وہ سوال ہے جو کارڈ پوچھتا ہے۔"
+        },
+        "subtitle": {
+          "name": "ذیلی عنوان",
+          "description": "سرگرمی پر دکھایا جانے والا ذیلی عنوان۔"
+        },
+        "icon": {
+          "name": "آئیکن",
+          "description": "SF Symbol یا MDI آئیکن کا نام (مثلاً questionmark.circle.fill، mdi:help-circle)۔"
+        },
+        "completion_message": {
+          "name": "تکمیل کا پیغام",
+          "description": "سرگرمی ختم ہونے پر دکھایا جانے والا پیغام۔"
+        },
+        "accent_color": {
+          "name": "لہجے کا رنگ",
+          "description": "سرگرمی کے لیے لہجے کا رنگ۔ Hex (#RRGGBB) یا نامزد رنگ۔"
+        },
+        "background_color": {
+          "name": "پس منظر کا رنگ",
+          "description": "Live Activity کے لیے پس منظر کا رنگ۔ Hex (#RRGGBB) یا نامزد رنگ۔"
+        },
+        "text_color": {
+          "name": "متن کا رنگ",
+          "description": "Live Activity کے لیے متن کا رنگ۔ Hex (#RRGGBB) یا نامزد رنگ۔"
+        },
+        "tap_action": {
+          "name": "ٹیپ ایکشن",
+          "description": "پوری سرگرمی کا ٹیپ ہدف بطور آبجیکٹ: url (لازمی)، اختیاری foreground، اور http(s) url کے لیے method/headers/body کے ذریعے خاموش webhook۔"
+        },
+        "sound": {
+          "name": "آواز",
+          "description": "اس اپڈیٹ کے لیے آلے پر بجائی جانے والی اطلاع کی آواز۔"
+        },
+        "priority": {
+          "name": "ترجیح کا اوور رائڈ",
+          "description": "فی اپڈیٹ ترجیح (0-10)۔ صرف اس پش کے لیے سرگرمی کی کنفیگر شدہ ترجیح کو اوور رائڈ کرتا ہے۔"
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "سرگرمی ختم ہونے کے بعد اسے برقرار رکھنے کے سیکنڈ۔"
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "سرگرمی کو پرانا سمجھے جانے سے پہلے کے سیکنڈ۔"
+        },
+        "dismissal_ttl": {
+          "name": "ہٹانے کی TTL",
+          "description": "ختم شدہ سرگرمی ہٹائے جانے سے پہلے لاک اسکرین پر کتنے سیکنڈ رہتی ہے۔ 0 اسے ختم ہوتے ہی فوراً ہٹا دیتا ہے۔"
+        }
+      }
+    },
     "create_activity": {
       "name": "سرگرمی بنائیں",
       "description": "نئی PushWard Live Activity بنائیں۔",

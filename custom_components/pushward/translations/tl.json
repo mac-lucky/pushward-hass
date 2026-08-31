@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "I-update ang Activity (Approval)",
+      "description": "I-update ang isang PushWard approval Live Activity: isang question card na may 2-4 na answer button na tumatawag sa sarili mong mga webhook o nagtatala sa server ng na-tap na opsyon.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "options": {
+          "name": "Mga Opsyon",
+          "description": "Listahan ng 2-4 na answer button. Bawat isa: id (kailangan, max 64), title (kailangan, max 24), at opsyonal na style (primary/secondary/destructive), icon (kailangan kapag 3 o higit pang button), url, method, headers, body. Ang http(s) url ay laging tahimik na webhook (default POST); ang opsyong walang url ay itinatala ng server: ang unang tap ay napupunta sa read-only na answer field at nagtatapos ang activity. Ang muling pagpapadala ng options ay nagsisimula ng bagong round."
+        },
+        "source": {
+          "name": "Pinagmulan",
+          "description": "Badge ng pinagmulan na ipinapakita sa header ng card (max 24 na character)."
+        },
+        "details": {
+          "name": "Mga Detalye",
+          "description": "Hanggang 2 context row bilang listahan ng mga object: label (kailangan, max 24) at value (kailangan, max 64)."
+        },
+        "on_expire": {
+          "name": "Kapag Nag-expire",
+          "description": "Id ng opsyong itatala ng server bilang sagot kapag lumipas ang End Date, o none para i-disable. Kailangan ang End Date."
+        },
+        "end_date": {
+          "name": "Petsa ng Pagtatapos",
+          "description": "Unix timestamp (segundo) kung kailan mag-e-expire ang tanong. Kailangan kasama ng Kapag Nag-expire."
+        },
+        "state_text": {
+          "name": "Teksto ng Estado",
+          "description": "Tekstong ipinapakita bilang estado ng activity. Ito ang tanong na itinatanong ng card."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent na Kulay",
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Background color para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Tunog ng notification na tinutugtog sa device para sa update na ito."
+        },
+        "priority": {
+          "name": "Override ng Priyoridad",
+          "description": "Priyoridad kada update (0-10). Nino-override ang naka-configure na priyoridad ng activity para sa push na ito lamang."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
+        }
+      }
+    },
     "create_activity": {
       "name": "Lumikha ng Activity",
       "description": "Lumikha ng bagong PushWard Live Activity.",

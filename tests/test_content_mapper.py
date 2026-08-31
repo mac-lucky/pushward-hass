@@ -8,9 +8,16 @@ import pytest
 import voluptuous as vol
 
 from custom_components.pushward.const import (
+    APPROVAL_DETAIL_LABEL_MAX,
+    APPROVAL_DETAIL_VALUE_MAX,
+    APPROVAL_OPTION_TITLE_MAX,
+    APPROVAL_SOURCE_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ALARM,
+    CONF_APPROVAL_DETAILS,
+    CONF_APPROVAL_OPTIONS,
+    CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPLETION_MESSAGE,
@@ -3626,3 +3633,134 @@ def test_media_completion_stops_the_scrubber():
     assert content["playback_state"] == "stopped"
     assert content["progress"] == 0.0
     assert_valid_activity_content(content, where="media completion")
+
+
+# --- approval template -------------------------------------------------------
+
+
+_GATE_OPTIONS = [
+    {
+        "id": "approve",
+        "title": "Approve",
+        "style": "primary",
+        "url": "https://ha.example.com/api/webhook/approve-gate",
+    },
+    # url-less: the server signs an answer URL into it and records the first tap.
+    {"id": "deny", "title": "Deny", "style": "destructive"},
+]
+
+
+def _approval_config(**overrides) -> dict:
+    config = {CONF_TEMPLATE: "approval", CONF_APPROVAL_OPTIONS: [dict(o) for o in _GATE_OPTIONS]}
+    config.update(overrides)
+    return config
+
+
+def test_approval_maps_the_configured_question_card():
+    state = _make_state("on", {"friendly_name": "Front Gate"})
+    config = _approval_config(
+        **{
+            CONF_APPROVAL_SOURCE: "Home Assistant",
+            CONF_APPROVAL_DETAILS: [{"label": "Requested by", "value": "Front gate keypad"}],
+        }
+    )
+    content = map_content(state, config)
+
+    assert content["template"] == "approval"
+    # The webhook option is routed like build_tap_action routes a silent action:
+    # an empty method on an http(s) url is filled to POST.
+    assert content["options"][0] == {**_GATE_OPTIONS[0], "method": "POST"}
+    # The url-less option stays bare for the server to sign an answer URL into.
+    assert content["options"][1] == _GATE_OPTIONS[1]
+    assert content["source"] == "Home Assistant"
+    assert content["details"] == [{"label": "Requested by", "value": "Front gate keypad"}]
+    assert content["progress"] == 0.0
+    assert_valid_activity_content(content, where="approval")
+
+
+def test_approval_truncates_the_capped_strings():
+    config = _approval_config(
+        **{
+            CONF_APPROVAL_OPTIONS: [{"id": "a", "title": "x" * 40}, {"id": "b", "title": "B"}],
+            CONF_APPROVAL_SOURCE: "s" * 40,
+            CONF_APPROVAL_DETAILS: [{"label": "l" * 40, "value": "v" * 80}],
+        }
+    )
+    content = map_content(_make_state("on", {}), config)
+
+    assert content["options"][0]["title"] == "x" * APPROVAL_OPTION_TITLE_MAX
+    assert content["source"] == "s" * APPROVAL_SOURCE_MAX
+    assert content["details"] == [{"label": "l" * APPROVAL_DETAIL_LABEL_MAX, "value": "v" * APPROVAL_DETAIL_VALUE_MAX}]
+    assert_valid_activity_content(content, where="approval truncation")
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        # fewer than two usable rows (the second one has no id)
+        [{"id": "only", "title": "Only"}, {"title": "no id"}],
+        # three-plus buttons render icon-only, so a missing icon drops the set
+        [{"id": f"o{i}", "title": "T"} for i in range(3)],
+        # duplicate ids
+        [{"id": "same", "title": "A"}, {"id": "same", "title": "B"}],
+    ],
+    ids=["too_few_valid_rows", "three_without_icons", "duplicate_ids"],
+)
+def test_approval_omits_an_incomplete_option_set(options):
+    """A partial list would 422 the whole push, and re-sending options clears the
+    recorded answer - so nothing goes out instead of something wrong."""
+    content = map_content(_make_state("on", {}), _approval_config(**{CONF_APPROVAL_OPTIONS: options}))
+
+    assert "options" not in content
+    assert_valid_activity_content(content, where="approval incomplete options")
+
+
+def test_approval_drops_rows_past_the_option_and_detail_caps():
+    config = _approval_config(
+        **{
+            CONF_APPROVAL_OPTIONS: [{"id": f"o{i}", "title": f"T{i}", "icon": "checkmark"} for i in range(6)],
+            CONF_APPROVAL_DETAILS: [{"label": f"L{i}", "value": f"V{i}"} for i in range(4)],
+        }
+    )
+    content = map_content(_make_state("on", {}), config)
+
+    assert [o["id"] for o in content["options"]] == ["o0", "o1", "o2", "o3"]
+    assert [d["label"] for d in content["details"]] == ["L0", "L1"]
+    assert_valid_activity_content(content, where="approval over the caps")
+
+
+def test_approval_leaves_a_custom_scheme_option_unrouted():
+    """A deep link opens that app; only http(s) options get the silent POST fill,
+    and the HTTP routing keys are dropped where they cannot route."""
+    config = _approval_config(
+        **{
+            CONF_APPROVAL_OPTIONS: [
+                {"id": "open", "title": "Open", "url": "myapp://approve", "method": "POST", "body": "x"},
+                {"id": "deny", "title": "Deny"},
+            ]
+        }
+    )
+    content = map_content(_make_state("on", {}), config)
+
+    assert content["options"][0] == {"id": "open", "title": "Open", "url": "myapp://approve"}
+    assert_valid_activity_content(content, where="approval deep link")
+
+
+def test_approval_without_configured_options_still_validates():
+    """An update frame with no options is legal: the stored set survives the merge."""
+    content = map_content(_make_state("on", {}), {CONF_TEMPLATE: "approval"})
+
+    assert "options" not in content
+    assert content["progress"] == 0.0
+    assert_valid_activity_content(content, where="approval bare")
+
+
+def test_approval_completion_does_not_restate_the_options():
+    """Re-sending options would clear the recorded answer - the one thing the
+    completion screen is there to show. The merge patch keeps the stored set."""
+    last = {"progress": 0.0, "subtitle": "Front gate", "options": [dict(o) for o in _GATE_OPTIONS]}
+    content = map_completion_content({CONF_TEMPLATE: "approval"}, last)
+
+    assert "options" not in content
+    assert content["progress"] == 0.0
+    assert_valid_activity_content(content, where="approval completion")

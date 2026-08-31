@@ -142,6 +142,13 @@ CONF_MEDIA_FAVORITE_SCRIPT = "media_favorite_script"
 # the callback - the endpoint cannot require a Home Assistant token, because the
 # request comes from the phone with only what the activity payload carried.
 CONF_MEDIA_TOKEN = "media_token"
+# Approval template: the question card's answer buttons, producer badge and detail
+# rows. There is no config-flow editor for these yet (the update_activity_approval
+# action is the way to drive the card); the mapper reads them so a future flow
+# editor lands on top without touching it.
+CONF_APPROVAL_OPTIONS = "approval_options"
+CONF_APPROVAL_DETAILS = "approval_details"
+CONF_APPROVAL_SOURCE = "approval_source"
 # Not stored: the manager's entity configs get the owning subentry's id injected at
 # load time so a control URL can name the subentry the callback has to look up.
 CONF_SUBENTRY_ID = "subentry_id"
@@ -317,10 +324,11 @@ NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
 # Templates offered by the tracked-entity config flow (each has a mapper).
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log", "media"]
-# Templates with an update_activity_<template> action. Every template the flow
-# offers also has one; the two lists were only ever different while media was a
-# service-only pass-through.
-SERVICE_TEMPLATES = tuple(TEMPLATES)
+# Templates with an update_activity_<template> action: every template the flow
+# offers, plus approval, which is service-only (like media once was) until the
+# flow grows an options editor - a flow-created approval config could not name
+# its answer buttons, so every create would 422.
+SERVICE_TEMPLATES = (*TEMPLATES, "approval")
 
 # Media template caps (mirror pushward-server/internal/model/activity.go).
 # media_title is the big line of the player card (the activity name is the source
@@ -350,6 +358,27 @@ MEDIA_CONTROL_SLOTS = (
     "volume_down",
     "volume_up",
 )
+
+# Approval template caps (mirror pushward-server/internal/model/activity.go).
+# The question is the activity's `state` text; `options` are the 2-4 answer
+# buttons. An option with an http(s) url is always a silent webhook (the server
+# rejects foreground and fills an empty method to POST, exactly like the media
+# controls); an option WITHOUT a url gets a server-signed answer URL instead: the
+# first tap is recorded in the server-owned `answer` field, pushed to every
+# device, and the activity ends shortly after. Re-sending `options` starts a new
+# round (the stored answer is cleared), and `answer` itself must never be sent.
+APPROVAL_OPTIONS_MIN = 2
+APPROVAL_OPTIONS_MAX = 4
+APPROVAL_OPTION_TITLE_MAX = 24
+APPROVAL_OPTION_STYLES = ("primary", "secondary", "destructive")
+# Same shape as an activity slug: leading alphanumeric, then [a-zA-Z0-9_-], 64 max.
+# \Z, not $: Python's $ also matches before a trailing newline, the server's
+# (Go RE2) does not - "approve\n" must fail here the way it fails there.
+APPROVAL_OPTION_ID_PATTERN = r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}\Z"
+APPROVAL_SOURCE_MAX = 24
+APPROVAL_DETAILS_MAX = 2
+APPROVAL_DETAIL_LABEL_MAX = 24
+APPROVAL_DETAIL_VALUE_MAX = 64
 
 # Widget templates (server: pushward-server/internal/model/widget.go)
 WIDGET_TEMPLATE_VALUE = "value"

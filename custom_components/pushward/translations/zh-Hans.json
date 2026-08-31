@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "更新活动 (Approval)",
+      "description": "更新 PushWard 审批实时活动：带有 2-4 个回答按钮的问题卡片，按钮可调用你自己的 Webhook，或由服务器记录被点按的选项。",
+      "fields": {
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "options": {
+          "name": "选项",
+          "description": "2-4 个回答按钮的列表。每个按钮：id（必填，最长 64）、title（必填，最长 24），可选 style（primary/secondary/destructive）、icon（3 个及以上按钮时必填）、url、method、headers、body。http(s) url 始终是静默 Webhook（默认 POST）；没有 url 的选项由服务器记录：第一次点按会写入只读的 answer 字段并结束活动。重新发送 options 会开始新一轮。"
+        },
+        "source": {
+          "name": "来源",
+          "description": "卡片标题栏显示的来源徽标（最长 24 个字符）。"
+        },
+        "details": {
+          "name": "详情",
+          "description": "以对象列表形式最多 2 行上下文：label（必填，最长 24）和 value（必填，最长 64）。"
+        },
+        "on_expire": {
+          "name": "到期时",
+          "description": "超过结束时间后服务器记录为答案的选项 id，或用 none 停用。需要结束时间。"
+        },
+        "end_date": {
+          "name": "结束日期",
+          "description": "问题到期的 Unix 时间戳（秒）。与到期时一起必填。"
+        },
+        "state_text": {
+          "name": "状态文本",
+          "description": "显示为活动状态的文本。这就是卡片提出的问题。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 questionmark.circle.fill、mdi:help-circle）。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
+        }
+      }
+    },
     "create_activity": {
       "name": "创建活动",
       "description": "创建新的 PushWard Live Activity。",

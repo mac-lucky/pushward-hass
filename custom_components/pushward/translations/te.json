@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Activity అప్‌డేట్ చేయి (Approval)",
+      "description": "PushWard ఆమోద Live Activity-ని అప్‌డేట్ చేయండి: 2-4 సమాధాన బటన్లతో కూడిన ప్రశ్న కార్డు; బటన్లు మీ సొంత webhooks-ను పిలుస్తాయి లేదా నొక్కిన ఎంపికను సర్వర్ నమోదు చేస్తుంది.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug గుర్తింపు."
+        },
+        "state": {
+          "name": "స్థితి",
+          "description": "కావలసిన Activity స్థితి."
+        },
+        "options": {
+          "name": "ఎంపికలు",
+          "description": "2-4 సమాధాన బటన్ల జాబితా. ప్రతి ఒక్కటి: id (తప్పనిసరి, గరిష్ఠం 64), title (తప్పనిసరి, గరిష్ఠం 24), ఐచ్ఛికంగా style (primary/secondary/destructive), icon (3 లేదా అంతకు మించి బటన్లు ఉంటే తప్పనిసరి), url, method, headers, body. http(s) url ఎప్పుడూ నిశ్శబ్ద webhook (డిఫాల్ట్ POST); url లేని ఎంపికను సర్వర్ నమోదు చేస్తుంది: మొదటి ట్యాప్ చదవడానికి-మాత్రమే answer ఫీల్డ్‌లో చేరి Activity ముగుస్తుంది. options మళ్లీ పంపితే కొత్త రౌండ్ మొదలవుతుంది."
+        },
+        "source": {
+          "name": "మూలం",
+          "description": "కార్డు హెడర్‌లో చూపే మూల బ్యాడ్జ్ (గరిష్ఠం 24 అక్షరాలు)."
+        },
+        "details": {
+          "name": "వివరాలు",
+          "description": "ఆబ్జెక్టుల జాబితాగా గరిష్ఠం 2 సందర్భ వరుసలు: label (తప్పనిసరి, గరిష్ఠం 24) మరియు value (తప్పనిసరి, గరిష్ఠం 64)."
+        },
+        "on_expire": {
+          "name": "గడువు ముగిసినప్పుడు",
+          "description": "End Date దాటాక సర్వర్ సమాధానంగా నమోదు చేసే ఎంపిక id, లేదా నిలిపివేయడానికి none. End Date అవసరం."
+        },
+        "end_date": {
+          "name": "ముగింపు తేదీ",
+          "description": "ప్రశ్న గడువు ముగిసే Unix టైమ్‌స్టాంప్ (సెకన్లు). On Expire-తో పాటు అవసరం."
+        },
+        "state_text": {
+          "name": "స్థితి టెక్స్ట్",
+          "description": "Activity స్థితిగా చూపబడే టెక్స్ట్. కార్డు అడిగే ప్రశ్న ఇదే."
+        },
+        "subtitle": {
+          "name": "ఉప శీర్షిక",
+          "description": "Activity పై చూపబడే ఉప శీర్షిక టెక్స్ట్."
+        },
+        "icon": {
+          "name": "చిహ్నం",
+          "description": "SF Symbol లేదా MDI చిహ్నం పేరు (ఉదా. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "పూర్తి సందేశం",
+          "description": "Activity ముగించినప్పుడు చూపబడే సందేశం."
+        },
+        "accent_color": {
+          "name": "యాక్సెంట్ రంగు",
+          "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "background_color": {
+          "name": "నేపథ్య రంగు",
+          "description": "Live Activity కోసం నేపథ్య రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "text_color": {
+          "name": "టెక్స్ట్ రంగు",
+          "description": "Live Activity కోసం టెక్స్ట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
+        },
+        "tap_action": {
+          "name": "ట్యాప్ చర్య",
+          "description": "మొత్తం-activity ట్యాప్ లక్ష్యం ఆబ్జెక్ట్‌గా: url (అవసరం), ఐచ్ఛిక foreground, మరియు http(s) url కోసం method/headers/body ద్వారా నిశ్శబ్ద webhook."
+        },
+        "sound": {
+          "name": "సౌండ్",
+          "description": "ఈ అప్‌డేట్ కోసం పరికరంలో ప్లే చేయబడే నోటిఫికేషన్ సౌండ్."
+        },
+        "priority": {
+          "name": "ప్రాధాన్యత ఓవర్‌రైడ్",
+          "description": "ప్రతి-నవీకరణ ప్రాధాన్యత (0-10). ఈ పుష్ కోసం మాత్రమే activity యొక్క కాన్ఫిగర్ చేసిన ప్రాధాన్యతను ఓవర్‌రైడ్ చేస్తుంది."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Activity ముగించిన తర్వాత ఉంచే సెకన్లు."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Activity పాతదిగా పరిగణించబడే ముందు సెకన్లు."
+        },
+        "dismissal_ttl": {
+          "name": "తొలగింపు TTL",
+          "description": "ముగిసిన యాక్టివిటీ తొలగించబడే ముందు లాక్ స్క్రీన్‌పై ఎన్ని సెకన్లు ఉంటుందో. 0 అయితే ముగిసిన వెంటనే దాన్ని తొలగిస్తుంది."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activity సృష్టించు",
       "description": "కొత్త PushWard Live Activity సృష్టించండి.",

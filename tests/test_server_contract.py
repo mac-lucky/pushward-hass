@@ -150,6 +150,41 @@ def _controls(**changes) -> dict:
     return c
 
 
+def valid_approval() -> dict:
+    return {
+        "template": "approval",
+        "progress": 0.0,
+        "state": "Open the gate?",
+        "accent_color": "orange",
+        "source": "Home Assistant",
+        "details": [{"label": "Requested by", "value": "Front gate keypad"}],
+        "on_expire": "deny",
+        "end_date": int(time.time()) + 600,
+        "options": [
+            {
+                "id": "approve",
+                "title": "Approve",
+                "style": "primary",
+                "url": "https://ha.example.com/api/webhook/approve-gate",
+                "method": "POST",
+            },
+            # url-less: the server signs an answer URL into it and records the tap.
+            {"id": "deny", "title": "Deny", "style": "destructive"},
+        ],
+    }
+
+
+def _approval_options(n: int, *, icons: bool = True) -> list:
+    """n answer buttons, carrying the icon three-plus options require unless icons=False."""
+    icon = {"icon": "checkmark"} if icons else {}
+    return [{"id": f"opt-{i}", "title": f"Option {i}", **icon} for i in range(n)]
+
+
+def _approval_with(**changes) -> dict:
+    """valid_approval without the expiry pair, so option mutations need no matching id."""
+    return _mut(lambda: _rm(valid_approval, "on_expire", "end_date"), **changes)
+
+
 def _mut(factory, **changes) -> dict:
     d = factory()
     d.update(changes)
@@ -178,8 +213,9 @@ def _rm(factory, *keys) -> dict:
         valid_board,
         valid_log,
         valid_media,
+        valid_approval,
     ],
-    ids=["generic", "countdown", "steps", "alert", "gauge", "timeline", "board", "log", "media"],
+    ids=["generic", "countdown", "steps", "alert", "gauge", "timeline", "board", "log", "media", "approval"],
 )
 def test_valid_activity_payloads_pass(factory) -> None:
     assert_valid_activity_content(factory())
@@ -414,6 +450,78 @@ _ACTIVITY_INVALID = [
     ),
     pytest.param(lambda: _mut(valid_media, controls=_controls(extra=[{"url": IMAGE_OK}])), id="extra_control_no_icon"),
     pytest.param(lambda: _mut(valid_media, controls=_controls(extra={"url": IMAGE_OK})), id="extra_not_list"),
+    # approval: its fields are a 422 on every other template, and on approval each is bounded.
+    pytest.param(
+        lambda: _mut(valid_generic, options=[{"id": "a", "title": "A"}, {"id": "b", "title": "B"}]),
+        id="options_on_unsupported_template",
+    ),
+    pytest.param(lambda: _mut(valid_alert, source="Home Assistant"), id="source_on_unsupported_template"),
+    pytest.param(
+        lambda: _mut(valid_steps, details=[{"label": "L", "value": "V"}]), id="details_on_unsupported_template"
+    ),
+    pytest.param(lambda: _mut(valid_board, on_expire="none"), id="on_expire_on_unsupported_template"),
+    pytest.param(
+        lambda: _mut(valid_approval, answer={"option": "approve", "at": 1755500000, "by": "user"}),
+        id="answer_is_server_owned",
+    ),
+    pytest.param(lambda: _approval_with(options=_approval_options(1)), id="too_few_options"),
+    pytest.param(lambda: _approval_with(options=_approval_options(5)), id="too_many_options"),
+    pytest.param(lambda: _approval_with(options={"approve": {"title": "A"}}), id="options_not_list"),
+    pytest.param(
+        # Python's $ would let the trailing newline through; the server's does not
+        lambda: _approval_with(options=[{"id": "approve\n", "title": "A"}, {"id": "b", "title": "B"}]),
+        id="option_id_trailing_newline",
+    ),
+    pytest.param(
+        lambda: _approval_with(options=[{"id": "same", "title": "A"}, {"id": "same", "title": "B"}]),
+        id="duplicate_option_ids",
+    ),
+    pytest.param(
+        lambda: _approval_with(options=[{"id": "-bad", "title": "A"}, {"id": "ok", "title": "B"}]),
+        id="option_id_bad_lead",
+    ),
+    pytest.param(
+        lambda: _approval_with(options=[{"id": "a" * 65, "title": "A"}, {"id": "ok", "title": "B"}]),
+        id="option_id_too_long",
+    ),
+    pytest.param(lambda: _approval_with(options=[{"id": "a"}, {"id": "b", "title": "B"}]), id="option_title_missing"),
+    pytest.param(
+        lambda: _approval_with(options=[{"id": "a", "title": "x" * 25}, {"id": "b", "title": "B"}]),
+        id="option_title_too_long",
+    ),
+    pytest.param(
+        lambda: _approval_with(options=[{"id": "a", "title": "A", "style": "danger"}, {"id": "b", "title": "B"}]),
+        id="option_style_not_in_enum",
+    ),
+    pytest.param(lambda: _approval_with(options=_approval_options(3, icons=False)), id="three_options_need_icons"),
+    pytest.param(
+        lambda: _approval_with(
+            options=[{"id": "a", "title": "A", "url": IMAGE_OK, "foreground": True}, {"id": "b", "title": "B"}]
+        ),
+        id="http_option_foreground",
+    ),
+    pytest.param(
+        lambda: _approval_with(options=[{"id": "a", "title": "A", "method": "POST"}, {"id": "b", "title": "B"}]),
+        id="urlless_option_with_method",
+    ),
+    pytest.param(
+        lambda: _approval_with(
+            options=[{"id": "a", "title": "A", "url": "homeassistant://x", "method": "POST"}, {"id": "b", "title": "B"}]
+        ),
+        id="custom_scheme_option_with_method",
+    ),
+    pytest.param(lambda: _mut(valid_approval, source="x" * 25), id="source_too_long"),
+    pytest.param(lambda: _mut(valid_approval, details=[{"label": "L", "value": "V"}] * 3), id="too_many_details"),
+    pytest.param(lambda: _mut(valid_approval, details=[{"label": "", "value": "V"}]), id="detail_label_empty"),
+    pytest.param(lambda: _mut(valid_approval, details=[{"label": "x" * 25, "value": "V"}]), id="detail_label_too_long"),
+    pytest.param(lambda: _mut(valid_approval, details=[{"label": "L", "value": "x" * 65}]), id="detail_value_too_long"),
+    pytest.param(lambda: _mut(valid_approval, details=[{"label": "L"}]), id="detail_value_missing"),
+    pytest.param(lambda: _mut(valid_approval, on_expire="missing-option"), id="on_expire_not_a_sent_option"),
+    pytest.param(lambda: _mut(valid_approval, on_expire="not a valid id!"), id="on_expire_bad_id"),
+    pytest.param(lambda: _mut(valid_approval, end_date=0), id="approval_end_date_zero"),
+    pytest.param(lambda: _mut(valid_approval, url_action={"url": IMAGE_OK}), id="url_action_on_approval"),
+    pytest.param(lambda: _mut(valid_approval, alarm=True), id="alarm_on_approval"),
+    pytest.param(lambda: _mut(valid_approval, snooze_seconds=300), id="snooze_on_approval"),
 ]
 
 
@@ -451,6 +559,36 @@ def test_valid_media_payloads_pass() -> None:
     assert_valid_activity_content(_mut(valid_media, image_shape="circle"))
     # {"stop": null} is the merge-layer way to drop a slot; the contract reads it as absent.
     assert_valid_activity_content(_mut(valid_media, controls=_controls(stop=None)))
+
+
+def test_valid_approval_payloads_pass() -> None:
+    """Approval edge shapes the server accepts: a bare update frame (the stored
+    options survive the merge and re-sending them would clear the recorded answer),
+    two title-only buttons, four icon-only buttons, a deep-link option with
+    foreground, on_expire disarmed with "none", an options-less on_expire whose
+    end_date pairing only the merged content can settle, and [] as the wholesale
+    details-clearing form (absent for the off-template leak check too)."""
+    assert_valid_activity_content({"template": "approval", "progress": 0.0})
+    assert_valid_activity_content(_rm(valid_approval, "on_expire", "end_date", "source", "details"))
+    assert_valid_activity_content(_approval_with(options=[{"id": "yes", "title": "Yes"}, {"id": "no", "title": "No"}]))
+    assert_valid_activity_content(_approval_with(options=_approval_options(4)))
+    # foreground is only refused on http(s) options; a deep link opens that app anyway.
+    assert_valid_activity_content(
+        _approval_with(
+            options=[{"id": "a", "title": "A", "url": "myapp://open", "foreground": True}, {"id": "b", "title": "B"}]
+        )
+    )
+    assert_valid_activity_content(_mut(valid_approval, on_expire="none"))
+    # Without options the merge may inherit the stored deadline; the pairing is
+    # the server's call on the merged content, so it passes here.
+    assert_valid_activity_content(_rm(valid_approval, "end_date", "options"))
+    # on_expire with options but no end_date: even a new round may inherit the
+    # stored deadline, so the pairing is the server's call alone
+    assert_valid_activity_content(_rm(valid_approval, "end_date"))
+    # [] clears details wholesale, and empty collections read as absent even on
+    # templates with no approval fields, matching the server's length-based checks.
+    assert_valid_activity_content(_mut(valid_approval, details=[]))
+    assert_valid_activity_content(_mut(valid_generic, options=[], details=[]))
 
 
 def test_valid_live_progress_payloads_pass() -> None:

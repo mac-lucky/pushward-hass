@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "アクティビティを更新 (Approval)",
+      "description": "PushWard の承認 Live Activity を更新します。2〜4 個の回答ボタンを持つ質問カードで、ボタンは自分の Webhook を呼び出すか、タップされた選択肢をサーバー側に記録します。",
+      "fields": {
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "options": {
+          "name": "選択肢",
+          "description": "2〜4 個の回答ボタンのリスト。各ボタン: id（必須、最大 64）、title（必須、最大 24）、任意で style（primary/secondary/destructive）、icon（ボタンが 3 個以上なら必須）、url、method、headers、body。http(s) の url は常にサイレント Webhook（既定は POST）。url のない選択肢はサーバーが記録します: 最初のタップが読み取り専用の answer フィールドに入り、アクティビティは終了します。options を再送すると新しいラウンドが始まります。"
+        },
+        "source": {
+          "name": "ソース",
+          "description": "カードのヘッダーに表示される発信元バッジ（最大 24 文字）。"
+        },
+        "details": {
+          "name": "詳細",
+          "description": "オブジェクトのリストとして最大 2 行のコンテキスト行: label（必須、最大 24）と value（必須、最大 64）。"
+        },
+        "on_expire": {
+          "name": "期限切れ時",
+          "description": "終了日時を過ぎたときにサーバーが回答として記録する選択肢の id。none で無効化。終了日時が必要です。"
+        },
+        "end_date": {
+          "name": "終了日時",
+          "description": "質問の期限となる Unix タイムスタンプ（秒）。期限切れ時と併せて必須です。"
+        },
+        "state_text": {
+          "name": "状態テキスト",
+          "description": "アクティビティの状態として表示されるテキスト。これがカードの尋ねる質問です。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: questionmark.circle.fill, mdi:help-circle）。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
+        }
+      }
+    },
     "create_activity": {
       "name": "アクティビティを作成",
       "description": "新しいPushWard Live Activityを作成します。",

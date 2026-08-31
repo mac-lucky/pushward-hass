@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Update Activity (Approval)",
+      "description": "Update a PushWard approval Live Activity: a question card with 2-4 answer buttons that call your own webhooks or record the tapped option server-side.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "options": {
+          "name": "Options",
+          "description": "List of 2-4 answer buttons. Each: id (required, max 64, slug shape), title (required, max 24), and optional style (primary/secondary/destructive), icon (required once there are 3 or more buttons), url, method, headers, body. An http(s) url is always a silent webhook (POST by default); an option without a url is recorded by the server: the first tap lands in the read-only answer field and ends the activity. Re-sending options starts a new round."
+        },
+        "source": {
+          "name": "Source",
+          "description": "Producer badge shown in the card header (max 24 characters)."
+        },
+        "details": {
+          "name": "Details",
+          "description": "Up to 2 context rows as a list of objects: label (required, max 24) and value (required, max 64)."
+        },
+        "on_expire": {
+          "name": "On Expire",
+          "description": "Option id the server records as the answer (by: expired) when End Date passes, or none to disarm. Requires End Date."
+        },
+        "end_date": {
+          "name": "End Date",
+          "description": "Unix timestamp (seconds) when the question expires. Required with On Expire."
+        },
+        "state_text": {
+          "name": "State Text",
+          "description": "Text shown as the activity state. This is the question the card asks."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
+        }
+      }
+    },
     "create_activity": {
       "name": "Create Activity",
       "description": "Create a new PushWard Live Activity.",

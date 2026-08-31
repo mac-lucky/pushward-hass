@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Atualizar Atividade (Approval)",
+      "description": "Atualiza uma Live Activity de aprovação do PushWard: um cartão de pergunta com 2-4 botões de resposta que chamam seus próprios webhooks ou registram no servidor a opção tocada.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "options": {
+          "name": "Opções",
+          "description": "Lista de 2-4 botões de resposta. Cada um: id (obrigatório, máx. 64), title (obrigatório, máx. 24) e opcionalmente style (primary/secondary/destructive), icon (obrigatório com 3 ou mais botões), url, method, headers, body. Uma url http(s) é sempre um webhook silencioso (POST por padrão); uma opção sem url é registrada pelo servidor: o primeiro toque cai no campo answer somente leitura e a atividade termina. Reenviar options inicia uma nova rodada."
+        },
+        "source": {
+          "name": "Origem",
+          "description": "Selo de origem exibido no cabeçalho do cartão (máx. 24 caracteres)."
+        },
+        "details": {
+          "name": "Detalhes",
+          "description": "Até 2 linhas de contexto como lista de objetos: label (obrigatório, máx. 24) e value (obrigatório, máx. 64)."
+        },
+        "on_expire": {
+          "name": "Ao expirar",
+          "description": "Id da opção que o servidor registra como resposta quando a data de término passa, ou none para desativar. Requer a data de término."
+        },
+        "end_date": {
+          "name": "Data de Término",
+          "description": "Timestamp Unix (segundos) em que a pergunta expira. Obrigatório junto com Ao expirar."
+        },
+        "state_text": {
+          "name": "Texto do Estado",
+          "description": "Texto exibido como estado da atividade. É a pergunta que o cartão faz."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Cor de destaque para a atividade. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "tap_action": {
+          "name": "Ação de toque",
+          "description": "Alvo de toque da atividade inteira como um objeto: url (obrigatório), foreground opcional e, para uma url http(s), um webhook silencioso via method/headers/body."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
+        }
+      }
+    },
     "create_activity": {
       "name": "Criar Atividade",
       "description": "Criar uma nova PushWard Live Activity.",

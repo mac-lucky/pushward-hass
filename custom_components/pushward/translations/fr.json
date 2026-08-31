@@ -1325,6 +1325,92 @@
         }
       }
     },
+    "update_activity_approval": {
+      "name": "Mettre à jour la Live Activity (Approval)",
+      "description": "Met à jour une Live Activity d'approbation PushWard : une carte question avec 2 à 4 boutons de réponse qui appellent vos propres webhooks ou enregistrent côté serveur l'option touchée.",
+      "fields": {
+        "slug": {
+          "name": "Slug",
+          "description": "Identifiant slug de la Live Activity."
+        },
+        "state": {
+          "name": "État",
+          "description": "État souhaité de la Live Activity."
+        },
+        "options": {
+          "name": "Options",
+          "description": "Liste de 2 à 4 boutons de réponse. Chacun : id (requis, 64 max), title (requis, 24 max) et en option style (primary/secondary/destructive), icon (requis à partir de 3 boutons), url, method, headers, body. Une url http(s) est toujours un webhook silencieux (POST par défaut) ; une option sans url est enregistrée par le serveur : le premier appui atterrit dans le champ answer en lecture seule et l'activité se termine. Renvoyer options démarre une nouvelle manche."
+        },
+        "source": {
+          "name": "Source",
+          "description": "Badge de la source affiché dans l'en-tête de la carte (24 caractères max)."
+        },
+        "details": {
+          "name": "Détails",
+          "description": "Jusqu'à 2 lignes de contexte sous forme de liste d'objets : label (requis, 24 max) et value (requis, 64 max)."
+        },
+        "on_expire": {
+          "name": "À expiration",
+          "description": "Id de l'option que le serveur enregistre comme réponse quand la date de fin est atteinte, ou none pour désactiver. Nécessite la date de fin."
+        },
+        "end_date": {
+          "name": "Date de fin",
+          "description": "Horodatage Unix (secondes) auquel la question expire. Requis avec À expiration."
+        },
+        "state_text": {
+          "name": "Texte d'état",
+          "description": "Texte affiché comme état de la Live Activity. C'est la question que pose la carte."
+        },
+        "subtitle": {
+          "name": "Sous-titre",
+          "description": "Texte du sous-titre affiché sur la Live Activity."
+        },
+        "icon": {
+          "name": "Icône",
+          "description": "Nom d'icône SF Symbol ou MDI (ex. questionmark.circle.fill, mdi:help-circle)."
+        },
+        "completion_message": {
+          "name": "Message de fin",
+          "description": "Message affiché lorsque la Live Activity se termine."
+        },
+        "accent_color": {
+          "name": "Couleur d'accentuation",
+          "description": "Couleur d'accentuation de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "background_color": {
+          "name": "Couleur d'arrière-plan",
+          "description": "Couleur d'arrière-plan de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "text_color": {
+          "name": "Couleur du texte",
+          "description": "Couleur du texte de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
+        },
+        "tap_action": {
+          "name": "Action d'appui",
+          "description": "Cible d'appui pour toute la Live Activity, sous forme d'objet : url (requis), foreground facultatif, et pour une url http(s) un webhook silencieux via method/headers/body."
+        },
+        "sound": {
+          "name": "Son",
+          "description": "Son de notification joué sur l'appareil pour cette mise à jour."
+        },
+        "priority": {
+          "name": "Priorité ponctuelle",
+          "description": "Priorité par mise à jour (0-10). Remplace la priorité configurée de la Live Activity pour ce push uniquement."
+        },
+        "ended_ttl": {
+          "name": "TTL après fin",
+          "description": "Secondes pendant lesquelles conserver la Live Activity après sa fin."
+        },
+        "stale_ttl": {
+          "name": "TTL d'obsolescence",
+          "description": "Secondes avant que la Live Activity soit considérée comme obsolète."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de suppression",
+          "description": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin."
+        }
+      }
+    },
     "create_activity": {
       "name": "Créer une Live Activity",
       "description": "Créer une nouvelle Live Activity PushWard.",

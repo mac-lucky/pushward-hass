@@ -63,7 +63,7 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 ## Features
 
 - **Track any HA entity** as a PushWard Live Activity (Dynamic Island + Lock Screen)
-- **9 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log, media
+- **10 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log, media, approval
 - **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
@@ -448,7 +448,7 @@ On premium, uncapped resources report `limit: unlimited`, and the notifications 
 
 ## Services
 
-All services live in the `pushward` domain. There are 18 in total: the nine below plus a per-template `update_activity_<template>` for each of the 9 activity templates (and the deprecated `update_activity` alias).
+All services live in the `pushward` domain. There are 19 in total: the nine below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
 
 ### `pushward.create_activity`
 
@@ -468,7 +468,8 @@ Create a new activity.
 Push a content update to an existing activity. There is **one action per template**:
 `update_activity_generic`, `update_activity_countdown`, `update_activity_steps`,
 `update_activity_alert`, `update_activity_gauge`, `update_activity_timeline`,
-`update_activity_board`, `update_activity_log`, `update_activity_media`, so the UI shows only
+`update_activity_board`, `update_activity_log`, `update_activity_media`,
+`update_activity_approval`, so the UI shows only
 the fields that template supports (Home Assistant cannot hide service fields based on another field's value, so a single
 action with collapsed sections would always surface every template's fields). The template is
 implied by the action name; you no longer pass a `template` field.
@@ -515,15 +516,17 @@ implied by the action name; you no longer pass a `template` field.
 | `update_activity_board` | `tiles` |
 | `update_activity_log` | `lines` |
 | `update_activity_media` | `media_title` (max 128), `playback_state`, `position_seconds`, `duration_seconds`, `position_at`, `volume`, `favorite`, `controls`, `image_url`, `image_shape`, `image_thumbhash` |
+| `update_activity_approval` | `options` (2-4 answer buttons), `source` (max 24), `details` (up to 2 label/value rows), `on_expire`, `end_date` |
 
-> **`board` / `log` / `media` use a lean schema.** They render no progress bar and no
-> whole-activity button slots, so `update_activity_board`, `update_activity_log` and
-> `update_activity_media` accept only the labels (`state_text`, `subtitle`, `icon`), appearance
+> **`board` / `log` / `media` / `approval` use a lean schema.** They render no progress bar and no
+> whole-activity button slots, so `update_activity_board`, `update_activity_log`,
+> `update_activity_media` and `update_activity_approval` accept only the labels (`state_text`, `subtitle`, `icon`), appearance
 > (`completion_message`, the colors, `sound`, `priority`, the TTLs
 > `ended_ttl`/`stale_ttl`/`dismissal_ttl`), the whole-activity `tap_action`, and their template
-> fields (`tiles` / `lines` / the media fields), **not** `progress`, `remaining_time`, `url`,
-> `secondary_url`, `url_action`, or `secondary_url_action` (board tap targets are per-tile via
-> each tile's `url_action`; media buttons live in `controls`). `tiles` is a list of 1-4 objects
+> fields (`tiles` / `lines` / the media fields / the approval fields), **not** `progress`,
+> `remaining_time`, `url`, `secondary_url`, `url_action`, or `secondary_url_action` (board tap
+> targets are per-tile via each tile's `url_action`; media buttons live in `controls`; approval
+> buttons live in `options`). `tiles` is a list of 1-4 objects
 > `{ label, value, unit?, icon?, color?, trend?, url_action? }` (`value` is a string max 16
 > chars). `lines` is a list of 1-20 newest-first objects `{ text, at?, level? }` where `level`
 > is `info`/`warn`/`error`.
@@ -570,6 +573,65 @@ implied by the action name; you no longer pass a `template` field.
 >       previous: { url: "https://ha.example.com/api/webhook/pw-prev" }
 >       play_pause: { url: "https://ha.example.com/api/webhook/pw-toggle" }
 >       next: { url: "https://ha.example.com/api/webhook/pw-next" }
+> ```
+
+> **`approval`** is a question card driven entirely by this action (the config flow does not
+> offer the template): the question rides `state_text`, `source` (max 24) names
+> the producer in the card header, and `details` adds up to 2 `{ label, value }` rows (label
+> max 24, value max 64; `[]` clears them). `options` is a list of 2-4 answer buttons
+> `{ id, title, style?, icon?, url?, method?, headers?, body? }`: `id` (slug shape, max 64) and
+> `title` (max 24) are required, `style` is `primary` / `secondary` / `destructive` (default:
+> first primary, rest secondary), and `icon` is required once there are 3 or more buttons (they
+> render icon-only then). An option with an `http(s)` `url` is always a silent webhook, exactly
+> like a media control (`POST` when no `method` is given, no `foreground`); a custom-scheme
+> `url` opens that app. An option **without** a `url` is server-recorded: the server signs an
+> answer URL into the button, the first tap lands in the read-only `answer` field
+> (`{ option, at, by }`), is pushed to every device, and the activity ends shortly after. The
+> recorded answer shows on the card, but this integration never reads an activity back, so to
+> react from Home Assistant give each option a `url` pointing at a webhook trigger instead, as
+> in the example below. `on_expire` names the option to record
+> (`by: "expired"`) when `end_date` passes, or `none` to disarm; it needs `end_date` (already
+> stored or sent along). Recording is all it does: the expiry sweep never fires the option's
+> webhook, so an automation behind a `url` option runs only on a real tap. Options
+> and details replace wholesale on update, and re-sending `options` starts a new round (the
+> stored answer is cleared) - so a plain update leaves them out.
+>
+> ```yaml
+> - action: pushward.update_activity_approval
+>   data:
+>     slug: gate-request
+>     state: ongoing
+>     state_text: Open the gate?
+>     source: Home Assistant
+>     details:
+>       - label: Requested by
+>         value: Front gate keypad
+>     on_expire: deny
+>     end_date: "{{ (now().timestamp() + 600) | int }}"
+>     options:
+>       - id: approve
+>         title: Approve
+>         style: primary
+>         url: https://ha.example.com/api/webhook/approve-gate
+>       - id: deny
+>         title: Deny
+>         style: destructive
+>         url: https://ha.example.com/api/webhook/deny-gate
+> ```
+>
+> Each tapped option POSTs to its webhook from the phone, outside your LAN, so the matching
+> automation must allow remote requests:
+>
+> ```yaml
+> - triggers:
+>     - trigger: webhook
+>       webhook_id: approve-gate
+>       allowed_methods: [POST]
+>       local_only: false
+>   actions:
+>     - action: cover.open_cover
+>       target:
+>         entity_id: cover.front_gate
 > ```
 
 #### Activity images
