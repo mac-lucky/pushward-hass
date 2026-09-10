@@ -630,11 +630,31 @@ def usage_limit_issue_id(entry_id: str, used_key: str) -> str:
     return f"usage_limit_{entry_id}_{used_key}"
 
 
+def metered_resource_for_kind(kind: str) -> MeteredResource | None:
+    """Map a server quota `kind` (e.g. ``widget_updates``) to its metered resource.
+
+    The server's kinds are the ``/auth/me`` counter names without the ``_used``
+    suffix, so the lookup is a suffix match against USAGE_LIMIT_RESOURCES.
+    """
+    used_key = f"{kind}_used"
+    return next((r for r in USAGE_LIMIT_RESOURCES if r.used_key == used_key), None)
+
+
 # API retry
 MAX_RETRIES = 5
 RETRY_BASE_DELAY = 1  # seconds
 RETRY_MAX_DELAY = 30  # seconds
 MAX_CONCURRENT_REQUESTS = 5  # max simultaneous API request+retry loops
+
+# Quota gate: how long metered requests stay paused after a `quota.exceeded` 429.
+# Normally until the server's reset_at; the floor absorbs clock skew that would
+# put reset_at in the past (a zero-length pause is no pause), the fallback covers
+# a missing or implausible reset_at, and the jitter spreads the reset-time wake-up
+# of many installs so they do not all poll the server in the same second.
+QUOTA_BLOCK_MIN_SECONDS = 60
+QUOTA_BLOCK_FALLBACK_SECONDS = 3600
+QUOTA_BLOCK_PLAUSIBLE_MAX_SECONDS = 32 * 24 * 3600
+QUOTA_RELEASE_JITTER_SECONDS = 60
 
 END_DELAY_SECONDS = 5
 

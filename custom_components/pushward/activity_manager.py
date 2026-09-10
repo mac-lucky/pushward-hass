@@ -18,6 +18,7 @@ from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, HomeAssistant, State, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import (
     async_call_later,
     async_track_state_change_event,
@@ -30,6 +31,7 @@ from .api import (
     PushWardAuthError,
     PushWardForbiddenError,
     PushWardNotFoundError,
+    PushWardQuotaExceededError,
 )
 from .const import (
     ACTIVITY_STATE_ENDED,
@@ -70,6 +72,7 @@ from .content_mapper import (
 )
 from .image_hash import async_ensure_thumbhash
 from .media_control import async_ensure_media_artwork
+from .quota import quota_released_signal
 from .recorder_history import async_recorder_states, downsample_evenly
 
 # Live ring-buffer depth per tracked entity; independent of HISTORY_SEED_MAX
@@ -176,6 +179,9 @@ class TrackedEntity:
     last_sent_at: float = 0.0
     # One recreate per 404 streak; reset on the next successful push.
     recreate_attempted: bool = False
+    # The last push was refused because the account's Live Activity quota is
+    # spent; re-sent (or restarted) when the quota gate releases the kind.
+    quota_pending: bool = False
     # (ts_seconds, {label: value}) — sampled on every state change. HA 2024.8+
     # strips light attributes from the recorder DB, so recorder queries can't
     # rebuild brightness history. Keep our own ring buffer instead.
@@ -203,6 +209,7 @@ class ActivityManager:
         self._reauth_triggered = False
         # Slugs currently in a push-failure streak: WARN once on entry, DEBUG after.
         self._failed_slugs: set[str] = set()
+        self._unsub_quota: Callable[[], None] | None = None
         # History ring buffers are persisted so that sparklines survive restarts
         # (HA 2024.8+ no longer stores light attributes in the recorder DB, so
         # we cannot reconstruct history from HA itself).
@@ -241,6 +248,19 @@ class ActivityManager:
                 notification_id=_forbidden_notification_id(slug),
             )
             self._log_push_failure(slug, "PushWard 403 while %s %s: %s", context, slug, err)
+        except PushWardQuotaExceededError as err:
+            # The quota gate already warned once and raised the Repair issue;
+            # remember what to catch up on when it releases the kind.
+            _LOGGER.debug("PushWard quota exhausted while %s %s: %s", context, slug, err)
+            tracked = self._tracked_by_slug(slug)
+            if tracked is not None:
+                tracked.quota_pending = True
+                # A local refusal says nothing about whether the row still exists
+                # server-side, so it must not use up the one recreate a 404 streak
+                # is allowed (POST /activities is metered and can be refused too).
+                tracked.recreate_attempted = False
+            if context == "ending":
+                await self._delete_quietly(slug, context)
         except PushWardApiError as err:
             if err.status_code == 409:
                 persistent_notification.async_create(
@@ -266,6 +286,11 @@ class ActivityManager:
     async def async_start(self) -> None:
         """Subscribe to state changes and resume any active entities."""
         persisted, persisted_logs = await self._async_load_history()
+
+        if self._unsub_quota is None:
+            self._unsub_quota = async_dispatcher_connect(
+                self._hass, quota_released_signal(self._entry.entry_id), self._on_quota_released
+            )
 
         for entity_cfg in self._entities:
             entity_id = entity_cfg[CONF_ENTITY_ID]
@@ -415,16 +440,60 @@ class ActivityManager:
         if cancelled:
             await asyncio.gather(*cancelled, return_exceptions=True)
 
+        if self._unsub_quota is not None:
+            self._unsub_quota()
+            self._unsub_quota = None
+
         for tracked in self._tracked.values():
             if tracked.is_active:
                 slug = tracked.config[CONF_SLUG]
                 try:
                     content = map_completion_content(tracked.config, tracked.last_content)
                     await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
+                except PushWardQuotaExceededError:
+                    # Updates are metered, deletes are not: still take the card down.
+                    await self._delete_quietly(slug, "shutdown")
                 except (PushWardApiError, aiohttp.ClientError):
                     _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
 
         self._tracked.clear()
+
+    async def _delete_quietly(self, slug: str, context: str) -> None:
+        """DELETE the activity as the un-metered stand-in for a quota-refused end.
+
+        Harder than an ``ended`` update: the server drops the row and its history,
+        so the activity disappears from the app's list instead of showing as ended.
+        Still better than a card that stays "ongoing" until its TTL expires.
+        """
+        try:
+            await self._api.delete_activity(slug)
+        except (PushWardApiError, aiohttp.ClientError):
+            _LOGGER.debug("Failed to delete activity %s during %s", slug, context, exc_info=True)
+
+    def _tracked_by_slug(self, slug: str) -> TrackedEntity | None:
+        return next((t for t in self._tracked.values() if t.config.get(CONF_SLUG) == slug), None)
+
+    @callback
+    def _on_quota_released(self, kind: str) -> None:
+        """Catch up after the Live Activity quota came back.
+
+        Active entities go through the normal throttle (unchanged content is
+        deduplicated there). An entity whose start was refused never became
+        active, so it is restarted if it still sits in a start state.
+        """
+        if kind != "live_activity_updates":
+            return
+        for entity_id, tracked in self._tracked.items():
+            if not tracked.quota_pending:
+                continue
+            tracked.quota_pending = False
+            if tracked.is_active:
+                if not self._is_ending(tracked):
+                    self._schedule_throttled_update(entity_id)
+                continue
+            current = self._hass.states.get(entity_id)
+            if current is not None and current.state in tracked.config.get(CONF_START_STATES, []):
+                self._hass.async_create_task(self._start_activity(entity_id))
 
     async def async_reload(self, new_entities: list[dict]) -> None:
         """Reload with new entity configuration."""
@@ -634,6 +703,7 @@ class ActivityManager:
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
             tracked.recreate_attempted = False
+            tracked.quota_pending = False
 
     def _activity_name(self, entity_id: str, config: dict) -> str:
         """Resolve activity name: configured name > friendly name > entity_id."""
@@ -829,6 +899,7 @@ class ActivityManager:
             self._clear_forbidden_notification(slug)
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
+            tracked.quota_pending = False
 
     @callback
     def _flush_update(self, entity_id: str, _now: datetime | None = None) -> None:

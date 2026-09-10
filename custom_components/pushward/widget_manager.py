@@ -27,6 +27,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_interval,
@@ -39,6 +40,7 @@ from .api import (
     PushWardAuthError,
     PushWardForbiddenError,
     PushWardNotFoundError,
+    PushWardQuotaExceededError,
     PushWardWidgetPermissionError,
 )
 from .const import (
@@ -72,6 +74,7 @@ from .const import (
     WIDGET_TRIGGER_POLL,
 )
 from .content_mapper import lookup_registry_icon
+from .quota import quota_released_signal
 from .recorder_history import async_recorder_states, downsample_evenly
 from .widget_mapper import map_widget_content, read_numeric_value, widget_name_from_config
 
@@ -112,6 +115,9 @@ class TrackedWidget:
     update_pending: bool = False
     # One recreate per 404 streak; reset on the next successful PATCH.
     recreate_attempted: bool = False
+    # The last PATCH was refused because the widget-update quota is spent;
+    # re-sent when the quota gate releases the kind.
+    quota_pending: bool = False
     # monotonic() of the last create/PATCH that reached the server. Drives the
     # heartbeat, which exists only to keep a stale_after widget from expiring.
     last_synced: float = 0.0
@@ -212,12 +218,18 @@ class WidgetManager:
         self._permission_notified = False
         # Slugs currently in a push-failure streak: WARN once on entry, DEBUG after.
         self._failed_slugs: set[str] = set()
+        self._unsub_quota: Callable[[], None] | None = None
 
     # ----- public lifecycle -----
 
     async def async_start(self) -> None:
         """Set up listeners, restore cached state, and POST initial widgets."""
         persisted = await self._async_load_cache()
+
+        if self._unsub_quota is None:
+            self._unsub_quota = async_dispatcher_connect(
+                self._hass, quota_released_signal(self._entry.entry_id), self._on_quota_released
+            )
 
         pending: list[TrackedWidget] = []
         for cfg in self._widgets:
@@ -255,6 +267,9 @@ class WidgetManager:
 
     async def async_stop(self) -> None:
         """Detach all listeners and flush cache to disk."""
+        if self._unsub_quota is not None:
+            self._unsub_quota()
+            self._unsub_quota = None
         cancelled: list[asyncio.Task] = []
         for tracked in self._tracked.values():
             self._detach(tracked)
@@ -282,6 +297,21 @@ class WidgetManager:
         # _delete_widget swallows expected API errors per slug; return_exceptions keeps an
         # unexpected one from stranding the rest.
         await asyncio.gather(*(self._delete_widget(slug) for slug in removed), return_exceptions=True)
+
+    @callback
+    def _on_quota_released(self, kind: str) -> None:
+        """Re-send the widgets whose last PATCH the quota refused.
+
+        Goes through the single-flight scheduler; _send_update drops the push
+        again if the rendered content still matches the cached one.
+        """
+        if kind != "widget_updates":
+            return
+        for tracked in self._tracked.values():
+            if not tracked.quota_pending:
+                continue
+            tracked.quota_pending = False
+            self._schedule_update(tracked)
 
     @staticmethod
     def _slug_set(widgets: list[dict]) -> set[str]:
@@ -499,6 +529,7 @@ class WidgetManager:
             await self._create_widget(tracked, content)
             tracked.last_content = content
             tracked.last_synced = time.monotonic()
+            tracked.quota_pending = False
             self._clear_forbidden_notification(slug)
             self._schedule_cache_save()
 
@@ -560,6 +591,7 @@ class WidgetManager:
 
             tracked.last_content = content
             tracked.last_synced = time.monotonic()
+            tracked.quota_pending = False
             self._clear_forbidden_notification(slug)
             self._schedule_cache_save()
 
@@ -759,6 +791,13 @@ class WidgetManager:
                 notification_id=_forbidden_notification_id(slug),
             )
             self._log_push_failure(slug, "PushWard 403 while %s widget %s: %s", context, slug, err)
+        except PushWardQuotaExceededError as err:
+            # The quota gate already warned once and raised the Repair issue;
+            # remember the widget so it catches up when the kind is released.
+            _LOGGER.debug("PushWard quota exhausted while %s widget %s: %s", context, slug, err)
+            tracked = self._tracked.get(slug)
+            if tracked is not None:
+                tracked.quota_pending = True
         except PushWardApiError as err:
             self._log_push_failure(slug, "PushWard API error while %s widget %s: %s", context, slug, err)
         except aiohttp.ClientError:

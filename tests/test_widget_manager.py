@@ -11,6 +11,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
@@ -18,6 +19,7 @@ from custom_components.pushward.api import (
     PushWardApiError,
     PushWardAuthError,
     PushWardNotFoundError,
+    PushWardQuotaExceededError,
     PushWardWidgetPermissionError,
 )
 from custom_components.pushward.const import (
@@ -44,6 +46,7 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_POLL,
 )
+from custom_components.pushward.quota import quota_released_signal
 from custom_components.pushward.widget_manager import (
     _GROUP_ROW_SOURCES,
     _WIDGET_PERMISSION_NOTIFICATION,
@@ -949,3 +952,89 @@ async def test_group_row_sources_cover_every_group_template(hass: HomeAssistant)
     branch and the widget subscribes to nothing.
     """
     assert set(_GROUP_ROW_SOURCES) == set(WIDGET_GROUP_TEMPLATES)
+
+
+# --- quota gate ---
+
+
+def _quota_entry(entry_id: str = "quota_entry") -> MagicMock:
+    entry = _mock_entry()
+    entry.entry_id = entry_id
+    return entry
+
+
+def _widget_quota_error() -> PushWardQuotaExceededError:
+    return PushWardQuotaExceededError("widget_updates", used=50, limit=50)
+
+
+async def test_quota_error_marks_pending_and_resends_on_release(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    api = _mock_api()
+    entry = _quota_entry()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config()], entry)
+    await manager.async_start()
+    api.reset_mock()
+    tracked = manager._tracked["ha-users"]
+
+    api.patch_widget = AsyncMock(side_effect=_widget_quota_error())
+    with caplog.at_level(logging.DEBUG, logger="custom_components.pushward.widget_manager"):
+        hass.states.async_set("sensor.users", "43")
+        await hass.async_block_till_done()
+
+    assert api.patch_widget.await_count == 1
+    assert tracked.quota_pending is True
+    assert "ha-users" not in manager._failed_slugs
+    assert not [r for r in caplog.records if r.levelno >= logging.WARNING]
+    # The cached payload still holds the last value that reached the server.
+    assert tracked.last_content["value"] == 42.0
+
+    api.patch_widget = AsyncMock()
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "widget_updates")
+    await hass.async_block_till_done()
+
+    assert api.patch_widget.await_count == 1
+    assert api.patch_widget.call_args.args[1]["content"]["value"] == 43.0
+    assert tracked.quota_pending is False
+    await manager.async_stop()
+
+
+async def test_quota_release_skips_widgets_that_were_not_refused(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    entry = _quota_entry()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config()], entry)
+    await manager.async_start()
+    api.reset_mock()
+
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "widget_updates")
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+
+    api.patch_widget.assert_not_awaited()
+    api.create_widget.assert_not_awaited()
+    await manager.async_stop()
+
+
+async def test_quota_release_subscription_dropped_on_stop(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    entry = _quota_entry()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config()], entry)
+    await manager.async_start()
+    await manager.async_reload([make_widget_config()])
+    tracked = manager._tracked["ha-users"]
+    api.reset_mock()
+
+    tracked.quota_pending = True
+    tracked.last_content = None
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "widget_updates")
+    await hass.async_block_till_done()
+    assert api.patch_widget.await_count == 1
+
+    await manager.async_stop()
+    tracked.quota_pending = True
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "widget_updates")
+    await hass.async_block_till_done()
+    assert api.patch_widget.await_count == 1

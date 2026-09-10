@@ -13,6 +13,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from homeassistant.components.media_player import MediaPlayerEntityFeature
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
 
 from custom_components.pushward.activity_manager import (
@@ -28,6 +29,7 @@ from custom_components.pushward.api import (
     PushWardAuthError,
     PushWardForbiddenError,
     PushWardNotFoundError,
+    PushWardQuotaExceededError,
 )
 from custom_components.pushward.const import (
     CONF_DISMISSAL_TTL,
@@ -61,6 +63,7 @@ from custom_components.pushward.const import (
     LOG_MAX_LINES,
 )
 from custom_components.pushward.media_control import EMITTED_CONTROL_SLOTS
+from custom_components.pushward.quota import quota_released_signal
 
 from .conftest import (
     IMAGE_URL,
@@ -2474,4 +2477,202 @@ async def test_media_controls_nulled_when_switched_off(hass: HomeAssistant) -> N
     assert set(controls) == set(EMITTED_CONTROL_SLOTS)
     assert all(action is None for action in controls.values())
 
+    await manager.async_stop()
+
+
+# --- quota gate ---
+
+
+def _quota_entry(entry_id: str = "quota_entry") -> MagicMock:
+    entry = _mock_entry()
+    entry.entry_id = entry_id
+    return entry
+
+
+def _quota_error() -> PushWardQuotaExceededError:
+    return PushWardQuotaExceededError("live_activity_updates", used=250, limit=250)
+
+
+async def test_quota_error_marks_pending_and_resends_on_release(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A quota-refused update is swallowed quietly and re-sent once the kind is released."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    entry = _quota_entry()
+    manager = ActivityManager(hass, api, [config], entry)
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    api.reset_mock()
+
+    api.update_activity = AsyncMock(side_effect=_quota_error())
+    with caplog.at_level(logging.DEBUG, logger="custom_components.pushward.activity_manager"):
+        await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 42})
+
+    assert api.update_activity.await_count == 1
+    assert tracked.quota_pending is True
+    assert "ha-washer" not in manager._failed_slugs
+    assert not [r for r in caplog.records if r.levelno >= logging.WARNING]
+
+    api.update_activity = AsyncMock()
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+
+    assert api.update_activity.await_count == 1
+    assert api.update_activity.call_args.args[2].get("progress") == 0.42
+    assert tracked.quota_pending is False
+    await manager.async_stop()
+
+
+async def test_quota_release_ignores_other_kinds_and_unaffected_entities(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    config = _entity_config()
+    entry = _quota_entry()
+    manager = ActivityManager(hass, api, [config], entry)
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+    api.reset_mock()
+
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "widget_updates")
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+
+    api.update_activity.assert_not_awaited()
+    api.create_activity.assert_not_awaited()
+    await manager.async_stop()
+
+
+async def test_quota_refused_start_restarts_on_release(hass: HomeAssistant) -> None:
+    """A start refused by quota never became active; the release restarts it if still on."""
+    api = _mock_api()
+    api.create_activity = AsyncMock(side_effect=_quota_error())
+    config = _entity_config()
+    entry = _quota_entry()
+    manager = ActivityManager(hass, api, [config], entry)
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert not tracked.is_active
+    assert tracked.quota_pending is True
+
+    api.create_activity = AsyncMock()
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_awaited_once()
+    assert tracked.is_active
+    assert tracked.quota_pending is False
+    await manager.async_stop()
+
+
+async def test_quota_refused_start_not_restarted_when_entity_off(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.create_activity = AsyncMock(side_effect=_quota_error())
+    config = _entity_config()
+    entry = _quota_entry()
+    manager = ActivityManager(hass, api, [config], entry)
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+    assert manager._tracked["binary_sensor.washer"].quota_pending is True
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await hass.async_block_till_done()
+    api.create_activity = AsyncMock()
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_not_awaited()
+    await manager.async_stop()
+
+
+async def test_quota_refused_end_deletes_activity(hass: HomeAssistant) -> None:
+    """Updates are metered but deletes are not: a gated end still takes the card down."""
+    api = _mock_api()
+    config = _entity_config()
+    manager, tracked = await _start_active(hass, api, config)
+
+    api.update_activity = AsyncMock(side_effect=_quota_error())
+    await end_activity_via_state(manager, hass, "binary_sensor.washer", "off", {})
+
+    api.delete_activity.assert_awaited_once_with("ha-washer")
+    assert not tracked.is_active
+    await manager.async_stop()
+
+
+async def test_quota_refused_shutdown_end_deletes_activity(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    api = _mock_api()
+    config = _entity_config()
+    manager, _ = await _start_active(hass, api, config)
+
+    api.update_activity = AsyncMock(side_effect=_quota_error())
+    with caplog.at_level(logging.WARNING, logger="custom_components.pushward.activity_manager"):
+        await manager.async_stop()
+
+    api.delete_activity.assert_awaited_once_with("ha-washer")
+    assert not [r for r in caplog.records if r.levelno >= logging.WARNING]
+
+
+async def test_quota_release_subscription_survives_reload_without_stacking(hass: HomeAssistant) -> None:
+    """Subentry edits reload the manager; the release handler must not multiply."""
+    api = _mock_api()
+    config = _entity_config()
+    entry = _quota_entry()
+    manager = ActivityManager(hass, api, [config], entry)
+    hass.states.async_set("binary_sensor.washer", "on")
+    await manager.async_start()
+    await manager.async_reload([config])
+    await manager.async_reload([config])
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    tracked.quota_pending = True
+    tracked.last_sent_at = 0.0
+    tracked.last_content = None
+    api.reset_mock()
+
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+
+    assert api.update_activity.await_count == 1
+    await manager.async_stop()  # sends the shutdown ENDED and drops the subscription
+    after_stop = api.update_activity.await_count
+
+    tracked.quota_pending = True
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+    assert api.update_activity.await_count == after_stop
+
+
+async def test_quota_refused_recreate_does_not_wedge_self_heal(hass: HomeAssistant) -> None:
+    """POST /activities is metered too; a refused recreate must not spend the one-per-streak recreate."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    entry = _quota_entry()
+    manager, tracked = await _start_active(hass, api, config)
+    manager._entry = entry
+
+    api.update_activity = AsyncMock(side_effect=PushWardNotFoundError("gone", status_code=404))
+    api.create_activity = AsyncMock(side_effect=_quota_error())
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 42})
+    assert tracked.quota_pending is True
+    assert tracked.recreate_attempted is False
+
+    # Quota back: PATCH still 404s, but the recreate is allowed again and sticks.
+    api.update_activity = AsyncMock(side_effect=[PushWardNotFoundError("gone", status_code=404), None])
+    api.create_activity = AsyncMock()
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {"progress": 43})
+
+    api.create_activity.assert_awaited_once()
+    assert api.update_activity.await_count == 2
+    assert tracked.recreate_attempted is False
+    api.update_activity = AsyncMock()
     await manager.async_stop()

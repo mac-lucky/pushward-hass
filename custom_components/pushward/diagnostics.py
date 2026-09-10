@@ -57,6 +57,7 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigE
     manager: ActivityManager | None = data.get("manager")
     widget_manager: WidgetManager | None = data.get("widget_manager")
     coordinator = data.get("coordinator")
+    quota_gate = data.get("quota_gate")
 
     subentries: list[dict[str, Any]] = []
     for sub in entry.subentries.values():
@@ -88,4 +89,7 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigE
         },
         "subentries": subentries,
         "usage": coordinator.data if coordinator is not None else None,
+        # Metered request kinds currently paused after a quota 429, with the
+        # server's reset time; empty when nothing is paused.
+        "quota_blocks": quota_gate.snapshot() if quota_gate is not None else {},
     }

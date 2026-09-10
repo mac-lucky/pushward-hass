@@ -26,6 +26,7 @@ from .api import (
     PushWardApiClient,
     PushWardApiError,
     PushWardForbiddenError,
+    PushWardQuotaExceededError,
 )
 from .const import (
     ACTIVITY_STATE_ENDED,
@@ -100,6 +101,7 @@ from .image_hash import (
     clear_thumbhash_cache,
 )
 from .media_control import async_register_media_control_view
+from .quota import QuotaGate
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -737,12 +739,12 @@ def _surface_api_errors():
     Without this, an exception from the API bubbles up to the service layer as a
     generic "Unknown error" with no hint of the cause. A 403 (missing capability,
     unverified recipient, …) is user-fixable, so it becomes a ServiceValidationError;
-    everything else (4xx/5xx/connection) becomes a HomeAssistantError carrying the
-    server's message.
+    so is an exhausted quota (wait for the reset or upgrade). Everything else
+    (4xx/5xx/connection) becomes a HomeAssistantError carrying the server's message.
     """
     try:
         yield
-    except PushWardForbiddenError as err:
+    except (PushWardForbiddenError, PushWardQuotaExceededError) as err:
         raise ServiceValidationError(str(err)) from err
     except PushWardApiError as err:
         raise HomeAssistantError(str(err)) from err
@@ -1045,13 +1047,20 @@ def _entity_configs(entry: ConfigEntry) -> list[dict]:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up PushWard from a config entry."""
     session = async_get_clientsession(hass)
-    api = PushWardApiClient(session, entry.data[CONF_SERVER_URL], entry.data[CONF_INTEGRATION_KEY])
+    # One quota gate per entry: the client arms it on a quota 429, the coordinator
+    # releases it once /auth/me shows the counters back under the cap.
+    quota_gate = QuotaGate(hass, entry)
+    entry.async_on_unload(quota_gate.async_shutdown)
+    api = PushWardApiClient(
+        session, entry.data[CONF_SERVER_URL], entry.data[CONF_INTEGRATION_KEY], quota_gate=quota_gate
+    )
 
     # The usage coordinator's first refresh doubles as the connection/key check:
     # a bad key surfaces as ConfigEntryAuthFailed (→ reauth); a transient failure
     # surfaces as UpdateFailed, which async_config_entry_first_refresh translates
     # to ConfigEntryNotReady (→ retry).
     coordinator = PushWardUsageCoordinator(hass, api, entry)
+    quota_gate.attach_coordinator(coordinator)
     await coordinator.async_config_entry_first_refresh()
 
     entities = _entity_configs(entry)
@@ -1065,6 +1074,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "manager": manager,
         "widget_manager": widget_manager,
         "coordinator": coordinator,
+        "quota_gate": quota_gate,
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

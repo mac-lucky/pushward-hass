@@ -20,26 +20,15 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
-    APP_STORE_URL,
     DOMAIN,
     QUOTA_RESET_KEY,
     USAGE_LIMIT_RESOURCES,
     USAGE_UPDATE_INTERVAL,
     usage_limit_issue_id,
 )
+from .quota import QuotaGate, async_report_usage_limit
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def _format_reset(value: Any) -> str:
-    """Friendly reset hint for the repair description.
-
-    ``/auth/me`` returns ISO-8601 timestamps (e.g. ``2026-07-01T00:00:00Z``); the
-    date portion is enough for the user and avoids leaking a clock-precise time.
-    """
-    if isinstance(value, str) and value:
-        return value.split("T", 1)[0]
-    return "the next reset"
 
 
 def _is_over_limit(used: Any, limit: Any) -> bool:
@@ -63,6 +52,9 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             update_interval=timedelta(seconds=USAGE_UPDATE_INTERVAL),
         )
         self._api = api
+        # Set by QuotaGate.attach_coordinator; released here once a poll shows the
+        # exhausted resource is back under its cap.
+        self.quota_gate: QuotaGate | None = None
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch the latest usage snapshot.
@@ -86,6 +78,10 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         Uncapped resources (premium Live Activity / widget updates omit the limit key)
         never trip. ``async_delete_issue`` is a no-op when the issue is absent, so the
         under-limit branch keeps the registry in sync without a presence check.
+
+        The same under-limit reading releases the quota gate for that resource: the
+        server has confirmed the period rolled over (or the plan changed), so paused
+        updates can go out again.
         """
         entry_id = self.config_entry.entry_id
         for resource in USAGE_LIMIT_RESOURCES:
@@ -94,20 +90,8 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             limit = data.get(resource.limit_key)
             if not _is_over_limit(used, limit):
                 ir.async_delete_issue(self.hass, DOMAIN, issue_id)
+                if self.quota_gate is not None:
+                    self.quota_gate.release(resource.used_key.removesuffix("_used"))
                 continue
             reset = data.get(resource.reset_key) or data.get(QUOTA_RESET_KEY)
-            ir.async_create_issue(
-                self.hass,
-                DOMAIN,
-                issue_id,
-                is_fixable=False,
-                is_persistent=False,
-                severity=ir.IssueSeverity.WARNING,
-                translation_key=resource.translation_key,
-                translation_placeholders={
-                    "used": str(used),
-                    "limit": str(limit),
-                    "resets_at": _format_reset(reset),
-                },
-                learn_more_url=APP_STORE_URL,
-            )
+            async_report_usage_limit(self.hass, entry_id, resource, used, limit, reset)
