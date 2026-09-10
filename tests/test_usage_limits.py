@@ -30,9 +30,8 @@ from custom_components.pushward.const import (
     USAGE_LIMIT_RESOURCES,
     usage_limit_issue_id,
 )
-from custom_components.pushward.coordinator import PushWardUsageCoordinator
+from custom_components.pushward.coordinator import PushWardUsageCoordinator, _format_reset
 from custom_components.pushward.image_hash import DATA_THUMBHASH_CACHE, async_thumbhash_for_url
-from custom_components.pushward.quota import format_reset
 from custom_components.pushward.sensor import USAGE_SENSORS
 
 from .conftest import (
@@ -238,7 +237,7 @@ async def test_unload_clears_the_thumbhash_cache(hass: HomeAssistant) -> None:
     ],
 )
 def test_format_reset(value, expected) -> None:
-    assert format_reset(value) == expected
+    assert _format_reset(value) == expected
 
 
 # --- drift guards (no HomeAssistant needed) ---

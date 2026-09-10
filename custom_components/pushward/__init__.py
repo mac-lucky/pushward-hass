@@ -1049,7 +1049,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = async_get_clientsession(hass)
     # One quota gate per entry: the client arms it on a quota 429, the coordinator
     # releases it once /auth/me shows the counters back under the cap.
-    quota_gate = QuotaGate(hass, entry)
+    quota_gate = QuotaGate(hass, entry.entry_id)
     entry.async_on_unload(quota_gate.async_shutdown)
     api = PushWardApiClient(
         session, entry.data[CONF_SERVER_URL], entry.data[CONF_INTEGRATION_KEY], quota_gate=quota_gate
@@ -1059,8 +1059,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # a bad key surfaces as ConfigEntryAuthFailed (→ reauth); a transient failure
     # surfaces as UpdateFailed, which async_config_entry_first_refresh translates
     # to ConfigEntryNotReady (→ retry).
-    coordinator = PushWardUsageCoordinator(hass, api, entry)
-    quota_gate.attach_coordinator(coordinator)
+    coordinator = PushWardUsageCoordinator(hass, api, entry, quota_gate)
     await coordinator.async_config_entry_first_refresh()
 
     entities = _entity_configs(entry)

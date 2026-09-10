@@ -2,6 +2,7 @@
 
 import time
 from contextlib import contextmanager
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
@@ -11,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 
 from custom_components.pushward.activity_manager import ActivityManager
-from custom_components.pushward.api import PushWardApiClient
+from custom_components.pushward.api import PushWardApiClient, PushWardQuotaExceededError
 from custom_components.pushward.const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
@@ -380,6 +381,17 @@ def make_widget_api() -> AsyncMock:
     api.create_widget = AsyncMock()
     api.patch_widget = AsyncMock()
     return api
+
+
+def make_quota_error(
+    kind: str = "live_activity_updates",
+    *,
+    used: int | None = 250,
+    limit: int | None = 250,
+    reset_at: datetime | None = None,
+) -> PushWardQuotaExceededError:
+    """Build the typed error the client raises for a `quota.exceeded` 429."""
+    return PushWardQuotaExceededError(kind, used=used, limit=limit, reset_at=reset_at)
 
 
 def make_mock_entry(entry_id: str = "test_entry") -> MagicMock:

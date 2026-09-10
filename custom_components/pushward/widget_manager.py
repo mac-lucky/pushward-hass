@@ -60,6 +60,7 @@ from .const import (
     CONF_WIDGET_TRIGGER_MODE,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DEFAULT_WIDGET_TREND_PERIOD,
+    QUOTA_KIND_WIDGET_UPDATES,
     WIDGET_GROUP_TEMPLATES,
     WIDGET_MAX_TREND_POINTS,
     WIDGET_MIN_TREND_POINTS,
@@ -115,9 +116,10 @@ class TrackedWidget:
     update_pending: bool = False
     # One recreate per 404 streak; reset on the next successful PATCH.
     recreate_attempted: bool = False
-    # The last PATCH was refused because the widget-update quota is spent;
-    # re-sent when the quota gate releases the kind.
-    quota_pending: bool = False
+    # The last PATCH was refused by the quota gate. Widgets cannot rely on the
+    # content check alone at release time: `trend` is computed against the
+    # previous value, so re-rendering an unchanged widget still differs.
+    quota_refused: bool = False
     # monotonic() of the last create/PATCH that reached the server. Drives the
     # heartbeat, which exists only to keep a stale_after widget from expiring.
     last_synced: float = 0.0
@@ -300,18 +302,13 @@ class WidgetManager:
 
     @callback
     def _on_quota_released(self, kind: str) -> None:
-        """Re-send the widgets whose last PATCH the quota refused.
-
-        Goes through the single-flight scheduler; _send_update drops the push
-        again if the rendered content still matches the cached one.
-        """
-        if kind != "widget_updates":
+        """Re-send, through the single-flight scheduler, the widgets the quota refused."""
+        if kind != QUOTA_KIND_WIDGET_UPDATES:
             return
         for tracked in self._tracked.values():
-            if not tracked.quota_pending:
-                continue
-            tracked.quota_pending = False
-            self._schedule_update(tracked)
+            if tracked.quota_refused:
+                tracked.quota_refused = False
+                self._schedule_update(tracked)
 
     @staticmethod
     def _slug_set(widgets: list[dict]) -> set[str]:
@@ -529,7 +526,6 @@ class WidgetManager:
             await self._create_widget(tracked, content)
             tracked.last_content = content
             tracked.last_synced = time.monotonic()
-            tracked.quota_pending = False
             self._clear_forbidden_notification(slug)
             self._schedule_cache_save()
 
@@ -591,7 +587,6 @@ class WidgetManager:
 
             tracked.last_content = content
             tracked.last_synced = time.monotonic()
-            tracked.quota_pending = False
             self._clear_forbidden_notification(slug)
             self._schedule_cache_save()
 
@@ -758,6 +753,9 @@ class WidgetManager:
 
     @callback
     def _clear_forbidden_notification(self, slug: str) -> None:
+        """Bookkeeping after a push reached the server."""
+        if (tracked := self._tracked.get(slug)) is not None:
+            tracked.quota_refused = False
         if self._permission_notified:
             self._permission_notified = False
             persistent_notification.async_dismiss(self._hass, _WIDGET_PERMISSION_NOTIFICATION)
@@ -792,12 +790,10 @@ class WidgetManager:
             )
             self._log_push_failure(slug, "PushWard 403 while %s widget %s: %s", context, slug, err)
         except PushWardQuotaExceededError as err:
-            # The quota gate already warned once and raised the Repair issue;
-            # remember the widget so it catches up when the kind is released.
+            # The quota gate warned once when it armed; just remember who to re-send.
             _LOGGER.debug("PushWard quota exhausted while %s widget %s: %s", context, slug, err)
-            tracked = self._tracked.get(slug)
-            if tracked is not None:
-                tracked.quota_pending = True
+            if (tracked := self._tracked.get(slug)) is not None:
+                tracked.quota_refused = True
         except PushWardApiError as err:
             self._log_push_failure(slug, "PushWard API error while %s widget %s: %s", context, slug, err)
         except aiohttp.ClientError:

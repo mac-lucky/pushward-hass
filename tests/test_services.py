@@ -19,7 +19,6 @@ from custom_components.pushward.api import (
     PushWardAuthError,
     PushWardEmailPermissionError,
     PushWardForbiddenError,
-    PushWardQuotaExceededError,
 )
 from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
@@ -38,6 +37,7 @@ from .conftest import (
     IMAGE_THUMBHASH,
     IMAGE_URL,
     expected_thumbhash,
+    make_quota_error,
     make_usage_payload,
     make_widget_config,
     patch_image_download,
@@ -576,9 +576,7 @@ async def test_service_send_email_permission_error_becomes_validation_error(hass
 async def test_service_quota_exhausted_becomes_validation_error(hass: HomeAssistant) -> None:
     """A spent quota is user-actionable (wait or upgrade), so it is a ServiceValidationError."""
     api = _mock_api()
-    api.create_notification = AsyncMock(
-        side_effect=PushWardQuotaExceededError("notifications", used=500, limit=500, reset_at=None)
-    )
+    api.create_notification = AsyncMock(side_effect=make_quota_error("notifications", used=500, limit=500))
     await _setup_entry(hass, api)
 
     with pytest.raises(ServiceValidationError, match="notifications quota exhausted"):

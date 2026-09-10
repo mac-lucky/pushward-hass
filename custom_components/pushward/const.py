@@ -603,11 +603,26 @@ QUOTA_DAILY_RESET_KEY = "quota_resets_day_at"
 class MeteredResource(NamedTuple):
     """A metered account resource tracked for usage-limit repair issues."""
 
-    used_key: str
-    limit_key: str
+    # The server's quota `kind` (the /auth/me counter name without `_used`); also
+    # what a `quota.exceeded` 429 names and what the quota gate is keyed on.
+    kind: str
     translation_key: str
     # Preferred /auth/me reset key; falls back to QUOTA_RESET_KEY when absent.
     reset_key: str
+
+    @property
+    def used_key(self) -> str:
+        return f"{self.kind}_used"
+
+    @property
+    def limit_key(self) -> str:
+        return f"{self.kind}_limit"
+
+
+QUOTA_KIND_NOTIFICATIONS = "notifications"
+QUOTA_KIND_LIVE_ACTIVITY_UPDATES = "live_activity_updates"
+QUOTA_KIND_WIDGET_UPDATES = "widget_updates"
+QUOTA_KIND_EMAILS = "emails"
 
 
 # Metered resources checked for usage-limit repair issues. Mirrors the metered
@@ -616,12 +631,10 @@ class MeteredResource(NamedTuple):
 # pluralization — is fully localizable, rather than injecting an English resource
 # name as a placeholder (which would arrive untranslated in every locale).
 USAGE_LIMIT_RESOURCES = (
-    MeteredResource("notifications_used", "notifications_limit", "usage_limit_notifications", QUOTA_DAILY_RESET_KEY),
-    MeteredResource(
-        "live_activity_updates_used", "live_activity_updates_limit", "usage_limit_live_activity", QUOTA_RESET_KEY
-    ),
-    MeteredResource("widget_updates_used", "widget_updates_limit", "usage_limit_widgets", QUOTA_RESET_KEY),
-    MeteredResource("emails_used", "emails_limit", "usage_limit_emails", QUOTA_RESET_KEY),
+    MeteredResource(QUOTA_KIND_NOTIFICATIONS, "usage_limit_notifications", QUOTA_DAILY_RESET_KEY),
+    MeteredResource(QUOTA_KIND_LIVE_ACTIVITY_UPDATES, "usage_limit_live_activity", QUOTA_RESET_KEY),
+    MeteredResource(QUOTA_KIND_WIDGET_UPDATES, "usage_limit_widgets", QUOTA_RESET_KEY),
+    MeteredResource(QUOTA_KIND_EMAILS, "usage_limit_emails", QUOTA_RESET_KEY),
 )
 
 
@@ -630,27 +643,15 @@ def usage_limit_issue_id(entry_id: str, used_key: str) -> str:
     return f"usage_limit_{entry_id}_{used_key}"
 
 
-def metered_resource_for_kind(kind: str) -> MeteredResource | None:
-    """Map a server quota `kind` (e.g. ``widget_updates``) to its metered resource.
-
-    The server's kinds are the ``/auth/me`` counter names without the ``_used``
-    suffix, so the lookup is a suffix match against USAGE_LIMIT_RESOURCES.
-    """
-    used_key = f"{kind}_used"
-    return next((r for r in USAGE_LIMIT_RESOURCES if r.used_key == used_key), None)
-
-
 # API retry
 MAX_RETRIES = 5
 RETRY_BASE_DELAY = 1  # seconds
 RETRY_MAX_DELAY = 30  # seconds
 MAX_CONCURRENT_REQUESTS = 5  # max simultaneous API request+retry loops
 
-# Quota gate: how long metered requests stay paused after a `quota.exceeded` 429.
-# Normally until the server's reset_at; the floor absorbs clock skew that would
-# put reset_at in the past (a zero-length pause is no pause), the fallback covers
-# a missing or implausible reset_at, and the jitter spreads the reset-time wake-up
-# of many installs so they do not all poll the server in the same second.
+# Quota gate pause after a `quota.exceeded` 429: until the server's reset_at,
+# floored (a reset_at in the past must still pause), with a fallback for a missing
+# or implausible reset_at and jitter so installs do not all wake at the same second.
 QUOTA_BLOCK_MIN_SECONDS = 60
 QUOTA_BLOCK_FALLBACK_SECONDS = 3600
 QUOTA_BLOCK_PLAUSIBLE_MAX_SECONDS = 32 * 24 * 3600

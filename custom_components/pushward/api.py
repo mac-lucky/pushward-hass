@@ -15,7 +15,16 @@ from typing import TYPE_CHECKING, Any
 import aiohttp
 from homeassistant.util import dt as dt_util
 
-from .const import MAX_CONCURRENT_REQUESTS, MAX_RETRIES, RETRY_BASE_DELAY, RETRY_MAX_DELAY
+from .const import (
+    MAX_CONCURRENT_REQUESTS,
+    MAX_RETRIES,
+    QUOTA_KIND_EMAILS,
+    QUOTA_KIND_LIVE_ACTIVITY_UPDATES,
+    QUOTA_KIND_NOTIFICATIONS,
+    QUOTA_KIND_WIDGET_UPDATES,
+    RETRY_BASE_DELAY,
+    RETRY_MAX_DELAY,
+)
 
 if TYPE_CHECKING:
     from .quota import QuotaGate
@@ -28,31 +37,17 @@ _TIMEOUT = aiohttp.ClientTimeout(total=30)
 # `rate_limit.exceeded`, the per-client request limiter, which is worth retrying).
 QUOTA_EXCEEDED_CODE = "quota.exceeded"
 
-# Which metered quota each request spends. Mirrors the routes the server marks
-# `x-require-subscription-or-quota` in router.go: create/update activity,
-# update widget, notifications and emails. The snooze and /activity/{id} routes
-# are gated there too but this client never calls them. Everything else the
-# client uses (GET /auth/me, POST /widgets, DELETE ...) is not metered.
-_QUOTA_ROUTES: tuple[tuple[str, str, str], ...] = (
-    ("POST", "/activities", "live_activity_updates"),
-    ("PATCH", "/activities/", "live_activity_updates"),
-    ("PATCH", "/widgets/", "widget_updates"),
-    ("POST", "/notifications", "notifications"),
-    ("POST", "/emails", "emails"),
-)
 
-
-def quota_kind_for(method: str, path: str) -> str | None:
-    """Return the quota kind a request spends, or None when it is not metered."""
-    for route_method, prefix, kind in _QUOTA_ROUTES:
-        if method != route_method:
-            continue
-        if prefix.endswith("/"):
-            if path.startswith(prefix):
-                return kind
-        elif path == prefix:
-            return kind
-    return None
+def parse_http_date(header: str | None) -> datetime | None:
+    """Parse an RFC 7231 date header to an aware datetime (None when absent/invalid)."""
+    if not header:
+        return None
+    try:
+        parsed = parsedate_to_datetime(header)
+    except (TypeError, ValueError):
+        return None
+    # A `-0000` zone parses to a naive datetime; treat it as UTC like the rest.
+    return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=dt_util.UTC)
 
 
 class PushWardApiError(Exception):
@@ -101,12 +96,7 @@ class PushWardEmailPermissionError(PushWardForbiddenError):
 
 
 class PushWardQuotaExceededError(PushWardApiError):
-    """429 with code `quota.exceeded`: a metered quota is used up for the period.
-
-    Unlike a rate-limit 429 there is nothing to retry: every further request of
-    the same kind is rejected until `reset_at`. The client stops sending them
-    (see quota.QuotaGate) and raises this locally in the meantime.
-    """
+    """429 with code `quota.exceeded`: nothing to retry until `reset_at` (see quota.QuotaGate)."""
 
     def __init__(
         self,
@@ -129,10 +119,6 @@ class PushWardQuotaExceededError(PushWardApiError):
         if self.reset_at is not None:
             text += f", resets {self.reset_at.astimezone(dt_util.UTC).strftime('%Y-%m-%d %H:%M UTC')}"
         return text
-
-
-def _as_int(value: Any) -> int | None:
-    return value if isinstance(value, int) and not isinstance(value, bool) else None
 
 
 class PushWardApiClient:
@@ -211,6 +197,7 @@ class PushWardApiClient:
             "/activities",
             json=body,
             handle_409=True,
+            quota_kind=QUOTA_KIND_LIVE_ACTIVITY_UPDATES,
         )
 
     async def update_activity(
@@ -237,7 +224,9 @@ class PushWardApiClient:
             body["stale_ttl"] = stale_ttl
         if dismissal_ttl is not None:
             body["dismissal_ttl"] = dismissal_ttl
-        await self._request_with_retry("PATCH", f"/activities/{slug}", json=body)
+        await self._request_with_retry(
+            "PATCH", f"/activities/{slug}", json=body, quota_kind=QUOTA_KIND_LIVE_ACTIVITY_UPDATES
+        )
 
     async def delete_activity(self, slug: str) -> None:
         """Delete an activity via DELETE /activities/{slug}."""
@@ -281,7 +270,7 @@ class PushWardApiClient:
         "push_throttle": ...}). Template lives inside content; change it via
         `content.template`. Absent fields are preserved server-side.
         """
-        await self._request_with_retry("PATCH", f"/widgets/{slug}", json=body)
+        await self._request_with_retry("PATCH", f"/widgets/{slug}", json=body, quota_kind=QUOTA_KIND_WIDGET_UPDATES)
 
     async def delete_widget(self, slug: str) -> None:
         """DELETE /widgets/{slug}. Idempotent — 404 swallowed."""
@@ -326,7 +315,7 @@ class PushWardApiClient:
         ]:
             if val is not None:
                 payload[key] = val
-        await self._request_with_retry("POST", "/notifications", json=payload)
+        await self._request_with_retry("POST", "/notifications", json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS)
 
     async def send_email(
         self,
@@ -348,25 +337,19 @@ class PushWardApiClient:
             payload["text_body"] = text_body
         if html_body is not None:
             payload["html_body"] = html_body
-        await self._request_with_retry("POST", "/emails", json=payload)
+        await self._request_with_retry("POST", "/emails", json=payload, quota_kind=QUOTA_KIND_EMAILS)
 
     @staticmethod
     def _truncate(message: str, max_len: int = 200) -> str:
         return message[:max_len] + ("…" if len(message) > max_len else "")
 
     @staticmethod
-    async def _parse_problem(resp: aiohttp.ClientResponse) -> tuple[str, str, str]:
-        """Parse a RFC 9457 Problem body. Return (code, detail, raw_body).
+    async def _parse_problem(resp: aiohttp.ClientResponse) -> tuple[str, str, str, dict]:
+        """Parse a RFC 9457 Problem body. Return (code, detail, raw_body, fields).
 
         Tolerant to non-Problem bodies (plain text, empty) — falls back to an
-        empty code/detail so callers can use the raw body.
+        empty code/detail/fields so callers can use the raw body.
         """
-        code, detail, raw, _ = await PushWardApiClient._parse_problem_dict(resp)
-        return code, detail, raw
-
-    @staticmethod
-    async def _parse_problem_dict(resp: aiohttp.ClientResponse) -> tuple[str, str, str, dict]:
-        """Like _parse_problem but also return the parsed body (empty when not JSON)."""
         raw = await resp.text()
         if not raw:
             return "", "", raw, {}
@@ -384,12 +367,7 @@ class PushWardApiClient:
         reset_at = dt_util.parse_datetime(str(data.get("reset_at") or ""))
         if reset_at is not None and reset_at.tzinfo is None:
             reset_at = reset_at.replace(tzinfo=dt_util.UTC)
-        return PushWardQuotaExceededError(
-            str(data.get("kind") or kind),
-            used=_as_int(data.get("used")),
-            limit=_as_int(data.get("limit")),
-            reset_at=reset_at,
-        )
+        return PushWardQuotaExceededError(kind, used=data.get("used"), limit=data.get("limit"), reset_at=reset_at)
 
     async def _request_with_retry(
         self,
@@ -401,20 +379,18 @@ class PushWardApiClient:
         allow_404: bool = False,
         forbidden_is_auth: bool = False,
         return_json: bool = False,
+        quota_kind: str | None = None,
     ) -> Any:
         """Execute an HTTP request with exponential backoff retry.
 
         ``forbidden_is_auth`` maps 403 to PushWardAuthError (endpoints where a
         403 means a bad/expired key, e.g. /auth/me). ``return_json`` parses and
-        returns the success body instead of None.
+        returns the success body instead of None. ``quota_kind`` names the metered
+        quota the request spends (the server's `x-require-subscription-or-quota`
+        routes); such requests are refused locally while the quota gate has that
+        kind paused, and a `quota.exceeded` 429 pauses it.
         """
-        quota_kind = quota_kind_for(method, path)
-        # Refuse a paused kind before queueing on the semaphore: the refusal is
-        # local, so it should not wait behind in-flight requests.
-        if quota_kind is not None and self._quota_gate is not None:
-            blocked = self._quota_gate.blocked(quota_kind)
-            if blocked is not None:
-                raise blocked
+        gate = self._quota_gate if quota_kind is not None else None
         async with self._request_semaphore:
             url = f"{self._base_url}{path}"
             last_error: Exception | None = None
@@ -423,10 +399,8 @@ class PushWardApiClient:
                 # Checked per attempt, not once up front: a request that waited on
                 # the semaphore or slept through a rate-limit retry must not go out
                 # after another request has just learned the quota is gone.
-                if quota_kind is not None and self._quota_gate is not None:
-                    blocked = self._quota_gate.blocked(quota_kind)
-                    if blocked is not None:
-                        raise blocked
+                if gate is not None:
+                    gate.raise_if_blocked(quota_kind)
                 try:
                     async with self._session.request(
                         method, url, headers=self._headers, json=json, timeout=_TIMEOUT
@@ -443,7 +417,7 @@ class PushWardApiClient:
                             return None
 
                         if handle_409 and resp.status == HTTPStatus.CONFLICT:
-                            code, detail, raw = await self._parse_problem(resp)
+                            code, detail, raw, _ = await self._parse_problem(resp)
                             if code == "activity.already_exists" or "already exists" in (detail or raw).lower():
                                 return None
                             raise PushWardApiError(
@@ -463,7 +437,7 @@ class PushWardApiClient:
                                     "Invalid integration key",
                                     status_code=resp.status,
                                 )
-                            _, detail, raw = await self._parse_problem(resp)
+                            _, detail, raw, _ = await self._parse_problem(resp)
                             message = self._truncate(detail or raw) or "Forbidden"
                             if path.startswith("/widgets"):
                                 raise PushWardWidgetPermissionError(
@@ -481,24 +455,13 @@ class PushWardApiClient:
                             )
 
                         if resp.status == HTTPStatus.TOO_MANY_REQUESTS:
-                            code, _, _, data = await self._parse_problem_dict(resp)
+                            code, _, _, data = await self._parse_problem(resp)
                             if code == QUOTA_EXCEEDED_CODE:
-                                # The quota is spent for the whole period; retrying
-                                # only burns requests. Remember it and fail fast.
-                                err = self._quota_error_from(quota_kind or "", data)
-                                if quota_kind is not None and err.kind != quota_kind:
-                                    # The gate is keyed by the client's route table; a
-                                    # kind the server names differently would never be
-                                    # paused, so make the drift visible.
-                                    _LOGGER.warning(
-                                        "PushWard quota kind mismatch for %s %s: server says %r, client expected %r",
-                                        method,
-                                        path,
-                                        err.kind,
-                                        quota_kind,
-                                    )
-                                if self._quota_gate is not None:
-                                    self._quota_gate.arm(err, server_date=resp.headers.get("Date"))
+                                # Spent for the whole period; retrying only burns
+                                # requests. Pause the kind and fail fast.
+                                err = self._quota_error_from(quota_kind or str(data.get("kind") or ""), data)
+                                if gate is not None:
+                                    gate.arm(err, server_now=parse_http_date(resp.headers.get("Date")))
                                 raise err
                             last_error = PushWardApiError(
                                 f"{method} {path} rate limited (429)",
@@ -514,7 +477,7 @@ class PushWardApiClient:
 
                         # Other 4xx — don't retry
                         if 400 <= resp.status < 500:
-                            _, detail, raw = await self._parse_problem(resp)
+                            _, detail, raw, _ = await self._parse_problem(resp)
                             message = f"{method} {path} failed ({resp.status}): {self._truncate(detail or raw)}"
                             # A 404 that reached here means the caller didn't opt into
                             # allow_404, so a missing resource is a typed error the caller
@@ -572,9 +535,7 @@ class PushWardApiClient:
             if value != value:
                 return 0
             return min(max(0.0, value), RETRY_MAX_DELAY)
-        try:
-            dt = parsedate_to_datetime(header)
-            delta = dt.timestamp() - time.time()
-            return min(max(0, delta), RETRY_MAX_DELAY)
-        except (ValueError, TypeError):
+        dt = parse_http_date(header)
+        if dt is None:
             return 0
+        return min(max(0, dt.timestamp() - time.time()), RETRY_MAX_DELAY)

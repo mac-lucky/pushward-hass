@@ -360,7 +360,9 @@ async def test_retry_on_server_error(mock_sleep):
 
 @patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
 async def test_retry_on_429_with_retry_after(mock_sleep):
-    resp_429 = _mock_response(429, headers={"Retry-After": "2"})
+    """A rate-limit 429 (code rate_limit.exceeded) is retried; only quota.exceeded is not."""
+    body = '{"status":429,"detail":"rate limit exceeded","code":"rate_limit.exceeded","retry_after_ms":2000}'
+    resp_429 = _mock_response(429, text=body, headers={"Retry-After": "2"})
     resp_200 = _mock_response(200)
     session = _make_session(resp_429, resp_200)
     client = _make_client(session)

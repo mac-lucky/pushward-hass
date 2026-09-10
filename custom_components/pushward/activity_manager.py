@@ -61,6 +61,7 @@ from .const import (
     END_DELAY_SECONDS,
     HISTORY_SEED_MAX,
     LOG_MAX_LINES,
+    QUOTA_KIND_LIVE_ACTIVITY_UPDATES,
 )
 from .content_mapper import (
     _build_log_line,
@@ -179,9 +180,6 @@ class TrackedEntity:
     last_sent_at: float = 0.0
     # One recreate per 404 streak; reset on the next successful push.
     recreate_attempted: bool = False
-    # The last push was refused because the account's Live Activity quota is
-    # spent; re-sent (or restarted) when the quota gate releases the kind.
-    quota_pending: bool = False
     # (ts_seconds, {label: value}) — sampled on every state change. HA 2024.8+
     # strips light attributes from the recorder DB, so recorder queries can't
     # rebuild brightness history. Keep our own ring buffer instead.
@@ -249,16 +247,9 @@ class ActivityManager:
             )
             self._log_push_failure(slug, "PushWard 403 while %s %s: %s", context, slug, err)
         except PushWardQuotaExceededError as err:
-            # The quota gate already warned once and raised the Repair issue;
-            # remember what to catch up on when it releases the kind.
+            # The quota gate warned once when it armed; the release signal
+            # re-evaluates every entity, so nothing to remember per slug.
             _LOGGER.debug("PushWard quota exhausted while %s %s: %s", context, slug, err)
-            tracked = self._tracked_by_slug(slug)
-            if tracked is not None:
-                tracked.quota_pending = True
-                # A local refusal says nothing about whether the row still exists
-                # server-side, so it must not use up the one recreate a 404 streak
-                # is allowed (POST /activities is metered and can be refused too).
-                tracked.recreate_attempted = False
             if context == "ending":
                 await self._delete_quietly(slug, context)
         except PushWardApiError as err:
@@ -470,23 +461,17 @@ class ActivityManager:
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.debug("Failed to delete activity %s during %s", slug, context, exc_info=True)
 
-    def _tracked_by_slug(self, slug: str) -> TrackedEntity | None:
-        return next((t for t in self._tracked.values() if t.config.get(CONF_SLUG) == slug), None)
-
     @callback
     def _on_quota_released(self, kind: str) -> None:
         """Catch up after the Live Activity quota came back.
 
-        Active entities go through the normal throttle (unchanged content is
-        deduplicated there). An entity whose start was refused never became
-        active, so it is restarted if it still sits in a start state.
+        Every entity is re-evaluated: active ones go through the normal throttle,
+        whose content check drops anything that did not change; one whose start
+        was refused never became active and is restarted if still in a start state.
         """
-        if kind != "live_activity_updates":
+        if kind != QUOTA_KIND_LIVE_ACTIVITY_UPDATES:
             return
         for entity_id, tracked in self._tracked.items():
-            if not tracked.quota_pending:
-                continue
-            tracked.quota_pending = False
             if tracked.is_active:
                 if not self._is_ending(tracked):
                     self._schedule_throttled_update(entity_id)
@@ -703,7 +688,6 @@ class ActivityManager:
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
             tracked.recreate_attempted = False
-            tracked.quota_pending = False
 
     def _activity_name(self, entity_id: str, config: dict) -> str:
         """Resolve activity name: configured name > friendly name > entity_id."""
@@ -885,9 +869,11 @@ class ActivityManager:
                 if tracked.recreate_attempted:
                     _LOGGER.debug("Activity %s still missing server-side; skipping recreate", slug)
                     return
-                tracked.recreate_attempted = True
                 _LOGGER.debug("Activity %s missing server-side on update; recreating", slug)
                 await self._create_activity(entity_id, tracked.config)
+                # Counts only once the create reached the server: a create refused
+                # locally (quota gate) or lost on the wire says nothing about the row.
+                tracked.recreate_attempted = True
                 await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
                 # The retry push landed, so the 404 streak is over: re-arm the guard
                 # (reset on the next successful push) so a later re-deletion self-heals
@@ -899,7 +885,6 @@ class ActivityManager:
             self._clear_forbidden_notification(slug)
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
-            tracked.quota_pending = False
 
     @callback
     def _flush_update(self, entity_id: str, _now: datetime | None = None) -> None:
