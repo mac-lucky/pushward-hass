@@ -20,6 +20,7 @@ from custom_components.pushward.const import (
     CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
+    CONF_COMPACT_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -520,6 +521,52 @@ def test_map_completion_content_no_last():
     assert content["accent_color"] == "green"
     assert content["template"] == "generic"
     assert content["subtitle"] == ""
+
+
+def test_map_content_compact_label_from_config():
+    state = _make_state("on", {"friendly_name": "Washer"})
+
+    content = map_content(state, {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_COMPACT_LABEL: "WASH"})
+    assert content["compact_label"] == "WASH"
+    assert_valid_activity_content(content)
+
+    # no option at all (a config written before the field existed): nothing is sent
+    content = map_content(state, {CONF_TEMPLATE: "generic", CONF_ICON: "washer"})
+    assert "compact_label" not in content
+
+
+def test_map_content_cleared_compact_label_ships_empty():
+    """A cleared label must reach the server as "" or the running activity keeps the old one."""
+    state = _make_state("on", {"friendly_name": "Washer"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_COMPACT_LABEL: ""}
+
+    content = map_content(state, config)
+    assert content["compact_label"] == ""
+    assert_valid_activity_content(content)
+
+    content = map_completion_content(config, last_content={"progress": 0.5, "compact_label": "WASH"})
+    assert content["compact_label"] == ""
+
+
+def test_map_content_compact_label_is_trimmed_before_the_cap():
+    """A label seeded outside the form as "  WASH  " must ship "WASH", not "  WA"."""
+    state = _make_state("on", {"friendly_name": "Washer"})
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_COMPACT_LABEL: "  WASH  "}
+
+    content = map_content(state, config)
+    assert content["compact_label"] == "WASH"
+    assert_valid_activity_content(content)
+    assert map_completion_content(config)["compact_label"] == "WASH"
+
+
+def test_map_completion_content_keeps_compact_label():
+    config = {CONF_TEMPLATE: "generic", CONF_ICON: "washer", CONF_COMPACT_LABEL: "WASH"}
+
+    content = map_completion_content(config, last_content={"progress": 0.5, "subtitle": "Cotton"})
+
+    assert content["compact_label"] == "WASH"
+    assert_valid_activity_content(content)
+    assert "compact_label" not in map_completion_content({CONF_TEMPLATE: "generic", CONF_ICON: "washer"})
 
 
 def test_map_completion_content_preserves_last():

@@ -18,7 +18,7 @@ from pathlib import Path
 
 import yaml
 
-from custom_components.pushward.const import MAX_SEVERITY_LABEL_LEN, SERVICE_TEMPLATES
+from custom_components.pushward.const import MAX_COMPACT_LABEL_LEN, MAX_SEVERITY_LABEL_LEN, SERVICE_TEMPLATES
 
 _COMPONENT = Path(__file__).parent.parent / "custom_components" / "pushward"
 _SERVICES_YAML = _COMPONENT / "services.yaml"
@@ -188,6 +188,37 @@ def test_severity_label_prose_matches_the_constant() -> None:
         for text in descriptions:
             assert want_ascii in text or want_bengali in text, (
                 f"{locale_file.name}: severity_label help text does not mention {want_ascii}; it reads {text!r}"
+            )
+
+
+_COMPACT_LABEL_PROSE_PATHS = (
+    *(
+        f"services.{svc}.fields.compact_label.description"
+        for svc in ("update_activity", *(f"update_activity_{t}" for t in SERVICE_TEMPLATES))
+    ),
+    "config_subentries.tracked_entity.step.details.sections.display_options.data_description.compact_label",
+)
+
+
+def test_compact_label_prose_matches_the_constant() -> None:
+    """Every compact_label help text must quote the real cap, in every locale.
+
+    Same trap as severity_label, twelve strings per file this time. Keyed on the
+    exact JSON paths rather than a length heuristic: the zh-Hans descriptions are
+    23 characters, shorter than several field labels.
+    """
+    bengali = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
+    want_ascii = str(MAX_COMPACT_LABEL_LEN)
+    want_bengali = want_ascii.translate(bengali)
+
+    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
+        data = json.loads(locale_file.read_text())
+        for path in _COMPACT_LABEL_PROSE_PATHS:
+            node = data
+            for key in path.split("."):
+                node = node[key]
+            assert want_ascii in node or want_bengali in node, (
+                f"{locale_file.name}: {path} does not mention {want_ascii}; it reads {node!r}"
             )
 
 

@@ -308,6 +308,7 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_generic, remaining_time=5.5), id="remaining_time_float"),
     pytest.param(lambda: _mut(valid_generic, progress=float("inf")), id="progress_not_finite"),
     pytest.param(lambda: _mut(valid_generic, subtitle="x" * 256), id="subtitle_too_long"),
+    pytest.param(lambda: _mut(valid_generic, compact_label="WASHX"), id="compact_label_too_long"),
     pytest.param(lambda: _mut(valid_generic, completion_message="x" * 1025), id="completion_message_too_long"),
     pytest.param(lambda: _mut(valid_generic, state=123), id="state_not_string"),
     pytest.param(lambda: _mut(valid_generic, accent_color=123), id="colour_not_string"),

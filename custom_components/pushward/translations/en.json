@@ -55,6 +55,10 @@
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
         },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
         "accent_color": {
           "name": "Accent Color",
           "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
@@ -283,6 +287,10 @@
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
         },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
         },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
+        },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
         "icon": {
           "name": "Icon",
@@ -719,6 +735,10 @@
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
         },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
         },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
+        },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
         "icon": {
           "name": "Icon",
@@ -1099,6 +1127,10 @@
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
         },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
         },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Subtitle",
           "description": "Artist, show or channel shown under the media title."
+        },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
         "playback_state": {
           "name": "Playback State",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."
+        },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
         "icon": {
           "name": "Icon",
@@ -1813,7 +1857,8 @@
                 "priority": "Priority (0-10)",
                 "sound": "Sound",
                 "update_interval": "Min. Update Interval (seconds)",
-                "state_labels": "State Labels"
+                "state_labels": "State Labels",
+                "compact_label": "Island Label"
               },
               "data_description": {
                 "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
                 "sound": "Sound played on every update for this entity. Leave empty to use no override.",
                 "update_interval": "Minimum seconds between updates. Rapid state changes are throttled.",
-                "state_labels": "Custom display text for states. One row per state: the state value and the label to show. Example: heating and Heating Up. A legacy state=Label, state2=Label 2 string is still accepted."
+                "state_labels": "Custom display text for states. One row per state: the state value and the label to show. Example: heating and Heating Up. A legacy state=Label, state2=Label 2 string is still accepted.",
+                "compact_label": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it. Leave empty to keep the template's own content."
               }
             },
             "colors": {

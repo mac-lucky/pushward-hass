@@ -55,6 +55,10 @@
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
         },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
         "accent_color": {
           "name": "Kolor akcentu",
           "description": "Kolor akcentu dla Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
@@ -283,6 +287,10 @@
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
         },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
         },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
+        },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
         "icon": {
           "name": "Ikona",
@@ -719,6 +735,10 @@
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
         },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
         },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
+        },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
         "icon": {
           "name": "Ikona",
@@ -1099,6 +1127,10 @@
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
         },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
         },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Podtytuł",
           "description": "Wykonawca, program lub kanał wyświetlany pod tytułem mediów."
+        },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
         "playback_state": {
           "name": "Stan odtwarzania",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Podtytuł",
           "description": "Tekst podtytułu wyświetlany w Live Activity."
+        },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
         "icon": {
           "name": "Ikona",
@@ -1813,7 +1857,8 @@
                 "priority": "Priorytet (0-10)",
                 "sound": "Dźwięk",
                 "update_interval": "Min. interwał aktualizacji (sekundy)",
-                "state_labels": "Etykiety stanów"
+                "state_labels": "Etykiety stanów",
+                "compact_label": "Etykieta Island"
               },
               "data_description": {
                 "slug": "Unikalny identyfikator dla tego Live Activity. Pozostaw puste, aby wygenerować automatycznie z ID encji. Przykład: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Live Activity o wyższym priorytecie są utrzymywane dłużej, gdy osiągnięto limit urządzenia (0 = najniższy, 10 = najwyższy).",
                 "sound": "Dźwięk odtwarzany przy każdej aktualizacji dla tej encji. Pozostaw puste, aby nie używać żadnego nadpisania.",
                 "update_interval": "Minimalna liczba sekund między aktualizacjami. Szybkie zmiany stanu są ograniczane.",
-                "state_labels": "Własny tekst wyświetlany dla stanów. Jeden wiersz na stan: wartość stanu i etykieta do wyświetlenia. Przykład: heating i Nagrzewanie. Stary ciąg stan=Etykieta, stan2=Etykieta 2 jest nadal akceptowany."
+                "state_labels": "Własny tekst wyświetlany dla stanów. Jeden wiersz na stan: wartość stanu i etykieta do wyświetlenia. Przykład: heating i Nagrzewanie. Stary ciąg stan=Etykieta, stan2=Etykieta 2 jest nadal akceptowany.",
+                "compact_label": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje. Pozostaw puste, aby zachować własną zawartość szablonu."
               }
             },
             "colors": {

@@ -55,6 +55,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
         },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
+        },
         "accent_color": {
           "name": "Color de acento",
           "description": "Color de acento para la actividad. Hexadecimal (#RRGGBB) o nombre de color."
@@ -283,6 +287,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
         },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
+        },
         "icon": {
           "name": "Icono",
           "description": "Nombre de icono SF Symbol o MDI (p. ej. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
         },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
+        },
         "icon": {
           "name": "Icono",
           "description": "Nombre de icono SF Symbol o MDI (p. ej. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
+        },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
         },
         "icon": {
           "name": "Icono",
@@ -719,6 +735,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
         },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
+        },
         "icon": {
           "name": "Icono",
           "description": "Nombre de icono SF Symbol o MDI (p. ej. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
         },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
+        },
         "icon": {
           "name": "Icono",
           "description": "Nombre de icono SF Symbol o MDI (p. ej. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
+        },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
         },
         "icon": {
           "name": "Icono",
@@ -1099,6 +1127,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
         },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
+        },
         "icon": {
           "name": "Icono",
           "description": "Nombre de icono SF Symbol o MDI (p. ej. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
         },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
+        },
         "icon": {
           "name": "Icono",
           "description": "Nombre de icono SF Symbol o MDI (p. ej. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Artista, programa o canal mostrado bajo el título del medio."
+        },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
         },
         "playback_state": {
           "name": "Estado de reproducción",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."
+        },
+        "compact_label": {
+          "name": "Etiqueta de Island",
+          "description": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora."
         },
         "icon": {
           "name": "Icono",
@@ -1813,7 +1857,8 @@
                 "priority": "Prioridad (0-10)",
                 "sound": "Sonido",
                 "update_interval": "Intervalo mínimo de actualización (segundos)",
-                "state_labels": "Etiquetas de estado"
+                "state_labels": "Etiquetas de estado",
+                "compact_label": "Etiqueta de Island"
               },
               "data_description": {
                 "slug": "Identificador único para esta actividad. Dejar vacío para generarlo automáticamente a partir del ID de entidad. Ejemplo: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Las actividades de mayor prioridad se conservan más tiempo cuando se alcanza el límite del dispositivo (0 = mínima, 10 = máxima).",
                 "sound": "Sonido que se reproduce en cada actualización para esta entidad. Dejar vacío para no forzar ningún sonido.",
                 "update_interval": "Segundos mínimos entre actualizaciones. Los cambios de estado rápidos se limitan.",
-                "state_labels": "Texto de visualización personalizado para los estados. Una fila por estado: el valor del estado y la etiqueta a mostrar. Ejemplo: heating y Calentando. Se sigue aceptando una cadena antigua state=Etiqueta, state2=Etiqueta 2."
+                "state_labels": "Texto de visualización personalizado para los estados. Una fila por estado: el valor del estado y la etiqueta a mostrar. Ejemplo: heating y Calentando. Se sigue aceptando una cadena antigua state=Etiqueta, state2=Etiqueta 2.",
+                "compact_label": "Hasta 4 caracteres mostrados en la parte delantera de la vista compacta de la Dynamic Island en lugar del contenido predeterminado de la plantilla (el icono, el anillo de pasos o la pila máximo/mínimo de la línea de tiempo). La presentación mínima lo ignora. Déjalo vacío para mantener el contenido propio de la plantilla."
               }
             },
             "colors": {

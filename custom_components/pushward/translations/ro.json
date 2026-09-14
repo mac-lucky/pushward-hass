@@ -55,6 +55,10 @@
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
         },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
         "accent_color": {
           "name": "Culoare accent",
           "description": "Culoarea de accent pentru activitate. Hex (#RRGGBB) sau culoare numită."
@@ -283,6 +287,10 @@
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
         },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
         },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
+        },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
         "icon": {
           "name": "Pictogramă",
@@ -719,6 +735,10 @@
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
         },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
         },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
+        },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
         "icon": {
           "name": "Pictogramă",
@@ -1099,6 +1127,10 @@
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
         },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
         },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Subtitrare",
           "description": "Artistul, emisiunea sau canalul afișat sub titlul media."
+        },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
         "playback_state": {
           "name": "Starea redării",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Subtitrare",
           "description": "Textul de subtitrare afișat în activitate."
+        },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
         "icon": {
           "name": "Pictogramă",
@@ -1813,7 +1857,8 @@
                 "priority": "Prioritate (0-10)",
                 "sound": "Sunet",
                 "update_interval": "Interval minim de actualizare (secunde)",
-                "state_labels": "Etichete stări"
+                "state_labels": "Etichete stări",
+                "compact_label": "Etichetă Island"
               },
               "data_description": {
                 "slug": "Identificator unic pentru această activitate. Lăsați gol pentru a genera automat din ID-ul entității. Exemplu: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Activitățile cu prioritate mai mare sunt păstrate mai mult timp când se atinge limita dispozitivului (0 = cea mai mică, 10 = cea mai mare).",
                 "sound": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS.",
                 "update_interval": "Numărul minim de secunde între actualizări. Modificările rapide ale stării sunt limitate ca rată.",
-                "state_labels": "Text de afișare personalizat pentru stări. Un rând pe stare: valoarea stării și eticheta de afișat. Exemplu: heating și Se încălzește. Un șir vechi stare=Etichetă, stare2=Etichetă 2 este încă acceptat."
+                "state_labels": "Text de afișare personalizat pentru stări. Un rând pe stare: valoarea stării și eticheta de afișat. Exemplu: heating și Se încălzește. Un șir vechi stare=Etichetă, stare2=Etichetă 2 este încă acceptat.",
+                "compact_label": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră. Lăsați gol pentru a păstra conținutul propriu al șablonului."
               }
             },
             "colors": {

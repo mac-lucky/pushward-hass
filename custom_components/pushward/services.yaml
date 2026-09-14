@@ -63,6 +63,12 @@ update_activity:
       example: "episode-01.mkv"
       selector:
         text:
+    compact_label:
+      name: Island Label
+      description: Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it.
+      example: "WASH"
+      selector:
+        text:
     completion_message:
       name: Completion Message
       description: Message shown when the activity ends.
@@ -422,6 +428,10 @@ update_activity_generic:
           example: "episode-01.mkv"
           selector:
             text:
+        compact_label:
+          example: "WASH"
+          selector:
+            text:
         icon:
           example: "arrow.down.circle.fill"
           selector:
@@ -597,6 +607,10 @@ update_activity_countdown:
           example: "episode-01.mkv"
           selector:
             text:
+        compact_label:
+          example: "WASH"
+          selector:
+            text:
         icon:
           example: "arrow.down.circle.fill"
           selector:
@@ -758,6 +772,10 @@ update_activity_steps:
             text:
         subtitle:
           example: "episode-01.mkv"
+          selector:
+            text:
+        compact_label:
+          example: "WASH"
           selector:
             text:
         icon:
@@ -952,6 +970,10 @@ update_activity_alert:
           example: "episode-01.mkv"
           selector:
             text:
+        compact_label:
+          example: "WASH"
+          selector:
+            text:
         icon:
           example: "arrow.down.circle.fill"
           selector:
@@ -1111,6 +1133,10 @@ update_activity_gauge:
           example: "episode-01.mkv"
           selector:
             text:
+        compact_label:
+          example: "WASH"
+          selector:
+            text:
         icon:
           example: "arrow.down.circle.fill"
           selector:
@@ -1245,6 +1271,10 @@ update_activity_timeline:
             text:
         subtitle:
           example: "episode-01.mkv"
+          selector:
+            text:
+        compact_label:
+          example: "WASH"
           selector:
             text:
         icon:
@@ -1413,6 +1443,10 @@ update_activity_board:
       example: "Updated just now"
       selector:
         text:
+    compact_label:
+      example: "WASH"
+      selector:
+        text:
     icon:
       example: "square.grid.2x2.fill"
       selector:
@@ -1507,6 +1541,10 @@ update_activity_log:
       example: "5 events today"
       selector:
         text:
+    compact_label:
+      example: "WASH"
+      selector:
+        text:
     icon:
       example: "list.bullet.rectangle"
       selector:
@@ -1594,6 +1632,10 @@ update_activity_media:
         text:
     subtitle:
       example: "SZA"
+      selector:
+        text:
+    compact_label:
+      example: "WASH"
       selector:
         text:
     playback_state:
@@ -1769,6 +1811,10 @@ update_activity_approval:
         text:
     subtitle:
       example: "Front gate"
+      selector:
+        text:
+    compact_label:
+      example: "WASH"
       selector:
         text:
     icon:

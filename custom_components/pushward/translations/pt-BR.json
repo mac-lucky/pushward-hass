@@ -55,6 +55,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
         },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
         "accent_color": {
           "name": "Cor de Destaque",
           "description": "Cor de destaque para a atividade. Hexadecimal (#RRGGBB) ou nome de cor."
@@ -283,6 +287,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
         },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
         },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
+        },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
         "icon": {
           "name": "Ícone",
@@ -719,6 +735,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
         },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
         },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
+        },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
         "icon": {
           "name": "Ícone",
@@ -1099,6 +1127,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
         },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
         },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Artista, programa ou canal exibido abaixo do título da mídia."
+        },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
         "playback_state": {
           "name": "Estado de Reprodução",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."
+        },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
         "icon": {
           "name": "Ícone",
@@ -1813,7 +1857,8 @@
                 "priority": "Prioridade (0–10)",
                 "sound": "Som",
                 "update_interval": "Intervalo Mínimo de Atualização (segundos)",
-                "state_labels": "Rótulos de Estado"
+                "state_labels": "Rótulos de Estado",
+                "compact_label": "Rótulo da Island"
               },
               "data_description": {
                 "slug": "Identificador único desta atividade. Deixe vazio para gerar automaticamente a partir do ID da entidade. Exemplo: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Atividades com prioridade mais alta são mantidas por mais tempo quando o limite do dispositivo é atingido (0 = menor, 10 = maior).",
                 "sound": "Som reproduzido em cada atualização para esta entidade. Deixe vazio para não usar substituição.",
                 "update_interval": "Intervalo mínimo em segundos entre atualizações. Mudanças de estado rápidas são limitadas.",
-                "state_labels": "Texto de exibição personalizado para estados. Uma linha por estado: o valor do estado e o rótulo a exibir. Exemplo: heating e Aquecendo. Uma string antiga estado=Rótulo, estado2=Rótulo 2 ainda é aceita."
+                "state_labels": "Texto de exibição personalizado para estados. Uma linha por estado: o valor do estado e o rótulo a exibir. Exemplo: heating e Aquecendo. Uma string antiga estado=Rótulo, estado2=Rótulo 2 ainda é aceita.",
+                "compact_label": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora. Deixe vazio para manter o conteúdo próprio do modelo."
               }
             },
             "colors": {

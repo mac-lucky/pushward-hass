@@ -46,6 +46,7 @@ from .const import (
     CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
+    CONF_COMPACT_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -120,6 +121,7 @@ from .const import (
     LOG_COLUMN_VALUE_MAX,
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
+    MAX_COMPACT_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_ICON_LEN,
     MEDIA_DURATION_MAX,
@@ -939,6 +941,10 @@ def map_content(
         "accent_color": accent,
     }
 
+    # Sent whenever the option exists, "" included: the server merge-patches content
+    # and keeps an absent key, so clearing the label in the flow must ship "".
+    if CONF_COMPACT_LABEL in entity_config:
+        content["compact_label"] = entity_config[CONF_COMPACT_LABEL].strip()[:MAX_COMPACT_LABEL_LEN]
     if background_color:
         content["background_color"] = background_color
     if text_color:
@@ -1078,6 +1084,9 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         "subtitle": last_content.get("subtitle", "") if last_content else "",
         "accent_color": "green",
     }
+    # The island is still up during the completion frame, so the label stays too.
+    if CONF_COMPACT_LABEL in entity_config:
+        content["compact_label"] = entity_config[CONF_COMPACT_LABEL].strip()[:MAX_COMPACT_LABEL_LEN]
 
     _add_activity_actions(content, entity_config)
 

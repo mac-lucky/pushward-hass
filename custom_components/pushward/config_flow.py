@@ -54,6 +54,7 @@ from .const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
     CONF_CHARGING_ENTITY,
+    CONF_COMPACT_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -187,6 +188,7 @@ from .const import (
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
+    MAX_COMPACT_LABEL_LEN,
     MAX_LONG_TEXT_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_SLUG_LEN,
@@ -545,6 +547,20 @@ _TAP_ACTION_SECTION_FIELDS: tuple[str, ...] = (
 # header. A field key can be top-level for one template and sectioned for another
 # (remaining_time on countdown vs generic/steps) - its label then needs an entry
 # in BOTH step.details.data and the section's data block.
+class _TrimmedLength(vol.Length):
+    """vol.Length that trims the string first.
+
+    A trailing space on a label sitting at the cap would otherwise fail the form.
+    A subclass rather than a str.strip step in vol.All because HA renders the form
+    from voluptuous_serialize, which cannot convert a bare callable.
+    """
+
+    def __call__(self, v):
+        if isinstance(v, str):
+            v = v.strip()
+        return super().__call__(v)
+
+
 ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
     "data_sources": (
         CONF_PROGRESS_ENTITY,
@@ -582,6 +598,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_SOUND,
         CONF_UPDATE_INTERVAL,
         CONF_STATE_LABELS,
+        CONF_COMPACT_LABEL,
     ),
     "colors": (
         CONF_ACCENT_COLOR,
@@ -1277,6 +1294,12 @@ def _details_schema(
     # Custom display text per state (a two-column row editor: state -> label). A
     # legacy 'state=Label, ...' string is still accepted by _parse_entity_input.
     fields[_object_rows_key(CONF_STATE_LABELS, d, required=False)] = _STATE_LABELS_SELECTOR
+    fields[
+        vol.Optional(
+            CONF_COMPACT_LABEL,
+            default=d.get(CONF_COMPACT_LABEL, ""),
+        )
+    ] = vol.All(str, _TrimmedLength(max=MAX_COMPACT_LABEL_LEN))
     if template == "countdown":
         fields[
             vol.Optional(
@@ -1977,6 +2000,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_SUBTITLE_ENTITY: user_input.get(CONF_SUBTITLE_ENTITY, ""),
         CONF_STATE_LABELS: _kv_rows_to_map(user_input.get(CONF_STATE_LABELS, ""), "state", CONF_LABEL),
         CONF_COMPLETION_MESSAGE: user_input.get(CONF_COMPLETION_MESSAGE, ""),
+        CONF_COMPACT_LABEL: user_input.get(CONF_COMPACT_LABEL, ""),
         CONF_TOTAL_STEPS: int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)),
         CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
         CONF_CURRENT_STEP_ENTITY: user_input.get(CONF_CURRENT_STEP_ENTITY, ""),

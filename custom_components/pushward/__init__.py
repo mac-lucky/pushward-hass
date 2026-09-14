@@ -60,6 +60,7 @@ from .const import (
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
+    MAX_COMPACT_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_BODY_LEN,
     MAX_TAP_ACTION_ICON_LEN,
@@ -232,9 +233,33 @@ _UPDATE_TOPLEVEL_FIELDS = {
     vol.Optional("stale_ttl"): vol.All(vol.Coerce(int), vol.Range(min=ACTIVITY_TTL_MIN, max=ACTIVITY_TTL_MAX)),
     vol.Optional("dismissal_ttl"): vol.All(vol.Coerce(int), vol.Range(min=DISMISSAL_TTL_MIN, max=DISMISSAL_TTL_MAX)),
 }
+
+
+def _clearable(validator):
+    """Trim the value, and let an empty string through as an explicit clear.
+
+    The server reads "" on an image field as "remove this", which is the only way an
+    automation can take artwork off an activity again - and every image validator
+    refuses "" on its own, so without this the field could be set but never unset.
+    Trimming matches what the config flow does with the same three values.
+    compact_label goes through it only for the trim: an empty label is valid
+    there on its own, the server reads it as "show the template's default".
+    """
+
+    def _validate(value):
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return ""
+        return validator(value)
+
+    return _validate
+
+
 _UNIVERSAL_LABEL_FIELDS = {
     vol.Optional("state_text"): str,
     vol.Optional("subtitle"): str,
+    vol.Optional("compact_label"): vol.All(str, _clearable(vol.Length(max=MAX_COMPACT_LABEL_LEN))),
     vol.Optional("icon"): str,
     vol.Optional("progress"): vol.Coerce(float),
 }
@@ -255,25 +280,6 @@ _LIVE_PROGRESS_FIELDS = {
     vol.Optional("start_date"): vol.Coerce(int),
     vol.Optional("end_date"): vol.Coerce(int),
 }
-
-
-def _clearable(validator):
-    """Trim the value, and let an empty string through as an explicit clear.
-
-    The server reads "" on an image field as "remove this", which is the only way an
-    automation can take artwork off an activity again - and every image validator
-    refuses "" on its own, so without this the field could be set but never unset.
-    Trimming matches what the config flow does with the same three values.
-    """
-
-    def _validate(value):
-        if isinstance(value, str):
-            value = value.strip()
-            if not value:
-                return ""
-        return validator(value)
-
-    return _validate
 
 
 # Optional artwork, accepted only by the templates in IMAGE_TEMPLATES (generic,
@@ -494,6 +500,7 @@ def _validate_approval_update(data: dict) -> dict:
 _BOARD_LOG_LABEL_FIELDS = {
     vol.Optional("state_text"): str,
     vol.Optional("subtitle"): str,
+    vol.Optional("compact_label"): vol.All(str, _clearable(vol.Length(max=MAX_COMPACT_LABEL_LEN))),
     vol.Optional("icon"): str,
 }
 _BOARD_LOG_APPEARANCE_FIELDS = {

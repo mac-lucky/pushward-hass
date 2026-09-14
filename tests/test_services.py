@@ -629,6 +629,58 @@ async def test_update_activity_service_passes_priority_top_level(hass: HomeAssis
     assert "priority" not in content
 
 
+@pytest.mark.parametrize("service", ["update_activity_generic", "update_activity_board", "update_activity"])
+@pytest.mark.parametrize(
+    "label", [pytest.param("WASH", id="ascii_4"), pytest.param("\u6d17\u8863\u6a5f\u4e2d", id="cjk_4_codepoints")]
+)
+async def test_update_activity_compact_label_lands_in_content(hass: HomeAssistant, service: str, label: str) -> None:
+    """compact_label rides the content dict on the universal, the lean board/log and the alias schemas."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        service,
+        {"slug": "x", "state": "ongoing", "compact_label": label},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["compact_label"] == label
+
+
+@pytest.mark.parametrize("raw, sent", [(" WA ", "WA"), ("ABCD ", "ABCD"), ("   ", "")])
+async def test_update_activity_compact_label_trimmed_and_clearable(hass: HomeAssistant, raw: str, sent: str) -> None:
+    """Whitespace is trimmed before the cap, and a blank value ships as "" to clear the label."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {"slug": "x", "state": "ongoing", "compact_label": raw},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args[0][2]["compact_label"] == sent
+
+
+@pytest.mark.parametrize("service", ["update_activity_generic", "update_activity_board", "update_activity"])
+async def test_update_activity_compact_label_over_cap_rejected(hass: HomeAssistant, service: str) -> None:
+    """A fifth character fails the schema inline, like severity_label, instead of a server 422."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            service,
+            {"slug": "x", "state": "ongoing", "compact_label": "WASHX"},
+            blocking=True,
+        )
+    api.update_activity.assert_not_called()
+
+
 async def test_update_activity_service_rejects_invalid_sound(hass: HomeAssistant) -> None:
     """Invalid sound value is rejected by the service schema."""
     api = _mock_api()

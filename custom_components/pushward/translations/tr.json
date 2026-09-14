@@ -55,6 +55,10 @@
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
         },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
         "accent_color": {
           "name": "Vurgu Rengi",
           "description": "Aktivite için vurgu rengi. Hex (#RRGGBB) veya adlandırılmış renk."
@@ -283,6 +287,10 @@
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
         },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
         },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
         "icon": {
           "name": "Simge",
@@ -719,6 +735,10 @@
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
         },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
         },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
         "icon": {
           "name": "Simge",
@@ -1099,6 +1127,10 @@
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
         },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
         },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Alt Başlık",
           "description": "Medya başlığının altında gösterilen sanatçı, program veya kanal."
+        },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
         "playback_state": {
           "name": "Oynatma Durumu",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
         "icon": {
           "name": "Simge",
@@ -1813,7 +1857,8 @@
                 "priority": "Öncelik (0-10)",
                 "sound": "Ses",
                 "update_interval": "Min. Güncelleme Aralığı (saniye)",
-                "state_labels": "Durum Etiketleri"
+                "state_labels": "Durum Etiketleri",
+                "compact_label": "Island Etiketi"
               },
               "data_description": {
                 "slug": "Bu aktivite için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın. Örnek: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Cihaz sınırına ulaşıldığında daha yüksek öncelikli aktiviteler daha uzun süre tutulur (0 = en düşük, 10 = en yüksek).",
                 "sound": "Bu güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın.",
                 "update_interval": "Güncellemeler arasındaki minimum saniye. Hızlı durum değişiklikleri kısıtlanır.",
-                "state_labels": "Durumlar için özel görüntü metni. Her durum için bir satır: durum değeri ve gösterilecek etiket. Örnek: heating ve Isınıyor. Eski durum=Etiket, durum2=Etiket 2 dizesi hâlâ kabul edilir."
+                "state_labels": "Durumlar için özel görüntü metni. Her durum için bir satır: durum değeri ve gösterilecek etiket. Örnek: heating ve Isınıyor. Eski durum=Etiket, durum2=Etiket 2 dizesi hâlâ kabul edilir.",
+                "compact_label": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar. Şablonun kendi içeriğini korumak için boş bırakın."
               }
             },
             "colors": {

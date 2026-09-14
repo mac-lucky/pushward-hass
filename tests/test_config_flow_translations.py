@@ -192,6 +192,7 @@ _ENTITY_COMMON: set[str] = {
     "sound",
     "update_interval",
     "state_labels",
+    "compact_label",
     "accent_color",
     "accent_color_attribute",
     "background_color",

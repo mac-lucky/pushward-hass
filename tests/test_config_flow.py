@@ -55,6 +55,7 @@ from custom_components.pushward.const import (
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
+    CONF_COMPACT_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -155,6 +156,7 @@ from custom_components.pushward.const import (
     LIVE_PROGRESS_TEMPLATES,
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
+    MAX_COMPACT_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_URL_LEN,
     SUBENTRY_TYPE_ENTITY,
@@ -3223,6 +3225,53 @@ async def test_severity_label_over_cap_rejected(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.CREATE_ENTRY
     subentries = list(entry.subentries.values())
     assert subentries[0].data[CONF_SEVERITY_LABEL] == "y" * MAX_SEVERITY_LABEL_LEN
+
+
+async def test_compact_label_over_cap_rejected(hass: HomeAssistant) -> None:
+    """The island label is capped at the server's 4 characters, inline like severity_label."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "generic"}),
+    )
+    assert result["step_id"] == "details"
+
+    with pytest.raises(InvalidData):
+        await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input=_mock_details_input("generic", **{CONF_COMPACT_LABEL: "x" * (MAX_COMPACT_LABEL_LEN + 1)}),
+        )
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input("generic", **{CONF_COMPACT_LABEL: "WASH"}),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_COMPACT_LABEL] == "WASH"
+
+
+async def test_compact_label_is_stripped(hass: HomeAssistant) -> None:
+    """Whitespace around the island label is dropped before the cap is checked."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_COMPACT_LABEL: " WA "})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentries = list(entry.subentries.values())
+    assert subentries[0].data[CONF_COMPACT_LABEL] == "WA"
+
+    # a label at the cap with a stray trailing space is trimmed, not rejected
+    result = await _add_entity_subentry(
+        hass, entry, core_overrides={CONF_ENTITY_ID: "sensor.other"}, details_overrides={CONF_COMPACT_LABEL: "ABCD "}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
 # --- NumberSelector fields stored as int ---

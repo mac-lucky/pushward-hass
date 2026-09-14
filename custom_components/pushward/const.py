@@ -57,6 +57,7 @@ CONF_TOTAL_STEPS = "total_steps"
 CONF_CURRENT_STEP_ATTR = "current_step_attribute"
 CONF_SEVERITY = "severity"
 CONF_SEVERITY_LABEL = "severity_label"
+CONF_COMPACT_LABEL = "compact_label"
 CONF_SUBTITLE_ATTRIBUTE = "subtitle_attribute"
 CONF_STATE_LABELS = "state_labels"
 CONF_ENDED_TTL = "ended_ttl"
@@ -289,6 +290,9 @@ MAX_SLUG_LEN = 128
 # from the alert Lock Screen header, the one slot with no lineLimit and no scale
 # floor - it clipped near 45 on an iPhone 17, less on a narrower one.
 MAX_SEVERITY_LABEL_LEN = 40
+# Optional text for the Dynamic Island compact leading ear, shown instead of the
+# icon. Mirrors the server's 4-rune cap; the ear is ~52pt wide.
+MAX_COMPACT_LABEL_LEN = 4
 MAX_TAP_ACTION_TITLE_LEN = 64
 MAX_TAP_ACTION_ICON_LEN = 64
 MAX_TAP_ACTION_BODY_LEN = 1024  # server maxTapActionBodyRunes

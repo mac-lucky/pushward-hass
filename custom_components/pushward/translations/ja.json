@@ -55,6 +55,10 @@
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
         },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
         "accent_color": {
           "name": "アクセントカラー",
           "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
@@ -283,6 +287,10 @@
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
         },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
@@ -423,6 +431,10 @@
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
         },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
         "icon": {
           "name": "アイコン",
@@ -719,6 +735,10 @@
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
         },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
@@ -847,6 +867,10 @@
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
         },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
         "icon": {
           "name": "アイコン",
@@ -1099,6 +1127,10 @@
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
         },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: square.grid.2x2.fill, mdi:view-dashboard）。"
@@ -1169,6 +1201,10 @@
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
         },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: list.bullet.rectangle, mdi:format-list-bulleted）。"
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "サブタイトル",
           "description": "メディアタイトルの下に表示されるアーティスト、番組、チャンネル。"
+        },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
         "playback_state": {
           "name": "再生状態",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "サブタイトル",
           "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
         "icon": {
           "name": "アイコン",
@@ -1813,7 +1857,8 @@
                 "priority": "優先度 (0〜10)",
                 "sound": "サウンド",
                 "update_interval": "最小更新間隔（秒）",
-                "state_labels": "状態ラベル"
+                "state_labels": "状態ラベル",
+                "compact_label": "Islandラベル"
               },
               "data_description": {
                 "slug": "このアクティビティの一意の識別子。空白のままにするとエンティティIDから自動生成されます。例: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "デバイスの上限に達した場合、優先度の高いアクティビティが長く保持されます（0 = 最低, 10 = 最高）。",
                 "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
                 "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
-                "state_labels": "状態のカスタム表示テキスト。状態ごとに1行: 状態の値と表示するラベル。例: heating と 加熱中。従来の state=Label, state2=Label 2 文字列も引き続き使用できます。"
+                "state_labels": "状態のカスタム表示テキスト。状態ごとに1行: 状態の値と表示するラベル。例: heating と 加熱中。従来の state=Label, state2=Label 2 文字列も引き続き使用できます。",
+                "compact_label": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。空のままにするとテンプレート本来の内容が表示されます。"
               }
             },
             "colors": {

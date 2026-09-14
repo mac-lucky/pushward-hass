@@ -54,6 +54,7 @@ from custom_components.pushward.const import (
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
+    MAX_COMPACT_LABEL_LEN,
     MAX_LONG_TEXT_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_ICON_LEN,
@@ -258,6 +259,7 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
 
     _check_len(content.get("state"), MAX_TEXT_LEN, "state", where)
     _check_len(content.get("subtitle"), MAX_TEXT_LEN, "subtitle", where)
+    _check_len(content.get("compact_label"), MAX_COMPACT_LABEL_LEN, "compact_label", where)
     _check_len(content.get("completion_message"), MAX_LONG_TEXT_LEN, "completion_message", where)
     _check_len(content.get("icon"), ICON_MAX, "icon", where)
 

@@ -55,6 +55,10 @@
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
         },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
         "accent_color": {
           "name": "Akzentfarbe",
           "description": "Akzentfarbe für die Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
@@ -283,6 +287,10 @@
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
         },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
         },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
+        },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
         "icon": {
           "name": "Symbol",
@@ -719,6 +735,10 @@
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
         },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
         },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
+        },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
         "icon": {
           "name": "Symbol",
@@ -1099,6 +1127,10 @@
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
         },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
         },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Untertitel",
           "description": "Interpret, Sendung oder Sender, angezeigt unter dem Medientitel."
+        },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
         "playback_state": {
           "name": "Wiedergabestatus",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."
+        },
+        "compact_label": {
+          "name": "Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
         "icon": {
           "name": "Symbol",
@@ -1813,7 +1857,8 @@
                 "priority": "Priorität (0–10)",
                 "sound": "Ton",
                 "update_interval": "Min. Aktualisierungsintervall (Sekunden)",
-                "state_labels": "Zustandsbeschriftungen"
+                "state_labels": "Zustandsbeschriftungen",
+                "compact_label": "Island-Beschriftung"
               },
               "data_description": {
                 "slug": "Eindeutige Kennung für diese Live Activity. Leer lassen, um aus der Entitäts-ID automatisch zu generieren. Beispiel: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Live Activities mit höherer Priorität bleiben länger erhalten, wenn das Gerätelimit erreicht ist (0 = niedrigste, 10 = höchste).",
                 "sound": "Ton, der bei jedem Update für diese Entität abgespielt wird. Leer lassen, um keine Überschreibung zu verwenden.",
                 "update_interval": "Mindestanzahl Sekunden zwischen Aktualisierungen. Schnelle Zustandsänderungen werden gedrosselt.",
-                "state_labels": "Benutzerdefinierte Anzeigetexte für Zustände. Eine Zeile pro Zustand: der Zustandswert und die anzuzeigende Beschriftung. Beispiel: heating und Heizt auf. Eine alte Zeichenkette state=Label, state2=Label 2 wird weiterhin akzeptiert."
+                "state_labels": "Benutzerdefinierte Anzeigetexte für Zustände. Eine Zeile pro Zustand: der Zustandswert und die anzuzeigende Beschriftung. Beispiel: heating und Heizt auf. Eine alte Zeichenkette state=Label, state2=Label 2 wird weiterhin akzeptiert.",
+                "compact_label": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie. Leer lassen, um den eigenen Inhalt der Vorlage zu behalten."
               }
             },
             "colors": {

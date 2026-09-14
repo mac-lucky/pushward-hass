@@ -180,6 +180,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Favorite Script | Script the heart button runs; hidden when empty (media template) |
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
 | State Labels | Rows giving custom display text per state (a state and its label, e.g. `on` shows `Running`) |
+| Island Label | Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it |
 | Completion Message | Text shown at end (default: "Complete") |
 | Accent / Background / Text Color (+ Attribute) | Static hex / named color, or an entity attribute |
 | URL / Secondary URL | Deep-link URLs, http/https (steps/alert templates) |
@@ -482,6 +483,7 @@ implied by the action name; you no longer pass a `template` field.
 | `state` | Yes | `ongoing` or `ended` |
 | `state_text` | No | Display text |
 | `subtitle` | No | Subtitle text |
+| `compact_label` | No | Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it |
 | `icon` | No | SF Symbol or MDI icon |
 | `progress` | No | 0.0-1.0 |
 | `completion_message` | No | End display message |
@@ -520,7 +522,7 @@ implied by the action name; you no longer pass a `template` field.
 
 > **`board` / `log` / `media` / `approval` use a lean schema.** They render no progress bar and no
 > whole-activity button slots, so `update_activity_board`, `update_activity_log`,
-> `update_activity_media` and `update_activity_approval` accept only the labels (`state_text`, `subtitle`, `icon`), appearance
+> `update_activity_media` and `update_activity_approval` accept only the labels (`state_text`, `subtitle`, `compact_label`, `icon`), appearance
 > (`completion_message`, the colors, `sound`, `priority`, the TTLs
 > `ended_ttl`/`stale_ttl`/`dismissal_ttl`), the whole-activity `tap_action`, and their template
 > fields (`tiles` / `lines` / the media fields / the approval fields), **not** `progress`,

@@ -55,6 +55,10 @@
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
         },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
         "accent_color": {
           "name": "Accentkleur",
           "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
@@ -283,6 +287,10 @@
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
         },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
         },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
+        },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
         "icon": {
           "name": "Pictogram",
@@ -719,6 +735,10 @@
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
         },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
         },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
+        },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
         "icon": {
           "name": "Pictogram",
@@ -1099,6 +1127,10 @@
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
         },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
         },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Ondertitel",
           "description": "Artiest, programma of zender, getoond onder de mediatitel."
+        },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
         "playback_state": {
           "name": "Afspeelstatus",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."
+        },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
         "icon": {
           "name": "Pictogram",
@@ -1813,7 +1857,8 @@
                 "priority": "Prioriteit (0-10)",
                 "sound": "Geluid",
                 "update_interval": "Min. bijwerkinterval (seconden)",
-                "state_labels": "Statuslabels"
+                "state_labels": "Statuslabels",
+                "compact_label": "Island-label"
               },
               "data_description": {
                 "slug": "Unieke identificator voor deze activiteit. Laat leeg om automatisch te genereren vanuit de entiteits-ID. Voorbeeld: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
                 "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
                 "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
-                "state_labels": "Aangepaste weergavetekst voor statussen. Eén rij per status: de statuswaarde en het te tonen label. Voorbeeld: heating en Bezig met opwarmen. Een oude tekenreeks status=Label, status2=Label 2 wordt nog steeds geaccepteerd."
+                "state_labels": "Aangepaste weergavetekst voor statussen. Eén rij per status: de statuswaarde en het te tonen label. Voorbeeld: heating en Bezig met opwarmen. Een oude tekenreeks status=Label, status2=Label 2 wordt nog steeds geaccepteerd.",
+                "compact_label": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze. Laat leeg om de eigen inhoud van de sjabloon te behouden."
               }
             },
             "colors": {

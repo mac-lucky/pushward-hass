@@ -55,6 +55,10 @@
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
         },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
         "accent_color": {
           "name": "Warna Aksen",
           "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
@@ -283,6 +287,10 @@
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
         },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
         },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
         "icon": {
           "name": "Ikon",
@@ -719,6 +735,10 @@
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
         },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
         },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
         "icon": {
           "name": "Ikon",
@@ -1099,6 +1127,10 @@
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
         },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
         },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Subjudul",
           "description": "Artis, acara, atau saluran yang ditampilkan di bawah judul media."
+        },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
         "playback_state": {
           "name": "Status Pemutaran",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
         "icon": {
           "name": "Ikon",
@@ -1813,7 +1857,8 @@
                 "priority": "Prioritas (0-10)",
                 "sound": "Suara",
                 "update_interval": "Interval Pembaruan Min. (detik)",
-                "state_labels": "Label Status"
+                "state_labels": "Label Status",
+                "compact_label": "Label Island"
               },
               "data_description": {
                 "slug": "Identifikasi unik untuk aktivitas ini. Kosongkan untuk dibuat otomatis dari ID entitas. Contoh: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
                 "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
                 "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
-                "state_labels": "Teks tampilan kustom untuk status. Satu baris per status: nilai status dan label yang ditampilkan. Contoh: heating dan Sedang Memanaskan. String lama state=Label, state2=Label 2 masih diterima."
+                "state_labels": "Teks tampilan kustom untuk status. Satu baris per status: nilai status dan label yang ditampilkan. Contoh: heating dan Sedang Memanaskan. String lama state=Label, state2=Label 2 masih diterima.",
+                "compact_label": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya. Kosongkan untuk mempertahankan konten templat itu sendiri."
               }
             },
             "colors": {

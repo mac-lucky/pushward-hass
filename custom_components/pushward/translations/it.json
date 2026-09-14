@@ -55,6 +55,10 @@
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
         },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
         "accent_color": {
           "name": "Colore accento",
           "description": "Colore accento per l'attività. Esadecimale (#RRGGBB) o nome del colore."
@@ -283,6 +287,10 @@
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
         },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
         },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
+        },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
         "icon": {
           "name": "Icona",
@@ -719,6 +735,10 @@
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
         },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
         },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
+        },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
         "icon": {
           "name": "Icona",
@@ -1099,6 +1127,10 @@
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
         },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
         },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Sottotitolo",
           "description": "Artista, programma o canale mostrato sotto il titolo del contenuto."
+        },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
         "playback_state": {
           "name": "Stato di riproduzione",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."
+        },
+        "compact_label": {
+          "name": "Etichetta Island",
+          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
         "icon": {
           "name": "Icona",
@@ -1813,7 +1857,8 @@
                 "priority": "Priorità (0-10)",
                 "sound": "Suono",
                 "update_interval": "Intervallo minimo aggiornamento (secondi)",
-                "state_labels": "Etichette stato"
+                "state_labels": "Etichette stato",
+                "compact_label": "Etichetta Island"
               },
               "data_description": {
                 "slug": "Identificatore univoco per questa attività. Lasciare vuoto per generarlo automaticamente dall'ID entità. Esempio: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Le attività con priorità maggiore vengono conservate più a lungo quando si raggiunge il limite del dispositivo (0 = minima, 10 = massima).",
                 "sound": "Suono riprodotto ad ogni aggiornamento per questa entità. Lasciare vuoto per non forzare alcun suono.",
                 "update_interval": "Secondi minimi tra un aggiornamento e l'altro. I cambi di stato rapidi vengono limitati.",
-                "state_labels": "Testo personalizzato per gli stati. Una riga per stato: il valore dello stato e l'etichetta da mostrare. Esempio: heating e In riscaldamento. Una vecchia stringa stato=Etichetta, stato2=Etichetta 2 è ancora accettata."
+                "state_labels": "Testo personalizzato per gli stati. Una riga per stato: il valore dello stato e l'etichetta da mostrare. Esempio: heating e In riscaldamento. Una vecchia stringa stato=Etichetta, stato2=Etichetta 2 è ancora accettata.",
+                "compact_label": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora. Lascia vuoto per mantenere il contenuto proprio del modello."
               }
             },
             "colors": {

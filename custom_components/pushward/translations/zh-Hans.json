@@ -55,6 +55,10 @@
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
         },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
         "accent_color": {
           "name": "强调色",
           "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
@@ -283,6 +287,10 @@
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
         },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
@@ -423,6 +431,10 @@
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
         },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
+        },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
         "icon": {
           "name": "图标",
@@ -719,6 +735,10 @@
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
         },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
@@ -847,6 +867,10 @@
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
         },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
+        },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
         "icon": {
           "name": "图标",
@@ -1099,6 +1127,10 @@
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
         },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 square.grid.2x2.fill、mdi:view-dashboard）。"
@@ -1169,6 +1201,10 @@
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
         },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 list.bullet.rectangle、mdi:format-list-bulleted）。"
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "副标题",
           "description": "显示在媒体标题下方的艺术家、节目或频道。"
+        },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
         "playback_state": {
           "name": "播放状态",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "副标题",
           "description": "活动上显示的副标题文本。"
+        },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
         "icon": {
           "name": "图标",
@@ -1813,7 +1857,8 @@
                 "priority": "优先级（0-10）",
                 "sound": "声音",
                 "update_interval": "最小更新间隔（秒）",
-                "state_labels": "状态标签"
+                "state_labels": "状态标签",
+                "compact_label": "灵动岛标签"
               },
               "data_description": {
                 "slug": "此活动的唯一标识符。留空则自动从实体 ID 生成。示例：ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "当设备达到上限时，优先级较高的活动会保留更长时间（0 = 最低，10 = 最高）。",
                 "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
                 "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
-                "state_labels": "状态的自定义显示文本。每个状态一行：状态值和要显示的标签。示例：heating 和 加热中。仍接受旧的 state=标签, state2=标签2 字符串。"
+                "state_labels": "状态的自定义显示文本。每个状态一行：状态值和要显示的标签。示例：heating 和 加热中。仍接受旧的 state=标签, state2=标签2 字符串。",
+                "compact_label": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。留空则保留模板自身的内容。"
               }
             },
             "colors": {

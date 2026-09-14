@@ -55,6 +55,10 @@
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
         },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
         "accent_color": {
           "name": "Màu Nhấn",
           "description": "Màu nhấn cho hoạt động. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
@@ -283,6 +287,10 @@
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
         },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
@@ -423,6 +431,10 @@
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
         },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
@@ -554,6 +566,10 @@
         "subtitle": {
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
+        },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
         "icon": {
           "name": "Biểu Tượng",
@@ -719,6 +735,10 @@
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
         },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
@@ -847,6 +867,10 @@
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
         },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
@@ -958,6 +982,10 @@
         "subtitle": {
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
+        },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
         "icon": {
           "name": "Biểu Tượng",
@@ -1099,6 +1127,10 @@
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
         },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1169,6 +1201,10 @@
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
         },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1234,6 +1270,10 @@
         "subtitle": {
           "name": "Phụ Đề",
           "description": "Nghệ sĩ, chương trình hoặc kênh hiển thị dưới tiêu đề phương tiện."
+        },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
         "playback_state": {
           "name": "Trạng Thái Phát",
@@ -1364,6 +1404,10 @@
         "subtitle": {
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."
+        },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
         "icon": {
           "name": "Biểu Tượng",
@@ -1813,7 +1857,8 @@
                 "priority": "Ưu Tiên (0-10)",
                 "sound": "Âm Thanh",
                 "update_interval": "Khoảng Cập Nhật Tối Thiểu (giây)",
-                "state_labels": "Nhãn Trạng Thái"
+                "state_labels": "Nhãn Trạng Thái",
+                "compact_label": "Nhãn Island"
               },
               "data_description": {
                 "slug": "Mã định danh duy nhất cho hoạt động này. Để trống để tự tạo từ ID thực thể. Ví dụ: ha-living-room-lamp",
@@ -1823,7 +1868,8 @@
                 "priority": "Hoạt động có mức ưu tiên cao hơn được giữ lâu hơn khi đạt giới hạn thiết bị (0 = thấp nhất, 10 = cao nhất).",
                 "sound": "Tên âm thanh thông báo cho bản cập nhật này. Để trống để dùng âm thanh hệ thống iOS.",
                 "update_interval": "Số giây tối thiểu giữa các lần cập nhật. Các thay đổi trạng thái nhanh sẽ bị giới hạn tốc độ.",
-                "state_labels": "Văn bản hiển thị tùy chỉnh cho các trạng thái. Mỗi trạng thái một hàng: giá trị trạng thái và nhãn hiển thị. Ví dụ: heating và Đang Sưởi. Chuỗi cũ state=Label, state2=Label 2 vẫn được chấp nhận."
+                "state_labels": "Văn bản hiển thị tùy chỉnh cho các trạng thái. Mỗi trạng thái một hàng: giá trị trạng thái và nhãn hiển thị. Ví dụ: heating và Đang Sưởi. Chuỗi cũ state=Label, state2=Label 2 vẫn được chấp nhận.",
+                "compact_label": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này. Để trống để giữ nội dung riêng của mẫu."
               }
             },
             "colors": {
