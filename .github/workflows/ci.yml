@@ -114,3 +114,17 @@ jobs:
         run: |
           printf 'Requires the PushWard iOS app %s or later.\n\n%s\n' "$APP_VERSION" "$CHANGELOG" > /tmp/notes.md
           gh release create "${{ github.ref_name }}" --title "${{ github.ref_name }}" --notes-file /tmp/notes.md
+
+  # The single check branch protection requires, so adding or renaming a job
+  # above does not silently drop it from the rule.
+  all-checks:
+    name: All checks passed
+    runs-on: ubuntu-latest
+    needs: [hacs-validate, hassfest, lint, test]
+    if: ${{ always() }}
+    steps:
+      - name: Fail if any job did not succeed
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::one or more jobs failed or were cancelled"
+          exit 1
