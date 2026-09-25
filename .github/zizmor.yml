@@ -1,0 +1,8 @@
+# zizmor settings, read by zizmor itself and by the fleet's weekly workflow
+# sweep.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # First-party reusable workflows and actions ride @master by design.
+        mac-lucky/*: any
