@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "On Expire",
-          "description": "Option id the server records as the answer (by: expired) when End Date passes, or none to disarm. Requires End Date."
+          "description": "Option id the server records as the answer (by: expired) if End Date passes unanswered, or none to record no option. It does not cancel the deadline: the activity expires and ends at End Date either way. Requires End Date."
         },
         "end_date": {
           "name": "End Date",
-          "description": "Unix timestamp (seconds) when the question expires. Required with On Expire."
+          "description": "Unix timestamp (seconds) when the question expires. If nobody has answered by then, the activity expires and ends, with or without On Expire. This action can change it but not remove it. Required with On Expire."
         },
         "state_text": {
           "name": "State Text",

@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Bij verlopen",
-          "description": "Optie-id die de server als antwoord vastlegt zodra de einddatum verstrijkt, of none om uit te schakelen. Vereist de einddatum."
+          "description": "Optie-id die de server als antwoord (by: expired) vastlegt als de einddatum zonder antwoord verstrijkt, of none om geen optie vast te leggen. De deadline vervalt daarmee niet: in beide gevallen verloopt de activiteit op de einddatum en eindigt ze. Vereist de einddatum."
         },
         "end_date": {
           "name": "Einddatum",
-          "description": "Unix-tijdstempel (seconden) waarop de vraag verloopt. Verplicht samen met Bij verlopen."
+          "description": "Unix-tijdstempel (seconden) waarop de vraag verloopt. Heeft niemand dan geantwoord, dan verloopt de activiteit en eindigt ze, met of zonder Bij verlopen. Deze actie kan de waarde wijzigen, maar niet verwijderen. Verplicht samen met Bij verlopen."
         },
         "state_text": {
           "name": "Statustekst",

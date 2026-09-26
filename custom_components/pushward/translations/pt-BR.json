@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Ao expirar",
-          "description": "Id da opção que o servidor registra como resposta quando a data de término passa, ou none para desativar. Requer a data de término."
+          "description": "Id da opção que o servidor registra como resposta (by: expired) se a data de término passar sem resposta, ou none para não registrar nenhuma opção. Isso não cancela o prazo: nos dois casos a atividade expira e termina na data de término. Requer a data de término."
         },
         "end_date": {
           "name": "Data de Término",
-          "description": "Timestamp Unix (segundos) em que a pergunta expira. Obrigatório junto com Ao expirar."
+          "description": "Timestamp Unix (segundos) em que a pergunta expira. Se ninguém tiver respondido até lá, a atividade expira e termina, com ou sem Ao expirar. Esta ação pode alterá-lo, mas não removê-lo. Obrigatório junto com Ao expirar."
         },
         "state_text": {
           "name": "Texto do Estado",

@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Saat Kedaluwarsa",
-          "description": "Id opsi yang direkam server sebagai jawaban saat End Date terlewati, atau none untuk menonaktifkan. Membutuhkan End Date."
+          "description": "Id opsi yang direkam server sebagai jawaban (by: expired) jika Tanggal Akhir terlewati tanpa jawaban, atau none untuk tidak merekam opsi apa pun. Ini tidak membatalkan tenggat: dalam kedua kasus aktivitas kedaluwarsa dan berakhir pada Tanggal Akhir. Membutuhkan Tanggal Akhir."
         },
         "end_date": {
           "name": "Tanggal Akhir",
-          "description": "Stempel waktu Unix (detik) saat pertanyaan kedaluwarsa. Wajib bersama Saat Kedaluwarsa."
+          "description": "Stempel waktu Unix (detik) saat pertanyaan kedaluwarsa. Jika belum ada yang menjawab saat itu, aktivitas kedaluwarsa dan berakhir, dengan atau tanpa Saat Kedaluwarsa. Aksi ini dapat mengubahnya, tetapi tidak dapat menghapusnya. Wajib bersama Saat Kedaluwarsa."
         },
         "state_text": {
           "name": "Teks Status",

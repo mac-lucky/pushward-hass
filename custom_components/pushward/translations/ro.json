@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "La expirare",
-          "description": "Id-ul opțiunii pe care serverul o înregistrează ca răspuns când trece data de sfârșit, sau none pentru dezactivare. Necesită data de sfârșit."
+          "description": "Id-ul opțiunii pe care serverul o înregistrează ca răspuns (by: expired) dacă data de sfârșit trece fără răspuns, sau none pentru a nu înregistra nicio opțiune. Nu anulează termenul: în ambele cazuri activitatea expiră și se încheie la data de sfârșit. Necesită data de sfârșit."
         },
         "end_date": {
           "name": "Dată de încheiere",
-          "description": "Marcaj de timp Unix (secunde) la care expiră întrebarea. Obligatoriu împreună cu La expirare."
+          "description": "Marcaj de timp Unix (secunde) la care expiră întrebarea. Dacă nimeni nu a răspuns până atunci, activitatea expiră și se încheie, cu sau fără La expirare. Această acțiune îl poate modifica, dar nu îl poate elimina. Obligatoriu împreună cu La expirare."
         },
         "state_text": {
           "name": "Text stare",

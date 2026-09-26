@@ -464,9 +464,11 @@ _APPROVAL_TEMPLATE_FIELDS = {
     vol.Optional("source"): vol.All(str, vol.Length(max=APPROVAL_SOURCE_MAX)),
     # No minimum: details replace wholesale on update, so [] is the clearing form.
     vol.Optional("details"): vol.All([_APPROVAL_DETAIL_SCHEMA], vol.Length(max=APPROVAL_DETAILS_MAX)),
-    # An option id, or "none" to disarm. At end_date the server records the named
-    # option as the answer (by: "expired"). The end_date pairing is checked in
-    # _validate_approval_update, and only when options ride the same call.
+    # An option id, or "none" to record no option (same as leaving it out). Neither
+    # disarms anything: at end_date an unanswered card gets answer {by: "expired"}
+    # and ends regardless. Only removing end_date cancels that, and end_date here
+    # takes no null. Option membership is checked in _validate_approval_update;
+    # the end_date pairing is the server's call.
     vol.Optional("on_expire"): vol.Any(
         "none",
         vol.Match(APPROVAL_OPTION_ID_PATTERN, msg='on_expire must be an option id or "none"'),

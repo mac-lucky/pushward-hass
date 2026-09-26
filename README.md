@@ -591,10 +591,14 @@ implied by the action name; you no longer pass a `template` field.
 > (`{ option, at, by }`), is pushed to every device, and the activity ends shortly after. The
 > recorded answer shows on the card, but this integration never reads an activity back, so to
 > react from Home Assistant give each option a `url` pointing at a webhook trigger instead, as
-> in the example below. `on_expire` names the option to record
-> (`by: "expired"`) when `end_date` passes, or `none` to disarm; it needs `end_date` (already
-> stored or sent along). Recording is all it does: the expiry sweep never fires the option's
-> webhook, so an automation behind a `url` option runs only on a real tap. Options
+> in the example below. `end_date` is a hard deadline: if nobody has answered by then, the
+> server records an expired answer (`by: "expired"`) and ends the card, whatever `on_expire`
+> says. `on_expire` only picks the option that answer names. `none` records no option, same as
+> leaving `on_expire` out, so it is for dropping a default set earlier, not for switching the
+> deadline off. `on_expire` needs `end_date` (already stored or sent along). Recording is all
+> the sweep does: it never fires the option's webhook, so an automation behind a `url` option
+> runs only on a real tap. This action can move a stored `end_date` but can't remove it; to
+> drop the deadline, `delete_activity` and create the card again without one. Options
 > and details replace wholesale on update, and re-sending `options` starts a new round (the
 > stored answer is cleared) - so a plain update leaves them out.
 >

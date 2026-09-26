@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "À expiration",
-          "description": "Id de l'option que le serveur enregistre comme réponse quand la date de fin est atteinte, ou none pour désactiver. Nécessite la date de fin."
+          "description": "Id de l'option que le serveur enregistre comme réponse (by: expired) si la date de fin passe sans réponse, ou none pour n'enregistrer aucune option. Cela n'annule pas l'échéance : dans les deux cas, l'activité expire et se termine à la date de fin. Nécessite la date de fin."
         },
         "end_date": {
           "name": "Date de fin",
-          "description": "Horodatage Unix (secondes) auquel la question expire. Requis avec À expiration."
+          "description": "Horodatage Unix (secondes) auquel la question expire. Si personne n'a répondu d'ici là, l'activité expire et se termine, avec ou sans À expiration. Cette action peut le modifier, mais pas le supprimer. Requis avec À expiration."
         },
         "state_text": {
           "name": "Texte d'état",

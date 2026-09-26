@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Al expirar",
-          "description": "Id de la opción que el servidor registra como respuesta cuando pasa la fecha de fin, o none para desactivarlo. Requiere la fecha de fin."
+          "description": "Id de la opción que el servidor registra como respuesta (by: expired) si la fecha de fin pasa sin respuesta, o none para no registrar ninguna opción. No cancela el plazo: en ambos casos la actividad expira y termina en la fecha de fin. Requiere la fecha de fin."
         },
         "end_date": {
           "name": "Fecha de fin",
-          "description": "Marca de tiempo Unix (segundos) en la que expira la pregunta. Obligatoria junto con Al expirar."
+          "description": "Marca de tiempo Unix (segundos) en la que expira la pregunta. Si nadie ha respondido para entonces, la actividad expira y termina, con o sin Al expirar. Esta acción puede cambiarla, pero no quitarla. Obligatoria junto con Al expirar."
         },
         "state_text": {
           "name": "Texto de estado",

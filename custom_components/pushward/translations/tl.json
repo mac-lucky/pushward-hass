@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Kapag Nag-expire",
-          "description": "Id ng opsyong itatala ng server bilang sagot kapag lumipas ang End Date, o none para i-disable. Kailangan ang End Date."
+          "description": "Id ng opsyong itatala ng server bilang sagot (by: expired) kapag lumipas ang Petsa ng Pagtatapos nang walang sagot, o none para walang opsyong maitala. Hindi nito kinakansela ang deadline: sa parehong kaso, mag-e-expire at matatapos ang activity sa Petsa ng Pagtatapos. Kailangan ang Petsa ng Pagtatapos."
         },
         "end_date": {
           "name": "Petsa ng Pagtatapos",
-          "description": "Unix timestamp (segundo) kung kailan mag-e-expire ang tanong. Kailangan kasama ng Kapag Nag-expire."
+          "description": "Unix timestamp (segundo) kung kailan mag-e-expire ang tanong. Kung wala pang sumasagot pagsapit nito, mag-e-expire at matatapos ang activity, may Kapag Nag-expire man o wala. Kaya itong baguhin ng aksyong ito, pero hindi alisin. Kailangan kasama ng Kapag Nag-expire."
         },
         "state_text": {
           "name": "Teksto ng Estado",

@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Khi Hết Hạn",
-          "description": "Id lựa chọn mà máy chủ ghi làm câu trả lời khi qua ngày kết thúc, hoặc none để tắt. Cần ngày kết thúc."
+          "description": "Id lựa chọn mà máy chủ ghi làm câu trả lời (by: expired) nếu qua ngày kết thúc mà chưa có ai trả lời, hoặc none để không ghi lựa chọn nào. Điều này không hủy hạn chót: trong cả hai trường hợp, hoạt động hết hạn và kết thúc vào ngày kết thúc. Cần ngày kết thúc."
         },
         "end_date": {
           "name": "Ngày Kết Thúc",
-          "description": "Dấu thời gian Unix (giây) khi câu hỏi hết hạn. Bắt buộc cùng với Khi Hết Hạn."
+          "description": "Dấu thời gian Unix (giây) khi câu hỏi hết hạn. Nếu đến lúc đó chưa ai trả lời, hoạt động hết hạn và kết thúc, dù có Khi Hết Hạn hay không. Hành động này có thể thay đổi giá trị nhưng không thể xóa nó. Bắt buộc cùng với Khi Hết Hạn."
         },
         "state_text": {
           "name": "Văn Bản Trạng Thái",

@@ -566,7 +566,7 @@ def test_valid_approval_payloads_pass() -> None:
     """Approval edge shapes the server accepts: a bare update frame (the stored
     options survive the merge and re-sending them would clear the recorded answer),
     two title-only buttons, four icon-only buttons, a deep-link option with
-    foreground, on_expire disarmed with "none", an options-less on_expire whose
+    foreground, on_expire set to "none" (no default option), an options-less on_expire whose
     end_date pairing only the merged content can settle, and [] as the wholesale
     details-clearing form (absent for the off-template leak check too)."""
     assert_valid_activity_content({"template": "approval", "progress": 0.0})

@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Süre Dolunca",
-          "description": "Bitiş tarihi geçtiğinde sunucunun yanıt olarak kaydedeceği seçenek id'si veya devre dışı bırakmak için none. Bitiş tarihi gerektirir."
+          "description": "Bitiş tarihi yanıtsız geçerse sunucunun yanıt (by: expired) olarak kaydedeceği seçenek id'si veya hiçbir seçenek kaydetmemek için none. Süreyi iptal etmez: her iki durumda da aktivitenin süresi bitiş tarihinde dolar ve aktivite sona erer. Bitiş tarihi gerektirir."
         },
         "end_date": {
           "name": "Bitiş Tarihi",
-          "description": "Sorunun süresinin dolacağı Unix zaman damgası (saniye). Süre Dolunca ile birlikte zorunludur."
+          "description": "Sorunun süresinin dolacağı Unix zaman damgası (saniye). O zamana kadar kimse yanıt vermezse, Süre Dolunca ayarlı olsun ya da olmasın aktivitenin süresi dolar ve aktivite sona erer. Bu eylem değeri değiştirebilir ama kaldıramaz. Süre Dolunca ile birlikte zorunludur."
         },
         "state_text": {
           "name": "Durum Metni",

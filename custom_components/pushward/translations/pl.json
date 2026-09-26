@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Po wygaśnięciu",
-          "description": "Id opcji, którą serwer zapisze jako odpowiedź po upływie daty zakończenia, albo none, aby wyłączyć. Wymaga daty zakończenia."
+          "description": "Id opcji, którą serwer zapisze jako odpowiedź (by: expired), jeśli data zakończenia minie bez odpowiedzi, albo none, aby nie zapisywać żadnej opcji. Nie anuluje to terminu: w obu przypadkach aktywność wygasa i kończy się z upływem daty zakończenia. Wymaga daty zakończenia."
         },
         "end_date": {
           "name": "Data zakończenia",
-          "description": "Uniksowy znacznik czasu (sekundy), kiedy pytanie wygasa. Wymagany razem z Po wygaśnięciu."
+          "description": "Uniksowy znacznik czasu (sekundy), kiedy pytanie wygasa. Jeśli do tego czasu nikt nie odpowie, aktywność wygasa i się kończy, niezależnie od pola Po wygaśnięciu. Ta akcja może go zmienić, ale nie usunąć. Wymagany razem z Po wygaśnięciu."
         },
         "state_text": {
           "name": "Tekst stanu",

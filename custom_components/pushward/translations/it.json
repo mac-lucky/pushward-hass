@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Alla scadenza",
-          "description": "Id dell'opzione che il server registra come risposta al superamento della data di fine, oppure none per disattivare. Richiede la data di fine."
+          "description": "Id dell'opzione che il server registra come risposta (by: expired) se la data di fine passa senza risposta, oppure none per non registrare alcuna opzione. Non annulla la scadenza: in entrambi i casi l'attività scade e termina alla data di fine. Richiede la data di fine."
         },
         "end_date": {
           "name": "Data di fine",
-          "description": "Timestamp Unix (secondi) in cui la domanda scade. Obbligatorio insieme ad Alla scadenza."
+          "description": "Timestamp Unix (secondi) in cui la domanda scade. Se nessuno ha risposto entro allora, l'attività scade e termina, con o senza Alla scadenza. Questa azione può modificarlo, ma non rimuoverlo. Obbligatorio insieme ad Alla scadenza."
         },
         "state_text": {
           "name": "Testo stato",

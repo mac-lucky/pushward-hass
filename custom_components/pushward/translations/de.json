@@ -1391,11 +1391,11 @@
         },
         "on_expire": {
           "name": "Bei Ablauf",
-          "description": "Options-id, die der Server beim Erreichen des Enddatums als Antwort aufzeichnet, oder none zum Deaktivieren. Erfordert das Enddatum."
+          "description": "Options-id, die der Server als Antwort (by: expired) aufzeichnet, wenn das Enddatum ohne Antwort verstreicht, oder none, um keine Option aufzuzeichnen. Die Frist wird dadurch nicht aufgehoben: Die Activity läuft in beiden Fällen zum Enddatum ab und endet. Erfordert das Enddatum."
         },
         "end_date": {
           "name": "Enddatum",
-          "description": "Unix-Zeitstempel (Sekunden), zu dem die Frage abläuft. Erforderlich zusammen mit Bei Ablauf."
+          "description": "Unix-Zeitstempel (Sekunden), zu dem die Frage abläuft. Hat bis dahin niemand geantwortet, läuft die Activity ab und endet, mit oder ohne Bei Ablauf. Diese Aktion kann den Wert ändern, aber nicht entfernen. Erforderlich zusammen mit Bei Ablauf."
         },
         "state_text": {
           "name": "Zustandstext",
