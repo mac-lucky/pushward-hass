@@ -286,6 +286,67 @@ async def test_create_notification_all_fields():
     assert body["push"] is False
 
 
+async def test_create_notification_returns_created_notification():
+    resp = _mock_response(201, json_body={"id": 991, "title": "t"})
+    client = _make_client(_make_session(resp))
+
+    assert await client.create_notification("t", "b") == {"id": 991, "title": "t"}
+
+
+async def test_create_notification_with_send_at_schedules():
+    """send_at posts to /notifications/scheduled with an RFC 3339 send_at."""
+    resp = _mock_response(201, json_body={"id": 42, "status": "scheduled"})
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    result = await client.create_notification(
+        "Bins",
+        "Tonight",
+        send_at=datetime(2026, 10, 1, 16, 0, tzinfo=UTC),
+        source="home",
+    )
+
+    assert result == {"id": 42, "status": "scheduled"}
+    call_args = session.request.call_args
+    assert call_args[0][0] == "POST"
+    assert call_args[0][1].endswith("/notifications/scheduled")
+    assert call_args[1]["json"] == {
+        "title": "Bins",
+        "body": "Tonight",
+        "push": True,
+        "source": "home",
+        "send_at": "2026-10-01T16:00:00+00:00",
+    }
+
+
+async def test_create_notification_requires_aware_send_at():
+    client = _make_client(_make_session(_mock_response(201)))
+    with pytest.raises(ValueError):
+        await client.create_notification("t", "b", send_at=datetime(2026, 10, 1, 16, 0))
+
+
+async def test_list_scheduled_notifications():
+    resp = _mock_response(200, json_body={"items": [{"id": 3}]})
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    assert await client.list_scheduled_notifications("sent") == [{"id": 3}]
+    call_args = session.request.call_args
+    assert call_args[0][0] == "GET"
+    assert call_args[0][1].endswith("/notifications/scheduled?status=sent&limit=100")
+
+
+async def test_cancel_scheduled_notification_swallows_404():
+    session = _make_session(_mock_response(404))
+    client = _make_client(session)
+
+    await client.cancel_scheduled_notification(42)
+
+    call_args = session.request.call_args
+    assert call_args[0][0] == "DELETE"
+    assert call_args[0][1].endswith("/notifications/scheduled/42")
+
+
 async def test_create_notification_omits_none_fields():
     """Optional fields set to None are not included in the JSON payload."""
     resp = _mock_response(201)

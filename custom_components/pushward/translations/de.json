@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Aktionen",
           "description": "Liste von Aktionsschaltflächen. Jede Aktion ist ein Objekt mit id, title, optional url, foreground, destructive, authentication_required und icon. Bei einer http(s)-URL kann zusätzlich ein stiller Webhook mit method (GET/POST/PUT/PATCH/DELETE/HEAD), headers und body gesendet werden."
+        },
+        "send_at": {
+          "name": "Sendezeitpunkt",
+          "description": "Die Benachrichtigung später statt sofort senden, höchstens 30 Tage im Voraus. PushWard hält sie zurück und sendet sie zu diesem Zeitpunkt; beim Senden wird sie auf das Benachrichtigungskontingent angerechnet. Eine Zeit ohne UTC-Offset wird in der Zeitzone von Home Assistant interpretiert. Eine Antwort anfordern, um die ID für cancel_scheduled_notification zu erhalten."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Geplante Benachrichtigung abbrechen",
+      "description": "Eine mit send_at von send_notification eingeplante Benachrichtigung abbrechen. Eine ID, die nicht mehr existiert, wird ignoriert.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID der geplanten Benachrichtigung",
+          "description": "Die von send_notification zurückgegebene scheduled_notification_id."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Geplante Benachrichtigungen auflisten",
+      "description": "Die geplanten Benachrichtigungen zurückgeben, die nächstfällige zuerst.",
+      "fields": {
+        "status": {
+          "name": "Status",
+          "description": "Welche zurückgegeben werden. scheduled (Standard) listet die noch wartenden auf; sent und failed bleiben 7 Tage erhalten."
         }
       }
     },

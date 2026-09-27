@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Действия",
           "description": "Список кнопок действий. Каждое действие — объект с id, title, необязательными url, foreground, destructive, authentication_required и icon. Для http(s)-адреса можно также отправить тихий webhook с method (GET/POST/PUT/PATCH/DELETE/HEAD), headers и body."
+        },
+        "send_at": {
+          "name": "Время отправки",
+          "description": "Отправить уведомление позже, а не сейчас, не более чем на 30 дней вперёд. PushWard хранит его и отправляет в это время, а при отправке оно засчитывается в вашу квоту уведомлений. Время без смещения UTC интерпретируется в часовом поясе Home Assistant. Запросите ответ, чтобы получить id для cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Отменить запланированное уведомление",
+      "description": "Отменить уведомление, поставленное в очередь через send_at в send_notification. Несуществующий id игнорируется.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID запланированного уведомления",
+          "description": "scheduled_notification_id, возвращённый send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Список запланированных уведомлений",
+      "description": "Возвращает ваши запланированные уведомления, ближайшие первыми.",
+      "fields": {
+        "status": {
+          "name": "Статус",
+          "description": "Какие уведомления вернуть. scheduled (по умолчанию) показывает ещё ожидающие; sent и failed хранятся 7 дней."
         }
       }
     },

@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Hành động",
           "description": "Danh sách các nút hành động. Mỗi hành động là một đối tượng với id, title, và url, foreground, destructive, authentication_required, icon tùy chọn. Với url http(s) bạn cũng có thể gửi một webhook im lặng với method (GET/POST/PUT/PATCH/DELETE/HEAD), headers và body."
+        },
+        "send_at": {
+          "name": "Thời Gian Gửi",
+          "description": "Gửi thông báo sau thay vì ngay bây giờ, tối đa 30 ngày tới. PushWard giữ thông báo và gửi vào thời điểm này, và thông báo được tính vào hạn mức thông báo của bạn khi được gửi. Thời gian không có độ lệch UTC được hiểu theo múi giờ của Home Assistant. Yêu cầu phản hồi để lấy id cho cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Hủy Thông Báo Đã Lên Lịch",
+      "description": "Hủy một thông báo đã được xếp hàng bằng send_at của send_notification. Id không còn tồn tại sẽ bị bỏ qua.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID Thông Báo Đã Lên Lịch",
+          "description": "scheduled_notification_id do send_notification trả về."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Liệt Kê Thông Báo Đã Lên Lịch",
+      "description": "Trả về các thông báo đã lên lịch của bạn, gần nhất trước.",
+      "fields": {
+        "status": {
+          "name": "Trạng Thái",
+          "description": "Loại cần trả về. scheduled (mặc định) liệt kê các thông báo vẫn đang chờ; sent và failed được lưu giữ trong 7 ngày."
         }
       }
     },

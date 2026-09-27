@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Acțiuni",
           "description": "Listă de butoane de acțiune. Fiecare acțiune este un obiect cu id, title și, opțional, url, foreground, destructive, authentication_required și icon. Pentru un url http(s) puteți trimite și un webhook silențios cu method (GET/POST/PUT/PATCH/DELETE/HEAD), headers și body."
+        },
+        "send_at": {
+          "name": "Ora trimiterii",
+          "description": "Trimiteți notificarea mai târziu în loc de acum, cu cel mult 30 de zile în avans. PushWard o păstrează și o trimite la această oră, iar la trimitere este inclusă în cota dvs. de notificări. O oră fără decalaj UTC este interpretată în fusul orar al Home Assistant. Solicitați un răspuns pentru a obține id-ul pentru cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Anulați notificarea programată",
+      "description": "Anulați o notificare pusă în coadă cu send_at din send_notification. Un id care nu mai există este ignorat.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID notificare programată",
+          "description": "scheduled_notification_id returnat de send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Listați notificările programate",
+      "description": "Returnează notificările dvs. programate, cele mai apropiate primele.",
+      "fields": {
+        "status": {
+          "name": "Stare",
+          "description": "Pe care să le returneze. scheduled (implicit) listează notificările încă în așteptare; sent și failed se păstrează 7 zile."
         }
       }
     },

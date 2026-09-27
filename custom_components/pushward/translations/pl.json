@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Akcje",
           "description": "Lista przycisków akcji. Każda akcja to obiekt z id, title, opcjonalnym url, foreground, destructive, authentication_required oraz icon. Dla adresu http(s) możesz też wysłać cichy webhook z method (GET/POST/PUT/PATCH/DELETE/HEAD), headers i body."
+        },
+        "send_at": {
+          "name": "Czas wysłania",
+          "description": "Wyślij powiadomienie później zamiast teraz, maksymalnie 30 dni naprzód. PushWard przechowuje je i wysyła o tej godzinie, a w momencie wysłania jest ono wliczane do Twojego limitu powiadomień. Czas bez przesunięcia UTC jest odczytywany w strefie czasowej Home Assistant. Zażądaj odpowiedzi, aby otrzymać id dla cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Anuluj zaplanowane powiadomienie",
+      "description": "Anuluj powiadomienie zakolejkowane przez send_at w send_notification. Id, które już nie istnieje, jest ignorowane.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID zaplanowanego powiadomienia",
+          "description": "scheduled_notification_id zwrócony przez send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Pokaż zaplanowane powiadomienia",
+      "description": "Zwróć swoje zaplanowane powiadomienia, od najbliższego.",
+      "fields": {
+        "status": {
+          "name": "Status",
+          "description": "Które zwrócić. scheduled (domyślnie) pokazuje te wciąż oczekujące; sent i failed są przechowywane przez 7 dni."
         }
       }
     },

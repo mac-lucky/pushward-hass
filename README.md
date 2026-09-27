@@ -755,6 +755,23 @@ Send a push notification.
 | `metadata` | No | Arbitrary key-value pairs for custom app handling |
 | `actions` | No | List of action buttons `{ id, title, url, foreground, destructive, authentication_required, icon }`. `url` may use a custom scheme, and `method`/`headers`/`body` make the button a silent HTTP webhook (http(s) only). A silent http(s) action can also set `text_input: true` (with optional `text_input_placeholder`, `text_input_button_title`) to prompt for a typed reply, delivered to your webhook as JSON `{ "text": ... }` or via the `{{input}}` body placeholder |
 | `push` | No | Send as APNs push (default: true); when false, inbox-only |
+| `send_at` | No | Send later instead of now, at most 30 days ahead. A time without a UTC offset is read in Home Assistant's time zone |
+
+With `send_at`, PushWard holds the notification and sends it at that time; it counts toward your notification quota when it is sent, not when you schedule it. Up to 20 can be waiting at once. Ask for a response to get the id you need to cancel it:
+
+```yaml
+- action: pushward.send_notification
+  data:
+    title: "Bins go out tonight"
+    body: "Collection is at 7:00 tomorrow."
+    send_at: "{{ today_at('18:00') }}"
+  response_variable: scheduled
+- action: pushward.cancel_scheduled_notification
+  data:
+    scheduled_notification_id: "{{ scheduled.scheduled_notification_id }}"
+```
+
+`pushward.list_scheduled_notifications` returns them (`status`: scheduled by default, or sent, failed, all) as `scheduled_notifications`; it covers the ones this integration's key scheduled. Scheduling while your notification quota is already used up fails right away. Without `send_at`, a requested response carries the created `notification_id`.
 
 ### `pushward.send_email`
 

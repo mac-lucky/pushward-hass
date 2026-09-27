@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "অ্যাকশন",
           "description": "অ্যাকশন বোতামের তালিকা। প্রতিটি অ্যাকশন id, title, ঐচ্ছিক url, foreground, destructive, authentication_required, এবং icon সহ একটি অবজেক্ট। একটি http(s) url-এর জন্য আপনি method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, এবং body সহ একটি সাইলেন্ট ওয়েবহুকও পাঠাতে পারেন।"
+        },
+        "send_at": {
+          "name": "পাঠানোর সময়",
+          "description": "বিজ্ঞপ্তিটি এখনই না পাঠিয়ে পরে পাঠান, সর্বোচ্চ 30 দিন পর পর্যন্ত। PushWard এটি ধরে রাখে এবং এই সময়ে পাঠায়, আর পাঠানোর সময় এটি আপনার নোটিফিকেশন কোটায় গণনা করা হয়। UTC অফসেট ছাড়া কোনো সময় Home Assistant-এর টাইম জোন অনুযায়ী পড়া হয়। cancel_scheduled_notification-এর জন্য আইডি পেতে একটি রেসপন্স অনুরোধ করুন।"
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "নির্ধারিত বিজ্ঞপ্তি বাতিল করুন",
+      "description": "send_notification-এর send_at দিয়ে সারিতে রাখা একটি বিজ্ঞপ্তি বাতিল করুন। যে আইডি আর নেই সেটি উপেক্ষা করা হয়।",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "নির্ধারিত বিজ্ঞপ্তির আইডি",
+          "description": "send_notification যে scheduled_notification_id ফেরত দেয়।"
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "নির্ধারিত বিজ্ঞপ্তির তালিকা",
+      "description": "আপনার নির্ধারিত বিজ্ঞপ্তিগুলি ফেরত দিন, সবচেয়ে কাছের সময়েরটি আগে।",
+      "fields": {
+        "status": {
+          "name": "স্ট্যাটাস",
+          "description": "কোনগুলি ফেরত দেওয়া হবে। scheduled (ডিফল্ট) এখনও অপেক্ষমাণগুলি দেখায়; sent এবং failed 7 দিন রাখা হয়।"
         }
       }
     },

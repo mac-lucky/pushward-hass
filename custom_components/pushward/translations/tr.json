@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Eylemler",
           "description": "Eylem düğmelerinin listesi. Her eylem; id, title, isteğe bağlı url, foreground, destructive, authentication_required ve icon içeren bir nesnedir. Bir http(s) url için method (GET/POST/PUT/PATCH/DELETE/HEAD), headers ve body ile sessiz bir webhook da gönderebilirsiniz."
+        },
+        "send_at": {
+          "name": "Gönderim zamanı",
+          "description": "Bildirimi şimdi yerine daha sonra, en fazla 30 gün ileriye kadar gönderin. PushWard bildirimi saklar ve bu zamanda gönderir; bildirim gönderildiğinde bildirim kotanızdan düşülür. UTC farkı içermeyen bir zaman, Home Assistant'ın saat diliminde yorumlanır. cancel_scheduled_notification için id almak üzere bir yanıt isteyin."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Zamanlanmış Bildirimi İptal Et",
+      "description": "send_notification'ın send_at alanıyla sıraya alınan bir bildirimi iptal eder. Artık var olmayan bir id yok sayılır.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "Zamanlanmış bildirim kimliği",
+          "description": "send_notification tarafından döndürülen scheduled_notification_id."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Zamanlanmış Bildirimleri Listele",
+      "description": "Zamanlanmış bildirimlerinizi en yakın olandan başlayarak döndürür.",
+      "fields": {
+        "status": {
+          "name": "Durum",
+          "description": "Hangilerinin döndürüleceği. scheduled (varsayılan) hâlâ bekleyenleri listeler; sent ve failed 7 gün saklanır."
         }
       }
     },

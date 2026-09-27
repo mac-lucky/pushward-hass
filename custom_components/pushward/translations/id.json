@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Aksi",
           "description": "Daftar tombol aksi. Setiap aksi adalah objek dengan id, title, serta url, foreground, destructive, authentication_required, dan icon opsional. Untuk url http(s) Anda juga dapat mengirim webhook senyap dengan method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, dan body."
+        },
+        "send_at": {
+          "name": "Waktu kirim",
+          "description": "Kirim notifikasi nanti alih-alih sekarang, paling lama 30 hari ke depan. PushWard menyimpannya dan mengirimkannya pada waktu ini, dan notifikasi dihitung dalam kuota notifikasi Anda saat dikirim. Waktu tanpa offset UTC dibaca dalam zona waktu Home Assistant. Minta respons untuk mendapatkan id bagi cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Batalkan Notifikasi Terjadwal",
+      "description": "Batalkan notifikasi yang diantrekan dengan send_at dari send_notification. Id yang sudah tidak ada akan diabaikan.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID notifikasi terjadwal",
+          "description": "scheduled_notification_id yang dikembalikan oleh send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Daftar Notifikasi Terjadwal",
+      "description": "Kembalikan notifikasi terjadwal Anda, yang paling dekat lebih dulu.",
+      "fields": {
+        "status": {
+          "name": "Status",
+          "description": "Notifikasi mana yang dikembalikan. scheduled (default) mencantumkan yang masih menunggu; sent dan failed disimpan selama 7 hari."
         }
       }
     },

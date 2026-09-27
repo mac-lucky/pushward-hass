@@ -12,7 +12,7 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
+from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.exceptions import (
     HomeAssistantError,
     ServiceValidationError,
@@ -20,6 +20,7 @@ from homeassistant.exceptions import (
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.util import dt as dt_util
 
 from .activity_manager import ActivityManager, build_history_store
 from .api import (
@@ -76,6 +77,7 @@ from .const import (
     PRIORITY_MAX,
     PRIORITY_MIN,
     SCALES,
+    SCHEDULED_NOTIFICATION_STATUSES,
     SERVICE_TEMPLATES,
     SEVERITIES,
     SOUNDS,
@@ -123,6 +125,8 @@ SERVICE_SEND_NOTIFICATION = "send_notification"
 SERVICE_SEND_EMAIL = "send_email"
 SERVICE_WIDGET_REFRESH = "widget_refresh"
 SERVICE_DELETE_WIDGET = "delete_widget"
+SERVICE_CANCEL_SCHEDULED_NOTIFICATION = "cancel_scheduled_notification"
+SERVICE_LIST_SCHEDULED_NOTIFICATIONS = "list_scheduled_notifications"
 
 # Keys that turn an action into a silent HTTP webhook — gated by _validate_http_action_fields.
 _HTTP_ACTION_KEYS = ("method", "headers", "body")
@@ -683,7 +687,17 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
         vol.Optional("metadata"): vol.Schema({str: str}),
         vol.Optional("actions"): vol.All([SCHEMA_ACTION], vol.Length(max=10)),
         vol.Optional("push", default=True): bool,
+        # Naive values (the UI datetime picker) are in Home Assistant's time zone.
+        vol.Optional("send_at"): vol.All(cv.datetime, dt_util.as_utc),
     }
+)
+
+SCHEMA_CANCEL_SCHEDULED_NOTIFICATION = vol.Schema(
+    {vol.Required("scheduled_notification_id"): vol.All(vol.Coerce(int), vol.Range(min=1))}
+)
+
+SCHEMA_LIST_SCHEDULED_NOTIFICATIONS = vol.Schema(
+    {vol.Optional("status", default="scheduled"): vol.In(SCHEDULED_NOTIFICATION_STATUSES)}
 )
 
 
@@ -892,20 +906,44 @@ _NOTIFICATION_FIELDS = [
 ]
 
 
-async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall) -> None:
-    """Handle the send_notification service call."""
+async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
+    """Handle the send_notification service call.
+
+    With send_at the notification is queued server-side instead of sent now.
+    The optional response carries the id to cancel it with.
+    """
     api = _get_api(hass)
-    kwargs: dict = {}
-    for field in _NOTIFICATION_FIELDS:
-        if field in call.data:
-            kwargs[field] = call.data[field]
+    kwargs: dict = {field: call.data[field] for field in _NOTIFICATION_FIELDS if field in call.data}
+    send_at = call.data.get("send_at")
     with _surface_api_errors():
-        await api.create_notification(
+        created = await api.create_notification(
             title=call.data["title"],
             body=call.data["body"],
             push=call.data["push"],
+            send_at=send_at,
             **kwargs,
         )
+    if not call.return_response:
+        return None
+    created = created or {}
+    if send_at is None:
+        return {"notification_id": created.get("id")}
+    return {"scheduled_notification_id": created.get("id"), "send_at": created.get("send_at")}
+
+
+async def _async_handle_cancel_scheduled_notification(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Cancel a scheduled notification. Unknown ids are a no-op."""
+    api = _get_api(hass)
+    with _surface_api_errors():
+        await api.cancel_scheduled_notification(call.data["scheduled_notification_id"])
+
+
+async def _async_handle_list_scheduled_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
+    """Return scheduled notifications, soonest first."""
+    api = _get_api(hass)
+    with _surface_api_errors():
+        items = await api.list_scheduled_notifications(call.data["status"])
+    return {"scheduled_notifications": items}
 
 
 async def _async_handle_send_email(hass: HomeAssistant, call: ServiceCall) -> None:
@@ -1016,7 +1054,24 @@ def _register_services(hass: HomeAssistant) -> None:
         supports_response=SupportsResponse.ONLY,
     )
     hass.services.async_register(
-        DOMAIN, SERVICE_SEND_NOTIFICATION, partial(_async_handle_send_notification, hass), SCHEMA_SEND_NOTIFICATION
+        DOMAIN,
+        SERVICE_SEND_NOTIFICATION,
+        partial(_async_handle_send_notification, hass),
+        SCHEMA_SEND_NOTIFICATION,
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_CANCEL_SCHEDULED_NOTIFICATION,
+        partial(_async_handle_cancel_scheduled_notification, hass),
+        SCHEMA_CANCEL_SCHEDULED_NOTIFICATION,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_LIST_SCHEDULED_NOTIFICATIONS,
+        partial(_async_handle_list_scheduled_notifications, hass),
+        SCHEMA_LIST_SCHEDULED_NOTIFICATIONS,
+        supports_response=SupportsResponse.ONLY,
     )
     hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)
     hass.services.async_register(

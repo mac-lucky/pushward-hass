@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "الإجراءات",
           "description": "قائمة بأزرار الإجراءات. كل إجراء هو كائن يحتوي على id وtitle، وurl وforeground وdestructive وauthentication_required وicon اختيارية. بالنسبة لعنوان http(s) يمكنك أيضًا إرسال خطاف ويب صامت باستخدام method (GET/POST/PUT/PATCH/DELETE/HEAD) وheaders وbody."
+        },
+        "send_at": {
+          "name": "وقت الإرسال",
+          "description": "إرسال الإشعار لاحقًا بدلًا من الآن، بحد أقصى 30 يومًا مقدمًا. يحتفظ به PushWard ويرسله في هذا الوقت، ويُحتسب من حصة الإشعارات الخاصة بك عند إرساله. يُفسَّر الوقت الذي لا يتضمن إزاحة UTC حسب المنطقة الزمنية لـ Home Assistant. اطلب استجابة للحصول على المعرّف اللازم لـ cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "إلغاء إشعار مجدول",
+      "description": "إلغاء إشعار أُضيف إلى قائمة الانتظار عبر send_at في send_notification. يُتجاهل أي معرّف لم يعد موجودًا.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "معرّف الإشعار المجدول",
+          "description": "قيمة scheduled_notification_id التي يعيدها send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "عرض الإشعارات المجدولة",
+      "description": "إرجاع إشعاراتك المجدولة، الأقرب موعدًا أولًا.",
+      "fields": {
+        "status": {
+          "name": "الحالة",
+          "description": "الإشعارات المطلوب إرجاعها. تعرض scheduled (الافتراضية) الإشعارات التي لا تزال في الانتظار؛ وتُحفظ sent و failed لمدة 7 أيام."
         }
       }
     },

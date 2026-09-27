@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Acciones",
           "description": "Lista de botones de acción. Cada acción es un objeto con id, title, url opcional, foreground, destructive, authentication_required e icon. Para una url http(s) también puedes enviar un webhook silencioso con method (GET/POST/PUT/PATCH/DELETE/HEAD), headers y body."
+        },
+        "send_at": {
+          "name": "Hora de envío",
+          "description": "Enviar la notificación más tarde en lugar de ahora, como máximo con 30 días de antelación. PushWard la guarda y la envía a esa hora, y se descuenta de tu cuota de notificaciones cuando se envía. Una hora sin desfase UTC se interpreta en la zona horaria de Home Assistant. Solicita una respuesta para obtener el id para cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Cancelar notificación programada",
+      "description": "Cancelar una notificación puesta en cola con el send_at de send_notification. Un id que ya no existe se ignora.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID de notificación programada",
+          "description": "El scheduled_notification_id devuelto por send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Listar notificaciones programadas",
+      "description": "Devolver tus notificaciones programadas, las más próximas primero.",
+      "fields": {
+        "status": {
+          "name": "Estado",
+          "description": "Cuáles devolver. scheduled (el valor predeterminado) lista las que aún están en espera; sent y failed se conservan durante 7 días."
         }
       }
     },

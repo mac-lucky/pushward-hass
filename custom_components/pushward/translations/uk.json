@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Дії",
           "description": "Список кнопок дій. Кожна дія — це об’єкт з id, title, необов’язковими url, foreground, destructive, authentication_required та icon. Для http(s)-адреси можна також надіслати тихий вебхук з method (GET/POST/PUT/PATCH/DELETE/HEAD), headers і body."
+        },
+        "send_at": {
+          "name": "Час надсилання",
+          "description": "Надіслати сповіщення пізніше, а не зараз, щонайбільше на 30 днів наперед. PushWard зберігає його й надсилає в цей час, а під час надсилання воно зараховується до вашої квоти сповіщень. Час без зсуву UTC інтерпретується в часовому поясі Home Assistant. Запитайте відповідь, щоб отримати id для cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Скасувати заплановане сповіщення",
+      "description": "Скасувати сповіщення, поставлене в чергу через send_at у send_notification. Id, якого більше не існує, ігнорується.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID запланованого сповіщення",
+          "description": "scheduled_notification_id, повернутий send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Список запланованих сповіщень",
+      "description": "Повертає ваші заплановані сповіщення, найближчі першими.",
+      "fields": {
+        "status": {
+          "name": "Статус",
+          "description": "Які сповіщення повернути. scheduled (за замовчуванням) показує ті, що ще очікують; sent і failed зберігаються 7 днів."
         }
       }
     },

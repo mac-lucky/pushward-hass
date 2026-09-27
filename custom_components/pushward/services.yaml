@@ -2097,6 +2097,42 @@ send_notification:
       default: true
       selector:
         boolean:
+    send_at:
+      name: Send at
+      description: Send the notification later instead of now, at most 30 days ahead. PushWard holds it and sends it at this time, and it counts toward your notification quota when it is sent. A time without a UTC offset is read in Home Assistant's time zone. Request a response to get the id for cancel_scheduled_notification.
+      example: "2026-10-01 18:00:00"
+      selector:
+        datetime:
+
+cancel_scheduled_notification:
+  name: Cancel Scheduled Notification
+  description: Cancel a notification queued with send_notification's send_at. An id that no longer exists is ignored.
+  fields:
+    scheduled_notification_id:
+      name: Scheduled notification ID
+      description: The scheduled_notification_id returned by send_notification.
+      required: true
+      example: 42
+      selector:
+        number:
+          min: 1
+          mode: box
+
+list_scheduled_notifications:
+  name: List Scheduled Notifications
+  description: Return your scheduled notifications, soonest first.
+  fields:
+    status:
+      name: Status
+      description: Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days.
+      default: scheduled
+      selector:
+        select:
+          options:
+            - scheduled
+            - sent
+            - failed
+            - all
 
 send_email:
   name: Send Email

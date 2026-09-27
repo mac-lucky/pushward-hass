@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -98,6 +99,8 @@ _BASE_SERVICES = (
     "delete_activity",
     "send_notification",
     "send_email",
+    "cancel_scheduled_notification",
+    "list_scheduled_notifications",
 )
 
 
@@ -334,6 +337,128 @@ async def test_service_send_notification(hass: HomeAssistant) -> None:
     assert call_kwargs["title"] == "Door Opened"
     assert call_kwargs["body"] == "The front door was opened."
     assert call_kwargs["push"] is True
+
+
+async def test_service_send_notification_send_at_schedules(hass: HomeAssistant) -> None:
+    """send_at routes to schedule_notification (UTC) and returns the schedule id."""
+    api = _mock_api()
+    api.create_notification = AsyncMock(return_value={"id": 42, "send_at": "2026-10-01T16:00:00Z"})
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Bins", "body": "Tonight", "send_at": "2026-10-01T18:00:00+02:00", "source": "home"},
+        blocking=True,
+        return_response=True,
+    )
+
+    api.create_notification.assert_awaited_once()
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["send_at"] == datetime(2026, 10, 1, 16, 0, tzinfo=UTC)
+    assert call_kwargs["title"] == "Bins"
+    assert call_kwargs["source"] == "home"
+    assert call_kwargs["push"] is True
+    assert response == {"scheduled_notification_id": 42, "send_at": "2026-10-01T16:00:00Z"}
+
+
+async def test_service_send_notification_naive_send_at_uses_ha_time_zone(hass: HomeAssistant) -> None:
+    """A send_at without an offset (the UI datetime picker) is Home Assistant local time."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Bins", "body": "Tonight", "send_at": "2026-10-01 18:00:00"},
+        blocking=True,
+    )
+
+    assert api.create_notification.call_args[1]["send_at"] == datetime(2026, 10, 1, 16, 0, tzinfo=UTC)
+
+
+async def test_service_send_notification_response_for_immediate_send(hass: HomeAssistant) -> None:
+    """Without send_at, the optional response carries the created notification id."""
+    api = _mock_api()
+    api.create_notification = AsyncMock(return_value={"id": 991, "title": "t"})
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "t", "body": "b"},
+        blocking=True,
+        return_response=True,
+    )
+
+    assert response == {"notification_id": 991}
+
+
+async def test_service_send_notification_rejects_bad_send_at(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {"title": "t", "body": "b", "send_at": "next tuesday"},
+            blocking=True,
+        )
+
+
+async def test_service_cancel_scheduled_notification(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.cancel_scheduled_notification = AsyncMock()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "cancel_scheduled_notification",
+        {"scheduled_notification_id": "42"},
+        blocking=True,
+    )
+
+    api.cancel_scheduled_notification.assert_awaited_once_with(42)
+
+
+async def test_service_list_scheduled_notifications(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    items = [{"id": 3, "status": "scheduled", "send_at": "2026-10-01T16:00:00Z", "title": "t", "body": "b"}]
+    api.list_scheduled_notifications = AsyncMock(return_value=items)
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        "list_scheduled_notifications",
+        {},
+        blocking=True,
+        return_response=True,
+    )
+
+    api.list_scheduled_notifications.assert_awaited_once_with("scheduled")
+    assert response == {"scheduled_notifications": items}
+
+
+async def test_service_schedule_limit_surfaces_server_message(hass: HomeAssistant) -> None:
+    """The server's 409 (20 pending) reaches the user as a HomeAssistantError."""
+    api = _mock_api()
+    api.create_notification = AsyncMock(
+        side_effect=PushWardApiError(
+            "POST /notifications/scheduled failed (409): scheduled notification limit reached (max 20 pending)",
+            status_code=409,
+        )
+    )
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="limit reached"):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {"title": "t", "body": "b", "send_at": "2099-01-01T00:00:00+00:00"},
+            blocking=True,
+        )
 
 
 async def test_service_send_notification_all_fields(hass: HomeAssistant) -> None:

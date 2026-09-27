@@ -295,8 +295,15 @@ class PushWardApiClient:
         metadata: dict[str, str] | None = None,
         actions: list[dict] | None = None,
         push: bool = True,
-    ) -> None:
-        """Create a notification via POST /notifications."""
+        send_at: datetime | None = None,
+    ) -> dict | None:
+        """Create a notification via POST /notifications and return it.
+
+        With a timezone-aware ``send_at`` it is queued instead, via
+        POST /notifications/scheduled, and the schedule is returned. Both count
+        against the notification quota (a schedule when it is sent), so both go
+        through the quota gate.
+        """
         payload: dict = {"title": title, "body": body, "push": push}
         for key, val in [
             ("subtitle", subtitle),
@@ -315,7 +322,26 @@ class PushWardApiClient:
         ]:
             if val is not None:
                 payload[key] = val
-        await self._request_with_retry("POST", "/notifications", json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS)
+        path = "/notifications"
+        if send_at is not None:
+            if send_at.tzinfo is None:
+                raise ValueError("send_at must be timezone-aware")
+            payload["send_at"] = send_at.isoformat()
+            path = "/notifications/scheduled"
+        return await self._request_with_retry(
+            "POST", path, json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
+        )
+
+    async def list_scheduled_notifications(self, status: str = "scheduled") -> list[dict]:
+        """GET /notifications/scheduled, soonest first (at most 100)."""
+        data = await self._request_with_retry(
+            "GET", f"/notifications/scheduled?status={status}&limit=100", return_json=True
+        )
+        return list((data or {}).get("items") or [])
+
+    async def cancel_scheduled_notification(self, scheduled_id: int) -> None:
+        """DELETE /notifications/scheduled/{id}. Idempotent: 404 swallowed."""
+        await self._request_with_retry("DELETE", f"/notifications/scheduled/{int(scheduled_id)}", allow_404=True)
 
     async def send_email(
         self,

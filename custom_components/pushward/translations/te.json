@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "చర్యలు",
           "description": "చర్య బటన్‌ల జాబితా. ప్రతి చర్య id, title, ఐచ్ఛిక url, foreground, destructive, authentication_required, మరియు icon తో ఆబ్జెక్ట్. http(s) url కోసం మీరు method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, మరియు body తో నిశ్శబ్ద webhook కూడా పంపవచ్చు."
+        },
+        "send_at": {
+          "name": "పంపే సమయం",
+          "description": "నోటిఫికేషన్‌ను ఇప్పుడు కాకుండా తర్వాత పంపండి, గరిష్టంగా 30 రోజుల ముందు వరకు. PushWard దాన్ని ఉంచుకుని ఈ సమయానికి పంపుతుంది, పంపినప్పుడు అది మీ నోటిఫికేషన్ కోటాలో లెక్కించబడుతుంది. UTC offset లేని సమయం Home Assistant టైమ్ జోన్‌లో చదవబడుతుంది. cancel_scheduled_notification కోసం ID పొందడానికి response ను అభ్యర్థించండి."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "షెడ్యూల్ చేసిన నోటిఫికేషన్ రద్దు చేయి",
+      "description": "send_notification యొక్క send_at తో క్యూలో ఉంచిన నోటిఫికేషన్‌ను రద్దు చేయండి. ఇక ఉనికిలో లేని ID విస్మరించబడుతుంది.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "షెడ్యూల్ చేసిన నోటిఫికేషన్ ID",
+          "description": "send_notification తిరిగి ఇచ్చే scheduled_notification_id."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "షెడ్యూల్ చేసిన నోటిఫికేషన్ల జాబితా",
+      "description": "మీ షెడ్యూల్ చేసిన నోటిఫికేషన్లను తిరిగి ఇవ్వండి, అత్యంత సమీపమైనవి ముందుగా.",
+      "fields": {
+        "status": {
+          "name": "స్థితి",
+          "description": "ఏవి తిరిగి ఇవ్వాలి. scheduled (డిఫాల్ట్) ఇంకా వేచి ఉన్నవాటిని చూపుతుంది; sent మరియు failed 7 రోజులు ఉంచబడతాయి."
         }
       }
     },

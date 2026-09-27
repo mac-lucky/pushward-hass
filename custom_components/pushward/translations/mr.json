@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "क्रिया",
           "description": "क्रिया बटणांची यादी. प्रत्येक क्रिया id, title, पर्यायी url, foreground, destructive, authentication_required, आणि icon असलेला ऑब्जेक्ट आहे. http(s) url साठी तुम्ही method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, आणि body सह सायलेंट वेबहूक देखील पाठवू शकता."
+        },
+        "send_at": {
+          "name": "पाठवण्याची वेळ",
+          "description": "सूचना आत्ता पाठवण्याऐवजी नंतर पाठवा, जास्तीत जास्त 30 दिवस पुढे. PushWard ती राखून ठेवते आणि या वेळी पाठवते, आणि पाठवल्यावर ती तुमच्या नोटिफिकेशन कोट्यात मोजली जाते. UTC ऑफसेटशिवायची वेळ Home Assistant च्या टाइम झोनमध्ये वाचली जाते. cancel_scheduled_notification साठी आयडी मिळवण्यासाठी response ची विनंती करा."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "शेड्यूल केलेली सूचना रद्द करा",
+      "description": "send_notification च्या send_at ने रांगेत ठेवलेली सूचना रद्द करा. आता अस्तित्वात नसलेला आयडी दुर्लक्षित केला जातो.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "शेड्यूल केलेल्या सूचनेचा आयडी",
+          "description": "send_notification ने परत केलेला scheduled_notification_id."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "शेड्यूल केलेल्या सूचनांची यादी",
+      "description": "तुमच्या शेड्यूल केलेल्या सूचना परत करा, सर्वात जवळची आधी.",
+      "fields": {
+        "status": {
+          "name": "स्थिती",
+          "description": "कोणत्या परत करायच्या. scheduled (डीफॉल्ट) अजून प्रतीक्षेत असलेल्या दाखवते; sent आणि failed 7 दिवस ठेवल्या जातात."
         }
       }
     },

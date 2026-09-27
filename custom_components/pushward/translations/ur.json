@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "ایکشنز",
           "description": "ایکشن بٹنوں کی فہرست۔ ہر ایکشن ایک آبجیکٹ ہے جس میں id، title، اختیاری url، foreground، destructive، authentication_required، اور icon ہوتے ہیں۔ http(s) url کے لیے آپ method (GET/POST/PUT/PATCH/DELETE/HEAD)، headers، اور body کے ساتھ خاموش webhook بھی بھیج سکتے ہیں۔"
+        },
+        "send_at": {
+          "name": "بھیجنے کا وقت",
+          "description": "اطلاع کو ابھی کے بجائے بعد میں بھیجیں، زیادہ سے زیادہ 30 دن آگے تک۔ PushWard اسے اپنے پاس رکھتا ہے اور اس وقت پر بھیجتا ہے، اور بھیجے جانے پر یہ آپ کے نوٹیفکیشن کوٹا میں شمار ہوتی ہے۔ UTC آفسیٹ کے بغیر وقت Home Assistant کے ٹائم زون میں پڑھا جاتا ہے۔ cancel_scheduled_notification کے لیے ID حاصل کرنے کے لیے response کی درخواست کریں۔"
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "شیڈول شدہ اطلاع منسوخ کریں",
+      "description": "send_notification کے send_at کے ذریعے قطار میں لگائی گئی اطلاع منسوخ کریں۔ جو ID اب موجود نہیں، اسے نظر انداز کر دیا جاتا ہے۔",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "شیڈول شدہ اطلاع کی ID",
+          "description": "send_notification کی طرف سے واپس کیا گیا scheduled_notification_id۔"
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "شیڈول شدہ اطلاعات کی فہرست",
+      "description": "اپنی شیڈول شدہ اطلاعات واپس کریں، سب سے قریب والی پہلے۔",
+      "fields": {
+        "status": {
+          "name": "حالت",
+          "description": "کون سی واپس کرنی ہیں۔ scheduled (ڈیفالٹ) ابھی تک منتظر اطلاعات دکھاتا ہے؛ sent اور failed کو 7 دن تک رکھا جاتا ہے۔"
         }
       }
     },

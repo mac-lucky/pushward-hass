@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "アクション",
           "description": "アクションボタンのリスト。各アクションは id、title、任意の url、foreground、destructive、authentication_required、icon を持つオブジェクトです。http(s) URL の場合は method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers、body を指定してサイレント Webhook を送信することもできます。"
+        },
+        "send_at": {
+          "name": "送信日時",
+          "description": "通知を今すぐではなく後で送信します（最大 30 日先まで）。PushWard が通知を保持してこの日時に送信し、送信時に通知クォータにカウントされます。UTC オフセットのない日時は Home Assistant のタイムゾーンで解釈されます。cancel_scheduled_notification 用の ID を取得するには、レスポンスを要求してください。"
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "予約通知をキャンセル",
+      "description": "send_notification の send_at で予約した通知をキャンセルします。存在しなくなった ID は無視されます。",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "予約通知ID",
+          "description": "send_notification が返す scheduled_notification_id。"
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "予約通知を一覧表示",
+      "description": "予約済みの通知を、送信予定が近い順に返します。",
+      "fields": {
+        "status": {
+          "name": "ステータス",
+          "description": "返す通知の種類。scheduled（デフォルト）はまだ待機中の通知を一覧表示します。sent と failed は 7 日間保持されます。"
         }
       }
     },

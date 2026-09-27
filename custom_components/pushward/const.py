@@ -326,6 +326,10 @@ SEVERITIES = ["critical", "warning", "info"]
 # "critical" is kept for backward compat — UI dropdown hides it until Apple approves entitlement
 NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
+# GET /notifications/scheduled?status= filter values. "scheduled" (the server
+# default) also covers ones being sent right now.
+SCHEDULED_NOTIFICATION_STATUSES = ["scheduled", "sent", "failed", "all"]
+
 # Templates offered by the tracked-entity config flow (each has a mapper).
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log", "media"]
 # Templates with an update_activity_<template> action: every template the flow

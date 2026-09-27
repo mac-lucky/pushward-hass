@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Acties",
           "description": "Lijst met actieknoppen. Elke actie is een object met id, title, optionele url, foreground, destructive, authentication_required en icon. Voor een http(s)-url kun je ook een stille webhook versturen met method (GET/POST/PUT/PATCH/DELETE/HEAD), headers en body."
+        },
+        "send_at": {
+          "name": "Verzendtijd",
+          "description": "Verstuur de melding later in plaats van nu, maximaal 30 dagen vooruit. PushWard bewaart hem en verstuurt hem op dit tijdstip; bij verzending telt hij mee voor je meldingenquotum. Een tijd zonder UTC-offset wordt gelezen in de tijdzone van Home Assistant. Vraag een respons aan om de id voor cancel_scheduled_notification te krijgen."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Geplande melding annuleren",
+      "description": "Annuleer een melding die met send_at van send_notification in de wachtrij is gezet. Een id die niet meer bestaat, wordt genegeerd.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID van geplande melding",
+          "description": "De scheduled_notification_id die send_notification teruggeeft."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Geplande meldingen weergeven",
+      "description": "Geef je geplande meldingen terug, de eerstvolgende eerst.",
+      "fields": {
+        "status": {
+          "name": "Status",
+          "description": "Welke je terugkrijgt. scheduled (standaard) toont de meldingen die nog wachten; sent en failed blijven 7 dagen bewaard."
         }
       }
     },

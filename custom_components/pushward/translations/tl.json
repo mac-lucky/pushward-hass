@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Mga Aksyon",
           "description": "Listahan ng action buttons. Ang bawat aksyon ay isang object na may id, title, opsyonal na url, foreground, destructive, authentication_required, at icon. Para sa http(s) url, maaari ka ring magpadala ng silent webhook na may method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, at body."
+        },
+        "send_at": {
+          "name": "Oras ng pagpapadala",
+          "description": "Ipadala ang notification mamaya sa halip na ngayon, hanggang 30 araw pasulong. Hinahawakan ito ng PushWard at ipinapadala sa oras na ito, at ibinibilang ito sa iyong notification quota kapag naipadala na. Ang oras na walang UTC offset ay binabasa sa time zone ng Home Assistant. Humiling ng response para makuha ang id para sa cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Kanselahin ang Naka-iskedyul na Notification",
+      "description": "Kanselahin ang notification na nakapila gamit ang send_at ng send_notification. Binabalewala ang id na wala na.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "ID ng naka-iskedyul na notification",
+          "description": "Ang scheduled_notification_id na ibinalik ng send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "Ilista ang mga Naka-iskedyul na Notification",
+      "description": "Ibalik ang iyong mga naka-iskedyul na notification, ang pinakamalapit muna.",
+      "fields": {
+        "status": {
+          "name": "Status",
+          "description": "Alin ang ibabalik. Inililista ng scheduled (ang default) ang mga naghihintay pa; ang sent at failed ay itinatago nang 7 araw."
         }
       }
     },

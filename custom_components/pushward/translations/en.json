@@ -1604,6 +1604,30 @@
         "actions": {
           "name": "Actions",
           "description": "List of action buttons. Each action is an object with id, title, optional url, foreground, destructive, authentication_required, and icon. For an http(s) url you can also send a silent webhook with method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, and body. Set text_input: true on a silent http(s) action to prompt for a typed reply (optional text_input_placeholder and text_input_button_title); the reply is sent to your webhook as JSON with a text field. To embed it in body instead, use the {{input}} placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent."
+        },
+        "send_at": {
+          "name": "Send at",
+          "description": "Send the notification later instead of now, at most 30 days ahead. PushWard holds it and sends it at this time, and it counts toward your notification quota when it is sent. A time without a UTC offset is read in Home Assistant's time zone. Request a response to get the id for cancel_scheduled_notification."
+        }
+      }
+    },
+    "cancel_scheduled_notification": {
+      "name": "Cancel Scheduled Notification",
+      "description": "Cancel a notification queued with send_notification's send_at. An id that no longer exists is ignored.",
+      "fields": {
+        "scheduled_notification_id": {
+          "name": "Scheduled notification ID",
+          "description": "The scheduled_notification_id returned by send_notification."
+        }
+      }
+    },
+    "list_scheduled_notifications": {
+      "name": "List Scheduled Notifications",
+      "description": "Return your scheduled notifications, soonest first.",
+      "fields": {
+        "status": {
+          "name": "Status",
+          "description": "Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days."
         }
       }
     },
