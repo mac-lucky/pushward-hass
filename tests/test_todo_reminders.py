@@ -555,6 +555,9 @@ async def test_unavailable_list_with_a_reminder_past_its_time_does_not_spin(
     items = [{"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T08:30:00+00:00"}]
     manager, _, _ = await setup(items)
     hass.states.async_set(ENTITY, "unavailable")
+    await hass.async_block_till_done()
+    async_fire_time_changed(hass, NOW + timedelta(seconds=5))  # the debounced pass for that write
+    await hass.async_block_till_done()
     freezer.move_to(NOW + timedelta(minutes=35))
 
     calls = 0
