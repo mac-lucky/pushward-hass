@@ -14,7 +14,8 @@ notes).
 - Editing an item replaces its schedule (purged, so no canceled record shows in
   the app); completing or removing the item cancels it.
 - A schedule canceled elsewhere (the PushWard app) stays canceled: the item stays
-  open and gets no new reminder until it is edited.
+  open and gets no new reminder until its due date or time changes. The same goes
+  for a reminder that already went out: renaming the item does not send it again.
 - With the Done button on, the reminder carries a url-less "done" action. The
   server records the tap; the manager watches for it and completes the item.
 """
@@ -156,6 +157,7 @@ async def async_cancel_stored_schedules(hass: HomeAssistant, api: PushWardApiCli
 class _Reminder:
     uid: str
     version: str
+    due: str
     fingerprint: str
     due_at: datetime
     send_at: datetime
@@ -200,8 +202,23 @@ def _from_iso(value: Any) -> datetime | None:
     return parsed
 
 
+def _due_key(item: dict) -> str:
+    return str(item.get("due") or "")
+
+
+def _same_occurrence(rec: dict, item: dict, version: str) -> bool:
+    """Whether a sent or stopped record still stands for the item's current due time.
+
+    Only a new due date or time is a new occurrence; changing the wording of an item
+    whose reminder already went out (or was stopped) does not send it again.
+    """
+    if "due" in rec:
+        return rec["due"] == _due_key(item)
+    return rec.get("version") == version
+
+
 def _version(item: dict) -> str:
-    """One version of an item. A new version (an edit) gets a reminder of its own."""
+    """One version of an item: any edit to a pending reminder replaces it."""
     version = [item.get("summary"), item.get("description"), str(item.get("due") or "")]
     return hashlib.sha256(json.dumps(version, default=str).encode()).hexdigest()[:16]
 
@@ -507,8 +524,8 @@ class TodoReminderManager:
                 await self._api.cancel_scheduled_notification(rec["schedule_id"], purge=uid in open_items)
                 del records[uid]
                 self._blocked.discard(sub_id)
-            elif uid in open_items and versions[uid] != rec.get("version"):
-                del records[uid]  # edited: the new version gets a reminder of its own
+            elif uid in open_items and not _same_occurrence(rec, open_items[uid], versions[uid]):
+                del records[uid]  # moved to a new due time: that one gets a reminder of its own
             elif self._finished(rec, now):
                 del records[uid]
             elif uid not in open_items:
@@ -566,8 +583,8 @@ class TodoReminderManager:
             if due_at is None:
                 continue
             rec = records.get(uid)
-            if rec is not None and rec["status"] != _SCHEDULED and rec.get("version") == versions[uid]:
-                continue  # this version of the item was already reminded, or its reminder stopped
+            if rec is not None and rec["status"] != _SCHEDULED and _same_occurrence(rec, item, versions[uid]):
+                continue  # this due time was already reminded, or its reminder stopped
             if self._refused.get((sub_id, uid)) == versions[uid]:
                 continue
             send_at = due_at - offset
@@ -581,6 +598,7 @@ class TodoReminderManager:
                 _Reminder(
                     uid=uid,
                     version=versions[uid],
+                    due=_due_key(item),
                     fingerprint=_fingerprint(versions[uid], cfg, _is_date_only(due)),
                     due_at=due_at,
                     send_at=send_at,
@@ -639,6 +657,7 @@ class TodoReminderManager:
             records[reminder.uid] = {
                 "schedule_id": schedule_id,
                 "version": reminder.version,
+                "due": reminder.due,
                 "fingerprint": reminder.fingerprint,
                 "send_at": _iso(send_at),
                 "due_at": _iso(reminder.due_at),

@@ -187,7 +187,7 @@ async def test_completed_item_cancels_without_purge(setup) -> None:
     assert "a" not in _records(manager)
 
 
-async def test_schedule_canceled_elsewhere_is_left_alone_until_the_item_changes(setup) -> None:
+async def test_schedule_canceled_elsewhere_is_left_alone_until_the_due_time_changes(setup) -> None:
     items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
     manager, api, todo = await setup(items)
     schedule_id = _records(manager)["a"]["schedule_id"]
@@ -201,7 +201,11 @@ async def test_schedule_canceled_elsewhere_is_left_alone_until_the_item_changes(
     assert api.create_notification.await_count == 1
     api.cancel_scheduled_notification.assert_not_awaited()
 
-    todo.items[0] = {**todo.items[0], "summary": "Dentist, bring the card"}
+    todo.items[0] = {**todo.items[0], "summary": "Dentist, bring the card"}  # wording only
+    await manager._async_reconcile(SUB)
+    assert api.create_notification.await_count == 1
+
+    todo.items[0] = {**todo.items[0], "due": "2026-10-03T15:00:00+02:00"}  # a new time
     await manager._async_reconcile(SUB)
 
     assert api.create_notification.await_count == 2
@@ -643,3 +647,19 @@ async def test_a_sent_reminder_lifts_the_account_cap_hold(setup, freezer) -> Non
     await manager._async_reconcile(SUB)
 
     assert _records(manager)["b"]["status"] == "scheduled"
+
+
+async def test_renaming_after_the_reminder_went_out_does_not_send_it_again(setup, freezer) -> None:
+    items = [{"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T08:10:00+00:00"}]
+    manager, api, todo = await setup(items)
+    freezer.move_to(NOW + timedelta(minutes=10, seconds=15))
+    await manager._async_reconcile(SUB)  # sent
+
+    todo.items[0] = {**todo.items[0], "summary": "Call mum", "description": "About Sunday"}
+    await manager._async_reconcile(SUB)
+    assert api.create_notification.await_count == 1
+    assert _records(manager)["a"]["status"] == "sent"
+
+    todo.items[0] = {**todo.items[0], "due": "2026-10-01T09:00:00+00:00"}  # moved: remind again
+    await manager._async_reconcile(SUB)
+    assert api.create_notification.await_count == 2
