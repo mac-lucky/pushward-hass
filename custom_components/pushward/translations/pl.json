@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Akcje",
-          "description": "Lista przycisków akcji. Każda akcja to obiekt z id, title, opcjonalnym url, foreground, destructive, authentication_required oraz icon. Dla adresu http(s) możesz też wysłać cichy webhook z method (GET/POST/PUT/PATCH/DELETE/HEAD), headers i body."
+          "description": "Lista przycisków akcji. Każda akcja to obiekt z id, title, opcjonalnym url, foreground, destructive, authentication_required oraz icon. Dla adresu http(s) możesz też wysłać cichy webhook z method (GET/POST/PUT/PATCH/DELETE/HEAD), headers i body. Pomiń url (i foreground), a PushWard sam zapisze dotknięcie; odczytasz je przez get_notification_answer. Ustaw text_input: true w cichej akcji, aby poprosić o wpisaną odpowiedź (opcjonalnie text_input_placeholder i text_input_button_title): bez url PushWard zapisuje odpowiedź, a z adresem http(s) trafia ona do Twojego webhooka jako JSON z polem text. Aby zamiast tego wstawić ją do body, użyj symbolu zastępczego {{input}} i otocz body blokiem raw Jinja w swojej automatyzacji, żeby Home Assistant nie przetworzył go przed wysłaniem akcji."
         },
         "send_at": {
           "name": "Czas wysłania",
-          "description": "Wyślij powiadomienie później zamiast teraz, maksymalnie 30 dni naprzód. PushWard przechowuje je i wysyła o tej godzinie, a w momencie wysłania jest ono wliczane do Twojego limitu powiadomień. Czas bez przesunięcia UTC jest odczytywany w strefie czasowej Home Assistant. Zażądaj odpowiedzi, aby otrzymać id dla cancel_scheduled_notification."
+          "description": "Wyślij powiadomienie później zamiast teraz, maksymalnie 365 dni naprzód. PushWard przechowuje je i wysyła o tej godzinie, a w momencie wysłania jest ono wliczane do Twojego limitu powiadomień. Czas bez przesunięcia UTC jest odczytywany w strefie czasowej Home Assistant. Z polem Powtarzanie wyznacza początek serii. Zażądaj odpowiedzi, aby otrzymać id dla cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Powtarzanie",
+          "description": "Powtarzaj powiadomienie według harmonogramu, jako obiekt: cron (5 pól, minuta godzina dzień-miesiąca miesiąc dzień-tygodnia, albo @hourly/@daily/@weekly/@monthly/@yearly), opcjonalny timezone (domyślnie strefa Home Assistant) oraz opcjonalny until (data i godzina) lub count (1-1000 wysyłek), aby je zakończyć. Między wysyłkami musi upłynąć co najmniej 15 minut. Seria zachowuje jedno id; cancel_scheduled_notification ją zatrzymuje."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Anuluj zaplanowane powiadomienie",
-      "description": "Anuluj powiadomienie zakolejkowane przez send_at w send_notification. Id, które już nie istnieje, jest ignorowane.",
+      "description": "Anuluj powiadomienie zakolejkowane przez send_at lub Powtarzanie w send_notification. Anulowanie powtarzanego powiadomienia zatrzymuje całą serię, nawet w trakcie jej wysyłania. Id, które już nie istnieje, jest ignorowane. Anulowane powiadomienie jest widoczne w aplikacji PushWard jako anulowane przez 24 godziny.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID zaplanowanego powiadomienia",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Pokaż zaplanowane powiadomienia",
-      "description": "Zwróć swoje zaplanowane powiadomienia, od najbliższego.",
+      "description": "Zwróć swoje zaplanowane powiadomienia, od najbliższego. Powtarzane zawierają swoje recurrence, liczbę dotychczasowych wysyłek (occurrence) i czas ostatniej wysyłki (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",
-          "description": "Które zwrócić. scheduled (domyślnie) pokazuje te wciąż oczekujące; sent i failed są przechowywane przez 7 dni."
+          "description": "Które zwrócić. scheduled (domyślnie) pokazuje te wciąż oczekujące; sent i failed są przechowywane przez 7 dni. canceled są przechowywane przez 24 godziny."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Pobierz odpowiedź na powiadomienie",
+      "description": "Poczekaj na odpowiedź na powiadomienie wysłane z akcjami bez url i zwróć, która akcja została dotknięta (action_id), ewentualną wpisaną odpowiedź (text) oraz kiedy (answered_at). Jeśli nikt nie odpowie w limicie czasu, answered ma wartość false. Odpowiedzi są przechowywane przez 30 dni, więc późniejsze wywołanie z limitem czasu 0 może odczytać odpowiedź bez czekania.",
+      "fields": {
+        "notification_id": {
+          "name": "ID powiadomienia",
+          "description": "notification_id zwrócony przez send_notification lub notification_id wysłanego zaplanowanego powiadomienia."
+        },
+        "timeout": {
+          "name": "Limit czasu",
+          "description": "Jak długo czekać na odpowiedź, w sekundach (do 24 godzin). 0 odczytuje bieżącą odpowiedź bez czekania."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Widżet z tym slugiem już istnieje.",
         "reconfigure_successful": "Zaktualizowano konfigurację widżetu."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Śledzona lista zadań",
+      "initiate_flow": {
+        "user": "Dodaj śledzoną listę zadań"
+      },
+      "step": {
+        "user": {
+          "title": "Dodaj listę zadań do PushWard",
+          "description": "PushWard wysyła każde przypomnienie o wyznaczonej porze, nawet gdy Home Assistant jest offline. Ukończenie lub usunięcie zadania anuluje jego przypomnienie; edycja zadania zastępuje przypomnienie.",
+          "data": {
+            "entity_id": "Lista zadań",
+            "offset_minutes": "Przypomnij przed terminem",
+            "all_day_time": "Godzina dla zadań z samą datą",
+            "notification_level": "Poziom powiadomienia",
+            "done_button": "Przycisk Zrobione",
+            "max_scheduled": "Maksymalnie zaplanowanych przypomnień naraz"
+          },
+          "data_description": {
+            "entity_id": "Każde otwarte zadanie z tej listy, które ma termin, dostaje przypomnienie PushWard.",
+            "offset_minutes": "Wyślij przypomnienie tyle minut przed terminem (0 wysyła je w chwili terminu).",
+            "all_day_time": "Zadanie z terminem, ale bez godziny, jest przypominane tego dnia o tej godzinie.",
+            "notification_level": "Jak przypomnienie przerywa: Pasywny przychodzi po cichu, Pilny przebija się przez Skupienie.",
+            "done_button": "Dodaj do przypomnienia przycisk Zrobione. Dotknięcie go oznacza zadanie jako wykonane w Home Assistant.",
+            "max_scheduled": "Planowane są tylko najbliższe zadania; pozostałe dołączają, gdy te zostaną wysłane. Twoje konto może mieć łącznie maksymalnie 25 oczekujących zaplanowanych powiadomień."
+          }
+        },
+        "reconfigure": {
+          "title": "Edytuj listę zadań",
+          "data": {
+            "entity_id": "Lista zadań",
+            "offset_minutes": "Przypomnij przed terminem",
+            "all_day_time": "Godzina dla zadań z samą datą",
+            "notification_level": "Poziom powiadomienia",
+            "done_button": "Przycisk Zrobione",
+            "max_scheduled": "Maksymalnie zaplanowanych przypomnień naraz"
+          },
+          "data_description": {
+            "entity_id": "Każde otwarte zadanie z tej listy, które ma termin, dostaje przypomnienie PushWard.",
+            "offset_minutes": "Wyślij przypomnienie tyle minut przed terminem (0 wysyła je w chwili terminu).",
+            "all_day_time": "Zadanie z terminem, ale bez godziny, jest przypominane tego dnia o tej godzinie.",
+            "notification_level": "Jak przypomnienie przerywa: Pasywny przychodzi po cichu, Pilny przebija się przez Skupienie.",
+            "done_button": "Dodaj do przypomnienia przycisk Zrobione. Dotknięcie go oznacza zadanie jako wykonane w Home Assistant.",
+            "max_scheduled": "Planowane są tylko najbliższe zadania; pozostałe dołączają, gdy te zostaną wysłane. Twoje konto może mieć łącznie maksymalnie 25 oczekujących zaplanowanych powiadomień."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Ta lista zadań jest już śledzona.",
+        "reconfigure_successful": "Zaktualizowano ustawienia listy zadań."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Najniższy poziom baterii najpierw",
         "level_desc": "Najwyższy poziom baterii najpierw"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Pasywny",
+        "active": "Aktywny",
+        "time-sensitive": "Pilny"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Zrobione"
       }
     }
   }

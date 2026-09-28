@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Actions",
-          "description": "Liste de boutons d'action. Chaque action est un objet avec id, title, et url, foreground, destructive, authentication_required, icon facultatifs. Pour une url http(s), vous pouvez aussi envoyer un webhook silencieux avec method (GET/POST/PUT/PATCH/DELETE/HEAD), headers et body."
+          "description": "Liste de boutons d'action. Chaque action est un objet avec id, title, et url, foreground, destructive, authentication_required, icon facultatifs. Pour une url http(s), vous pouvez aussi envoyer un webhook silencieux avec method (GET/POST/PUT/PATCH/DELETE/HEAD), headers et body. Sans url (ni foreground), PushWard enregistre lui-même l'appui ; lisez-le avec get_notification_answer. Définissez text_input: true sur une action silencieuse pour demander une réponse saisie (text_input_placeholder et text_input_button_title facultatifs) : sans url, PushWard enregistre la réponse ; avec une url http(s), elle est envoyée à votre webhook en JSON avec un champ text. Pour l'insérer plutôt dans body, utilisez l'espace réservé {{input}} et entourez body d'un bloc raw Jinja dans votre automatisation, afin que Home Assistant ne le remplace pas avant l'envoi de l'action."
         },
         "send_at": {
           "name": "Heure d'envoi",
-          "description": "Envoyer la notification plus tard plutôt que maintenant, jusqu'à 30 jours à l'avance. PushWard la conserve et l'envoie à cette heure ; elle est décomptée de votre quota de notifications au moment de l'envoi. Une heure sans décalage UTC est interprétée dans le fuseau horaire de Home Assistant. Demandez une réponse pour obtenir l'id à utiliser avec cancel_scheduled_notification."
+          "description": "Envoyer la notification plus tard plutôt que maintenant, jusqu'à 365 jours à l'avance. PushWard la conserve et l'envoie à cette heure ; elle est décomptée de votre quota de notifications au moment de l'envoi. Une heure sans décalage UTC est interprétée dans le fuseau horaire de Home Assistant. Avec Répéter, cette heure marque le début de la série. Demandez une réponse pour obtenir l'id à utiliser avec cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Répéter",
+          "description": "Répéter la notification selon un calendrier, sous forme d'objet : cron (5 champs, minute heure jour-du-mois mois jour-de-la-semaine, ou @hourly/@daily/@weekly/@monthly/@yearly), timezone facultatif (par défaut celui de Home Assistant), et until facultatif (une date et une heure) ou count (1-1000 envois) pour l'arrêter. Les envois doivent être espacés d'au moins 15 minutes. La série garde un seul id ; cancel_scheduled_notification l'arrête."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Annuler une notification planifiée",
-      "description": "Annuler une notification mise en file d'attente avec le send_at de send_notification. Un id qui n'existe plus est ignoré.",
+      "description": "Annuler une notification mise en file d'attente avec le send_at ou Répéter de send_notification. Annuler une notification répétée arrête toute la série, même pendant son envoi. Un id qui n'existe plus est ignoré. Une notification annulée apparaît comme annulée dans l'app PushWard pendant 24 heures.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID de notification planifiée",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Lister les notifications planifiées",
-      "description": "Renvoyer vos notifications planifiées, de la plus proche à la plus lointaine.",
+      "description": "Renvoyer vos notifications planifiées, de la plus proche à la plus lointaine. Les notifications répétées incluent leur recurrence, le nombre d'envois effectués (occurrence) et l'heure du dernier envoi (last_sent_at).",
       "fields": {
         "status": {
           "name": "Statut",
-          "description": "Lesquelles renvoyer. scheduled (par défaut) liste celles encore en attente ; sent et failed sont conservées 7 jours."
+          "description": "Lesquelles renvoyer. scheduled (par défaut) liste celles encore en attente ; sent et failed sont conservées 7 jours. canceled sont conservées 24 heures."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Obtenir la réponse à une notification",
+      "description": "Attendre la réponse à une notification envoyée avec des actions sans url, et renvoyer l'action touchée (action_id), l'éventuelle réponse saisie (text) et son heure (answered_at). Si personne ne répond dans le délai d'attente, answered vaut false. Les réponses sont conservées 30 jours, donc un appel ultérieur avec un délai d'attente de 0 peut en lire une sans attendre.",
+      "fields": {
+        "notification_id": {
+          "name": "ID de notification",
+          "description": "Le notification_id renvoyé par send_notification, ou le notification_id d'une notification planifiée déjà envoyée."
+        },
+        "timeout": {
+          "name": "Délai d'attente",
+          "description": "Durée d'attente de la réponse, en secondes (jusqu'à 24 heures). 0 lit la réponse actuelle sans attendre."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Un widget avec ce slug existe déjà.",
         "reconfigure_successful": "Configuration du widget mise à jour."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Liste de tâches suivie",
+      "initiate_flow": {
+        "user": "Ajouter une liste de tâches suivie"
+      },
+      "step": {
+        "user": {
+          "title": "Ajouter une liste de tâches à PushWard",
+          "description": "PushWard envoie chaque rappel à son heure, même lorsque Home Assistant est hors ligne. Terminer ou supprimer un élément annule son rappel ; le modifier remplace le rappel.",
+          "data": {
+            "entity_id": "Liste de tâches",
+            "offset_minutes": "Rappel avant l'échéance",
+            "all_day_time": "Heure pour les éléments sans heure",
+            "notification_level": "Niveau de notification",
+            "done_button": "Bouton Terminé",
+            "max_scheduled": "Nombre maximal de rappels planifiés à la fois"
+          },
+          "data_description": {
+            "entity_id": "Chaque élément ouvert de cette liste ayant une échéance reçoit un rappel PushWard.",
+            "offset_minutes": "Envoyer le rappel ce nombre de minutes avant l'heure d'échéance (0 l'envoie à l'heure d'échéance).",
+            "all_day_time": "Un élément avec une date d'échéance mais sans heure est rappelé à cette heure ce jour-là.",
+            "notification_level": "Comment le rappel interrompt : Passif arrive en silence, Urgent passe outre le mode Concentration.",
+            "done_button": "Ajouter un bouton Terminé au rappel. Le toucher termine l'élément dans Home Assistant.",
+            "max_scheduled": "Seuls les éléments les plus proches sont planifiés ; les autres suivent à mesure que ceux-ci partent. Votre compte peut contenir au maximum 25 notifications planifiées en attente, tout confondu."
+          }
+        },
+        "reconfigure": {
+          "title": "Modifier la liste de tâches",
+          "data": {
+            "entity_id": "Liste de tâches",
+            "offset_minutes": "Rappel avant l'échéance",
+            "all_day_time": "Heure pour les éléments sans heure",
+            "notification_level": "Niveau de notification",
+            "done_button": "Bouton Terminé",
+            "max_scheduled": "Nombre maximal de rappels planifiés à la fois"
+          },
+          "data_description": {
+            "entity_id": "Chaque élément ouvert de cette liste ayant une échéance reçoit un rappel PushWard.",
+            "offset_minutes": "Envoyer le rappel ce nombre de minutes avant l'heure d'échéance (0 l'envoie à l'heure d'échéance).",
+            "all_day_time": "Un élément avec une date d'échéance mais sans heure est rappelé à cette heure ce jour-là.",
+            "notification_level": "Comment le rappel interrompt : Passif arrive en silence, Urgent passe outre le mode Concentration.",
+            "done_button": "Ajouter un bouton Terminé au rappel. Le toucher termine l'élément dans Home Assistant.",
+            "max_scheduled": "Seuls les éléments les plus proches sont planifiés ; les autres suivent à mesure que ceux-ci partent. Votre compte peut contenir au maximum 25 notifications planifiées en attente, tout confondu."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Cette liste de tâches est déjà suivie.",
+        "reconfigure_successful": "Paramètres de la liste de tâches mis à jour."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Batterie la plus faible d'abord",
         "level_desc": "Batterie la plus élevée d'abord"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Passif",
+        "active": "Actif",
+        "time-sensitive": "Urgent"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Terminé"
       }
     }
   }

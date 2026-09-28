@@ -2087,8 +2087,8 @@ send_notification:
         object:
     actions:
       name: Actions
-      description: 'List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`. For an http(s) `url` you can also send a silent webhook with `method` (GET/POST/PUT/PATCH/DELETE/HEAD), `headers`, and `body`. Set `text_input: true` on a silent http(s) action to prompt for a typed reply (optional `text_input_placeholder` and `text_input_button_title`); the reply is sent to your webhook as JSON with a `text` field. To embed it in `body` instead, use the `{{input}}` placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent.'
-      example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}, {"id": "ack", "title": "Acknowledge", "url": "https://example.com/ack", "method": "POST", "body": "ok"}, {"id": "reply", "title": "Reply", "url": "https://example.com/reply", "method": "POST", "text_input": true, "text_input_placeholder": "Type a reply"}]'
+      description: 'List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`. For an http(s) `url` you can also send a silent webhook with `method` (GET/POST/PUT/PATCH/DELETE/HEAD), `headers`, and `body`. Leave out `url` (and `foreground`) and PushWard records the tap itself; read it with get_notification_answer. Set `text_input: true` on a silent action to prompt for a typed reply (optional `text_input_placeholder` and `text_input_button_title`): without a url PushWard records the reply, with an http(s) url it is sent to your webhook as JSON with a `text` field. To embed it in `body` instead, use the `{{input}}` placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent.'
+      example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}, {"id": "ack", "title": "Acknowledge"}, {"id": "reply", "title": "Reply", "text_input": true, "text_input_placeholder": "Type a reply"}]'
       selector:
         object:
     push:
@@ -2099,14 +2099,20 @@ send_notification:
         boolean:
     send_at:
       name: Send at
-      description: Send the notification later instead of now, at most 30 days ahead. PushWard holds it and sends it at this time, and it counts toward your notification quota when it is sent. A time without a UTC offset is read in Home Assistant's time zone. Request a response to get the id for cancel_scheduled_notification.
+      description: Send the notification later instead of now, at most 365 days ahead. PushWard holds it and sends it at this time, and it counts toward your notification quota when it is sent. A time without a UTC offset is read in Home Assistant's time zone. With Repeat it marks where the series starts. Request a response to get the id for cancel_scheduled_notification.
       example: "2026-10-01 18:00:00"
       selector:
         datetime:
+    recurrence:
+      name: Repeat
+      description: 'Repeat the notification on a schedule, as an object: `cron` (5 fields, minute hour day-of-month month day-of-week, or @hourly/@daily/@weekly/@monthly/@yearly), optional `timezone` (defaults to Home Assistant''s), and optional `until` (a date and time) or `count` (1-1000 sends) to end it. Sends must be at least 15 minutes apart. The series keeps one id; cancel_scheduled_notification stops it.'
+      example: '{"cron": "0 8 * * 1-5"}'
+      selector:
+        object:
 
 cancel_scheduled_notification:
   name: Cancel Scheduled Notification
-  description: Cancel a notification queued with send_notification's send_at. An id that no longer exists is ignored.
+  description: Cancel a notification queued with send_notification's send_at or Repeat. Canceling a repeating one stops the whole series, even while it is being sent. A canceled notification shows as canceled in the PushWard app for 24 hours. An id that no longer exists is ignored.
   fields:
     scheduled_notification_id:
       name: Scheduled notification ID
@@ -2120,11 +2126,11 @@ cancel_scheduled_notification:
 
 list_scheduled_notifications:
   name: List Scheduled Notifications
-  description: Return your scheduled notifications, soonest first.
+  description: Return your scheduled notifications, soonest first. Repeating ones carry their recurrence, how many times they have sent (occurrence) and when they last sent (last_sent_at).
   fields:
     status:
       name: Status
-      description: Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days.
+      description: Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days, canceled for 24 hours.
       default: scheduled
       selector:
         select:
@@ -2132,7 +2138,32 @@ list_scheduled_notifications:
             - scheduled
             - sent
             - failed
+            - canceled
             - all
+
+get_notification_answer:
+  name: Get Notification Answer
+  description: Wait for the answer to a notification sent with actions that have no url, and return which action was tapped (action_id), any typed reply (text) and when (answered_at). If nobody answers within the timeout, answered is false. Answers are kept for 30 days, so a later call with timeout 0 can read one without waiting.
+  fields:
+    notification_id:
+      name: Notification ID
+      description: The notification_id returned by send_notification, or the notification_id of a sent scheduled notification.
+      required: true
+      example: 991
+      selector:
+        number:
+          min: 1
+          mode: box
+    timeout:
+      name: Timeout
+      description: How long to wait for the answer, in seconds (up to 24 hours). 0 reads the current answer without waiting.
+      default: 300
+      selector:
+        number:
+          min: 0
+          max: 86400
+          unit_of_measurement: s
+          mode: box
 
 send_email:
   name: Send Email

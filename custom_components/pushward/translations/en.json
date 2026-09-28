@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Actions",
-          "description": "List of action buttons. Each action is an object with id, title, optional url, foreground, destructive, authentication_required, and icon. For an http(s) url you can also send a silent webhook with method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, and body. Set text_input: true on a silent http(s) action to prompt for a typed reply (optional text_input_placeholder and text_input_button_title); the reply is sent to your webhook as JSON with a text field. To embed it in body instead, use the {{input}} placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent."
+          "description": "List of action buttons. Each action is an object with id, title, optional url, foreground, destructive, authentication_required, and icon. For an http(s) url you can also send a silent webhook with method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, and body. Leave out url (and foreground) and PushWard records the tap itself; read it with get_notification_answer. Set text_input: true on a silent action to prompt for a typed reply (optional text_input_placeholder and text_input_button_title): without a url PushWard records the reply, with an http(s) url it is sent to your webhook as JSON with a text field. To embed it in body instead, use the {{input}} placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent."
         },
         "send_at": {
           "name": "Send at",
-          "description": "Send the notification later instead of now, at most 30 days ahead. PushWard holds it and sends it at this time, and it counts toward your notification quota when it is sent. A time without a UTC offset is read in Home Assistant's time zone. Request a response to get the id for cancel_scheduled_notification."
+          "description": "Send the notification later instead of now, at most 365 days ahead. PushWard holds it and sends it at this time, and it counts toward your notification quota when it is sent. A time without a UTC offset is read in Home Assistant's time zone. With Repeat it marks where the series starts. Request a response to get the id for cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Repeat",
+          "description": "Repeat the notification on a schedule, as an object: cron (5 fields, minute hour day-of-month month day-of-week, or @hourly/@daily/@weekly/@monthly/@yearly), optional timezone (defaults to Home Assistant's), and optional until (a date and time) or count (1-1000 sends) to end it. Sends must be at least 15 minutes apart. The series keeps one id; cancel_scheduled_notification stops it."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Cancel Scheduled Notification",
-      "description": "Cancel a notification queued with send_notification's send_at. An id that no longer exists is ignored.",
+      "description": "Cancel a notification queued with send_notification's send_at or Repeat. Canceling a repeating one stops the whole series, even while it is being sent. A canceled notification shows as canceled in the PushWard app for 24 hours. An id that no longer exists is ignored.",
       "fields": {
         "scheduled_notification_id": {
           "name": "Scheduled notification ID",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "List Scheduled Notifications",
-      "description": "Return your scheduled notifications, soonest first.",
+      "description": "Return your scheduled notifications, soonest first. Repeating ones carry their recurrence, how many times they have sent (occurrence) and when they last sent (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",
-          "description": "Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days."
+          "description": "Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days, canceled for 24 hours."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Get Notification Answer",
+      "description": "Wait for the answer to a notification sent with actions that have no url, and return which action was tapped (action_id), any typed reply (text) and when (answered_at). If nobody answers within the timeout, answered is false. Answers are kept for 30 days, so a later call with timeout 0 can read one without waiting.",
+      "fields": {
+        "notification_id": {
+          "name": "Notification ID",
+          "description": "The notification_id returned by send_notification, or the notification_id of a sent scheduled notification."
+        },
+        "timeout": {
+          "name": "Timeout",
+          "description": "How long to wait for the answer, in seconds (up to 24 hours). 0 reads the current answer without waiting."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "A widget with this slug already exists.",
         "reconfigure_successful": "Widget configuration updated."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Tracked To-do List",
+      "initiate_flow": {
+        "user": "Add tracked to-do list"
+      },
+      "step": {
+        "user": {
+          "title": "Add To-do List to PushWard",
+          "description": "PushWard sends each reminder at its time, even when Home Assistant is offline. Completing or deleting an item cancels its reminder; editing it replaces the reminder.",
+          "data": {
+            "entity_id": "To-do list",
+            "offset_minutes": "Remind before due",
+            "all_day_time": "Time for date-only items",
+            "notification_level": "Notification level",
+            "done_button": "Done button",
+            "max_scheduled": "Most reminders scheduled at once"
+          },
+          "data_description": {
+            "entity_id": "Every open item on this list that has a due date gets a PushWard reminder.",
+            "offset_minutes": "Send the reminder this many minutes before the due time (0 sends it at the due time).",
+            "all_day_time": "An item with a due date but no time is reminded at this time on that day.",
+            "notification_level": "How the reminder interrupts: passive arrives silently, time-sensitive breaks through Focus.",
+            "done_button": "Add a Done button to the reminder. Tapping it completes the item in Home Assistant.",
+            "max_scheduled": "Only the soonest items are scheduled; the rest follow as those go out. Your account holds at most 25 pending scheduled notifications across everything."
+          }
+        },
+        "reconfigure": {
+          "title": "Edit To-do List",
+          "data": {
+            "entity_id": "To-do list",
+            "offset_minutes": "Remind before due",
+            "all_day_time": "Time for date-only items",
+            "notification_level": "Notification level",
+            "done_button": "Done button",
+            "max_scheduled": "Most reminders scheduled at once"
+          },
+          "data_description": {
+            "entity_id": "Every open item on this list that has a due date gets a PushWard reminder.",
+            "offset_minutes": "Send the reminder this many minutes before the due time (0 sends it at the due time).",
+            "all_day_time": "An item with a due date but no time is reminded at this time on that day.",
+            "notification_level": "How the reminder interrupts: passive arrives silently, time-sensitive breaks through Focus.",
+            "done_button": "Add a Done button to the reminder. Tapping it completes the item in Home Assistant.",
+            "max_scheduled": "Only the soonest items are scheduled; the rest follow as those go out. Your account holds at most 25 pending scheduled notifications across everything."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "This to-do list is already tracked.",
+        "reconfigure_successful": "To-do list settings updated."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Lowest battery first",
         "level_desc": "Highest battery first"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Passive",
+        "active": "Active",
+        "time-sensitive": "Time-sensitive"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Done"
       }
     }
   }

@@ -15,8 +15,14 @@ from custom_components.pushward.api import (
     PushWardAuthError,
     PushWardEmailPermissionError,
     PushWardForbiddenError,
+    PushWardNotFoundError,
+    PushWardRateLimitedError,
 )
 from custom_components.pushward.const import (
+    ANSWER_FAILURE_BUDGET,
+    ANSWER_LONG_POLL_SECONDS,
+    ANSWER_MAX_CONCURRENT_WAITS,
+    ANSWER_MIN_POLL_INTERVAL,
     MAX_CONCURRENT_REQUESTS,
     MAX_RETRIES,
     RETRY_BASE_DELAY,
@@ -345,6 +351,183 @@ async def test_cancel_scheduled_notification_swallows_404():
     call_args = session.request.call_args
     assert call_args[0][0] == "DELETE"
     assert call_args[0][1].endswith("/notifications/scheduled/42")
+
+
+async def test_create_notification_with_recurrence_schedules_without_send_at():
+    """recurrence alone posts to /notifications/scheduled with no send_at and until as RFC 3339."""
+    session = _make_session(_mock_response(201, json_body={"id": 7, "status": "scheduled"}))
+    client = _make_client(session)
+
+    await client.create_notification(
+        "Bins",
+        "Tonight",
+        recurrence={
+            "cron": "0 19 * * 2",
+            "timezone": "Europe/Warsaw",
+            "until": datetime(2026, 12, 31, 23, 0, tzinfo=UTC),
+            "count": None,
+        },
+    )
+
+    call_args = session.request.call_args
+    assert call_args[0][1].endswith("/notifications/scheduled")
+    assert call_args[1]["json"] == {
+        "title": "Bins",
+        "body": "Tonight",
+        "push": True,
+        "recurrence": {"cron": "0 19 * * 2", "timezone": "Europe/Warsaw", "until": "2026-12-31T23:00:00+00:00"},
+    }
+
+
+async def test_create_notification_requires_aware_recurrence_until():
+    client = _make_client(_make_session(_mock_response(201)))
+    with pytest.raises(ValueError):
+        await client.create_notification(
+            "t", "b", recurrence={"cron": "@daily", "timezone": "UTC", "until": datetime(2026, 12, 31)}
+        )
+
+
+async def test_list_scheduled_notifications_follows_next_cursor():
+    session = _make_session(
+        _mock_response(200, json_body={"items": [{"id": 1}], "next_cursor": "abc"}),
+        _mock_response(200, json_body={"items": [{"id": 2}]}),
+    )
+    client = _make_client(session)
+
+    assert await client.list_scheduled_notifications("all") == [{"id": 1}, {"id": 2}]
+    urls = [call[0][1] for call in session.request.call_args_list]
+    assert urls[0].endswith("/notifications/scheduled?status=all&limit=100")
+    assert urls[1].endswith("/notifications/scheduled?status=all&limit=100&cursor=abc")
+
+
+# --- notification answers ---
+
+
+async def test_get_notification_answer_long_polls_with_its_own_timeout():
+    answer = {"notification_id": 7, "status": "answered", "action_id": "yes"}
+    session = _make_session(_mock_response(200, json_body=answer))
+    client = _make_client(session)
+
+    assert await client.get_notification_answer(7, wait=20) == answer
+    call_args = session.request.call_args
+    assert call_args[0][0] == "GET"
+    assert call_args[0][1].endswith("/notifications/answers/7?wait=20")
+    # The hold plus a margin, not the 30s default a 25s hold would come close to.
+    assert call_args[1]["timeout"].total > 20
+
+
+async def test_get_notification_answer_maps_errors():
+    client = _make_client(_make_session(_mock_response(404, text='{"code": "notification_answer.not_found"}')))
+    with pytest.raises(PushWardNotFoundError):
+        await client.get_notification_answer(7)
+
+    client = _make_client(_make_session(_mock_response(429, headers={"Retry-After": "3"})))
+    with pytest.raises(PushWardRateLimitedError) as exc:
+        await client.get_notification_answer(7, wait=20)
+    assert exc.value.retry_after == 3
+
+    client = _make_client(_make_session(_mock_response(401)))
+    with pytest.raises(PushWardAuthError):
+        await client.get_notification_answer(7)
+
+
+async def test_wait_for_notification_answer_polls_until_answered():
+    session = _make_session(
+        _mock_response(200, json_body={"notification_id": 7, "status": "pending"}),
+        _mock_response(
+            200,
+            json_body={
+                "notification_id": 7,
+                "status": "answered",
+                "action_id": "reply",
+                "text": "on my way",
+                "answered_at": "2026-09-28T12:00:00Z",
+            },
+        ),
+    )
+    client = _make_client(session)
+
+    with patch("custom_components.pushward.api.asyncio.sleep", new=AsyncMock()):
+        result = await client.wait_for_notification_answer(7, 300)
+
+    assert result == {
+        "answered": True,
+        "notification_id": 7,
+        "status": "answered",
+        "action_id": "reply",
+        "text": "on my way",
+        "answered_at": "2026-09-28T12:00:00Z",
+    }
+    for call in session.request.call_args_list:
+        assert call[0][1].endswith(f"/notifications/answers/7?wait={ANSWER_LONG_POLL_SECONDS}")
+
+
+async def test_wait_for_notification_answer_zero_timeout_reads_once():
+    session = _make_session(_mock_response(200, json_body={"notification_id": 7, "status": "pending"}))
+    client = _make_client(session)
+
+    result = await client.wait_for_notification_answer(7, 0)
+
+    assert result["answered"] is False
+    assert result["status"] == "pending"
+    assert result["action_id"] is None
+    assert result["reason"] == "no answer within 0s"
+    assert session.request.call_count == 1
+    assert session.request.call_args[0][1].endswith("/notifications/answers/7")
+
+
+async def test_wait_for_notification_answer_rides_out_the_wait_cap():
+    """A 429 (the server's per-user wait cap) is not a failure: back off, keep asking."""
+    session = _make_session(
+        _mock_response(429, text='{"code": "answer_wait.limit_exceeded"}'),
+        _mock_response(200, json_body={"notification_id": 7, "status": "answered", "action_id": "yes"}),
+    )
+    client = _make_client(session)
+    sleep = AsyncMock()
+
+    with patch("custom_components.pushward.api.asyncio.sleep", new=sleep):
+        result = await client.wait_for_notification_answer(7, 300)
+
+    assert result["action_id"] == "yes"
+    # The server refuses a held wait before it looks at the answer, so the next
+    # read must not wait: an answer recorded meanwhile is seen at once.
+    urls = [call[0][1] for call in session.request.call_args_list]
+    assert urls[0].endswith(f"/notifications/answers/7?wait={ANSWER_LONG_POLL_SECONDS}")
+    assert urls[1].endswith("/notifications/answers/7")
+    sleep.assert_awaited_once_with(ANSWER_MIN_POLL_INTERVAL)
+
+
+async def test_wait_for_notification_answer_reads_without_holding_when_waits_are_busy():
+    session = _make_session(_mock_response(200, json_body={"notification_id": 7, "status": "answered"}))
+    client = _make_client(session)
+    for _ in range(ANSWER_MAX_CONCURRENT_WAITS):
+        await client._answer_wait_semaphore.acquire()
+
+    result = await client.wait_for_notification_answer(7, 300)
+
+    assert result["answered"] is True
+    assert session.request.call_args[0][1].endswith("/notifications/answers/7")
+
+
+async def test_wait_for_notification_answer_gives_up_after_failure_budget():
+    session = _make_session(*[_mock_response(503) for _ in range(ANSWER_FAILURE_BUDGET)])
+    client = _make_client(session)
+
+    with (
+        patch("custom_components.pushward.api.asyncio.sleep", new=AsyncMock()),
+        pytest.raises(PushWardApiError),
+    ):
+        await client.wait_for_notification_answer(7, 300)
+    assert session.request.call_count == ANSWER_FAILURE_BUDGET
+
+
+async def test_wait_for_notification_answer_fails_fast_on_404():
+    session = _make_session(_mock_response(404))
+    client = _make_client(session)
+
+    with pytest.raises(PushWardNotFoundError):
+        await client.wait_for_notification_answer(7, 300)
+    assert session.request.call_count == 1
 
 
 async def test_create_notification_omits_none_fields():

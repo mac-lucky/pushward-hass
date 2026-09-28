@@ -11,6 +11,7 @@ import voluptuous as vol
 DOMAIN = "pushward"
 SUBENTRY_TYPE_ENTITY = "tracked_entity"
 SUBENTRY_TYPE_WIDGET = "tracked_widget"
+SUBENTRY_TYPE_TODO = "tracked_todo"
 
 CONF_SERVER_URL = "server_url"
 CONF_INTEGRATION_KEY = "integration_key"
@@ -327,8 +328,85 @@ SEVERITIES = ["critical", "warning", "info"]
 NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
 # GET /notifications/scheduled?status= filter values. "scheduled" (the server
-# default) also covers ones being sent right now.
-SCHEDULED_NOTIFICATION_STATUSES = ["scheduled", "sent", "failed", "all"]
+# default) also covers ones being sent right now; canceled ones stay readable for
+# 24 hours, sent and failed ones for 7 days.
+SCHEDULED_NOTIFICATION_STATUSES = ["scheduled", "sent", "failed", "canceled", "all"]
+# Page size and page cap for list_scheduled_notifications (server max limit 100).
+SCHEDULED_LIST_PAGE_SIZE = 100
+SCHEDULED_LIST_MAX_PAGES = 10
+
+# Recurrence bounds (server model.Recurrence): cron is at most 128 chars, count 1-1000.
+RECURRENCE_CRON_MAX_LEN = 128
+RECURRENCE_MAX_COUNT = 1000
+
+# get_notification_answer: the server holds one GET /notifications/answers/{id}
+# for at most 25s (under the 30s gateway timeout); 20 leaves margin. The service
+# keeps asking until the answer lands or its timeout passes, so a person can take
+# hours to tap. The server allows 4 concurrent waits per user across every client
+# of the account (Hermes, MCP, ...), so one install holds at most 2 (the service
+# and the to-do Done watch share them) and reads without waiting when both are
+# busy, or for a while after the server says the waits are used up.
+ANSWER_LONG_POLL_SECONDS = 20
+ANSWER_REQUEST_MARGIN_SECONDS = 10
+ANSWER_MAX_CONCURRENT_WAITS = 2
+ANSWER_MIN_POLL_INTERVAL = 2  # seconds between polls that came back early
+ANSWER_PLAIN_POLL_INTERVAL = 15  # seconds between reads that did not hold a wait
+ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS = 60  # plain reads only, after a 429 on a wait
+ANSWER_FAILURE_BUDGET = 5  # consecutive transient failures (5xx, connection) before giving up
+ANSWER_DEFAULT_TIMEOUT = 300
+ANSWER_MAX_TIMEOUT = 86400
+ANSWER_STATUS_ANSWERED = "answered"
+ANSWER_STATUS_PENDING = "pending"
+
+# Tracked to-do lists (tracked_todo subentries): each open item with a due date
+# gets a PushWard scheduled notification. The entity is CONF_ENTITY_ID.
+CONF_TODO_OFFSET_MINUTES = "offset_minutes"
+CONF_TODO_ALL_DAY_TIME = "all_day_time"
+CONF_TODO_LEVEL = "notification_level"
+CONF_TODO_DONE_BUTTON = "done_button"
+CONF_TODO_MAX_SCHEDULED = "max_scheduled"
+DEFAULT_TODO_OFFSET_MINUTES = 0
+DEFAULT_TODO_ALL_DAY_TIME = "09:00:00"
+DEFAULT_TODO_LEVEL = "active"
+DEFAULT_TODO_DONE_BUTTON = True
+DEFAULT_TODO_MAX_SCHEDULED = 10
+# Levels the to-do list form offers (critical needs a volume and the entitlement).
+TODO_LEVELS = ["passive", "active", "time-sensitive"]
+TODO_OFFSET_MAX_MINUTES = 7 * 24 * 60
+# Pending schedules are capped at 25 per account, shared with every other client.
+TODO_MAX_SCHEDULED_LIMIT = 25
+# The server accepts send_at at most 365 days ahead; the margin keeps a reminder
+# computed a moment before the request inside it. Later items are picked up by
+# the hourly reconcile once they come into range.
+TODO_SCHEDULE_HORIZON_DAYS = 365
+TODO_SCHEDULE_HORIZON_MARGIN_MINUTES = 60
+# A reminder whose time has passed goes out this many seconds from now, as long as
+# its item is less than TODO_LATE_GRACE_MINUTES past due (a lead time reaching into
+# the past, or an item held back by the cap until the ones before it went out).
+TODO_NEAR_DUE_DELAY_SECONDS = 60
+# A little longer than the hourly full pass, so an item held back until then is not lost.
+TODO_LATE_GRACE_MINUTES = 90
+# A list is reconciled again this long after its earliest pending reminder's time,
+# to mark it sent (and start watching its Done button) and to fill its slot.
+TODO_SEND_RECHECK_SECONDS = 10
+TODO_RECONCILE_INTERVAL_MINUTES = 60
+TODO_RECONCILE_DEBOUNCE_SECONDS = 2
+# Server caps the whole push at 4 KB; the item text is cut well below that.
+TODO_TITLE_MAX = 200
+TODO_BODY_MAX = 1000
+# metadata keys tagging the schedules a tracked list made, so a list can find
+# its own schedules on the server (the subentry id, and the item uid).
+TODO_METADATA_LIST = "ha_todo_list"
+TODO_METADATA_UID = "ha_todo_uid"
+TODO_DONE_ACTION_ID = "done"
+# Done-button answers: watched for this long after the reminder is sent. For the
+# first TODO_WATCH_ACTIVE_MINUTES after a send the watcher keeps a long-poll open
+# (one at a time, rotating over every watched reminder); after that it reads
+# without waiting every TODO_WATCH_IDLE_SECONDS.
+TODO_WATCH_HOURS = 24
+TODO_WATCH_ACTIVE_MINUTES = 60
+TODO_WATCH_IDLE_SECONDS = 300
+TODO_WATCH_ERROR_BACKOFF_SECONDS = 60
 
 # Templates offered by the tracked-entity config flow (each has a mapper).
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log", "media"]

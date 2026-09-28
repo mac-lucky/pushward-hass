@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Eylemler",
-          "description": "Eylem düğmelerinin listesi. Her eylem; id, title, isteğe bağlı url, foreground, destructive, authentication_required ve icon içeren bir nesnedir. Bir http(s) url için method (GET/POST/PUT/PATCH/DELETE/HEAD), headers ve body ile sessiz bir webhook da gönderebilirsiniz."
+          "description": "Eylem düğmelerinin listesi. Her eylem; id, title, isteğe bağlı url, foreground, destructive, authentication_required ve icon içeren bir nesnedir. Bir http(s) url için method (GET/POST/PUT/PATCH/DELETE/HEAD), headers ve body ile sessiz bir webhook da gönderebilirsiniz. url'yi (ve foreground'u) atlarsanız dokunmayı PushWard kendisi kaydeder; get_notification_answer ile okuyabilirsiniz. Yazılı bir yanıt istemek için sessiz bir eylemde text_input: true ayarlayın (isteğe bağlı text_input_placeholder ve text_input_button_title): url olmadan yanıtı PushWard kaydeder, http(s) url ile yanıt webhook'unuza text alanı içeren JSON olarak gönderilir. Yanıtı bunun yerine body içine yerleştirmek için {{input}} yer tutucusunu kullanın ve otomasyonunuzda body'yi bir Jinja raw bloğuna alın; böylece Home Assistant eylem gönderilmeden önce onu işlemez."
         },
         "send_at": {
           "name": "Gönderim zamanı",
-          "description": "Bildirimi şimdi yerine daha sonra, en fazla 30 gün ileriye kadar gönderin. PushWard bildirimi saklar ve bu zamanda gönderir; bildirim gönderildiğinde bildirim kotanızdan düşülür. UTC farkı içermeyen bir zaman, Home Assistant'ın saat diliminde yorumlanır. cancel_scheduled_notification için id almak üzere bir yanıt isteyin."
+          "description": "Bildirimi şimdi yerine daha sonra, en fazla 365 gün ileriye kadar gönderin. PushWard bildirimi saklar ve bu zamanda gönderir; bildirim gönderildiğinde bildirim kotanızdan düşülür. UTC farkı içermeyen bir zaman, Home Assistant'ın saat diliminde yorumlanır. Tekrarla ile birlikte kullanıldığında serinin başlangıcını belirler. cancel_scheduled_notification için id almak üzere bir yanıt isteyin."
+        },
+        "recurrence": {
+          "name": "Tekrarla",
+          "description": "Bildirimi bir zamanlamaya göre tekrarlar, nesne olarak: cron (5 alan, dakika saat ayın-günü ay haftanın-günü, veya @hourly/@daily/@weekly/@monthly/@yearly), isteğe bağlı timezone (varsayılan Home Assistant'ınki) ve bitirmek için isteğe bağlı until (tarih ve saat) veya count (1-1000 gönderim). Gönderimler arasında en az 15 dakika olmalıdır. Seri tek bir id'yi korur; cancel_scheduled_notification seriyi durdurur."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Zamanlanmış Bildirimi İptal Et",
-      "description": "send_notification'ın send_at alanıyla sıraya alınan bir bildirimi iptal eder. Artık var olmayan bir id yok sayılır.",
+      "description": "send_notification'ın send_at veya Tekrarla alanıyla sıraya alınan bir bildirimi iptal eder. Tekrarlanan bir bildirimi iptal etmek, gönderilmekte olsa bile tüm seriyi durdurur. Artık var olmayan bir id yok sayılır. İptal edilen bildirim PushWard uygulamasında 24 saat boyunca iptal edildi olarak görünür.",
       "fields": {
         "scheduled_notification_id": {
           "name": "Zamanlanmış bildirim kimliği",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Zamanlanmış Bildirimleri Listele",
-      "description": "Zamanlanmış bildirimlerinizi en yakın olandan başlayarak döndürür.",
+      "description": "Zamanlanmış bildirimlerinizi en yakın olandan başlayarak döndürür. Tekrarlananlar recurrence bilgisini, kaç kez gönderildiklerini (occurrence) ve en son ne zaman gönderildiklerini (last_sent_at) içerir.",
       "fields": {
         "status": {
           "name": "Durum",
-          "description": "Hangilerinin döndürüleceği. scheduled (varsayılan) hâlâ bekleyenleri listeler; sent ve failed 7 gün saklanır."
+          "description": "Hangilerinin döndürüleceği. scheduled (varsayılan) hâlâ bekleyenleri listeler; sent ve failed 7 gün saklanır. canceled 24 saat saklanır."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Bildirim Yanıtını Al",
+      "description": "url içermeyen eylemlerle gönderilen bir bildirimin yanıtını bekler ve hangi eyleme dokunulduğunu (action_id), varsa yazılı yanıtı (text) ve ne zaman yanıtlandığını (answered_at) döndürür. Zaman aşımı içinde kimse yanıt vermezse answered false olur. Yanıtlar 30 gün saklanır; bu nedenle daha sonra zaman aşımı 0 ile yapılan bir çağrı, beklemeden bir yanıtı okuyabilir.",
+      "fields": {
+        "notification_id": {
+          "name": "Bildirim kimliği",
+          "description": "send_notification tarafından döndürülen notification_id veya gönderilmiş bir zamanlanmış bildirimin notification_id değeri."
+        },
+        "timeout": {
+          "name": "Zaman aşımı",
+          "description": "Yanıtın ne kadar bekleneceği, saniye cinsinden (en fazla 24 saat). 0, beklemeden mevcut yanıtı okur."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Bu slug'a sahip bir widget zaten var.",
         "reconfigure_successful": "Widget yapılandırması güncellendi."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "İzlenen Yapılacaklar Listesi",
+      "initiate_flow": {
+        "user": "İzlenen yapılacaklar listesi ekle"
+      },
+      "step": {
+        "user": {
+          "title": "PushWard'a Yapılacaklar Listesi Ekle",
+          "description": "PushWard, Home Assistant çevrimdışı olsa bile her hatırlatıcıyı zamanında gönderir. Bir öğeyi tamamlamak veya silmek hatırlatıcısını iptal eder; düzenlemek hatırlatıcıyı değiştirir.",
+          "data": {
+            "entity_id": "Yapılacaklar listesi",
+            "offset_minutes": "Son tarihten önce hatırlat",
+            "all_day_time": "Yalnızca tarihli öğeler için saat",
+            "notification_level": "Bildirim düzeyi",
+            "done_button": "Tamamlandı düğmesi",
+            "max_scheduled": "Aynı anda planlanan en fazla hatırlatıcı"
+          },
+          "data_description": {
+            "entity_id": "Bu listedeki son tarihi olan her açık öğe bir PushWard hatırlatıcısı alır.",
+            "offset_minutes": "Hatırlatıcıyı son tarihten bu kadar dakika önce gönderin (0, son tarih saatinde gönderir).",
+            "all_day_time": "Son tarihi olan ancak saati olmayan bir öğe o gün bu saatte hatırlatılır.",
+            "notification_level": "Hatırlatıcının nasıl böldüğü: Pasif sessizce gelir, Zamana duyarlı Odak modunu aşar.",
+            "done_button": "Hatırlatıcıya bir Tamamlandı düğmesi ekler. Düğmeye dokunmak öğeyi Home Assistant'ta tamamlar.",
+            "max_scheduled": "Yalnızca en yakın öğeler planlanır; diğerleri bunlar gönderildikçe sıraya girer. Hesabınız toplamda en fazla 25 bekleyen zamanlanmış bildirim tutabilir."
+          }
+        },
+        "reconfigure": {
+          "title": "Yapılacaklar Listesini Düzenle",
+          "data": {
+            "entity_id": "Yapılacaklar listesi",
+            "offset_minutes": "Son tarihten önce hatırlat",
+            "all_day_time": "Yalnızca tarihli öğeler için saat",
+            "notification_level": "Bildirim düzeyi",
+            "done_button": "Tamamlandı düğmesi",
+            "max_scheduled": "Aynı anda planlanan en fazla hatırlatıcı"
+          },
+          "data_description": {
+            "entity_id": "Bu listedeki son tarihi olan her açık öğe bir PushWard hatırlatıcısı alır.",
+            "offset_minutes": "Hatırlatıcıyı son tarihten bu kadar dakika önce gönderin (0, son tarih saatinde gönderir).",
+            "all_day_time": "Son tarihi olan ancak saati olmayan bir öğe o gün bu saatte hatırlatılır.",
+            "notification_level": "Hatırlatıcının nasıl böldüğü: Pasif sessizce gelir, Zamana duyarlı Odak modunu aşar.",
+            "done_button": "Hatırlatıcıya bir Tamamlandı düğmesi ekler. Düğmeye dokunmak öğeyi Home Assistant'ta tamamlar.",
+            "max_scheduled": "Yalnızca en yakın öğeler planlanır; diğerleri bunlar gönderildikçe sıraya girer. Hesabınız toplamda en fazla 25 bekleyen zamanlanmış bildirim tutabilir."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Bu yapılacaklar listesi zaten izleniyor.",
+        "reconfigure_successful": "Yapılacaklar listesi ayarları güncellendi."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Önce en düşük pil",
         "level_desc": "Önce en yüksek pil"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Pasif",
+        "active": "Aktif",
+        "time-sensitive": "Zamana duyarlı"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Tamamlandı"
       }
     }
   }

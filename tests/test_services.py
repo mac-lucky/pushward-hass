@@ -20,6 +20,7 @@ from custom_components.pushward.api import (
     PushWardAuthError,
     PushWardEmailPermissionError,
     PushWardForbiddenError,
+    PushWardNotFoundError,
 )
 from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
@@ -359,7 +360,8 @@ async def test_service_send_notification_send_at_schedules(hass: HomeAssistant) 
     assert call_kwargs["title"] == "Bins"
     assert call_kwargs["source"] == "home"
     assert call_kwargs["push"] is True
-    assert response == {"scheduled_notification_id": 42, "send_at": "2026-10-01T16:00:00Z"}
+    assert call_kwargs["recurrence"] is None
+    assert response == {"scheduled_notification_id": 42, "send_at": "2026-10-01T16:00:00Z", "recurrence": None}
 
 
 async def test_service_send_notification_naive_send_at_uses_ha_time_zone(hass: HomeAssistant) -> None:
@@ -392,7 +394,160 @@ async def test_service_send_notification_response_for_immediate_send(hass: HomeA
         return_response=True,
     )
 
-    assert response == {"notification_id": 991}
+    assert response == {"notification_id": 991, "answerable": False}
+
+
+async def test_service_send_notification_response_says_answerable(hass: HomeAssistant) -> None:
+    """A url-less action makes the server record the answer; the response passes that on."""
+    api = _mock_api()
+    api.create_notification = AsyncMock(return_value={"id": 991, "answerable": True})
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Garage open", "body": "Close it?", "actions": [{"id": "close", "title": "Close"}]},
+        blocking=True,
+        return_response=True,
+    )
+
+    assert api.create_notification.call_args[1]["actions"] == [{"id": "close", "title": "Close"}]
+    assert response == {"notification_id": 991, "answerable": True}
+
+
+async def test_service_send_notification_recurrence_defaults_to_ha_time_zone(hass: HomeAssistant) -> None:
+    """recurrence without a timezone is evaluated in Home Assistant's; send_at stays optional."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    api = _mock_api()
+    recurrence_echo = {"cron": "0 8 * * 1-5", "timezone": "Europe/Warsaw"}
+    api.create_notification = AsyncMock(
+        return_value={"id": 6, "send_at": "2026-09-29T06:00:00Z", "recurrence": recurrence_echo}
+    )
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Standup", "body": "In 10 minutes", "recurrence": {"cron": "0 8 * * 1-5"}},
+        blocking=True,
+        return_response=True,
+    )
+
+    call_kwargs = api.create_notification.call_args[1]
+    assert call_kwargs["send_at"] is None
+    assert call_kwargs["recurrence"] == {"cron": "0 8 * * 1-5", "timezone": "Europe/Warsaw"}
+    assert response == {
+        "scheduled_notification_id": 6,
+        "send_at": "2026-09-29T06:00:00Z",
+        "recurrence": recurrence_echo,
+    }
+
+
+async def test_service_send_notification_recurrence_keeps_explicit_zone_and_until(hass: HomeAssistant) -> None:
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "t",
+            "body": "b",
+            "recurrence": {"cron": "@daily", "timezone": "America/New_York", "until": "2026-12-31 20:00:00"},
+        },
+        blocking=True,
+    )
+
+    recurrence = api.create_notification.call_args[1]["recurrence"]
+    assert recurrence["timezone"] == "America/New_York"
+    # A naive until is read in Home Assistant's time zone, like send_at.
+    assert recurrence["until"] == datetime(2026, 12, 31, 19, 0, tzinfo=UTC)
+
+
+async def test_service_send_notification_rejects_bad_recurrence(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    for bad in (
+        {"timezone": "UTC"},  # cron is required
+        {"cron": "@daily", "until": "2026-12-31T00:00:00+00:00", "count": 3},  # until xor count
+        {"cron": "@daily", "timezone": "Mars/Olympus"},
+        {"cron": "@daily", "count": 0},
+        {"cron": "@daily", "count": 1001},
+    ):
+        with pytest.raises(vol.Invalid):
+            await hass.services.async_call(
+                DOMAIN,
+                "send_notification",
+                {"title": "t", "body": "b", "recurrence": bad},
+                blocking=True,
+            )
+    api.create_notification.assert_not_awaited()
+
+
+async def test_service_get_notification_answer(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    answer = {
+        "answered": True,
+        "notification_id": 991,
+        "status": "answered",
+        "action_id": "close",
+        "text": None,
+        "answered_at": "2026-09-28T12:00:00Z",
+    }
+    api.wait_for_notification_answer = AsyncMock(return_value=answer)
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        "get_notification_answer",
+        {"notification_id": "991"},
+        blocking=True,
+        return_response=True,
+    )
+
+    api.wait_for_notification_answer.assert_awaited_once_with(991, 300)
+    assert response == answer
+
+
+async def test_service_get_notification_answer_timeout_bounds(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.wait_for_notification_answer = AsyncMock(return_value={"answered": False})
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "get_notification_answer",
+        {"notification_id": 991, "timeout": 0},
+        blocking=True,
+        return_response=True,
+    )
+    api.wait_for_notification_answer.assert_awaited_once_with(991, 0)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "get_notification_answer",
+            {"notification_id": 991, "timeout": 86401},
+            blocking=True,
+            return_response=True,
+        )
+
+
+async def test_service_get_notification_answer_not_found_is_user_facing(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.wait_for_notification_answer = AsyncMock(side_effect=PushWardNotFoundError("404", status_code=404))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError, match="no answer to read"):
+        await hass.services.async_call(
+            DOMAIN,
+            "get_notification_answer",
+            {"notification_id": 991},
+            blocking=True,
+            return_response=True,
+        )
 
 
 async def test_service_send_notification_rejects_bad_send_at(hass: HomeAssistant) -> None:
@@ -442,11 +597,11 @@ async def test_service_list_scheduled_notifications(hass: HomeAssistant) -> None
 
 
 async def test_service_schedule_limit_surfaces_server_message(hass: HomeAssistant) -> None:
-    """The server's 409 (20 pending) reaches the user as a HomeAssistantError."""
+    """The server's 409 (25 pending) reaches the user as a HomeAssistantError."""
     api = _mock_api()
     api.create_notification = AsyncMock(
         side_effect=PushWardApiError(
-            "POST /notifications/scheduled failed (409): scheduled notification limit reached (max 20 pending)",
+            "POST /notifications/scheduled failed (409): scheduled notification limit reached (max 25 pending)",
             status_code=409,
         )
     )
@@ -1848,8 +2003,24 @@ async def test_send_notification_text_input_labels_reject_oversize(hass: HomeAss
     api.create_notification.assert_not_awaited()
 
 
+async def test_send_notification_url_less_text_input_is_recorded_reply(hass: HomeAssistant) -> None:
+    """A url-less, silent text_input action is valid: the server records the reply."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    action = {"id": "reply", "title": "Reply", "text_input": True, "text_input_placeholder": "Type a reply"}
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "t", "body": "b", "actions": [action]},
+        blocking=True,
+    )
+
+    assert api.create_notification.call_args[1]["actions"] == [action]
+
+
 async def test_send_notification_action_text_input_requires_silent_http(hass: HomeAssistant) -> None:
-    """text_input on a foreground or non-http action is rejected (mirrors the server)."""
+    """text_input on a foreground or custom-scheme action is rejected (mirrors the server)."""
     api = _mock_api()
     await _setup_entry(hass, api)
 

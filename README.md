@@ -57,8 +57,9 @@ flowchart LR
 
 - **Live Activities**: when an entity enters a configured *start* state (e.g. the washer turns on), a Live Activity appears; on an *end* state it dismisses with a two-phase completion animation. Each tracked entity is a `tracked_entity` subentry.
 - **Widgets**: an entity (or several, for `stat_list`) is bound to a server-rendered Home/Lock Screen widget that re-renders on state change or on a poll interval. Each widget is a `tracked_widget` subentry.
+- **To-do reminders**: every open item with a due date on a tracked to-do list gets a push at its due time, sent by PushWard even while Home Assistant is down. Each list is a `tracked_todo` subentry.
 
-The two surfaces are independent (separate config, managers, and caches) and share only the API client and icon/color resolution.
+The surfaces are independent (separate config, managers, and caches) and share only the API client and icon/color resolution.
 
 ## Features
 
@@ -67,6 +68,7 @@ The two surfaces are independent (separate config, managers, and caches) and sha
 - **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
+- **To-do reminders**: a push for every dated item on a to-do list, with a Done button that completes the item
 - **Account usage sensors**: notifications, Live Activity updates, widget updates, and emails consumed vs. plan limits, plus subscription tier
 - **Template auto-suggestion** picks the best activity template from entity domain and device class
 - **14 domain defaults**: pre-filled start/end states and a default icon per HA domain
@@ -433,6 +435,27 @@ Leave the field blank and the widget is never marked stale and no heartbeat runs
 
 How many `stat_list` rows are visible depends on the widget size. By default a medium or large Home Screen widget shows all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3, packing in up to 6 when every value is very short (for example a single status glyph). You can change Row Density per widget in the PushWard iOS app: Compact packs two columns to show up to 6 rows on any size (labels may truncate on the small placements), and Comfortable keeps a single column with larger rows. To see all 6 rows with full labels, use a medium or large widget, or set Compact.
 
+### Add a tracked to-do list
+
+**Settings > Devices & Services > PushWard > Add tracked to-do list** picks a to-do list (any `todo` entity, such as a Local To-do list). Every open item on it with a due date gets a PushWard scheduled notification: the item's title is the push title, its description (or the list name) the body.
+
+| Option | Default | What it does |
+|--------|---------|--------------|
+| To-do list | | The `todo` entity to follow. Each list can be tracked once |
+| Remind before due | 0 min | Send the reminder this long before the due time (up to 7 days) |
+| Time for date-only items | 09:00 | An item with a due date but no time is reminded at this time on that day |
+| Notification level | active | passive, active or time-sensitive |
+| Done button | on | Adds a Done button to the reminder; tapping it completes the item in Home Assistant |
+| Most reminders scheduled at once | 10 | Only the soonest items are scheduled; the rest follow as those go out (the account holds at most 25 pending scheduled notifications across everything) |
+
+How it stays in step:
+
+- Adding or editing an item (title, description, due date) schedules or replaces its reminder right away; completing or deleting it cancels the reminder. PushWard sends the push at its time, so it arrives even if Home Assistant is offline then.
+- An item due more than 365 days out is scheduled once it comes within range. An item whose reminder time has already passed gets its reminder within a minute, unless it is more than 90 minutes past due; then it gets none.
+- If you stop a reminder in the PushWard app, the item stays open and gets no new reminder until you edit it.
+- After a reminder goes out, the item stays open for you to tick off. With the Done button, the integration watches for the tap for 24 hours: a long-lived request at a time for the first hour, then a quick check every 5 minutes.
+- The pairing between items and reminders is kept in Home Assistant's storage, not in the item, so notes synced to other apps stay clean. Removing the list (or the integration) cancels its pending reminders.
+
 ## Account sensors
 
 Each config entry registers **5 sensors** under one service device named **PushWard**, fed by a coordinator that polls `GET /auth/me` every **15 minutes**. They report your account's own consumption against its plan limits (these sensors stay *unavailable* on older servers that don't return usage to integration keys):
@@ -753,11 +776,12 @@ Send a push notification.
 | `media` | No | Object `{ url, type }`, type is image, video, or audio |
 | `icon_url` | No | Custom icon URL |
 | `metadata` | No | Arbitrary key-value pairs for custom app handling |
-| `actions` | No | List of action buttons `{ id, title, url, foreground, destructive, authentication_required, icon }`. `url` may use a custom scheme, and `method`/`headers`/`body` make the button a silent HTTP webhook (http(s) only). A silent http(s) action can also set `text_input: true` (with optional `text_input_placeholder`, `text_input_button_title`) to prompt for a typed reply, delivered to your webhook as JSON `{ "text": ... }` or via the `{{input}}` body placeholder |
+| `actions` | No | List of action buttons `{ id, title, url, foreground, destructive, authentication_required, icon }`. `url` may use a custom scheme, and `method`/`headers`/`body` make the button a silent HTTP webhook (http(s) only). Without a `url` (and without `foreground`) PushWard records the tap itself, see [Answers](#answers). A silent action can also set `text_input: true` (with optional `text_input_placeholder`, `text_input_button_title`) to prompt for a typed reply: recorded by PushWard when the action has no `url`, otherwise delivered to your webhook as JSON `{ "text": ... }` or via the `{{input}}` body placeholder |
 | `push` | No | Send as APNs push (default: true); when false, inbox-only |
-| `send_at` | No | Send later instead of now, at most 30 days ahead. A time without a UTC offset is read in Home Assistant's time zone |
+| `send_at` | No | Send later instead of now, at most 365 days ahead. A time without a UTC offset is read in Home Assistant's time zone |
+| `recurrence` | No | Repeat on a schedule: `{ cron, timezone, until, count }`, see below |
 
-With `send_at`, PushWard holds the notification and sends it at that time; it counts toward your notification quota when it is sent, not when you schedule it. Up to 20 can be waiting at once. Ask for a response to get the id you need to cancel it:
+With `send_at`, PushWard holds the notification and sends it at that time; it counts toward your notification quota when it is sent, not when you schedule it. Up to 25 can be waiting at once. Ask for a response to get the id you need to cancel it:
 
 ```yaml
 - action: pushward.send_notification
@@ -771,7 +795,53 @@ With `send_at`, PushWard holds the notification and sends it at that time; it co
     scheduled_notification_id: "{{ scheduled.scheduled_notification_id }}"
 ```
 
-`pushward.list_scheduled_notifications` returns them (`status`: scheduled by default, or sent, failed, all) as `scheduled_notifications`; it covers the ones this integration's key scheduled. Scheduling while your notification quota is already used up fails right away. Without `send_at`, a requested response carries the created `notification_id`.
+`recurrence` repeats the notification. `cron` is a 5-field expression (minute hour day-of-month month day-of-week) or `@hourly`, `@daily`, `@weekly`, `@monthly`, `@yearly`, read in `timezone` (defaults to Home Assistant's time zone; wall-clock times hold across DST changes). End the series with `until` (a date and time) or `count` (1-1000 sends), not both, or leave both out to repeat until you cancel it. Sends must be at least 15 minutes apart. With `recurrence`, `send_at` is optional and marks where the series starts. A series keeps one id and takes one of the 25 slots; each send counts toward your quota when it happens. Canceling it stops the whole series, even while a send is in progress. A canceled notification shows as canceled in the PushWard app for 24 hours:
+
+```yaml
+- action: pushward.send_notification
+  data:
+    title: "Standup in 10 minutes"
+    body: "Room 2 or the usual call."
+    recurrence:
+      cron: "50 8 * * 1-5"
+  response_variable: standup
+```
+
+`pushward.list_scheduled_notifications` returns them (`status`: scheduled by default, or sent, failed, canceled, all) as `scheduled_notifications`; it covers the ones this integration's key scheduled. Repeating ones also carry `recurrence`, `occurrence` (sends so far) and `last_sent_at`. Scheduling while your notification quota is already used up fails right away. Without `send_at` or `recurrence`, a requested response carries the created `notification_id` and `answerable`.
+
+#### Answers
+
+Give a notification actions without a `url` and PushWard records which one was tapped, and the typed reply of a `text_input` action. The response of `send_notification` says `answerable: true` when it will. `pushward.get_notification_answer` then waits for the answer:
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `notification_id` | Yes | `notification_id` from the `send_notification` response (or from a sent scheduled notification) |
+| `timeout` | No | Seconds to wait, default 300, up to 86400 (24 h). `0` reads the current answer without waiting |
+
+It returns `answered`, `status` (`answered` or `pending`), `action_id`, `text` and `answered_at`; when nobody answers in time, `answered` is false and `reason` says so. Answers are kept for 30 days, so an automation can also read one later with `timeout: 0` instead of waiting.
+
+```yaml
+- action: pushward.send_notification
+  data:
+    title: "Garage door is open"
+    body: "Close it?"
+    actions:
+      - id: close
+        title: Close
+      - id: leave
+        title: Leave it
+  response_variable: sent
+- action: pushward.get_notification_answer
+  data:
+    notification_id: "{{ sent.notification_id }}"
+    timeout: 3600
+  response_variable: answer
+- if: "{{ answer.action_id == 'close' }}"
+  then:
+    - action: cover.close_cover
+      target:
+        entity_id: cover.garage_door
+```
 
 ### `pushward.send_email`
 

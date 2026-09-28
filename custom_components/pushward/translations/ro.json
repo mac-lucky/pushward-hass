@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Acțiuni",
-          "description": "Listă de butoane de acțiune. Fiecare acțiune este un obiect cu id, title și, opțional, url, foreground, destructive, authentication_required și icon. Pentru un url http(s) puteți trimite și un webhook silențios cu method (GET/POST/PUT/PATCH/DELETE/HEAD), headers și body."
+          "description": "Listă de butoane de acțiune. Fiecare acțiune este un obiect cu id, title și, opțional, url, foreground, destructive, authentication_required și icon. Pentru un url http(s) puteți trimite și un webhook silențios cu method (GET/POST/PUT/PATCH/DELETE/HEAD), headers și body. Omiteți url (și foreground) și PushWard înregistrează singur atingerea; o citiți cu get_notification_answer. Setați text_input: true pe o acțiune silențioasă pentru a cere un răspuns tastat (opțional text_input_placeholder și text_input_button_title): fără url PushWard înregistrează răspunsul, cu un url http(s) acesta este trimis la webhook-ul dvs. ca JSON cu un câmp text. Pentru a-l include în schimb în body, folosiți substituentul {{input}} și încadrați body într-un bloc raw Jinja în automatizarea dvs., astfel încât Home Assistant să nu îl proceseze înainte de trimiterea acțiunii."
         },
         "send_at": {
           "name": "Ora trimiterii",
-          "description": "Trimiteți notificarea mai târziu în loc de acum, cu cel mult 30 de zile în avans. PushWard o păstrează și o trimite la această oră, iar la trimitere este inclusă în cota dvs. de notificări. O oră fără decalaj UTC este interpretată în fusul orar al Home Assistant. Solicitați un răspuns pentru a obține id-ul pentru cancel_scheduled_notification."
+          "description": "Trimiteți notificarea mai târziu în loc de acum, cu cel mult 365 de zile în avans. PushWard o păstrează și o trimite la această oră, iar la trimitere este inclusă în cota dvs. de notificări. O oră fără decalaj UTC este interpretată în fusul orar al Home Assistant. Împreună cu Repetare, această oră marchează începutul seriei. Solicitați un răspuns pentru a obține id-ul pentru cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Repetare",
+          "description": "Repetă notificarea după un program, sub formă de obiect: cron (5 câmpuri, minut oră zi-a-lunii lună zi-a-săptămânii, sau @hourly/@daily/@weekly/@monthly/@yearly), timezone opțional (implicit cel al Home Assistant) și until opțional (o dată și oră) sau count (1-1000 de trimiteri) pentru a o încheia. Între trimiteri trebuie să treacă cel puțin 15 minute. Seria păstrează un singur id; cancel_scheduled_notification o oprește."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Anulați notificarea programată",
-      "description": "Anulați o notificare pusă în coadă cu send_at din send_notification. Un id care nu mai există este ignorat.",
+      "description": "Anulați o notificare pusă în coadă cu send_at sau Repetare din send_notification. Anularea unei notificări repetate oprește întreaga serie, chiar și în timp ce este trimisă. Un id care nu mai există este ignorat. O notificare anulată apare ca anulată în aplicația PushWard timp de 24 de ore.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID notificare programată",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Listați notificările programate",
-      "description": "Returnează notificările dvs. programate, cele mai apropiate primele.",
+      "description": "Returnează notificările dvs. programate, cele mai apropiate primele. Cele repetate includ recurrence, de câte ori au fost trimise (occurrence) și când au fost trimise ultima dată (last_sent_at).",
       "fields": {
         "status": {
           "name": "Stare",
-          "description": "Pe care să le returneze. scheduled (implicit) listează notificările încă în așteptare; sent și failed se păstrează 7 zile."
+          "description": "Pe care să le returneze. scheduled (implicit) listează notificările încă în așteptare; sent și failed se păstrează 7 zile. canceled se păstrează 24 de ore."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Obțineți răspunsul la notificare",
+      "description": "Așteaptă răspunsul la o notificare trimisă cu acțiuni fără url și returnează ce acțiune a fost atinsă (action_id), eventualul răspuns tastat (text) și când (answered_at). Dacă nimeni nu răspunde în limita de timp, answered este false. Răspunsurile se păstrează 30 de zile, astfel încât un apel ulterior cu limita de timp 0 poate citi un răspuns fără să aștepte.",
+      "fields": {
+        "notification_id": {
+          "name": "ID notificare",
+          "description": "notification_id returnat de send_notification sau notification_id al unei notificări programate deja trimise."
+        },
+        "timeout": {
+          "name": "Limită de timp",
+          "description": "Cât timp se așteaptă răspunsul, în secunde (până la 24 de ore). 0 citește răspunsul curent fără așteptare."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Există deja un widget cu acest slug.",
         "reconfigure_successful": "Configurația widget-ului a fost actualizată."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Listă de sarcini urmărită",
+      "initiate_flow": {
+        "user": "Adăugați o listă de sarcini urmărită"
+      },
+      "step": {
+        "user": {
+          "title": "Adăugați o listă de sarcini în PushWard",
+          "description": "PushWard trimite fiecare memento la ora lui, chiar și când Home Assistant este offline. Finalizarea sau ștergerea unui element anulează mementoul; editarea lui înlocuiește mementoul.",
+          "data": {
+            "entity_id": "Listă de sarcini",
+            "offset_minutes": "Memento înainte de termen",
+            "all_day_time": "Ora pentru elementele doar cu dată",
+            "notification_level": "Nivel de notificare",
+            "done_button": "Butonul Gata",
+            "max_scheduled": "Numărul maxim de mementouri programate simultan"
+          },
+          "data_description": {
+            "entity_id": "Fiecare element deschis din această listă care are un termen primește un memento PushWard.",
+            "offset_minutes": "Trimite mementoul cu atâtea minute înainte de ora termenului (0 îl trimite la ora termenului).",
+            "all_day_time": "Un element cu dată de termen, dar fără oră, este amintit la această oră în ziua respectivă.",
+            "notification_level": "Cum întrerupe mementoul: Pasiv sosește silențios, Urgent trece prin modul Concentrare.",
+            "done_button": "Adaugă un buton Gata la memento. Atingerea lui finalizează elementul în Home Assistant.",
+            "max_scheduled": "Sunt programate doar elementele cele mai apropiate; restul urmează pe măsură ce acestea sunt trimise. Contul dvs. poate avea în total cel mult 25 de notificări programate în așteptare."
+          }
+        },
+        "reconfigure": {
+          "title": "Editați lista de sarcini",
+          "data": {
+            "entity_id": "Listă de sarcini",
+            "offset_minutes": "Memento înainte de termen",
+            "all_day_time": "Ora pentru elementele doar cu dată",
+            "notification_level": "Nivel de notificare",
+            "done_button": "Butonul Gata",
+            "max_scheduled": "Numărul maxim de mementouri programate simultan"
+          },
+          "data_description": {
+            "entity_id": "Fiecare element deschis din această listă care are un termen primește un memento PushWard.",
+            "offset_minutes": "Trimite mementoul cu atâtea minute înainte de ora termenului (0 îl trimite la ora termenului).",
+            "all_day_time": "Un element cu dată de termen, dar fără oră, este amintit la această oră în ziua respectivă.",
+            "notification_level": "Cum întrerupe mementoul: Pasiv sosește silențios, Urgent trece prin modul Concentrare.",
+            "done_button": "Adaugă un buton Gata la memento. Atingerea lui finalizează elementul în Home Assistant.",
+            "max_scheduled": "Sunt programate doar elementele cele mai apropiate; restul urmează pe măsură ce acestea sunt trimise. Contul dvs. poate avea în total cel mult 25 de notificări programate în așteptare."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Această listă de sarcini este deja urmărită.",
+        "reconfigure_successful": "Setările listei de sarcini au fost actualizate."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Bateria cea mai mică prima",
         "level_desc": "Bateria cea mai mare prima"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Pasiv",
+        "active": "Activ",
+        "time-sensitive": "Urgent"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Gata"
       }
     }
   }

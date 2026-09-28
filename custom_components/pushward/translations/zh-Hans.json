@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "动作",
-          "description": "动作按钮列表。每个动作是一个对象，包含 id、title、可选的 url、foreground、destructive、authentication_required 和 icon。对于 http(s) URL，还可通过 method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers 和 body 发送静默 webhook。"
+          "description": "动作按钮列表。每个动作是一个对象，包含 id、title、可选的 url、foreground、destructive、authentication_required 和 icon。对于 http(s) URL，还可通过 method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers 和 body 发送静默 webhook。省略 url（及 foreground）时，PushWard 会自行记录点击，可用 get_notification_answer 读取。在静默动作上设置 text_input: true 可请求输入回复（可选 text_input_placeholder 和 text_input_button_title）：没有 url 时由 PushWard 记录回复，有 http(s) URL 时回复会以带 text 字段的 JSON 发送到你的 webhook。若要改为嵌入 body，请使用 {{input}} 占位符，并在自动化中用 Jinja raw 块包裹 body，以免 Home Assistant 在动作发送前就将其渲染掉。"
         },
         "send_at": {
           "name": "发送时间",
-          "description": "稍后而非立即发送通知，最多可提前 30 天。PushWard 会保存通知并在此时间发送，发送时计入你的通知配额。不带 UTC 偏移的时间按 Home Assistant 的时区解析。请求返回响应即可获取用于 cancel_scheduled_notification 的 ID。"
+          "description": "稍后而非立即发送通知，最多可提前 365 天。PushWard 会保存通知并在此时间发送，发送时计入你的通知配额。不带 UTC 偏移的时间按 Home Assistant 的时区解析。配合重复字段使用时，此时间标记系列的开始。请求返回响应即可获取用于 cancel_scheduled_notification 的 ID。"
+        },
+        "recurrence": {
+          "name": "重复",
+          "description": "按计划重复发送通知，值为对象：cron（5 个字段：分 时 日 月 周，或 @hourly/@daily/@weekly/@monthly/@yearly）、可选的 timezone（默认为 Home Assistant 的时区），以及用于结束的可选 until（日期和时间）或 count（1-1000 次发送）。两次发送之间至少间隔 15 分钟。整个系列保持同一个 ID；cancel_scheduled_notification 可将其停止。"
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "取消定时通知",
-      "description": "取消通过 send_notification 的 send_at 排队的通知。已不存在的 ID 会被忽略。",
+      "description": "取消通过 send_notification 的 send_at 或重复字段排队的通知。取消重复通知会停止整个系列，即使正在发送也是如此。已不存在的 ID 会被忽略。已取消的通知会在 PushWard 应用中显示为已取消，保留 24 小时。",
       "fields": {
         "scheduled_notification_id": {
           "name": "定时通知 ID",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "列出定时通知",
-      "description": "返回你的定时通知，按发送时间由近到远排列。",
+      "description": "返回你的定时通知，按发送时间由近到远排列。重复通知会附带其 recurrence、已发送次数（occurrence）和最近一次发送时间（last_sent_at）。",
       "fields": {
         "status": {
           "name": "状态",
-          "description": "要返回哪些通知。scheduled（默认）列出仍在等待的通知；sent 和 failed 保留 7 天。"
+          "description": "要返回哪些通知。scheduled（默认）列出仍在等待的通知；sent 和 failed 保留 7 天。canceled 保留 24 小时。"
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "获取通知回答",
+      "description": "对于带有无 url 动作的通知，等待其回答，并返回被点击的动作（action_id）、输入的回复（text，如有）及回答时间（answered_at）。若在超时时间内无人回答，answered 为 false。回答保留 30 天，因此之后以超时 0 调用可直接读取，无需等待。",
+      "fields": {
+        "notification_id": {
+          "name": "通知 ID",
+          "description": "send_notification 返回的 notification_id，或已发送定时通知的 notification_id。"
+        },
+        "timeout": {
+          "name": "超时",
+          "description": "等待回答的时长，单位为秒（最长 24 小时）。0 表示不等待，直接读取当前回答。"
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "已存在使用此 slug 的小组件。",
         "reconfigure_successful": "小组件配置已更新。"
       }
+    },
+    "tracked_todo": {
+      "entry_type": "追踪的待办事项列表",
+      "initiate_flow": {
+        "user": "添加追踪的待办事项列表"
+      },
+      "step": {
+        "user": {
+          "title": "将待办事项列表添加到 PushWard",
+          "description": "即使 Home Assistant 离线，PushWard 也会按时发送每条提醒。完成或删除某项会取消其提醒；编辑某项会替换其提醒。",
+          "data": {
+            "entity_id": "待办事项列表",
+            "offset_minutes": "到期前提醒",
+            "all_day_time": "仅有日期的事项的时间",
+            "notification_level": "通知级别",
+            "done_button": "完成按钮",
+            "max_scheduled": "同时安排的最多提醒数"
+          },
+          "data_description": {
+            "entity_id": "此列表中每个设有截止日期的未完成事项都会收到 PushWard 提醒。",
+            "offset_minutes": "在截止时间前这么多分钟发送提醒（0 表示在截止时间发送）。",
+            "all_day_time": "有截止日期但没有时间的事项，会在当天的这个时间提醒。",
+            "notification_level": "提醒的打扰方式：被动会静默送达，时效性可突破专注模式。",
+            "done_button": "为提醒添加完成按钮。点按后会在 Home Assistant 中完成该事项。",
+            "max_scheduled": "只安排最近的事项；其余事项会随着这些提醒发出而依次安排。你的账户总共最多保留 25 条待发送的定时通知。"
+          }
+        },
+        "reconfigure": {
+          "title": "编辑待办事项列表",
+          "data": {
+            "entity_id": "待办事项列表",
+            "offset_minutes": "到期前提醒",
+            "all_day_time": "仅有日期的事项的时间",
+            "notification_level": "通知级别",
+            "done_button": "完成按钮",
+            "max_scheduled": "同时安排的最多提醒数"
+          },
+          "data_description": {
+            "entity_id": "此列表中每个设有截止日期的未完成事项都会收到 PushWard 提醒。",
+            "offset_minutes": "在截止时间前这么多分钟发送提醒（0 表示在截止时间发送）。",
+            "all_day_time": "有截止日期但没有时间的事项，会在当天的这个时间提醒。",
+            "notification_level": "提醒的打扰方式：被动会静默送达，时效性可突破专注模式。",
+            "done_button": "为提醒添加完成按钮。点按后会在 Home Assistant 中完成该事项。",
+            "max_scheduled": "只安排最近的事项；其余事项会随着这些提醒发出而依次安排。你的账户总共最多保留 25 条待发送的定时通知。"
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "此待办事项列表已被追踪。",
+        "reconfigure_successful": "待办事项列表设置已更新。"
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "电量最低优先",
         "level_desc": "电量最高优先"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "被动",
+        "active": "主动",
+        "time-sensitive": "时效性"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "完成"
       }
     }
   }

@@ -34,6 +34,7 @@ from homeassistant.helpers.selector import (
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
+    TimeSelector,
 )
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
@@ -137,6 +138,11 @@ from .const import (
     CONF_TILE_COLOR,
     CONF_TILE_URL_ACTION,
     CONF_TILES,
+    CONF_TODO_ALL_DAY_TIME,
+    CONF_TODO_DONE_BUTTON,
+    CONF_TODO_LEVEL,
+    CONF_TODO_MAX_SCHEDULED,
+    CONF_TODO_OFFSET_MINUTES,
     CONF_TOTAL_ENTITY,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
@@ -170,6 +176,11 @@ from .const import (
     DEFAULT_SEVERITY,
     DEFAULT_SUBTITLE_TIMER_STYLE,
     DEFAULT_TAP_ACTION_FOREGROUND,
+    DEFAULT_TODO_ALL_DAY_TIME,
+    DEFAULT_TODO_DONE_BUTTON,
+    DEFAULT_TODO_LEVEL,
+    DEFAULT_TODO_MAX_SCHEDULED,
+    DEFAULT_TODO_OFFSET_MINUTES,
     DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_VALUE_SCALE,
@@ -207,6 +218,7 @@ from .const import (
     STEP_ROW_MAX,
     STEP_ROW_MIN,
     SUBENTRY_TYPE_ENTITY,
+    SUBENTRY_TYPE_TODO,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
     THRESHOLD_LABEL_MAX,
@@ -214,6 +226,9 @@ from .const import (
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
     TIMER_STYLES,
+    TODO_LEVELS,
+    TODO_MAX_SCHEDULED_LIMIT,
+    TODO_OFFSET_MAX_MINUTES,
     TOTAL_STEPS_MAX,
     UPDATE_INTERVAL_MIN,
     VALUE_SCALES,
@@ -2143,6 +2158,7 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return {
             SUBENTRY_TYPE_ENTITY: PushWardEntitySubentryFlow,
             SUBENTRY_TYPE_WIDGET: PushWardWidgetSubentryFlow,
+            SUBENTRY_TYPE_TODO: PushWardTodoSubentryFlow,
         }
 
 
@@ -3497,3 +3513,106 @@ def _parse_thresholds(raw: object, *, strict: bool = False) -> list[dict]:
     if strict and len(result) > THRESHOLDS_MAX:
         raise vol.Invalid("too_many_thresholds", path=[CONF_THRESHOLDS])
     return result[:THRESHOLDS_MAX]
+
+
+def _todo_schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
+    """The tracked to-do list form: the list plus when and how its reminders go out."""
+    d = defaults or {}
+    entity_default = {"default": d[CONF_ENTITY_ID]} if d.get(CONF_ENTITY_ID) else {}
+    return vol.Schema(
+        {
+            vol.Required(CONF_ENTITY_ID, **entity_default): EntitySelector(EntitySelectorConfig(domain="todo")),
+            vol.Required(
+                CONF_TODO_OFFSET_MINUTES, default=d.get(CONF_TODO_OFFSET_MINUTES, DEFAULT_TODO_OFFSET_MINUTES)
+            ): NumberSelector(
+                NumberSelectorConfig(
+                    min=0,
+                    max=TODO_OFFSET_MAX_MINUTES,
+                    step=1,
+                    mode=NumberSelectorMode.BOX,
+                    unit_of_measurement="min",
+                )
+            ),
+            vol.Required(
+                CONF_TODO_ALL_DAY_TIME, default=d.get(CONF_TODO_ALL_DAY_TIME, DEFAULT_TODO_ALL_DAY_TIME)
+            ): TimeSelector(),
+            vol.Required(CONF_TODO_LEVEL, default=d.get(CONF_TODO_LEVEL, DEFAULT_TODO_LEVEL)): SelectSelector(
+                SelectSelectorConfig(
+                    options=TODO_LEVELS,
+                    mode=SelectSelectorMode.DROPDOWN,
+                    translation_key="todo_notification_level",
+                )
+            ),
+            vol.Required(
+                CONF_TODO_DONE_BUTTON, default=d.get(CONF_TODO_DONE_BUTTON, DEFAULT_TODO_DONE_BUTTON)
+            ): BooleanSelector(),
+            vol.Required(
+                CONF_TODO_MAX_SCHEDULED, default=d.get(CONF_TODO_MAX_SCHEDULED, DEFAULT_TODO_MAX_SCHEDULED)
+            ): NumberSelector(
+                NumberSelectorConfig(min=1, max=TODO_MAX_SCHEDULED_LIMIT, step=1, mode=NumberSelectorMode.BOX)
+            ),
+        }
+    )
+
+
+def _todo_data(user_input: Mapping[str, Any]) -> dict[str, Any]:
+    """Stored form of the to-do list form (NumberSelector hands back floats)."""
+    return {
+        CONF_ENTITY_ID: user_input[CONF_ENTITY_ID],
+        CONF_TODO_OFFSET_MINUTES: int(user_input.get(CONF_TODO_OFFSET_MINUTES, DEFAULT_TODO_OFFSET_MINUTES)),
+        CONF_TODO_ALL_DAY_TIME: str(user_input.get(CONF_TODO_ALL_DAY_TIME, DEFAULT_TODO_ALL_DAY_TIME)),
+        CONF_TODO_LEVEL: user_input.get(CONF_TODO_LEVEL, DEFAULT_TODO_LEVEL),
+        CONF_TODO_DONE_BUTTON: bool(user_input.get(CONF_TODO_DONE_BUTTON, DEFAULT_TODO_DONE_BUTTON)),
+        CONF_TODO_MAX_SCHEDULED: int(user_input.get(CONF_TODO_MAX_SCHEDULED, DEFAULT_TODO_MAX_SCHEDULED)),
+    }
+
+
+def _todo_unique_id(entity_id: str) -> str:
+    """Subentry unique ids are checked across subentry types; a tracked entity uses the bare id."""
+    return f"todo:{entity_id}"
+
+
+def _todo_title(hass: HomeAssistant, entity_id: str) -> str:
+    state = hass.states.get(entity_id)
+    return str((state.attributes.get("friendly_name") if state else None) or entity_id)
+
+
+class PushWardTodoSubentryFlow(config_entries.ConfigSubentryFlow):
+    """Add or reconfigure a tracked to-do list (one form)."""
+
+    def _tracked_elsewhere(self, entity_id: str, own_subentry_id: str | None = None) -> bool:
+        return any(
+            sub.subentry_type == SUBENTRY_TYPE_TODO
+            and sub.data.get(CONF_ENTITY_ID) == entity_id
+            and sub.subentry_id != own_subentry_id
+            for sub in self._get_entry().subentries.values()
+        )
+
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
+        if user_input is not None:
+            data = _todo_data(user_input)
+            entity_id = data[CONF_ENTITY_ID]
+            if self._tracked_elsewhere(entity_id):
+                return self.async_abort(reason="already_configured")
+            return self.async_create_entry(
+                title=_todo_title(self.hass, entity_id), data=data, unique_id=_todo_unique_id(entity_id)
+            )
+        return self.async_show_form(step_id="user", data_schema=_todo_schema())
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.SubentryFlowResult:
+        subentry = self._get_reconfigure_subentry()
+        if user_input is not None:
+            data = _todo_data(user_input)
+            entity_id = data[CONF_ENTITY_ID]
+            if self._tracked_elsewhere(entity_id, subentry.subentry_id):
+                return self.async_abort(reason="already_configured")
+            return self.async_update_and_abort(
+                self._get_entry(),
+                subentry,
+                data=data,
+                title=_todo_title(self.hass, entity_id),
+                unique_id=_todo_unique_id(entity_id),
+            )
+        return self.async_show_form(step_id="reconfigure", data_schema=_todo_schema(subentry.data))

@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "アクション",
-          "description": "アクションボタンのリスト。各アクションは id、title、任意の url、foreground、destructive、authentication_required、icon を持つオブジェクトです。http(s) URL の場合は method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers、body を指定してサイレント Webhook を送信することもできます。"
+          "description": "アクションボタンのリスト。各アクションは id、title、任意の url、foreground、destructive、authentication_required、icon を持つオブジェクトです。http(s) URL の場合は method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers、body を指定してサイレント Webhook を送信することもできます。url（と foreground）を省略すると、PushWard がタップを自身で記録し、get_notification_answer で読み取れます。サイレントアクションに text_input: true を設定すると、入力による返信を求めます（text_input_placeholder と text_input_button_title は任意）。url がない場合は PushWard が返信を記録し、http(s) URL がある場合は text フィールドを含む JSON として Webhook に送信されます。代わりに body に埋め込むには、{{input}} プレースホルダーを使い、オートメーション内で body を Jinja の raw ブロックで囲んでください。そうしないと、アクションの送信前に Home Assistant がプレースホルダーを展開してしまいます。"
         },
         "send_at": {
           "name": "送信日時",
-          "description": "通知を今すぐではなく後で送信します（最大 30 日先まで）。PushWard が通知を保持してこの日時に送信し、送信時に通知クォータにカウントされます。UTC オフセットのない日時は Home Assistant のタイムゾーンで解釈されます。cancel_scheduled_notification 用の ID を取得するには、レスポンスを要求してください。"
+          "description": "通知を今すぐではなく後で送信します（最大 365 日先まで）。PushWard が通知を保持してこの日時に送信し、送信時に通知クォータにカウントされます。UTC オフセットのない日時は Home Assistant のタイムゾーンで解釈されます。「繰り返し」と併用すると、この日時がシリーズの開始点になります。cancel_scheduled_notification 用の ID を取得するには、レスポンスを要求してください。"
+        },
+        "recurrence": {
+          "name": "繰り返し",
+          "description": "スケジュールに従って通知を繰り返します。値はオブジェクトで、cron（5 つのフィールド「分 時 日 月 曜日」、または @hourly/@daily/@weekly/@monthly/@yearly）、任意の timezone（既定は Home Assistant のタイムゾーン）、終了条件として任意の until（日時）または count（送信回数 1-1000）を指定します。送信間隔は 15 分以上空ける必要があります。シリーズの ID は 1 つのままで、cancel_scheduled_notification で停止できます。"
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "予約通知をキャンセル",
-      "description": "send_notification の send_at で予約した通知をキャンセルします。存在しなくなった ID は無視されます。",
+      "description": "send_notification の send_at または「繰り返し」で予約した通知をキャンセルします。繰り返し通知をキャンセルすると、送信中であってもシリーズ全体が停止します。存在しなくなった ID は無視されます。キャンセルした通知は、PushWard アプリに 24 時間キャンセル済みとして表示されます。",
       "fields": {
         "scheduled_notification_id": {
           "name": "予約通知ID",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "予約通知を一覧表示",
-      "description": "予約済みの通知を、送信予定が近い順に返します。",
+      "description": "予約済みの通知を、送信予定が近い順に返します。繰り返し通知には recurrence、これまでの送信回数（occurrence）、最後に送信した日時（last_sent_at）が含まれます。",
       "fields": {
         "status": {
           "name": "ステータス",
-          "description": "返す通知の種類。scheduled（デフォルト）はまだ待機中の通知を一覧表示します。sent と failed は 7 日間保持されます。"
+          "description": "返す通知の種類。scheduled（デフォルト）はまだ待機中の通知を一覧表示します。sent と failed は 7 日間保持されます。canceled は 24 時間保持されます。"
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "通知の回答を取得",
+      "description": "url のないアクション付きで送信した通知への回答を待ち、タップされたアクション（action_id）、入力された返信（text）、回答日時（answered_at）を返します。タイムアウトまでに誰も回答しなかった場合、answered は false になります。回答は 30 日間保持されるため、後からタイムアウト 0 で呼び出せば待たずに読み取れます。",
+      "fields": {
+        "notification_id": {
+          "name": "通知ID",
+          "description": "send_notification が返す notification_id、または送信済みの予約通知の notification_id。"
+        },
+        "timeout": {
+          "name": "タイムアウト",
+          "description": "回答を待つ時間（秒、最大 24 時間）。0 を指定すると待たずに現在の回答を読み取ります。"
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "このスラッグのウィジェットはすでに存在します。",
         "reconfigure_successful": "ウィジェットの設定を更新しました。"
       }
+    },
+    "tracked_todo": {
+      "entry_type": "追跡 ToDo リスト",
+      "initiate_flow": {
+        "user": "追跡 ToDo リストを追加"
+      },
+      "step": {
+        "user": {
+          "title": "ToDo リストを PushWard に追加",
+          "description": "PushWard は、Home Assistant がオフラインのときでも、各リマインダーをその時刻に送信します。項目を完了または削除するとリマインダーはキャンセルされ、編集するとリマインダーが置き換えられます。",
+          "data": {
+            "entity_id": "ToDo リスト",
+            "offset_minutes": "期限の何分前に通知",
+            "all_day_time": "日付のみの項目の時刻",
+            "notification_level": "通知レベル",
+            "done_button": "完了ボタン",
+            "max_scheduled": "同時に予約するリマインダーの上限"
+          },
+          "data_description": {
+            "entity_id": "このリストで期限が設定されている未完了の項目すべてに、PushWard のリマインダーが届きます。",
+            "offset_minutes": "期限の時刻の何分前にリマインダーを送信するかを指定します（0 の場合は期限の時刻に送信）。",
+            "all_day_time": "期限の日付はあるが時刻がない項目は、その日のこの時刻に通知されます。",
+            "notification_level": "リマインダーの割り込み方。パッシブは音を鳴らさずに届き、即時は集中モードを突破します。",
+            "done_button": "リマインダーに完了ボタンを追加します。タップすると Home Assistant で項目が完了になります。",
+            "max_scheduled": "期限が近い項目だけが予約され、残りはそれらが送信されるにつれて順に予約されます。アカウント全体で保留中の予約通知は最大 25 件までです。"
+          }
+        },
+        "reconfigure": {
+          "title": "ToDo リストを編集",
+          "data": {
+            "entity_id": "ToDo リスト",
+            "offset_minutes": "期限の何分前に通知",
+            "all_day_time": "日付のみの項目の時刻",
+            "notification_level": "通知レベル",
+            "done_button": "完了ボタン",
+            "max_scheduled": "同時に予約するリマインダーの上限"
+          },
+          "data_description": {
+            "entity_id": "このリストで期限が設定されている未完了の項目すべてに、PushWard のリマインダーが届きます。",
+            "offset_minutes": "期限の時刻の何分前にリマインダーを送信するかを指定します（0 の場合は期限の時刻に送信）。",
+            "all_day_time": "期限の日付はあるが時刻がない項目は、その日のこの時刻に通知されます。",
+            "notification_level": "リマインダーの割り込み方。パッシブは音を鳴らさずに届き、即時は集中モードを突破します。",
+            "done_button": "リマインダーに完了ボタンを追加します。タップすると Home Assistant で項目が完了になります。",
+            "max_scheduled": "期限が近い項目だけが予約され、残りはそれらが送信されるにつれて順に予約されます。アカウント全体で保留中の予約通知は最大 25 件までです。"
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "この ToDo リストはすでに追跡されています。",
+        "reconfigure_successful": "ToDo リストの設定を更新しました。"
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "残量の少ない順",
         "level_desc": "残量の多い順"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "パッシブ",
+        "active": "アクティブ",
+        "time-sensitive": "即時"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "完了"
       }
     }
   }

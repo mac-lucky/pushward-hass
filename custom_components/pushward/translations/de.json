@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Aktionen",
-          "description": "Liste von Aktionsschaltflächen. Jede Aktion ist ein Objekt mit id, title, optional url, foreground, destructive, authentication_required und icon. Bei einer http(s)-URL kann zusätzlich ein stiller Webhook mit method (GET/POST/PUT/PATCH/DELETE/HEAD), headers und body gesendet werden."
+          "description": "Liste von Aktionsschaltflächen. Jede Aktion ist ein Objekt mit id, title, optional url, foreground, destructive, authentication_required und icon. Bei einer http(s)-URL kann zusätzlich ein stiller Webhook mit method (GET/POST/PUT/PATCH/DELETE/HEAD), headers und body gesendet werden. Ohne url (und foreground) erfasst PushWard das Antippen selbst; abrufbar ist es mit get_notification_answer. Mit text_input: true bei einer stillen Aktion wird eine getippte Antwort abgefragt (optional text_input_placeholder und text_input_button_title): ohne url erfasst PushWard die Antwort, mit einer http(s)-URL wird sie als JSON mit einem Feld text an den Webhook gesendet. Um sie stattdessen in body einzubetten, den Platzhalter {{input}} verwenden und body in der Automatisierung in einen Jinja-raw-Block einschließen, damit Home Assistant ihn nicht schon vor dem Senden der Aktion auswertet."
         },
         "send_at": {
           "name": "Sendezeitpunkt",
-          "description": "Die Benachrichtigung später statt sofort senden, höchstens 30 Tage im Voraus. PushWard hält sie zurück und sendet sie zu diesem Zeitpunkt; beim Senden wird sie auf das Benachrichtigungskontingent angerechnet. Eine Zeit ohne UTC-Offset wird in der Zeitzone von Home Assistant interpretiert. Eine Antwort anfordern, um die ID für cancel_scheduled_notification zu erhalten."
+          "description": "Die Benachrichtigung später statt sofort senden, höchstens 365 Tage im Voraus. PushWard hält sie zurück und sendet sie zu diesem Zeitpunkt; beim Senden wird sie auf das Benachrichtigungskontingent angerechnet. Eine Zeit ohne UTC-Offset wird in der Zeitzone von Home Assistant interpretiert. Zusammen mit Wiederholen markiert dieser Zeitpunkt den Beginn der Serie. Eine Antwort anfordern, um die ID für cancel_scheduled_notification zu erhalten."
+        },
+        "recurrence": {
+          "name": "Wiederholen",
+          "description": "Die Benachrichtigung nach einem Zeitplan wiederholen, als Objekt: cron (5 Felder, Minute Stunde Monatstag Monat Wochentag, oder @hourly/@daily/@weekly/@monthly/@yearly), optional timezone (Standard ist die Zeitzone von Home Assistant) und optional until (Datum und Uhrzeit) oder count (1-1000 Sendungen) als Ende. Zwischen zwei Sendungen müssen mindestens 15 Minuten liegen. Die Serie behält eine einzige ID; cancel_scheduled_notification beendet sie."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Geplante Benachrichtigung abbrechen",
-      "description": "Eine mit send_at von send_notification eingeplante Benachrichtigung abbrechen. Eine ID, die nicht mehr existiert, wird ignoriert.",
+      "description": "Eine mit send_at oder Wiederholen von send_notification eingeplante Benachrichtigung abbrechen. Das Abbrechen einer wiederkehrenden Benachrichtigung beendet die gesamte Serie, auch während sie gerade gesendet wird. Eine ID, die nicht mehr existiert, wird ignoriert. Eine abgebrochene Benachrichtigung wird in der PushWard-App 24 Stunden lang als abgebrochen angezeigt.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID der geplanten Benachrichtigung",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Geplante Benachrichtigungen auflisten",
-      "description": "Die geplanten Benachrichtigungen zurückgeben, die nächstfällige zuerst.",
+      "description": "Die geplanten Benachrichtigungen zurückgeben, die nächstfällige zuerst. Wiederkehrende enthalten ihre recurrence, wie oft sie gesendet wurden (occurrence) und wann zuletzt (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",
-          "description": "Welche zurückgegeben werden. scheduled (Standard) listet die noch wartenden auf; sent und failed bleiben 7 Tage erhalten."
+          "description": "Welche zurückgegeben werden. scheduled (Standard) listet die noch wartenden auf; sent und failed bleiben 7 Tage erhalten. canceled bleiben 24 Stunden erhalten."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Antwort auf Benachrichtigung abrufen",
+      "description": "Auf die Antwort zu einer Benachrichtigung warten, die mit Aktionen ohne url gesendet wurde, und zurückgeben, welche Aktion angetippt wurde (action_id), eine getippte Antwort (text) und wann (answered_at). Antwortet niemand innerhalb des Zeitlimits, ist answered false. Antworten bleiben 30 Tage erhalten, sodass ein späterer Aufruf mit Zeitlimit 0 eine Antwort ohne Warten lesen kann.",
+      "fields": {
+        "notification_id": {
+          "name": "Benachrichtigungs-ID",
+          "description": "Die von send_notification zurückgegebene notification_id oder die notification_id einer gesendeten geplanten Benachrichtigung."
+        },
+        "timeout": {
+          "name": "Zeitlimit",
+          "description": "Wie lange auf die Antwort gewartet wird, in Sekunden (bis zu 24 Stunden). 0 liest die aktuelle Antwort, ohne zu warten."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Ein Widget mit diesem Slug existiert bereits.",
         "reconfigure_successful": "Widget-Konfiguration aktualisiert."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Verfolgte To-do-Liste",
+      "initiate_flow": {
+        "user": "Verfolgte To-do-Liste hinzufügen"
+      },
+      "step": {
+        "user": {
+          "title": "To-do-Liste zu PushWard hinzufügen",
+          "description": "PushWard sendet jede Erinnerung zu ihrem Zeitpunkt, auch wenn Home Assistant offline ist. Das Erledigen oder Löschen eines Eintrags bricht seine Erinnerung ab; das Bearbeiten ersetzt sie.",
+          "data": {
+            "entity_id": "To-do-Liste",
+            "offset_minutes": "Vor Fälligkeit erinnern",
+            "all_day_time": "Uhrzeit für Einträge nur mit Datum",
+            "notification_level": "Benachrichtigungsstufe",
+            "done_button": "Erledigt-Schaltfläche",
+            "max_scheduled": "Höchstens gleichzeitig geplante Erinnerungen"
+          },
+          "data_description": {
+            "entity_id": "Jeder offene Eintrag dieser Liste mit Fälligkeitsdatum erhält eine PushWard-Erinnerung.",
+            "offset_minutes": "Die Erinnerung so viele Minuten vor der Fälligkeit senden (0 sendet sie zur Fälligkeit).",
+            "all_day_time": "Ein Eintrag mit Fälligkeitsdatum, aber ohne Uhrzeit wird an diesem Tag zu dieser Uhrzeit erinnert.",
+            "notification_level": "Wie die Erinnerung unterbricht: Passiv kommt lautlos an, Dringlich durchbricht den Fokus.",
+            "done_button": "Der Erinnerung eine Erledigt-Schaltfläche hinzufügen. Antippen erledigt den Eintrag in Home Assistant.",
+            "max_scheduled": "Nur die nächstfälligen Einträge werden geplant; der Rest folgt, sobald diese gesendet sind. Das Konto hält über alles hinweg höchstens 25 ausstehende geplante Benachrichtigungen."
+          }
+        },
+        "reconfigure": {
+          "title": "To-do-Liste bearbeiten",
+          "data": {
+            "entity_id": "To-do-Liste",
+            "offset_minutes": "Vor Fälligkeit erinnern",
+            "all_day_time": "Uhrzeit für Einträge nur mit Datum",
+            "notification_level": "Benachrichtigungsstufe",
+            "done_button": "Erledigt-Schaltfläche",
+            "max_scheduled": "Höchstens gleichzeitig geplante Erinnerungen"
+          },
+          "data_description": {
+            "entity_id": "Jeder offene Eintrag dieser Liste mit Fälligkeitsdatum erhält eine PushWard-Erinnerung.",
+            "offset_minutes": "Die Erinnerung so viele Minuten vor der Fälligkeit senden (0 sendet sie zur Fälligkeit).",
+            "all_day_time": "Ein Eintrag mit Fälligkeitsdatum, aber ohne Uhrzeit wird an diesem Tag zu dieser Uhrzeit erinnert.",
+            "notification_level": "Wie die Erinnerung unterbricht: Passiv kommt lautlos an, Dringlich durchbricht den Fokus.",
+            "done_button": "Der Erinnerung eine Erledigt-Schaltfläche hinzufügen. Antippen erledigt den Eintrag in Home Assistant.",
+            "max_scheduled": "Nur die nächstfälligen Einträge werden geplant; der Rest folgt, sobald diese gesendet sind. Das Konto hält über alles hinweg höchstens 25 ausstehende geplante Benachrichtigungen."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Diese To-do-Liste wird bereits verfolgt.",
+        "reconfigure_successful": "Einstellungen der To-do-Liste aktualisiert."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Niedrigster Ladestand zuerst",
         "level_desc": "Höchster Ladestand zuerst"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Passiv",
+        "active": "Aktiv",
+        "time-sensitive": "Dringlich"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Erledigt"
       }
     }
   }

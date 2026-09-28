@@ -11,11 +11,21 @@ from datetime import datetime
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlencode
 
 import aiohttp
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    ANSWER_FAILURE_BUDGET,
+    ANSWER_LONG_POLL_SECONDS,
+    ANSWER_MAX_CONCURRENT_WAITS,
+    ANSWER_MIN_POLL_INTERVAL,
+    ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS,
+    ANSWER_PLAIN_POLL_INTERVAL,
+    ANSWER_REQUEST_MARGIN_SECONDS,
+    ANSWER_STATUS_ANSWERED,
+    ANSWER_STATUS_PENDING,
     MAX_CONCURRENT_REQUESTS,
     MAX_RETRIES,
     QUOTA_KIND_EMAILS,
@@ -24,6 +34,8 @@ from .const import (
     QUOTA_KIND_WIDGET_UPDATES,
     RETRY_BASE_DELAY,
     RETRY_MAX_DELAY,
+    SCHEDULED_LIST_MAX_PAGES,
+    SCHEDULED_LIST_PAGE_SIZE,
 )
 
 if TYPE_CHECKING:
@@ -48,6 +60,33 @@ def parse_http_date(header: str | None) -> datetime | None:
         return None
     # A `-0000` zone parses to a naive datetime; treat it as UTC like the rest.
     return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=dt_util.UTC)
+
+
+def _aware_isoformat(value: datetime, field: str) -> str:
+    """RFC 3339 for a timezone-aware datetime; a naive one would be read as UTC server-side."""
+    if value.tzinfo is None:
+        raise ValueError(f"{field} must be timezone-aware")
+    return value.isoformat()
+
+
+def _recurrence_payload(recurrence: dict) -> dict:
+    """The wire form of a recurrence rule: None fields dropped, until as RFC 3339."""
+    payload = {key: val for key, val in recurrence.items() if val is not None}
+    if isinstance(payload.get("until"), datetime):
+        payload["until"] = _aware_isoformat(payload["until"], "recurrence.until")
+    return payload
+
+
+def _answer_result(notification_id: int, answer: dict, *, answered: bool) -> dict:
+    """get_notification_answer's response: every key present, so templates never hit a missing one."""
+    return {
+        "answered": answered,
+        "notification_id": answer.get("notification_id", notification_id),
+        "status": answer.get("status"),
+        "action_id": answer.get("action_id"),
+        "text": answer.get("text"),
+        "answered_at": answer.get("answered_at"),
+    }
 
 
 class PushWardApiError(Exception):
@@ -95,6 +134,17 @@ class PushWardEmailPermissionError(PushWardForbiddenError):
     """
 
 
+class PushWardRateLimitedError(PushWardApiError):
+    """429 on a request that is not retried in place (answer reads): the caller backs off.
+
+    ``retry_after`` is the server's Retry-After in seconds, clamped, 0 when absent.
+    """
+
+    def __init__(self, message: str, *, retry_after: float = 0) -> None:
+        super().__init__(message, status_code=HTTPStatus.TOO_MANY_REQUESTS)
+        self.retry_after = retry_after
+
+
 class PushWardQuotaExceededError(PushWardApiError):
     """429 with code `quota.exceeded`: nothing to retry until `reset_at` (see quota.QuotaGate)."""
 
@@ -135,6 +185,11 @@ class PushWardApiClient:
         self._base_url = base_url.rstrip("/")
         self._integration_key = integration_key
         self._request_semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+        # Answer long-polls hold their connection for up to ANSWER_LONG_POLL_SECONDS,
+        # so they stay out of the shared request semaphore (they would stall pushes)
+        # and get their own, small enough to leave the account's other clients room
+        # under the server's per-user wait cap.
+        self._answer_wait_semaphore = asyncio.Semaphore(ANSWER_MAX_CONCURRENT_WAITS)
         self._headers = {"Authorization": f"Bearer {self._integration_key}"}
         # Optional: remembers exhausted quotas so metered requests are refused
         # locally instead of being sent (and rejected) until the period resets.
@@ -296,13 +351,16 @@ class PushWardApiClient:
         actions: list[dict] | None = None,
         push: bool = True,
         send_at: datetime | None = None,
+        recurrence: dict | None = None,
     ) -> dict | None:
         """Create a notification via POST /notifications and return it.
 
-        With a timezone-aware ``send_at`` it is queued instead, via
-        POST /notifications/scheduled, and the schedule is returned. Both count
-        against the notification quota (a schedule when it is sent), so both go
-        through the quota gate.
+        With a timezone-aware ``send_at`` and/or a ``recurrence`` rule
+        (``{cron, timezone, until, count}``) it is queued instead, via
+        POST /notifications/scheduled, and the schedule is returned. With
+        recurrence, send_at is optional and marks where the series starts. Both
+        count against the notification quota (a schedule each time it sends), so
+        both go through the quota gate.
         """
         payload: dict = {"title": title, "body": body, "push": push}
         for key, val in [
@@ -324,24 +382,159 @@ class PushWardApiClient:
                 payload[key] = val
         path = "/notifications"
         if send_at is not None:
-            if send_at.tzinfo is None:
-                raise ValueError("send_at must be timezone-aware")
-            payload["send_at"] = send_at.isoformat()
+            payload["send_at"] = _aware_isoformat(send_at, "send_at")
+            path = "/notifications/scheduled"
+        if recurrence is not None:
+            payload["recurrence"] = _recurrence_payload(recurrence)
             path = "/notifications/scheduled"
         return await self._request_with_retry(
             "POST", path, json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
         )
 
     async def list_scheduled_notifications(self, status: str = "scheduled") -> list[dict]:
-        """GET /notifications/scheduled, soonest first (at most 100)."""
-        data = await self._request_with_retry(
-            "GET", f"/notifications/scheduled?status={status}&limit=100", return_json=True
-        )
-        return list((data or {}).get("items") or [])
+        """GET /notifications/scheduled, soonest first, following next_cursor.
 
-    async def cancel_scheduled_notification(self, scheduled_id: int) -> None:
-        """DELETE /notifications/scheduled/{id}. Idempotent: 404 swallowed."""
-        await self._request_with_retry("DELETE", f"/notifications/scheduled/{int(scheduled_id)}", allow_404=True)
+        Stops after SCHEDULED_LIST_MAX_PAGES pages. Pending schedules are capped
+        at 25 server-side, so only sent/failed history can get that long.
+        """
+        items: list[dict] = []
+        cursor = ""
+        for _ in range(SCHEDULED_LIST_MAX_PAGES):
+            query: dict[str, str | int] = {"status": status, "limit": SCHEDULED_LIST_PAGE_SIZE}
+            if cursor:
+                query["cursor"] = cursor
+            data = await self._request_with_retry(
+                "GET", f"/notifications/scheduled?{urlencode(query)}", return_json=True
+            )
+            data = data or {}
+            items.extend(data.get("items") or [])
+            cursor = str(data.get("next_cursor") or "")
+            if not cursor:
+                break
+        return items
+
+    async def get_notification_answer(self, notification_id: int, *, wait: int = 0) -> dict:
+        """GET /notifications/answers/{id} once, holding up to ``wait`` seconds (max 25).
+
+        One attempt, no retry: wait_for_notification_answer owns the backoff.
+        Not metered (no quota gate), and outside the shared request semaphore.
+        Raises PushWardNotFoundError when there is nothing to read (no url-less
+        action, sent with another key, or past the 30-day retention),
+        PushWardRateLimitedError on 429 and PushWardApiError otherwise.
+        """
+        path = f"/notifications/answers/{int(notification_id)}"
+        if wait > 0:
+            path += f"?wait={int(wait)}"
+        timeout = aiohttp.ClientTimeout(total=max(0, wait) + ANSWER_REQUEST_MARGIN_SECONDS)
+        try:
+            async with self._session.request(
+                "GET", f"{self._base_url}{path}", headers=self._headers, timeout=timeout
+            ) as resp:
+                if resp.ok:
+                    try:
+                        data = await resp.json(content_type=None)
+                    except ValueError as err:
+                        raise PushWardApiError(f"GET {path} returned invalid JSON") from err
+                    if not isinstance(data, dict):
+                        raise PushWardApiError(f"GET {path} returned invalid JSON")
+                    return data
+                if resp.status == HTTPStatus.UNAUTHORIZED:
+                    raise PushWardAuthError("Invalid integration key", status_code=resp.status)
+                _, detail, raw, _ = await self._parse_problem(resp)
+                message = f"GET {path} failed ({resp.status}): {self._truncate(detail or raw)}"
+                if resp.status == HTTPStatus.FORBIDDEN:
+                    raise PushWardForbiddenError(self._truncate(detail or raw) or "Forbidden", status_code=resp.status)
+                if resp.status == HTTPStatus.NOT_FOUND:
+                    raise PushWardNotFoundError(message, status_code=resp.status)
+                if resp.status == HTTPStatus.TOO_MANY_REQUESTS:
+                    raise PushWardRateLimitedError(
+                        message, retry_after=self._parse_retry_after(resp.headers.get("Retry-After", ""))
+                    )
+                raise PushWardApiError(message, status_code=resp.status)
+        except (aiohttp.ClientError, TimeoutError) as err:
+            raise PushWardApiError(f"GET {path} connection error: {self._truncate(str(err))}") from err
+
+    async def poll_notification_answer(self, notification_id: int, *, hold: int) -> tuple[dict, bool]:
+        """One read of an answer, and whether it held a server wait.
+
+        A long-poll of up to ``hold`` seconds when one of this install's wait
+        slots is free, a plain read otherwise. Errors as get_notification_answer.
+        """
+        if hold > 0 and not self._answer_wait_semaphore.locked():
+            async with self._answer_wait_semaphore:
+                return await self.get_notification_answer(notification_id, wait=hold), True
+        return await self.get_notification_answer(notification_id), False
+
+    async def wait_for_notification_answer(self, notification_id: int, timeout: float) -> dict:
+        """Wait up to ``timeout`` seconds for the answer to a notification.
+
+        Repeats server long-polls (ANSWER_LONG_POLL_SECONDS each) until the
+        answer lands or the time runs out; ``timeout`` 0 reads once. A timeout
+        comes back as ``answered: False`` with a ``reason``, not as an error.
+        401/403/404 fail at once. A 429 (the server's per-user wait cap, shared
+        with the account's other clients, or the request limiter) switches to
+        plain reads for ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS, the first one
+        right away, since a held wait is refused before the answer is looked
+        at; so do busy local wait slots. ANSWER_FAILURE_BUDGET consecutive 5xx
+        or connection errors give up.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + max(0.0, timeout)
+        plain_until = 0.0
+        failures = 0
+        while True:
+            hold = int(min(ANSWER_LONG_POLL_SECONDS, deadline - loop.time()))
+            if loop.time() < plain_until:
+                hold = 0
+            started = loop.time()
+            try:
+                answer, held = await self.poll_notification_answer(notification_id, hold=hold)
+            except PushWardRateLimitedError as err:
+                plain_until = loop.time() + ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS
+                delay = max(err.retry_after, ANSWER_MIN_POLL_INTERVAL)
+            except (PushWardAuthError, PushWardForbiddenError, PushWardNotFoundError):
+                raise
+            except PushWardApiError as err:
+                if err.status_code is not None and err.status_code < HTTPStatus.INTERNAL_SERVER_ERROR:
+                    raise
+                failures += 1
+                if failures >= ANSWER_FAILURE_BUDGET:
+                    raise
+                delay = ANSWER_PLAIN_POLL_INTERVAL * failures
+            else:
+                failures = 0
+                if answer.get("status") == ANSWER_STATUS_ANSWERED:
+                    return _answer_result(notification_id, answer, answered=True)
+                # A long-poll that ran its hold goes straight into the next one;
+                # one that came back early (a server without ?wait=) is spaced out.
+                if held:
+                    delay = max(0.0, ANSWER_MIN_POLL_INTERVAL - (loop.time() - started))
+                else:
+                    delay = ANSWER_PLAIN_POLL_INTERVAL
+            remaining = deadline - loop.time()
+            if remaining < 1:
+                result = _answer_result(notification_id, {"status": ANSWER_STATUS_PENDING}, answered=False)
+                result["reason"] = f"no answer within {timeout:g}s"
+                return result
+            await asyncio.sleep(min(delay, remaining))
+
+    async def cancel_scheduled_notification(self, scheduled_id: int, *, purge: bool = False) -> None:
+        """DELETE /notifications/scheduled/{id}. Idempotent: 404 swallowed.
+
+        A plain cancel leaves the schedule readable as ``canceled`` for 24 hours
+        (the app shows it). ``purge`` removes it outright, for a schedule that is
+        only being replaced; a server without purge treats it as a plain cancel.
+        """
+        path = f"/notifications/scheduled/{int(scheduled_id)}"
+        if purge:
+            path += "?purge=true"
+        await self._request_with_retry("DELETE", path, allow_404=True)
+
+    async def get_scheduled_notification(self, scheduled_id: int) -> dict | None:
+        """GET /notifications/scheduled/{id}; None when it no longer exists."""
+        return await self._request_with_retry(
+            "GET", f"/notifications/scheduled/{int(scheduled_id)}", allow_404=True, return_json=True
+        )
 
     async def send_email(
         self,

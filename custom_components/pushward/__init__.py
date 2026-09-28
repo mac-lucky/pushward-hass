@@ -27,6 +27,7 @@ from .api import (
     PushWardApiClient,
     PushWardApiError,
     PushWardForbiddenError,
+    PushWardNotFoundError,
     PushWardQuotaExceededError,
 )
 from .const import (
@@ -34,6 +35,8 @@ from .const import (
     ACTIVITY_STATES,
     ACTIVITY_TTL_MAX,
     ACTIVITY_TTL_MIN,
+    ANSWER_DEFAULT_TIMEOUT,
+    ANSWER_MAX_TIMEOUT,
     APPROVAL_DETAIL_LABEL_MAX,
     APPROVAL_DETAIL_VALUE_MAX,
     APPROVAL_DETAILS_MAX,
@@ -76,6 +79,8 @@ from .const import (
     PLAYBACK_STATES,
     PRIORITY_MAX,
     PRIORITY_MIN,
+    RECURRENCE_CRON_MAX_LEN,
+    RECURRENCE_MAX_COUNT,
     SCALES,
     SCHEDULED_NOTIFICATION_STATUSES,
     SERVICE_TEMPLATES,
@@ -105,6 +110,7 @@ from .image_hash import (
 )
 from .media_control import async_register_media_control_view
 from .quota import QuotaGate
+from .todo_reminders import TodoReminderManager, async_cancel_stored_schedules, todo_configs
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -127,6 +133,7 @@ SERVICE_WIDGET_REFRESH = "widget_refresh"
 SERVICE_DELETE_WIDGET = "delete_widget"
 SERVICE_CANCEL_SCHEDULED_NOTIFICATION = "cancel_scheduled_notification"
 SERVICE_LIST_SCHEDULED_NOTIFICATIONS = "list_scheduled_notifications"
+SERVICE_GET_NOTIFICATION_ANSWER = "get_notification_answer"
 
 # Keys that turn an action into a silent HTTP webhook — gated by _validate_http_action_fields.
 _HTTP_ACTION_KEYS = ("method", "headers", "body")
@@ -165,17 +172,18 @@ def _validate_text_input_fields(data: dict) -> dict:
 
     Mirrors pushward-server ValidateTextInput: the placeholder / button label
     require text_input, and text_input itself needs a silent (non-foreground)
-    http(s) action, the only shape the iOS client renders a reply field for.
-    Surfacing it here gives a clear HA error instead of a server 400.
+    action with an http(s) url, or with no url at all, in which case the server
+    records the reply (read it back with get_notification_answer). Surfacing it
+    here gives a clear HA error instead of a server 400.
     """
     if not data.get("text_input"):
         if data.get("text_input_placeholder") or data.get("text_input_button_title"):
             raise vol.Invalid("text_input_placeholder and text_input_button_title require text_input")
         return data
-    if not _action_url_is_http(data):
-        raise vol.Invalid("text_input requires an http or https url")
     if data.get("foreground"):
         raise vol.Invalid("text_input is only valid on silent (non-foreground) actions")
+    if data.get("url") and not _action_url_is_http(data):
+        raise vol.Invalid("text_input requires an http or https url, or no url")
     return data
 
 
@@ -669,6 +677,29 @@ SCHEMA_ACTION = vol.All(
     _validate_text_input_fields,
 )
 
+
+def _validate_recurrence_end(data: dict) -> dict:
+    """until and count both end a series; the server takes one or the other."""
+    if data.get("until") is not None and data.get("count") is not None:
+        raise vol.Invalid("recurrence takes until or count, not both")
+    return data
+
+
+# The cron expression itself is checked by the server (syntax, 15-minute minimum
+# spacing); its 400 detail reaches the user through _surface_api_errors.
+SCHEMA_RECURRENCE = vol.All(
+    vol.Schema(
+        {
+            vol.Required("cron"): vol.All(cv.string, vol.Length(min=1, max=RECURRENCE_CRON_MAX_LEN)),
+            # Defaults to Home Assistant's time zone in the service handler.
+            vol.Optional("timezone"): cv.time_zone,
+            vol.Optional("until"): vol.All(cv.datetime, dt_util.as_utc),
+            vol.Optional("count"): vol.All(vol.Coerce(int), vol.Range(min=1, max=RECURRENCE_MAX_COUNT)),
+        }
+    ),
+    _validate_recurrence_end,
+)
+
 SCHEMA_SEND_NOTIFICATION = vol.Schema(
     {
         vol.Required("title"): str,
@@ -689,11 +720,21 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
         vol.Optional("push", default=True): bool,
         # Naive values (the UI datetime picker) are in Home Assistant's time zone.
         vol.Optional("send_at"): vol.All(cv.datetime, dt_util.as_utc),
+        vol.Optional("recurrence"): SCHEMA_RECURRENCE,
     }
 )
 
 SCHEMA_CANCEL_SCHEDULED_NOTIFICATION = vol.Schema(
     {vol.Required("scheduled_notification_id"): vol.All(vol.Coerce(int), vol.Range(min=1))}
+)
+
+SCHEMA_GET_NOTIFICATION_ANSWER = vol.Schema(
+    {
+        vol.Required("notification_id"): vol.All(vol.Coerce(int), vol.Range(min=1)),
+        vol.Optional("timeout", default=ANSWER_DEFAULT_TIMEOUT): vol.All(
+            vol.Coerce(int), vol.Range(min=0, max=ANSWER_MAX_TIMEOUT)
+        ),
+    }
 )
 
 SCHEMA_LIST_SCHEDULED_NOTIFICATIONS = vol.Schema(
@@ -909,26 +950,51 @@ _NOTIFICATION_FIELDS = [
 async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
     """Handle the send_notification service call.
 
-    With send_at the notification is queued server-side instead of sent now.
-    The optional response carries the id to cancel it with.
+    With send_at and/or recurrence the notification is queued server-side
+    instead of sent now, and the optional response carries the id to cancel it
+    with. Sent now, the response says whether the server records an answer
+    (answerable: at least one action had no url), read with get_notification_answer.
     """
     api = _get_api(hass)
     kwargs: dict = {field: call.data[field] for field in _NOTIFICATION_FIELDS if field in call.data}
     send_at = call.data.get("send_at")
+    recurrence = call.data.get("recurrence")
+    if recurrence is not None:
+        # cron times are wall-clock times in this zone, kept across DST changes.
+        recurrence = {"timezone": hass.config.time_zone, **recurrence}
     with _surface_api_errors():
         created = await api.create_notification(
             title=call.data["title"],
             body=call.data["body"],
             push=call.data["push"],
             send_at=send_at,
+            recurrence=recurrence,
             **kwargs,
         )
     if not call.return_response:
         return None
     created = created or {}
-    if send_at is None:
-        return {"notification_id": created.get("id")}
-    return {"scheduled_notification_id": created.get("id"), "send_at": created.get("send_at")}
+    if send_at is None and recurrence is None:
+        return {"notification_id": created.get("id"), "answerable": bool(created.get("answerable"))}
+    return {
+        "scheduled_notification_id": created.get("id"),
+        "send_at": created.get("send_at"),
+        "recurrence": created.get("recurrence"),
+    }
+
+
+async def _async_handle_get_notification_answer(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
+    """Wait up to timeout seconds for the answer to a notification sent with url-less actions."""
+    api = _get_api(hass)
+    notification_id = call.data["notification_id"]
+    with _surface_api_errors():
+        try:
+            return await api.wait_for_notification_answer(notification_id, call.data["timeout"])
+        except PushWardNotFoundError as err:
+            raise ServiceValidationError(
+                f"Notification {notification_id} has no answer to read: none of its actions was sent without"
+                " a url, it was sent with another integration key, or it is older than 30 days"
+            ) from err
 
 
 async def _async_handle_cancel_scheduled_notification(hass: HomeAssistant, call: ServiceCall) -> None:
@@ -1073,6 +1139,13 @@ def _register_services(hass: HomeAssistant) -> None:
         SCHEMA_LIST_SCHEDULED_NOTIFICATIONS,
         supports_response=SupportsResponse.ONLY,
     )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_GET_NOTIFICATION_ANSWER,
+        partial(_async_handle_get_notification_answer, hass),
+        SCHEMA_GET_NOTIFICATION_ANSWER,
+        supports_response=SupportsResponse.ONLY,
+    )
     hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)
     hass.services.async_register(
         DOMAIN, SERVICE_WIDGET_REFRESH, partial(_async_handle_widget_refresh, hass), SCHEMA_WIDGET_REFRESH
@@ -1130,12 +1203,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
     manager = ActivityManager(hass, api, entities, entry)
     widget_manager = WidgetManager(hass, api, widgets, entry)
-    await asyncio.gather(manager.async_start(), widget_manager.async_start())
+    todo_manager = TodoReminderManager(hass, api, todo_configs(entry), entry, entry.data[CONF_INTEGRATION_KEY])
+    await asyncio.gather(manager.async_start(), widget_manager.async_start(), todo_manager.async_start())
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "api": api,
         "manager": manager,
         "widget_manager": widget_manager,
+        "todo_manager": todo_manager,
         "coordinator": coordinator,
         "quota_gate": quota_gate,
     }
@@ -1148,16 +1223,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Handle config entry or subentry updates — reload entity + widget tracking."""
+    """Handle config entry or subentry updates: reload entity, widget and to-do tracking."""
     data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
     if data is None:
         return
     entities = _entity_configs(entry)
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
     widget_manager: WidgetManager | None = data.get("widget_manager")
+    todo_manager: TodoReminderManager | None = data.get("todo_manager")
     reloads = [data["manager"].async_reload(entities)]
     if widget_manager is not None:
         reloads.append(widget_manager.async_reload(widgets))
+    if todo_manager is not None:
+        reloads.append(todo_manager.async_reload(todo_configs(entry)))
     await asyncio.gather(*reloads)
 
 
@@ -1181,9 +1259,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     data = hass.data[DOMAIN].pop(entry.entry_id, None)
     if data:
         widget_manager: WidgetManager | None = data.get("widget_manager")
+        todo_manager: TodoReminderManager | None = data.get("todo_manager")
         stops = [data["manager"].async_stop()]
         if widget_manager is not None:
             stops.append(widget_manager.async_stop())
+        if todo_manager is not None:
+            stops.append(todo_manager.async_stop())
         await asyncio.gather(*stops)
 
     # Non-persistent usage-limit repair issues clear on restart but not on a plain
@@ -1199,25 +1280,27 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Delete server-side widgets, then persisted history and widget cache, on removal.
+    """Delete server-side widgets and pending to-do reminders, then the persisted stores.
 
-    Removing the whole integration must also delete every tracked widget server-side —
-    otherwise the widget rows + device widget-push tokens leak forever. Per-subentry removal
-    is handled by WidgetManager.async_reload, but no manager is live here (async_unload_entry
-    already ran and popped hass.data), so build a throwaway client from entry.data.
+    Removing the whole integration must also delete every tracked widget server-side
+    (otherwise the widget rows + device widget-push tokens leak forever) and cancel the
+    reminders its to-do lists still have pending. Per-subentry removal is handled by the
+    managers' async_reload, but no manager is live here (async_unload_entry already ran
+    and popped hass.data), so build a throwaway client from entry.data.
     """
     widget_slugs = [
         slug
         for sub in entry.subentries.values()
         if sub.subentry_type == SUBENTRY_TYPE_WIDGET and (slug := sub.data.get(CONF_SLUG))
     ]
+    api = PushWardApiClient(
+        async_get_clientsession(hass),
+        entry.data[CONF_SERVER_URL],
+        entry.data[CONF_INTEGRATION_KEY],
+    )
     if widget_slugs:
-        api = PushWardApiClient(
-            async_get_clientsession(hass),
-            entry.data[CONF_SERVER_URL],
-            entry.data[CONF_INTEGRATION_KEY],
-        )
         # delete_widget is 404-safe; isolate failures so one bad slug can't strand the rest.
         await asyncio.gather(*(api.delete_widget(slug) for slug in widget_slugs), return_exceptions=True)
+    await async_cancel_stored_schedules(hass, api, entry.entry_id)
     await build_history_store(hass, entry.entry_id).async_remove()
     await build_widget_store(hass, entry.entry_id).async_remove()

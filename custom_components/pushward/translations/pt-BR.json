@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Ações",
-          "description": "Lista de botões de ação. Cada ação é um objeto com id, title e, opcionalmente, url, foreground, destructive, authentication_required e icon. Para uma url http(s), você também pode enviar um webhook silencioso com method (GET/POST/PUT/PATCH/DELETE/HEAD), headers e body."
+          "description": "Lista de botões de ação. Cada ação é um objeto com id, title e, opcionalmente, url, foreground, destructive, authentication_required e icon. Para uma url http(s), você também pode enviar um webhook silencioso com method (GET/POST/PUT/PATCH/DELETE/HEAD), headers e body. Sem url (e foreground), o PushWard registra o toque por conta própria; leia-o com get_notification_answer. Defina text_input: true em uma ação silenciosa para pedir uma resposta digitada (text_input_placeholder e text_input_button_title opcionais): sem url, o PushWard registra a resposta; com uma url http(s), ela é enviada ao seu webhook como JSON com um campo text. Para inseri-la em body, use o marcador {{input}} e envolva body em um bloco raw do Jinja na sua automação, para que o Home Assistant não o processe antes de a ação ser enviada."
         },
         "send_at": {
           "name": "Horário de envio",
-          "description": "Envia a notificação mais tarde em vez de agora, com no máximo 30 dias de antecedência. O PushWard a guarda e a envia neste horário, e ela conta para sua cota de notificações quando é enviada. Um horário sem deslocamento UTC é interpretado no fuso horário do Home Assistant. Solicite uma resposta para obter o id para cancel_scheduled_notification."
+          "description": "Envia a notificação mais tarde em vez de agora, com no máximo 365 dias de antecedência. O PushWard a guarda e a envia neste horário, e ela conta para sua cota de notificações quando é enviada. Um horário sem deslocamento UTC é interpretado no fuso horário do Home Assistant. Com Repetir, ele marca o início da série. Solicite uma resposta para obter o id para cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Repetir",
+          "description": "Repete a notificação conforme uma programação, como objeto: cron (5 campos, minuto hora dia-do-mês mês dia-da-semana, ou @hourly/@daily/@weekly/@monthly/@yearly), timezone opcional (por padrão, o do Home Assistant) e until opcional (uma data e hora) ou count (1-1000 envios) para encerrá-la. Os envios devem ter pelo menos 15 minutos de intervalo. A série mantém um único id; cancel_scheduled_notification a interrompe."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Cancelar Notificação Agendada",
-      "description": "Cancela uma notificação enfileirada com o send_at de send_notification. Um id que não existe mais é ignorado.",
+      "description": "Cancela uma notificação enfileirada com o send_at ou Repetir de send_notification. Cancelar uma notificação recorrente interrompe a série inteira, mesmo enquanto ela está sendo enviada. Um id que não existe mais é ignorado. Uma notificação cancelada aparece como cancelada no app PushWard por 24 horas.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID da notificação agendada",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Listar Notificações Agendadas",
-      "description": "Retorna suas notificações agendadas, as mais próximas primeiro.",
+      "description": "Retorna suas notificações agendadas, as mais próximas primeiro. As recorrentes trazem sua recurrence, quantas vezes já foram enviadas (occurrence) e quando foram enviadas pela última vez (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",
-          "description": "Quais retornar. scheduled (o padrão) lista as que ainda estão aguardando; sent e failed ficam guardadas por 7 dias."
+          "description": "Quais retornar. scheduled (o padrão) lista as que ainda estão aguardando; sent e failed ficam guardadas por 7 dias. canceled ficam guardadas por 24 horas."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Obter Resposta da Notificação",
+      "description": "Aguarda a resposta a uma notificação enviada com ações sem url e retorna qual ação foi tocada (action_id), a resposta digitada, se houver (text), e quando (answered_at). Se ninguém responder dentro do tempo limite, answered é false. As respostas são guardadas por 30 dias, então uma chamada posterior com tempo limite 0 pode ler uma sem esperar.",
+      "fields": {
+        "notification_id": {
+          "name": "ID da notificação",
+          "description": "O notification_id retornado por send_notification, ou o notification_id de uma notificação agendada já enviada."
+        },
+        "timeout": {
+          "name": "Tempo limite",
+          "description": "Quanto tempo aguardar a resposta, em segundos (até 24 horas). 0 lê a resposta atual sem esperar."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Já existe um widget com este slug.",
         "reconfigure_successful": "Configuração do widget atualizada."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Lista de Tarefas Monitorada",
+      "initiate_flow": {
+        "user": "Adicionar lista de tarefas monitorada"
+      },
+      "step": {
+        "user": {
+          "title": "Adicionar Lista de Tarefas ao PushWard",
+          "description": "O PushWard envia cada lembrete no horário certo, mesmo quando o Home Assistant está offline. Concluir ou excluir um item cancela o lembrete dele; editá-lo substitui o lembrete.",
+          "data": {
+            "entity_id": "Lista de tarefas",
+            "offset_minutes": "Lembrar antes do prazo",
+            "all_day_time": "Horário para itens só com data",
+            "notification_level": "Nível de notificação",
+            "done_button": "Botão Concluído",
+            "max_scheduled": "Máximo de lembretes agendados ao mesmo tempo"
+          },
+          "data_description": {
+            "entity_id": "Cada item aberto desta lista que tenha data de vencimento recebe um lembrete do PushWard.",
+            "offset_minutes": "Envia o lembrete esta quantidade de minutos antes do horário de vencimento (0 envia no horário de vencimento).",
+            "all_day_time": "Um item com data de vencimento, mas sem horário, é lembrado neste horário naquele dia.",
+            "notification_level": "Como o lembrete interrompe: Passivo chega em silêncio, Urgente atravessa o Foco.",
+            "done_button": "Adiciona um botão Concluído ao lembrete. Tocar nele conclui o item no Home Assistant.",
+            "max_scheduled": "Apenas os itens mais próximos são agendados; os demais entram à medida que esses são enviados. Sua conta comporta no máximo 25 notificações agendadas pendentes no total."
+          }
+        },
+        "reconfigure": {
+          "title": "Editar Lista de Tarefas",
+          "data": {
+            "entity_id": "Lista de tarefas",
+            "offset_minutes": "Lembrar antes do prazo",
+            "all_day_time": "Horário para itens só com data",
+            "notification_level": "Nível de notificação",
+            "done_button": "Botão Concluído",
+            "max_scheduled": "Máximo de lembretes agendados ao mesmo tempo"
+          },
+          "data_description": {
+            "entity_id": "Cada item aberto desta lista que tenha data de vencimento recebe um lembrete do PushWard.",
+            "offset_minutes": "Envia o lembrete esta quantidade de minutos antes do horário de vencimento (0 envia no horário de vencimento).",
+            "all_day_time": "Um item com data de vencimento, mas sem horário, é lembrado neste horário naquele dia.",
+            "notification_level": "Como o lembrete interrompe: Passivo chega em silêncio, Urgente atravessa o Foco.",
+            "done_button": "Adiciona um botão Concluído ao lembrete. Tocar nele conclui o item no Home Assistant.",
+            "max_scheduled": "Apenas os itens mais próximos são agendados; os demais entram à medida que esses são enviados. Sua conta comporta no máximo 25 notificações agendadas pendentes no total."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Esta lista de tarefas já está sendo monitorada.",
+        "reconfigure_successful": "Configurações da lista de tarefas atualizadas."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Menor bateria primeiro",
         "level_desc": "Maior bateria primeiro"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Passivo",
+        "active": "Ativo",
+        "time-sensitive": "Urgente"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Concluído"
       }
     }
   }

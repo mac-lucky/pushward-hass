@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Azioni",
-          "description": "Elenco di pulsanti di azione. Ogni azione è un oggetto con id, title, e facoltativamente url, foreground, destructive, authentication_required e icon. Per un url http(s) puoi anche inviare un webhook silenzioso con method (GET/POST/PUT/PATCH/DELETE/HEAD), headers e body."
+          "description": "Elenco di pulsanti di azione. Ogni azione è un oggetto con id, title, e facoltativamente url, foreground, destructive, authentication_required e icon. Per un url http(s) puoi anche inviare un webhook silenzioso con method (GET/POST/PUT/PATCH/DELETE/HEAD), headers e body. Senza url (e foreground) PushWard registra direttamente il tocco; leggilo con get_notification_answer. Imposta text_input: true su un'azione silenziosa per chiedere una risposta scritta (facoltativi text_input_placeholder e text_input_button_title): senza url PushWard registra la risposta, con un url http(s) viene inviata al tuo webhook come JSON con un campo text. Per inserirla invece in body, usa il segnaposto {{input}} e racchiudi body in un blocco raw di Jinja nella tua automazione, così Home Assistant non lo elabora prima dell'invio dell'azione."
         },
         "send_at": {
           "name": "Orario di invio",
-          "description": "Invia la notifica più tardi invece che subito, al massimo 30 giorni in anticipo. PushWard la conserva e la invia a quest'ora, e viene conteggiata nella tua quota di notifiche quando viene inviata. Un orario senza offset UTC viene interpretato nel fuso orario di Home Assistant. Richiedi una risposta per ottenere l'id per cancel_scheduled_notification."
+          "description": "Invia la notifica più tardi invece che subito, al massimo 365 giorni in anticipo. PushWard la conserva e la invia a quest'ora, e viene conteggiata nella tua quota di notifiche quando viene inviata. Un orario senza offset UTC viene interpretato nel fuso orario di Home Assistant. Con Ripeti indica l'inizio della serie. Richiedi una risposta per ottenere l'id per cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Ripeti",
+          "description": "Ripete la notifica secondo una pianificazione, come oggetto: cron (5 campi, minuto ora giorno-del-mese mese giorno-della-settimana, oppure @hourly/@daily/@weekly/@monthly/@yearly), timezone facoltativo (predefinito quello di Home Assistant) e until facoltativo (una data e ora) o count (1-1000 invii) per terminarla. Gli invii devono distare almeno 15 minuti. La serie mantiene un solo id; cancel_scheduled_notification la interrompe."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Annulla notifica programmata",
-      "description": "Annulla una notifica messa in coda con il send_at di send_notification. Un id che non esiste più viene ignorato.",
+      "description": "Annulla una notifica messa in coda con il send_at o Ripeti di send_notification. Annullare una notifica ripetuta interrompe l'intera serie, anche durante l'invio. Un id che non esiste più viene ignorato. Una notifica annullata compare come annullata nell'app PushWard per 24 ore.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID notifica programmata",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Elenca notifiche programmate",
-      "description": "Restituisce le tue notifiche programmate, a partire dalla più vicina.",
+      "description": "Restituisce le tue notifiche programmate, a partire dalla più vicina. Quelle ripetute riportano la loro recurrence, quante volte sono state inviate (occurrence) e quando sono state inviate l'ultima volta (last_sent_at).",
       "fields": {
         "status": {
           "name": "Stato",
-          "description": "Quali restituire. scheduled (predefinito) elenca quelle ancora in attesa; sent e failed vengono conservate per 7 giorni."
+          "description": "Quali restituire. scheduled (predefinito) elenca quelle ancora in attesa; sent e failed vengono conservate per 7 giorni. canceled vengono conservate per 24 ore."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Ottieni risposta alla notifica",
+      "description": "Attende la risposta a una notifica inviata con azioni senza url e restituisce quale azione è stata toccata (action_id), l'eventuale risposta scritta (text) e quando (answered_at). Se nessuno risponde entro il timeout, answered è false. Le risposte vengono conservate per 30 giorni, quindi una chiamata successiva con timeout 0 può leggerne una senza attendere.",
+      "fields": {
+        "notification_id": {
+          "name": "ID notifica",
+          "description": "Il notification_id restituito da send_notification, oppure il notification_id di una notifica programmata già inviata."
+        },
+        "timeout": {
+          "name": "Timeout",
+          "description": "Quanto attendere la risposta, in secondi (fino a 24 ore). 0 legge la risposta attuale senza attendere."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Esiste già un widget con questo slug.",
         "reconfigure_successful": "Configurazione del widget aggiornata."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Lista di cose da fare monitorata",
+      "initiate_flow": {
+        "user": "Aggiungi lista di cose da fare monitorata"
+      },
+      "step": {
+        "user": {
+          "title": "Aggiungi lista di cose da fare a PushWard",
+          "description": "PushWard invia ogni promemoria al suo orario, anche quando Home Assistant è offline. Completare o eliminare un elemento annulla il suo promemoria; modificarlo sostituisce il promemoria.",
+          "data": {
+            "entity_id": "Lista di cose da fare",
+            "offset_minutes": "Promemoria prima della scadenza",
+            "all_day_time": "Orario per elementi con sola data",
+            "notification_level": "Livello di notifica",
+            "done_button": "Pulsante Fatto",
+            "max_scheduled": "Massimo di promemoria programmati insieme"
+          },
+          "data_description": {
+            "entity_id": "Ogni elemento aperto di questa lista con una data di scadenza riceve un promemoria PushWard.",
+            "offset_minutes": "Invia il promemoria questo numero di minuti prima della scadenza (0 lo invia all'ora di scadenza).",
+            "all_day_time": "Un elemento con data di scadenza ma senza orario viene ricordato a quest'ora in quel giorno.",
+            "notification_level": "Come il promemoria interrompe: Passivo arriva in silenzio, Urgente supera la modalità Full immersion.",
+            "done_button": "Aggiunge un pulsante Fatto al promemoria. Toccarlo completa l'elemento in Home Assistant.",
+            "max_scheduled": "Vengono programmati solo gli elementi più vicini; gli altri seguono man mano che questi vengono inviati. Il tuo account può avere al massimo 25 notifiche programmate in attesa in tutto."
+          }
+        },
+        "reconfigure": {
+          "title": "Modifica lista di cose da fare",
+          "data": {
+            "entity_id": "Lista di cose da fare",
+            "offset_minutes": "Promemoria prima della scadenza",
+            "all_day_time": "Orario per elementi con sola data",
+            "notification_level": "Livello di notifica",
+            "done_button": "Pulsante Fatto",
+            "max_scheduled": "Massimo di promemoria programmati insieme"
+          },
+          "data_description": {
+            "entity_id": "Ogni elemento aperto di questa lista con una data di scadenza riceve un promemoria PushWard.",
+            "offset_minutes": "Invia il promemoria questo numero di minuti prima della scadenza (0 lo invia all'ora di scadenza).",
+            "all_day_time": "Un elemento con data di scadenza ma senza orario viene ricordato a quest'ora in quel giorno.",
+            "notification_level": "Come il promemoria interrompe: Passivo arriva in silenzio, Urgente supera la modalità Full immersion.",
+            "done_button": "Aggiunge un pulsante Fatto al promemoria. Toccarlo completa l'elemento in Home Assistant.",
+            "max_scheduled": "Vengono programmati solo gli elementi più vicini; gli altri seguono man mano che questi vengono inviati. Il tuo account può avere al massimo 25 notifiche programmate in attesa in tutto."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Questa lista di cose da fare è già monitorata.",
+        "reconfigure_successful": "Impostazioni della lista di cose da fare aggiornate."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Batteria più bassa prima",
         "level_desc": "Batteria più alta prima"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Passivo",
+        "active": "Attivo",
+        "time-sensitive": "Urgente"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Fatto"
       }
     }
   }

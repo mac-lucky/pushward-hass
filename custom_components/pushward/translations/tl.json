@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Mga Aksyon",
-          "description": "Listahan ng action buttons. Ang bawat aksyon ay isang object na may id, title, opsyonal na url, foreground, destructive, authentication_required, at icon. Para sa http(s) url, maaari ka ring magpadala ng silent webhook na may method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, at body."
+          "description": "Listahan ng action buttons. Ang bawat aksyon ay isang object na may id, title, opsyonal na url, foreground, destructive, authentication_required, at icon. Para sa http(s) url, maaari ka ring magpadala ng silent webhook na may method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, at body. Kapag inalis ang url (at foreground), ang PushWard mismo ang magtatala ng tap; basahin ito gamit ang get_notification_answer. Itakda ang text_input: true sa isang silent na aksyon para humingi ng typed reply (opsyonal ang text_input_placeholder at text_input_button_title): kapag walang url, itinatala ng PushWard ang reply, at kapag may http(s) url, ipinapadala ito sa iyong webhook bilang JSON na may text field. Para ilagay ito sa body sa halip, gamitin ang {{input}} placeholder at balutin ang body sa isang Jinja raw block sa iyong automation, para hindi ito i-render ng Home Assistant bago maipadala ang action."
         },
         "send_at": {
           "name": "Oras ng pagpapadala",
-          "description": "Ipadala ang notification mamaya sa halip na ngayon, hanggang 30 araw pasulong. Hinahawakan ito ng PushWard at ipinapadala sa oras na ito, at ibinibilang ito sa iyong notification quota kapag naipadala na. Ang oras na walang UTC offset ay binabasa sa time zone ng Home Assistant. Humiling ng response para makuha ang id para sa cancel_scheduled_notification."
+          "description": "Ipadala ang notification mamaya sa halip na ngayon, hanggang 365 araw pasulong. Hinahawakan ito ng PushWard at ipinapadala sa oras na ito, at ibinibilang ito sa iyong notification quota kapag naipadala na. Ang oras na walang UTC offset ay binabasa sa time zone ng Home Assistant. Kapag may Ulitin, ito ang simula ng serye. Humiling ng response para makuha ang id para sa cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Ulitin",
+          "description": "Ulitin ang notification ayon sa iskedyul, bilang object: cron (5 field, minuto oras araw-ng-buwan buwan araw-ng-linggo, o @hourly/@daily/@weekly/@monthly/@yearly), opsyonal na timezone (default ang sa Home Assistant), at opsyonal na until (petsa at oras) o count (1-1000 pagpapadala) para tapusin ito. Dapat may pagitan na hindi bababa sa 15 minuto ang bawat pagpapadala. Iisang id ang serye; pinahihinto ito ng cancel_scheduled_notification."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Kanselahin ang Naka-iskedyul na Notification",
-      "description": "Kanselahin ang notification na nakapila gamit ang send_at ng send_notification. Binabalewala ang id na wala na.",
+      "description": "Kanselahin ang notification na nakapila gamit ang send_at o Ulitin ng send_notification. Ang pagkansela sa umuulit na notification ay nagpapahinto sa buong serye, kahit habang ipinapadala ito. Binabalewala ang id na wala na. Makikitang kinansela sa PushWard app ang kinanselang notification sa loob ng 24 na oras.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID ng naka-iskedyul na notification",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Ilista ang mga Naka-iskedyul na Notification",
-      "description": "Ibalik ang iyong mga naka-iskedyul na notification, ang pinakamalapit muna.",
+      "description": "Ibalik ang iyong mga naka-iskedyul na notification, ang pinakamalapit muna. Kasama sa mga umuulit ang kanilang recurrence, kung ilang beses na silang naipadala (occurrence) at kung kailan huling naipadala (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",
-          "description": "Alin ang ibabalik. Inililista ng scheduled (ang default) ang mga naghihintay pa; ang sent at failed ay itinatago nang 7 araw."
+          "description": "Alin ang ibabalik. Inililista ng scheduled (ang default) ang mga naghihintay pa; ang sent at failed ay itinatago nang 7 araw. Ang canceled ay itinatago nang 24 na oras."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Kunin ang Sagot sa Notification",
+      "description": "Hintayin ang sagot sa notification na ipinadala na may mga aksyong walang url, at ibalik kung aling aksyon ang na-tap (action_id), ang anumang typed reply (text) at kung kailan (answered_at). Kung walang sumagot sa loob ng timeout, false ang answered. Itinatago ang mga sagot nang 30 araw, kaya ang susunod na tawag na may timeout na 0 ay makakabasa nito nang hindi naghihintay.",
+      "fields": {
+        "notification_id": {
+          "name": "Notification ID",
+          "description": "Ang notification_id na ibinalik ng send_notification, o ang notification_id ng isang naipadalang naka-iskedyul na notification."
+        },
+        "timeout": {
+          "name": "Timeout",
+          "description": "Gaano katagal hihintayin ang sagot, sa segundo (hanggang 24 oras). Binabasa ng 0 ang kasalukuyang sagot nang hindi naghihintay."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "May widget na umiiral na sa slug na ito.",
         "reconfigure_successful": "Na-update ang configuration ng widget."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Na-track na To-do List",
+      "initiate_flow": {
+        "user": "Magdagdag ng na-track na to-do list"
+      },
+      "step": {
+        "user": {
+          "title": "Magdagdag ng To-do List sa PushWard",
+          "description": "Ipinapadala ng PushWard ang bawat paalala sa oras nito, kahit offline ang Home Assistant. Kapag tinapos o binura ang isang item, makakansela ang paalala nito; kapag in-edit ito, papalitan ang paalala.",
+          "data": {
+            "entity_id": "To-do list",
+            "offset_minutes": "Magpaalala bago ang due",
+            "all_day_time": "Oras para sa mga item na petsa lang",
+            "notification_level": "Antas ng notification",
+            "done_button": "Tapos na button",
+            "max_scheduled": "Pinakamaraming paalalang naka-iskedyul nang sabay"
+          },
+          "data_description": {
+            "entity_id": "Bawat bukas na item sa listahang ito na may due date ay makakatanggap ng paalala mula sa PushWard.",
+            "offset_minutes": "Ipadala ang paalala nang ganitong karaming minuto bago ang due time (ang 0 ay nagpapadala nito sa mismong due time).",
+            "all_day_time": "Ang item na may due date pero walang oras ay ipapaalala sa oras na ito sa araw na iyon.",
+            "notification_level": "Paano umaabala ang paalala: ang Pasibo ay dumarating nang tahimik, ang Sensitibo sa oras ay lumulusot sa Focus.",
+            "done_button": "Magdagdag ng Tapos na button sa paalala. Kapag na-tap ito, matatapos ang item sa Home Assistant.",
+            "max_scheduled": "Ang pinakamalapit na mga item lang ang naka-iskedyul; susunod ang iba habang naipapadala ang mga iyon. Hanggang 25 nakabinbing naka-iskedyul na notification lang ang kaya ng iyong account sa kabuuan."
+          }
+        },
+        "reconfigure": {
+          "title": "I-edit ang To-do List",
+          "data": {
+            "entity_id": "To-do list",
+            "offset_minutes": "Magpaalala bago ang due",
+            "all_day_time": "Oras para sa mga item na petsa lang",
+            "notification_level": "Antas ng notification",
+            "done_button": "Tapos na button",
+            "max_scheduled": "Pinakamaraming paalalang naka-iskedyul nang sabay"
+          },
+          "data_description": {
+            "entity_id": "Bawat bukas na item sa listahang ito na may due date ay makakatanggap ng paalala mula sa PushWard.",
+            "offset_minutes": "Ipadala ang paalala nang ganitong karaming minuto bago ang due time (ang 0 ay nagpapadala nito sa mismong due time).",
+            "all_day_time": "Ang item na may due date pero walang oras ay ipapaalala sa oras na ito sa araw na iyon.",
+            "notification_level": "Paano umaabala ang paalala: ang Pasibo ay dumarating nang tahimik, ang Sensitibo sa oras ay lumulusot sa Focus.",
+            "done_button": "Magdagdag ng Tapos na button sa paalala. Kapag na-tap ito, matatapos ang item sa Home Assistant.",
+            "max_scheduled": "Ang pinakamalapit na mga item lang ang naka-iskedyul; susunod ang iba habang naipapadala ang mga iyon. Hanggang 25 nakabinbing naka-iskedyul na notification lang ang kaya ng iyong account sa kabuuan."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Naka-track na ang to-do list na ito.",
+        "reconfigure_successful": "Na-update ang settings ng to-do list."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Pinakamababang baterya muna",
         "level_desc": "Pinakamataas na baterya muna"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Pasibo",
+        "active": "Aktibo",
+        "time-sensitive": "Sensitibo sa oras"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Tapos na"
       }
     }
   }

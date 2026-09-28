@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Hành động",
-          "description": "Danh sách các nút hành động. Mỗi hành động là một đối tượng với id, title, và url, foreground, destructive, authentication_required, icon tùy chọn. Với url http(s) bạn cũng có thể gửi một webhook im lặng với method (GET/POST/PUT/PATCH/DELETE/HEAD), headers và body."
+          "description": "Danh sách các nút hành động. Mỗi hành động là một đối tượng với id, title, và url, foreground, destructive, authentication_required, icon tùy chọn. Với url http(s) bạn cũng có thể gửi một webhook im lặng với method (GET/POST/PUT/PATCH/DELETE/HEAD), headers và body. Nếu bỏ url (và foreground), PushWard tự ghi nhận lần chạm; đọc kết quả bằng get_notification_answer. Đặt text_input: true trên một hành động im lặng để yêu cầu phản hồi dạng văn bản (text_input_placeholder và text_input_button_title tùy chọn): không có url thì PushWard ghi nhận phản hồi, có url http(s) thì phản hồi được gửi tới webhook của bạn dưới dạng JSON với trường text. Để chèn phản hồi vào body, hãy dùng placeholder {{input}} và bọc body trong khối raw của Jinja trong tự động hóa của bạn, để Home Assistant không xử lý nó trước khi hành động được gửi."
         },
         "send_at": {
           "name": "Thời Gian Gửi",
-          "description": "Gửi thông báo sau thay vì ngay bây giờ, tối đa 30 ngày tới. PushWard giữ thông báo và gửi vào thời điểm này, và thông báo được tính vào hạn mức thông báo của bạn khi được gửi. Thời gian không có độ lệch UTC được hiểu theo múi giờ của Home Assistant. Yêu cầu phản hồi để lấy id cho cancel_scheduled_notification."
+          "description": "Gửi thông báo sau thay vì ngay bây giờ, tối đa 365 ngày tới. PushWard giữ thông báo và gửi vào thời điểm này, và thông báo được tính vào hạn mức thông báo của bạn khi được gửi. Thời gian không có độ lệch UTC được hiểu theo múi giờ của Home Assistant. Khi dùng cùng Lặp lại, thời điểm này đánh dấu lúc chuỗi bắt đầu. Yêu cầu phản hồi để lấy id cho cancel_scheduled_notification."
+        },
+        "recurrence": {
+          "name": "Lặp lại",
+          "description": "Lặp lại thông báo theo lịch, dưới dạng đối tượng: cron (5 trường, phút giờ ngày-trong-tháng tháng ngày-trong-tuần, hoặc @hourly/@daily/@weekly/@monthly/@yearly), timezone tùy chọn (mặc định theo Home Assistant), và until tùy chọn (ngày giờ) hoặc count (1-1000 lần gửi) để kết thúc. Các lần gửi phải cách nhau ít nhất 15 phút. Chuỗi giữ nguyên một id; cancel_scheduled_notification sẽ dừng chuỗi."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Hủy Thông Báo Đã Lên Lịch",
-      "description": "Hủy một thông báo đã được xếp hàng bằng send_at của send_notification. Id không còn tồn tại sẽ bị bỏ qua.",
+      "description": "Hủy một thông báo đã được xếp hàng bằng send_at hoặc Lặp lại của send_notification. Hủy một thông báo lặp lại sẽ dừng toàn bộ chuỗi, kể cả khi đang gửi. Id không còn tồn tại sẽ bị bỏ qua. Thông báo đã hủy hiển thị là đã hủy trong ứng dụng PushWard trong 24 giờ.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID Thông Báo Đã Lên Lịch",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Liệt Kê Thông Báo Đã Lên Lịch",
-      "description": "Trả về các thông báo đã lên lịch của bạn, gần nhất trước.",
+      "description": "Trả về các thông báo đã lên lịch của bạn, gần nhất trước. Thông báo lặp lại kèm theo recurrence, số lần đã gửi (occurrence) và thời điểm gửi gần nhất (last_sent_at).",
       "fields": {
         "status": {
           "name": "Trạng Thái",
-          "description": "Loại cần trả về. scheduled (mặc định) liệt kê các thông báo vẫn đang chờ; sent và failed được lưu giữ trong 7 ngày."
+          "description": "Loại cần trả về. scheduled (mặc định) liệt kê các thông báo vẫn đang chờ; sent và failed được lưu giữ trong 7 ngày. canceled được lưu giữ trong 24 giờ."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Lấy Câu Trả Lời Thông Báo",
+      "description": "Chờ câu trả lời cho một thông báo được gửi với các hành động không có url, rồi trả về hành động nào đã được chạm (action_id), phản hồi văn bản nếu có (text) và thời điểm (answered_at). Nếu không ai trả lời trong thời gian chờ, answered là false. Câu trả lời được lưu giữ trong 30 ngày, nên một lần gọi sau với thời gian chờ 0 có thể đọc mà không cần chờ.",
+      "fields": {
+        "notification_id": {
+          "name": "ID Thông Báo",
+          "description": "notification_id do send_notification trả về, hoặc notification_id của một thông báo đã lên lịch đã được gửi."
+        },
+        "timeout": {
+          "name": "Thời Gian Chờ",
+          "description": "Thời gian chờ câu trả lời, tính bằng giây (tối đa 24 giờ). 0 đọc câu trả lời hiện tại mà không chờ."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Đã tồn tại một widget với slug này.",
         "reconfigure_successful": "Đã cập nhật cấu hình widget."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Danh Sách Việc Cần Làm Được Theo Dõi",
+      "initiate_flow": {
+        "user": "Thêm danh sách việc cần làm được theo dõi"
+      },
+      "step": {
+        "user": {
+          "title": "Thêm Danh Sách Việc Cần Làm vào PushWard",
+          "description": "PushWard gửi từng lời nhắc đúng giờ, kể cả khi Home Assistant ngoại tuyến. Hoàn thành hoặc xóa một mục sẽ hủy lời nhắc của mục đó; chỉnh sửa mục sẽ thay thế lời nhắc.",
+          "data": {
+            "entity_id": "Danh sách việc cần làm",
+            "offset_minutes": "Nhắc trước hạn",
+            "all_day_time": "Giờ cho mục chỉ có ngày",
+            "notification_level": "Mức thông báo",
+            "done_button": "Nút Xong",
+            "max_scheduled": "Số lời nhắc tối đa được lên lịch cùng lúc"
+          },
+          "data_description": {
+            "entity_id": "Mỗi mục đang mở trong danh sách này có ngày đến hạn sẽ nhận một lời nhắc PushWard.",
+            "offset_minutes": "Gửi lời nhắc trước thời điểm đến hạn bấy nhiêu phút (0 gửi đúng thời điểm đến hạn).",
+            "all_day_time": "Mục có ngày đến hạn nhưng không có giờ sẽ được nhắc vào giờ này trong ngày đó.",
+            "notification_level": "Cách lời nhắc làm gián đoạn: Thụ động đến lặng lẽ, Nhạy cảm thời gian vượt qua Tập trung.",
+            "done_button": "Thêm nút Xong vào lời nhắc. Chạm vào nút sẽ hoàn thành mục đó trong Home Assistant.",
+            "max_scheduled": "Chỉ những mục gần nhất được lên lịch; các mục còn lại sẽ theo sau khi những mục đó được gửi. Tài khoản của bạn chỉ có tối đa 25 thông báo đã lên lịch đang chờ cho tất cả mọi thứ."
+          }
+        },
+        "reconfigure": {
+          "title": "Chỉnh Sửa Danh Sách Việc Cần Làm",
+          "data": {
+            "entity_id": "Danh sách việc cần làm",
+            "offset_minutes": "Nhắc trước hạn",
+            "all_day_time": "Giờ cho mục chỉ có ngày",
+            "notification_level": "Mức thông báo",
+            "done_button": "Nút Xong",
+            "max_scheduled": "Số lời nhắc tối đa được lên lịch cùng lúc"
+          },
+          "data_description": {
+            "entity_id": "Mỗi mục đang mở trong danh sách này có ngày đến hạn sẽ nhận một lời nhắc PushWard.",
+            "offset_minutes": "Gửi lời nhắc trước thời điểm đến hạn bấy nhiêu phút (0 gửi đúng thời điểm đến hạn).",
+            "all_day_time": "Mục có ngày đến hạn nhưng không có giờ sẽ được nhắc vào giờ này trong ngày đó.",
+            "notification_level": "Cách lời nhắc làm gián đoạn: Thụ động đến lặng lẽ, Nhạy cảm thời gian vượt qua Tập trung.",
+            "done_button": "Thêm nút Xong vào lời nhắc. Chạm vào nút sẽ hoàn thành mục đó trong Home Assistant.",
+            "max_scheduled": "Chỉ những mục gần nhất được lên lịch; các mục còn lại sẽ theo sau khi những mục đó được gửi. Tài khoản của bạn chỉ có tối đa 25 thông báo đã lên lịch đang chờ cho tất cả mọi thứ."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Danh sách việc cần làm này đã được theo dõi.",
+        "reconfigure_successful": "Đã cập nhật cài đặt danh sách việc cần làm."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Pin thấp nhất trước",
         "level_desc": "Pin cao nhất trước"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Thụ động",
+        "active": "Chủ động",
+        "time-sensitive": "Nhạy cảm thời gian"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Xong"
       }
     }
   }

@@ -1603,17 +1603,21 @@
         },
         "actions": {
           "name": "Acties",
-          "description": "Lijst met actieknoppen. Elke actie is een object met id, title, optionele url, foreground, destructive, authentication_required en icon. Voor een http(s)-url kun je ook een stille webhook versturen met method (GET/POST/PUT/PATCH/DELETE/HEAD), headers en body."
+          "description": "Lijst met actieknoppen. Elke actie is een object met id, title, optionele url, foreground, destructive, authentication_required en icon. Voor een http(s)-url kun je ook een stille webhook versturen met method (GET/POST/PUT/PATCH/DELETE/HEAD), headers en body. Laat je url (en foreground) weg, dan legt PushWard de tik zelf vast; lees die uit met get_notification_answer. Zet text_input: true op een stille actie om een getypt antwoord op te vragen (optioneel text_input_placeholder en text_input_button_title): zonder url legt PushWard het antwoord vast, met een http(s)-url wordt het als JSON met een veld text naar je webhook gestuurd. Wil je het in plaats daarvan in body opnemen, gebruik dan de placeholder {{input}} en zet body in je automatisering in een Jinja-raw-blok, zodat Home Assistant hem niet al verwerkt voordat de actie wordt verstuurd."
         },
         "send_at": {
           "name": "Verzendtijd",
-          "description": "Verstuur de melding later in plaats van nu, maximaal 30 dagen vooruit. PushWard bewaart hem en verstuurt hem op dit tijdstip; bij verzending telt hij mee voor je meldingenquotum. Een tijd zonder UTC-offset wordt gelezen in de tijdzone van Home Assistant. Vraag een respons aan om de id voor cancel_scheduled_notification te krijgen."
+          "description": "Verstuur de melding later in plaats van nu, maximaal 365 dagen vooruit. PushWard bewaart hem en verstuurt hem op dit tijdstip; bij verzending telt hij mee voor je meldingenquotum. Een tijd zonder UTC-offset wordt gelezen in de tijdzone van Home Assistant. Met Herhalen markeert dit tijdstip het begin van de reeks. Vraag een respons aan om de id voor cancel_scheduled_notification te krijgen."
+        },
+        "recurrence": {
+          "name": "Herhalen",
+          "description": "Herhaal de melding volgens een schema, als object: cron (5 velden, minuut uur dag-van-de-maand maand dag-van-de-week, of @hourly/@daily/@weekly/@monthly/@yearly), optioneel timezone (standaard die van Home Assistant) en optioneel until (een datum en tijd) of count (1-1000 verzendingen) om de reeks te beëindigen. Tussen twee verzendingen moet minstens 15 minuten zitten. De reeks houdt één id; cancel_scheduled_notification stopt hem."
         }
       }
     },
     "cancel_scheduled_notification": {
       "name": "Geplande melding annuleren",
-      "description": "Annuleer een melding die met send_at van send_notification in de wachtrij is gezet. Een id die niet meer bestaat, wordt genegeerd.",
+      "description": "Annuleer een melding die met send_at of Herhalen van send_notification in de wachtrij is gezet. Een herhalende melding annuleren stopt de hele reeks, ook terwijl die wordt verstuurd. Een id die niet meer bestaat, wordt genegeerd. Een geannuleerde melding staat 24 uur als geannuleerd in de PushWard-app.",
       "fields": {
         "scheduled_notification_id": {
           "name": "ID van geplande melding",
@@ -1623,11 +1627,25 @@
     },
     "list_scheduled_notifications": {
       "name": "Geplande meldingen weergeven",
-      "description": "Geef je geplande meldingen terug, de eerstvolgende eerst.",
+      "description": "Geef je geplande meldingen terug, de eerstvolgende eerst. Herhalende meldingen bevatten hun recurrence, hoe vaak ze zijn verstuurd (occurrence) en wanneer voor het laatst (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",
-          "description": "Welke je terugkrijgt. scheduled (standaard) toont de meldingen die nog wachten; sent en failed blijven 7 dagen bewaard."
+          "description": "Welke je terugkrijgt. scheduled (standaard) toont de meldingen die nog wachten; sent en failed blijven 7 dagen bewaard. canceled blijven 24 uur bewaard."
+        }
+      }
+    },
+    "get_notification_answer": {
+      "name": "Antwoord op melding ophalen",
+      "description": "Wacht op het antwoord op een melding die is verstuurd met acties zonder url, en geef terug welke actie is aangetikt (action_id), een eventueel getypt antwoord (text) en wanneer (answered_at). Antwoordt niemand binnen de time-out, dan is answered false. Antwoorden worden 30 dagen bewaard, dus een latere aanroep met time-out 0 kan er een lezen zonder te wachten.",
+      "fields": {
+        "notification_id": {
+          "name": "Meldings-ID",
+          "description": "De notification_id die send_notification teruggeeft, of de notification_id van een verstuurde geplande melding."
+        },
+        "timeout": {
+          "name": "Time-out",
+          "description": "Hoe lang op het antwoord wordt gewacht, in seconden (maximaal 24 uur). 0 leest het huidige antwoord zonder te wachten."
         }
       }
     },
@@ -2169,6 +2187,57 @@
         "already_configured": "Er bestaat al een widget met deze slug.",
         "reconfigure_successful": "Widgetconfiguratie bijgewerkt."
       }
+    },
+    "tracked_todo": {
+      "entry_type": "Gevolgde takenlijst",
+      "initiate_flow": {
+        "user": "Gevolgde takenlijst toevoegen"
+      },
+      "step": {
+        "user": {
+          "title": "Takenlijst toevoegen aan PushWard",
+          "description": "PushWard verstuurt elke herinnering op het juiste tijdstip, ook als Home Assistant offline is. Een item voltooien of verwijderen annuleert de herinnering; een item bewerken vervangt de herinnering.",
+          "data": {
+            "entity_id": "Takenlijst",
+            "offset_minutes": "Herinneren voor vervaldatum",
+            "all_day_time": "Tijd voor items met alleen een datum",
+            "notification_level": "Meldingsniveau",
+            "done_button": "Klaar-knop",
+            "max_scheduled": "Maximaal tegelijk geplande herinneringen"
+          },
+          "data_description": {
+            "entity_id": "Elk open item op deze lijst met een vervaldatum krijgt een PushWard-herinnering.",
+            "offset_minutes": "Verstuur de herinnering zoveel minuten voor het vervaltijdstip (0 verstuurt hem op het vervaltijdstip).",
+            "all_day_time": "Een item met een vervaldatum maar zonder tijd wordt op die dag op dit tijdstip herinnerd.",
+            "notification_level": "Hoe de herinnering onderbreekt: Passief komt stil binnen, Tijdgevoelig doorbreekt Focus.",
+            "done_button": "Voeg een Klaar-knop toe aan de herinnering. Erop tikken voltooit het item in Home Assistant.",
+            "max_scheduled": "Alleen de eerstvolgende items worden gepland; de rest volgt zodra die verstuurd zijn. Je account kan in totaal maximaal 25 openstaande geplande meldingen bevatten."
+          }
+        },
+        "reconfigure": {
+          "title": "Takenlijst bewerken",
+          "data": {
+            "entity_id": "Takenlijst",
+            "offset_minutes": "Herinneren voor vervaldatum",
+            "all_day_time": "Tijd voor items met alleen een datum",
+            "notification_level": "Meldingsniveau",
+            "done_button": "Klaar-knop",
+            "max_scheduled": "Maximaal tegelijk geplande herinneringen"
+          },
+          "data_description": {
+            "entity_id": "Elk open item op deze lijst met een vervaldatum krijgt een PushWard-herinnering.",
+            "offset_minutes": "Verstuur de herinnering zoveel minuten voor het vervaltijdstip (0 verstuurt hem op het vervaltijdstip).",
+            "all_day_time": "Een item met een vervaldatum maar zonder tijd wordt op die dag op dit tijdstip herinnerd.",
+            "notification_level": "Hoe de herinnering onderbreekt: Passief komt stil binnen, Tijdgevoelig doorbreekt Focus.",
+            "done_button": "Voeg een Klaar-knop toe aan de herinnering. Erop tikken voltooit het item in Home Assistant.",
+            "max_scheduled": "Alleen de eerstvolgende items worden gepland; de rest volgt zodra die verstuurd zijn. Je account kan in totaal maximaal 25 openstaande geplande meldingen bevatten."
+          }
+        }
+      },
+      "abort": {
+        "already_configured": "Deze takenlijst wordt al gevolgd.",
+        "reconfigure_successful": "Instellingen van takenlijst bijgewerkt."
+      }
     }
   },
   "issues": {
@@ -2309,6 +2378,18 @@
       "options": {
         "level_asc": "Laagste batterij eerst",
         "level_desc": "Hoogste batterij eerst"
+      }
+    },
+    "todo_notification_level": {
+      "options": {
+        "passive": "Passief",
+        "active": "Actief",
+        "time-sensitive": "Tijdgevoelig"
+      }
+    },
+    "todo_reminder_action": {
+      "options": {
+        "done": "Klaar"
       }
     }
   }

@@ -29,6 +29,7 @@ from custom_components.pushward.config_flow import (
     WIDGET_SECTIONS,
     _details_schema,
     _entity_template_schema,
+    _todo_schema,
     _widget_details_schema,
     _widget_step1_schema,
 )
@@ -41,6 +42,7 @@ from custom_components.pushward.const import (
     SOUNDS,
     TEMPLATES,
     TIMER_STYLES,
+    TODO_LEVELS,
     VALUE_SCALES,
     WIDGET_BATTERY_SORTS,
     WIDGET_SEVERITIES,
@@ -71,6 +73,7 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "named_color": tuple(NAMED_COLORS),
     "timer_style": tuple(TIMER_STYLES),
     "flow_slot": tuple(FLOW_SLOTS),
+    "todo_notification_level": tuple(TODO_LEVELS),
 }
 
 
@@ -88,7 +91,7 @@ def _en_translations() -> dict:
 
 @functools.cache
 def _translation_keys_in_schemas() -> dict[str, tuple[str, ...]]:
-    """Every translated dropdown across both subentry flows: translation_key -> options.
+    """Every translated dropdown across the subentry flows: translation_key -> options.
 
     Covers both plain SelectSelectors and selects nested inside an ObjectSelector's
     row fields (the per-tile color editor is a ``{"select": {...}}`` dict config
@@ -123,6 +126,7 @@ def _translation_keys_in_schemas() -> dict[str, tuple[str, ...]]:
     scan(_widget_step1_schema())
     for template in WIDGET_TEMPLATES:
         scan(_widget_details_schema("sensor.foo", template, {}))
+    scan(_todo_schema())
     return found
 
 
