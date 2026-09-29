@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Listați notificările programate",
-      "description": "Returnează notificările dvs. programate, cele mai apropiate primele. Cele repetate includ recurrence, de câte ori au fost trimise (occurrence) și când au fost trimise ultima dată (last_sent_at).",
+      "description": "Returnează notificările dvs. programate: cele mai apropiate primele pentru cele încă în așteptare (implicit), cele mai recente primele pentru orice altă stare. Cele repetate includ recurrence, de câte ori au fost trimise (occurrence) și când au fost trimise ultima dată (last_sent_at).",
       "fields": {
         "status": {
           "name": "Stare",

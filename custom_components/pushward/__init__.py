@@ -1005,7 +1005,7 @@ async def _async_handle_cancel_scheduled_notification(hass: HomeAssistant, call:
 
 
 async def _async_handle_list_scheduled_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
-    """Return scheduled notifications, soonest first."""
+    """Return scheduled notifications: pending soonest first, any other status latest first."""
     api = _get_api(hass)
     with _surface_api_errors():
         items = await api.list_scheduled_notifications(call.data["status"])

@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Lister les notifications planifiées",
-      "description": "Renvoyer vos notifications planifiées, de la plus proche à la plus lointaine. Les notifications répétées incluent leur recurrence, le nombre d'envois effectués (occurrence) et l'heure du dernier envoi (last_sent_at).",
+      "description": "Renvoyer vos notifications planifiées : de la plus proche à la plus lointaine pour celles encore en attente (par défaut), de la plus récente à la plus ancienne pour tout autre statut. Les notifications répétées incluent leur recurrence, le nombre d'envois effectués (occurrence) et l'heure du dernier envoi (last_sent_at).",
       "fields": {
         "status": {
           "name": "Statut",

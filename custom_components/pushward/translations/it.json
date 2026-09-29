@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Elenca notifiche programmate",
-      "description": "Restituisce le tue notifiche programmate, a partire dalla più vicina. Quelle ripetute riportano la loro recurrence, quante volte sono state inviate (occurrence) e quando sono state inviate l'ultima volta (last_sent_at).",
+      "description": "Restituisce le tue notifiche programmate: a partire dalla più vicina per quelle ancora in attesa (predefinito), a partire dalla più recente per qualsiasi altro stato. Quelle ripetute riportano la loro recurrence, quante volte sono state inviate (occurrence) e quando sono state inviate l'ultima volta (last_sent_at).",
       "fields": {
         "status": {
           "name": "Stato",

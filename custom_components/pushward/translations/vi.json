@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Liệt Kê Thông Báo Đã Lên Lịch",
-      "description": "Trả về các thông báo đã lên lịch của bạn, gần nhất trước. Thông báo lặp lại kèm theo recurrence, số lần đã gửi (occurrence) và thời điểm gửi gần nhất (last_sent_at).",
+      "description": "Trả về các thông báo đã lên lịch của bạn: gần nhất trước với các thông báo vẫn đang chờ (mặc định), mới nhất trước với mọi trạng thái khác. Thông báo lặp lại kèm theo recurrence, số lần đã gửi (occurrence) và thời điểm gửi gần nhất (last_sent_at).",
       "fields": {
         "status": {
           "name": "Trạng Thái",

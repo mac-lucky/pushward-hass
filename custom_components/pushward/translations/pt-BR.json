@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Listar Notificações Agendadas",
-      "description": "Retorna suas notificações agendadas, as mais próximas primeiro. As recorrentes trazem sua recurrence, quantas vezes já foram enviadas (occurrence) e quando foram enviadas pela última vez (last_sent_at).",
+      "description": "Retorna suas notificações agendadas: as mais próximas primeiro para as que ainda estão aguardando (o padrão) e as mais recentes primeiro para qualquer outro status. As recorrentes trazem sua recurrence, quantas vezes já foram enviadas (occurrence) e quando foram enviadas pela última vez (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",

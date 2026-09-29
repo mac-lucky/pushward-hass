@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "列出定时通知",
-      "description": "返回你的定时通知，按发送时间由近到远排列。重复通知会附带其 recurrence、已发送次数（occurrence）和最近一次发送时间（last_sent_at）。",
+      "description": "返回你的定时通知：仍在等待的通知（默认）按发送时间由近到远排列，其他任何状态则按由新到旧排列。重复通知会附带其 recurrence、已发送次数（occurrence）和最近一次发送时间（last_sent_at）。",
       "fields": {
         "status": {
           "name": "状态",

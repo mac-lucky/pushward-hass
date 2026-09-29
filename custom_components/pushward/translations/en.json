@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "List Scheduled Notifications",
-      "description": "Return your scheduled notifications, soonest first. Repeating ones carry their recurrence, how many times they have sent (occurrence) and when they last sent (last_sent_at).",
+      "description": "Return your scheduled notifications: soonest first for pending ones (the default), latest first for any other status. Repeating ones carry their recurrence, how many times they have sent (occurrence) and when they last sent (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",

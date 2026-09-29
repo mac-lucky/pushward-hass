@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Ilista ang mga Naka-iskedyul na Notification",
-      "description": "Ibalik ang iyong mga naka-iskedyul na notification, ang pinakamalapit muna. Kasama sa mga umuulit ang kanilang recurrence, kung ilang beses na silang naipadala (occurrence) at kung kailan huling naipadala (last_sent_at).",
+      "description": "Ibalik ang iyong mga naka-iskedyul na notification: ang pinakamalapit muna para sa mga naghihintay pa (ang default), ang pinakabago muna para sa anumang ibang status. Kasama sa mga umuulit ang kanilang recurrence, kung ilang beses na silang naipadala (occurrence) at kung kailan huling naipadala (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",

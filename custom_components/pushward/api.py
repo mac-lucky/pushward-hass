@@ -392,7 +392,9 @@ class PushWardApiClient:
         )
 
     async def list_scheduled_notifications(self, status: str = "scheduled") -> list[dict]:
-        """GET /notifications/scheduled, soonest first, following next_cursor.
+        """GET /notifications/scheduled, following next_cursor.
+
+        status=scheduled comes soonest first, every other status latest first.
 
         Stops after SCHEDULED_LIST_MAX_PAGES pages. Pending schedules are capped
         at 25 server-side, so only sent/failed history can get that long.

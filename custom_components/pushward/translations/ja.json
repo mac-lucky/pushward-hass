@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "予約通知を一覧表示",
-      "description": "予約済みの通知を、送信予定が近い順に返します。繰り返し通知には recurrence、これまでの送信回数（occurrence）、最後に送信した日時（last_sent_at）が含まれます。",
+      "description": "予約済みの通知を、まだ待機中のもの（デフォルト）は送信予定が近い順、それ以外のステータスでは新しい順に返します。繰り返し通知には recurrence、これまでの送信回数（occurrence）、最後に送信した日時（last_sent_at）が含まれます。",
       "fields": {
         "status": {
           "name": "ステータス",

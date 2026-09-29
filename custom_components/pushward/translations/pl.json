@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Pokaż zaplanowane powiadomienia",
-      "description": "Zwróć swoje zaplanowane powiadomienia, od najbliższego. Powtarzane zawierają swoje recurrence, liczbę dotychczasowych wysyłek (occurrence) i czas ostatniej wysyłki (last_sent_at).",
+      "description": "Zwróć swoje zaplanowane powiadomienia: wciąż oczekujące (domyślnie) od najbliższego, przy każdym innym statusie od najnowszego. Powtarzane zawierają swoje recurrence, liczbę dotychczasowych wysyłek (occurrence) i czas ostatniej wysyłki (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",

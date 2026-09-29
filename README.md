@@ -807,7 +807,7 @@ With `send_at`, PushWard holds the notification and sends it at that time; it co
   response_variable: standup
 ```
 
-`pushward.list_scheduled_notifications` returns them (`status`: scheduled by default, or sent, failed, canceled, all) as `scheduled_notifications`; it covers the ones this integration's key scheduled. Repeating ones also carry `recurrence`, `occurrence` (sends so far) and `last_sent_at`. Scheduling while your notification quota is already used up fails right away. Without `send_at` or `recurrence`, a requested response carries the created `notification_id` and `answerable`.
+`pushward.list_scheduled_notifications` returns them (`status`: scheduled by default, or sent, failed, canceled, all) as `scheduled_notifications`, soonest first for `scheduled` and latest first for the other statuses; it covers the ones this integration's key scheduled. Repeating ones also carry `recurrence`, `occurrence` (sends so far) and `last_sent_at`. Scheduling while your notification quota is already used up fails right away. Without `send_at` or `recurrence`, a requested response carries the created `notification_id` and `answerable`.
 
 #### Answers
 

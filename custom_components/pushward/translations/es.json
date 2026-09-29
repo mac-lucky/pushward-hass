@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Listar notificaciones programadas",
-      "description": "Devolver tus notificaciones programadas, las más próximas primero. Las que se repiten incluyen su recurrence, cuántas veces se han enviado (occurrence) y cuándo se enviaron por última vez (last_sent_at).",
+      "description": "Devolver tus notificaciones programadas: las más próximas primero para las que aún están en espera (el valor predeterminado) y las más recientes primero para cualquier otro estado. Las que se repiten incluyen su recurrence, cuántas veces se han enviado (occurrence) y cuándo se enviaron por última vez (last_sent_at).",
       "fields": {
         "status": {
           "name": "Estado",

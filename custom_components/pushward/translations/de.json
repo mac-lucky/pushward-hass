@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Geplante Benachrichtigungen auflisten",
-      "description": "Die geplanten Benachrichtigungen zurückgeben, die nächstfällige zuerst. Wiederkehrende enthalten ihre recurrence, wie oft sie gesendet wurden (occurrence) und wann zuletzt (last_sent_at).",
+      "description": "Die geplanten Benachrichtigungen zurückgeben: bei noch wartenden (Standard) die nächstfällige zuerst, bei jedem anderen Status die neueste zuerst. Wiederkehrende enthalten ihre recurrence, wie oft sie gesendet wurden (occurrence) und wann zuletzt (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",

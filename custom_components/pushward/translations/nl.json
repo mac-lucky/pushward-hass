@@ -1627,7 +1627,7 @@
     },
     "list_scheduled_notifications": {
       "name": "Geplande meldingen weergeven",
-      "description": "Geef je geplande meldingen terug, de eerstvolgende eerst. Herhalende meldingen bevatten hun recurrence, hoe vaak ze zijn verstuurd (occurrence) en wanneer voor het laatst (last_sent_at).",
+      "description": "Geef je geplande meldingen terug: bij meldingen die nog wachten (standaard) de eerstvolgende eerst, bij elke andere status de meest recente eerst. Herhalende meldingen bevatten hun recurrence, hoe vaak ze zijn verstuurd (occurrence) en wanneer voor het laatst (last_sent_at).",
       "fields": {
         "status": {
           "name": "Status",
