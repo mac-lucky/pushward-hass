@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "Impossible de générer un ThumbHash : {error}"
+    },
+    "e2e_seal_failed": {
+      "message": "Impossible de chiffrer la notification : {error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "PushWard est déjà configuré.",
       "reconfigure_successful": "Configuration PushWard mise à jour.",
       "reauth_successful": "Réauthentification réussie."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Chiffrement de bout en bout",
+        "description": "Home Assistant chiffre avec cette clé le titre, le sous-titre, le corps et l'URL de chaque notification envoyée par cette intégration, et seuls les appareils qui possèdent la même clé peuvent les lire. Créez la clé dans l'application PushWard sous Réglages > Chiffrement et collez-la ici. Le niveau, le son, les actions, les médias et les métadonnées restent lisibles par PushWard, qui en a besoin pour distribuer la notification ; les Activités en direct et les widgets ne sont pas chiffrés. Un appareil sans la clé, ou avec une application PushWard antérieure à la 1.17, affiche un texte de remplacement à la place du contenu. Laissez le champ vide pour envoyer les notifications sans chiffrement.\n\nID de clé utilisé : {key_id}",
+        "data": {
+          "e2e_key": "Clé de chiffrement de bout en bout"
+        },
+        "data_description": {
+          "e2e_key": "64 caractères hexadécimaux. L'application affiche le même ID de clé à côté de la clé."
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "Une clé de chiffrement comporte 64 caractères hexadécimaux.",
+      "e2e_key_is_integration_key": "Il s'agit d'une clé d'intégration. Collez la clé de chiffrement depuis Réglages > Chiffrement dans l'application PushWard."
     }
   },
   "config_subentries": {

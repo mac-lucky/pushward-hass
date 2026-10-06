@@ -93,6 +93,7 @@ from .const import (
     TODO_WATCH_HOURS,
     TODO_WATCH_IDLE_SECONDS,
 )
+from .e2e import E2EError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -634,6 +635,11 @@ class TodoReminderManager:
                     actions=[{"id": TODO_DONE_ACTION_ID, "title": self._done_label}] if done_button else None,
                     send_at=send_at,
                 )
+            except E2EError as err:
+                # The item's text does not fit in an envelope; nothing goes out in the clear.
+                _LOGGER.warning("PushWard cannot encrypt the reminder for a to-do item in %s: %s", entity_id, err)
+                self._refused[(sub_id, reminder.uid)] = reminder.version
+                continue
             except (PushWardQuotaExceededError, PushWardForbiddenError) as err:
                 _LOGGER.warning("PushWard reminders for %s are on hold: %s", entity_id, err)
                 self._blocked.add(sub_id)

@@ -69,6 +69,7 @@ The surfaces are independent (separate config, managers, and caches) and share o
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
 - **To-do reminders**: a push for every dated item on a to-do list, with a Done button that completes the item
+- **End-to-end encryption** of notification text with a key only your devices hold
 - **Account usage sensors**: notifications, Live Activity updates, widget updates, and emails consumed vs. plan limits, plus subscription tier
 - **Template auto-suggestion** picks the best activity template from entity domain and device class
 - **14 domain defaults**: pre-filled start/end states and a default icon per HA domain
@@ -127,6 +128,7 @@ Once the entry exists, add tracked entities and widgets through the integration'
 |---------|:--------:|---------|-------------|
 | Integration key | Yes | - | PushWard key (`hlk_` prefix). Stored on the config entry; validated on setup. |
 | Server URL | No | `https://api.pushward.app` | Fixed by the integration; not shown in the UI. |
+| Encryption key | No | - | Set under **Configure**; turns on [end-to-end encryption](#end-to-end-encryption) of notification text. |
 
 Every field label and its help text is shown live in the Home Assistant config-flow UI, so the tables below are a reference, not something you need to read before setting up.
 
@@ -455,6 +457,26 @@ How it stays in step:
 - If you stop a reminder in the PushWard app, the item stays open and gets no new reminder until you change its due date or time. Renaming an item whose reminder already went out does not send it again either.
 - After a reminder goes out, the item stays open for you to tick off. With the Done button, the integration watches for the tap for 24 hours: a long-lived request at a time for the first hour, then a quick check every 5 minutes.
 - The pairing between items and reminders is kept in Home Assistant's storage, not in the item, so notes synced to other apps stay clean. Removing the list (or the integration) cancels its pending reminders.
+
+### End-to-end encryption
+
+With an encryption key set, Home Assistant seals the title, subtitle, body and URL of every notification it sends, and PushWard only stores and forwards an envelope it cannot open. Your devices decrypt it with the same key.
+
+1. In the PushWard app (1.17 or later), open **Settings > Encryption**, create a key and copy it.
+2. In Home Assistant, open **Settings > Devices & Services > PushWard > Configure** and paste it. The form shows its Key ID, which should match the one in the app.
+
+Clear the field to send plain text again. An `hlk_` integration key pasted here is refused.
+
+Only those four fields are encrypted. Level, sound, volume, thread and collapse ids, source, media and icon URLs, metadata, actions and typed replies stay readable to PushWard, which needs them to deliver the push, and Live Activities and widgets are not encrypted at all. PushWard and Apple also still see when a notification was sent and to which account.
+
+Some side effects:
+
+- `send_notification` and to-do reminders are sealed whether they go out now or are scheduled. Notifications scheduled before you set or change the key go out the way they were queued.
+- The server cannot check sealed text, so the integration does it first: an empty title or body, a blocked URL scheme, or text too long to encrypt fails the action call instead of reaching PushWard. The envelope fits about 2.2 KB of text (title, subtitle, body and URL together), well under the plain-text limits, so a long body that worked before may need trimming.
+- A device without the key, or with an app older than 1.17, shows "Encrypted notification" in place of the text.
+- The key is stored on the config entry next to the integration key. Diagnostics leave it out and show only the Key ID.
+
+The envelope format and test vectors are described at <https://pushward.app/docs/notifications/encryption>.
 
 ## Account sensors
 

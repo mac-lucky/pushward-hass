@@ -61,6 +61,7 @@ from .const import (
     CONF_CURRENT_STEP_ENTITY,
     CONF_DECIMALS,
     CONF_DISMISSAL_TTL,
+    CONF_E2E_KEY,
     CONF_END_DATE_ATTRIBUTE,
     CONF_END_STATES,
     CONF_ENDED_TTL,
@@ -269,6 +270,7 @@ from .const import (
     validate_thumbhash,
 )
 from .content_mapper import get_domain_defaults, is_valid_color, sanitize_slug
+from .e2e import E2EError, key_id, parse_key
 from .media_control import new_control_token
 
 _LOGGER = logging.getLogger(__name__)
@@ -2149,6 +2151,12 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> PushWardOptionsFlow:
+        """Options: the end-to-end encryption key."""
+        return PushWardOptionsFlow()
+
     @classmethod
     @callback
     def async_get_supported_subentry_types(
@@ -2160,6 +2168,43 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             SUBENTRY_TYPE_WIDGET: PushWardWidgetSubentryFlow,
             SUBENTRY_TYPE_TODO: PushWardTodoSubentryFlow,
         }
+
+
+_E2E_KEY_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_E2E_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
+    }
+)
+
+
+class PushWardOptionsFlow(config_entries.OptionsFlow):
+    """Set or clear the key that encrypts notification text end to end."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
+        """One field: an empty one turns encryption off."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            raw = (user_input.get(CONF_E2E_KEY) or "").strip()
+            if not raw:
+                return self.async_create_entry(data={})
+            try:
+                key = parse_key(raw)
+            except E2EError:
+                errors[CONF_E2E_KEY] = (
+                    "e2e_key_is_integration_key" if raw.startswith(("hlk_", "hla_")) else "invalid_e2e_key"
+                )
+            else:
+                return self.async_create_entry(data={CONF_E2E_KEY: key.hex()})
+
+        current = self.config_entry.options.get(CONF_E2E_KEY)
+        # Shown back (masked), so saving the form unchanged keeps the key.
+        suggested = user_input if user_input is not None else {CONF_E2E_KEY: current or ""}
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(_E2E_KEY_SCHEMA, suggested),
+            errors=errors,
+            description_placeholders={"key_id": key_id(parse_key(current)) if current else "-"},
+        )
 
 
 def _media_control_token(entity_cfg: dict, existing: str | None) -> str:

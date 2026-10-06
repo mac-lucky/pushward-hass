@@ -15,6 +15,8 @@ SUBENTRY_TYPE_TODO = "tracked_todo"
 
 CONF_SERVER_URL = "server_url"
 CONF_INTEGRATION_KEY = "integration_key"
+# Entry option: the end-to-end encryption key (64 lowercase hex), absent when off.
+CONF_E2E_KEY = "e2e_key"
 
 # Per-entity config keys
 CONF_ENTITY_ID = "entity_id"

@@ -22,6 +22,7 @@ from custom_components.pushward.const import (
     TODO_METADATA_LIST,
     TODO_METADATA_UID,
 )
+from custom_components.pushward.e2e import E2EError
 from custom_components.pushward.todo_reminders import (
     TodoReminderManager,
     async_cancel_stored_schedules,
@@ -506,6 +507,20 @@ async def test_refused_item_is_not_retried_until_edited(setup) -> None:
     items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
     api = _api()
     api.create_notification = AsyncMock(side_effect=PushWardApiError("bad", status_code=400))
+    manager, api, todo = await setup(items, api=api)
+
+    await manager._async_reconcile(SUB, full=True)
+    assert api.create_notification.await_count == 1
+
+    todo.items[0] = {**todo.items[0], "summary": "Dentist at 3"}
+    await manager._async_reconcile(SUB)
+    assert api.create_notification.await_count == 2
+
+
+async def test_item_that_cannot_be_encrypted_waits_for_an_edit(setup) -> None:
+    items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
+    api = _api()
+    api.create_notification = AsyncMock(side_effect=E2EError("too long to encrypt"))
     manager, api, todo = await setup(items, api=api)
 
     await manager._async_reconcile(SUB, full=True)

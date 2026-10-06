@@ -5,8 +5,8 @@ Home Assistant renders a per-config-entry "Download diagnostics" button from
 snapshot to a bug report so a broken board/log (or any template) payload is
 visible without manual back-and-forth.
 
-The integration key (``hlk_``) is always redacted; only rendered content and
-config shapes are included.
+The integration key (``hlk_``) and the encryption key are always redacted; only
+rendered content and config shapes are included.
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ from homeassistant.core import HomeAssistant
 
 from .activity_manager import ActivityManager
 from .const import (
+    CONF_E2E_KEY,
     CONF_ENTITY_ID,
     CONF_INTEGRATION_KEY,
     CONF_MEDIA_TOKEN,
@@ -30,18 +31,20 @@ from .const import (
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
 )
+from .e2e import key_id, parse_key
 from .widget_manager import WidgetManager
 
-# Never leak the integration key, the media-control secret, nor user-supplied
-# tap-action targets - webhook URLs (config + rendered last_content) and any
-# silent-webhook headers/body can embed secrets/tokens. The URL keys are shared
-# by activity and widget subentries, so widget button targets are covered by the
-# same three entries. async_redact_data matches these keys recursively, so the
+# Never leak the integration key, the encryption key, the media-control secret,
+# nor user-supplied tap-action targets - webhook URLs (config + rendered
+# last_content) and any silent-webhook headers/body can embed secrets/tokens.
+# The URL keys are shared by activity and widget subentries, so widget button
+# targets are covered by the same three entries. async_redact_data matches these keys recursively, so the
 # rendered tap_action/url_action dicts inside last_content are covered too, and
 # with them the token-bearing media control URLs (each control is an action
 # object keyed "url").
 TO_REDACT = {
     CONF_INTEGRATION_KEY,
+    CONF_E2E_KEY,
     CONF_MEDIA_TOKEN,
     CONF_TAP_ACTION_URL,
     CONF_URL,
@@ -81,11 +84,14 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigE
                 )
         subentries.append(item)
 
+    e2e_key = entry.options.get(CONF_E2E_KEY)
     return {
         "entry": {
             "version": entry.version,
             "data": async_redact_data(dict(entry.data), TO_REDACT),
             "options": async_redact_data(dict(entry.options), TO_REDACT),
+            # Not secret: the app shows the same ID next to the key that opens these.
+            "e2e_key_id": key_id(parse_key(e2e_key)) if e2e_key else None,
         },
         "subentries": subentries,
         "usage": coordinator.data if coordinator is not None else None,

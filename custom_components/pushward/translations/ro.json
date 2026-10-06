@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "Nu s-a putut genera ThumbHash: {error}"
+    },
+    "e2e_seal_failed": {
+      "message": "Notificarea nu a putut fi criptată: {error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "PushWard este deja configurat.",
       "reconfigure_successful": "Configurația PushWard a fost actualizată.",
       "reauth_successful": "Reautentificare reușită."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Criptare end-to-end",
+        "description": "Home Assistant criptează cu această cheie titlul, subtitlul, conținutul și URL-ul fiecărei notificări trimise de această integrare, iar doar dispozitivele care dețin aceeași cheie le pot citi. Creați cheia în aplicația PushWard la Setări > Criptare și lipiți-o aici. Nivelul, sunetul, acțiunile, conținutul media și metadatele rămân lizibile pentru PushWard, care are nevoie de ele pentru a livra notificarea; Activitățile live și widgeturile nu sunt criptate. Un dispozitiv fără cheie sau cu o aplicație PushWard mai veche de 1.17 afișează un substituent în loc de text. Lăsați câmpul gol pentru a trimite notificările necriptate.\n\nID cheie în uz: {key_id}",
+        "data": {
+          "e2e_key": "Cheie de criptare end-to-end"
+        },
+        "data_description": {
+          "e2e_key": "64 de caractere hexazecimale. Aplicația afișează același ID de cheie lângă cheie."
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "O cheie de criptare are 64 de caractere hexazecimale.",
+      "e2e_key_is_integration_key": "Aceasta este o cheie de integrare. Lipiți cheia de criptare din Setări > Criptare în aplicația PushWard."
     }
   },
   "config_subentries": {

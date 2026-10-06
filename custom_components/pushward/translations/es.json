@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "No se pudo generar el ThumbHash: {error}"
+    },
+    "e2e_seal_failed": {
+      "message": "No se pudo cifrar la notificación: {error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "PushWard ya está configurado.",
       "reconfigure_successful": "Configuración de PushWard actualizada.",
       "reauth_successful": "Reautenticación completada."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Cifrado de extremo a extremo",
+        "description": "Home Assistant cifra el título, el subtítulo, el cuerpo y la URL de cada notificación que envía esta integración con esta clave, y solo los dispositivos que tengan la misma clave pueden leerlos. Crea la clave en la app de PushWard en Ajustes > Cifrado y pégala aquí. El nivel, el sonido, las acciones, los medios y los metadatos siguen siendo legibles para PushWard, que los necesita para entregar la notificación; las Actividades en vivo y los widgets no se cifran. Un dispositivo sin la clave, o con una app de PushWard anterior a la 1.17, muestra un marcador de posición en lugar del texto. Deja el campo vacío para enviar las notificaciones sin cifrar.\n\nID de clave en uso: {key_id}",
+        "data": {
+          "e2e_key": "Clave de cifrado de extremo a extremo"
+        },
+        "data_description": {
+          "e2e_key": "64 caracteres hexadecimales. La app muestra el mismo ID de clave junto a la clave."
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "Una clave de cifrado tiene 64 caracteres hexadecimales.",
+      "e2e_key_is_integration_key": "Esa es una clave de integración. Pega la clave de cifrado de Ajustes > Cifrado en la app de PushWard."
     }
   },
   "config_subentries": {

@@ -52,6 +52,7 @@ from .const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    CONF_E2E_KEY,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     CONF_SLUG,
@@ -101,6 +102,7 @@ from .const import (
     validate_url,
 )
 from .coordinator import PushWardUsageCoordinator
+from .e2e import E2EError, parse_key
 from .image_hash import (
     ThumbhashError,
     async_ensure_thumbhash,
@@ -812,6 +814,12 @@ def _surface_api_errors():
         raise ServiceValidationError(str(err)) from err
     except PushWardApiError as err:
         raise HomeAssistantError(str(err)) from err
+    except E2EError as err:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="e2e_seal_failed",
+            translation_placeholders={"error": str(err)},
+        ) from err
 
 
 async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, template: str | None = None) -> None:
@@ -1167,6 +1175,12 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     return True
 
 
+def _e2e_key(entry: ConfigEntry) -> bytes | None:
+    """The encryption key from the entry options (the options flow stored it validated)."""
+    raw = entry.options.get(CONF_E2E_KEY)
+    return parse_key(raw) if raw else None
+
+
 def _entity_configs(entry: ConfigEntry) -> list[dict]:
     """The tracked-entity configs, each tagged with the subentry that owns it.
 
@@ -1189,7 +1203,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     quota_gate = QuotaGate(hass, entry.entry_id)
     entry.async_on_unload(quota_gate.async_shutdown)
     api = PushWardApiClient(
-        session, entry.data[CONF_SERVER_URL], entry.data[CONF_INTEGRATION_KEY], quota_gate=quota_gate
+        session,
+        entry.data[CONF_SERVER_URL],
+        entry.data[CONF_INTEGRATION_KEY],
+        quota_gate=quota_gate,
+        e2e_key=_e2e_key(entry),
     )
 
     # The usage coordinator's first refresh doubles as the connection/key check:
@@ -1213,6 +1231,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "todo_manager": todo_manager,
         "coordinator": coordinator,
         "quota_gate": quota_gate,
+        "e2e_key": entry.options.get(CONF_E2E_KEY),
     }
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -1226,6 +1245,12 @@ async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle config entry or subentry updates: reload entity, widget and to-do tracking."""
     data = hass.data.get(DOMAIN, {}).get(entry.entry_id)
     if data is None:
+        return
+    # The options hold only the encryption key, which the client takes as is.
+    # Reloading the managers for it would end and restart every Live Activity.
+    if entry.options.get(CONF_E2E_KEY) != data.get("e2e_key"):
+        data["e2e_key"] = entry.options.get(CONF_E2E_KEY)
+        data["api"].e2e_key = _e2e_key(entry)
         return
     entities = _entity_configs(entry)
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]

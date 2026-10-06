@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "Could not generate a ThumbHash: {error}"
+    },
+    "e2e_seal_failed": {
+      "message": "Could not encrypt the notification: {error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "PushWard is already configured.",
       "reconfigure_successful": "PushWard configuration updated.",
       "reauth_successful": "Reauthentication successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "End-to-end encryption",
+        "description": "Home Assistant encrypts the title, subtitle, body and URL of every notification this integration sends with this key, and only devices that hold the same key can read them. Create the key in the PushWard app under Settings > Encryption and paste it here. Level, sound, actions, media and metadata stay readable to PushWard, which needs them to deliver the push; Live Activities and widgets are not encrypted. A device without the key, or with a PushWard app older than 1.17, shows a placeholder instead of the text. Leave the field empty to send notifications unencrypted.\n\nKey ID in use: {key_id}",
+        "data": {
+          "e2e_key": "End-to-end encryption key"
+        },
+        "data_description": {
+          "e2e_key": "64 hexadecimal characters. The app shows the same Key ID next to the key."
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "An encryption key is 64 hexadecimal characters.",
+      "e2e_key_is_integration_key": "That is an integration key. Paste the encryption key from Settings > Encryption in the PushWard app."
     }
   },
   "config_subentries": {

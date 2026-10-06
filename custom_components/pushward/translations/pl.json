@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "Nie udało się wygenerować ThumbHash: {error}"
+    },
+    "e2e_seal_failed": {
+      "message": "Nie udało się zaszyfrować powiadomienia: {error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "PushWard jest już skonfigurowany.",
       "reconfigure_successful": "Konfiguracja PushWard została zaktualizowana.",
       "reauth_successful": "Ponowne uwierzytelnienie powiodło się."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Szyfrowanie end-to-end",
+        "description": "Home Assistant szyfruje tym kluczem tytuł, podtytuł, treść i adres URL każdego powiadomienia wysyłanego przez tę integrację, a odczytać je mogą tylko urządzenia z tym samym kluczem. Utwórz klucz w aplikacji PushWard w Ustawienia > Szyfrowanie i wklej go tutaj. Poziom, dźwięk, akcje, multimedia i metadane pozostają czytelne dla PushWard, który potrzebuje ich do dostarczenia powiadomienia; Aktywności na żywo i widżety nie są szyfrowane. Urządzenie bez klucza lub z aplikacją PushWard starszą niż 1.17 pokaże zamiast tekstu symbol zastępczy. Zostaw pole puste, aby wysyłać powiadomienia bez szyfrowania.\n\nUżywany identyfikator klucza: {key_id}",
+        "data": {
+          "e2e_key": "Klucz szyfrowania end-to-end"
+        },
+        "data_description": {
+          "e2e_key": "64 znaki szesnastkowe. Aplikacja pokazuje ten sam identyfikator klucza obok klucza."
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "Klucz szyfrowania to 64 znaki szesnastkowe.",
+      "e2e_key_is_integration_key": "To jest klucz integracji. Wklej klucz szyfrowania z Ustawienia > Szyfrowanie w aplikacji PushWard."
     }
   },
   "config_subentries": {

@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "Không thể tạo ThumbHash: {error}"
+    },
+    "e2e_seal_failed": {
+      "message": "Không thể mã hóa thông báo: {error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "PushWard đã được cấu hình.",
       "reconfigure_successful": "Đã cập nhật cấu hình PushWard.",
       "reauth_successful": "Xác thực lại thành công."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Mã hóa đầu cuối",
+        "description": "Home Assistant mã hóa tiêu đề, phụ đề, nội dung và URL của mọi thông báo mà tích hợp này gửi bằng khóa này, và chỉ các thiết bị có cùng khóa mới đọc được. Tạo khóa trong ứng dụng PushWard tại Cài đặt > Mã hóa rồi dán vào đây. Mức độ, âm thanh, hành động, phương tiện và siêu dữ liệu vẫn đọc được đối với PushWard, nơi cần chúng để gửi thông báo đẩy; Hoạt động trực tiếp và widget không được mã hóa. Thiết bị không có khóa, hoặc dùng ứng dụng PushWard cũ hơn 1.17, sẽ hiển thị văn bản giữ chỗ thay cho nội dung. Để trống trường này để gửi thông báo không mã hóa.\n\nID khóa đang dùng: {key_id}",
+        "data": {
+          "e2e_key": "Khóa mã hóa đầu cuối"
+        },
+        "data_description": {
+          "e2e_key": "64 ký tự thập lục phân. Ứng dụng hiển thị cùng ID khóa bên cạnh khóa."
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "Khóa mã hóa gồm 64 ký tự thập lục phân.",
+      "e2e_key_is_integration_key": "Đó là khóa tích hợp. Hãy dán khóa mã hóa từ Cài đặt > Mã hóa trong ứng dụng PushWard."
     }
   },
   "config_subentries": {

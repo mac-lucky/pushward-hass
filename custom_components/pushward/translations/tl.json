@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "Hindi makagawa ng ThumbHash: {error}"
+    },
+    "e2e_seal_failed": {
+      "message": "Hindi ma-encrypt ang notification: {error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "Naka-configure na ang PushWard.",
       "reconfigure_successful": "Na-update na ang configuration ng PushWard.",
       "reauth_successful": "Matagumpay na ang reauthentication."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "End-to-end encryption",
+        "description": "Ine-encrypt ng Home Assistant gamit ang key na ito ang pamagat, subtitle, nilalaman, at URL ng bawat notification na ipinapadala ng integration na ito, at ang mga device lang na may parehong key ang makakabasa ng mga ito. Gumawa ng key sa PushWard app sa Settings > Encryption at i-paste ito rito. Nananatiling nababasa ng PushWard ang level, tunog, mga action, media, at metadata, dahil kailangan nito ang mga iyon para maihatid ang push; hindi ine-encrypt ang Live Activities at mga widget. Ang device na walang key, o may PushWard app na mas luma sa 1.17, ay magpapakita ng placeholder sa halip na ang teksto. Iwanang walang laman ang field para magpadala ng mga notification nang walang encryption.\n\nKey ID na ginagamit: {key_id}",
+        "data": {
+          "e2e_key": "End-to-end encryption key"
+        },
+        "data_description": {
+          "e2e_key": "64 na hexadecimal na character. Ipinapakita ng app ang parehong Key ID sa tabi ng key."
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "Ang encryption key ay 64 na hexadecimal na character.",
+      "e2e_key_is_integration_key": "Integration key iyan. I-paste ang encryption key mula sa Settings > Encryption sa PushWard app."
     }
   },
   "config_subentries": {

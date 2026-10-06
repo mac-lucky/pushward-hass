@@ -33,6 +33,7 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_WIDGET,
     validate_tap_action_url,
 )
+from custom_components.pushward.e2e import E2EError
 from custom_components.pushward.widget_manager import WidgetManager
 
 from .conftest import (
@@ -484,6 +485,17 @@ async def test_service_send_notification_rejects_bad_recurrence(hass: HomeAssist
                 blocking=True,
             )
     api.create_notification.assert_not_awaited()
+
+
+async def test_service_send_notification_surfaces_an_encryption_failure(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.create_notification = AsyncMock(side_effect=E2EError("the notification is too long to encrypt"))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await hass.services.async_call(DOMAIN, "send_notification", {"title": "t", "body": "x" * 3000}, blocking=True)
+    assert exc_info.value.translation_key == "e2e_seal_failed"
+    assert exc_info.value.translation_placeholders == {"error": "the notification is too long to encrypt"}
 
 
 async def test_service_get_notification_answer(hass: HomeAssistant) -> None:

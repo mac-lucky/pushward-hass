@@ -37,6 +37,7 @@ from .const import (
     SCHEDULED_LIST_MAX_PAGES,
     SCHEDULED_LIST_PAGE_SIZE,
 )
+from .e2e import seal
 
 if TYPE_CHECKING:
     from .quota import QuotaGate
@@ -180,6 +181,7 @@ class PushWardApiClient:
         base_url: str,
         integration_key: str,
         quota_gate: QuotaGate | None = None,
+        e2e_key: bytes | None = None,
     ) -> None:
         self._session = session
         self._base_url = base_url.rstrip("/")
@@ -194,6 +196,9 @@ class PushWardApiClient:
         # Optional: remembers exhausted quotas so metered requests are refused
         # locally instead of being sent (and rejected) until the period resets.
         self._quota_gate = quota_gate
+        # The end-to-end encryption key from the entry options; None sends notification
+        # text in the clear. Swapped in place when the options change.
+        self.e2e_key = e2e_key
 
     async def validate_connection(self) -> bool:
         """Validate the connection and integration key via GET /auth/me."""
@@ -361,8 +366,19 @@ class PushWardApiClient:
         recurrence, send_at is optional and marks where the series starts. Both
         count against the notification quota (a schedule each time it sends), so
         both go through the quota gate.
+
+        With an e2e_key, title, subtitle, body and url go out only inside the
+        ``encrypted`` envelope (E2EError when they cannot be sealed); the server
+        stores placeholders for them.
         """
-        payload: dict = {"title": title, "body": body, "push": push}
+        if self.e2e_key is not None:
+            payload: dict = {
+                "encrypted": seal(self.e2e_key, title=title, body=body, subtitle=subtitle, url=url),
+                "push": push,
+            }
+            subtitle = url = None
+        else:
+            payload = {"title": title, "body": body, "push": push}
         for key, val in [
             ("subtitle", subtitle),
             ("level", level),

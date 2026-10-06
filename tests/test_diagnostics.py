@@ -15,6 +15,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.const import (
     CONF_ACTIVITY_NAME,
+    CONF_E2E_KEY,
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_INTEGRATION_KEY,
@@ -31,6 +32,7 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_WIDGET,
 )
 from custom_components.pushward.diagnostics import async_get_config_entry_diagnostics
+from custom_components.pushward.e2e import key_id
 
 from .conftest import make_entity_config, make_usage_payload, make_widget_config
 
@@ -92,6 +94,20 @@ async def test_diagnostics_redacts_integration_key(hass: HomeAssistant) -> None:
 
     assert diag["entry"]["data"][CONF_INTEGRATION_KEY] != MOCK_KEY
     assert MOCK_KEY not in str(diag)
+
+
+async def test_diagnostics_redacts_the_e2e_key_and_shows_its_key_id(hass: HomeAssistant) -> None:
+    key_hex = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+    entry = _entry_with_subentries()
+    entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(entry, options={CONF_E2E_KEY: key_hex})
+    await _setup(hass, entry, _mock_api())
+
+    diag = await async_get_config_entry_diagnostics(hass, entry)
+
+    assert key_hex not in str(diag)
+    assert diag["entry"]["options"][CONF_E2E_KEY] != key_hex
+    assert diag["entry"]["e2e_key_id"] == key_id(bytes.fromhex(key_hex))
 
 
 async def test_diagnostics_includes_subentries(hass: HomeAssistant) -> None:

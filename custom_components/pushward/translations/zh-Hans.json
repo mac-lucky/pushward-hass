@@ -1692,6 +1692,9 @@
     },
     "thumbhash_failed": {
       "message": "无法生成 ThumbHash：{error}"
+    },
+    "e2e_seal_failed": {
+      "message": "无法加密通知：{error}"
     }
   },
   "config": {
@@ -1737,6 +1740,24 @@
       "already_configured": "PushWard 已配置。",
       "reconfigure_successful": "PushWard 配置已更新。",
       "reauth_successful": "重新验证成功。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "端到端加密",
+        "description": "Home Assistant 会使用此密钥加密此集成发送的每条通知的标题、副标题、正文和 URL，只有持有相同密钥的设备才能读取。请在 PushWard 应用的“设置”>“加密”中创建密钥，并粘贴到此处。级别、声音、操作、媒体和元数据仍可被 PushWard 读取，因为它需要这些信息来送达推送；实时活动和小组件不会被加密。没有密钥的设备，或 PushWard 应用版本低于 1.17 的设备，会显示占位符而不是文本。将此字段留空即可发送未加密的通知。\n\n正在使用的密钥 ID：{key_id}",
+        "data": {
+          "e2e_key": "端到端加密密钥"
+        },
+        "data_description": {
+          "e2e_key": "64 个十六进制字符。应用会在密钥旁显示相同的密钥 ID。"
+        }
+      }
+    },
+    "error": {
+      "invalid_e2e_key": "加密密钥为 64 个十六进制字符。",
+      "e2e_key_is_integration_key": "这是集成密钥。请粘贴 PushWard 应用中“设置”>“加密”里的加密密钥。"
     }
   },
   "config_subentries": {

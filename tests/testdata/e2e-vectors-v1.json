@@ -1,0 +1,252 @@
+{
+  "description": "PushWard end-to-end encrypted notification envelope, version 1. key = 32 bytes (64 hex); enc_key = HKDF-SHA256(key, salt empty, info \"pushward/e2e/v1/enc\", 32); kid = hex(HKDF-SHA256(key, salt empty, info \"pushward/e2e/v1/kid\", 4)); AES-256-GCM, 12-byte nonce, AAD = ASCII \"pw1.\" + kid; envelope = \"pw1.\" + kid + \".\" + base64url-nopad(nonce || ciphertext || tag), at most 3072 characters.",
+  "format": "pw1",
+  "open_fail": [
+    {
+      "name": "tampered_tag",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1I",
+      "reason": "authentication fails"
+    },
+    {
+      "name": "tampered_ciphertext",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhCOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "authentication fails"
+    },
+    {
+      "name": "tampered_nonce",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.oaGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "authentication fails"
+    },
+    {
+      "name": "wrong_key",
+      "key_hex": "f0e1d2c3b4a5968778695a4b3c2d1e0f00112233445566778899aabbccddeeff",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "kid does not match the key; with the right kid it would fail authentication"
+    },
+    {
+      "name": "kid_swapped",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.eb6c5c92.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "the kid is part of the AAD; a key holding kid eb6c5c92 cannot open it and key A fails authentication"
+    },
+    {
+      "name": "sealed_with_wrong_aad",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.eb6c5c92.oKGio6Slpqeoqaqr-DhDOK4k53I0XLbOAqOQv04eqRALRCEG6yGGiBZ8yDnZZkkiSjlMGw",
+      "reason": "sealed with AAD pw1.eb6c5c92 under key A"
+    },
+    {
+      "name": "plaintext_not_object",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.sLGys7S1tre4ubq7AhPh2HTPPvEHsieStDj2uH9wSnDu_sNCohlhVG8mxZM",
+      "reason": "plaintext is valid JSON but not an object"
+    },
+    {
+      "name": "plaintext_not_json",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.wMHCw8TFxsfIycrLL_ZjhFi0_qY4tZBVAD7G2s4ex2kdLT8u",
+      "reason": "plaintext is not JSON"
+    },
+    {
+      "name": "missing_body",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIGCQvjSsQoT4l5FWCEGmOqoEmMUO1zMU3bHMSTqrw",
+      "reason": "title and body are required strings"
+    },
+    {
+      "name": "empty_title",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.sLGys7S1tre4ubq7IhPh2HTPPvERsmfR8iO7gdkm46ZznLEO4NyV8chynqXpnFgIPFEQ",
+      "reason": "title and body must be non-empty"
+    },
+    {
+      "name": "title_not_string",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "envelope": "pw1.767c0806.wMHCw8TFxsfIycrLIL1jgUniu_wlTzj0QXqusCUHsjth5dhpAQ-SfTIgeuGXAPhX2RQ",
+      "reason": "title and body must be strings"
+    }
+  ],
+  "parse_fail": [
+    {
+      "name": "padding_char",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J=",
+      "reason": "base64url without padding only"
+    },
+    {
+      "name": "uppercase_kid",
+      "envelope": "pw1.767C0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "kid is 8 lowercase hex characters"
+    },
+    {
+      "name": "short_kid",
+      "envelope": "pw1.767c08.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "kid is 8 lowercase hex characters"
+    },
+    {
+      "name": "wrong_version",
+      "envelope": "pw2.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "only pw1 is defined"
+    },
+    {
+      "name": "too_short",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8",
+      "reason": "at least 40 base64url characters (30 bytes: nonce, 2-byte plaintext, tag)"
+    },
+    {
+      "name": "bad_base64_length",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5",
+      "reason": "41 characters is not a valid unpadded base64 length"
+    },
+    {
+      "name": "standard_base64_alphabet",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr+DhDOK4k53I0XIqFXerStl8L5wgFH2EUp/HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm/WWiP9w4ooFbGhar/XGOj1J+/",
+      "reason": "base64url alphabet only"
+    },
+    {
+      "name": "missing_part",
+      "envelope": "pw1.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "reason": "three dot-separated parts"
+    },
+    {
+      "name": "too_long",
+      "envelope": "pw1.767c0806.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "reason": "at most 3072 characters"
+    },
+    {
+      "name": "empty",
+      "envelope": "",
+      "reason": "empty"
+    }
+  ],
+  "seal": [
+    {
+      "name": "ascii_minimal",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "enc_key_hex": "39651bee6a4696d8a5f21e130dab8ed8e17160b55fa6a3eef3524ea6b3adc83e",
+      "kid": "767c0806",
+      "nonce_hex": "a0a1a2a3a4a5a6a7a8a9aaab",
+      "plaintext": "{\"title\":\"Disk full\",\"body\":\"/var is at 97% on db01\"}",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIqFXerStl8L5wgFH2EUp_HSYIhOtPQU6R9X6oBtcwaIVw6kyen5OK3Vm_WWiP9w4ooFbGhar_XGOj1J",
+      "expect": {
+        "title": "Disk full",
+        "body": "/var is at 97% on db01"
+      }
+    },
+    {
+      "name": "all_fields",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "enc_key_hex": "39651bee6a4696d8a5f21e130dab8ed8e17160b55fa6a3eef3524ea6b3adc83e",
+      "kid": "767c0806",
+      "nonce_hex": "b0b1b2b3b4b5b6b7b8b9babb",
+      "plaintext": "{\"title\":\"Deploy failed\",\"subtitle\":\"api / production\",\"body\":\"Step 3 of 5: migrate\",\"url\":\"https://ci.example.com/runs/42\"}",
+      "envelope": "pw1.767c0806.sLGys7S1tre4ubq7IhPh2HTPPvERsgGYoC27nIBiuO1n26jrA8xe-tEjxm4TqS9Bvjvlk7iT6F2P5KlCpkPa2mhWw7jIM4ciWI-eOZX_y7gChNKTT5z0-Z3C4pvgrf51_B3c1EJd7-XCRvbzoYGXOg8lnpZ3E2khX_u-3A3DhSdDBl8xhacaTBCmoJCqY0n7LCxNegxPpiY",
+      "expect": {
+        "title": "Deploy failed",
+        "subtitle": "api / production",
+        "body": "Step 3 of 5: migrate",
+        "url": "https://ci.example.com/runs/42"
+      }
+    },
+    {
+      "name": "padded_to_64",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "enc_key_hex": "39651bee6a4696d8a5f21e130dab8ed8e17160b55fa6a3eef3524ea6b3adc83e",
+      "kid": "767c0806",
+      "nonce_hex": "c0c1c2c3c4c5c6c7c8c9cacb",
+      "plaintext": "{\"title\":\"Padded\",\"body\":\"Trailing spaces pad the JSON to a multiple of 64 bytes\"}                                              ",
+      "envelope": "pw1.767c0806.wMHCw8TFxsfIycrLIL1jgUniu_wlWES3R3GvrSURsiEs_B4jsQoxp0EscCyRO_CBFuKjKv1ykj5XyYw4a7-JpimC9ZeiCaYeyIE_ZVUbdgUKT341KKyE31GzM6HP5-c7qZ65f7Hww1pN4GsFwto4NdlMhHzOwz0rAbk-51gD4ugWs8T47DuXkhEaA9BJLLyegzqFXi6uvxY_rA1J",
+      "expect": {
+        "title": "Padded",
+        "body": "Trailing spaces pad the JSON to a multiple of 64 bytes"
+      },
+      "note": "plaintext ends with spaces; JSON parsers accept trailing whitespace"
+    },
+    {
+      "name": "emoji_and_rtl",
+      "key_hex": "f0e1d2c3b4a5968778695a4b3c2d1e0f00112233445566778899aabbccddeeff",
+      "enc_key_hex": "1c2bf9263e8def99c955c0628dc3b29c5310a373553cbfd8b7e93bc580a0425d",
+      "kid": "eb6c5c92",
+      "nonce_hex": "a0a1a2a3a4a5a6a7a8a9aaab",
+      "plaintext": "{\"title\":\"🔥 Alarm\",\"body\":\"תקלה בשרת · خطأ في الخادم · Zażółć gęślą jaźń\"}",
+      "envelope": "pw1.eb6c5c92.oKGio6SlpqeoqaqreIlJ0E1zK_l4CWu90uB0HTN35NEQAD9bF-X7ZwraFxKsVUkPC1uRAff3z4V5FkFyhhxjRol0jMNlWd-Fp3z0mVxRRzfo37_I6eflACT9yjFfdQjPuhEd7eDOqVeIT1f00Gytc1OygykgUdzMQDuelBHiteC5m7-R2VTc",
+      "expect": {
+        "title": "🔥 Alarm",
+        "body": "תקלה בשרת · خطأ في الخادم · Zażółć gęślą jaźń"
+      }
+    },
+    {
+      "name": "unknown_key_ignored",
+      "key_hex": "f0e1d2c3b4a5968778695a4b3c2d1e0f00112233445566778899aabbccddeeff",
+      "enc_key_hex": "1c2bf9263e8def99c955c0628dc3b29c5310a373553cbfd8b7e93bc580a0425d",
+      "kid": "eb6c5c92",
+      "nonce_hex": "b0b1b2b3b4b5b6b7b8b9babb",
+      "plaintext": "{\"title\":\"Hello\",\"body\":\"World\",\"future_field\":{\"x\":1}}",
+      "envelope": "pw1.eb6c5c92.sLGys7S1tre4ubq7bz4flROS-CNwIvx-TtrlPf2ETY2AvTSGNo5QcnFxpse5IPRilOlLnOu2kTly4bsWQ2DFQyEsXKI32_YHbef6CsFPFX8G4T0",
+      "expect": {
+        "title": "Hello",
+        "body": "World"
+      },
+      "note": "receivers ignore keys they do not know"
+    },
+    {
+      "name": "custom_scheme_url_kept",
+      "key_hex": "f0e1d2c3b4a5968778695a4b3c2d1e0f00112233445566778899aabbccddeeff",
+      "enc_key_hex": "1c2bf9263e8def99c955c0628dc3b29c5310a373553cbfd8b7e93bc580a0425d",
+      "kid": "eb6c5c92",
+      "nonce_hex": "c0c1c2c3c4c5c6c7c8c9cacb",
+      "plaintext": "{\"title\":\"Open app\",\"body\":\"Tap to open\",\"url\":\"myapp://incident/7\"}",
+      "envelope": "pw1.eb6c5c92.wMHCw8TFxsfIycrLOSGn4v5QzYo-qs0YnJE7M42Cz6uAbmx3AyaU3ePtDO5ytzux6IWhxw2I7t3rgFqczAFwmUOoMBVWn5R3vrWHkSFGo7ZKPmEKIiAztvXidyWzQQaT",
+      "expect": {
+        "title": "Open app",
+        "body": "Tap to open",
+        "url": "myapp://incident/7"
+      },
+      "note": "non-http schemes other than javascript, data, file and vbscript are allowed"
+    },
+    {
+      "name": "javascript_url_dropped",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "enc_key_hex": "39651bee6a4696d8a5f21e130dab8ed8e17160b55fa6a3eef3524ea6b3adc83e",
+      "kid": "767c0806",
+      "nonce_hex": "a0a1a2a3a4a5a6a7a8a9aaab",
+      "plaintext": "{\"title\":\"Bad link\",\"body\":\"The url must be dropped\",\"url\":\"javascript:alert(1)\"}",
+      "envelope": "pw1.767c0806.oKGio6Slpqeoqaqr-DhDOK4k53I0XIyNSqGeuUQMqQYLX2wfuqrKeP4Jp7UTuxoEp5RqJx_dFw6v1abtKviAm6QpZBdzeiZzQpwAWSJ0v141sx65kpp6KT717cdqQVhMHN5Zwyem2VpaRaN8aA",
+      "expect": {
+        "title": "Bad link",
+        "body": "The url must be dropped"
+      },
+      "note": "receivers drop a url the server would have refused"
+    },
+    {
+      "name": "title_clamped_to_256",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "enc_key_hex": "39651bee6a4696d8a5f21e130dab8ed8e17160b55fa6a3eef3524ea6b3adc83e",
+      "kid": "767c0806",
+      "nonce_hex": "b0b1b2b3b4b5b6b7b8b9babb",
+      "plaintext": "{\"title\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"body\":\"Title longer than 256 code points is cut\"}",
+      "envelope": "pw1.767c0806.sLGys7S1tre4ubq7IhPh2HTPPvERsiScsSC1hMFluOVq362oTo9M7tI2znserWwa_Tv0m_ndqUyc6qxWpFbS1GcVjvvLPYI6G9TdC4D72vlQxdyUDsivuJHK5IjguPo2sV7Ix08etKbLU-Pis9rZdA0t0ZJuE2UwUv_x3gPPyzRXCU1_0PRZUEeZcVvttDiCG_2ocT_iZf506FcTn7sjpmvYgBaxC_P9zJY_lCa81gfMxa8HIPkGWiUT-5HzXLWAtsn-L2WnvIK7iICOZ7YbfUo9gUlK5PEwZEDkvHPQj_8_L4Iy9sED-N8X8TKciggiljFHCD9r5kPmmX-WKhOv9yr3IyIkGP8mXOB-wByj2a658mhJ2CMBIyK7DXQ5axLfJfX4QnWxLlZmsZFppdYYHoWJo4uqE-ndQaMdE1GEytJPe-L-8jofZb9QAL9h8-cJUpB_yhHzVKPHVVosMFO64lYDtB3jjq2YdGK3tzYnFnXaKxR9Ra4jb5UcfxJwVcm53m9FmJdw",
+      "expect": {
+        "title": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "body": "Title longer than 256 code points is cut"
+      },
+      "note": "receivers clamp title and subtitle to 256 and body to 4096 Unicode code points"
+    },
+    {
+      "name": "max_size",
+      "key_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "enc_key_hex": "39651bee6a4696d8a5f21e130dab8ed8e17160b55fa6a3eef3524ea6b3adc83e",
+      "kid": "767c0806",
+      "nonce_hex": "c0c1c2c3c4c5c6c7c8c9cacb",
+      "plaintext": "{\"title\":\"Max\",\"body\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}",
+      "envelope": "pw1.767c0806.wMHCw8TFxsfIycrLIL1jgUniu_wlWFm3Wzfm62VS9DphokV581AdrVg9ZD2HJKiKHvu4N_YqmidLkYAodue7jR60rZu1Ub9G3YwraUQTYhhSWGBtZuDcxVC_LqqV4r9j8cbhJ-momwIVuDNdmoJgbYEU3CSWm2VzWeFmvwBburBO65ygtGPPyklCW4g_dTGnAcS_kiacg8xN98zP6_bhJzQRLHZB2Jf24_9LkYlvKtDtWBlQYKujib0ejhToPVrYvF6QPBW4iWeejR1GvUZiszWA5_a7jeyCKYCyvQEF4GcSlkRmIgrZAMCT2ou71VKeN8ZtiHUuVgFdQYE8cVY8_TfaT2w1rlqyu9v-s9QzYOREr0qFguM5sW0tt-f2o-wMUPh_lA7N2HabquJN-BGoUe0ctybGQ1p1oyw4_9iQAha52of5DkK0rhHVvSqMjj4E6cSmp-s3R7b8ANJ8YmwkDvjjs7pnpbOgEqrmbS4PugQq3gWLortefgvwxP1kPnepeYovOBZdR6hOFL25rDATse5Atb5H2O0xhyRi_x5t4CjjVDVpLg0SOxqIFXxmPhURmISe2vNqNVg0PpEg_cC9XEnT228BH7fgOkgTH-DoTnPdr8ldr4bFmWHgG-p3LmSIlG4QAUfOSI4TfzMEaLLj74N-M6jehGXiTBNz2B-qj3jki4Q71w-TdqKf7kIU64qK3Za3ThcVCj7BrlcsHSXZ7dwh1a5SMAHgOZ9Xjwhv4ex0IhPlWebO9S_r65l_ohxnMmrJqDaGQQwhHzbM_8tUb7tnaHAgAM5mkaV-sIzW4K9N4QiZyp_YoyXYH26mRLDzM1KMBFQGE17dSqNnmdd8zuoe8s8VvPcwPZWr-et9qtmeFbKZMGtf9CRluBoqzdztAV98uF-mbtq1b4BFeLEgj5MSWRnmcMTNrFUPMAmgY-jgeeBS5DWhZLaweY6gMr56WfV_Zee5gnY3qCyrQC1fAk-YiTcBxrPuuXIKBTweSNWVtfxazU8YyU50hVDT5cFKQQ0hBSr1l_FP8TxZepd1eXx5JheqW9tI55lS8yVtCtZmoUYB80P6AUh9_9HiwS6-CCf-Urq5IOdTF51f81MEzsSBEWDUTRTzuJ-mFXjh49sFrF5vqOFMCxkDdiPt11MwIo3iO61w9SFlHlZy6yhXbRlBZecE77I2o-szATP2T_kVGQEUPuAKvMjBhx0Of7B9XD4X-yYWYPOVZI2n-aQn-ANyTwJ3yJ-y0BpZxqsvAjMjUkTaWpUd4oXB4dY375GRsEQBb2aFGiLlEjL_SapIY2YuEPJSts7vNRNDnzp119IUEJipevI6CGs_P2GbmFcBFVst2Y9F-38HYIIFFsdGBEx_GvDTEDQ57I2nclLC7rHDUIKeu6bLTVCStJiGhuYwVW3KhmegNqcdM0uujq_v52jM8pUoJ9d5AapHXaJ2T0DAGIOgNLCpYkiLP0050vegWOf15PF4jox_Yd4yVcCYRIWice8EksdaT8IoH7KAN3O0lQbaXlLRB3HIbjLI9uIEG9V7Fx3pwRfYQfOgOLae-7mlmwzEvX50rx9uMmQHyu7-MVvGKZrt7L6TNEg3YCYb2_lD98Og0i2ddCxeKn4y9WG5cMrXLhX2ZDwzpxI_4LoOa8E-eyGw7tNFsygJCTK6E6iF4F3rxE7FQTc1Py3hlwEFPtJJD-xE2L8Pt4FzcXbRnCKSPWNwQDzHmoiFYPhQSbjW7gApSGxUgvscnoUlQ-l1BEIzzWSdbR7z_8-rUu65iYN7P5Uby7kHTycv1HobrEm3ouA-O4-iCT-wkoB-9u5CiyJ_uNNQw6tHZaPyZGuyJSSfibC9dEoIgkbfghCnfVx7Q3wm8FKRwTAE3ej9v3iL5NEFVs0HfHleMpAElAGivU9tPbd53n5_dSOzwpxwGcXxEaI1du9AE7PYh0fjm8xn6620kfpOA1JBRvtklzBDQ3fxXqqU8tCiS6dzFi9QAuyy3tkY6qy2zhtZJEBT_jsYHgaxYlTa9Y6CtYqZ_yFQUZ0fK5aKBQV8qd_QudpUo1EL0IfDbJE6MUP_897NY6_8jOPmkeqFgqLFtu0lPGRgn4AWixoUBF9n_gjxLX_v2gaJzNDwd437tVvIllt5hJI25IUHMh-N5Szb204viA_PWmyRFDuXLEu9hdT3to65IL5mAuqneWxZiuXx2rfBX6GjCMEFOGm900ltX5-uzgf8O4pErEeRLSKF0SqfHThDPv8cQQbBoQE6mS4AaxiEs7SEtrplRLLx6kHowcw2ODZYMGWUBwGOH6jyC11pbxB1o5i80lTMsUW9My8wd51m2NjVzNbvdgH3Im5ELH9R7pBOYgTdQSR1pzCtDD5VgfbYfaGlBwPhKuFXGiSc5oiX6VVRTMnsc-bi6vb5ptJHm3vqUwevMCLmHiibg6Dwly0YHHcRi9ZuM9Ax6C8m5I2rSDCOCZHIVbr_HrBRfa5_otSHnIcHJsT7La7Bg25REns7QC-04Q-WRN9d1POmjsOTpHYqPbGUN4kXQ3KklFEDMvw8NPE8JQpTOF_GP4DLN0gqVFCJ4fOG7q3IgvAgDI2frJRi5sSh-MhK63dTR_wbLegeHVcJIae62Uo5mGcOPurkr5YbpS0ErchxQhihdrjLBsWQDA7SwAdBNivLzbycoprhtqWpKksG_eLNTPqesrSWtnIQuihxd3Owzhh3BaDHhHgUjQa1u1hXE52yu8awCzDBKUmECLrOm9trVbUIVvj7V-DvAXhqfLylKlFfaoy1LiS0eFXhv7yyolQj5aOHbWhVuFoDY2o8E3A307yM_YsSlWomMvi9Gm0byR5sQD1P3_kTzXZoG81BWGOPyEZWJNBVyy_4NZIUw8oFxmyguJeBtygLsnfv690Q0kfe2ozMwRGXC4c93ghHN0_lDXyq0E0YIjnAGD-999Kw2q7aBY2ZWgzXQzFao6RxjI2n-giwyrUmdjzRn9XA6TR9Guhk8g_5GGulrTq7xxrbmoO7nWBtrCp4ECvaWPKc3jlUq2wlPNldbnbUw3lC7WayBgFYVinVDYBSZN8",
+      "expect": {
+        "title": "Max",
+        "body": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "note": "2266-byte plaintext, envelope exactly 3072 characters"
+    }
+  ]
+}

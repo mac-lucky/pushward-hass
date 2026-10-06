@@ -28,6 +28,7 @@ from custom_components.pushward.const import (
     RETRY_BASE_DELAY,
     RETRY_MAX_DELAY,
 )
+from custom_components.pushward.e2e import E2EError, key_id, open_envelope
 
 from .conftest import make_api_client as _make_client
 from .conftest import make_mock_response as _mock_response
@@ -329,6 +330,67 @@ async def test_create_notification_requires_aware_send_at():
     client = _make_client(_make_session(_mock_response(201)))
     with pytest.raises(ValueError):
         await client.create_notification("t", "b", send_at=datetime(2026, 10, 1, 16, 0))
+
+
+_E2E_KEY = bytes(range(32))
+
+
+async def test_create_notification_with_e2e_key_sends_only_the_envelope():
+    """title, subtitle, body and url travel only inside `encrypted`; the rest stays plain."""
+    session = _make_session(_mock_response(201))
+    client = _make_client(session)
+    client.e2e_key = _E2E_KEY
+
+    await client.create_notification(
+        "Door",
+        "Opened",
+        subtitle="Hall",
+        url="https://ha.example.com/lovelace",
+        level="active",
+        thread_id="security",
+        metadata={"entity_id": "binary_sensor.door"},
+    )
+
+    call_args = session.request.call_args
+    assert call_args[0][1].endswith("/notifications")
+    body = call_args[1]["json"]
+    assert set(body) == {"encrypted", "push", "level", "thread_id", "metadata"}
+    assert body["encrypted"].startswith(f"pw1.{key_id(_E2E_KEY)}.")
+    assert open_envelope(_E2E_KEY, body["encrypted"]) == {
+        "title": "Door",
+        "subtitle": "Hall",
+        "body": "Opened",
+        "url": "https://ha.example.com/lovelace",
+    }
+
+
+async def test_create_notification_with_e2e_key_seals_scheduled_sends():
+    session = _make_session(_mock_response(201, json_body={"id": 42, "status": "scheduled"}))
+    client = _make_client(session)
+    client.e2e_key = _E2E_KEY
+
+    await client.create_notification("Bins", "Tonight", send_at=datetime(2026, 10, 1, 16, 0, tzinfo=UTC))
+
+    call_args = session.request.call_args
+    assert call_args[0][1].endswith("/notifications/scheduled")
+    body = call_args[1]["json"]
+    assert set(body) == {"encrypted", "push", "send_at"}
+    assert open_envelope(_E2E_KEY, body["encrypted"]) == {"title": "Bins", "body": "Tonight"}
+
+
+@pytest.mark.parametrize(
+    ("title", "body", "url"),
+    [("", "b", None), ("t", "", None), ("t", "b", "javascript:alert(1)"), ("t", "x" * 3000, None)],
+)
+async def test_create_notification_with_e2e_key_refuses_before_sending(title, body, url):
+    """What the server can no longer check once sealed is refused here, and nothing is sent."""
+    session = _make_session(_mock_response(201))
+    client = _make_client(session)
+    client.e2e_key = _E2E_KEY
+
+    with pytest.raises(E2EError):
+        await client.create_notification(title, body, url=url)
+    session.request.assert_not_called()
 
 
 async def test_list_scheduled_notifications():
