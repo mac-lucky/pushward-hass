@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Bildirim şifrelenemedi: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard bu hesap için zaten 25 onay bekleyen bildirimi tekrarlıyor. Birinin onaylanmasını veya süresinin dolmasını bekleyin ya da pushward.cancel_notifications ile bazılarını durdurun."
+    },
+    "receipts_disabled": {
+      "message": "Onay gerektiren bildirimler PushWard'da geçici olarak kullanılamıyor. Bunu acknowledge olmadan gönderin veya daha sonra tekrar deneyin."
+    },
+    "e2e_unavailable": {
+      "message": "Bu entegrasyon anahtarı bir kuruma ait ve kurumlar uçtan uca şifreli bildirim gönderemez. Şifreleme anahtarını Yapılandır altından kaldırın veya kişisel bir entegrasyon anahtarı kullanın."
+    },
+    "receipt_not_found": {
+      "message": "{notification_id} bildirimi için iptal edilecek bir şey yok: acknowledge ile gönderilmedi, başka bir entegrasyon anahtarıyla gönderildi veya 7 günden daha önce sona erdi."
     }
   },
   "config": {

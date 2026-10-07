@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Hindi ma-encrypt ang notification: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "Inuulit na ng PushWard ang 25 notification na kailangang kilalanin para sa account na ito. Maghintay na may makilala o mag-expire, o ihinto ang ilan gamit ang pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Pansamantalang hindi available ang mga notification na kailangang kilalanin sa PushWard. Ipadala ito nang walang acknowledge, o subukan ulit mamaya."
+    },
+    "e2e_unavailable": {
+      "message": "Pag-aari ng isang organisasyon ang integration key na ito, at hindi makapagpapadala ng end-to-end encrypted na notification ang mga organisasyon. Alisin ang encryption key sa Configure, o gumamit ng personal na integration key."
+    },
+    "receipt_not_found": {
+      "message": "Walang makakansela sa notification {notification_id}: hindi ito ipinadala nang may acknowledge, ipinadala ito gamit ang ibang integration key, o natapos ito mahigit 7 araw na ang nakalipas."
     }
   },
   "config": {

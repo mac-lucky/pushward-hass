@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Impossibile cifrare la notifica: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard sta già ripetendo 25 notifiche con conferma per questo account. Attendi che una venga confermata o scada, oppure interrompine alcune con pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Le notifiche con conferma sono temporaneamente non disponibili su PushWard. Invia questa senza acknowledge, oppure riprova più tardi."
+    },
+    "e2e_unavailable": {
+      "message": "Questa chiave di integrazione appartiene a un'organizzazione, e le organizzazioni non possono inviare notifiche con crittografia end-to-end. Rimuovi la chiave di crittografia in Configura, oppure usa una chiave di integrazione personale."
+    },
+    "receipt_not_found": {
+      "message": "La notifica {notification_id} non ha nulla da annullare: non è stata inviata con acknowledge, è stata inviata con un'altra chiave di integrazione, oppure si è conclusa più di 7 giorni fa."
     }
   },
   "config": {

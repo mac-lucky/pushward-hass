@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Impossible de chiffrer la notification : {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard répète déjà 25 notifications avec accusé de réception pour ce compte. Attendez qu'une soit acquittée ou expire, ou arrêtez-en avec pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Les notifications avec accusé de réception sont temporairement indisponibles sur PushWard. Envoyez celle-ci sans acknowledge, ou réessayez plus tard."
+    },
+    "e2e_unavailable": {
+      "message": "Cette clé d'intégration appartient à une organisation, et les organisations ne peuvent pas envoyer de notifications chiffrées de bout en bout. Supprimez la clé de chiffrement sous Configurer, ou utilisez une clé d'intégration personnelle."
+    },
+    "receipt_not_found": {
+      "message": "La notification {notification_id} n'a rien à annuler : elle n'a pas été envoyée avec acknowledge, elle a été envoyée avec une autre clé d'intégration, ou elle s'est terminée il y a plus de 7 jours."
     }
   },
   "config": {

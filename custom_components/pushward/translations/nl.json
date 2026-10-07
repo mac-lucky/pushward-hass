@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "De melding kon niet worden versleuteld: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard herhaalt al 25 meldingen met bevestiging voor dit account. Wacht tot er een is bevestigd of verlopen, of stop er een paar met pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Meldingen met bevestiging zijn tijdelijk niet beschikbaar bij PushWard. Verstuur deze zonder acknowledge, of probeer het later opnieuw."
+    },
+    "e2e_unavailable": {
+      "message": "Deze integratiesleutel hoort bij een organisatie, en organisaties kunnen geen end-to-end versleutelde meldingen versturen. Verwijder de versleutelingssleutel onder Configureren, of gebruik een persoonlijke integratiesleutel."
+    },
+    "receipt_not_found": {
+      "message": "Melding {notification_id} heeft niets om te annuleren: ze is niet met acknowledge verstuurd, ze is met een andere integratiesleutel verstuurd, of ze is meer dan 7 dagen geleden afgelopen."
     }
   },
   "config": {

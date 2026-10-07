@@ -91,11 +91,12 @@ def _answer_result(notification_id: int, answer: dict, *, answered: bool) -> dic
 
 
 class PushWardApiError(Exception):
-    """PushWard API error."""
+    """PushWard API error. ``code`` is the Problem body's code, "" when it had none."""
 
-    def __init__(self, message: str, status_code: int | None = None) -> None:
+    def __init__(self, message: str, status_code: int | None = None, *, code: str = "") -> None:
         super().__init__(message)
         self.status_code = status_code
+        self.code = code
 
 
 class PushWardAuthError(PushWardApiError):
@@ -749,14 +750,14 @@ class PushWardApiClient:
 
                         # Other 4xx — don't retry
                         if 400 <= resp.status < 500:
-                            _, detail, raw, _ = await self._parse_problem(resp)
+                            code, detail, raw, _ = await self._parse_problem(resp)
                             message = f"{method} {path} failed ({resp.status}): {self._truncate(detail or raw)}"
                             # A 404 that reached here means the caller didn't opt into
                             # allow_404, so a missing resource is a typed error the caller
                             # can catch to recreate it (e.g. widget PATCH -> recreate).
                             if resp.status == HTTPStatus.NOT_FOUND:
-                                raise PushWardNotFoundError(message, status_code=resp.status)
-                            raise PushWardApiError(message, status_code=resp.status)
+                                raise PushWardNotFoundError(message, status_code=resp.status, code=code)
+                            raise PushWardApiError(message, status_code=resp.status, code=code)
 
                         # 5xx — retry
                         last_error = PushWardApiError(

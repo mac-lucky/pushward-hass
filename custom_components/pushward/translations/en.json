@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Could not encrypt the notification: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard is already repeating 25 acknowledged notifications for this account. Wait for one to be acknowledged or to expire, or stop some with pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Acknowledged notifications are temporarily unavailable on PushWard. Send this one without acknowledge, or try again later."
+    },
+    "e2e_unavailable": {
+      "message": "This integration key belongs to an organization, and organizations cannot send end-to-end encrypted notifications. Remove the encryption key under Configure, or use a personal integration key."
+    },
+    "receipt_not_found": {
+      "message": "Notification {notification_id} has nothing to cancel: it was not sent with acknowledge, it was sent with another integration key, or it finished more than 7 days ago."
     }
   },
   "config": {

@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "无法加密通知：{error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard 已在为此账户重复发送 25 条需确认的通知。请等待其中一条被确认或过期，或使用 pushward.cancel_notifications 停止其中一些。"
+    },
+    "receipts_disabled": {
+      "message": "PushWard 暂时无法使用需确认的通知。请不带 acknowledge 发送此通知，或稍后重试。"
+    },
+    "e2e_unavailable": {
+      "message": "此集成密钥属于某个组织，而组织无法发送端到端加密通知。请在“配置”下移除加密密钥，或使用个人集成密钥。"
+    },
+    "receipt_not_found": {
+      "message": "通知 {notification_id} 没有可取消的内容：它不是通过 acknowledge 发送的，是用另一个集成密钥发送的，或已在 7 天前结束。"
     }
   },
   "config": {

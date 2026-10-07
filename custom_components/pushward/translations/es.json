@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "No se pudo cifrar la notificación: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard ya está repitiendo 25 notificaciones con confirmación para esta cuenta. Espera a que se confirme o caduque alguna, o detén algunas con pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Las notificaciones con confirmación no están disponibles temporalmente en PushWard. Envía esta sin acknowledge o inténtalo de nuevo más tarde."
+    },
+    "e2e_unavailable": {
+      "message": "Esta clave de integración pertenece a una organización, y las organizaciones no pueden enviar notificaciones con cifrado de extremo a extremo. Elimina la clave de cifrado en Configurar o usa una clave de integración personal."
+    },
+    "receipt_not_found": {
+      "message": "La notificación {notification_id} no tiene nada que cancelar: no se envió con acknowledge, se envió con otra clave de integración o terminó hace más de 7 días."
     }
   },
   "config": {

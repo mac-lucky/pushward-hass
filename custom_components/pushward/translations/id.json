@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Tidak dapat mengenkripsi notifikasi: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard sudah mengulang 25 notifikasi yang perlu diakui untuk akun ini. Tunggu hingga salah satunya diakui atau kedaluwarsa, atau hentikan beberapa dengan pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Notifikasi yang perlu diakui untuk sementara tidak tersedia di PushWard. Kirim notifikasi ini tanpa acknowledge, atau coba lagi nanti."
+    },
+    "e2e_unavailable": {
+      "message": "Kunci integrasi ini milik organisasi, dan organisasi tidak dapat mengirim notifikasi terenkripsi ujung ke ujung. Hapus kunci enkripsi di bawah Konfigurasikan, atau gunakan kunci integrasi pribadi."
+    },
+    "receipt_not_found": {
+      "message": "Notifikasi {notification_id} tidak ada yang bisa dibatalkan: notifikasi ini tidak dikirim dengan acknowledge, dikirim dengan kunci integrasi lain, atau selesai lebih dari 7 hari lalu."
     }
   },
   "config": {

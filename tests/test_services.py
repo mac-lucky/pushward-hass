@@ -659,8 +659,43 @@ async def test_service_cancel_notifications_without_a_receipt(hass: HomeAssistan
     api.cancel_notification_receipt = AsyncMock(side_effect=PushWardNotFoundError("404", status_code=404))
     await _setup_entry(hass, api)
 
-    with pytest.raises(ServiceValidationError, match="nothing to cancel"):
+    with pytest.raises(ServiceValidationError) as exc_info:
         await hass.services.async_call(DOMAIN, "cancel_notifications", {"notification_id": 991}, blocking=True)
+    assert exc_info.value.translation_key == "receipt_not_found"
+    assert exc_info.value.translation_placeholders == {"notification_id": "991"}
+
+
+@pytest.mark.parametrize(
+    ("status", "code", "translation_key"),
+    [
+        (409, "notification_receipt.limit_exceeded", "receipt_limit_exceeded"),
+        (422, "notification_receipt.disabled", "receipts_disabled"),
+        (422, "notification.encryption_unavailable", "e2e_unavailable"),
+    ],
+)
+async def test_service_send_notification_translates_refusals_the_user_can_act_on(
+    hass: HomeAssistant, status: int, code: str, translation_key: str
+) -> None:
+    api = _mock_api()
+    api.create_notification = AsyncMock(side_effect=PushWardApiError("refused", status_code=status, code=code))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await hass.services.async_call(
+            DOMAIN, "send_notification", {"title": "t", "body": "b", "acknowledge": True}, blocking=True
+        )
+    assert exc_info.value.translation_key == translation_key
+
+
+async def test_service_send_notification_other_refusals_keep_the_server_message(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    refused = PushWardApiError("POST /notifications failed (400): bad", status_code=400, code="notification.invalid")
+    api.create_notification = AsyncMock(side_effect=refused)
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="failed \\(400\\): bad") as exc_info:
+        await hass.services.async_call(DOMAIN, "send_notification", {"title": "t", "body": "b"}, blocking=True)
+    assert not isinstance(exc_info.value, ServiceValidationError)
 
 
 @pytest.mark.parametrize("data", [{}, {"tag": "a", "notification_id": 1}, {"tag": "two words"}, {"notification_id": 0}])

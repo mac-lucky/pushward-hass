@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Không thể mã hóa thông báo: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard đang lặp lại 25 thông báo cần xác nhận cho tài khoản này. Hãy chờ một thông báo được xác nhận hoặc hết hạn, hoặc dừng bớt bằng pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Thông báo cần xác nhận tạm thời không khả dụng trên PushWard. Hãy gửi thông báo này không kèm acknowledge, hoặc thử lại sau."
+    },
+    "e2e_unavailable": {
+      "message": "Khóa tích hợp này thuộc về một tổ chức, và tổ chức không thể gửi thông báo mã hóa đầu cuối. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc dùng khóa tích hợp cá nhân."
+    },
+    "receipt_not_found": {
+      "message": "Thông báo {notification_id} không có gì để hủy: nó không được gửi kèm acknowledge, được gửi bằng khóa tích hợp khác, hoặc đã kết thúc hơn 7 ngày trước."
     }
   },
   "config": {

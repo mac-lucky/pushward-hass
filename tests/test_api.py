@@ -435,6 +435,16 @@ async def test_cancel_notification_receipt_returns_the_receipt():
     assert_valid_notification_receipt(receipt)
 
 
+async def test_a_refusal_carries_the_problem_code():
+    problem = json.dumps({"status": 409, "code": "notification_receipt.limit_exceeded", "detail": "limit reached"})
+    client = _make_client(_make_session(_mock_response(409, text=problem)))
+
+    with pytest.raises(PushWardApiError) as exc_info:
+        await client.create_notification("t", "b", acknowledge={})
+    assert exc_info.value.status_code == 409
+    assert exc_info.value.code == "notification_receipt.limit_exceeded"
+
+
 async def test_cancel_notification_receipt_without_one_is_not_found():
     client = _make_client(_make_session(_mock_response(404)))
     with pytest.raises(PushWardNotFoundError):

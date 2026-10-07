@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Die Benachrichtigung konnte nicht verschlüsselt werden: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard wiederholt bereits 25 zu bestätigende Benachrichtigungen für dieses Konto. Warte, bis eine bestätigt wird oder abläuft, oder beende einige mit pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Zu bestätigende Benachrichtigungen sind bei PushWard vorübergehend nicht verfügbar. Sende diese ohne acknowledge oder versuche es später erneut."
+    },
+    "e2e_unavailable": {
+      "message": "Dieser Integrationsschlüssel gehört zu einer Organisation, und Organisationen können keine Ende-zu-Ende-verschlüsselten Benachrichtigungen senden. Entferne den Verschlüsselungsschlüssel unter Konfigurieren oder verwende einen persönlichen Integrationsschlüssel."
+    },
+    "receipt_not_found": {
+      "message": "Für Benachrichtigung {notification_id} gibt es nichts abzubrechen: Sie wurde nicht mit acknowledge gesendet, wurde mit einem anderen Integrationsschlüssel gesendet oder ist vor mehr als 7 Tagen beendet worden."
     }
   },
   "config": {

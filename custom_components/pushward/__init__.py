@@ -876,6 +876,15 @@ def _get_api(hass: HomeAssistant) -> PushWardApiClient:
     return next(iter(entries.values()))["api"]
 
 
+# Refusals the user can act on, by Problem code: shown as translated validation
+# errors instead of the raw server message.
+_TRANSLATED_ERROR_CODES = {
+    "notification_receipt.limit_exceeded": "receipt_limit_exceeded",
+    "notification_receipt.disabled": "receipts_disabled",
+    "notification.encryption_unavailable": "e2e_unavailable",
+}
+
+
 @contextmanager
 def _surface_api_errors():
     """Translate PushWard API errors into user-facing HA errors.
@@ -891,6 +900,8 @@ def _surface_api_errors():
     except (PushWardForbiddenError, PushWardQuotaExceededError) as err:
         raise ServiceValidationError(str(err)) from err
     except PushWardApiError as err:
+        if (translation_key := _TRANSLATED_ERROR_CODES.get(err.code)) is not None:
+            raise ServiceValidationError(translation_domain=DOMAIN, translation_key=translation_key) from err
         raise HomeAssistantError(str(err)) from err
     except E2EError as err:
         raise ServiceValidationError(
@@ -1109,8 +1120,9 @@ async def _async_handle_cancel_notifications(hass: HomeAssistant, call: ServiceC
                 response = {"receipt": await api.cancel_notification_receipt(notification_id)}
             except PushWardNotFoundError as err:
                 raise ServiceValidationError(
-                    f"Notification {notification_id} has nothing to cancel: it was not sent with acknowledge,"
-                    " it was sent with another integration key, or it finished more than 7 days ago"
+                    translation_domain=DOMAIN,
+                    translation_key="receipt_not_found",
+                    translation_placeholders={"notification_id": str(notification_id)},
                 ) from err
     return response if call.return_response else None
 

@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Notificarea nu a putut fi criptată: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard repetă deja 25 de notificări cu confirmare pentru acest cont. Așteptați ca una să fie confirmată sau să expire, sau opriți câteva cu pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Notificările cu confirmare sunt temporar indisponibile în PushWard. Trimiteți-o pe aceasta fără acknowledge sau încercați din nou mai târziu."
+    },
+    "e2e_unavailable": {
+      "message": "Această cheie de integrare aparține unei organizații, iar organizațiile nu pot trimite notificări criptate end-to-end. Eliminați cheia de criptare la Configurare sau folosiți o cheie de integrare personală."
+    },
+    "receipt_not_found": {
+      "message": "Notificarea {notification_id} nu are nimic de anulat: nu a fost trimisă cu acknowledge, a fost trimisă cu altă cheie de integrare sau s-a încheiat acum mai mult de 7 zile."
     }
   },
   "config": {

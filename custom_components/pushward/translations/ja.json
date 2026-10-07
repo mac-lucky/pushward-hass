@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "通知を暗号化できませんでした: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard はこのアカウントの確認付き通知をすでに 25 件繰り返し送信しています。いずれかが確認されるか期限切れになるまで待つか、pushward.cancel_notifications でいくつかを停止してください。"
+    },
+    "receipts_disabled": {
+      "message": "確認付き通知は現在 PushWard で一時的に利用できません。この通知は acknowledge なしで送信するか、しばらくしてからもう一度お試しください。"
+    },
+    "e2e_unavailable": {
+      "message": "この統合キーは組織に属しており、組織はエンドツーエンド暗号化通知を送信できません。「設定」で暗号化キーを削除するか、個人用の統合キーを使用してください。"
+    },
+    "receipt_not_found": {
+      "message": "通知 {notification_id} には取り消すものがありません。acknowledge 付きで送信されていない、別の統合キーで送信された、または 7 日以上前に終了しています。"
     }
   },
   "config": {

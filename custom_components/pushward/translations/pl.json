@@ -1721,6 +1721,18 @@
     },
     "e2e_seal_failed": {
       "message": "Nie udało się zaszyfrować powiadomienia: {error}"
+    },
+    "receipt_limit_exceeded": {
+      "message": "PushWard powtarza już 25 powiadomień wymagających potwierdzenia dla tego konta. Poczekaj, aż któreś zostanie potwierdzone lub wygaśnie, albo zatrzymaj część za pomocą pushward.cancel_notifications."
+    },
+    "receipts_disabled": {
+      "message": "Powiadomienia wymagające potwierdzenia są tymczasowo niedostępne w PushWard. Wyślij to bez acknowledge lub spróbuj ponownie później."
+    },
+    "e2e_unavailable": {
+      "message": "Ten klucz integracji należy do organizacji, a organizacje nie mogą wysyłać powiadomień szyfrowanych end-to-end. Usuń klucz szyfrowania w Konfiguruj lub użyj osobistego klucza integracji."
+    },
+    "receipt_not_found": {
+      "message": "Powiadomienie {notification_id} nie ma czego anulować: nie wysłano go z acknowledge, wysłano je innym kluczem integracji albo zakończyło się ponad 7 dni temu."
     }
   },
   "config": {
