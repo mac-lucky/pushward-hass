@@ -883,7 +883,7 @@ For alerts that must not be missed (a leak, an alarm, a door left open), `acknow
 | `expire_seconds` | 3600 | 60-10800, after this the repeats stop and the notification counts as expired |
 | `action_title` | Acknowledge | 1-64 characters, the label of the button PushWard adds |
 
-It needs `push` and a level other than passive, and at most 25 acknowledged notifications can be repeating at once. Repeats do not count toward your notification quota. A new acknowledged notification with the same `collapse_id` replaces an earlier one that is still repeating. It also works with `send_at` and `recurrence`; the repeats start when the notification goes out.
+It needs `push` and a level other than passive, and at most 25 acknowledged notifications can be repeating at once. Repeats do not count toward your notification quota. A new acknowledged notification with the same `collapse_id` replaces an earlier one that is still repeating; one sent now without a `collapse_id` gets a random one, so a send retried after a lost response does not repeat twice. It also works with `send_at` and `recurrence`; the repeats start when the notification goes out.
 
 With a response requested, `send_notification` returns the `receipt` next to `notification_id`: `status` (`active`, `acknowledged`, `expired` or `canceled`), `repeats_sent`, `expires_at`, `tags`, and once answered `acknowledged_at`, `action_id` and, when the app reports it, the device it was answered on. `pushward.get_notification_answer` waits for the answer as usual.
 

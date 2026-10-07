@@ -414,6 +414,63 @@ async def test_create_notification_sends_the_acknowledge_fields():
     assert_valid_notification_receipt(created["receipt"])
 
 
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_acknowledged_send_retries_under_one_collapse_id(mock_sleep):
+    # A retry after a lost response must supersede the first receipt, not start a second one.
+    session = _make_session(
+        _mock_response(503, text="unavailable"),
+        _mock_response(502, text="bad gateway"),
+        _mock_response(201, json_body={"id": 7, "answerable": True}),
+    )
+    client = _make_client(session)
+
+    await client.create_notification("Garage", "Still open", acknowledge={"repeat_seconds": 60})
+
+    ids = [call[1]["json"].get("collapse_id") for call in session.request.call_args_list]
+    assert len(ids) == 3
+    assert ids[0]
+    assert ids == [ids[0]] * 3
+    assert_valid_notification_request(session.request.call_args[1]["json"])
+
+
+async def test_acknowledged_send_gets_a_new_collapse_id_per_call():
+    session = _make_session(_mock_response(201, json_body={"id": 1}), _mock_response(201, json_body={"id": 2}))
+    client = _make_client(session)
+
+    await client.create_notification("t", "b", acknowledge={})
+    await client.create_notification("t", "b", acknowledge={})
+
+    first, second = (call[1]["json"]["collapse_id"] for call in session.request.call_args_list)
+    assert first != second
+
+
+async def test_acknowledged_send_keeps_the_callers_collapse_id():
+    session = _make_session(_mock_response(201, json_body={"id": 1}))
+    client = _make_client(session)
+
+    await client.create_notification("t", "b", acknowledge={}, collapse_id="garage-door")
+
+    assert session.request.call_args[1]["json"]["collapse_id"] == "garage-door"
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "acknowledge"),
+    [
+        ({}, None),
+        ({"send_at": datetime(2030, 1, 1, tzinfo=UTC)}, {}),
+        ({"recurrence": {"cron": "0 8 * * *", "timezone": "UTC"}}, {}),
+    ],
+    ids=["no-acknowledge", "scheduled", "recurring"],
+)
+async def test_only_immediate_acknowledged_sends_get_a_collapse_id(kwargs, acknowledge):
+    session = _make_session(_mock_response(201, json_body={"id": 1}))
+    client = _make_client(session)
+
+    await client.create_notification("t", "b", acknowledge=acknowledge, **kwargs)
+
+    assert "collapse_id" not in session.request.call_args[1]["json"]
+
+
 async def test_cancel_notification_receipt_returns_the_receipt():
     receipt = {
         "notification_id": 991,

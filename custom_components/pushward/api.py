@@ -12,6 +12,7 @@ from email.utils import parsedate_to_datetime
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode
+from uuid import uuid4
 
 import aiohttp
 from homeassistant.util import dt as dt_util
@@ -379,7 +380,8 @@ class PushWardApiClient:
 
         ``acknowledge`` (``{repeat_seconds, expire_seconds, action_title}``, all
         optional) repeats the push until it is answered; the response then
-        carries the ``receipt``. ``tags`` and ``callback_url`` need it.
+        carries the ``receipt``. ``tags`` and ``callback_url`` need it. Sent now
+        without a collapse_id, it gets a random one.
         """
         if self.e2e_key is not None:
             if trim_to_fit:
@@ -391,6 +393,11 @@ class PushWardApiClient:
             subtitle = url = None
         else:
             payload = {"title": title, "body": body, "push": push}
+        if acknowledge is not None and not collapse_id and send_at is None and recurrence is None:
+            # The POST is retried after a lost response. With a collapse_id of its
+            # own, the retry supersedes the first receipt instead of starting a
+            # second alert that repeats until answered.
+            collapse_id = uuid4().hex
         for key, val in [
             ("subtitle", subtitle),
             ("level", level),
