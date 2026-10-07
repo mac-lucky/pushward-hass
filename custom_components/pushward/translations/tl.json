@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Ulitin",
           "description": "Ulitin ang notification ayon sa iskedyul, bilang object: cron (5 field, minuto oras araw-ng-buwan buwan araw-ng-linggo, o @hourly/@daily/@weekly/@monthly/@yearly), opsyonal na timezone (default ang sa Home Assistant), at opsyonal na until (petsa at oras) o count (1-1000 pagpapadala) para tapusin ito. Dapat may pagitan na hindi bababa sa 15 minuto ang bawat pagpapadala. Iisang id ang serye; pinahihinto ito ng cancel_scheduled_notification."
+        },
+        "acknowledge": {
+          "name": "Kumpirmahin",
+          "description": "Ipadala muli ang push hanggang may mag-kumpirma nito: true para sa mga default, o isang object na may alinman sa repeat_seconds (30-3600, default 60), expire_seconds (60-10800, default 3600), at action_title (ang label ng button, default Acknowledge). Kapag pinindot ang anumang aksyon na walang url, makukumpirma ito; kung wala, magdaragdag ang PushWard ng Acknowledge button. Kailangan ng push, at hindi level passive. Hanggang 25 lang ang puwedeng umulit nang sabay. Humiling ng sagot para sa resibo; hihinto ito sa cancel_notifications."
+        },
+        "tags": {
+          "name": "Mga Tag",
+          "description": "Hanggang 10 label, bawat isa ay 1-64 printable na ASCII character na walang espasyo, para ihinto bilang grupo ang mga notification na kinukumpirma gamit ang cancel_notifications. Nangangailangan ng Kumpirmahin."
+        },
+        "callback_url": {
+          "name": "Callback URL",
+          "description": "Pampublikong https URL kung saan ipinapadala ng PushWard ang resibo gamit ang POST kapag nakumpirma o nag-expire na ang notification, nilagdaan ng sikretong hango sa integration key. Tinatanggihan ang mga lokal na address, kaya kailangan ng Home Assistant webhook ang Home Assistant Cloud URL nito o ibang pampublikong URL. Nangangailangan ng Kumpirmahin."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Timeout",
           "description": "Gaano katagal hihintayin ang sagot, sa segundo (hanggang 24 oras). Binabasa ng 0 ang kasalukuyang sagot nang hindi naghihintay."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Kanselahin ang mga Notification na Kinukumpirma",
+      "description": "Ihinto ang pag-ulit ng mga notification na kinukumpirma, alinman sa lahat ng aktibong ipinadala na may tag o isa gamit ang notification_id nito. Naaabot lang nito ang mga notification na ipinadala gamit ang key ng integration na ito, at hindi ipinapadala ang kanilang callback. Ang opsyonal na sagot ay naglalaman ng dami ng nakansela (canceled) para sa isang tag, o ang resibo para sa isang notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Kanselahin ang lahat ng aktibong notification na kinukumpirma na ipinadala gamit ang tag na ito."
+        },
+        "notification_id": {
+          "name": "Notification ID",
+          "description": "Kanselahin ang isang notification na kinukumpirma, gamit ang notification_id na ibinalik ng send_notification."
         }
       }
     },

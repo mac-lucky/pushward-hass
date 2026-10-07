@@ -2,6 +2,7 @@
 
 import base64
 import binascii
+import ipaddress
 import re
 from typing import NamedTuple
 from urllib.parse import ParseResult, urlparse
@@ -340,6 +341,21 @@ SCHEDULED_LIST_MAX_PAGES = 10
 # Recurrence bounds (server model.Recurrence): cron is at most 128 chars, count 1-1000.
 RECURRENCE_CRON_MAX_LEN = 128
 RECURRENCE_MAX_COUNT = 1000
+
+# Acknowledged notifications (send_notification acknowledge): the push repeats
+# until an action without a url is tapped, it expires or it is canceled. Bounds
+# mirror the server's request validation.
+ACK_REPEAT_SECONDS_MIN = 30
+ACK_REPEAT_SECONDS_MAX = 3600
+ACK_EXPIRE_SECONDS_MIN = 60
+ACK_EXPIRE_SECONDS_MAX = 10800
+ACK_ACTION_TITLE_MAX = 64
+# The Acknowledge button the server adds when no action can be answered; a
+# caller's action may not take its id.
+ACK_ACTION_ID = "pw_ack"
+NOTIFICATION_ACTIONS_MAX = 10
+NOTIFICATION_TAGS_MAX = 10
+NOTIFICATION_TAG_MAX_LEN = 64
 
 # get_notification_answer: the server holds one GET /notifications/answers/{id}
 # for at most 25s (under the 30s gateway timeout); 20 leaves margin. The service
@@ -1058,6 +1074,58 @@ def is_valid_image_url(value: object) -> bool:
     except vol.Invalid:
         return False
     return True
+
+
+# Printable ASCII without the space, as the server matches tags.
+_NOTIFICATION_TAG_RE = re.compile(rf"[\x21-\x7e]{{1,{NOTIFICATION_TAG_MAX_LEN}}}")
+
+
+def validate_notification_tag(value: str) -> str:
+    """A send_notification / cancel_notifications tag: 1-64 printable ASCII characters, no spaces."""
+    if not isinstance(value, str) or not _NOTIFICATION_TAG_RE.fullmatch(value):
+        raise vol.Invalid(
+            f"a tag is 1-{NOTIFICATION_TAG_MAX_LEN} printable ASCII characters without spaces, got {value!r}"
+        )
+    return value
+
+
+# Names that only resolve inside a home or a cluster. PushWard cannot reach them
+# and refuses them as callback hosts, like a host without any dot.
+_LOCAL_HOST_SUFFIXES = (".localhost", ".local", ".internal", ".svc", ".cluster.local", ".home.arpa")
+
+
+def validate_callback_url(value: str) -> str:
+    """Validate a send_notification callback_url the way the server does.
+
+    PushWard itself POSTs to it when the notification is acknowledged or expires,
+    so it must be an https URL on the public internet: no credentials, no private
+    or reserved IP address, no localhost or local-only name. A Home Assistant URL
+    on the LAN fails here; a Home Assistant Cloud webhook URL works.
+    """
+    if not isinstance(value, str) or not value:
+        raise vol.Invalid("callback_url must be a non-empty string")
+    if len(value) > MAX_URL_LEN:
+        raise vol.Invalid(f"callback_url must be at most {MAX_URL_LEN} characters")
+    if _URL_FORBIDDEN_RE.search(value):
+        raise vol.Invalid("callback_url must not contain whitespace or control characters")
+    parsed = _parse_url(value, "callback_url")
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise vol.Invalid("callback_url must be an https URL with a host")
+    _validate_url_host(parsed, "callback_url")
+    host = (parsed.hostname or "").lower().removesuffix(".")
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        ip = None
+    if ip is not None:
+        if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
+            ip = ip.ipv4_mapped
+        if not ip.is_global:
+            raise vol.Invalid("callback_url must not point at a private or reserved address")
+        return value
+    if host == "localhost" or "." not in host or host.endswith(_LOCAL_HOST_SUFFIXES):
+        raise vol.Invalid("callback_url must point at a public host, not a local one")
+    return value
 
 
 # Padded standard-alphabet base64: the only form Swift's Data(base64Encoded:) accepts.

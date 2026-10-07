@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Ulangi",
           "description": "Ulangi notifikasi sesuai jadwal, sebagai objek: cron (5 field, menit jam hari-dalam-bulan bulan hari-dalam-minggu, atau @hourly/@daily/@weekly/@monthly/@yearly), timezone opsional (default zona waktu Home Assistant), dan until opsional (tanggal dan waktu) atau count (1-1000 pengiriman) untuk mengakhirinya. Jarak antarpengiriman minimal 15 menit. Seri tetap memakai satu id; cancel_scheduled_notification menghentikannya."
+        },
+        "acknowledge": {
+          "name": "Konfirmasi",
+          "description": "Kirim ulang push sampai seseorang mengonfirmasinya: true untuk nilai bawaan, atau objek dengan salah satu dari repeat_seconds (30-3600, bawaan 60), expire_seconds (60-10800, bawaan 3600), dan action_title (label tombol, bawaan Acknowledge). Mengetuk aksi apa pun tanpa url akan mengonfirmasinya; jika tidak ada, PushWard menambahkan tombol Acknowledge. Memerlukan push, dan level bukan passive. Paling banyak 25 yang dapat berulang sekaligus. Minta respons untuk mendapatkan tanda terima; cancel_notifications menghentikannya."
+        },
+        "tags": {
+          "name": "Tag",
+          "description": "Hingga 10 label, masing-masing 1-64 karakter ASCII yang dapat dicetak tanpa spasi, untuk menghentikan notifikasi terkonfirmasi sebagai grup dengan cancel_notifications. Memerlukan Konfirmasi."
+        },
+        "callback_url": {
+          "name": "URL callback",
+          "description": "URL https publik tempat PushWard mengirim tanda terima dengan POST setelah notifikasi dikonfirmasi atau kedaluwarsa, ditandatangani dengan rahasia yang diturunkan dari kunci integrasi. Alamat lokal ditolak, jadi webhook Home Assistant memerlukan URL Home Assistant Cloud atau URL publik lainnya. Memerlukan Konfirmasi."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Batas waktu",
           "description": "Berapa lama menunggu jawaban, dalam detik (hingga 24 jam). 0 membaca jawaban saat ini tanpa menunggu."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Batalkan Notifikasi Konfirmasi",
+      "description": "Hentikan pengulangan notifikasi konfirmasi, baik semua yang aktif dan dikirim dengan tag maupun satu notifikasi lewat notification_id-nya. Hanya menjangkau notifikasi yang dikirim dengan kunci integrasi ini, dan callback-nya tidak dikirim. Respons opsional berisi berapa banyak yang dibatalkan (canceled) untuk sebuah tag, atau tanda terima untuk sebuah notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Batalkan semua notifikasi konfirmasi aktif yang dikirim dengan tag ini."
+        },
+        "notification_id": {
+          "name": "ID notifikasi",
+          "description": "Batalkan satu notifikasi konfirmasi, lewat notification_id yang dikembalikan send_notification."
         }
       }
     },

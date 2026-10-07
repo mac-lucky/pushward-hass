@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Ripeti",
           "description": "Ripete la notifica secondo una pianificazione, come oggetto: cron (5 campi, minuto ora giorno-del-mese mese giorno-della-settimana, oppure @hourly/@daily/@weekly/@monthly/@yearly), timezone facoltativo (predefinito quello di Home Assistant) e until facoltativo (una data e ora) o count (1-1000 invii) per terminarla. Gli invii devono distare almeno 15 minuti. La serie mantiene un solo id; cancel_scheduled_notification la interrompe."
+        },
+        "acknowledge": {
+          "name": "Conferma",
+          "description": "Reinvia il push finché qualcuno non lo conferma: true per i valori predefiniti, oppure un oggetto con uno qualsiasi tra repeat_seconds (30-3600, predefinito 60), expire_seconds (60-10800, predefinito 3600) e action_title (l'etichetta del pulsante, predefinito Acknowledge). Toccare un'azione senza url la conferma; se non ce n'è nessuna, PushWard aggiunge un pulsante Acknowledge. Richiede push e un level diverso da passive. Al massimo 25 possono ripetersi contemporaneamente. Richiedi una risposta per la ricevuta; cancel_notifications lo interrompe."
+        },
+        "tags": {
+          "name": "Tag",
+          "description": "Fino a 10 etichette, ciascuna di 1-64 caratteri ASCII stampabili senza spazi, per interrompere come gruppo le notifiche da confermare con cancel_notifications. Richiede Conferma."
+        },
+        "callback_url": {
+          "name": "URL di callback",
+          "description": "URL https pubblico a cui PushWard invia la ricevuta con POST quando la notifica viene confermata o scade, firmata con un segreto derivato dalla chiave di integrazione. Gli indirizzi locali vengono rifiutati, quindi un webhook di Home Assistant richiede il suo URL Home Assistant Cloud o un altro URL pubblico. Richiede Conferma."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Timeout",
           "description": "Quanto attendere la risposta, in secondi (fino a 24 ore). 0 legge la risposta attuale senza attendere."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Annulla notifiche da confermare",
+      "description": "Interrompi la ripetizione delle notifiche da confermare, tutte quelle attive inviate con un tag oppure una sola tramite il suo notification_id. Riguarda solo le notifiche inviate con la chiave di questa integrazione e il loro callback non viene inviato. La risposta facoltativa contiene quante ne sono state annullate (canceled) per un tag, oppure la ricevuta per un notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Annulla tutte le notifiche da confermare attive inviate con questo tag."
+        },
+        "notification_id": {
+          "name": "ID notifica",
+          "description": "Annulla una notifica da confermare, tramite il notification_id restituito da send_notification."
         }
       }
     },

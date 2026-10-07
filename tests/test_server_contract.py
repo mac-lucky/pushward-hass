@@ -24,7 +24,10 @@ from custom_components.pushward.const import (
 from .server_contract import (
     PushWardContractError,
     assert_valid_activity_content,
+    assert_valid_notification_receipt,
+    assert_valid_notification_request,
     assert_valid_priority,
+    assert_valid_receipts_canceled,
     assert_valid_sound,
     assert_valid_widget_content,
 )
@@ -808,3 +811,143 @@ def test_rejections_pin_the_offending_rule() -> None:
         assert_valid_activity_content(_mut(valid_countdown, snooze_seconds=30))
     with pytest.raises(PushWardContractError, match="priority"):
         assert_valid_priority(True)
+
+
+# --- notifications -----------------------------------------------------------------
+
+ENVELOPE = "pw1.0a1b2c3d." + "A" * 40
+LINK = {"id": "open", "title": "Open", "url": "https://example.com"}
+
+
+def valid_receipt(**overrides) -> dict:
+    return {
+        "notification_id": 991,
+        "status": "active",
+        "repeat_seconds": 60,
+        "expires_at": "2026-10-07T13:00:00Z",
+        "repeats_sent": 0,
+        "tags": ["garage"],
+        "created_at": "2026-10-07T12:00:00Z",
+        **overrides,
+    }
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"title": "t", "body": "b"},
+        {"title": "t" * 256, "subtitle": "s" * 256, "body": "b" * 4096, "push": True},
+        {"encrypted": ENVELOPE, "push": True, "level": "active"},
+        {"encrypted": ENVELOPE, "title": "", "body": ""},
+        {"title": "t", "body": "b", "acknowledge": {}},
+        {
+            "title": "t",
+            "body": "b",
+            "acknowledge": {"repeat_seconds": 30, "expire_seconds": 10800, "action_title": "a" * 64},
+            "tags": [f"t{i}" for i in range(10)],
+            "callback_url": "https://hooks.example.com/pushward",
+        },
+        {"title": "t", "body": "b", "acknowledge": {"repeat_seconds": 3600, "expire_seconds": 60}},
+        {"title": "t", "body": "b", "acknowledge": {}, "actions": [LINK] * 9},
+        {"title": "t", "body": "b", "acknowledge": {}, "actions": [LINK] * 9 + [{"id": "ok", "title": "OK"}]},
+        {"encrypted": ENVELOPE, "acknowledge": {}, "callback_url": "https://8.8.8.8/hook"},
+    ],
+)
+def test_valid_notification_requests_pass(payload) -> None:
+    assert_valid_notification_request(payload)
+
+
+@pytest.mark.parametrize(
+    ("payload", "rule"),
+    [
+        ({"body": "b"}, "title is required"),
+        ({"title": "t", "body": ""}, "body is required"),
+        ({"title": "t" * 257, "body": "b"}, "title must be at most"),
+        ({"title": "t", "body": "b", "level": "loud"}, "level"),
+        ({"encrypted": "pw1.0A1B2C3D." + "A" * 40}, "pw1 envelope"),
+        ({"encrypted": "pw1.0a1b2c3d." + "A" * 3060}, "pw1 envelope"),
+        ({"encrypted": ENVELOPE, "title": "t"}, "title must not be sent next to encrypted"),
+        ({"encrypted": ENVELOPE, "url": "https://example.com"}, "url must not be sent next to encrypted"),
+        ({"title": "t", "body": "b", "tags": ["x"]}, "require acknowledge"),
+        ({"title": "t", "body": "b", "callback_url": "https://hooks.example.com"}, "require acknowledge"),
+        ({"title": "t", "body": "b", "acknowledge": True}, "acknowledge must be an object"),
+        ({"title": "t", "body": "b", "acknowledge": {"repeat": 60}}, "unknown fields"),
+        ({"title": "t", "body": "b", "acknowledge": {"repeat_seconds": 29}}, "repeat_seconds"),
+        ({"title": "t", "body": "b", "acknowledge": {"repeat_seconds": 3601}}, "repeat_seconds"),
+        ({"title": "t", "body": "b", "acknowledge": {"expire_seconds": 59}}, "expire_seconds"),
+        ({"title": "t", "body": "b", "acknowledge": {"expire_seconds": 10801}}, "expire_seconds"),
+        ({"title": "t", "body": "b", "acknowledge": {"repeat_seconds": True}}, "repeat_seconds"),
+        ({"title": "t", "body": "b", "acknowledge": {"action_title": ""}}, "action_title"),
+        ({"title": "t", "body": "b", "acknowledge": {"action_title": "a" * 65}}, "action_title"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "push": False}, "requires push"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "level": "passive"}, "level passive"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "actions": [{"id": "pw_ack", "title": "x"}]}, "reserved"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "actions": [LINK] * 10}, "no room"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "tags": [f"t{i}" for i in range(11)]}, "at most 10"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "tags": ["two words"]}, "printable ASCII"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "tags": ["x" * 65]}, "printable ASCII"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "http://hooks.example.com"}, "https"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://u:p@example.com"}, "credentials"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://192.168.1.2/hook"}, "non-public"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://[::ffff:10.0.0.1]/"}, "non-public"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://ha.local/hook"}, "is local"),
+        ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://homeassistant/hook"}, "is local"),
+    ],
+)
+def test_invalid_notification_requests_rejected(payload, rule) -> None:
+    with pytest.raises(PushWardContractError, match=rule):
+        assert_valid_notification_request(payload)
+
+
+@pytest.mark.parametrize(
+    "receipt",
+    [
+        valid_receipt(),
+        valid_receipt(
+            status="acknowledged",
+            acknowledged_at="2026-10-07T12:01:00Z",
+            acknowledged_by="5b0c6c1e-8d0f-4a59-9a63-0b8f2d3c4e5f",
+            acknowledged_by_device="iPhone",
+            action_id="pw_ack",
+            last_delivered_at="2026-10-07T12:00:01Z",
+            callback={
+                "status": "delivered",
+                "attempts": 1,
+                "delivered_at": "2026-10-07T12:01:02Z",
+                "last_status_code": 200,
+            },
+        ),
+        valid_receipt(status="canceled", canceled_at="2026-10-07T12:05:00Z", cancel_reason="tag"),
+        valid_receipt(status="expired", repeats_sent=50, callback={"status": "failed", "attempts": 7}),
+    ],
+)
+def test_valid_notification_receipts_pass(receipt) -> None:
+    assert_valid_notification_receipt(receipt)
+
+
+@pytest.mark.parametrize(
+    ("receipt", "rule"),
+    [
+        (valid_receipt(status="done"), "status"),
+        (valid_receipt(notification_id="991"), "notification_id"),
+        (valid_receipt(repeats_sent=-1), "repeats_sent"),
+        (valid_receipt(expires_at="tomorrow"), "expires_at"),
+        (valid_receipt(created_at=None), "created_at is required"),
+        (valid_receipt(status="acknowledged"), "acknowledged_at"),
+        (valid_receipt(status="canceled", canceled_at="2026-10-07T12:05:00Z"), "cancel_reason"),
+        (valid_receipt(status="canceled", canceled_at="2026-10-07T12:05:00Z", cancel_reason="user"), "cancel_reason"),
+        (valid_receipt(callback={"status": "sent", "attempts": 1}), "callback.status"),
+        (valid_receipt(callback={"status": "pending"}), "callback.attempts"),
+    ],
+)
+def test_invalid_notification_receipts_rejected(receipt, rule) -> None:
+    with pytest.raises(PushWardContractError, match=rule):
+        assert_valid_notification_receipt(receipt)
+
+
+def test_receipts_canceled_response() -> None:
+    assert_valid_receipts_canceled({"canceled": 0})
+    assert_valid_receipts_canceled({"canceled": 3})
+    for bad in ({}, {"canceled": -1}, {"canceled": True}, {"canceled": "2"}, []):
+        with pytest.raises(PushWardContractError):
+            assert_valid_receipts_canceled(bad)

@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Powtarzanie",
           "description": "Powtarzaj powiadomienie według harmonogramu, jako obiekt: cron (5 pól, minuta godzina dzień-miesiąca miesiąc dzień-tygodnia, albo @hourly/@daily/@weekly/@monthly/@yearly), opcjonalny timezone (domyślnie strefa Home Assistant) oraz opcjonalny until (data i godzina) lub count (1-1000 wysyłek), aby je zakończyć. Między wysyłkami musi upłynąć co najmniej 15 minut. Seria zachowuje jedno id; cancel_scheduled_notification ją zatrzymuje."
+        },
+        "acknowledge": {
+          "name": "Potwierdź",
+          "description": "Wysyłaj push ponownie, aż ktoś go potwierdzi: true dla wartości domyślnych albo obiekt z dowolnymi z repeat_seconds (30-3600, domyślnie 60), expire_seconds (60-10800, domyślnie 3600) i action_title (etykieta przycisku, domyślnie Acknowledge). Dotknięcie dowolnej akcji bez url potwierdza powiadomienie; gdy jej nie ma, PushWard dodaje przycisk Acknowledge. Wymaga push i level innego niż passive. Jednocześnie może się powtarzać najwyżej 25. Poproś o odpowiedź, aby otrzymać potwierdzenie odbioru; cancel_notifications to zatrzymuje."
+        },
+        "tags": {
+          "name": "Tagi",
+          "description": "Do 10 etykiet, każda o długości 1-64 drukowalnych znaków ASCII bez spacji, do zatrzymywania potwierdzanych powiadomień jako grupy przez cancel_notifications. Wymaga Potwierdź."
+        },
+        "callback_url": {
+          "name": "Callback URL",
+          "description": "Publiczny adres https, na który PushWard wysyła potwierdzenie odbioru przez POST, gdy powiadomienie zostanie potwierdzone lub wygaśnie, podpisane sekretem wyprowadzonym z klucza integracji. Adresy lokalne są odrzucane, więc webhook Home Assistant wymaga adresu Home Assistant Cloud lub innego publicznego adresu. Wymaga Potwierdź."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Limit czasu",
           "description": "Jak długo czekać na odpowiedź, w sekundach (do 24 godzin). 0 odczytuje bieżącą odpowiedź bez czekania."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Anuluj potwierdzane powiadomienia",
+      "description": "Zatrzymaj powtarzanie potwierdzanych powiadomień: wszystkich aktywnych wysłanych z tagiem albo jednego po jego notification_id. Dotyczy tylko powiadomień wysłanych kluczem tej integracji, a ich callback nie jest wysyłany. Opcjonalna odpowiedź zawiera liczbę anulowanych (canceled) dla tagu albo potwierdzenie odbioru dla notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Anuluj wszystkie aktywne potwierdzane powiadomienia wysłane z tym tagiem."
+        },
+        "notification_id": {
+          "name": "ID powiadomienia",
+          "description": "Anuluj jedno potwierdzane powiadomienie przez notification_id zwrócony przez send_notification."
         }
       }
     },

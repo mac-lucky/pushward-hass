@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "繰り返し",
           "description": "スケジュールに従って通知を繰り返します。値はオブジェクトで、cron（5 つのフィールド「分 時 日 月 曜日」、または @hourly/@daily/@weekly/@monthly/@yearly）、任意の timezone（既定は Home Assistant のタイムゾーン）、終了条件として任意の until（日時）または count（送信回数 1-1000）を指定します。送信間隔は 15 分以上空ける必要があります。シリーズの ID は 1 つのままで、cancel_scheduled_notification で停止できます。"
+        },
+        "acknowledge": {
+          "name": "確認",
+          "description": "誰かが確認するまでプッシュを再送します。true で既定値を使用、または repeat_seconds（30-3600、既定 60）、expire_seconds（60-10800、既定 3600）、action_title（ボタンのラベル、既定 Acknowledge）のいずれかを含むオブジェクトを指定します。url のないアクションをタップすると確認されます。アクションがない場合、PushWard は Acknowledge ボタンを追加します。push が必要で、level は passive 以外にしてください。同時に繰り返せるのは最大 25 件です。受信確認を得るには回答を要求してください。cancel_notifications で停止できます。"
+        },
+        "tags": {
+          "name": "タグ",
+          "description": "最大 10 個のラベル。各ラベルは空白を含まない印字可能な ASCII 文字 1-64 文字で、cancel_notifications で確認待ち通知をまとめて停止するために使います。「確認」が必要です。"
+        },
+        "callback_url": {
+          "name": "コールバック URL",
+          "description": "通知が確認されるか期限切れになったときに、PushWard が POST で受信確認を送信する公開 https URL。連携キーから導出したシークレットで署名されます。ローカルアドレスは拒否されるため、Home Assistant の webhook には Home Assistant Cloud の URL かその他の公開 URL が必要です。「確認」が必要です。"
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "タイムアウト",
           "description": "回答を待つ時間（秒、最大 24 時間）。0 を指定すると待たずに現在の回答を読み取ります。"
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "確認待ち通知をキャンセル",
+      "description": "確認待ち通知の繰り返しを停止します。タグ付きで送信されたすべての有効な通知、または notification_id で指定した 1 件が対象です。この連携のキーで送信した通知のみが対象で、そのコールバックは送信されません。任意の応答には、タグの場合はキャンセルした件数（canceled）、notification_id の場合は受信確認が含まれます。",
+      "fields": {
+        "tag": {
+          "name": "タグ",
+          "description": "このタグ付きで送信された、有効な確認待ち通知をすべてキャンセルします。"
+        },
+        "notification_id": {
+          "name": "通知ID",
+          "description": "send_notification が返した notification_id で、確認待ち通知を 1 件キャンセルします。"
         }
       }
     },

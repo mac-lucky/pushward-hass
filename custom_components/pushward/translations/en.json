@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Repeat",
           "description": "Repeat the notification on a schedule, as an object: cron (5 fields, minute hour day-of-month month day-of-week, or @hourly/@daily/@weekly/@monthly/@yearly), optional timezone (defaults to Home Assistant's), and optional until (a date and time) or count (1-1000 sends) to end it. Sends must be at least 15 minutes apart. The series keeps one id; cancel_scheduled_notification stops it."
+        },
+        "acknowledge": {
+          "name": "Acknowledge",
+          "description": "Re-send the push until someone acknowledges it: true for the defaults, or an object with any of repeat_seconds (30-3600, default 60), expire_seconds (60-10800, default 3600) and action_title (the button label, default Acknowledge). A tap on any action without a url acknowledges it; when there is none, PushWard adds an Acknowledge button. Needs push, and not level passive. At most 25 can repeat at once. Request a response for the receipt; cancel_notifications stops it."
+        },
+        "tags": {
+          "name": "Tags",
+          "description": "Up to 10 labels, each 1-64 printable ASCII characters without spaces, for stopping acknowledged notifications as a group with cancel_notifications. Requires Acknowledge."
+        },
+        "callback_url": {
+          "name": "Callback URL",
+          "description": "Public https URL that PushWard POSTs the receipt to once the notification is acknowledged or expires, signed with a secret derived from the integration key. Local addresses are refused, so a Home Assistant webhook needs its Home Assistant Cloud or other public URL. Requires Acknowledge."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Timeout",
           "description": "How long to wait for the answer, in seconds (up to 24 hours). 0 reads the current answer without waiting."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Cancel Acknowledged Notifications",
+      "description": "Stop acknowledged notifications from repeating, either every active one sent with a tag or one by its notification_id. It reaches only notifications sent with this integration's key, and their callback is not sent. The optional response holds how many were canceled (canceled) for a tag, or the receipt for a notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Cancel every active acknowledged notification sent with this tag."
+        },
+        "notification_id": {
+          "name": "Notification ID",
+          "description": "Cancel one acknowledged notification, by the notification_id send_notification returned."
         }
       }
     },

@@ -47,7 +47,7 @@ from .conftest import (
     patch_image_fetch_failure,
     png_bytes,
 )
-from .server_contract import assert_valid_activity_content
+from .server_contract import assert_valid_activity_content, assert_valid_notification_receipt
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -103,6 +103,7 @@ _BASE_SERVICES = (
     "send_email",
     "cancel_scheduled_notification",
     "list_scheduled_notifications",
+    "cancel_notifications",
 )
 
 
@@ -496,6 +497,183 @@ async def test_service_send_notification_surfaces_an_encryption_failure(hass: Ho
         await hass.services.async_call(DOMAIN, "send_notification", {"title": "t", "body": "x" * 3000}, blocking=True)
     assert exc_info.value.translation_key == "e2e_seal_failed"
     assert exc_info.value.translation_placeholders == {"error": "the notification is too long to encrypt"}
+
+
+_RECEIPT = {
+    "notification_id": 991,
+    "status": "active",
+    "repeat_seconds": 60,
+    "expires_at": "2026-10-07T13:00:00Z",
+    "repeats_sent": 0,
+    "tags": ["garage"],
+    "created_at": "2026-10-07T12:00:00Z",
+}
+
+
+async def test_service_send_notification_acknowledge_true_asks_for_the_defaults(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.create_notification = AsyncMock(return_value={"id": 991, "answerable": True, "receipt": _RECEIPT})
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "Garage",
+            "body": "Still open",
+            "acknowledge": True,
+            "tags": ["garage", "doors", "garage"],
+            "callback_url": "https://hooks.nabu.casa/abc123",
+        },
+        blocking=True,
+        return_response=True,
+    )
+
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["acknowledge"] == {}
+    assert kwargs["tags"] == ["garage", "doors"]
+    assert kwargs["callback_url"] == "https://hooks.nabu.casa/abc123"
+    assert response == {"notification_id": 991, "answerable": True, "receipt": _RECEIPT}
+    assert_valid_notification_receipt(response["receipt"])
+
+
+async def test_service_send_notification_acknowledge_options_and_a_single_tag(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "Leak",
+            "body": "Kitchen",
+            "acknowledge": {"repeat_seconds": "120", "expire_seconds": 10800, "action_title": "On it"},
+            "tags": "leak",
+        },
+        blocking=True,
+    )
+
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["acknowledge"] == {"repeat_seconds": 120, "expire_seconds": 10800, "action_title": "On it"}
+    assert kwargs["tags"] == ["leak"]
+
+
+async def test_service_send_notification_acknowledge_false_sends_none(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN, "send_notification", {"title": "t", "body": "b", "acknowledge": False, "tags": []}, blocking=True
+    )
+
+    kwargs = api.create_notification.call_args.kwargs
+    assert "acknowledge" not in kwargs
+    assert "tags" not in kwargs
+
+
+_LINK = {"id": "open", "title": "Open", "url": "https://example.com"}
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        {"tags": ["garage"]},
+        {"callback_url": "https://hooks.example.com/x"},
+        {"acknowledge": {"repeat_seconds": 29}},
+        {"acknowledge": {"repeat_seconds": 3601}},
+        {"acknowledge": {"expire_seconds": 59}},
+        {"acknowledge": {"expire_seconds": 10801}},
+        {"acknowledge": {"action_title": ""}},
+        {"acknowledge": {"action_title": "a" * 65}},
+        {"acknowledge": {"repeat": 60}},
+        {"acknowledge": "yes please"},
+        {"acknowledge": True, "push": False},
+        {"acknowledge": True, "level": "passive"},
+        {"acknowledge": True, "actions": [{"id": "pw_ack", "title": "Mine"}]},
+        {"acknowledge": True, "actions": [_LINK] * 10},
+        {"acknowledge": True, "tags": [f"t{i}" for i in range(11)]},
+        {"acknowledge": True, "tags": ["two words"]},
+        {"acknowledge": True, "tags": ["x" * 65]},
+        {"acknowledge": True, "callback_url": "http://hooks.example.com/x"},
+        {"acknowledge": True, "callback_url": "https://192.168.1.10:8123/api/webhook/x"},
+        {"acknowledge": True, "callback_url": "https://homeassistant.local:8123/api/webhook/x"},
+        {"acknowledge": True, "callback_url": "https://homeassistant:8123/api/webhook/x"},
+        {"acknowledge": True, "callback_url": "https://user:pass@hooks.example.com/x"},
+    ],
+)
+async def test_service_send_notification_refuses_bad_acknowledge_fields(hass: HomeAssistant, extra: dict) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(DOMAIN, "send_notification", {"title": "t", "body": "b", **extra}, blocking=True)
+    api.create_notification.assert_not_awaited()
+
+
+async def test_service_send_notification_acknowledge_with_ten_actions_needs_an_answerable_one(
+    hass: HomeAssistant,
+) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "t", "body": "b", "acknowledge": True, "actions": [_LINK] * 9 + [{"id": "ok", "title": "OK"}]},
+        blocking=True,
+    )
+    api.create_notification.assert_awaited_once()
+
+
+async def test_service_cancel_notifications_by_tag(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.cancel_notification_receipts_by_tag = AsyncMock(return_value=2)
+    await _setup_entry(hass, api)
+
+    response = await hass.services.async_call(
+        DOMAIN, "cancel_notifications", {"tag": "garage"}, blocking=True, return_response=True
+    )
+
+    api.cancel_notification_receipts_by_tag.assert_awaited_once_with("garage")
+    assert response == {"canceled": 2}
+
+
+async def test_service_cancel_notifications_by_id(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    canceled = {**_RECEIPT, "status": "canceled", "canceled_at": "2026-10-07T12:02:00Z", "cancel_reason": "api"}
+    api.cancel_notification_receipt = AsyncMock(return_value=canceled)
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(DOMAIN, "cancel_notifications", {"notification_id": "991"}, blocking=True)
+    response = await hass.services.async_call(
+        DOMAIN, "cancel_notifications", {"notification_id": 991}, blocking=True, return_response=True
+    )
+
+    assert api.cancel_notification_receipt.await_args_list[0].args == (991,)
+    assert response == {"receipt": canceled}
+    assert_valid_notification_receipt(response["receipt"])
+
+
+async def test_service_cancel_notifications_without_a_receipt(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.cancel_notification_receipt = AsyncMock(side_effect=PushWardNotFoundError("404", status_code=404))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError, match="nothing to cancel"):
+        await hass.services.async_call(DOMAIN, "cancel_notifications", {"notification_id": 991}, blocking=True)
+
+
+@pytest.mark.parametrize("data", [{}, {"tag": "a", "notification_id": 1}, {"tag": "two words"}, {"notification_id": 0}])
+async def test_service_cancel_notifications_needs_one_target(hass: HomeAssistant, data: dict) -> None:
+    api = _mock_api()
+    api.cancel_notification_receipt = AsyncMock()
+    api.cancel_notification_receipts_by_tag = AsyncMock()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(DOMAIN, "cancel_notifications", data, blocking=True)
+    api.cancel_notification_receipt.assert_not_awaited()
+    api.cancel_notification_receipts_by_tag.assert_not_awaited()
 
 
 async def test_service_get_notification_answer(hass: HomeAssistant) -> None:

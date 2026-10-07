@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "重复",
           "description": "按计划重复发送通知，值为对象：cron（5 个字段：分 时 日 月 周，或 @hourly/@daily/@weekly/@monthly/@yearly）、可选的 timezone（默认为 Home Assistant 的时区），以及用于结束的可选 until（日期和时间）或 count（1-1000 次发送）。两次发送之间至少间隔 15 分钟。整个系列保持同一个 ID；cancel_scheduled_notification 可将其停止。"
+        },
+        "acknowledge": {
+          "name": "确认",
+          "description": "重复发送该推送，直到有人确认：true 表示使用默认值，或传入包含 repeat_seconds（30-3600，默认 60）、expire_seconds（60-10800，默认 3600）和 action_title（按钮文字，默认 Acknowledge）中任意项的对象。点按任何没有 url 的动作即视为确认；若没有任何动作，PushWard 会添加一个 Acknowledge 按钮。需要 push，且 level 不能是 passive。同时最多可重复 25 条。请求响应可获得回执；cancel_notifications 可停止重复。"
+        },
+        "tags": {
+          "name": "标签",
+          "description": "最多 10 个标签，每个为 1-64 个可打印的 ASCII 字符且不含空格，用于通过 cancel_notifications 将需确认的通知作为一组停止。需要启用确认。"
+        },
+        "callback_url": {
+          "name": "回调 URL",
+          "description": "公开的 https URL，通知被确认或过期后，PushWard 会以 POST 将回执发送到该地址，并使用由集成密钥派生的密钥签名。本地地址会被拒绝，因此 Home Assistant webhook 需要使用其 Home Assistant Cloud URL 或其他公开 URL。需要启用确认。"
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "超时",
           "description": "等待回答的时长，单位为秒（最长 24 小时）。0 表示不等待，直接读取当前回答。"
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "取消需确认的通知",
+      "description": "停止需确认通知的重复发送，可取消所有带某标签发送的活动通知，或按 notification_id 取消单条。仅影响使用此集成密钥发送的通知，且不会发送其回调。可选的响应包含某标签下已取消的数量（canceled），或某 notification_id 的回执。",
+      "fields": {
+        "tag": {
+          "name": "标签",
+          "description": "取消所有带此标签发送的活动中的需确认通知。"
+        },
+        "notification_id": {
+          "name": "通知 ID",
+          "description": "按 send_notification 返回的 notification_id 取消一条需确认的通知。"
         }
       }
     },

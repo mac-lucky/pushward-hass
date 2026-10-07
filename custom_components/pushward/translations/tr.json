@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Tekrarla",
           "description": "Bildirimi bir zamanlamaya göre tekrarlar, nesne olarak: cron (5 alan, dakika saat ayın-günü ay haftanın-günü, veya @hourly/@daily/@weekly/@monthly/@yearly), isteğe bağlı timezone (varsayılan Home Assistant'ınki) ve bitirmek için isteğe bağlı until (tarih ve saat) veya count (1-1000 gönderim). Gönderimler arasında en az 15 dakika olmalıdır. Seri tek bir id'yi korur; cancel_scheduled_notification seriyi durdurur."
+        },
+        "acknowledge": {
+          "name": "Onayla",
+          "description": "Biri onaylayana kadar push'u yeniden gönder: varsayılanlar için true veya repeat_seconds (30-3600, varsayılan 60), expire_seconds (60-10800, varsayılan 3600) ve action_title (düğme etiketi, varsayılan Acknowledge) alanlarından herhangi birini içeren bir nesne. url içermeyen herhangi bir eyleme dokunmak bildirimi onaylar; hiç yoksa PushWard bir Acknowledge düğmesi ekler. push gerekir ve level passive olmamalıdır. Aynı anda en fazla 25 tanesi tekrarlanabilir. Alındı bilgisi için bir yanıt isteyin; cancel_notifications bunu durdurur."
+        },
+        "tags": {
+          "name": "Etiketler",
+          "description": "Onaylanan bildirimleri cancel_notifications ile grup olarak durdurmak için en fazla 10 etiket; her biri boşluksuz, yazdırılabilir 1-64 ASCII karakterdir. Onayla gerekir."
+        },
+        "callback_url": {
+          "name": "Geri çağrı URL'si",
+          "description": "Bildirim onaylandığında veya süresi dolduğunda PushWard'ın alındı bilgisini POST ile gönderdiği herkese açık https URL'si; entegrasyon anahtarından türetilen bir gizli anahtarla imzalanır. Yerel adresler reddedilir, bu yüzden bir Home Assistant webhook'u için Home Assistant Cloud URL'si veya başka bir herkese açık URL gerekir. Onayla gerekir."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Zaman aşımı",
           "description": "Yanıtın ne kadar bekleneceği, saniye cinsinden (en fazla 24 saat). 0, beklemeden mevcut yanıtı okur."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Onaylanan Bildirimleri İptal Et",
+      "description": "Onay bekleyen bildirimlerin tekrarlanmasını durdur: bir etiketle gönderilen etkin olanların tümü ya da notification_id ile tek bir bildirim. Yalnızca bu entegrasyonun anahtarıyla gönderilen bildirimleri etkiler ve geri çağrıları gönderilmez. İsteğe bağlı yanıt, bir etiket için kaç tanesinin iptal edildiğini (canceled) veya bir notification_id için alındı bilgisini içerir.",
+      "fields": {
+        "tag": {
+          "name": "Etiket",
+          "description": "Bu etiketle gönderilen tüm etkin onay bekleyen bildirimleri iptal et."
+        },
+        "notification_id": {
+          "name": "Bildirim kimliği",
+          "description": "send_notification'ın döndürdüğü notification_id ile tek bir onay bekleyen bildirimi iptal et."
         }
       }
     },

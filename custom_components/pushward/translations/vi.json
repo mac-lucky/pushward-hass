@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Lặp lại",
           "description": "Lặp lại thông báo theo lịch, dưới dạng đối tượng: cron (5 trường, phút giờ ngày-trong-tháng tháng ngày-trong-tuần, hoặc @hourly/@daily/@weekly/@monthly/@yearly), timezone tùy chọn (mặc định theo Home Assistant), và until tùy chọn (ngày giờ) hoặc count (1-1000 lần gửi) để kết thúc. Các lần gửi phải cách nhau ít nhất 15 phút. Chuỗi giữ nguyên một id; cancel_scheduled_notification sẽ dừng chuỗi."
+        },
+        "acknowledge": {
+          "name": "Xác nhận",
+          "description": "Gửi lại push cho đến khi có người xác nhận: true cho giá trị mặc định, hoặc một đối tượng với bất kỳ mục nào của repeat_seconds (30-3600, mặc định 60), expire_seconds (60-10800, mặc định 3600) và action_title (nhãn nút, mặc định Acknowledge). Chạm vào bất kỳ hành động nào không có url sẽ xác nhận thông báo; nếu không có hành động nào, PushWard thêm một nút Acknowledge. Cần push, và level không phải passive. Tối đa 25 thông báo có thể lặp lại cùng lúc. Yêu cầu phản hồi để nhận biên nhận; cancel_notifications sẽ dừng việc lặp."
+        },
+        "tags": {
+          "name": "Thẻ",
+          "description": "Tối đa 10 nhãn, mỗi nhãn gồm 1-64 ký tự ASCII in được, không có khoảng trắng, để dừng các thông báo cần xác nhận theo nhóm bằng cancel_notifications. Yêu cầu Xác nhận."
+        },
+        "callback_url": {
+          "name": "URL callback",
+          "description": "URL https công khai mà PushWard gửi biên nhận tới bằng POST khi thông báo được xác nhận hoặc hết hạn, được ký bằng một khóa bí mật suy ra từ khóa tích hợp. Địa chỉ cục bộ bị từ chối, nên webhook Home Assistant cần URL Home Assistant Cloud hoặc một URL công khai khác. Yêu cầu Xác nhận."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Thời Gian Chờ",
           "description": "Thời gian chờ câu trả lời, tính bằng giây (tối đa 24 giờ). 0 đọc câu trả lời hiện tại mà không chờ."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Hủy Thông Báo Cần Xác Nhận",
+      "description": "Dừng việc lặp lại các thông báo cần xác nhận, hoặc tất cả thông báo đang hoạt động được gửi kèm một thẻ, hoặc một thông báo theo notification_id. Chỉ tác động đến thông báo gửi bằng khóa của tích hợp này và callback của chúng không được gửi. Phản hồi tùy chọn cho biết số thông báo đã hủy (canceled) với một thẻ, hoặc biên nhận với một notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Thẻ",
+          "description": "Hủy mọi thông báo cần xác nhận đang hoạt động được gửi kèm thẻ này."
+        },
+        "notification_id": {
+          "name": "ID thông báo",
+          "description": "Hủy một thông báo cần xác nhận, theo notification_id mà send_notification trả về."
         }
       }
     },

@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Repetir",
           "description": "Repete a notificação conforme uma programação, como objeto: cron (5 campos, minuto hora dia-do-mês mês dia-da-semana, ou @hourly/@daily/@weekly/@monthly/@yearly), timezone opcional (por padrão, o do Home Assistant) e until opcional (uma data e hora) ou count (1-1000 envios) para encerrá-la. Os envios devem ter pelo menos 15 minutos de intervalo. A série mantém um único id; cancel_scheduled_notification a interrompe."
+        },
+        "acknowledge": {
+          "name": "Confirmar",
+          "description": "Reenviar o push até que alguém o confirme: true para os padrões, ou um objeto com qualquer um de repeat_seconds (30-3600, padrão 60), expire_seconds (60-10800, padrão 3600) e action_title (o rótulo do botão, padrão Acknowledge). Tocar em qualquer ação sem url a confirma; se não houver nenhuma, o PushWard adiciona um botão Acknowledge. Requer push e level diferente de passive. No máximo 25 podem se repetir ao mesmo tempo. Solicite uma resposta para obter o recibo; cancel_notifications interrompe."
+        },
+        "tags": {
+          "name": "Tags",
+          "description": "Até 10 rótulos, cada um com 1-64 caracteres ASCII imprimíveis sem espaços, para interromper notificações com confirmação em grupo com cancel_notifications. Requer Confirmar."
+        },
+        "callback_url": {
+          "name": "URL de callback",
+          "description": "URL https pública para a qual o PushWard envia o recibo por POST quando a notificação é confirmada ou expira, assinada com um segredo derivado da chave de integração. Endereços locais são recusados, então um webhook do Home Assistant precisa da URL do Home Assistant Cloud ou de outra URL pública. Requer Confirmar."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Tempo limite",
           "description": "Quanto tempo aguardar a resposta, em segundos (até 24 horas). 0 lê a resposta atual sem esperar."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Cancelar Notificações com Confirmação",
+      "description": "Interrompe a repetição de notificações com confirmação, todas as ativas enviadas com uma tag ou uma pelo seu notification_id. Atinge apenas notificações enviadas com a chave desta integração, e o callback delas não é enviado. A resposta opcional traz quantas foram canceladas (canceled) para uma tag, ou o recibo para um notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Cancela todas as notificações com confirmação ativas enviadas com esta tag."
+        },
+        "notification_id": {
+          "name": "ID da notificação",
+          "description": "Cancela uma notificação com confirmação, pelo notification_id retornado por send_notification."
         }
       }
     },

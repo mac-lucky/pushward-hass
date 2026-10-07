@@ -2109,6 +2109,26 @@ send_notification:
       example: '{"cron": "0 8 * * 1-5"}'
       selector:
         object:
+    acknowledge:
+      name: Acknowledge
+      description: 'Re-send the push until someone acknowledges it: true for the defaults, or an object with any of `repeat_seconds` (30-3600, default 60), `expire_seconds` (60-10800, default 3600) and `action_title` (the button label, default Acknowledge). A tap on any action without a url acknowledges it; when there is none, PushWard adds an Acknowledge button. Needs push, and not level passive. At most 25 can repeat at once. Request a response for the receipt; cancel_notifications stops it.'
+      example: '{"repeat_seconds": 120, "expire_seconds": 1800}'
+      selector:
+        object:
+    tags:
+      name: Tags
+      description: Up to 10 labels, each 1-64 printable ASCII characters without spaces, for stopping acknowledged notifications as a group with cancel_notifications. Requires Acknowledge.
+      example: "garage"
+      selector:
+        text:
+          multiple: true
+    callback_url:
+      name: Callback URL
+      description: Public https URL that PushWard POSTs the receipt to once the notification is acknowledged or expires, signed with a secret derived from the integration key. Local addresses are refused, so a Home Assistant webhook needs its Home Assistant Cloud or other public URL. Requires Acknowledge.
+      example: "https://hooks.nabu.casa/your-webhook-id"
+      selector:
+        text:
+          type: url
 
 cancel_scheduled_notification:
   name: Cancel Scheduled Notification
@@ -2163,6 +2183,25 @@ get_notification_answer:
           min: 0
           max: 86400
           unit_of_measurement: s
+          mode: box
+
+cancel_notifications:
+  name: Cancel Acknowledged Notifications
+  description: Stop acknowledged notifications from repeating, either every active one sent with a tag or one by its notification_id. It reaches only notifications sent with this integration's key, and their callback is not sent. The optional response holds how many were canceled (canceled) for a tag, or the receipt for a notification_id.
+  fields:
+    tag:
+      name: Tag
+      description: Cancel every active acknowledged notification sent with this tag.
+      example: "garage"
+      selector:
+        text:
+    notification_id:
+      name: Notification ID
+      description: Cancel one acknowledged notification, by the notification_id send_notification returned.
+      example: 991
+      selector:
+        number:
+          min: 1
           mode: box
 
 send_email:

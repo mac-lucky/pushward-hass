@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Wiederholen",
           "description": "Die Benachrichtigung nach einem Zeitplan wiederholen, als Objekt: cron (5 Felder, Minute Stunde Monatstag Monat Wochentag, oder @hourly/@daily/@weekly/@monthly/@yearly), optional timezone (Standard ist die Zeitzone von Home Assistant) und optional until (Datum und Uhrzeit) oder count (1-1000 Sendungen) als Ende. Zwischen zwei Sendungen müssen mindestens 15 Minuten liegen. Die Serie behält eine einzige ID; cancel_scheduled_notification beendet sie."
+        },
+        "acknowledge": {
+          "name": "Bestätigen",
+          "description": "Die Push-Benachrichtigung erneut senden, bis jemand sie bestätigt: true für die Standardwerte oder ein Objekt mit beliebigen Angaben aus repeat_seconds (30-3600, Standard 60), expire_seconds (60-10800, Standard 3600) und action_title (Beschriftung der Schaltfläche, Standard Acknowledge). Das Antippen einer Aktion ohne url bestätigt sie; gibt es keine, fügt PushWard eine Acknowledge-Schaltfläche hinzu. Erfordert push und nicht level passive. Höchstens 25 können gleichzeitig wiederholt werden. Eine Antwort anfordern, um die Quittung zu erhalten; cancel_notifications beendet das Wiederholen."
+        },
+        "tags": {
+          "name": "Tags",
+          "description": "Bis zu 10 Labels, jeweils 1-64 druckbare ASCII-Zeichen ohne Leerzeichen, um bestätigte Benachrichtigungen mit cancel_notifications gemeinsam zu stoppen. Erfordert Bestätigen."
+        },
+        "callback_url": {
+          "name": "Callback-URL",
+          "description": "Öffentliche https-URL, an die PushWard die Quittung per POST sendet, sobald die Benachrichtigung bestätigt wird oder abläuft, signiert mit einem aus dem Integrationsschlüssel abgeleiteten Geheimnis. Lokale Adressen werden abgelehnt, ein Home Assistant-Webhook benötigt daher seine Home Assistant Cloud-URL oder eine andere öffentliche URL. Erfordert Bestätigen."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Zeitlimit",
           "description": "Wie lange auf die Antwort gewartet wird, in Sekunden (bis zu 24 Stunden). 0 liest die aktuelle Antwort, ohne zu warten."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Bestätigte Benachrichtigungen abbrechen",
+      "description": "Das Wiederholen bestätigungspflichtiger Benachrichtigungen beenden, entweder alle aktiven mit einem Tag oder eine einzelne anhand ihrer notification_id. Es betrifft nur Benachrichtigungen, die mit dem Schlüssel dieser Integration gesendet wurden, und ihr Callback wird nicht gesendet. Die optionale Antwort enthält bei einem Tag, wie viele abgebrochen wurden (canceled), oder bei einer notification_id die Quittung.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Alle aktiven bestätigungspflichtigen Benachrichtigungen abbrechen, die mit diesem Tag gesendet wurden."
+        },
+        "notification_id": {
+          "name": "Benachrichtigungs-ID",
+          "description": "Eine bestätigungspflichtige Benachrichtigung abbrechen, anhand der von send_notification zurückgegebenen notification_id."
         }
       }
     },

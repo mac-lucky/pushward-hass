@@ -357,6 +357,9 @@ class PushWardApiClient:
         push: bool = True,
         send_at: datetime | None = None,
         recurrence: dict | None = None,
+        acknowledge: dict | None = None,
+        tags: list[str] | None = None,
+        callback_url: str | None = None,
     ) -> dict | None:
         """Create a notification via POST /notifications and return it.
 
@@ -370,6 +373,10 @@ class PushWardApiClient:
         With an e2e_key, title, subtitle, body and url go out only inside the
         ``encrypted`` envelope (E2EError when they cannot be sealed); the server
         stores placeholders for them.
+
+        ``acknowledge`` (``{repeat_seconds, expire_seconds, action_title}``, all
+        optional) repeats the push until it is answered; the response then
+        carries the ``receipt``. ``tags`` and ``callback_url`` need it.
         """
         if self.e2e_key is not None:
             payload: dict = {
@@ -393,6 +400,9 @@ class PushWardApiClient:
             ("icon_url", icon_url),
             ("metadata", metadata),
             ("actions", actions),
+            ("acknowledge", acknowledge),
+            ("tags", tags),
+            ("callback_url", callback_url),
         ]:
             if val is not None:
                 payload[key] = val
@@ -547,6 +557,27 @@ class PushWardApiClient:
         if purge:
             path += "?purge=true"
         await self._request_with_retry("DELETE", path, allow_404=True)
+
+    async def cancel_notification_receipt(self, notification_id: int) -> dict:
+        """POST /notifications/receipts/{id}/cancel and return the receipt.
+
+        Stops an acknowledged notification repeating; its callback is never sent.
+        A receipt that already finished comes back unchanged. Raises
+        PushWardNotFoundError when the notification has no receipt this key
+        can see.
+        """
+        data = await self._request_with_retry(
+            "POST", f"/notifications/receipts/{int(notification_id)}/cancel", return_json=True
+        )
+        return data if isinstance(data, dict) else {}
+
+    async def cancel_notification_receipts_by_tag(self, tag: str) -> int:
+        """POST /notifications/receipts/cancel for every active receipt with this tag; returns how many."""
+        data = await self._request_with_retry(
+            "POST", "/notifications/receipts/cancel", json={"tag": tag}, return_json=True
+        )
+        canceled = (data or {}).get("canceled") if isinstance(data, dict) else None
+        return canceled if isinstance(canceled, int) and not isinstance(canceled, bool) else 0
 
     async def get_scheduled_notification(self, scheduled_id: int) -> dict | None:
         """GET /notifications/scheduled/{id}; None when it no longer exists."""

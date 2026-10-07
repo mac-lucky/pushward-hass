@@ -31,6 +31,12 @@ from .api import (
     PushWardQuotaExceededError,
 )
 from .const import (
+    ACK_ACTION_ID,
+    ACK_ACTION_TITLE_MAX,
+    ACK_EXPIRE_SECONDS_MAX,
+    ACK_EXPIRE_SECONDS_MIN,
+    ACK_REPEAT_SECONDS_MAX,
+    ACK_REPEAT_SECONDS_MIN,
     ACTIVITY_STATE_ENDED,
     ACTIVITY_STATES,
     ACTIVITY_TTL_MAX,
@@ -76,7 +82,9 @@ from .const import (
     MEDIA_DURATION_MAX,
     MEDIA_EXTRA_CONTROLS_MAX,
     MEDIA_TITLE_MAX,
+    NOTIFICATION_ACTIONS_MAX,
     NOTIFICATION_LEVELS,
+    NOTIFICATION_TAGS_MAX,
     PLAYBACK_STATES,
     PRIORITY_MAX,
     PRIORITY_MIN,
@@ -94,8 +102,10 @@ from .const import (
     USAGE_LIMIT_RESOURCES,
     usage_limit_issue_id,
     validate_action_headers,
+    validate_callback_url,
     validate_duration,
     validate_image_url,
+    validate_notification_tag,
     validate_slug,
     validate_tap_action_url,
     validate_thumbhash,
@@ -136,6 +146,7 @@ SERVICE_DELETE_WIDGET = "delete_widget"
 SERVICE_CANCEL_SCHEDULED_NOTIFICATION = "cancel_scheduled_notification"
 SERVICE_LIST_SCHEDULED_NOTIFICATIONS = "list_scheduled_notifications"
 SERVICE_GET_NOTIFICATION_ANSWER = "get_notification_answer"
+SERVICE_CANCEL_NOTIFICATIONS = "cancel_notifications"
 
 # Keys that turn an action into a silent HTTP webhook — gated by _validate_http_action_fields.
 _HTTP_ACTION_KEYS = ("method", "headers", "body")
@@ -702,7 +713,58 @@ SCHEMA_RECURRENCE = vol.All(
     _validate_recurrence_end,
 )
 
-SCHEMA_SEND_NOTIFICATION = vol.Schema(
+SCHEMA_ACKNOWLEDGE_OPTIONS = vol.Schema(
+    {
+        vol.Optional("repeat_seconds"): vol.All(
+            vol.Coerce(int), vol.Range(min=ACK_REPEAT_SECONDS_MIN, max=ACK_REPEAT_SECONDS_MAX)
+        ),
+        vol.Optional("expire_seconds"): vol.All(
+            vol.Coerce(int), vol.Range(min=ACK_EXPIRE_SECONDS_MIN, max=ACK_EXPIRE_SECONDS_MAX)
+        ),
+        vol.Optional("action_title"): vol.All(cv.string, vol.Length(min=1, max=ACK_ACTION_TITLE_MAX)),
+    }
+)
+
+
+def _acknowledge(value: object) -> dict | None:
+    """true asks for the server's defaults, an object sets any of them, false for none."""
+    if value is None or isinstance(value, bool):
+        return {} if value else None
+    return SCHEMA_ACKNOWLEDGE_OPTIONS(value)
+
+
+def _answerable(action: dict) -> bool:
+    """An action PushWard records the tap of itself: no url and not foreground."""
+    return not action.get("url") and not action.get("foreground")
+
+
+def _validate_acknowledge(data: dict) -> dict:
+    """The acknowledge rules that span fields, checked before the server sees them."""
+    if not data.get("tags"):
+        data.pop("tags", None)
+    if data.get("acknowledge") is None:
+        data.pop("acknowledge", None)
+        if "tags" in data or "callback_url" in data:
+            raise vol.Invalid("tags and callback_url require acknowledge")
+        return data
+    if not data["push"]:
+        raise vol.Invalid("acknowledge needs push: an inbox-only notification does not repeat")
+    if data.get("level") == "passive":
+        raise vol.Invalid("acknowledge is not available for level passive")
+    actions = data.get("actions") or []
+    if any(action["id"] == ACK_ACTION_ID for action in actions):
+        raise vol.Invalid(f"action id {ACK_ACTION_ID} is reserved for the Acknowledge button")
+    if len(actions) >= NOTIFICATION_ACTIONS_MAX and not any(_answerable(action) for action in actions):
+        raise vol.Invalid(
+            "acknowledge adds an Acknowledge button: send at most 9 actions, or make one of them"
+            " answerable (no url, not foreground)"
+        )
+    if "tags" in data:
+        data["tags"] = list(dict.fromkeys(data["tags"]))
+    return data
+
+
+SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
     {
         vol.Required("title"): str,
         vol.Required("body"): str,
@@ -718,13 +780,19 @@ SCHEMA_SEND_NOTIFICATION = vol.Schema(
         vol.Optional("media"): SCHEMA_MEDIA,
         vol.Optional("icon_url"): validate_url,
         vol.Optional("metadata"): vol.Schema({str: str}),
-        vol.Optional("actions"): vol.All([SCHEMA_ACTION], vol.Length(max=10)),
+        vol.Optional("actions"): vol.All([SCHEMA_ACTION], vol.Length(max=NOTIFICATION_ACTIONS_MAX)),
         vol.Optional("push", default=True): bool,
         # Naive values (the UI datetime picker) are in Home Assistant's time zone.
         vol.Optional("send_at"): vol.All(cv.datetime, dt_util.as_utc),
         vol.Optional("recurrence"): SCHEMA_RECURRENCE,
+        vol.Optional("acknowledge"): _acknowledge,
+        vol.Optional("tags"): vol.All(
+            cv.ensure_list, [validate_notification_tag], vol.Length(max=NOTIFICATION_TAGS_MAX)
+        ),
+        vol.Optional("callback_url"): validate_callback_url,
     }
 )
+SCHEMA_SEND_NOTIFICATION = vol.All(SCHEMA_SEND_NOTIFICATION_FIELDS, _validate_acknowledge)
 
 SCHEMA_CANCEL_SCHEDULED_NOTIFICATION = vol.Schema(
     {vol.Required("scheduled_notification_id"): vol.All(vol.Coerce(int), vol.Range(min=1))}
@@ -737,6 +805,16 @@ SCHEMA_GET_NOTIFICATION_ANSWER = vol.Schema(
             vol.Coerce(int), vol.Range(min=0, max=ANSWER_MAX_TIMEOUT)
         ),
     }
+)
+
+SCHEMA_CANCEL_NOTIFICATIONS = vol.All(
+    vol.Schema(
+        {
+            vol.Exclusive("tag", "cancel_target"): validate_notification_tag,
+            vol.Exclusive("notification_id", "cancel_target"): vol.All(vol.Coerce(int), vol.Range(min=1)),
+        }
+    ),
+    cv.has_at_least_one_key("tag", "notification_id"),
 )
 
 SCHEMA_LIST_SCHEDULED_NOTIFICATIONS = vol.Schema(
@@ -952,6 +1030,9 @@ _NOTIFICATION_FIELDS = [
     "icon_url",
     "metadata",
     "actions",
+    "acknowledge",
+    "tags",
+    "callback_url",
 ]
 
 
@@ -961,7 +1042,8 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
     With send_at and/or recurrence the notification is queued server-side
     instead of sent now, and the optional response carries the id to cancel it
     with. Sent now, the response says whether the server records an answer
-    (answerable: at least one action had no url), read with get_notification_answer.
+    (answerable: at least one action had no url), read with get_notification_answer,
+    and for an acknowledged notification carries its receipt.
     """
     api = _get_api(hass)
     kwargs: dict = {field: call.data[field] for field in _NOTIFICATION_FIELDS if field in call.data}
@@ -983,7 +1065,10 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
         return None
     created = created or {}
     if send_at is None and recurrence is None:
-        return {"notification_id": created.get("id"), "answerable": bool(created.get("answerable"))}
+        response: dict = {"notification_id": created.get("id"), "answerable": bool(created.get("answerable"))}
+        if created.get("receipt") is not None:
+            response["receipt"] = created["receipt"]
+        return response
     return {
         "scheduled_notification_id": created.get("id"),
         "send_at": created.get("send_at"),
@@ -1010,6 +1095,24 @@ async def _async_handle_cancel_scheduled_notification(hass: HomeAssistant, call:
     api = _get_api(hass)
     with _surface_api_errors():
         await api.cancel_scheduled_notification(call.data["scheduled_notification_id"])
+
+
+async def _async_handle_cancel_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
+    """Stop acknowledged notifications repeating: every active one with a tag, or one by id."""
+    api = _get_api(hass)
+    with _surface_api_errors():
+        if "tag" in call.data:
+            response: dict = {"canceled": await api.cancel_notification_receipts_by_tag(call.data["tag"])}
+        else:
+            notification_id = call.data["notification_id"]
+            try:
+                response = {"receipt": await api.cancel_notification_receipt(notification_id)}
+            except PushWardNotFoundError as err:
+                raise ServiceValidationError(
+                    f"Notification {notification_id} has nothing to cancel: it was not sent with acknowledge,"
+                    " it was sent with another integration key, or it finished more than 7 days ago"
+                ) from err
+    return response if call.return_response else None
 
 
 async def _async_handle_list_scheduled_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
@@ -1153,6 +1256,13 @@ def _register_services(hass: HomeAssistant) -> None:
         partial(_async_handle_get_notification_answer, hass),
         SCHEMA_GET_NOTIFICATION_ANSWER,
         supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_CANCEL_NOTIFICATIONS,
+        partial(_async_handle_cancel_notifications, hass),
+        SCHEMA_CANCEL_NOTIFICATIONS,
+        supports_response=SupportsResponse.OPTIONAL,
     )
     hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)
     hass.services.async_register(

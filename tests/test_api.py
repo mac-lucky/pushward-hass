@@ -33,6 +33,11 @@ from custom_components.pushward.e2e import E2EError, key_id, open_envelope
 from .conftest import make_api_client as _make_client
 from .conftest import make_mock_response as _mock_response
 from .conftest import make_mock_session as _make_session
+from .server_contract import (
+    assert_valid_notification_receipt,
+    assert_valid_notification_request,
+    assert_valid_receipts_canceled,
+)
 
 # --- validate_connection ---
 
@@ -355,6 +360,7 @@ async def test_create_notification_with_e2e_key_sends_only_the_envelope():
     assert call_args[0][1].endswith("/notifications")
     body = call_args[1]["json"]
     assert set(body) == {"encrypted", "push", "level", "thread_id", "metadata"}
+    assert_valid_notification_request(body)
     assert body["encrypted"].startswith(f"pw1.{key_id(_E2E_KEY)}.")
     assert open_envelope(_E2E_KEY, body["encrypted"]) == {
         "title": "Door",
@@ -376,6 +382,75 @@ async def test_create_notification_with_e2e_key_seals_scheduled_sends():
     body = call_args[1]["json"]
     assert set(body) == {"encrypted", "push", "send_at"}
     assert open_envelope(_E2E_KEY, body["encrypted"]) == {"title": "Bins", "body": "Tonight"}
+
+
+async def test_create_notification_sends_the_acknowledge_fields():
+    receipt = {
+        "notification_id": 991,
+        "status": "active",
+        "repeat_seconds": 120,
+        "expires_at": "2026-10-07T13:00:00Z",
+        "repeats_sent": 0,
+        "tags": ["garage"],
+        "created_at": "2026-10-07T12:00:00Z",
+    }
+    session = _make_session(_mock_response(201, json_body={"id": 991, "answerable": True, "receipt": receipt}))
+    client = _make_client(session)
+    client.e2e_key = _E2E_KEY
+
+    created = await client.create_notification(
+        "Garage",
+        "Still open",
+        acknowledge={"repeat_seconds": 120},
+        tags=["garage"],
+        callback_url="https://hooks.example.com/pushward",
+    )
+
+    body = session.request.call_args[1]["json"]
+    assert body["acknowledge"] == {"repeat_seconds": 120}
+    assert body["tags"] == ["garage"]
+    assert body["callback_url"] == "https://hooks.example.com/pushward"
+    assert_valid_notification_request(body)
+    assert_valid_notification_receipt(created["receipt"])
+
+
+async def test_cancel_notification_receipt_returns_the_receipt():
+    receipt = {
+        "notification_id": 991,
+        "status": "canceled",
+        "repeat_seconds": 60,
+        "expires_at": "2026-10-07T13:00:00Z",
+        "repeats_sent": 2,
+        "canceled_at": "2026-10-07T12:03:00Z",
+        "cancel_reason": "api",
+        "created_at": "2026-10-07T12:00:00Z",
+    }
+    session = _make_session(_mock_response(200, json_body=receipt))
+    client = _make_client(session)
+
+    assert await client.cancel_notification_receipt(991) == receipt
+    call_args = session.request.call_args
+    assert call_args[0][0] == "POST"
+    assert call_args[0][1].endswith("/notifications/receipts/991/cancel")
+    assert_valid_notification_receipt(receipt)
+
+
+async def test_cancel_notification_receipt_without_one_is_not_found():
+    client = _make_client(_make_session(_mock_response(404)))
+    with pytest.raises(PushWardNotFoundError):
+        await client.cancel_notification_receipt(991)
+
+
+async def test_cancel_notification_receipts_by_tag_returns_the_count():
+    session = _make_session(_mock_response(200, json_body={"canceled": 3}))
+    client = _make_client(session)
+
+    assert await client.cancel_notification_receipts_by_tag("garage") == 3
+    call_args = session.request.call_args
+    assert call_args[0][0] == "POST"
+    assert call_args[0][1].endswith("/notifications/receipts/cancel")
+    assert call_args[1]["json"] == {"tag": "garage"}
+    assert_valid_receipts_canceled({"canceled": 3})
 
 
 @pytest.mark.parametrize(

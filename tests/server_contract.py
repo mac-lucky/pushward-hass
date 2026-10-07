@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import ipaddress
 import math
 import re
 import time
@@ -33,6 +34,11 @@ from typing import NoReturn
 from urllib.parse import urlparse
 
 from custom_components.pushward.const import (
+    ACK_ACTION_TITLE_MAX,
+    ACK_EXPIRE_SECONDS_MAX,
+    ACK_EXPIRE_SECONDS_MIN,
+    ACK_REPEAT_SECONDS_MAX,
+    ACK_REPEAT_SECONDS_MIN,
     ACTIVITY_UNIT_MAX,
     APPROVAL_DETAIL_LABEL_MAX,
     APPROVAL_DETAIL_VALUE_MAX,
@@ -66,6 +72,10 @@ from custom_components.pushward.const import (
     MEDIA_EXTRA_CONTROLS_MAX,
     MEDIA_POSITION_MAX_AGE,
     MEDIA_TITLE_MAX,
+    NOTIFICATION_ACTIONS_MAX,
+    NOTIFICATION_LEVELS,
+    NOTIFICATION_TAG_MAX_LEN,
+    NOTIFICATION_TAGS_MAX,
     PLAYBACK_STATES,
     PRIORITY_MAX,
     PRIORITY_MIN,
@@ -113,6 +123,7 @@ from custom_components.pushward.const import (
     WIDGET_UNIT_MAX,
 )
 from custom_components.pushward.content_mapper import _COLOR_HEX_RE, _COLOR_NAMED
+from custom_components.pushward.e2e import BODY_MAX, ENVELOPE_MAX_LEN, SUBTITLE_MAX, TITLE_MAX
 
 # --- Public caps that const.py does not (yet) name --------------------------------
 # Real server limits the integration honours but has no named constant for; defined
@@ -1065,3 +1076,180 @@ def assert_valid_priority(priority: object, *, where: str = "priority") -> None:
 
 def _now() -> int:
     return int(time.time())
+
+
+# --- Notifications (POST /notifications and /notifications/scheduled) -------------
+
+# Restated from the public spec rather than imported, like the allowlists above.
+_ENVELOPE_RE = re.compile(r"^pw1\.[0-9a-f]{8}\.[A-Za-z0-9_-]{40,}\Z")
+_SEALED_FIELDS = ("title", "subtitle", "body", "url")
+_ACK_FIELDS = ("repeat_seconds", "expire_seconds", "action_title")
+_ACK_ACTION_ID = "pw_ack"
+_TAG_RE = re.compile(rf"^[\x21-\x7e]{{1,{NOTIFICATION_TAG_MAX_LEN}}}\Z")
+_LOCAL_HOST_SUFFIXES = (".localhost", ".local", ".internal", ".svc", ".cluster.local", ".home.arpa")
+RECEIPT_STATUSES = ("active", "acknowledged", "expired", "canceled")
+RECEIPT_CANCEL_REASONS = ("api", "tag", "superseded", "key_revoked", "org_disabled")
+RECEIPT_CALLBACK_STATUSES = ("pending", "delivered", "failed")
+
+
+def _check_callback_url(url: object, where: str) -> None:
+    """https on a public host: no userinfo, no private/reserved IP, no local-only name."""
+    if not isinstance(url, str) or not url:
+        _fail(where, "callback_url must be a non-empty string")
+    _check_len(url, MAX_URL_LEN, "callback_url", where)
+    if _URL_FORBIDDEN_RE.search(url):
+        _fail(where, "callback_url contains whitespace or control characters")
+    parsed = urlparse(url)
+    if parsed.scheme != "https" or not parsed.hostname:
+        _fail(where, f"callback_url must be https with a host, got {url!r}")
+    if "@" in parsed.netloc:
+        _fail(where, "callback_url must not carry credentials")
+    host = parsed.hostname.lower().removesuffix(".")
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        if host == "localhost" or "." not in host or host.endswith(_LOCAL_HOST_SUFFIXES):
+            _fail(where, f"callback_url host {host!r} is local")
+        return
+    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
+        ip = ip.ipv4_mapped
+    if not ip.is_global:
+        _fail(where, f"callback_url points at the non-public address {ip}")
+
+
+def _answerable(action: dict) -> bool:
+    return not action.get("url") and not action.get("foreground")
+
+
+def assert_valid_notification_request(payload: dict, *, where: str = "notification") -> None:
+    """Assert a create-notification body would be accepted.
+
+    Covers what the plain fields need, the end-to-end ``encrypted`` envelope
+    (which replaces title, subtitle, body and url) and the acknowledged-alert
+    fields (``acknowledge``, ``tags``, ``callback_url``).
+    """
+    if not isinstance(payload, dict):
+        _fail(where, f"body must be an object, got {type(payload).__name__}")
+    level = payload.get("level")
+    if level is not None and level not in NOTIFICATION_LEVELS:
+        _fail(where, f"level {level!r} is not one of {NOTIFICATION_LEVELS}")
+
+    encrypted = payload.get("encrypted")
+    if encrypted is not None:
+        if not isinstance(encrypted, str) or len(encrypted) > ENVELOPE_MAX_LEN or not _ENVELOPE_RE.match(encrypted):
+            _fail(where, f"encrypted must be a pw1 envelope of at most {ENVELOPE_MAX_LEN} characters")
+        for field in _SEALED_FIELDS:
+            if payload.get(field):
+                _fail(where, f"{field} must not be sent next to encrypted (it travels inside the envelope)")
+    else:
+        for field in ("title", "body"):
+            if not isinstance(payload.get(field), str) or not payload[field]:
+                _fail(where, f"{field} is required")
+        _check_len(payload.get("title"), TITLE_MAX, "title", where)
+        _check_len(payload.get("subtitle"), SUBTITLE_MAX, "subtitle", where)
+        _check_len(payload.get("body"), BODY_MAX, "body", where)
+
+    actions = payload.get("actions") or []
+    if not isinstance(actions, list) or len(actions) > NOTIFICATION_ACTIONS_MAX:
+        _fail(where, f"actions must be a list of at most {NOTIFICATION_ACTIONS_MAX}")
+
+    ack = payload.get("acknowledge")
+    tags = payload.get("tags")
+    callback_url = payload.get("callback_url")
+    if ack is None:
+        if tags or callback_url:
+            _fail(where, "tags and callback_url require acknowledge")
+        return
+    if not isinstance(ack, dict):
+        _fail(where, f"acknowledge must be an object, got {type(ack).__name__}")
+    unknown = set(ack) - set(_ACK_FIELDS)
+    if unknown:
+        _fail(where, f"acknowledge has unknown fields {sorted(unknown)}")
+    for field, low, high in (
+        ("repeat_seconds", ACK_REPEAT_SECONDS_MIN, ACK_REPEAT_SECONDS_MAX),
+        ("expire_seconds", ACK_EXPIRE_SECONDS_MIN, ACK_EXPIRE_SECONDS_MAX),
+    ):
+        value = ack.get(field)
+        if value is not None and (not _is_int(value) or not low <= value <= high):
+            _fail(where, f"acknowledge.{field} must be an int in [{low}, {high}], got {value!r}")
+    title = ack.get("action_title")
+    if title is not None and (not isinstance(title, str) or not 1 <= len(title) <= ACK_ACTION_TITLE_MAX):
+        _fail(where, f"acknowledge.action_title must be 1-{ACK_ACTION_TITLE_MAX} characters")
+    if payload.get("push") is False:
+        _fail(where, "acknowledge requires push")
+    if level == "passive":
+        _fail(where, "acknowledge is not available for level passive")
+    if any(isinstance(a, dict) and a.get("id") == _ACK_ACTION_ID for a in actions):
+        _fail(where, f"action id {_ACK_ACTION_ID} is reserved")
+    if len(actions) >= NOTIFICATION_ACTIONS_MAX and not any(_answerable(a) for a in actions):
+        _fail(where, "acknowledge leaves no room for its button among 10 unanswerable actions")
+    if tags is not None:
+        if not isinstance(tags, list) or len(tags) > NOTIFICATION_TAGS_MAX:
+            _fail(where, f"tags must be a list of at most {NOTIFICATION_TAGS_MAX}")
+        for i, tag in enumerate(tags):
+            if not isinstance(tag, str) or not _TAG_RE.match(tag):
+                _fail(where, f"tags[{i}] {tag!r} is not 1-{NOTIFICATION_TAG_MAX_LEN} printable ASCII without spaces")
+    if callback_url is not None:
+        _check_callback_url(callback_url, where)
+
+
+def _check_timestamp(value: object, field: str, where: str, *, required: bool = False) -> None:
+    if value is None:
+        if required:
+            _fail(where, f"{field} is required")
+        return
+    if not isinstance(value, str):
+        _fail(where, f"{field} must be an RFC 3339 string")
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        _fail(where, f"{field} {value!r} is not RFC 3339")
+
+
+def assert_valid_notification_receipt(receipt: object, *, where: str = "receipt") -> None:
+    """Assert ``receipt`` has the NotificationReceipt shape the server returns.
+
+    It comes back on an acknowledged send (``receipt``), from
+    GET /notifications/receipts/{id} and from POST .../{id}/cancel.
+    """
+    if not isinstance(receipt, dict):
+        _fail(where, f"receipt must be an object, got {type(receipt).__name__}")
+    for field in ("notification_id", "repeat_seconds", "repeats_sent"):
+        if not _is_int(receipt.get(field)) or receipt[field] < 0:
+            _fail(where, f"{field} must be a non-negative int, got {receipt.get(field)!r}")
+    status = receipt.get("status")
+    if status not in RECEIPT_STATUSES:
+        _fail(where, f"status {status!r} is not one of {RECEIPT_STATUSES}")
+    for field in ("expires_at", "created_at"):
+        _check_timestamp(receipt.get(field), field, where, required=True)
+    for field in ("last_delivered_at", "acknowledged_at", "canceled_at"):
+        _check_timestamp(receipt.get(field), field, where)
+    for field in ("acknowledged_by", "acknowledged_by_device", "action_id"):
+        if receipt.get(field) is not None and not isinstance(receipt[field], str):
+            _fail(where, f"{field} must be a string")
+    reason = receipt.get("cancel_reason")
+    if reason is not None and reason not in RECEIPT_CANCEL_REASONS:
+        _fail(where, f"cancel_reason {reason!r} is not one of {RECEIPT_CANCEL_REASONS}")
+    if status == "acknowledged" and receipt.get("acknowledged_at") is None:
+        _fail(where, "an acknowledged receipt carries acknowledged_at")
+    if status == "canceled" and (receipt.get("canceled_at") is None or reason is None):
+        _fail(where, "a canceled receipt carries canceled_at and cancel_reason")
+    tags = receipt.get("tags")
+    if tags is not None and (not isinstance(tags, list) or not all(isinstance(t, str) for t in tags)):
+        _fail(where, "tags must be a list of strings")
+    callback = receipt.get("callback")
+    if callback is not None:
+        if not isinstance(callback, dict) or callback.get("status") not in RECEIPT_CALLBACK_STATUSES:
+            _fail(where, f"callback.status must be one of {RECEIPT_CALLBACK_STATUSES}")
+        if not _is_int(callback.get("attempts")):
+            _fail(where, "callback.attempts must be an int")
+        _check_timestamp(callback.get("delivered_at"), "callback.delivered_at", where)
+        code = callback.get("last_status_code")
+        if code is not None and not _is_int(code):
+            _fail(where, "callback.last_status_code must be an int")
+
+
+def assert_valid_receipts_canceled(body: object, *, where: str = "receipts_cancel") -> None:
+    """Assert the POST /notifications/receipts/cancel response: ``{"canceled": n}``."""
+    if not isinstance(body, dict) or not _is_int(body.get("canceled")) or body["canceled"] < 0:
+        _fail(where, f"expected {{'canceled': <non-negative int>}}, got {body!r}")

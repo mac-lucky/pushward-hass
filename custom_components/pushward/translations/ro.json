@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Repetare",
           "description": "Repetă notificarea după un program, sub formă de obiect: cron (5 câmpuri, minut oră zi-a-lunii lună zi-a-săptămânii, sau @hourly/@daily/@weekly/@monthly/@yearly), timezone opțional (implicit cel al Home Assistant) și until opțional (o dată și oră) sau count (1-1000 de trimiteri) pentru a o încheia. Între trimiteri trebuie să treacă cel puțin 15 minute. Seria păstrează un singur id; cancel_scheduled_notification o oprește."
+        },
+        "acknowledge": {
+          "name": "Confirmare",
+          "description": "Retrimite push-ul până când cineva îl confirmă: true pentru valorile implicite sau un obiect cu oricare dintre repeat_seconds (30-3600, implicit 60), expire_seconds (60-10800, implicit 3600) și action_title (eticheta butonului, implicit Acknowledge). Atingerea oricărei acțiuni fără url o confirmă; dacă nu există niciuna, PushWard adaugă un buton Acknowledge. Necesită push și un level diferit de passive. Cel mult 25 se pot repeta simultan. Solicitați un răspuns pentru confirmarea de primire; cancel_notifications o oprește."
+        },
+        "tags": {
+          "name": "Etichete",
+          "description": "Până la 10 etichete, fiecare de 1-64 de caractere ASCII imprimabile fără spații, pentru a opri ca grup notificările cu confirmare prin cancel_notifications. Necesită Confirmare."
+        },
+        "callback_url": {
+          "name": "URL de callback",
+          "description": "URL https public la care PushWard trimite confirmarea de primire prin POST când notificarea este confirmată sau expiră, semnată cu un secret derivat din cheia de integrare. Adresele locale sunt refuzate, deci un webhook Home Assistant are nevoie de URL-ul Home Assistant Cloud sau de alt URL public. Necesită Confirmare."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Limită de timp",
           "description": "Cât timp se așteaptă răspunsul, în secunde (până la 24 de ore). 0 citește răspunsul curent fără așteptare."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Anulați notificările cu confirmare",
+      "description": "Opriți repetarea notificărilor cu confirmare, fie pe toate cele active trimise cu o etichetă, fie pe una după notification_id. Afectează doar notificările trimise cu cheia acestei integrări, iar callback-ul lor nu este trimis. Răspunsul opțional conține câte au fost anulate (canceled) pentru o etichetă sau confirmarea de primire pentru un notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Etichetă",
+          "description": "Anulați toate notificările active cu confirmare trimise cu această etichetă."
+        },
+        "notification_id": {
+          "name": "ID notificare",
+          "description": "Anulați o notificare cu confirmare, după notification_id returnat de send_notification."
         }
       }
     },

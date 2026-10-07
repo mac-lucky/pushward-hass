@@ -1612,6 +1612,18 @@
         "recurrence": {
           "name": "Herhalen",
           "description": "Herhaal de melding volgens een schema, als object: cron (5 velden, minuut uur dag-van-de-maand maand dag-van-de-week, of @hourly/@daily/@weekly/@monthly/@yearly), optioneel timezone (standaard die van Home Assistant) en optioneel until (een datum en tijd) of count (1-1000 verzendingen) om de reeks te beëindigen. Tussen twee verzendingen moet minstens 15 minuten zitten. De reeks houdt één id; cancel_scheduled_notification stopt hem."
+        },
+        "acknowledge": {
+          "name": "Bevestigen",
+          "description": "Stuur de push opnieuw tot iemand hem bevestigt: true voor de standaardwaarden, of een object met een of meer van repeat_seconds (30-3600, standaard 60), expire_seconds (60-10800, standaard 3600) en action_title (het label van de knop, standaard Acknowledge). Tikken op een actie zonder url bevestigt de melding; is er geen, dan voegt PushWard een Acknowledge-knop toe. Vereist push en level niet passive. Maximaal 25 kunnen tegelijk herhalen. Vraag een antwoord aan voor de ontvangstbevestiging; cancel_notifications stopt het."
+        },
+        "tags": {
+          "name": "Tags",
+          "description": "Maximaal 10 labels, elk 1-64 afdrukbare ASCII-tekens zonder spaties, om te bevestigen meldingen als groep te stoppen met cancel_notifications. Vereist Bevestigen."
+        },
+        "callback_url": {
+          "name": "Callback-URL",
+          "description": "Openbare https-URL waarnaar PushWard de ontvangstbevestiging met POST verstuurt zodra de melding is bevestigd of verloopt, ondertekend met een geheim afgeleid van de integratiesleutel. Lokale adressen worden geweigerd, dus een Home Assistant-webhook heeft zijn Home Assistant Cloud-URL of een andere openbare URL nodig. Vereist Bevestigen."
         }
       }
     },
@@ -1646,6 +1658,20 @@
         "timeout": {
           "name": "Time-out",
           "description": "Hoe lang op het antwoord wordt gewacht, in seconden (maximaal 24 uur). 0 leest het huidige antwoord zonder te wachten."
+        }
+      }
+    },
+    "cancel_notifications": {
+      "name": "Te bevestigen meldingen annuleren",
+      "description": "Stop het herhalen van te bevestigen meldingen, ofwel alle actieve met een tag verzonden meldingen of een enkele via zijn notification_id. Dit geldt alleen voor meldingen verzonden met de sleutel van deze integratie en hun callback wordt niet verstuurd. Het optionele antwoord bevat hoeveel er zijn geannuleerd (canceled) voor een tag, of de ontvangstbevestiging voor een notification_id.",
+      "fields": {
+        "tag": {
+          "name": "Tag",
+          "description": "Annuleer alle actieve te bevestigen meldingen die met deze tag zijn verzonden."
+        },
+        "notification_id": {
+          "name": "Meldings-ID",
+          "description": "Annuleer één te bevestigen melding, via de notification_id die send_notification teruggaf."
         }
       }
     },

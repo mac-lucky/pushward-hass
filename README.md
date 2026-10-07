@@ -69,6 +69,7 @@ The surfaces are independent (separate config, managers, and caches) and share o
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
 - **To-do reminders**: a push for every dated item on a to-do list, with a Done button that completes the item
+- **Acknowledged notifications** that repeat until someone answers, with tags to cancel them and an optional signed callback
 - **End-to-end encryption** of notification text with a key only your devices hold
 - **Account usage sensors**: notifications, Live Activity updates, widget updates, and emails consumed vs. plan limits, plus subscription tier
 - **Template auto-suggestion** picks the best activity template from entity domain and device class
@@ -494,7 +495,7 @@ On premium, uncapped resources report `limit: unlimited`, and the notifications 
 
 ## Services
 
-All services live in the `pushward` domain. There are 19 in total: the nine below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
+All services live in the `pushward` domain. There are 22 in total: the twelve described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
 
 ### `pushward.create_activity`
 
@@ -802,6 +803,9 @@ Send a push notification.
 | `push` | No | Send as APNs push (default: true); when false, inbox-only |
 | `send_at` | No | Send later instead of now, at most 365 days ahead. A time without a UTC offset is read in Home Assistant's time zone |
 | `recurrence` | No | Repeat on a schedule: `{ cron, timezone, until, count }`, see below |
+| `acknowledge` | No | Re-send the push until someone acknowledges it: `true`, or `{ repeat_seconds, expire_seconds, action_title }`, see [Acknowledged notifications](#acknowledged-notifications) |
+| `tags` | No | Up to 10 labels for canceling acknowledged notifications as a group. Needs `acknowledge` |
+| `callback_url` | No | Public https URL that gets the receipt when the notification is acknowledged or expires. Needs `acknowledge` |
 
 With `send_at`, PushWard holds the notification and sends it at that time; it counts toward your notification quota when it is sent, not when you schedule it. Up to 25 can be waiting at once. Ask for a response to get the id you need to cancel it:
 
@@ -863,6 +867,57 @@ It returns `answered`, `status` (`answered` or `pending`), `action_id`, `text` a
     - action: cover.close_cover
       target:
         entity_id: cover.garage_door
+```
+
+#### Acknowledged notifications
+
+For alerts that must not be missed (a leak, an alarm, a door left open), `acknowledge` makes PushWard re-send the push until someone answers it. Any tap on an action without a `url` counts; when the notification has no such action, PushWard adds an Acknowledge button for it. The first answer stops the repeats and clears the notification from your other devices (app 1.17 or later).
+
+`acknowledge: true` uses the defaults. An object sets any of:
+
+| Key | Default | Range |
+|-----|---------|-------|
+| `repeat_seconds` | 60 | 30-3600, seconds between repeats (at most 50 are sent) |
+| `expire_seconds` | 3600 | 60-10800, after this the repeats stop and the notification counts as expired |
+| `action_title` | Acknowledge | 1-64 characters, the label of the button PushWard adds |
+
+It needs `push` and a level other than passive, and at most 25 acknowledged notifications can be repeating at once. Repeats do not count toward your notification quota. A new acknowledged notification with the same `collapse_id` replaces an earlier one that is still repeating. It also works with `send_at` and `recurrence`; the repeats start when the notification goes out.
+
+With a response requested, `send_notification` returns the `receipt` next to `notification_id`: `status` (`active`, `acknowledged`, `expired` or `canceled`), `repeats_sent`, `expires_at`, `tags`, and once answered `acknowledged_at`, `action_id` and, when the app reports it, the device it was answered on. `pushward.get_notification_answer` waits for the answer as usual.
+
+`callback_url` makes PushWard POST the receipt to a public https URL once the notification is acknowledged or expires, signed the [Standard Webhooks](https://www.standardwebhooks.com/) way with a secret derived from your integration key (`pushward receipt secret` in the PushWard CLI prints it). Addresses on your LAN (private IPs, `.local`, `homeassistant:8123`) are refused because PushWard cannot reach them; for a Home Assistant webhook trigger, use its Home Assistant Cloud URL.
+
+```yaml
+- action: pushward.send_notification
+  data:
+    title: "Water leak"
+    body: "Sensor under the kitchen sink"
+    level: time-sensitive
+    acknowledge:
+      repeat_seconds: 120
+      expire_seconds: 3600
+      action_title: "On it"
+    tags: [leak]
+  response_variable: sent
+```
+
+`pushward.cancel_notifications` stops the repeats, either for one notification or for every active one with a tag. It reaches only notifications sent with this integration's key, and no callback is sent for them. Give one of:
+
+| Field | Description |
+|-------|-------------|
+| `tag` | Cancel every active acknowledged notification sent with this tag. The response is `{ canceled: <count> }` |
+| `notification_id` | Cancel one, by the `notification_id` from `send_notification`. The response is its `receipt`; one that already finished comes back unchanged |
+
+```yaml
+- alias: Leak cleared, stop nagging
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_leak
+      to: "off"
+  actions:
+    - action: pushward.cancel_notifications
+      data:
+        tag: leak
 ```
 
 ### `pushward.send_email`
