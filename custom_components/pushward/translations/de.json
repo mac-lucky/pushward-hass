@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Dieser Integrationsschlüssel gehört zu einer Organisation, und Organisationen können keine Ende-zu-Ende-verschlüsselten Benachrichtigungen senden. Entferne den Verschlüsselungsschlüssel unter Konfigurieren oder verwende einen persönlichen Integrationsschlüssel."
     },
+    "e2e_too_large": {
+      "message": "Zusammen mit den übrigen Feldern überschreitet diese verschlüsselte Benachrichtigung das Push-Limit von 4 KB. Kürze Titel oder Text, die Aktionen oder die Medien- und Symbol-URLs, oder schalte Push aus, damit sie nur im Posteingang landet."
+    },
     "receipt_not_found": {
       "message": "Für Benachrichtigung {notification_id} gibt es nichts abzubrechen: Sie wurde nicht mit acknowledge gesendet, wurde mit einem anderen Integrationsschlüssel gesendet oder ist vor mehr als 7 Tagen beendet worden."
     }

@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Esta clave de integración pertenece a una organización, y las organizaciones no pueden enviar notificaciones con cifrado de extremo a extremo. Elimina la clave de cifrado en Configurar o usa una clave de integración personal."
     },
+    "e2e_too_large": {
+      "message": "Junto con sus demás campos, esta notificación cifrada supera el límite de 4 KB de un push. Acorta el título o el cuerpo, las acciones o las URL de multimedia e icono, o desactiva Push para guardarla solo en la bandeja de entrada."
+    },
     "receipt_not_found": {
       "message": "La notificación {notification_id} no tiene nada que cancelar: no se envió con acknowledge, se envió con otra clave de integración o terminó hace más de 7 días."
     }

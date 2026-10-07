@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import time
 from datetime import UTC, datetime
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -671,6 +673,7 @@ async def test_service_cancel_notifications_without_a_receipt(hass: HomeAssistan
         (409, "notification_receipt.limit_exceeded", "receipt_limit_exceeded"),
         (422, "notification_receipt.disabled", "receipts_disabled"),
         (422, "notification.encryption_unavailable", "e2e_unavailable"),
+        (422, "notification.encrypted_too_large", "e2e_too_large"),
     ],
 )
 async def test_service_send_notification_translates_refusals_the_user_can_act_on(
@@ -685,6 +688,8 @@ async def test_service_send_notification_translates_refusals_the_user_can_act_on
             DOMAIN, "send_notification", {"title": "t", "body": "b", "acknowledge": True}, blocking=True
         )
     assert exc_info.value.translation_key == translation_key
+    en = json.loads((Path(__file__).parents[1] / "custom_components/pushward/translations/en.json").read_text())
+    assert en["exceptions"][translation_key]["message"]
 
 
 async def test_service_send_notification_other_refusals_keep_the_server_message(hass: HomeAssistant) -> None:

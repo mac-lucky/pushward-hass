@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "This integration key belongs to an organization, and organizations cannot send end-to-end encrypted notifications. Remove the encryption key under Configure, or use a personal integration key."
     },
+    "e2e_too_large": {
+      "message": "Together with its other fields, this encrypted notification goes over the 4 KB push limit. Shorten the title or body, the actions or the media and icon URLs, or turn Push off to keep it in the inbox only."
+    },
     "receipt_not_found": {
       "message": "Notification {notification_id} has nothing to cancel: it was not sent with acknowledge, it was sent with another integration key, or it finished more than 7 days ago."
     }

@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Khóa tích hợp này thuộc về một tổ chức, và tổ chức không thể gửi thông báo mã hóa đầu cuối. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc dùng khóa tích hợp cá nhân."
     },
+    "e2e_too_large": {
+      "message": "Cùng với các trường khác, thông báo mã hóa này vượt quá giới hạn 4 KB của một thông báo đẩy. Hãy rút ngắn tiêu đề hoặc nội dung, các hành động hoặc URL phương tiện và biểu tượng, hoặc tắt Đẩy để chỉ lưu nó trong hộp thư đến."
+    },
     "receipt_not_found": {
       "message": "Thông báo {notification_id} không có gì để hủy: nó không được gửi kèm acknowledge, được gửi bằng khóa tích hợp khác, hoặc đã kết thúc hơn 7 ngày trước."
     }

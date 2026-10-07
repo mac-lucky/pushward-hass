@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Ten klucz integracji należy do organizacji, a organizacje nie mogą wysyłać powiadomień szyfrowanych end-to-end. Usuń klucz szyfrowania w Konfiguruj lub użyj osobistego klucza integracji."
     },
+    "e2e_too_large": {
+      "message": "Razem z pozostałymi polami to zaszyfrowane powiadomienie przekracza limit 4 KB dla pusha. Skróć tytuł lub treść, akcje albo adresy URL multimediów i ikony, albo wyłącz Push, aby zapisać je tylko w skrzynce."
+    },
     "receipt_not_found": {
       "message": "Powiadomienie {notification_id} nie ma czego anulować: nie wysłano go z acknowledge, wysłano je innym kluczem integracji albo zakończyło się ponad 7 dni temu."
     }

@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Această cheie de integrare aparține unei organizații, iar organizațiile nu pot trimite notificări criptate end-to-end. Eliminați cheia de criptare la Configurare sau folosiți o cheie de integrare personală."
     },
+    "e2e_too_large": {
+      "message": "Împreună cu celelalte câmpuri, această notificare criptată depășește limita de 4 KB a unui push. Scurtați titlul sau corpul, acțiunile ori URL-urile media și ale pictogramei, sau dezactivați Push pentru a o păstra doar în inbox."
+    },
     "receipt_not_found": {
       "message": "Notificarea {notification_id} nu are nimic de anulat: nu a fost trimisă cu acknowledge, a fost trimisă cu altă cheie de integrare sau s-a încheiat acum mai mult de 7 zile."
     }

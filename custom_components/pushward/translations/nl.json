@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Deze integratiesleutel hoort bij een organisatie, en organisaties kunnen geen end-to-end versleutelde meldingen versturen. Verwijder de versleutelingssleutel onder Configureren, of gebruik een persoonlijke integratiesleutel."
     },
+    "e2e_too_large": {
+      "message": "Samen met de overige velden gaat deze versleutelde melding over de pushlimiet van 4 KB. Kort de titel of tekst, de acties of de media- en pictogram-URL's in, of zet Push uit om de melding alleen in het postvak te bewaren."
+    },
     "receipt_not_found": {
       "message": "Melding {notification_id} heeft niets om te annuleren: ze is niet met acknowledge verstuurd, ze is met een andere integratiesleutel verstuurd, of ze is meer dan 7 dagen geleden afgelopen."
     }

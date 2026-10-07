@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Pag-aari ng isang organisasyon ang integration key na ito, at hindi makapagpapadala ng end-to-end encrypted na notification ang mga organisasyon. Alisin ang encryption key sa Configure, o gumamit ng personal na integration key."
     },
+    "e2e_too_large": {
+      "message": "Kasama ang iba pang field nito, lumalampas ang encrypted na notification na ito sa 4 KB na limitasyon ng push. Paikliin ang pamagat o body, ang mga aksyon, o ang mga URL ng media at icon, o i-off ang Push para sa inbox lang ito mapunta."
+    },
     "receipt_not_found": {
       "message": "Walang makakansela sa notification {notification_id}: hindi ito ipinadala nang may acknowledge, ipinadala ito gamit ang ibang integration key, o natapos ito mahigit 7 araw na ang nakalipas."
     }

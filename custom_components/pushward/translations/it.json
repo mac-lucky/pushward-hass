@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Questa chiave di integrazione appartiene a un'organizzazione, e le organizzazioni non possono inviare notifiche con crittografia end-to-end. Rimuovi la chiave di crittografia in Configura, oppure usa una chiave di integrazione personale."
     },
+    "e2e_too_large": {
+      "message": "Insieme agli altri campi, questa notifica cifrata supera il limite di 4 KB di un push. Accorcia il titolo o il corpo, le azioni o gli URL di media e icona, oppure disattiva Push per conservarla solo nella posta in arrivo."
+    },
     "receipt_not_found": {
       "message": "La notifica {notification_id} non ha nulla da annullare: non è stata inviata con acknowledge, è stata inviata con un'altra chiave di integrazione, oppure si è conclusa più di 7 giorni fa."
     }

@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Kunci integrasi ini milik organisasi, dan organisasi tidak dapat mengirim notifikasi terenkripsi ujung ke ujung. Hapus kunci enkripsi di bawah Konfigurasikan, atau gunakan kunci integrasi pribadi."
     },
+    "e2e_too_large": {
+      "message": "Bersama kolom lainnya, notifikasi terenkripsi ini melebihi batas push 4 KB. Persingkat judul atau isi, aksi, atau URL media dan ikon, atau matikan Push agar hanya disimpan di kotak masuk."
+    },
     "receipt_not_found": {
       "message": "Notifikasi {notification_id} tidak ada yang bisa dibatalkan: notifikasi ini tidak dikirim dengan acknowledge, dikirim dengan kunci integrasi lain, atau selesai lebih dari 7 hari lalu."
     }

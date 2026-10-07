@@ -882,6 +882,7 @@ _TRANSLATED_ERROR_CODES = {
     "notification_receipt.limit_exceeded": "receipt_limit_exceeded",
     "notification_receipt.disabled": "receipts_disabled",
     "notification.encryption_unavailable": "e2e_unavailable",
+    "notification.encrypted_too_large": "e2e_too_large",
 }
 
 

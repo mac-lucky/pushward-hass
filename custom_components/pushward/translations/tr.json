@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Bu entegrasyon anahtarı bir kuruma ait ve kurumlar uçtan uca şifreli bildirim gönderemez. Şifreleme anahtarını Yapılandır altından kaldırın veya kişisel bir entegrasyon anahtarı kullanın."
     },
+    "e2e_too_large": {
+      "message": "Diğer alanlarıyla birlikte bu şifreli bildirim 4 KB'lık anlık bildirim sınırını aşıyor. Başlığı veya gövdeyi, eylemleri ya da medya ve simge URL'lerini kısaltın veya yalnızca gelen kutusunda kalması için Gönder seçeneğini kapatın."
+    },
     "receipt_not_found": {
       "message": "{notification_id} bildirimi için iptal edilecek bir şey yok: acknowledge ile gönderilmedi, başka bir entegrasyon anahtarıyla gönderildi veya 7 günden daha önce sona erdi."
     }

@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Esta chave de integração pertence a uma organização, e organizações não podem enviar notificações com criptografia de ponta a ponta. Remova a chave de criptografia em Configurar ou use uma chave de integração pessoal."
     },
+    "e2e_too_large": {
+      "message": "Junto com os outros campos, esta notificação criptografada ultrapassa o limite de 4 KB de um push. Encurte o título ou o corpo, as ações ou as URLs de mídia e do ícone, ou desative Push para guardá-la apenas na caixa de entrada."
+    },
     "receipt_not_found": {
       "message": "A notificação {notification_id} não tem nada a cancelar: ela não foi enviada com acknowledge, foi enviada com outra chave de integração ou terminou há mais de 7 dias."
     }

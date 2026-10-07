@@ -1731,6 +1731,9 @@
     "e2e_unavailable": {
       "message": "Cette clé d'intégration appartient à une organisation, et les organisations ne peuvent pas envoyer de notifications chiffrées de bout en bout. Supprimez la clé de chiffrement sous Configurer, ou utilisez une clé d'intégration personnelle."
     },
+    "e2e_too_large": {
+      "message": "Avec ses autres champs, cette notification chiffrée dépasse la limite de 4 Ko d'un push. Raccourcissez le titre ou le corps, les actions ou les URL du média et de l'icône, ou désactivez Push pour la garder uniquement dans la boîte de réception."
+    },
     "receipt_not_found": {
       "message": "La notification {notification_id} n'a rien à annuler : elle n'a pas été envoyée avec acknowledge, elle a été envoyée avec une autre clé d'intégration, ou elle s'est terminée il y a plus de 7 jours."
     }
