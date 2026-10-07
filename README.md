@@ -873,7 +873,7 @@ It returns `answered`, `status` (`answered` or `pending`), `action_id`, `text` a
 
 #### Acknowledged notifications
 
-For alerts that must not be missed (a leak, an alarm, a door left open), `acknowledge` makes PushWard re-send the push until someone answers it. Any tap on an action without a `url` counts; when the notification has no such action, PushWard adds an Acknowledge button for it. The first answer stops the repeats and clears the notification from your other devices (app 1.17 or later).
+For alerts that must not be missed (a leak, an alarm, a door left open), `acknowledge` makes PushWard re-send the push until someone answers it. Any tap on an action without a `url` that does not open the app (`foreground` off) counts; when the notification has no such action, PushWard adds an Acknowledge button for it. The first answer stops the repeats and clears the notification from your other devices (app 1.17 or later).
 
 `acknowledge: true` uses the defaults. An object sets any of:
 
