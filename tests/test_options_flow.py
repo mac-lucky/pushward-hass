@@ -93,8 +93,11 @@ async def test_changing_the_key_swaps_it_in_without_a_reload(hass: HomeAssistant
         await hass.async_block_till_done()
     assert client_cls.call_args.kwargs["e2e_key"] is None
 
-    manager = hass.data[DOMAIN][entry.entry_id]["manager"]
-    with patch.object(manager, "async_reload") as reload:
+    data = hass.data[DOMAIN][entry.entry_id]
+    with (
+        patch.object(data["manager"], "async_reload") as reload,
+        patch.object(data["todo_manager"], "async_retry_refused") as retry_refused,
+    ):
         hass.config_entries.async_update_entry(entry, options={CONF_E2E_KEY: KEY_HEX})
         await hass.async_block_till_done()
         assert api.e2e_key == bytes.fromhex(KEY_HEX)
@@ -103,3 +106,5 @@ async def test_changing_the_key_swaps_it_in_without_a_reload(hass: HomeAssistant
         await hass.async_block_till_done()
         assert api.e2e_key is None
     reload.assert_not_called()
+    # A reminder refused under the old key gets another try under the new one.
+    assert retry_refused.call_count == 2

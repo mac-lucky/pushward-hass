@@ -90,6 +90,50 @@ def seal_plaintext(key: bytes, plaintext: bytes, *, nonce: bytes | None = None) 
     return f"pw1.{kid}.{_b64(nonce + sealed)}"
 
 
+def _fields(title: str, body: str, subtitle: str | None, url: str | None) -> dict[str, str]:
+    fields = {"title": title}
+    if subtitle:
+        fields["subtitle"] = subtitle
+    fields["body"] = body
+    if url:
+        fields["url"] = url
+    return fields
+
+
+def _serialize(fields: dict[str, str]) -> bytes:
+    try:
+        return json.dumps(fields, ensure_ascii=False, separators=(",", ":")).encode()
+    except UnicodeEncodeError as err:
+        # A lone surrogate (from a bad \ud800 escape somewhere upstream) has no UTF-8 form.
+        raise E2EError("the text is not valid Unicode (it holds an unpaired surrogate)") from err
+
+
+def _trim(text: str, excess: int) -> tuple[str, int]:
+    """Drop code points from the end of text until their JSON bytes cover excess; one always stays."""
+    end = len(text)
+    while excess > 0 and end > 1:
+        end -= 1
+        excess -= len(_serialize({"": text[end]})) - len('{"":""}')
+    return text[:end], excess
+
+
+def fit(title: str, body: str, *, subtitle: str | None = None, url: str | None = None) -> tuple[str, str]:
+    """title and body cut down, the body first, until the notification fits one envelope.
+
+    For text that may be shortened rather than refused, like a to-do item's
+    description: in scripts like Devanagari or CJK a code point takes three UTF-8
+    bytes, so text within the plain-field limits can still be far too long to seal.
+    Each keeps at least one code point, so seal() still refuses when subtitle and
+    url alone do not fit.
+    """
+    title, body = title[:TITLE_MAX], body[:BODY_MAX]
+    excess = len(_serialize(_fields(title, body, subtitle, url))) - PLAINTEXT_MAX
+    if excess > 0:
+        body, excess = _trim(body, excess)
+        title, _ = _trim(title, excess)
+    return title, body
+
+
 def seal(
     key: bytes,
     *,
@@ -115,13 +159,7 @@ def seal(
         except vol.Invalid as err:
             raise E2EError(f"url: {err}") from err
 
-    fields = {"title": title}
-    if subtitle:
-        fields["subtitle"] = subtitle
-    fields["body"] = body
-    if url:
-        fields["url"] = url
-    plaintext = json.dumps(fields, ensure_ascii=False, separators=(",", ":")).encode()
+    plaintext = _serialize(_fields(title, body, subtitle, url))
     # Padding to a multiple of 64 bytes hides the exact length, unless that alone
     # would push the envelope over the cap.
     padded = plaintext + b" " * (-len(plaintext) % _PAD_BLOCK)

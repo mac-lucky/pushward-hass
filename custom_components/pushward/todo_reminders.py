@@ -329,6 +329,19 @@ class TodoReminderManager:
                 pass
         await self._store.async_save(self._serialize())
 
+    @callback
+    def async_retry_refused(self) -> None:
+        """Forget the refused reminders and look at every list again.
+
+        For an encryption key change: a reminder refused under the old setting
+        may go out now, without waiting for its item to be edited.
+        """
+        self._refused.clear()
+        if not self._stopped:
+            self._entry.async_create_background_task(
+                self._hass, self._async_reconcile_all(), name=f"{DOMAIN} to-do reminders key change"
+            )
+
     async def async_reload(self, configs: list[dict]) -> None:
         """Apply added, changed and removed tracked lists."""
         new = {cfg[CONF_SUBENTRY_ID]: cfg for cfg in configs}
@@ -634,9 +647,11 @@ class TodoReminderManager:
                     metadata={TODO_METADATA_LIST: sub_id, TODO_METADATA_UID: reminder.uid},
                     actions=[{"id": TODO_DONE_ACTION_ID, "title": self._done_label}] if done_button else None,
                     send_at=send_at,
+                    # An encrypted reminder is shortened to fit rather than dropped.
+                    trim_to_fit=True,
                 )
             except E2EError as err:
-                # The item's text does not fit in an envelope; nothing goes out in the clear.
+                # Text that cannot be encrypted at all (invalid Unicode); nothing goes out in the clear.
                 _LOGGER.warning("PushWard cannot encrypt the reminder for a to-do item in %s: %s", entity_id, err)
                 self._refused[(sub_id, reminder.uid)] = reminder.version
                 continue

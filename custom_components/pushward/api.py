@@ -37,7 +37,7 @@ from .const import (
     SCHEDULED_LIST_MAX_PAGES,
     SCHEDULED_LIST_PAGE_SIZE,
 )
-from .e2e import seal
+from .e2e import fit, seal
 
 if TYPE_CHECKING:
     from .quota import QuotaGate
@@ -360,6 +360,7 @@ class PushWardApiClient:
         acknowledge: dict | None = None,
         tags: list[str] | None = None,
         callback_url: str | None = None,
+        trim_to_fit: bool = False,
     ) -> dict | None:
         """Create a notification via POST /notifications and return it.
 
@@ -372,13 +373,16 @@ class PushWardApiClient:
 
         With an e2e_key, title, subtitle, body and url go out only inside the
         ``encrypted`` envelope (E2EError when they cannot be sealed); the server
-        stores placeholders for them.
+        stores placeholders for them. ``trim_to_fit`` shortens the body, then the
+        title, when sealed text would not fit, instead of refusing it.
 
         ``acknowledge`` (``{repeat_seconds, expire_seconds, action_title}``, all
         optional) repeats the push until it is answered; the response then
         carries the ``receipt``. ``tags`` and ``callback_url`` need it.
         """
         if self.e2e_key is not None:
+            if trim_to_fit:
+                title, body = fit(title, body, subtitle=subtitle, url=url)
             payload: dict = {
                 "encrypted": seal(self.e2e_key, title=title, body=body, subtitle=subtitle, url=url),
                 "push": push,

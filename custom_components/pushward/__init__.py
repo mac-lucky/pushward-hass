@@ -1361,6 +1361,8 @@ async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
     if entry.options.get(CONF_E2E_KEY) != data.get("e2e_key"):
         data["e2e_key"] = entry.options.get(CONF_E2E_KEY)
         data["api"].e2e_key = _e2e_key(entry)
+        if (todo_manager := data.get("todo_manager")) is not None:
+            todo_manager.async_retry_refused()
         return
     entities = _entity_configs(entry)
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]

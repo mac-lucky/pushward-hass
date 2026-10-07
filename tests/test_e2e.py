@@ -13,8 +13,10 @@ import pytest
 
 from custom_components.pushward.e2e import (
     ENVELOPE_MAX_LEN,
+    PLAINTEXT_MAX,
     E2EError,
     _hkdf,
+    fit,
     key_id,
     open_envelope,
     parse_envelope,
@@ -132,3 +134,43 @@ def test_open_with_another_key_names_the_kid() -> None:
     other = bytes(range(32, 64))
     with pytest.raises(E2EError, match=key_id(KEY)):
         open_envelope(other, seal(KEY, title="t", body="b"))
+
+
+def _json_len(title: str, body: str) -> int:
+    return len(json.dumps({"title": title, "body": body}, ensure_ascii=False, separators=(",", ":")).encode())
+
+
+def test_fit_leaves_text_that_fits_alone() -> None:
+    assert fit("Dentist", "Bring the card") == ("Dentist", "Bring the card")
+
+
+@pytest.mark.parametrize("char", ["\u0928", "\u4e2d", "\U0001f525", '"', "\n"])
+def test_fit_cuts_the_body_until_the_json_fits(char: str) -> None:
+    title, body = fit("Shopping", char * 1200)
+    assert title == "Shopping"
+    assert body == char * len(body)
+    assert PLAINTEXT_MAX - 6 < _json_len(title, body) <= PLAINTEXT_MAX
+    assert open_envelope(KEY, seal(KEY, title=title, body=body))["body"] == body
+
+
+def test_fit_cuts_the_title_once_the_body_is_down_to_one_character() -> None:
+    subtitle, url = "\u4e2d" * 256, "https://example.com/" + "a" * 800
+    title, body = fit("\U0001f525" * 256, "b" * 100, subtitle=subtitle, url=url)
+    assert body == "b"
+    assert 0 < len(title) < 256
+    envelope = seal(KEY, title=title, body=body, subtitle=subtitle, url=url)
+    assert open_envelope(KEY, envelope)["title"] == title
+
+
+def test_fit_leaves_seal_to_refuse_when_subtitle_and_url_alone_are_too_long() -> None:
+    subtitle, url = "\u4e2d" * 256, "https://example.com/" + "a" * 2028
+    title, body = fit("t" * 50, "b" * 50, subtitle=subtitle, url=url)
+    assert (title, body) == ("t", "b")
+    with pytest.raises(E2EError, match="too long"):
+        seal(KEY, title=title, body=body, subtitle=subtitle, url=url)
+
+
+@pytest.mark.parametrize("call", [lambda: seal(KEY, title="a\ud800", body="b"), lambda: fit("t", "b\udfff")])
+def test_an_unpaired_surrogate_is_an_e2e_error(call) -> None:
+    with pytest.raises(E2EError, match="not valid Unicode"):
+        call()

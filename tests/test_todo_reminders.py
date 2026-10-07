@@ -531,6 +531,47 @@ async def test_item_that_cannot_be_encrypted_waits_for_an_edit(setup) -> None:
     assert api.create_notification.await_count == 2
 
 
+async def test_reminders_ask_to_be_trimmed_to_fit_an_envelope(setup) -> None:
+    items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
+    _, api, _ = await setup(items)
+
+    assert api.create_notification.call_args.kwargs["trim_to_fit"] is True
+
+
+async def test_an_item_that_cannot_be_encrypted_does_not_hold_up_the_rest(setup) -> None:
+    items = [
+        {"uid": "a", "summary": "Bad\ud800", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"},
+        {"uid": "b", "summary": "Fine", "status": "needs_action", "due": "2026-10-02T16:00:00+02:00"},
+    ]
+    api = _api()
+    ids = iter(range(100, 1000))
+
+    async def create(title, body, **kwargs):
+        if "\ud800" in title:
+            raise E2EError("the text is not valid Unicode")
+        return {"id": next(ids), "status": "scheduled"}
+
+    api.create_notification = AsyncMock(side_effect=create)
+    manager, api, _ = await setup(items, api=api)
+
+    assert set(_records(manager)) == {"b"}
+
+
+async def test_a_key_change_retries_refused_items_without_an_edit(setup, hass: HomeAssistant) -> None:
+    items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
+    api = _api()
+    api.create_notification = AsyncMock(side_effect=E2EError("the text is not valid Unicode"))
+    manager, api, _ = await setup(items, api=api)
+    assert api.create_notification.await_count == 1
+
+    api.create_notification = AsyncMock(return_value={"id": 7, "status": "scheduled"})
+    manager.async_retry_refused()
+    await hass.async_block_till_done()
+
+    api.create_notification.assert_awaited_once()
+    assert _records(manager)["a"]["schedule_id"] == 7
+
+
 async def test_reminders_carry_a_collapse_id_per_item(setup) -> None:
     items = [
         {"uid": "a", "summary": "One", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"},

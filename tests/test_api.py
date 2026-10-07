@@ -453,6 +453,22 @@ async def test_cancel_notification_receipts_by_tag_returns_the_count():
     assert_valid_receipts_canceled({"canceled": 3})
 
 
+async def test_create_notification_trim_to_fit_shortens_only_sealed_text():
+    session = _make_session(_mock_response(201))
+    await _make_client(session).create_notification("Shopping", "\u4e2d" * 1000, trim_to_fit=True)
+    assert session.request.call_args[1]["json"]["body"] == "\u4e2d" * 1000
+
+    session = _make_session(_mock_response(201))
+    client = _make_client(session)
+    client.e2e_key = _E2E_KEY
+    await client.create_notification("Shopping", "\u4e2d" * 1000, trim_to_fit=True)
+    body = session.request.call_args[1]["json"]
+    assert_valid_notification_request(body)
+    opened = open_envelope(_E2E_KEY, body["encrypted"])
+    assert opened["title"] == "Shopping"
+    assert 0 < len(opened["body"]) < 1000
+
+
 @pytest.mark.parametrize(
     ("title", "body", "url"),
     [("", "b", None), ("t", "", None), ("t", "b", "javascript:alert(1)"), ("t", "x" * 3000, None)],

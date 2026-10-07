@@ -473,7 +473,7 @@ Only those four fields are encrypted. Level, sound, volume, thread and collapse 
 Some side effects:
 
 - `send_notification` and to-do reminders are sealed whether they go out now or are scheduled. Notifications scheduled before you set or change the key go out the way they were queued.
-- The server cannot check sealed text, so the integration does it first: an empty title or body, a blocked URL scheme, or text too long to encrypt fails the action call instead of reaching PushWard. The envelope fits about 2.2 KB of text (title, subtitle, body and URL together), well under the plain-text limits, so a long body that worked before may need trimming.
+- The server cannot check sealed text, so the integration does it first: an empty title or body, a blocked URL scheme, or text too long to encrypt fails the action call instead of reaching PushWard. The envelope fits about 2.2 KB of text (title, subtitle, body and URL together), well under the plain-text limits, so a long body that worked before may need trimming. Text in scripts like Hindi or Chinese takes three bytes a character, so it runs out sooner. To-do reminders are cut to fit instead, the description first and then the title.
 - A device without the key, or with an app older than 1.17, shows "Encrypted notification" in place of the text.
 - The key is stored on the config entry next to the integration key. Diagnostics leave it out and show only the Key ID.
 
