@@ -1772,12 +1772,14 @@
     "step": {
       "init": {
         "title": "Chiffrement de bout en bout",
-        "description": "Home Assistant chiffre avec cette clé le titre, le sous-titre, le corps et l'URL de chaque notification envoyée par cette intégration, et seuls les appareils qui possèdent la même clé peuvent les lire. Créez la clé dans l'application PushWard sous Réglages > Chiffrement et collez-la ici. Le niveau, le son, les actions, les médias et les métadonnées restent lisibles par PushWard, qui en a besoin pour distribuer la notification ; les Activités en direct et les widgets ne sont pas chiffrés. Un appareil sans la clé, ou avec une application PushWard antérieure à la 1.17, affiche un texte de remplacement à la place du contenu. Laissez le champ vide pour envoyer les notifications sans chiffrement.\n\nID de clé utilisé : {key_id}",
+        "description": "Home Assistant chiffre avec cette clé le titre, le sous-titre, le corps et l'URL de chaque notification envoyée par cette intégration, et seuls les appareils qui possèdent la même clé peuvent les lire. Créez la clé dans l'application PushWard sous Réglages > Chiffrement et collez-la ici. Le niveau, le son, les actions, les médias et les métadonnées restent lisibles par PushWard, qui en a besoin pour distribuer la notification ; les Activités en direct et les widgets ne sont pas chiffrés. Un appareil sans la clé, ou avec une application PushWard antérieure à la 1.17, affiche un texte de remplacement à la place du contenu. Une clé d'intégration appartenant à une organisation ne peut pas envoyer de notifications chiffrées.\n\nID de clé utilisé : {key_id}",
         "data": {
-          "e2e_key": "Clé de chiffrement de bout en bout"
+          "e2e_key": "Clé de chiffrement de bout en bout",
+          "remove_e2e_key": "Supprimer la clé de chiffrement"
         },
         "data_description": {
-          "e2e_key": "64 caractères hexadécimaux. L'application affiche le même ID de clé à côté de la clé."
+          "e2e_key": "64 caractères hexadécimaux. Laissez-le vide pour conserver la clé utilisée ; l'application affiche le même ID de clé à côté de la clé.",
+          "remove_e2e_key": "Renvoyer les notifications sans chiffrement. Une clé saisie ci-dessus est ignorée."
         }
       }
     },

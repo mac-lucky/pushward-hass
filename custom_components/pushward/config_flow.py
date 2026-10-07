@@ -2170,23 +2170,33 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         }
 
 
-_E2E_KEY_SCHEMA = vol.Schema(
-    {
-        vol.Optional(CONF_E2E_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
-    }
-)
+# Form-only: ticking it turns encryption off. Never stored.
+_E2E_REMOVE = "remove_e2e_key"
+
+
+def _e2e_key_schema(has_key: bool) -> vol.Schema:
+    fields: dict = {vol.Optional(CONF_E2E_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))}
+    if has_key:
+        fields[vol.Optional(_E2E_REMOVE, default=False)] = BooleanSelector()
+    return vol.Schema(fields)
 
 
 class PushWardOptionsFlow(config_entries.OptionsFlow):
-    """Set or clear the key that encrypts notification text end to end."""
+    """Set, replace or remove the key that encrypts notification text end to end."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
-        """One field: an empty one turns encryption off."""
+        """The key field always starts empty, so the stored key never goes back to the browser.
+
+        Empty keeps the key in use; turning encryption off is the separate checkbox.
+        """
+        current = self.config_entry.options.get(CONF_E2E_KEY)
         errors: dict[str, str] = {}
         if user_input is not None:
             raw = (user_input.get(CONF_E2E_KEY) or "").strip()
-            if not raw:
+            if current and user_input.get(_E2E_REMOVE):
                 return self.async_create_entry(data={})
+            if not raw:
+                return self.async_create_entry(data=dict(self.config_entry.options))
             try:
                 key = parse_key(raw)
             except E2EError:
@@ -2196,12 +2206,9 @@ class PushWardOptionsFlow(config_entries.OptionsFlow):
             else:
                 return self.async_create_entry(data={CONF_E2E_KEY: key.hex()})
 
-        current = self.config_entry.options.get(CONF_E2E_KEY)
-        # Shown back (masked), so saving the form unchanged keeps the key.
-        suggested = user_input if user_input is not None else {CONF_E2E_KEY: current or ""}
         return self.async_show_form(
             step_id="init",
-            data_schema=self.add_suggested_values_to_schema(_E2E_KEY_SCHEMA, suggested),
+            data_schema=_e2e_key_schema(bool(current)),
             errors=errors,
             description_placeholders={"key_id": key_id(parse_key(current)) if current else "-"},
         )

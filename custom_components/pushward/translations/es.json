@@ -1772,12 +1772,14 @@
     "step": {
       "init": {
         "title": "Cifrado de extremo a extremo",
-        "description": "Home Assistant cifra el título, el subtítulo, el cuerpo y la URL de cada notificación que envía esta integración con esta clave, y solo los dispositivos que tengan la misma clave pueden leerlos. Crea la clave en la app de PushWard en Ajustes > Cifrado y pégala aquí. El nivel, el sonido, las acciones, los medios y los metadatos siguen siendo legibles para PushWard, que los necesita para entregar la notificación; las Actividades en vivo y los widgets no se cifran. Un dispositivo sin la clave, o con una app de PushWard anterior a la 1.17, muestra un marcador de posición en lugar del texto. Deja el campo vacío para enviar las notificaciones sin cifrar.\n\nID de clave en uso: {key_id}",
+        "description": "Home Assistant cifra el título, el subtítulo, el cuerpo y la URL de cada notificación que envía esta integración con esta clave, y solo los dispositivos que tengan la misma clave pueden leerlos. Crea la clave en la app de PushWard en Ajustes > Cifrado y pégala aquí. El nivel, el sonido, las acciones, los medios y los metadatos siguen siendo legibles para PushWard, que los necesita para entregar la notificación; las Actividades en vivo y los widgets no se cifran. Un dispositivo sin la clave, o con una app de PushWard anterior a la 1.17, muestra un marcador de posición en lugar del texto. Una clave de integración que pertenece a una organización no puede enviar notificaciones cifradas.\n\nID de clave en uso: {key_id}",
         "data": {
-          "e2e_key": "Clave de cifrado de extremo a extremo"
+          "e2e_key": "Clave de cifrado de extremo a extremo",
+          "remove_e2e_key": "Eliminar la clave de cifrado"
         },
         "data_description": {
-          "e2e_key": "64 caracteres hexadecimales. La app muestra el mismo ID de clave junto a la clave."
+          "e2e_key": "64 caracteres hexadecimales. Déjalo vacío para conservar la clave en uso; la app muestra el mismo ID de clave junto a la clave.",
+          "remove_e2e_key": "Vuelve a enviar las notificaciones sin cifrar. Se ignora una clave escrita arriba."
         }
       }
     },

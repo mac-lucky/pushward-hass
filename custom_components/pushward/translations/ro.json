@@ -1772,12 +1772,14 @@
     "step": {
       "init": {
         "title": "Criptare end-to-end",
-        "description": "Home Assistant criptează cu această cheie titlul, subtitlul, conținutul și URL-ul fiecărei notificări trimise de această integrare, iar doar dispozitivele care dețin aceeași cheie le pot citi. Creați cheia în aplicația PushWard la Setări > Criptare și lipiți-o aici. Nivelul, sunetul, acțiunile, conținutul media și metadatele rămân lizibile pentru PushWard, care are nevoie de ele pentru a livra notificarea; Activitățile live și widgeturile nu sunt criptate. Un dispozitiv fără cheie sau cu o aplicație PushWard mai veche de 1.17 afișează un substituent în loc de text. Lăsați câmpul gol pentru a trimite notificările necriptate.\n\nID cheie în uz: {key_id}",
+        "description": "Home Assistant criptează cu această cheie titlul, subtitlul, conținutul și URL-ul fiecărei notificări trimise de această integrare, iar doar dispozitivele care dețin aceeași cheie le pot citi. Creați cheia în aplicația PushWard la Setări > Criptare și lipiți-o aici. Nivelul, sunetul, acțiunile, conținutul media și metadatele rămân lizibile pentru PushWard, care are nevoie de ele pentru a livra notificarea; Activitățile live și widgeturile nu sunt criptate. Un dispozitiv fără cheie sau cu o aplicație PushWard mai veche de 1.17 afișează un substituent în loc de text. O cheie de integrare care aparține unei organizații nu poate trimite notificări criptate.\n\nID cheie în uz: {key_id}",
         "data": {
-          "e2e_key": "Cheie de criptare end-to-end"
+          "e2e_key": "Cheie de criptare end-to-end",
+          "remove_e2e_key": "Elimină cheia de criptare"
         },
         "data_description": {
-          "e2e_key": "64 de caractere hexazecimale. Aplicația afișează același ID de cheie lângă cheie."
+          "e2e_key": "64 de caractere hexazecimale. Lăsați-l gol pentru a păstra cheia în uz; aplicația afișează același ID de cheie lângă cheie.",
+          "remove_e2e_key": "Trimite din nou notificările necriptate. O cheie introdusă mai sus este ignorată."
         }
       }
     },

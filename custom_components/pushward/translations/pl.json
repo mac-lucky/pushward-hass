@@ -1772,12 +1772,14 @@
     "step": {
       "init": {
         "title": "Szyfrowanie end-to-end",
-        "description": "Home Assistant szyfruje tym kluczem tytuł, podtytuł, treść i adres URL każdego powiadomienia wysyłanego przez tę integrację, a odczytać je mogą tylko urządzenia z tym samym kluczem. Utwórz klucz w aplikacji PushWard w Ustawienia > Szyfrowanie i wklej go tutaj. Poziom, dźwięk, akcje, multimedia i metadane pozostają czytelne dla PushWard, który potrzebuje ich do dostarczenia powiadomienia; Aktywności na żywo i widżety nie są szyfrowane. Urządzenie bez klucza lub z aplikacją PushWard starszą niż 1.17 pokaże zamiast tekstu symbol zastępczy. Zostaw pole puste, aby wysyłać powiadomienia bez szyfrowania.\n\nUżywany identyfikator klucza: {key_id}",
+        "description": "Home Assistant szyfruje tym kluczem tytuł, podtytuł, treść i adres URL każdego powiadomienia wysyłanego przez tę integrację, a odczytać je mogą tylko urządzenia z tym samym kluczem. Utwórz klucz w aplikacji PushWard w Ustawienia > Szyfrowanie i wklej go tutaj. Poziom, dźwięk, akcje, multimedia i metadane pozostają czytelne dla PushWard, który potrzebuje ich do dostarczenia powiadomienia; Aktywności na żywo i widżety nie są szyfrowane. Urządzenie bez klucza lub z aplikacją PushWard starszą niż 1.17 pokaże zamiast tekstu symbol zastępczy. Klucz integracji należący do organizacji nie może wysyłać zaszyfrowanych powiadomień.\n\nUżywany identyfikator klucza: {key_id}",
         "data": {
-          "e2e_key": "Klucz szyfrowania end-to-end"
+          "e2e_key": "Klucz szyfrowania end-to-end",
+          "remove_e2e_key": "Usuń klucz szyfrowania"
         },
         "data_description": {
-          "e2e_key": "64 znaki szesnastkowe. Aplikacja pokazuje ten sam identyfikator klucza obok klucza."
+          "e2e_key": "64 znaki szesnastkowe. Zostaw puste, aby zachować używany klucz; aplikacja pokazuje ten sam identyfikator klucza obok klucza.",
+          "remove_e2e_key": "Wysyłaj powiadomienia ponownie bez szyfrowania. Klucz wpisany powyżej jest ignorowany."
         }
       }
     },

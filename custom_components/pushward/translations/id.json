@@ -1772,12 +1772,14 @@
     "step": {
       "init": {
         "title": "Enkripsi ujung ke ujung",
-        "description": "Home Assistant mengenkripsi judul, subjudul, isi, dan URL setiap notifikasi yang dikirim integrasi ini dengan kunci ini, dan hanya perangkat yang memiliki kunci yang sama yang dapat membacanya. Buat kunci di aplikasi PushWard pada Pengaturan > Enkripsi lalu tempel di sini. Level, suara, aksi, media, dan metadata tetap dapat dibaca oleh PushWard, yang membutuhkannya untuk mengirimkan push; Aktivitas Langsung dan widget tidak dienkripsi. Perangkat tanpa kunci, atau dengan aplikasi PushWard yang lebih lama dari 1.17, menampilkan teks pengganti sebagai ganti isi. Biarkan kolom kosong untuk mengirim notifikasi tanpa enkripsi.\n\nID Kunci yang digunakan: {key_id}",
+        "description": "Home Assistant mengenkripsi judul, subjudul, isi, dan URL setiap notifikasi yang dikirim integrasi ini dengan kunci ini, dan hanya perangkat yang memiliki kunci yang sama yang dapat membacanya. Buat kunci di aplikasi PushWard pada Pengaturan > Enkripsi lalu tempel di sini. Level, suara, aksi, media, dan metadata tetap dapat dibaca oleh PushWard, yang membutuhkannya untuk mengirimkan push; Aktivitas Langsung dan widget tidak dienkripsi. Perangkat tanpa kunci, atau dengan aplikasi PushWard yang lebih lama dari 1.17, menampilkan teks pengganti sebagai ganti isi. Kunci integrasi milik organisasi tidak dapat mengirim notifikasi terenkripsi.\n\nID Kunci yang digunakan: {key_id}",
         "data": {
-          "e2e_key": "Kunci enkripsi ujung ke ujung"
+          "e2e_key": "Kunci enkripsi ujung ke ujung",
+          "remove_e2e_key": "Hapus kunci enkripsi"
         },
         "data_description": {
-          "e2e_key": "64 karakter heksadesimal. Aplikasi menampilkan ID Kunci yang sama di samping kunci."
+          "e2e_key": "64 karakter heksadesimal. Biarkan kosong untuk mempertahankan kunci yang sedang digunakan; aplikasi menampilkan ID Kunci yang sama di samping kunci.",
+          "remove_e2e_key": "Kirim notifikasi tanpa enkripsi lagi. Kunci yang diketik di atas diabaikan."
         }
       }
     },

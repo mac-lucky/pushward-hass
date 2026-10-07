@@ -50,16 +50,56 @@ async def test_options_flow_stores_the_key_normalized(hass: HomeAssistant) -> No
     assert entry.options == {CONF_E2E_KEY: KEY_HEX}
 
 
-async def test_options_flow_shows_the_key_id_and_clears_with_an_empty_field(hass: HomeAssistant) -> None:
+async def test_options_flow_never_sends_the_stored_key_back(hass: HomeAssistant) -> None:
     entry = _entry({CONF_E2E_KEY: KEY_HEX})
     entry.add_to_hass(hass)
 
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["description_placeholders"] == {"key_id": KID}
+    for marker in result["data_schema"].schema:
+        assert "suggested_value" not in (marker.description or {})
+    assert KEY_HEX not in str(result)
 
+
+async def test_options_flow_empty_field_keeps_the_key(hass: HomeAssistant) -> None:
+    entry = _entry({CONF_E2E_KEY: KEY_HEX})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
     result = await hass.config_entries.options.async_configure(result["flow_id"], {CONF_E2E_KEY: "  "})
     assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options == {CONF_E2E_KEY: KEY_HEX}
+
+
+async def test_options_flow_replaces_the_key(hass: HomeAssistant) -> None:
+    other = "ff" * 32
+    entry = _entry({CONF_E2E_KEY: KEY_HEX})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {CONF_E2E_KEY: other.upper()})
+    assert entry.options == {CONF_E2E_KEY: other}
+
+
+@pytest.mark.parametrize("typed", ["", "ff" * 32])
+async def test_options_flow_remove_turns_encryption_off(hass: HomeAssistant, typed: str) -> None:
+    entry = _entry({CONF_E2E_KEY: KEY_HEX})
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {CONF_E2E_KEY: typed, "remove_e2e_key": True}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
     assert entry.options == {}
+
+
+async def test_options_flow_offers_remove_only_with_a_key(hass: HomeAssistant) -> None:
+    entry = _entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert [str(marker) for marker in result["data_schema"].schema] == [CONF_E2E_KEY]
 
 
 @pytest.mark.parametrize(

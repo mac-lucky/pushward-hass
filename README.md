@@ -466,9 +466,11 @@ With an encryption key set, Home Assistant seals the title, subtitle, body and U
 1. In the PushWard app (1.17 or later), open **Settings > Encryption**, create a key and copy it.
 2. In Home Assistant, open **Settings > Devices & Services > PushWard > Configure** and paste it. The form shows its Key ID, which should match the one in the app.
 
-Clear the field to send plain text again. An `hlk_` integration key pasted here is refused.
+The form never shows the stored key: leaving the field empty keeps the key in use, pasting another one replaces it, and **Remove the encryption key** turns encryption off. An `hlk_` integration key pasted here is refused.
 
-Only those four fields are encrypted. Level, sound, volume, thread and collapse ids, source, media and icon URLs, metadata, actions and typed replies stay readable to PushWard, which needs them to deliver the push, and Live Activities and widgets are not encrypted at all. PushWard and Apple also still see when a notification was sent and to which account.
+An integration key that belongs to an organization cannot send encrypted notifications: PushWard answers every encrypted send from it with `422 notification.encryption_unavailable`. Use a personal integration key, or leave encryption off for that entry.
+
+Only those four fields are encrypted. Level, sound, volume, thread and collapse ids, source, media and icon URLs, metadata, actions, typed replies and the acknowledged-alert settings (`tags`, `callback_url` and the button's `action_title`) stay readable to PushWard, which needs them to deliver the push, and Live Activities and widgets are not encrypted at all. PushWard and Apple also still see when a notification was sent and to which account.
 
 Some side effects:
 

@@ -1772,12 +1772,14 @@
     "step": {
       "init": {
         "title": "Uçtan uca şifreleme",
-        "description": "Home Assistant, bu entegrasyonun gönderdiği her bildirimin başlığını, alt başlığını, gövdesini ve URL'sini bu anahtarla şifreler; yalnızca aynı anahtara sahip cihazlar bunları okuyabilir. Anahtarı PushWard uygulamasında Ayarlar > Şifreleme bölümünde oluşturun ve buraya yapıştırın. Seviye, ses, eylemler, medya ve meta veriler, bildirimi iletmek için bunlara ihtiyaç duyan PushWard tarafından okunabilir kalır; Canlı Etkinlikler ve widget'lar şifrelenmez. Anahtarı olmayan veya 1.17'den eski bir PushWard uygulaması olan cihaz, metin yerine bir yer tutucu gösterir. Bildirimleri şifresiz göndermek için alanı boş bırakın.\n\nKullanılan anahtar kimliği: {key_id}",
+        "description": "Home Assistant, bu entegrasyonun gönderdiği her bildirimin başlığını, alt başlığını, gövdesini ve URL'sini bu anahtarla şifreler; yalnızca aynı anahtara sahip cihazlar bunları okuyabilir. Anahtarı PushWard uygulamasında Ayarlar > Şifreleme bölümünde oluşturun ve buraya yapıştırın. Seviye, ses, eylemler, medya ve meta veriler, bildirimi iletmek için bunlara ihtiyaç duyan PushWard tarafından okunabilir kalır; Canlı Etkinlikler ve widget'lar şifrelenmez. Anahtarı olmayan veya 1.17'den eski bir PushWard uygulaması olan cihaz, metin yerine bir yer tutucu gösterir. Bir kuruma ait entegrasyon anahtarı şifreli bildirim gönderemez.\n\nKullanılan anahtar kimliği: {key_id}",
         "data": {
-          "e2e_key": "Uçtan uca şifreleme anahtarı"
+          "e2e_key": "Uçtan uca şifreleme anahtarı",
+          "remove_e2e_key": "Şifreleme anahtarını kaldır"
         },
         "data_description": {
-          "e2e_key": "64 onaltılık karakter. Uygulama, anahtarın yanında aynı anahtar kimliğini gösterir."
+          "e2e_key": "64 onaltılık karakter. Kullanılan anahtarı korumak için boş bırakın; uygulama, anahtarın yanında aynı anahtar kimliğini gösterir.",
+          "remove_e2e_key": "Bildirimleri yeniden şifresiz gönderin. Yukarıya yazılan anahtar yok sayılır."
         }
       }
     },
