@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "Uçtan uca şifreleme",
-        "description": "Home Assistant, bu entegrasyonun gönderdiği her bildirimin başlığını, alt başlığını, gövdesini ve URL'sini bu anahtarla şifreler; yalnızca aynı anahtara sahip cihazlar bunları okuyabilir. Anahtarı PushWard uygulamasında Ayarlar > Şifreleme bölümünde oluşturun ve buraya yapıştırın. Seviye, ses, eylemler, medya ve meta veriler, bildirimi iletmek için bunlara ihtiyaç duyan PushWard tarafından okunabilir kalır; Canlı Etkinlikler ve widget'lar şifrelenmez. Anahtarı olmayan veya 1.17'den eski bir PushWard uygulaması olan cihaz, metin yerine bir yer tutucu gösterir. Bir kuruma ait entegrasyon anahtarı şifreli bildirim gönderemez.\n\nKullanılan anahtar kimliği: {key_id}",
+        "description": "Home Assistant, bu entegrasyonun gönderdiği her bildirimin başlığını, alt başlığını, gövdesini ve URL'sini bu anahtarla şifreler; yalnızca aynı anahtara sahip cihazlar bunları okuyabilir. Anahtarı PushWard uygulamasında Ayarlar > Uçtan Uca Şifreleme bölümünde oluşturun ve buraya yapıştırın. Seviye, ses, eylemler, medya ve meta veriler, bildirimi iletmek için bunlara ihtiyaç duyan PushWard tarafından okunabilir kalır; Canlı Etkinlikler ve widget'lar şifrelenmez. Anahtarı olmayan veya 1.17'den eski bir PushWard uygulaması olan cihaz, metin yerine bir yer tutucu gösterir. Bir kuruma ait entegrasyon anahtarı şifreli bildirim gönderemez.\n\nKullanılan anahtar kimliği: {key_id}",
         "data": {
           "e2e_key": "Uçtan uca şifreleme anahtarı",
           "remove_e2e_key": "Şifreleme anahtarını kaldır"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Şifreleme anahtarı 64 onaltılık karakterden oluşur.",
-      "e2e_key_is_integration_key": "Bu bir entegrasyon anahtarı. PushWard uygulamasında Ayarlar > Şifreleme bölümündeki şifreleme anahtarını yapıştırın."
+      "e2e_key_is_integration_key": "Bu bir entegrasyon anahtarı. PushWard uygulamasında Ayarlar > Uçtan Uca Şifreleme bölümündeki şifreleme anahtarını yapıştırın."
     }
   },
   "config_subentries": {

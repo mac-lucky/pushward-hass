@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "End-to-end-versleuteling",
-        "description": "Home Assistant versleutelt de titel, ondertitel, tekst en URL van elke melding die deze integratie verstuurt met deze sleutel, en alleen apparaten met dezelfde sleutel kunnen ze lezen. Maak de sleutel aan in de PushWard-app onder Instellingen > Versleuteling en plak hem hier. Niveau, geluid, acties, media en metadata blijven leesbaar voor PushWard, dat ze nodig heeft om de push af te leveren; Live Activities en widgets worden niet versleuteld. Een apparaat zonder de sleutel, of met een PushWard-app ouder dan 1.17, toont een tijdelijke tekst in plaats van de inhoud. Een integratiesleutel die bij een organisatie hoort, kan geen versleutelde meldingen versturen.\n\nGebruikte sleutel-ID: {key_id}",
+        "description": "Home Assistant versleutelt de titel, ondertitel, tekst en URL van elke melding die deze integratie verstuurt met deze sleutel, en alleen apparaten met dezelfde sleutel kunnen ze lezen. Maak de sleutel aan in de PushWard-app onder Instellingen > End-to-end-versleuteling en plak hem hier. Niveau, geluid, acties, media en metadata blijven leesbaar voor PushWard, dat ze nodig heeft om de push af te leveren; Live Activities en widgets worden niet versleuteld. Een apparaat zonder de sleutel, of met een PushWard-app ouder dan 1.17, toont een tijdelijke tekst in plaats van de inhoud. Een integratiesleutel die bij een organisatie hoort, kan geen versleutelde meldingen versturen.\n\nGebruikte sleutel-ID: {key_id}",
         "data": {
           "e2e_key": "End-to-end-versleutelingssleutel",
           "remove_e2e_key": "Versleutelingssleutel verwijderen"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Een versleutelingssleutel bestaat uit 64 hexadecimale tekens.",
-      "e2e_key_is_integration_key": "Dat is een integratiesleutel. Plak de versleutelingssleutel uit Instellingen > Versleuteling in de PushWard-app."
+      "e2e_key_is_integration_key": "Dat is een integratiesleutel. Plak de versleutelingssleutel uit Instellingen > End-to-end-versleuteling in de PushWard-app."
     }
   },
   "config_subentries": {

@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "Enkripsi ujung ke ujung",
-        "description": "Home Assistant mengenkripsi judul, subjudul, isi, dan URL setiap notifikasi yang dikirim integrasi ini dengan kunci ini, dan hanya perangkat yang memiliki kunci yang sama yang dapat membacanya. Buat kunci di aplikasi PushWard pada Pengaturan > Enkripsi lalu tempel di sini. Level, suara, aksi, media, dan metadata tetap dapat dibaca oleh PushWard, yang membutuhkannya untuk mengirimkan push; Aktivitas Langsung dan widget tidak dienkripsi. Perangkat tanpa kunci, atau dengan aplikasi PushWard yang lebih lama dari 1.17, menampilkan teks pengganti sebagai ganti isi. Kunci integrasi milik organisasi tidak dapat mengirim notifikasi terenkripsi.\n\nID Kunci yang digunakan: {key_id}",
+        "description": "Home Assistant mengenkripsi judul, subjudul, isi, dan URL setiap notifikasi yang dikirim integrasi ini dengan kunci ini, dan hanya perangkat yang memiliki kunci yang sama yang dapat membacanya. Buat kunci di aplikasi PushWard pada Pengaturan > Enkripsi End-to-End lalu tempel di sini. Level, suara, aksi, media, dan metadata tetap dapat dibaca oleh PushWard, yang membutuhkannya untuk mengirimkan push; Aktivitas Langsung dan widget tidak dienkripsi. Perangkat tanpa kunci, atau dengan aplikasi PushWard yang lebih lama dari 1.17, menampilkan teks pengganti sebagai ganti isi. Kunci integrasi milik organisasi tidak dapat mengirim notifikasi terenkripsi.\n\nID Kunci yang digunakan: {key_id}",
         "data": {
           "e2e_key": "Kunci enkripsi ujung ke ujung",
           "remove_e2e_key": "Hapus kunci enkripsi"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Kunci enkripsi terdiri dari 64 karakter heksadesimal.",
-      "e2e_key_is_integration_key": "Itu adalah kunci integrasi. Tempel kunci enkripsi dari Pengaturan > Enkripsi di aplikasi PushWard."
+      "e2e_key_is_integration_key": "Itu adalah kunci integrasi. Tempel kunci enkripsi dari Pengaturan > Enkripsi End-to-End di aplikasi PushWard."
     }
   },
   "config_subentries": {

@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "Ende-zu-Ende-Verschlüsselung",
-        "description": "Home Assistant verschlüsselt Titel, Untertitel, Text und URL jeder Benachrichtigung, die diese Integration sendet, mit diesem Schlüssel, und nur Geräte mit demselben Schlüssel können sie lesen. Den Schlüssel in der PushWard-App unter Einstellungen > Verschlüsselung erstellen und hier einfügen. Stufe, Ton, Aktionen, Medien und Metadaten bleiben für PushWard lesbar, das sie für die Zustellung der Push-Nachricht benötigt; Live-Aktivitäten und Widgets werden nicht verschlüsselt. Ein Gerät ohne den Schlüssel oder mit einer PushWard-App älter als 1.17 zeigt statt des Texts einen Platzhalter an. Ein Integrationsschlüssel, der zu einer Organisation gehört, kann keine verschlüsselten Benachrichtigungen senden.\n\nVerwendete Schlüssel-ID: {key_id}",
+        "description": "Home Assistant verschlüsselt Titel, Untertitel, Text und URL jeder Benachrichtigung, die diese Integration sendet, mit diesem Schlüssel, und nur Geräte mit demselben Schlüssel können sie lesen. Den Schlüssel in der PushWard-App unter Einstellungen > Ende-zu-Ende-Verschlüsselung erstellen und hier einfügen. Stufe, Ton, Aktionen, Medien und Metadaten bleiben für PushWard lesbar, das sie für die Zustellung der Push-Nachricht benötigt; Live-Aktivitäten und Widgets werden nicht verschlüsselt. Ein Gerät ohne den Schlüssel oder mit einer PushWard-App älter als 1.17 zeigt statt des Texts einen Platzhalter an. Ein Integrationsschlüssel, der zu einer Organisation gehört, kann keine verschlüsselten Benachrichtigungen senden.\n\nVerwendete Schlüssel-ID: {key_id}",
         "data": {
           "e2e_key": "Ende-zu-Ende-Verschlüsselungsschlüssel",
           "remove_e2e_key": "Verschlüsselungsschlüssel entfernen"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Ein Verschlüsselungsschlüssel besteht aus 64 hexadezimalen Zeichen.",
-      "e2e_key_is_integration_key": "Das ist ein Integrationsschlüssel. Den Verschlüsselungsschlüssel unter Einstellungen > Verschlüsselung in der PushWard-App einfügen."
+      "e2e_key_is_integration_key": "Das ist ein Integrationsschlüssel. Den Verschlüsselungsschlüssel unter Einstellungen > Ende-zu-Ende-Verschlüsselung in der PushWard-App einfügen."
     }
   },
   "config_subentries": {

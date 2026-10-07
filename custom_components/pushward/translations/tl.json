@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "End-to-end encryption",
-        "description": "Ine-encrypt ng Home Assistant gamit ang key na ito ang pamagat, subtitle, nilalaman, at URL ng bawat notification na ipinapadala ng integration na ito, at ang mga device lang na may parehong key ang makakabasa ng mga ito. Gumawa ng key sa PushWard app sa Settings > Encryption at i-paste ito rito. Nananatiling nababasa ng PushWard ang level, tunog, mga action, media, at metadata, dahil kailangan nito ang mga iyon para maihatid ang push; hindi ine-encrypt ang Live Activities at mga widget. Ang device na walang key, o may PushWard app na mas luma sa 1.17, ay magpapakita ng placeholder sa halip na ang teksto. Ang integration key na pag-aari ng isang organisasyon ay hindi makapagpapadala ng mga naka-encrypt na notification.\n\nKey ID na ginagamit: {key_id}",
+        "description": "Ine-encrypt ng Home Assistant gamit ang key na ito ang pamagat, subtitle, nilalaman, at URL ng bawat notification na ipinapadala ng integration na ito, at ang mga device lang na may parehong key ang makakabasa ng mga ito. Gumawa ng key sa PushWard app sa Settings > End-to-End Encryption at i-paste ito rito. Nananatiling nababasa ng PushWard ang level, tunog, mga action, media, at metadata, dahil kailangan nito ang mga iyon para maihatid ang push; hindi ine-encrypt ang Live Activities at mga widget. Ang device na walang key, o may PushWard app na mas luma sa 1.17, ay magpapakita ng placeholder sa halip na ang teksto. Ang integration key na pag-aari ng isang organisasyon ay hindi makapagpapadala ng mga naka-encrypt na notification.\n\nKey ID na ginagamit: {key_id}",
         "data": {
           "e2e_key": "End-to-end encryption key",
           "remove_e2e_key": "Alisin ang encryption key"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Ang encryption key ay 64 na hexadecimal na character.",
-      "e2e_key_is_integration_key": "Integration key iyan. I-paste ang encryption key mula sa Settings > Encryption sa PushWard app."
+      "e2e_key_is_integration_key": "Integration key iyan. I-paste ang encryption key mula sa Settings > End-to-End Encryption sa PushWard app."
     }
   },
   "config_subentries": {

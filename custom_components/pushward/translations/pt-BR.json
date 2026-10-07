@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "Criptografia de ponta a ponta",
-        "description": "O Home Assistant criptografa com esta chave o título, o subtítulo, o corpo e a URL de cada notificação enviada por esta integração, e somente dispositivos que tenham a mesma chave conseguem lê-los. Crie a chave no app PushWard em Ajustes > Criptografia e cole aqui. Nível, som, ações, mídia e metadados continuam legíveis para o PushWard, que precisa deles para entregar o push; as Atividades ao Vivo e os widgets não são criptografados. Um dispositivo sem a chave, ou com um app PushWard anterior à 1.17, mostra um texto provisório no lugar do conteúdo. Uma chave de integração que pertence a uma organização não pode enviar notificações criptografadas.\n\nID da chave em uso: {key_id}",
+        "description": "O Home Assistant criptografa com esta chave o título, o subtítulo, o corpo e a URL de cada notificação enviada por esta integração, e somente dispositivos que tenham a mesma chave conseguem lê-los. Crie a chave no app PushWard em Ajustes > Criptografia de Ponta a Ponta e cole aqui. Nível, som, ações, mídia e metadados continuam legíveis para o PushWard, que precisa deles para entregar o push; as Atividades ao Vivo e os widgets não são criptografados. Um dispositivo sem a chave, ou com um app PushWard anterior à 1.17, mostra um texto provisório no lugar do conteúdo. Uma chave de integração que pertence a uma organização não pode enviar notificações criptografadas.\n\nID da chave em uso: {key_id}",
         "data": {
           "e2e_key": "Chave de criptografia de ponta a ponta",
           "remove_e2e_key": "Remover a chave de criptografia"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Uma chave de criptografia tem 64 caracteres hexadecimais.",
-      "e2e_key_is_integration_key": "Essa é uma chave de integração. Cole a chave de criptografia de Ajustes > Criptografia no app PushWard."
+      "e2e_key_is_integration_key": "Essa é uma chave de integração. Cole a chave de criptografia de Ajustes > Criptografia de Ponta a Ponta no app PushWard."
     }
   },
   "config_subentries": {

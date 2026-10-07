@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "Mã hóa đầu cuối",
-        "description": "Home Assistant mã hóa tiêu đề, phụ đề, nội dung và URL của mọi thông báo mà tích hợp này gửi bằng khóa này, và chỉ các thiết bị có cùng khóa mới đọc được. Tạo khóa trong ứng dụng PushWard tại Cài đặt > Mã hóa rồi dán vào đây. Mức độ, âm thanh, hành động, phương tiện và siêu dữ liệu vẫn đọc được đối với PushWard, nơi cần chúng để gửi thông báo đẩy; Hoạt động trực tiếp và widget không được mã hóa. Thiết bị không có khóa, hoặc dùng ứng dụng PushWard cũ hơn 1.17, sẽ hiển thị văn bản giữ chỗ thay cho nội dung. Khóa tích hợp thuộc về một tổ chức không thể gửi thông báo được mã hóa.\n\nID khóa đang dùng: {key_id}",
+        "description": "Home Assistant mã hóa tiêu đề, phụ đề, nội dung và URL của mọi thông báo mà tích hợp này gửi bằng khóa này, và chỉ các thiết bị có cùng khóa mới đọc được. Tạo khóa trong ứng dụng PushWard tại Cài đặt > Mã hóa đầu cuối rồi dán vào đây. Mức độ, âm thanh, hành động, phương tiện và siêu dữ liệu vẫn đọc được đối với PushWard, nơi cần chúng để gửi thông báo đẩy; Hoạt động trực tiếp và widget không được mã hóa. Thiết bị không có khóa, hoặc dùng ứng dụng PushWard cũ hơn 1.17, sẽ hiển thị văn bản giữ chỗ thay cho nội dung. Khóa tích hợp thuộc về một tổ chức không thể gửi thông báo được mã hóa.\n\nID khóa đang dùng: {key_id}",
         "data": {
           "e2e_key": "Khóa mã hóa đầu cuối",
           "remove_e2e_key": "Xóa khóa mã hóa"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Khóa mã hóa gồm 64 ký tự thập lục phân.",
-      "e2e_key_is_integration_key": "Đó là khóa tích hợp. Hãy dán khóa mã hóa từ Cài đặt > Mã hóa trong ứng dụng PushWard."
+      "e2e_key_is_integration_key": "Đó là khóa tích hợp. Hãy dán khóa mã hóa từ Cài đặt > Mã hóa đầu cuối trong ứng dụng PushWard."
     }
   },
   "config_subentries": {

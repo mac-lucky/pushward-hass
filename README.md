@@ -463,7 +463,7 @@ How it stays in step:
 
 With an encryption key set, Home Assistant seals the title, subtitle, body and URL of every notification it sends, and PushWard only stores and forwards an envelope it cannot open. Your devices decrypt it with the same key.
 
-1. In the PushWard app (1.17 or later), open **Settings > Encryption**, create a key and copy it.
+1. In the PushWard app (1.17 or later), open **Settings > End-to-End Encryption**, create a key and copy it.
 2. In Home Assistant, open **Settings > Devices & Services > PushWard > Configure** and paste it. The form shows its Key ID, which should match the one in the app.
 
 The form never shows the stored key: leaving the field empty keeps the key in use, pasting another one replaces it, and **Remove the encryption key** turns encryption off. An `hlk_` integration key pasted here is refused.

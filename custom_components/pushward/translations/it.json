@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "Crittografia end-to-end",
-        "description": "Home Assistant cifra con questa chiave titolo, sottotitolo, corpo e URL di ogni notifica inviata da questa integrazione, e solo i dispositivi che hanno la stessa chiave possono leggerli. Crea la chiave nell'app PushWard in Impostazioni > Crittografia e incollala qui. Livello, suono, azioni, contenuti multimediali e metadati restano leggibili da PushWard, che ne ha bisogno per recapitare la notifica; le Attività live e i widget non sono cifrati. Un dispositivo senza la chiave, o con un'app PushWard precedente alla 1.17, mostra un segnaposto al posto del testo. Una chiave di integrazione appartenente a un'organizzazione non può inviare notifiche cifrate.\n\nID chiave in uso: {key_id}",
+        "description": "Home Assistant cifra con questa chiave titolo, sottotitolo, corpo e URL di ogni notifica inviata da questa integrazione, e solo i dispositivi che hanno la stessa chiave possono leggerli. Crea la chiave nell'app PushWard in Impostazioni > Crittografia end-to-end e incollala qui. Livello, suono, azioni, contenuti multimediali e metadati restano leggibili da PushWard, che ne ha bisogno per recapitare la notifica; le Attività live e i widget non sono cifrati. Un dispositivo senza la chiave, o con un'app PushWard precedente alla 1.17, mostra un segnaposto al posto del testo. Una chiave di integrazione appartenente a un'organizzazione non può inviare notifiche cifrate.\n\nID chiave in uso: {key_id}",
         "data": {
           "e2e_key": "Chiave di crittografia end-to-end",
           "remove_e2e_key": "Rimuovi la chiave di crittografia"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Una chiave di crittografia è composta da 64 caratteri esadecimali.",
-      "e2e_key_is_integration_key": "Questa è una chiave di integrazione. Incolla la chiave di crittografia da Impostazioni > Crittografia nell'app PushWard."
+      "e2e_key_is_integration_key": "Questa è una chiave di integrazione. Incolla la chiave di crittografia da Impostazioni > Crittografia end-to-end nell'app PushWard."
     }
   },
   "config_subentries": {

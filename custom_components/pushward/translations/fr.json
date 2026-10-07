@@ -1784,7 +1784,7 @@
     "step": {
       "init": {
         "title": "Chiffrement de bout en bout",
-        "description": "Home Assistant chiffre avec cette clé le titre, le sous-titre, le corps et l'URL de chaque notification envoyée par cette intégration, et seuls les appareils qui possèdent la même clé peuvent les lire. Créez la clé dans l'application PushWard sous Réglages > Chiffrement et collez-la ici. Le niveau, le son, les actions, les médias et les métadonnées restent lisibles par PushWard, qui en a besoin pour distribuer la notification ; les Activités en direct et les widgets ne sont pas chiffrés. Un appareil sans la clé, ou avec une application PushWard antérieure à la 1.17, affiche un texte de remplacement à la place du contenu. Une clé d'intégration appartenant à une organisation ne peut pas envoyer de notifications chiffrées.\n\nID de clé utilisé : {key_id}",
+        "description": "Home Assistant chiffre avec cette clé le titre, le sous-titre, le corps et l'URL de chaque notification envoyée par cette intégration, et seuls les appareils qui possèdent la même clé peuvent les lire. Créez la clé dans l'application PushWard sous Réglages > Chiffrement de bout en bout et collez-la ici. Le niveau, le son, les actions, les médias et les métadonnées restent lisibles par PushWard, qui en a besoin pour distribuer la notification ; les Activités en direct et les widgets ne sont pas chiffrés. Un appareil sans la clé, ou avec une application PushWard antérieure à la 1.17, affiche un texte de remplacement à la place du contenu. Une clé d'intégration appartenant à une organisation ne peut pas envoyer de notifications chiffrées.\n\nID de clé utilisé : {key_id}",
         "data": {
           "e2e_key": "Clé de chiffrement de bout en bout",
           "remove_e2e_key": "Supprimer la clé de chiffrement"
@@ -1797,7 +1797,7 @@
     },
     "error": {
       "invalid_e2e_key": "Une clé de chiffrement comporte 64 caractères hexadécimaux.",
-      "e2e_key_is_integration_key": "Il s'agit d'une clé d'intégration. Collez la clé de chiffrement depuis Réglages > Chiffrement dans l'application PushWard."
+      "e2e_key_is_integration_key": "Il s'agit d'une clé d'intégration. Collez la clé de chiffrement depuis Réglages > Chiffrement de bout en bout dans l'application PushWard."
     }
   },
   "config_subentries": {
