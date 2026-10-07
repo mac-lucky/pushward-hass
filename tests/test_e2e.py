@@ -125,6 +125,31 @@ def test_seal_refuses_what_the_server_would(fields: dict, message: str) -> None:
         seal(KEY, **fields)
 
 
+@pytest.mark.parametrize(
+    ("fields", "hint"),
+    [
+        ({"title": "Max", "body": "x" * 2242}, "; shorten the body or the title$"),
+        (
+            {"title": "t", "body": "b", "subtitle": "\u4e2d" * 256, "url": "https://example.com/" + "a" * 2028},
+            "; shorten the url or the subtitle$",
+        ),
+        (
+            {
+                "title": "\U0001f525" * 256,
+                "subtitle": "\U0001f525" * 256,
+                "body": "\U0001f525" * 250,
+                "url": "https://example.com/" + "a" * 990,
+            },
+            "; shorten the title, the subtitle, the url and the body$",
+        ),
+    ],
+    ids=["body", "subtitle-and-url", "no-field-alone"],
+)
+def test_seal_names_the_fields_to_shorten(fields: dict, hint: str) -> None:
+    with pytest.raises(E2EError, match=hint):
+        seal(KEY, **fields)
+
+
 def test_seal_counts_code_points_not_bytes() -> None:
     title = "\U0001f525" * 256  # 1024 bytes, 256 code points
     assert open_envelope(KEY, seal(KEY, title=title, body="b"))["title"] == title

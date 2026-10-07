@@ -108,13 +108,27 @@ def _serialize(fields: dict[str, str]) -> bytes:
         raise E2EError("the text is not valid Unicode (it holds an unpaired surrogate)") from err
 
 
+def _json_len(text: str) -> int:
+    """The bytes text takes as a JSON string value, quotes left out."""
+    return len(_serialize({"": text})) - len('{"":""}')
+
+
 def _trim(text: str, excess: int) -> tuple[str, int]:
     """Drop code points from the end of text until their JSON bytes cover excess; one always stays."""
     end = len(text)
     while excess > 0 and end > 1:
         end -= 1
-        excess -= len(_serialize({"": text[end]})) - len('{"":""}')
+        excess -= _json_len(text[end])
     return text[:end], excess
+
+
+def _shorten_hint(fields: dict[str, str], excess: int) -> str:
+    """The fields that could make room on their own, longest first, or all of them when none can."""
+    names = sorted(fields, key=lambda name: _json_len(fields[name]), reverse=True)
+    alone = [name for name in names if _json_len(fields[name]) > excess]
+    if alone:
+        return "shorten the " + " or the ".join(alone)
+    return "shorten the " + ", the ".join(names[:-1]) + " and the " + names[-1]
 
 
 def fit(title: str, body: str, *, subtitle: str | None = None, url: str | None = None) -> tuple[str, str]:
@@ -159,7 +173,8 @@ def seal(
         except vol.Invalid as err:
             raise E2EError(f"url: {err}") from err
 
-    plaintext = _serialize(_fields(title, body, subtitle, url))
+    fields = _fields(title, body, subtitle, url)
+    plaintext = _serialize(fields)
     # Padding to a multiple of 64 bytes hides the exact length, unless that alone
     # would push the envelope over the cap.
     padded = plaintext + b" " * (-len(plaintext) % _PAD_BLOCK)
@@ -168,7 +183,7 @@ def seal(
     elif _envelope_len(len(plaintext)) > ENVELOPE_MAX_LEN:
         raise E2EError(
             f"the notification is too long to encrypt ({len(plaintext)} bytes of JSON, at most {PLAINTEXT_MAX} fit);"
-            " shorten the body"
+            f" {_shorten_hint(fields, len(plaintext) - PLAINTEXT_MAX)}"
         )
     return seal_plaintext(key, plaintext)
 
