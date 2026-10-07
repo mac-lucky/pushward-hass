@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "Límite de correos de PushWard alcanzado",
       "description": "Tu cuenta de PushWard ha usado {used} de sus {limit} correos del periodo actual, por lo que se rechazarán los nuevos correos hasta que la cuota se restablezca ({resets_at}). Mejora tu suscripción en la app de PushWard para iOS para aumentar el límite."
+    },
+    "todo_e2e_unavailable": {
+      "title": "Los recordatorios de tareas de PushWard no se están enviando",
+      "description": "Esta clave de integración pertenece a una organización, y las organizaciones no pueden enviar notificaciones con cifrado de extremo a extremo, así que PushWard rechaza todos los recordatorios de tareas mientras haya una clave de cifrado configurada. Elimina la clave de cifrado en Configurar o reconfigura la integración con una clave de integración personal."
     }
   },
   "selector": {

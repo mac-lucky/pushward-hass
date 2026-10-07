@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "已达到 PushWard 邮件上限",
       "description": "你的 PushWard 账户在当前周期内已使用 {limit} 封邮件中的 {used} 封，因此在配额重置（{resets_at}）之前，新邮件将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+    },
+    "todo_e2e_unavailable": {
+      "title": "PushWard 待办事项提醒未能发送",
+      "description": "此集成密钥属于某个组织，而组织无法发送端到端加密通知，因此只要设置了加密密钥，PushWard 就会拒绝每条待办事项提醒。请在“配置”下移除加密密钥，或使用个人集成密钥重新配置此集成。"
     }
   },
   "selector": {

@@ -37,6 +37,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.debounce import Debouncer
 from homeassistant.helpers.event import (
     async_track_point_in_utc_time,
@@ -119,6 +120,9 @@ _SERVER_PENDING = ("scheduled", "sending")
 _WATCH_SHORT_PAUSE_SECONDS = 10
 # Tries at completing an item for a Done tap before the tap is given up.
 _COMPLETE_ATTEMPTS = 3
+
+# The server refuses every encrypted notification from an organization's key.
+_E2E_UNAVAILABLE_CODE = "notification.encryption_unavailable"
 
 
 def build_todo_store(hass: HomeAssistant, entry_id: str) -> Store:
@@ -240,6 +244,11 @@ def _fingerprint(version: str, cfg: dict, date_only: bool) -> str:
     return hashlib.sha256(json.dumps(parts, default=str).encode()).hexdigest()[:16]
 
 
+def e2e_unavailable_issue_id(entry_id: str) -> str:
+    """Repair issue for an entry whose reminders are refused because its key cannot encrypt."""
+    return f"todo_e2e_unavailable_{entry_id}"
+
+
 def _collapse_id(sub_id: str, uid: str) -> str:
     """One collapse id per item, so a duplicate send replaces the banner instead of stacking."""
     return "ha-todo-" + hashlib.sha256(f"{sub_id}/{uid}".encode()).hexdigest()[:32]
@@ -277,6 +286,7 @@ class TodoReminderManager:
         # the item version refused, so they are not re-sent on every edit-driven pass.
         self._blocked: set[str] = set()
         self._refused: dict[tuple[str, str], str] = {}
+        self._e2e_issue_raised = False
         self._unsub_interval: CALLBACK_TYPE | None = None
         self._unsub_started: CALLBACK_TYPE | None = None
         self._watch_task: asyncio.Task | None = None
@@ -327,6 +337,9 @@ class TodoReminderManager:
         for lock in list(self._locks.values()):
             async with lock:
                 pass
+        # A new integration key reloads the entry; the issue comes back on the
+        # next refusal if that key belongs to an organization too.
+        self._clear_e2e_issue()
         await self._store.async_save(self._serialize())
 
     @callback
@@ -337,6 +350,7 @@ class TodoReminderManager:
         may go out now, without waiting for its item to be edited.
         """
         self._refused.clear()
+        self._clear_e2e_issue()
         if not self._stopped:
             self._entry.async_create_background_task(
                 self._hass, self._async_reconcile_all(), name=f"{DOMAIN} to-do reminders key change"
@@ -671,10 +685,16 @@ class TodoReminderManager:
                     return
                 _LOGGER.warning("PushWard refused the reminder for a to-do item in %s: %s", entity_id, err)
                 self._refused[(sub_id, reminder.uid)] = reminder.version
+                if err.code == _E2E_UNAVAILABLE_CODE:
+                    self._raise_e2e_issue()
                 continue
             schedule_id = (created or {}).get("id")
             if not isinstance(schedule_id, int):
                 continue
+            if self._e2e_issue_raised:
+                # Accepted, so the key no longer meets the refusal (a pass that
+                # was under way when the key changed may have raised it again).
+                self._clear_e2e_issue()
             records[reminder.uid] = {
                 "schedule_id": schedule_id,
                 "version": reminder.version,
@@ -686,6 +706,26 @@ class TodoReminderManager:
                 "notification_id": None,
                 "watch_until": None,
             }
+
+    @callback
+    def _raise_e2e_issue(self) -> None:
+        if self._e2e_issue_raised:
+            return
+        self._e2e_issue_raised = True
+        ir.async_create_issue(
+            self._hass,
+            DOMAIN,
+            e2e_unavailable_issue_id(self._entry.entry_id),
+            is_fixable=False,
+            is_persistent=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key="todo_e2e_unavailable",
+        )
+
+    @callback
+    def _clear_e2e_issue(self) -> None:
+        self._e2e_issue_raised = False
+        ir.async_delete_issue(self._hass, DOMAIN, e2e_unavailable_issue_id(self._entry.entry_id))
 
     def _mark_sent(self, rec: dict, cfg: dict, notification_id: Any = None) -> None:
         rec["status"] = _SENT

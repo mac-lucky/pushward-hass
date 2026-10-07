@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "Limita de e-mailuri PushWard a fost atinsă",
       "description": "Contul dvs. PushWard a folosit {used} din cele {limit} e-mailuri pentru perioada curentă, așa că noile e-mailuri vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+    },
+    "todo_e2e_unavailable": {
+      "title": "Mementourile PushWard pentru sarcini nu sunt trimise",
+      "description": "Această cheie de integrare aparține unei organizații, iar organizațiile nu pot trimite notificări criptate end-to-end, așa că PushWard refuză fiecare memento pentru sarcini cât timp este setată o cheie de criptare. Eliminați cheia de criptare la Configurare sau reconfigurați integrarea cu o cheie de integrare personală."
     }
   },
   "selector": {

@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "PushWard e-posta limitine ulaşıldı",
       "description": "PushWard hesabınız mevcut dönem için {limit} e-postasının {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni e-postalar reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
+    },
+    "todo_e2e_unavailable": {
+      "title": "PushWard yapılacaklar hatırlatıcıları gönderilmiyor",
+      "description": "Bu entegrasyon anahtarı bir kuruma ait ve kurumlar uçtan uca şifreli bildirim gönderemez; bu yüzden bir şifreleme anahtarı ayarlı olduğu sürece PushWard her yapılacaklar hatırlatıcısını reddeder. Şifreleme anahtarını Yapılandır altından kaldırın veya entegrasyonu kişisel bir entegrasyon anahtarıyla yeniden yapılandırın."
     }
   },
   "selector": {

@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "PushWard-e-maillimiet bereikt",
       "description": "Je PushWard-account heeft {used} van zijn {limit} e-mails voor de huidige periode gebruikt, dus nieuwe e-mails worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+    },
+    "todo_e2e_unavailable": {
+      "title": "PushWard-herinneringen voor takenlijsten worden niet verstuurd",
+      "description": "Deze integratiesleutel hoort bij een organisatie, en organisaties kunnen geen end-to-end versleutelde meldingen versturen. Daarom weigert PushWard elke takenherinnering zolang er een versleutelingssleutel is ingesteld. Verwijder de versleutelingssleutel onder Configureren, of configureer de integratie opnieuw met een persoonlijke integratiesleutel."
     }
   },
   "selector": {

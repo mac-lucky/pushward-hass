@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
+from homeassistant.helpers import issue_registry as ir
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.pushward.api import PushWardApiError, PushWardNotFoundError
@@ -27,6 +28,7 @@ from custom_components.pushward.todo_reminders import (
     TodoReminderManager,
     async_cancel_stored_schedules,
     build_todo_store,
+    e2e_unavailable_issue_id,
 )
 
 NOW = datetime(2026, 10, 1, 8, 0, tzinfo=UTC)  # 10:00 in Europe/Warsaw
@@ -570,6 +572,71 @@ async def test_a_key_change_retries_refused_items_without_an_edit(setup, hass: H
 
     api.create_notification.assert_awaited_once()
     assert _records(manager)["a"]["schedule_id"] == 7
+
+
+def _e2e_issue(hass: HomeAssistant) -> ir.IssueEntry | None:
+    return ir.async_get(hass).async_get_issue(DOMAIN, e2e_unavailable_issue_id("entry-1"))
+
+
+async def test_org_key_refusing_encryption_raises_one_repair_issue(setup, hass: HomeAssistant) -> None:
+    items = [
+        {"uid": "a", "summary": "One", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"},
+        {"uid": "b", "summary": "Two", "status": "needs_action", "due": "2026-10-02T16:00:00+02:00"},
+    ]
+    api = _api()
+    refusal = PushWardApiError("refused", status_code=422, code="notification.encryption_unavailable")
+    api.create_notification = AsyncMock(side_effect=refusal)
+    manager, api, _ = await setup(items, api=api)
+
+    assert api.create_notification.await_count == 2
+    issue = _e2e_issue(hass)
+    assert issue is not None
+    assert issue.translation_key == "todo_e2e_unavailable"
+    assert not issue.is_persistent
+    assert [i for i in ir.async_get(hass).issues.values() if i.domain == DOMAIN] == [issue]
+
+    # A key change clears it, even while the retried reminders fail for other reasons.
+    api.create_notification = AsyncMock(side_effect=PushWardApiError("bad", status_code=400))
+    manager.async_retry_refused()
+    await hass.async_block_till_done()
+    assert api.create_notification.await_count == 2
+    assert _e2e_issue(hass) is None
+
+    # A new key that still cannot encrypt raises it again.
+    api.create_notification = AsyncMock(side_effect=refusal)
+    manager.async_retry_refused()
+    await hass.async_block_till_done()
+    assert _e2e_issue(hass) is not None
+
+
+async def test_e2e_issue_clears_on_an_accepted_reminder_and_on_stop(setup, hass: HomeAssistant) -> None:
+    items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
+    api = _api()
+    api.create_notification = AsyncMock(
+        side_effect=PushWardApiError("refused", status_code=422, code="notification.encryption_unavailable")
+    )
+    manager, api, todo = await setup(items, api=api)
+    assert _e2e_issue(hass) is not None
+
+    api.create_notification = AsyncMock(return_value={"id": 7, "status": "scheduled"})
+    todo.items[0] = {**todo.items[0], "summary": "Dentist at 3"}
+    await manager._async_reconcile(SUB)
+    assert _e2e_issue(hass) is None
+
+    manager._raise_e2e_issue()
+    await manager.async_stop()
+    assert _e2e_issue(hass) is None
+
+
+async def test_other_refusals_raise_no_repair_issue(setup, hass: HomeAssistant) -> None:
+    items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
+    api = _api()
+    api.create_notification = AsyncMock(
+        side_effect=PushWardApiError("bad", status_code=422, code="notification.invalid")
+    )
+    await setup(items, api=api)
+
+    assert _e2e_issue(hass) is None
 
 
 async def test_reminders_carry_a_collapse_id_per_item(setup) -> None:

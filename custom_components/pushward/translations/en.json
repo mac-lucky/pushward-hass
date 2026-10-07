@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "PushWard email limit reached",
       "description": "Your PushWard account has used {used} of its {limit} emails for the current period, so new emails will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+    },
+    "todo_e2e_unavailable": {
+      "title": "PushWard to-do reminders are not going out",
+      "description": "This integration key belongs to an organization, and organizations cannot send end-to-end encrypted notifications, so PushWard refuses every to-do reminder while an encryption key is set. Remove the encryption key under Configure, or reconfigure the integration with a personal integration key."
     }
   },
   "selector": {

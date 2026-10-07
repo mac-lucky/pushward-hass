@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "Limite di email PushWard raggiunto",
       "description": "Il tuo account PushWard ha utilizzato {used} delle sue {limit} email per il periodo corrente, quindi le nuove email verranno rifiutate finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per iOS per aumentare il limite."
+    },
+    "todo_e2e_unavailable": {
+      "title": "I promemoria delle cose da fare di PushWard non vengono inviati",
+      "description": "Questa chiave di integrazione appartiene a un'organizzazione, e le organizzazioni non possono inviare notifiche con crittografia end-to-end, quindi PushWard rifiuta ogni promemoria delle cose da fare finché è impostata una chiave di crittografia. Rimuovi la chiave di crittografia in Configura, oppure riconfigura l'integrazione con una chiave di integrazione personale."
     }
   },
   "selector": {

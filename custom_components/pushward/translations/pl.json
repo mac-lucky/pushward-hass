@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "Osiągnięto limit e-maili PushWard",
       "description": "Twoje konto PushWard wykorzystało {used} z {limit} e-maili w bieżącym okresie, więc nowe e-maile będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+    },
+    "todo_e2e_unavailable": {
+      "title": "Przypomnienia PushWard o zadaniach nie są wysyłane",
+      "description": "Ten klucz integracji należy do organizacji, a organizacje nie mogą wysyłać powiadomień szyfrowanych end-to-end, więc PushWard odrzuca każde przypomnienie o zadaniu, dopóki ustawiony jest klucz szyfrowania. Usuń klucz szyfrowania w Konfiguruj lub skonfiguruj integrację ponownie z osobistym kluczem integracji."
     }
   },
   "selector": {

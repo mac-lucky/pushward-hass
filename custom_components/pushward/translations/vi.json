@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "Đã đạt giới hạn email của PushWard",
       "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} email cho kỳ hiện tại, nên các email mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+    },
+    "todo_e2e_unavailable": {
+      "title": "Lời nhắc việc cần làm của PushWard không được gửi",
+      "description": "Khóa tích hợp này thuộc về một tổ chức, và tổ chức không thể gửi thông báo mã hóa đầu cuối, nên PushWard từ chối mọi lời nhắc việc cần làm khi khóa mã hóa đang được đặt. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc cấu hình lại tích hợp bằng khóa tích hợp cá nhân."
     }
   },
   "selector": {

@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "Batas email PushWard tercapai",
       "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} email untuk periode saat ini, sehingga email baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+    },
+    "todo_e2e_unavailable": {
+      "title": "Pengingat tugas PushWard tidak terkirim",
+      "description": "Kunci integrasi ini milik organisasi, dan organisasi tidak dapat mengirim notifikasi terenkripsi ujung ke ujung, sehingga PushWard menolak setiap pengingat tugas selama kunci enkripsi diatur. Hapus kunci enkripsi di bawah Konfigurasikan, atau konfigurasi ulang integrasi dengan kunci integrasi pribadi."
     }
   },
   "selector": {

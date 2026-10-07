@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "PushWard のメール上限に達しました",
       "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のメールを使用したため、クォータがリセットされる（{resets_at}）まで新しいメールは拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+    },
+    "todo_e2e_unavailable": {
+      "title": "PushWard の ToDo リマインダーが送信されていません",
+      "description": "この統合キーは組織に属しており、組織はエンドツーエンド暗号化通知を送信できません。そのため、暗号化キーが設定されている間、PushWard はすべての ToDo リマインダーを拒否します。「設定」で暗号化キーを削除するか、個人用の統合キーで統合を再設定してください。"
     }
   },
   "selector": {

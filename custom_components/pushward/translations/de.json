@@ -2324,6 +2324,10 @@
     "usage_limit_emails": {
       "title": "PushWard-E-Mail-Limit erreicht",
       "description": "Das PushWard-Konto hat im aktuellen Zeitraum {used} von {limit} E-Mails verwendet, daher werden neue E-Mails abgelehnt, bis das Kontingent zurückgesetzt wird ({resets_at}). Für ein höheres Limit das Abonnement in der PushWard-iOS-App upgraden."
+    },
+    "todo_e2e_unavailable": {
+      "title": "PushWard-Erinnerungen für To-do-Listen werden nicht gesendet",
+      "description": "Dieser Integrationsschlüssel gehört zu einer Organisation, und Organisationen können keine Ende-zu-Ende-verschlüsselten Benachrichtigungen senden. Deshalb lehnt PushWard jede To-do-Erinnerung ab, solange ein Verschlüsselungsschlüssel gesetzt ist. Entferne den Verschlüsselungsschlüssel unter Konfigurieren oder konfiguriere die Integration mit einem persönlichen Integrationsschlüssel neu."
     }
   },
   "selector": {
