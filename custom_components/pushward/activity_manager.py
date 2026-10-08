@@ -87,8 +87,6 @@ _HISTORY_SAMPLES_KEY = "samples"
 # but this avoids a visible gap before the first post-restart push).
 _LOG_SAMPLES_KEY = "logs"
 
-_ACTIVITY_LIMIT_NOTIFICATION_ID = "pushward_activity_limit"
-
 # Config keys that may point a value at a SEPARATE companion entity. Changes to
 # these entities should refresh the activity even though they don't drive
 # start/end (the tracked entity owns lifecycle).
@@ -138,8 +136,14 @@ def _same_log_line(head: dict | None, line: dict) -> bool:
     return head is not None and head.get("text") == line.get("text") and head.get("level") == line.get("level")
 
 
-def _forbidden_notification_id(slug: str) -> str:
-    return f"pushward_forbidden_{slug}"
+# Persistent notification ids carry the entry: two accounts can track the same entity
+# under the same slug, and each one's notices must come and go on their own.
+def _forbidden_notification_id(entry_id: str, slug: str) -> str:
+    return f"pushward_forbidden_{entry_id}_{slug}"
+
+
+def _activity_limit_notification_id(entry_id: str) -> str:
+    return f"pushward_activity_limit_{entry_id}"
 
 
 # Re-exported under its original private name: tests import it from here and the
@@ -242,8 +246,8 @@ class ActivityManager:
             persistent_notification.async_create(
                 self._hass,
                 f"PushWard: {err}",
-                title=f"PushWard — {slug}",
-                notification_id=_forbidden_notification_id(slug),
+                title=f"{self._entry.title} — {slug}",
+                notification_id=_forbidden_notification_id(self._entry.entry_id, slug),
             )
             self._log_push_failure(slug, "PushWard 403 while %s %s: %s", context, slug, err)
         except PushWardQuotaExceededError as err:
@@ -257,8 +261,8 @@ class ActivityManager:
                 persistent_notification.async_create(
                     self._hass,
                     "PushWard activity limit reached — delete unused activities or upgrade your subscription.",
-                    title="PushWard — Activity Limit",
-                    notification_id=_ACTIVITY_LIMIT_NOTIFICATION_ID,
+                    title=f"{self._entry.title} — Activity Limit",
+                    notification_id=_activity_limit_notification_id(self._entry.entry_id),
                 )
                 self._log_push_failure(slug, "Activity limit reached while %s %s", context, slug)
             else:
@@ -269,7 +273,7 @@ class ActivityManager:
     @callback
     def _clear_forbidden_notification(self, slug: str) -> None:
         """Dismiss the forbidden-notification (if any) after a successful call."""
-        persistent_notification.async_dismiss(self._hass, _forbidden_notification_id(slug))
+        persistent_notification.async_dismiss(self._hass, _forbidden_notification_id(self._entry.entry_id, slug))
         if slug in self._failed_slugs:
             self._failed_slugs.discard(slug)
             _LOGGER.info("PushWard %s: pushes succeeding again", slug)

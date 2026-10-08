@@ -27,6 +27,10 @@
       "name": "Perbarui Aktivitas (deprecated)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -271,6 +275,10 @@
       "name": "Perbarui Aktivitas (Generic)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -407,6 +415,10 @@
       "name": "Perbarui Aktivitas (Countdown)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -543,6 +555,10 @@
       "name": "Perbarui Aktivitas (Steps)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -711,6 +727,10 @@
       "name": "Perbarui Aktivitas (Alert)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -835,6 +855,10 @@
       "name": "Perbarui Aktivitas (Gauge)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -959,6 +983,10 @@
       "name": "Perbarui Aktivitas (Timeline)",
       "description": "Perbarui status dan konten PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -1107,6 +1135,10 @@
       "name": "Perbarui Aktivitas (Board)",
       "description": "Perbarui PushWard board Live Activity (1–4 ubin).",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -1181,6 +1213,10 @@
       "name": "Perbarui Aktivitas (Log)",
       "description": "Perbarui PushWard log Live Activity (1–20 baris, terbaru-lebih-dulu).",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -1255,6 +1291,10 @@
       "name": "Perbarui Aktivitas (Media)",
       "description": "Perbarui Live Activity media PushWard: kartu pemutar jarak jauh dengan sampul, bilah kemajuan yang berjalan, dan tombol transport yang memanggil webhook Anda sendiri.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -1369,6 +1409,10 @@
       "name": "Perbarui Aktivitas (Approval)",
       "description": "Perbarui Live Activity persetujuan PushWard: kartu pertanyaan dengan 2-4 tombol jawaban yang memanggil webhook Anda sendiri atau merekam opsi yang diketuk di sisi server.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas."
@@ -1459,6 +1503,10 @@
       "name": "Buat Aktivitas",
       "description": "Buat PushWard Live Activity baru.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas yang unik."
@@ -1503,6 +1551,10 @@
       "name": "Akhiri Aktivitas",
       "description": "Akhiri PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas yang akan diakhiri."
@@ -1517,6 +1569,10 @@
       "name": "Hapus Aktivitas",
       "description": "Hapus PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas yang akan dihapus."
@@ -1527,6 +1583,10 @@
       "name": "Segarkan Widget",
       "description": "Paksa segarkan widget PushWard yang dilacak. Melewati cache diff dalam memori sehingga widget dirender ulang dan dikirim ke iOS meski nilainya tidak berubah.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Pengidentifikasi slug widget. Slug atau entity_id harus diberikan."
@@ -1541,6 +1601,10 @@
       "name": "Kirim Notifikasi",
       "description": "Kirim notifikasi push melalui PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant; wajib dengan variabel respons jika lebih dari satu ditambahkan."
+        },
         "title": {
           "name": "Judul",
           "description": "Judul notifikasi."
@@ -1631,6 +1695,10 @@
       "name": "Batalkan Notifikasi Terjadwal",
       "description": "Batalkan notifikasi yang diantrekan dengan send_at atau Ulangi dari send_notification. Membatalkan notifikasi berulang menghentikan seluruh seri, bahkan saat sedang dikirim. Id yang sudah tidak ada akan diabaikan. Notifikasi yang dibatalkan tampil sebagai dibatalkan di aplikasi PushWard selama 24 jam.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Wajib jika lebih dari satu akun PushWard ditambahkan ke Home Assistant."
+        },
         "scheduled_notification_id": {
           "name": "ID notifikasi terjadwal",
           "description": "scheduled_notification_id yang dikembalikan oleh send_notification."
@@ -1641,6 +1709,10 @@
       "name": "Daftar Notifikasi Terjadwal",
       "description": "Kembalikan notifikasi terjadwal Anda: yang paling dekat lebih dulu untuk yang masih menunggu (default), yang terbaru lebih dulu untuk status lainnya. Notifikasi berulang menyertakan recurrence-nya, berapa kali sudah dikirim (occurrence), dan kapan terakhir dikirim (last_sent_at).",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Wajib jika lebih dari satu akun PushWard ditambahkan ke Home Assistant."
+        },
         "status": {
           "name": "Status",
           "description": "Notifikasi mana yang dikembalikan. scheduled (default) mencantumkan yang masih menunggu; sent dan failed disimpan selama 7 hari. canceled disimpan selama 24 jam."
@@ -1651,6 +1723,10 @@
       "name": "Ambil Jawaban Notifikasi",
       "description": "Tunggu jawaban atas notifikasi yang dikirim dengan aksi tanpa url, lalu kembalikan aksi mana yang diketuk (action_id), balasan ketikan jika ada (text), dan kapan (answered_at). Jika tidak ada yang menjawab dalam batas waktu, answered bernilai false. Jawaban disimpan selama 30 hari, jadi panggilan berikutnya dengan batas waktu 0 dapat membacanya tanpa menunggu.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Wajib jika lebih dari satu akun PushWard ditambahkan ke Home Assistant."
+        },
         "notification_id": {
           "name": "ID notifikasi",
           "description": "notification_id yang dikembalikan oleh send_notification, atau notification_id dari notifikasi terjadwal yang sudah terkirim."
@@ -1665,6 +1741,10 @@
       "name": "Batalkan Notifikasi Konfirmasi",
       "description": "Hentikan pengulangan notifikasi konfirmasi, baik semua yang aktif dan dikirim dengan tag maupun satu notifikasi lewat notification_id-nya. Hanya menjangkau notifikasi yang dikirim dengan kunci integrasi ini, dan callback-nya tidak dikirim. Respons opsional berisi berapa banyak yang dibatalkan (canceled) untuk sebuah tag, atau tanda terima untuk sebuah notification_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk membatalkan tag di setiap akun PushWard yang ditambahkan ke Home Assistant; wajib dengan notification_id jika lebih dari satu ditambahkan."
+        },
         "tag": {
           "name": "Tag",
           "description": "Batalkan semua notifikasi konfirmasi aktif yang dikirim dengan tag ini."
@@ -1679,6 +1759,10 @@
       "name": "Kirim Email",
       "description": "Kirim email transaksional melalui PushWard. Berikan body teks, body HTML, atau keduanya. Kunci integrasi memerlukan kapabilitas \"emails\".",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Wajib jika lebih dari satu akun PushWard ditambahkan ke Home Assistant."
+        },
         "to": {
           "name": "Kepada",
           "description": "Alamat email penerima. Harus merupakan alamat yang sudah Anda tambahkan dan konfirmasi di aplikasi PushWard iOS — alamat yang belum diverifikasi akan ditolak."
@@ -1701,6 +1785,10 @@
       "name": "Hapus Widget",
       "description": "Hapus widget PushWard dari server. Jika entri konfigurasi widget-terlacak masih menggerakkan slug ini, widget akan dibuat ulang pada mulai ulang/sinkronisasi berikutnya — hapus entri konfigurasi untuk menghapusnya secara permanen. Berikan slug atau entity_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Pengidentifikasi slug widget. Slug atau entity_id harus diberikan."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "Notifikasi {notification_id} tidak ada yang bisa dibatalkan: notifikasi ini tidak dikirim dengan acknowledge, dikirim dengan kunci integrasi lain, atau selesai lebih dari 7 hari lalu."
+    },
+    "config_entry_required": {
+      "message": "Lebih dari satu akun PushWard disiapkan, jadi {service} memerlukan config_entry_id yang menyebut tepat satu di antaranya."
+    },
+    "entry_not_loaded": {
+      "message": "Tidak ada akun PushWard yang dimuat dengan ID entri konfigurasi {config_entry_id}."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "Terjadi kesalahan yang tidak terduga."
     },
     "abort": {
-      "already_configured": "PushWard sudah dikonfigurasi.",
+      "already_configured": "Akun PushWard ini sudah dikonfigurasi.",
       "reconfigure_successful": "Konfigurasi PushWard diperbarui.",
-      "reauth_successful": "Autentikasi ulang berhasil."
+      "reauth_successful": "Autentikasi ulang berhasil.",
+      "wrong_account": "Kunci integrasi ini milik akun PushWard lain. Gunakan Konfigurasi ulang untuk memindahkan entri ini ke akun tersebut, atau tambahkan kunci sebagai entri PushWard baru."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "Tindakan `pushward.update_activity` sudah usang. Alihkan otomasi Anda ke tindakan khusus templat — misalnya `pushward.update_activity_countdown` atau `pushward.update_activity_gauge`. Tindakan lama masih berfungsi untuk saat ini tetapi akan dihapus pada rilis mendatang."
     },
     "usage_limit_notifications": {
-      "title": "Batas notifikasi PushWard tercapai",
+      "title": "Batas notifikasi {account} tercapai",
       "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} notifikasi untuk periode saat ini, sehingga notifikasi baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
     },
     "usage_limit_live_activity": {
-      "title": "Batas pembaruan Live Activity PushWard tercapai",
+      "title": "Batas pembaruan Live Activity {account} tercapai",
       "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan Live Activity untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
     },
     "usage_limit_widgets": {
-      "title": "Batas pembaruan widget PushWard tercapai",
+      "title": "Batas pembaruan widget {account} tercapai",
       "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan widget untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
     },
     "usage_limit_emails": {
-      "title": "Batas email PushWard tercapai",
+      "title": "Batas email {account} tercapai",
       "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} email untuk periode saat ini, sehingga email baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
     },
     "todo_e2e_unavailable": {
-      "title": "Pengingat tugas PushWard tidak terkirim",
+      "title": "Pengingat tugas {account} tidak terkirim",
       "description": "Kunci integrasi ini milik organisasi, dan organisasi tidak dapat mengirim notifikasi terenkripsi ujung ke ujung, sehingga PushWard menolak setiap pengingat tugas selama kunci enkripsi diatur. Hapus kunci enkripsi di bawah Konfigurasikan, atau konfigurasi ulang integrasi dengan kunci integrasi pribadi."
     }
   },

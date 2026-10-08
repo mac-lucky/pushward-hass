@@ -27,6 +27,10 @@
       "name": "Activity अपडेट करा (deprecated)",
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -271,6 +275,10 @@
       "name": "Activity अपडेट करा (Generic)",
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -407,6 +415,10 @@
       "name": "Activity अपडेट करा (Countdown)",
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -543,6 +555,10 @@
       "name": "Activity अपडेट करा (Steps)",
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -711,6 +727,10 @@
       "name": "Activity अपडेट करा (Alert)",
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -835,6 +855,10 @@
       "name": "Activity अपडेट करा (Gauge)",
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -959,6 +983,10 @@
       "name": "Activity अपडेट करा (Timeline)",
       "description": "PushWard Live Activity ची स्थिती आणि सामग्री अपडेट करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -1107,6 +1135,10 @@
       "name": "Activity अपडेट करा (Board)",
       "description": "PushWard board Live Activity अपडेट करा (1–4 टाइल).",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -1181,6 +1213,10 @@
       "name": "Activity अपडेट करा (Log)",
       "description": "PushWard log Live Activity अपडेट करा (1–20 नवीनतम-प्रथम ओळी).",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -1255,6 +1291,10 @@
       "name": "Activity अपडेट करा (Media)",
       "description": "PushWard मीडिया Live Activity अपडेट करा: कव्हर आर्ट, चालणारा स्क्रबर आणि तुमचे स्वतःचे webhooks कॉल करणारी ट्रान्सपोर्ट बटणे असलेले रिमोट प्लेयर कार्ड.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -1369,6 +1409,10 @@
       "name": "Activity अपडेट करा (Approval)",
       "description": "PushWard मंजुरी Live Activity अपडेट करा: 2-4 उत्तर बटणे असलेले प्रश्न कार्ड, जे तुमचे स्वतःचे webhooks कॉल करतात किंवा टॅप केलेला पर्याय सर्व्हरवर नोंदवतात.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity चा slug ओळखकर्ता."
@@ -1459,6 +1503,10 @@
       "name": "Activity तयार करा",
       "description": "नवीन PushWard Live Activity तयार करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "Activity साठी अद्वितीय slug ओळखकर्ता."
@@ -1503,6 +1551,10 @@
       "name": "Activity समाप्त करा",
       "description": "PushWard Live Activity समाप्त करा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "समाप्त करण्यासाठी Activity चा slug ओळखकर्ता."
@@ -1517,6 +1569,10 @@
       "name": "Activity हटवा",
       "description": "PushWard Live Activity हटवा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "हटवण्यासाठी Activity चा slug ओळखकर्ता."
@@ -1527,6 +1583,10 @@
       "name": "विजेट रिफ्रेश करा",
       "description": "ट्रॅक केलेले PushWard विजेट सक्तीने रिफ्रेश करा. इन-मेमरी diff कॅशला बायपास करते जेणेकरून मूल्य बदलले नसले तरी विजेट पुन्हा रेंडर होऊन iOS ला पाठवले जाते.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "विजेट स्लग आयडेंटिफायर. slug किंवा entity_id यापैकी एक देणे आवश्यक आहे."
@@ -1541,6 +1601,10 @@
       "name": "सूचना पाठवा",
       "description": "PushWard द्वारे push notification पाठवा.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा; एकापेक्षा जास्त खाती असल्यास रिस्पॉन्स व्हेरिएबलसह आवश्यक."
+        },
         "title": {
           "name": "शीर्षक",
           "description": "सूचनेचे शीर्षक."
@@ -1631,6 +1695,10 @@
       "name": "शेड्यूल केलेली सूचना रद्द करा",
       "description": "send_notification च्या send_at किंवा पुनरावृत्ती ने रांगेत ठेवलेली सूचना रद्द करा. पुनरावृत्त होणारी सूचना रद्द केल्यास संपूर्ण मालिका थांबते, ती पाठवली जात असतानाही. आता अस्तित्वात नसलेला आयडी दुर्लक्षित केला जातो. रद्द केलेली सूचना PushWard अॅपमध्ये 24 तास रद्द म्हणून दिसते.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये एकापेक्षा जास्त PushWard खाती जोडलेली असल्यास आवश्यक."
+        },
         "scheduled_notification_id": {
           "name": "शेड्यूल केलेल्या सूचनेचा आयडी",
           "description": "send_notification ने परत केलेला scheduled_notification_id."
@@ -1641,6 +1709,10 @@
       "name": "शेड्यूल केलेल्या सूचनांची यादी",
       "description": "तुमच्या शेड्यूल केलेल्या सूचना परत करा: अजून प्रतीक्षेत असलेल्यांसाठी (डीफॉल्ट) सर्वात जवळची आधी, इतर कोणत्याही स्थितीसाठी सर्वात अलीकडची आधी. पुनरावृत्त होणाऱ्या सूचनांमध्ये त्यांचा recurrence, त्या किती वेळा पाठवल्या गेल्या (occurrence) आणि शेवटच्या कधी पाठवल्या (last_sent_at) हे असते.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये एकापेक्षा जास्त PushWard खाती जोडलेली असल्यास आवश्यक."
+        },
         "status": {
           "name": "स्थिती",
           "description": "कोणत्या परत करायच्या. scheduled (डीफॉल्ट) अजून प्रतीक्षेत असलेल्या दाखवते; sent आणि failed 7 दिवस ठेवल्या जातात. canceled 24 तास ठेवल्या जातात."
@@ -1651,6 +1723,10 @@
       "name": "सूचनेचे उत्तर मिळवा",
       "description": "url नसलेल्या क्रियांसह पाठवलेल्या सूचनेच्या उत्तराची प्रतीक्षा करा, आणि कोणती क्रिया टॅप केली (action_id), टाइप केलेले उत्तर असल्यास (text) आणि केव्हा (answered_at) हे परत करा. टाइमआउटमध्ये कोणीही उत्तर न दिल्यास answered false असते. उत्तरे 30 दिवस ठेवली जातात, त्यामुळे नंतर टाइमआउट 0 सह केलेला कॉल प्रतीक्षा न करता उत्तर वाचू शकतो.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये एकापेक्षा जास्त PushWard खाती जोडलेली असल्यास आवश्यक."
+        },
         "notification_id": {
           "name": "सूचनेचा आयडी",
           "description": "send_notification ने परत केलेला notification_id, किंवा पाठवलेल्या शेड्यूल केलेल्या सूचनेचा notification_id."
@@ -1665,6 +1741,10 @@
       "name": "स्वीकारल्या जाणाऱ्या सूचना रद्द करा",
       "description": "स्वीकारल्या जाणाऱ्या सूचनांची पुनरावृत्ती थांबवा, एकतर टॅगसह पाठवलेल्या सर्व सक्रिय सूचना किंवा notification_id द्वारे एक. हे फक्त या इंटिग्रेशनच्या key ने पाठवलेल्या सूचनांवर लागू होते, आणि त्यांचा callback पाठवला जात नाही. पर्यायी response मध्ये टॅगसाठी किती रद्द झाल्या (canceled), किंवा notification_id साठी पावती असते.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेल्या प्रत्येक PushWard खात्यावर एक टॅग रद्द करण्यासाठी रिकामे ठेवा; एकापेक्षा जास्त खाती असल्यास notification_id सह आवश्यक."
+        },
         "tag": {
           "name": "टॅग",
           "description": "या टॅगसह पाठवलेल्या सर्व सक्रिय स्वीकारल्या जाणाऱ्या सूचना रद्द करा."
@@ -1679,6 +1759,10 @@
       "name": "ईमेल पाठवा",
       "description": "PushWard द्वारे ट्रान्झॅक्शनल ईमेल पाठवा. टेक्स्ट मजकूर, HTML मजकूर, किंवा दोन्ही द्या. इंटिग्रेशन कीला \"emails\" क्षमता आवश्यक आहे.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये एकापेक्षा जास्त PushWard खाती जोडलेली असल्यास आवश्यक."
+        },
         "to": {
           "name": "प्रति",
           "description": "प्राप्तकर्त्याचा ईमेल पत्ता. तुम्ही PushWard iOS अॅपमध्ये आधीच जोडलेला आणि पुष्टी केलेला पत्ता असावा — असत्यापित पत्ते नाकारले जातात."
@@ -1701,6 +1785,10 @@
       "name": "विजेट हटवा",
       "description": "सर्व्हरवरून PushWard विजेट हटवा. ट्रॅक-केलेल्या विजेटची कॉन्फिग एन्ट्री अजूनही हा स्लग चालवत असल्यास, पुढील रीस्टार्ट/सिंकवर विजेट पुन्हा तयार होते — कायमचे हटवण्यासाठी कॉन्फिग एन्ट्री काढा. slug किंवा entity_id यापैकी एक द्या.",
       "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
         "slug": {
           "name": "स्लग",
           "description": "विजेट स्लग आयडेंटिफायर. slug किंवा entity_id यापैकी एक देणे आवश्यक आहे."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "सूचना {notification_id} मध्ये रद्द करण्यासारखे काही नाही: ती acknowledge सह पाठवली नव्हती, ती दुसऱ्या इंटिग्रेशन कीने पाठवली होती, किंवा ती 7 दिवसांपूर्वी संपली आहे."
+    },
+    "config_entry_required": {
+      "message": "एकापेक्षा जास्त PushWard खाती सेट अप आहेत, त्यामुळे {service} ला त्यांपैकी नेमके एक सांगणारा config_entry_id हवा आहे."
+    },
+    "entry_not_loaded": {
+      "message": "कोणत्याही लोड केलेल्या PushWard खात्याचा कॉन्फिग एंट्री आयडी {config_entry_id} नाही."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "अनपेक्षित त्रुटी आली."
     },
     "abort": {
-      "already_configured": "PushWard आधीच कॉन्फिगर केले आहे.",
+      "already_configured": "हे PushWard खाते आधीच कॉन्फिगर केले आहे.",
       "reconfigure_successful": "PushWard कॉन्फिगरेशन अपडेट झाले.",
-      "reauth_successful": "पुन्हा प्रमाणीकरण यशस्वी."
+      "reauth_successful": "पुन्हा प्रमाणीकरण यशस्वी.",
+      "wrong_account": "ही इंटिग्रेशन की दुसऱ्या PushWard खात्याची आहे. ही नोंद त्या खात्यावर हलवण्यासाठी पुन्हा कॉन्फिगर करा वापरा, किंवा की नवीन PushWard नोंद म्हणून जोडा."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "`pushward.update_activity` क्रिया कालबाह्य झाली आहे. त्याऐवजी तुमची ऑटोमेशन्स टेम्पलेट-विशिष्ट क्रियेवर स्विच करा — उदाहरणार्थ `pushward.update_activity_countdown` किंवा `pushward.update_activity_gauge`. जुनी क्रिया सध्या कार्यरत आहे पण भविष्यातील रिलीझमध्ये काढून टाकली जाईल."
     },
     "usage_limit_notifications": {
-      "title": "PushWard सूचना मर्यादा गाठली",
+      "title": "{account} सूचना मर्यादा गाठली",
       "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} सूचना वापरल्या आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन सूचना नाकारल्या जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
     },
     "usage_limit_live_activity": {
-      "title": "PushWard Live Activity अपडेट मर्यादा गाठली",
+      "title": "{account} Live Activity अपडेट मर्यादा गाठली",
       "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} Live Activity अपडेट्स वापरल्या आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन अपडेट्स नाकारल्या जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
     },
     "usage_limit_widgets": {
-      "title": "PushWard विजेट अपडेट मर्यादा गाठली",
+      "title": "{account} विजेट अपडेट मर्यादा गाठली",
       "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} विजेट अपडेट्स वापरल्या आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन अपडेट्स नाकारल्या जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
     },
     "usage_limit_emails": {
-      "title": "PushWard ईमेल मर्यादा गाठली",
+      "title": "{account} ईमेल मर्यादा गाठली",
       "description": "तुमच्या PushWard खात्याने सध्याच्या कालावधीसाठी त्याच्या {limit} पैकी {used} ईमेल वापरले आहेत, त्यामुळे कोटा रीसेट होईपर्यंत ({resets_at}) नवीन ईमेल नाकारले जातील. मर्यादा वाढवण्यासाठी PushWard iOS अॅपमध्ये तुमची सदस्यता अपग्रेड करा."
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard ची टू-डू स्मरणपत्रे पाठवली जात नाहीत",
+      "title": "{account} ची टू-डू स्मरणपत्रे पाठवली जात नाहीत",
       "description": "ही इंटिग्रेशन की एका संस्थेची आहे, आणि संस्था एंड-टू-एंड एन्क्रिप्टेड सूचना पाठवू शकत नाहीत, म्हणून एन्क्रिप्शन की सेट असेपर्यंत PushWard प्रत्येक टू-डू स्मरणपत्र नाकारते. कॉन्फिगर करा मध्ये एन्क्रिप्शन की काढून टाका, किंवा वैयक्तिक इंटिग्रेशन की वापरून इंटिग्रेशन पुन्हा कॉन्फिगर करा."
     }
   },

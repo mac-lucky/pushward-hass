@@ -66,7 +66,7 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             hass,
             _LOGGER,
             config_entry=entry,
-            name=f"{DOMAIN}_usage",
+            name=f"{DOMAIN}_usage ({entry.title})",
             update_interval=timedelta(seconds=USAGE_UPDATE_INTERVAL),
         )
         self._api = api
@@ -123,6 +123,7 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 severity=ir.IssueSeverity.WARNING,
                 translation_key=resource.translation_key,
                 translation_placeholders={
+                    "account": self.config_entry.title,
                     "used": str(used),
                     "limit": str(limit),
                     "resets_at": _format_reset(reset),

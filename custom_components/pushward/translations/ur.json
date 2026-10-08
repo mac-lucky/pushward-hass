@@ -27,6 +27,10 @@
       "name": "سرگرمی اپڈیٹ کریں (deprecated)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -271,6 +275,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Generic)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -407,6 +415,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Countdown)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -543,6 +555,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Steps)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -711,6 +727,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Alert)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -835,6 +855,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Gauge)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -959,6 +983,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Timeline)",
       "description": "PushWard Live Activity کی حالت اور مواد کو اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -1107,6 +1135,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Board)",
       "description": "ایک PushWard بورڈ Live Activity (1–4 ٹائلز) اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -1181,6 +1213,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Log)",
       "description": "ایک PushWard لاگ Live Activity (1–20 تازہ ترین پہلے لائنیں) اپڈیٹ کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -1255,6 +1291,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Media)",
       "description": "PushWard میڈیا Live Activity اپڈیٹ کریں: کور آرٹ، چلتی ہوئی پروگریس بار اور آپ کے اپنے webhooks کو کال کرنے والے ٹرانسپورٹ بٹنوں والا ایک ریموٹ پلیئر کارڈ۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -1369,6 +1409,10 @@
       "name": "سرگرمی اپڈیٹ کریں (Approval)",
       "description": "PushWard منظوری Live Activity اپڈیٹ کریں: 2-4 جوابی بٹنوں والا سوالیہ کارڈ، جو آپ کے اپنے webhooks کو کال کرتے ہیں یا ٹیپ کیا گیا اختیار سرور پر درج کرتے ہیں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی slug شناخت۔"
@@ -1459,6 +1503,10 @@
       "name": "سرگرمی بنائیں",
       "description": "نئی PushWard Live Activity بنائیں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "سرگرمی کی منفرد slug شناخت۔"
@@ -1503,6 +1551,10 @@
       "name": "سرگرمی ختم کریں",
       "description": "PushWard Live Activity ختم کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "ختم کی جانے والی سرگرمی کی slug شناخت۔"
@@ -1517,6 +1569,10 @@
       "name": "سرگرمی حذف کریں",
       "description": "PushWard Live Activity حذف کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "حذف کی جانے والی سرگرمی کی slug شناخت۔"
@@ -1527,6 +1583,10 @@
       "name": "ویجٹ ریفریش کریں",
       "description": "کسی ٹریک شدہ PushWard ویجٹ کو زبردستی ریفریش کریں۔ ان-میموری diff کیش کو نظر انداز کرتا ہے تاکہ قدر تبدیل نہ ہونے کے باوجود ویجٹ دوبارہ رینڈر ہو کر iOS پر بھیجا جائے۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "ویجٹ کا slug شناخت کنندہ۔ slug یا entity_id میں سے ایک لازمی فراہم کرنا ہوگا۔"
@@ -1541,6 +1601,10 @@
       "name": "اطلاع بھیجیں",
       "description": "PushWard کے ذریعے push notification بھیجیں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں؛ ایک سے زیادہ اکاؤنٹ ہوں تو جوابی متغیر کے ساتھ لازمی ہے۔"
+        },
         "title": {
           "name": "عنوان",
           "description": "اطلاع کا عنوان۔"
@@ -1631,6 +1695,10 @@
       "name": "شیڈول شدہ اطلاع منسوخ کریں",
       "description": "send_notification کے send_at یا دہرائیں کے ذریعے قطار میں لگائی گئی اطلاع منسوخ کریں۔ دہرائی جانے والی اطلاع منسوخ کرنے سے پوری سیریز رک جاتی ہے، چاہے وہ بھیجی جا رہی ہو۔ جو ID اب موجود نہیں، اسے نظر انداز کر دیا جاتا ہے۔ منسوخ شدہ اطلاع PushWard ایپ میں 24 گھنٹے تک منسوخ کے طور پر دکھائی دیتی ہے۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ جب Home Assistant میں ایک سے زیادہ PushWard اکاؤنٹ شامل ہوں تو لازمی ہے۔"
+        },
         "scheduled_notification_id": {
           "name": "شیڈول شدہ اطلاع کی ID",
           "description": "send_notification کی طرف سے واپس کیا گیا scheduled_notification_id۔"
@@ -1641,6 +1709,10 @@
       "name": "شیڈول شدہ اطلاعات کی فہرست",
       "description": "اپنی شیڈول شدہ اطلاعات واپس کریں: ابھی تک منتظر اطلاعات (ڈیفالٹ) کے لیے سب سے قریب والی پہلے، کسی بھی دوسری حالت کے لیے سب سے نئی پہلے۔ دہرائی جانے والی اطلاعات میں ان کا recurrence، وہ کتنی بار بھیجی جا چکی ہیں (occurrence) اور آخری بار کب بھیجی گئیں (last_sent_at) شامل ہوتے ہیں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ جب Home Assistant میں ایک سے زیادہ PushWard اکاؤنٹ شامل ہوں تو لازمی ہے۔"
+        },
         "status": {
           "name": "حالت",
           "description": "کون سی واپس کرنی ہیں۔ scheduled (ڈیفالٹ) ابھی تک منتظر اطلاعات دکھاتا ہے؛ sent اور failed کو 7 دن تک رکھا جاتا ہے۔ canceled کو 24 گھنٹے تک رکھا جاتا ہے۔"
@@ -1651,6 +1723,10 @@
       "name": "اطلاع کا جواب حاصل کریں",
       "description": "بغیر url والے ایکشنز کے ساتھ بھیجی گئی اطلاع کے جواب کا انتظار کریں، اور واپس کریں کہ کون سا ایکشن ٹیپ کیا گیا (action_id)، کوئی ٹائپ کیا گیا جواب (text) اور کب (answered_at)۔ اگر ٹائم آؤٹ کے اندر کوئی جواب نہ دے تو answered کی قدر false ہوتی ہے۔ جوابات 30 دن تک رکھے جاتے ہیں، اس لیے بعد میں ٹائم آؤٹ 0 کے ساتھ کی گئی کال انتظار کیے بغیر جواب پڑھ سکتی ہے۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ جب Home Assistant میں ایک سے زیادہ PushWard اکاؤنٹ شامل ہوں تو لازمی ہے۔"
+        },
         "notification_id": {
           "name": "اطلاع کی ID",
           "description": "send_notification کی طرف سے واپس کیا گیا notification_id، یا بھیجی جا چکی شیڈول شدہ اطلاع کا notification_id۔"
@@ -1665,6 +1741,10 @@
       "name": "تصدیق طلب اطلاعات منسوخ کریں",
       "description": "تصدیق طلب اطلاعات کا دہرایا جانا روکیں، یا تو ٹیگ کے ساتھ بھیجی گئی تمام فعال اطلاعات یا notification_id کے ذریعے ایک۔ یہ صرف اس انٹیگریشن کی key سے بھیجی گئی اطلاعات تک پہنچتا ہے، اور ان کا callback نہیں بھیجا جاتا۔ اختیاری response میں ٹیگ کے لیے منسوخ ہونے والی تعداد (canceled)، یا notification_id کے لیے رسید ہوتی ہے۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ پر ایک ٹیگ منسوخ کرنے کے لیے خالی چھوڑیں؛ ایک سے زیادہ اکاؤنٹ ہوں تو notification_id کے ساتھ لازمی ہے۔"
+        },
         "tag": {
           "name": "ٹیگ",
           "description": "اس ٹیگ کے ساتھ بھیجی گئی تمام فعال تصدیق طلب اطلاعات منسوخ کریں۔"
@@ -1679,6 +1759,10 @@
       "name": "ای میل بھیجیں",
       "description": "PushWard کے ذریعے ٹرانزیکشنل ای میل بھیجیں۔ ایک text باڈی، ایک HTML باڈی، یا دونوں فراہم کریں۔ انٹیگریشن کلید کو \"emails\" صلاحیت درکار ہے۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ جب Home Assistant میں ایک سے زیادہ PushWard اکاؤنٹ شامل ہوں تو لازمی ہے۔"
+        },
         "to": {
           "name": "بنام",
           "description": "وصول کنندہ کا ای میل پتہ۔ یہ ایسا پتہ ہونا چاہیے جسے آپ پہلے ہی PushWard iOS ایپ میں شامل اور تصدیق کر چکے ہوں — غیر تصدیق شدہ پتے مسترد کر دیے جاتے ہیں۔"
@@ -1701,6 +1785,10 @@
       "name": "ویجٹ حذف کریں",
       "description": "سرور سے کوئی PushWard ویجٹ حذف کریں۔ اگر کوئی ٹریک شدہ ویجٹ کنفگ انٹری اب بھی اس slug کو چلا رہی ہے، تو اگلے ری اسٹارٹ/سنک پر ویجٹ دوبارہ بن جائے گا — اسے مستقل حذف کرنے کے لیے کنفگ انٹری ہٹا دیں۔ slug یا entity_id میں سے ایک فراہم کریں۔",
       "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
         "slug": {
           "name": "Slug",
           "description": "ویجٹ کا slug شناخت کنندہ۔ slug یا entity_id میں سے ایک لازمی فراہم کرنا ہوگا۔"
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "اطلاع {notification_id} میں منسوخ کرنے کے لیے کچھ نہیں ہے: اسے acknowledge کے ساتھ نہیں بھیجا گیا تھا، اسے کسی اور انٹیگریشن کی سے بھیجا گیا تھا، یا یہ 7 دن سے زیادہ پہلے ختم ہو چکی ہے۔"
+    },
+    "config_entry_required": {
+      "message": "ایک سے زیادہ PushWard اکاؤنٹ سیٹ اپ ہیں، اس لیے {service} کو ایسی config_entry_id درکار ہے جو ان میں سے ٹھیک ایک بتائے۔"
+    },
+    "entry_not_loaded": {
+      "message": "کسی لوڈ شدہ PushWard اکاؤنٹ کی کنفیگ اندراج آئی ڈی {config_entry_id} نہیں ہے۔"
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "ایک غیر متوقع خرابی پیش آئی۔"
     },
     "abort": {
-      "already_configured": "PushWard پہلے سے ترتیب شدہ ہے۔",
+      "already_configured": "یہ PushWard اکاؤنٹ پہلے سے ترتیب شدہ ہے۔",
       "reconfigure_successful": "PushWard کی ترتیب اپڈیٹ ہو گئی۔",
-      "reauth_successful": "دوبارہ توثیق کامیاب رہی۔"
+      "reauth_successful": "دوبارہ توثیق کامیاب رہی۔",
+      "wrong_account": "یہ انٹیگریشن کی کسی دوسرے PushWard اکاؤنٹ کی ہے۔ اس اندراج کو اس اکاؤنٹ پر منتقل کرنے کے لیے دوبارہ ترتیب دیں استعمال کریں، یا کی کو نئی PushWard اندراج کے طور پر شامل کریں۔"
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "`pushward.update_activity` ایکشن متروک ہے۔ اپنی آٹومیشنز کو اس کے بجائے ٹیمپلیٹ کے مخصوص ایکشن پر منتقل کریں — مثلاً `pushward.update_activity_countdown` یا `pushward.update_activity_gauge`۔ پرانا ایکشن فی الحال کام کرتا رہے گا لیکن مستقبل کی ریلیز میں ہٹا دیا جائے گا۔"
     },
     "usage_limit_notifications": {
-      "title": "PushWard اطلاعات کی حد پہنچ گئی",
+      "title": "{account} اطلاعات کی حد پہنچ گئی",
       "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} اطلاعات میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی اطلاعات مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
     },
     "usage_limit_live_activity": {
-      "title": "PushWard Live Activity اپڈیٹ کی حد پہنچ گئی",
+      "title": "{account} Live Activity اپڈیٹ کی حد پہنچ گئی",
       "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} Live Activity اپڈیٹس میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی اپڈیٹس مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
     },
     "usage_limit_widgets": {
-      "title": "PushWard ویجٹ اپڈیٹ کی حد پہنچ گئی",
+      "title": "{account} ویجٹ اپڈیٹ کی حد پہنچ گئی",
       "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} ویجٹ اپڈیٹس میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی اپڈیٹس مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
     },
     "usage_limit_emails": {
-      "title": "PushWard ای میل کی حد پہنچ گئی",
+      "title": "{account} ای میل کی حد پہنچ گئی",
       "description": "آپ کے PushWard اکاؤنٹ نے موجودہ مدت کے لیے اپنی {limit} ای میلز میں سے {used} استعمال کر لی ہیں، اس لیے کوٹا ری سیٹ ہونے ({resets_at}) تک نئی ای میلز مسترد کر دی جائیں گی۔ حد بڑھانے کے لیے PushWard iOS ایپ میں اپنی سبسکرپشن اپ گریڈ کریں۔"
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard کی کاموں کی یاد دہانیاں نہیں بھیجی جا رہیں",
+      "title": "{account} کی کاموں کی یاد دہانیاں نہیں بھیجی جا رہیں",
       "description": "یہ انٹیگریشن کی ایک تنظیم سے تعلق رکھتی ہے، اور تنظیمیں اینڈ ٹو اینڈ انکرپٹڈ اطلاعات نہیں بھیج سکتیں، اس لیے جب تک انکرپشن کی سیٹ ہے، PushWard کاموں کی ہر یاد دہانی مسترد کر دیتا ہے۔ کنفیگر کریں میں انکرپشن کی ہٹائیں، یا ذاتی انٹیگریشن کی کے ساتھ انٹیگریشن کو دوبارہ ترتیب دیں۔"
     }
   },

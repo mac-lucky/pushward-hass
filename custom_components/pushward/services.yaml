@@ -2,6 +2,12 @@ update_activity:
   name: Update Activity (deprecated)
   description: "Deprecated — use the template-specific Update actions (e.g. Update Activity (Countdown)). Kept for backward compatibility; will be removed in a future release."
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       name: Slug
       description: Activity slug identifier.
@@ -405,6 +411,10 @@ update_activity:
 
 update_activity_generic:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-washer"
@@ -570,6 +580,10 @@ update_activity_generic:
 
 update_activity_countdown:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-washer"
@@ -739,6 +753,10 @@ update_activity_countdown:
 
 update_activity_steps:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-washer"
@@ -935,6 +953,10 @@ update_activity_steps:
 
 update_activity_alert:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-washer"
@@ -1088,6 +1110,10 @@ update_activity_alert:
 
 update_activity_gauge:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-washer"
@@ -1242,6 +1268,10 @@ update_activity_gauge:
 
 update_activity_timeline:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-washer"
@@ -1418,6 +1448,10 @@ update_activity_timeline:
 # requirement. Each service shows exactly the fields its template renders.
 update_activity_board:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-status-board"
@@ -1516,6 +1550,10 @@ update_activity_board:
 
 update_activity_log:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-event-log"
@@ -1614,6 +1652,10 @@ update_activity_log:
 
 update_activity_media:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-living-room-player"
@@ -1771,6 +1813,10 @@ update_activity_media:
 
 update_activity_approval:
   fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       required: true
       example: "ha-gate-request"
@@ -1888,6 +1934,12 @@ create_activity:
   name: Create Activity
   description: Create a new PushWard Live Activity.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       name: Slug
       description: Unique activity slug identifier.
@@ -1961,6 +2013,12 @@ end_activity:
   name: End Activity
   description: End a PushWard Live Activity.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       name: Slug
       description: Activity slug identifier to end.
@@ -1979,6 +2037,12 @@ delete_activity:
   name: Delete Activity
   description: Delete a PushWard Live Activity.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       name: Slug
       description: Activity slug identifier to delete.
@@ -1991,6 +2055,12 @@ send_notification:
   name: Send Notification
   description: Send a push notification via PushWard.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant; required with a response variable when more than one is added."
+      selector:
+        config_entry:
+          integration: pushward
     title:
       name: Title
       description: Notification title.
@@ -2134,6 +2204,12 @@ cancel_scheduled_notification:
   name: Cancel Scheduled Notification
   description: Cancel a notification queued with send_notification's send_at or Repeat. Canceling a repeating one stops the whole series, even while it is being sent. A canceled notification shows as canceled in the PushWard app for 24 hours. An id that no longer exists is ignored.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     scheduled_notification_id:
       name: Scheduled notification ID
       description: The scheduled_notification_id returned by send_notification.
@@ -2148,6 +2224,12 @@ list_scheduled_notifications:
   name: List Scheduled Notifications
   description: "Return your scheduled notifications: soonest first for pending ones (the default), latest first for any other status. Repeating ones carry their recurrence, how many times they have sent (occurrence) and when they last sent (last_sent_at)."
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     status:
       name: Status
       description: Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days, canceled for 24 hours.
@@ -2165,6 +2247,12 @@ get_notification_answer:
   name: Get Notification Answer
   description: Wait for the answer to a notification sent with actions that have no url, and return which action was tapped (action_id), any typed reply (text) and when (answered_at). If nobody answers within the timeout, answered is false. Answers are kept for 30 days, so a later call with timeout 0 can read one without waiting.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     notification_id:
       name: Notification ID
       description: The notification_id returned by send_notification, or the notification_id of a sent scheduled notification.
@@ -2189,6 +2277,12 @@ cancel_notifications:
   name: Cancel Acknowledged Notifications
   description: Stop acknowledged notifications from repeating, either every active one sent with a tag or one by its notification_id. It reaches only notifications sent with this integration's key, and their callback is not sent. The optional response holds how many were canceled (canceled) for a tag, or the receipt for a notification_id.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to cancel a tag on every PushWard account added to Home Assistant; required with a notification_id when more than one is added."
+      selector:
+        config_entry:
+          integration: pushward
     tag:
       name: Tag
       description: Cancel every active acknowledged notification sent with this tag.
@@ -2208,6 +2302,12 @@ send_email:
   name: Send Email
   description: Send a transactional email via PushWard. Provide a text body, an HTML body, or both. The integration key needs the "emails" capability.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     to:
       name: To
       description: Recipient email address. Must be an address you have already added and confirmed in the PushWard iOS app — unverified addresses are rejected.
@@ -2242,6 +2342,12 @@ widget_refresh:
   name: Refresh Widget
   description: Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to iOS even when the value hasn't changed.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       name: Slug
       description: Widget slug identifier. Either `slug` or `entity_id` must be provided.
@@ -2259,6 +2365,12 @@ delete_widget:
   name: Delete Widget
   description: Delete a PushWard widget from the server. If a tracked-widget config entry still drives this slug, the widget is recreated on the next restart/sync — remove the config entry to delete it permanently. Provide either slug or entity_id.
   fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
     slug:
       name: Slug
       description: Widget slug identifier. Either `slug` or `entity_id` must be provided.

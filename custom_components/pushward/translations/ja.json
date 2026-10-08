@@ -27,6 +27,10 @@
       "name": "アクティビティを更新 (deprecated)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -271,6 +275,10 @@
       "name": "アクティビティを更新 (Generic)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -407,6 +415,10 @@
       "name": "アクティビティを更新 (Countdown)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -543,6 +555,10 @@
       "name": "アクティビティを更新 (Steps)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -711,6 +727,10 @@
       "name": "アクティビティを更新 (Alert)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -835,6 +855,10 @@
       "name": "アクティビティを更新 (Gauge)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -959,6 +983,10 @@
       "name": "アクティビティを更新 (Timeline)",
       "description": "PushWard Live Activityの状態とコンテンツを更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -1107,6 +1135,10 @@
       "name": "アクティビティを更新 (Board)",
       "description": "PushWard board Live Activity（1〜4個のタイル）を更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -1181,6 +1213,10 @@
       "name": "アクティビティを更新 (Log)",
       "description": "PushWard log Live Activity（新しい順の1〜20行）を更新します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -1255,6 +1291,10 @@
       "name": "アクティビティを更新 (Media)",
       "description": "PushWard のメディア Live Activity を更新します。カバーアート、進行するシークバー、独自の Webhook を呼び出すトランスポートボタンを備えたリモートプレーヤーカードです。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -1369,6 +1409,10 @@
       "name": "アクティビティを更新 (Approval)",
       "description": "PushWard の承認 Live Activity を更新します。2〜4 個の回答ボタンを持つ質問カードで、ボタンは自分の Webhook を呼び出すか、タップされた選択肢をサーバー側に記録します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "アクティビティのスラッグ識別子。"
@@ -1459,6 +1503,10 @@
       "name": "アクティビティを作成",
       "description": "新しいPushWard Live Activityを作成します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "一意のアクティビティスラッグ識別子。"
@@ -1503,6 +1551,10 @@
       "name": "アクティビティを終了",
       "description": "PushWard Live Activityを終了します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "終了するアクティビティのスラッグ識別子。"
@@ -1517,6 +1569,10 @@
       "name": "アクティビティを削除",
       "description": "PushWard Live Activityを削除します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "削除するアクティビティのスラッグ識別子。"
@@ -1527,6 +1583,10 @@
       "name": "ウィジェットを更新",
       "description": "追跡中の PushWard ウィジェットを強制的に更新します。メモリ内の差分キャッシュをバイパスし、値が変わっていなくてもウィジェットを再描画して iOS にプッシュします。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "ウィジェットのスラッグ識別子。slug または entity_id のいずれかを指定する必要があります。"
@@ -1541,6 +1601,10 @@
       "name": "通知を送信",
       "description": "PushWard経由でプッシュ通知を送信します。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。複数追加している場合、レスポンス変数を使うときは必須です。"
+        },
         "title": {
           "name": "タイトル",
           "description": "通知のタイトル。"
@@ -1631,6 +1695,10 @@
       "name": "予約通知をキャンセル",
       "description": "send_notification の send_at または「繰り返し」で予約した通知をキャンセルします。繰り返し通知をキャンセルすると、送信中であってもシリーズ全体が停止します。存在しなくなった ID は無視されます。キャンセルした通知は、PushWard アプリに 24 時間キャンセル済みとして表示されます。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。Home Assistant に複数の PushWard アカウントを追加している場合は必須です。"
+        },
         "scheduled_notification_id": {
           "name": "予約通知ID",
           "description": "send_notification が返す scheduled_notification_id。"
@@ -1641,6 +1709,10 @@
       "name": "予約通知を一覧表示",
       "description": "予約済みの通知を、まだ待機中のもの（デフォルト）は送信予定が近い順、それ以外のステータスでは新しい順に返します。繰り返し通知には recurrence、これまでの送信回数（occurrence）、最後に送信した日時（last_sent_at）が含まれます。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。Home Assistant に複数の PushWard アカウントを追加している場合は必須です。"
+        },
         "status": {
           "name": "ステータス",
           "description": "返す通知の種類。scheduled（デフォルト）はまだ待機中の通知を一覧表示します。sent と failed は 7 日間保持されます。canceled は 24 時間保持されます。"
@@ -1651,6 +1723,10 @@
       "name": "通知の回答を取得",
       "description": "url のないアクション付きで送信した通知への回答を待ち、タップされたアクション（action_id）、入力された返信（text）、回答日時（answered_at）を返します。タイムアウトまでに誰も回答しなかった場合、answered は false になります。回答は 30 日間保持されるため、後からタイムアウト 0 で呼び出せば待たずに読み取れます。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。Home Assistant に複数の PushWard アカウントを追加している場合は必須です。"
+        },
         "notification_id": {
           "name": "通知ID",
           "description": "send_notification が返す notification_id、または送信済みの予約通知の notification_id。"
@@ -1665,6 +1741,10 @@
       "name": "確認待ち通知をキャンセル",
       "description": "確認待ち通知の繰り返しを停止します。タグ付きで送信されたすべての有効な通知、または notification_id で指定した 1 件が対象です。この連携のキーで送信した通知のみが対象で、そのコールバックは送信されません。任意の応答には、タグの場合はキャンセルした件数（canceled）、notification_id の場合は受信確認が含まれます。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントでタグをキャンセルします。複数追加している場合、notification_id を使うときは必須です。"
+        },
         "tag": {
           "name": "タグ",
           "description": "このタグ付きで送信された、有効な確認待ち通知をすべてキャンセルします。"
@@ -1679,6 +1759,10 @@
       "name": "メールを送信",
       "description": "PushWard 経由でトランザクションメールを送信します。テキスト本文、HTML 本文、またはその両方を指定してください。統合キーには「emails」の権限が必要です。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。Home Assistant に複数の PushWard アカウントを追加している場合は必須です。"
+        },
         "to": {
           "name": "宛先",
           "description": "受信者のメールアドレス。PushWard iOS アプリですでに追加・確認済みのアドレスである必要があります — 未確認のアドレスは拒否されます。"
@@ -1701,6 +1785,10 @@
       "name": "ウィジェットを削除",
       "description": "サーバーから PushWard ウィジェットを削除します。追跡ウィジェットの設定エントリがまだこのスラッグを管理している場合、次回の再起動/同期時にウィジェットが再作成されます — 完全に削除するには設定エントリを削除してください。slug または entity_id のいずれかを指定してください。",
       "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
         "slug": {
           "name": "スラッグ",
           "description": "ウィジェットのスラッグ識別子。slug または entity_id のいずれかを指定する必要があります。"
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "通知 {notification_id} には取り消すものがありません。acknowledge 付きで送信されていない、別の統合キーで送信された、または 7 日以上前に終了しています。"
+    },
+    "config_entry_required": {
+      "message": "複数の PushWard アカウントが設定されているため、{service} ではそのうちちょうど 1 つを config_entry_id で指定する必要があります。"
+    },
+    "entry_not_loaded": {
+      "message": "構成エントリ ID {config_entry_id} の PushWard アカウントは読み込まれていません。"
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "予期しないエラーが発生しました。"
     },
     "abort": {
-      "already_configured": "PushWardはすでに設定されています。",
+      "already_configured": "この PushWard アカウントはすでに設定されています。",
       "reconfigure_successful": "PushWardの設定を更新しました。",
-      "reauth_successful": "再認証が完了しました。"
+      "reauth_successful": "再認証が完了しました。",
+      "wrong_account": "この統合キーは別の PushWard アカウントのものです。このエントリをそのアカウントに切り替えるには「再設定」を使うか、キーを新しい PushWard エントリとして追加してください。"
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "`pushward.update_activity` アクションは非推奨です。代わりにテンプレート固有のアクション — 例えば `pushward.update_activity_countdown` や `pushward.update_activity_gauge` — にオートメーションを切り替えてください。古いアクションは当面は動作しますが、将来のリリースで削除されます。"
     },
     "usage_limit_notifications": {
-      "title": "PushWard の通知上限に達しました",
+      "title": "{account} の通知上限に達しました",
       "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の通知を使用したため、クォータがリセットされる（{resets_at}）まで新しい通知は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
     },
     "usage_limit_live_activity": {
-      "title": "PushWard の Live Activity 更新上限に達しました",
+      "title": "{account} の Live Activity 更新上限に達しました",
       "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の Live Activity 更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
     },
     "usage_limit_widgets": {
-      "title": "PushWard のウィジェット更新上限に達しました",
+      "title": "{account} のウィジェット更新上限に達しました",
       "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のウィジェット更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
     },
     "usage_limit_emails": {
-      "title": "PushWard のメール上限に達しました",
+      "title": "{account} のメール上限に達しました",
       "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のメールを使用したため、クォータがリセットされる（{resets_at}）まで新しいメールは拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard の ToDo リマインダーが送信されていません",
+      "title": "{account} の ToDo リマインダーが送信されていません",
       "description": "この統合キーは組織に属しており、組織はエンドツーエンド暗号化通知を送信できません。そのため、暗号化キーが設定されている間、PushWard はすべての ToDo リマインダーを拒否します。「設定」で暗号化キーを削除するか、個人用の統合キーで統合を再設定してください。"
     }
   },

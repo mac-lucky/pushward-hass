@@ -41,6 +41,7 @@ from custom_components.pushward.widget_manager import WidgetManager
 from .conftest import (
     IMAGE_THUMBHASH,
     IMAGE_URL,
+    async_setup_with_api,
     expected_thumbhash,
     make_quota_error,
     make_usage_payload,
@@ -84,15 +85,7 @@ def _mock_api() -> AsyncMock:
 async def _setup_entry(hass: HomeAssistant, mock_api: AsyncMock) -> MockConfigEntry:
     """Set up a config entry with a mocked API client."""
     entry = _mock_entry()
-    entry.add_to_hass(hass)
-
-    with patch(
-        "custom_components.pushward.PushWardApiClient",
-        return_value=mock_api,
-    ):
-        await hass.config_entries.async_setup(entry.entry_id)
-        await hass.async_block_till_done()
-
+    await async_setup_with_api(hass, entry, mock_api)
     return entry
 
 
@@ -2339,7 +2332,7 @@ async def test_delete_widget_by_entity_id_resolves_and_deletes(hass: HomeAssista
     entry = await _setup_entry(hass, api)
 
     # Seed a tracked widget bound to an entity and expose it via hass.data so the service's
-    # _find_widget_slug → slug_for_entity path has something to resolve.
+    # slug_for_entity lookup has something to resolve.
     hass.states.async_set("sensor.users", "42")
     manager = WidgetManager(hass, api, [make_widget_config(slug="ha-users", entity_id="sensor.users")], entry)
     await manager.async_start()

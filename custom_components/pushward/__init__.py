@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable, Coroutine
 from contextlib import contextmanager
 from functools import partial
+from typing import Any
 from urllib.parse import urlparse
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
+from homeassistant.const import ATTR_CONFIG_ENTRY_ID, Platform
+from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse, callback
 from homeassistant.exceptions import (
     HomeAssistantError,
     ServiceValidationError,
@@ -148,6 +150,17 @@ SERVICE_LIST_SCHEDULED_NOTIFICATIONS = "list_scheduled_notifications"
 SERVICE_GET_NOTIFICATION_ANSWER = "get_notification_answer"
 SERVICE_CANCEL_NOTIFICATIONS = "cancel_notifications"
 
+
+def _entry_ids(value: object) -> list[str] | None:
+    """One config entry id or a list of them; empty (a blueprint's unset input) is None."""
+    ids = [cv.string(item) for item in cv.ensure_list(value) if item not in (None, "")]
+    return list(dict.fromkeys(ids)) or None
+
+
+# Every action that calls the API takes the PushWard account(s) to call: one config entry
+# id or a list. Without it the call goes to every loaded account (see _target_entries).
+_ENTRY_TARGET_FIELD = {vol.Optional(ATTR_CONFIG_ENTRY_ID): _entry_ids}
+
 # Keys that turn an action into a silent HTTP webhook — gated by _validate_http_action_fields.
 _HTTP_ACTION_KEYS = ("method", "headers", "body")
 
@@ -251,6 +264,7 @@ _UNIVERSAL_ACTION_FIELDS = {
 # each per-template schema accepts that template's fields plus the universal ones; the
 # deprecated update_activity schema is rebuilt below as the union of all of them.
 _UPDATE_TOPLEVEL_FIELDS = {
+    **_ENTRY_TARGET_FIELD,
     vol.Required("slug"): validate_slug,
     vol.Required("state"): vol.In(ACTIVITY_STATES),
     # Patchable persistence windows, top-level on the PATCH body, not content.
@@ -613,6 +627,7 @@ SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
 
 SCHEMA_CREATE_ACTIVITY = vol.Schema(
     {
+        **_ENTRY_TARGET_FIELD,
         vol.Required("slug"): validate_slug,
         vol.Required("name"): str,
         # services.yaml's number selectors are only a UI hint; automations, scripts and
@@ -630,6 +645,7 @@ SCHEMA_CREATE_ACTIVITY = vol.Schema(
 
 SCHEMA_END_ACTIVITY = vol.Schema(
     {
+        **_ENTRY_TARGET_FIELD,
         vol.Required("slug"): validate_slug,
         vol.Optional("completion_message"): str,
     }
@@ -637,6 +653,7 @@ SCHEMA_END_ACTIVITY = vol.Schema(
 
 SCHEMA_DELETE_ACTIVITY = vol.Schema(
     {
+        **_ENTRY_TARGET_FIELD,
         vol.Required("slug"): validate_slug,
     }
 )
@@ -766,6 +783,7 @@ def _validate_acknowledge(data: dict) -> dict:
 
 SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
     {
+        **_ENTRY_TARGET_FIELD,
         vol.Required("title"): str,
         vol.Required("body"): str,
         vol.Optional("subtitle"): str,
@@ -795,11 +813,15 @@ SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
 SCHEMA_SEND_NOTIFICATION = vol.All(SCHEMA_SEND_NOTIFICATION_FIELDS, _validate_acknowledge)
 
 SCHEMA_CANCEL_SCHEDULED_NOTIFICATION = vol.Schema(
-    {vol.Required("scheduled_notification_id"): vol.All(vol.Coerce(int), vol.Range(min=1))}
+    {
+        **_ENTRY_TARGET_FIELD,
+        vol.Required("scheduled_notification_id"): vol.All(vol.Coerce(int), vol.Range(min=1)),
+    }
 )
 
 SCHEMA_GET_NOTIFICATION_ANSWER = vol.Schema(
     {
+        **_ENTRY_TARGET_FIELD,
         vol.Required("notification_id"): vol.All(vol.Coerce(int), vol.Range(min=1)),
         vol.Optional("timeout", default=ANSWER_DEFAULT_TIMEOUT): vol.All(
             vol.Coerce(int), vol.Range(min=0, max=ANSWER_MAX_TIMEOUT)
@@ -810,6 +832,7 @@ SCHEMA_GET_NOTIFICATION_ANSWER = vol.Schema(
 SCHEMA_CANCEL_NOTIFICATIONS = vol.All(
     vol.Schema(
         {
+            **_ENTRY_TARGET_FIELD,
             vol.Exclusive("tag", "cancel_target"): validate_notification_tag,
             vol.Exclusive("notification_id", "cancel_target"): vol.All(vol.Coerce(int), vol.Range(min=1)),
         }
@@ -818,7 +841,10 @@ SCHEMA_CANCEL_NOTIFICATIONS = vol.All(
 )
 
 SCHEMA_LIST_SCHEDULED_NOTIFICATIONS = vol.Schema(
-    {vol.Optional("status", default="scheduled"): vol.In(SCHEDULED_NOTIFICATION_STATUSES)}
+    {
+        **_ENTRY_TARGET_FIELD,
+        vol.Optional("status", default="scheduled"): vol.In(SCHEDULED_NOTIFICATION_STATUSES),
+    }
 )
 
 
@@ -844,6 +870,7 @@ def _require_email_body(data: dict) -> dict:
 SCHEMA_SEND_EMAIL = vol.All(
     vol.Schema(
         {
+            **_ENTRY_TARGET_FIELD,
             vol.Required("to"): vol.All(str, vol.Email(), vol.Length(max=254)),
             vol.Required("subject"): vol.All(str, _no_line_breaks, vol.Length(min=1, max=256)),
             vol.Optional("body"): str,
@@ -858,6 +885,7 @@ SCHEMA_SEND_EMAIL = vol.All(
 SCHEMA_WIDGET_TARGET = vol.All(
     vol.Schema(
         {
+            **_ENTRY_TARGET_FIELD,
             vol.Exclusive("slug", "widget_target"): validate_slug,
             vol.Exclusive("entity_id", "widget_target"): cv.entity_id,
         }
@@ -868,12 +896,50 @@ SCHEMA_WIDGET_REFRESH = SCHEMA_WIDGET_TARGET
 SCHEMA_DELETE_WIDGET = SCHEMA_WIDGET_TARGET
 
 
-def _get_api(hass: HomeAssistant) -> PushWardApiClient:
-    """Get the API client from the first available config entry."""
-    entries = hass.data.get(DOMAIN)
-    if not entries:
+def _target_entries(hass: HomeAssistant, call: ServiceCall, *, single: bool = False) -> list[tuple[ConfigEntry, dict]]:
+    """The loaded config entries (one per PushWard account) a service call goes to.
+
+    config_entry_id names them; without it the call goes to every loaded entry, in the
+    order they were added. single is for calls whose ids or response belong to one
+    account: with several entries set up, those have to name it, even while all but one
+    are down (otherwise they would quietly reach whichever account is up).
+    """
+    domain_data = hass.data.get(DOMAIN) or {}
+    configured = hass.config_entries.async_entries(DOMAIN, include_ignore=False, include_disabled=False)
+    loaded = [(entry, domain_data[entry.entry_id]) for entry in configured if entry.entry_id in domain_data]
+    if not loaded:
         raise HomeAssistantError("PushWard is not configured. Add the integration via Settings → Devices & Services.")
-    return next(iter(entries.values()))["api"]
+    if (wanted := call.data.get(ATTR_CONFIG_ENTRY_ID)) is not None:
+        by_id = {entry.entry_id: (entry, data) for entry, data in loaded}
+        if missing := next((entry_id for entry_id in wanted if entry_id not in by_id), None):
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="entry_not_loaded",
+                translation_placeholders={"config_entry_id": missing},
+            )
+        if single and len(wanted) > 1:
+            raise _config_entry_required(call)
+        return [by_id[entry_id] for entry_id in wanted]
+    if single and len(configured) > 1:
+        raise _config_entry_required(call)
+    if skipped := [entry.title for entry in configured if entry.entry_id not in domain_data]:
+        # The entry card already shows the failed or reauth state; this names the skip.
+        _LOGGER.debug("PushWard %s skipped accounts that are not loaded: %s", call.service, ", ".join(skipped))
+    return loaded
+
+
+def _config_entry_required(call: ServiceCall) -> ServiceValidationError:
+    return ServiceValidationError(
+        translation_domain=DOMAIN,
+        translation_key="config_entry_required",
+        translation_placeholders={"service": f"{DOMAIN}.{call.service}"},
+    )
+
+
+def _single_api(hass: HomeAssistant, call: ServiceCall) -> PushWardApiClient:
+    """The API client of the one account a call addresses (see _target_entries)."""
+    [(_, data)] = _target_entries(hass, call, single=True)
+    return data["api"]
 
 
 # Refusals the user can act on, by Problem code: shown as translated validation
@@ -912,6 +978,31 @@ def _surface_api_errors():
         ) from err
 
 
+async def _fan_out(
+    targets: list[tuple[ConfigEntry, dict]], send: Callable[[dict], Coroutine[Any, Any, Any]]
+) -> list[Any]:
+    """Run send (one API call, given the entry's data) for every targeted account.
+
+    One account failing (a quota, a missing permission) must not keep the others from
+    getting the update, so every account is tried before the first error is raised;
+    with several accounts each failure is logged with the account it came from.
+    """
+
+    async def surfaced(data: dict) -> Any:
+        with _surface_api_errors():
+            return await send(data)
+
+    results = await asyncio.gather(*(surfaced(data) for _, data in targets), return_exceptions=True)
+    entries = [entry for entry, _ in targets]
+    failures = [(entry, res) for entry, res in zip(entries, results, strict=True) if isinstance(res, BaseException)]
+    if len(targets) > 1:
+        for entry, err in failures:
+            _LOGGER.warning("PushWard account %s: %s", entry.title, err)
+    if failures:
+        raise failures[0][1]
+    return results
+
+
 async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, template: str | None = None) -> None:
     """PATCH an activity from a service call.
 
@@ -920,8 +1011,9 @@ async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, templ
     string. The per-template actions inject their template (their schema omits it); the
     deprecated alias lets the caller pass it.
     """
-    api = _get_api(hass)
+    targets = _target_entries(hass, call)
     content = dict(call.data)
+    content.pop(ATTR_CONFIG_ENTRY_ID, None)
     slug = content.pop("slug")
     state = content.pop("state")
     sound = content.pop("sound", None) or None
@@ -936,8 +1028,9 @@ async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, templ
     # An automation that names a picture should not also have to hash it; a failure
     # here is silent and just leaves the activity relying on the URL alone.
     await async_ensure_thumbhash(hass, content)
-    with _surface_api_errors():
-        await api.update_activity(
+    await _fan_out(
+        targets,
+        lambda data: data["api"].update_activity(
             slug,
             state,
             content,
@@ -946,7 +1039,8 @@ async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, templ
             ended_ttl=ended_ttl,
             stale_ttl=stale_ttl,
             dismissal_ttl=dismissal_ttl,
-        )
+        ),
+    )
 
 
 async def _async_handle_update_activity(hass: HomeAssistant, call: ServiceCall) -> None:
@@ -975,34 +1069,32 @@ async def _async_handle_update_template(hass: HomeAssistant, call: ServiceCall, 
 
 async def _async_handle_create_activity(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the create_activity service call."""
-    api = _get_api(hass)
-    with _surface_api_errors():
-        await api.create_activity(
+    await _fan_out(
+        _target_entries(hass, call),
+        lambda data: data["api"].create_activity(
             slug=call.data["slug"],
             name=call.data["name"],
             priority=call.data["priority"],
             ended_ttl=call.data.get("ended_ttl"),
             stale_ttl=call.data.get("stale_ttl"),
             dismissal_ttl=call.data.get("dismissal_ttl"),
-        )
+        ),
+    )
 
 
 async def _async_handle_end_activity(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the end_activity service call."""
-    api = _get_api(hass)
+    targets = _target_entries(hass, call)
     slug = call.data["slug"]
     content = {}
     if "completion_message" in call.data:
         content["completion_message"] = call.data["completion_message"]
-    with _surface_api_errors():
-        await api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
+    await _fan_out(targets, lambda data: data["api"].update_activity(slug, ACTIVITY_STATE_ENDED, content))
 
 
 async def _async_handle_delete_activity(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the delete_activity service call."""
-    api = _get_api(hass)
-    with _surface_api_errors():
-        await api.delete_activity(call.data["slug"])
+    await _fan_out(_target_entries(hass, call), lambda data: data["api"].delete_activity(call.data["slug"]))
 
 
 async def _async_handle_generate_thumbhash(hass: HomeAssistant, call: ServiceCall) -> dict[str, str]:
@@ -1058,25 +1150,28 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
     and for an acknowledged notification carries its receipt, or acknowledge_refused
     when the server refused the acknowledge and it went out once without repeats.
     """
-    api = _get_api(hass)
+    # The response carries ids that belong to one account, so asking for it means naming one.
+    targets = _target_entries(hass, call, single=call.return_response)
     kwargs: dict = {field: call.data[field] for field in _NOTIFICATION_FIELDS if field in call.data}
     send_at = call.data.get("send_at")
     recurrence = call.data.get("recurrence")
     if recurrence is not None:
         # cron times are wall-clock times in this zone, kept across DST changes.
         recurrence = {"timezone": hass.config.time_zone, **recurrence}
-    with _surface_api_errors():
-        created = await api.create_notification(
+    results = await _fan_out(
+        targets,
+        lambda data: data["api"].create_notification(
             title=call.data["title"],
             body=call.data["body"],
             push=call.data["push"],
             send_at=send_at,
             recurrence=recurrence,
             **kwargs,
-        )
+        ),
+    )
     if not call.return_response:
         return None
-    created = created or {}
+    created = results[0] or {}
     if send_at is None and recurrence is None:
         response: dict = {"notification_id": created.get("id"), "answerable": bool(created.get("answerable"))}
         if created.get("receipt") is not None:
@@ -1093,7 +1188,7 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
 
 async def _async_handle_get_notification_answer(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
     """Wait up to timeout seconds for the answer to a notification sent with url-less actions."""
-    api = _get_api(hass)
+    api = _single_api(hass, call)
     notification_id = call.data["notification_id"]
     with _surface_api_errors():
         try:
@@ -1107,41 +1202,49 @@ async def _async_handle_get_notification_answer(hass: HomeAssistant, call: Servi
 
 async def _async_handle_cancel_scheduled_notification(hass: HomeAssistant, call: ServiceCall) -> None:
     """Cancel a scheduled notification. Unknown ids are a no-op."""
-    api = _get_api(hass)
+    api = _single_api(hass, call)
     with _surface_api_errors():
         await api.cancel_scheduled_notification(call.data["scheduled_notification_id"])
 
 
 async def _async_handle_cancel_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
     """Stop acknowledged notifications repeating: every active one with a tag, or one by id."""
-    api = _get_api(hass)
+    if "tag" in call.data:
+        # Every account stops its own receipts with the tag.
+        tag = call.data["tag"]
+        counts = await _fan_out(
+            _target_entries(hass, call), lambda data: data["api"].cancel_notification_receipts_by_tag(tag)
+        )
+        return {"canceled": sum(counts)} if call.return_response else None
+    api = _single_api(hass, call)
+    notification_id = call.data["notification_id"]
     with _surface_api_errors():
-        if "tag" in call.data:
-            response: dict = {"canceled": await api.cancel_notification_receipts_by_tag(call.data["tag"])}
-        else:
-            notification_id = call.data["notification_id"]
-            try:
-                response = {"receipt": await api.cancel_notification_receipt(notification_id)}
-            except PushWardNotFoundError as err:
-                raise ServiceValidationError(
-                    translation_domain=DOMAIN,
-                    translation_key="receipt_not_found",
-                    translation_placeholders={"notification_id": str(notification_id)},
-                ) from err
+        try:
+            response = {"receipt": await api.cancel_notification_receipt(notification_id)}
+        except PushWardNotFoundError as err:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="receipt_not_found",
+                translation_placeholders={"notification_id": str(notification_id)},
+            ) from err
     return response if call.return_response else None
 
 
 async def _async_handle_list_scheduled_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
     """Return scheduled notifications: pending soonest first, any other status latest first."""
-    api = _get_api(hass)
+    api = _single_api(hass, call)
     with _surface_api_errors():
         items = await api.list_scheduled_notifications(call.data["status"])
     return {"scheduled_notifications": items}
 
 
 async def _async_handle_send_email(hass: HomeAssistant, call: ServiceCall) -> None:
-    """Handle the send_email service call."""
-    api = _get_api(hass)
+    """Handle the send_email service call.
+
+    One account sends it: the recipient is named in the call, so sending from every
+    account would only deliver copies (or fail where the address is not verified).
+    """
+    api = _single_api(hass, call)
     with _surface_api_errors():
         await api.send_email(
             to=call.data["to"],
@@ -1154,43 +1257,25 @@ async def _async_handle_send_email(hass: HomeAssistant, call: ServiceCall) -> No
 async def _async_handle_widget_refresh(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the widget_refresh service call.
 
-    Routes the refresh to every config entry's WidgetManager; the manager
-    that owns the slug / entity_id wins, others raise ValueError (swallowed).
+    Routes the refresh to each targeted config entry's WidgetManager at once; the
+    managers that own the slug / entity_id refresh it, others raise ValueError.
     """
     slug = call.data.get("slug")
     entity_id = call.data.get("entity_id")
-    domain_data = hass.data.get(DOMAIN) or {}
-    if not domain_data:
-        raise HomeAssistantError("PushWard is not configured.")
-
-    found = False
-    for entry_data in domain_data.values():
-        manager: WidgetManager | None = entry_data.get("widget_manager")
-        if manager is None:
-            continue
-        try:
-            await manager.async_refresh(slug=slug, entity_id=entity_id)
-            found = True
-        except ValueError:
-            continue
-    if not found:
+    managers: list[WidgetManager] = [
+        manager for _, data in _target_entries(hass, call) if (manager := data.get("widget_manager")) is not None
+    ]
+    results = await asyncio.gather(
+        *(manager.async_refresh(slug=slug, entity_id=entity_id) for manager in managers), return_exceptions=True
+    )
+    if errors := [err for err in results if isinstance(err, BaseException) and not isinstance(err, ValueError)]:
+        raise errors[0]
+    if all(isinstance(result, ValueError) for result in results):
         raise ServiceValidationError(
             translation_domain=DOMAIN,
             translation_key="widget_not_found",
             translation_placeholders={"slug": slug or "", "entity_id": entity_id or ""},
         )
-
-
-def _find_widget_slug(hass: HomeAssistant, entity_id: str | None) -> str | None:
-    """Resolve an entity_id to the slug of the tracked widget bound to it."""
-    for entry_data in (hass.data.get(DOMAIN) or {}).values():
-        manager: WidgetManager | None = entry_data.get("widget_manager")
-        if manager is None:
-            continue
-        slug = manager.slug_for_entity(entity_id)
-        if slug:
-            return slug
-    return None
 
 
 async def _async_handle_delete_widget(hass: HomeAssistant, call: ServiceCall) -> None:
@@ -1199,20 +1284,26 @@ async def _async_handle_delete_widget(hass: HomeAssistant, call: ServiceCall) ->
     Deletes the server-side widget (DELETE /widgets/{slug}). If a tracked_widget subentry
     still drives this slug it will be recreated on the next restart/sync — remove the subentry
     to delete it permanently (subentry removal also deletes the server widget automatically).
+    A slug is deleted on every targeted account (404 is a no-op); an entity_id only on the
+    accounts whose tracked widget is bound to it, each by its own slug.
     """
-    api = _get_api(hass)
-    slug = call.data.get("slug")
-    entity_id = call.data.get("entity_id")
-    if slug is None:
-        slug = _find_widget_slug(hass, entity_id)
-        if slug is None:
-            raise ServiceValidationError(
-                translation_domain=DOMAIN,
-                translation_key="widget_not_found",
-                translation_placeholders={"slug": slug or "", "entity_id": entity_id or ""},
-            )
-    with _surface_api_errors():
-        await api.delete_widget(slug)
+    targets = _target_entries(hass, call)
+    if (slug := call.data.get("slug")) is not None:
+        await _fan_out(targets, lambda data: data["api"].delete_widget(slug))
+        return
+    entity_id = call.data["entity_id"]
+    owners = [
+        (entry, data)
+        for entry, data in targets
+        if (manager := data.get("widget_manager")) is not None and manager.slug_for_entity(entity_id)
+    ]
+    if not owners:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="widget_not_found",
+            translation_placeholders={"slug": "", "entity_id": entity_id},
+        )
+    await _fan_out(owners, lambda data: data["api"].delete_widget(data["widget_manager"].slug_for_entity(entity_id)))
 
 
 def _register_services(hass: HomeAssistant) -> None:
@@ -1294,7 +1385,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     Services live for the component's lifetime (not per config entry) so automations that
     reference them validate even before an entry loads; the handlers raise a clear error via
-    ``_get_api`` when no entry is configured.
+    ``_target_entries`` when no entry is configured.
     """
     _register_services(hass)
     async_register_media_control_view(hass)
@@ -1321,6 +1412,22 @@ def _entity_configs(entry: ConfigEntry) -> list[dict]:
     ]
 
 
+@callback
+def _adopt_account_id(hass: HomeAssistant, entry: ConfigEntry, me: dict | None) -> None:
+    """Give an entry from before several accounts were allowed its account's id.
+
+    Those entries carry the domain as their unique_id. The config flow keys entries by
+    the /auth/me id, which the first usage refresh has just read.
+    """
+    if entry.unique_id != DOMAIN or not (account_id := (me or {}).get("id")):
+        return
+    account_id = str(account_id)
+    if hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, account_id) is not None:
+        _LOGGER.warning("PushWard entry %s uses the same account as another entry", entry.title)
+        return
+    hass.config_entries.async_update_entry(entry, unique_id=account_id)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up PushWard from a config entry."""
     session = async_get_clientsession(hass)
@@ -1342,6 +1449,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # to ConfigEntryNotReady (→ retry).
     coordinator = PushWardUsageCoordinator(hass, api, entry, quota_gate)
     await coordinator.async_config_entry_first_refresh()
+    _adopt_account_id(hass, entry, coordinator.data)
 
     entities = _entity_configs(entry)
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]

@@ -27,6 +27,10 @@
       "name": "Activity అప్‌డేట్ చేయి (deprecated)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -271,6 +275,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Generic)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -407,6 +415,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Countdown)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -543,6 +555,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Steps)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -711,6 +727,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Alert)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -835,6 +855,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Gauge)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -959,6 +983,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Timeline)",
       "description": "PushWard Live Activity స్థితి మరియు కంటెంట్‌ను అప్‌డేట్ చేయండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -1107,6 +1135,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Board)",
       "description": "PushWard బోర్డ్ Live Activity ను అప్‌డేట్ చేయండి (1–4 టైల్‌లు).",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -1181,6 +1213,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Log)",
       "description": "PushWard లాగ్ Live Activity ను అప్‌డేట్ చేయండి (1–20 కొత్తవి-మొదట లైన్‌లు).",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -1255,6 +1291,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Media)",
       "description": "PushWard మీడియా Live Activity ని అప్‌డేట్ చేయండి: కవర్ ఆర్ట్, కదిలే ప్రోగ్రెస్ బార్ మరియు మీ స్వంత webhookలను పిలిచే ట్రాన్స్‌పోర్ట్ బటన్లతో కూడిన రిమోట్ ప్లేయర్ కార్డ్.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -1369,6 +1409,10 @@
       "name": "Activity అప్‌డేట్ చేయి (Approval)",
       "description": "PushWard ఆమోద Live Activity-ని అప్‌డేట్ చేయండి: 2-4 సమాధాన బటన్లతో కూడిన ప్రశ్న కార్డు; బటన్లు మీ సొంత webhooks-ను పిలుస్తాయి లేదా నొక్కిన ఎంపికను సర్వర్ నమోదు చేస్తుంది.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug గుర్తింపు."
@@ -1459,6 +1503,10 @@
       "name": "Activity సృష్టించు",
       "description": "కొత్త PushWard Live Activity సృష్టించండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "ప్రత్యేక activity slug గుర్తింపు."
@@ -1503,6 +1551,10 @@
       "name": "Activity ముగించు",
       "description": "PushWard Live Activity ముగించండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "ముగించాల్సిన activity slug గుర్తింపు."
@@ -1517,6 +1569,10 @@
       "name": "Activity తొలగించు",
       "description": "PushWard Live Activity తొలగించండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "తొలగించాల్సిన activity slug గుర్తింపు."
@@ -1527,6 +1583,10 @@
       "name": "విడ్జెట్ రిఫ్రెష్ చేయి",
       "description": "ట్రాక్ చేయబడిన PushWard విడ్జెట్‌ను బలవంతంగా రిఫ్రెష్ చేయండి. ఇన్-మెమరీ డిఫ్ కాష్‌ను దాటవేస్తుంది, తద్వారా విలువ మారకపోయినా కూడా విడ్జెట్ తిరిగి రెండర్ అయి iOS కు పంపబడుతుంది.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "విడ్జెట్ slug గుర్తింపు. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
@@ -1541,6 +1601,10 @@
       "name": "నోటిఫికేషన్ పంపు",
       "description": "PushWard ద్వారా పుష్ నోటిఫికేషన్ పంపండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి; ఒకటి కంటే ఎక్కువ ఉంటే రెస్పాన్స్ వేరియబుల్‌తో తప్పనిసరి."
+        },
         "title": {
           "name": "శీర్షిక",
           "description": "నోటిఫికేషన్ శీర్షిక."
@@ -1631,6 +1695,10 @@
       "name": "షెడ్యూల్ చేసిన నోటిఫికేషన్ రద్దు చేయి",
       "description": "send_notification యొక్క send_at లేదా పునరావృతం తో క్యూలో ఉంచిన నోటిఫికేషన్‌ను రద్దు చేయండి. పునరావృతమయ్యే నోటిఫికేషన్‌ను రద్దు చేస్తే, అది పంపబడుతున్నప్పుడు కూడా మొత్తం సిరీస్ ఆగిపోతుంది. ఇక ఉనికిలో లేని ID విస్మరించబడుతుంది. రద్దు చేసిన నోటిఫికేషన్ PushWard యాప్‌లో 24 గంటలు రద్దు అయినట్లు కనిపిస్తుంది.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి ఒకటి కంటే ఎక్కువ PushWard ఖాతాలు జోడించినప్పుడు తప్పనిసరి."
+        },
         "scheduled_notification_id": {
           "name": "షెడ్యూల్ చేసిన నోటిఫికేషన్ ID",
           "description": "send_notification తిరిగి ఇచ్చే scheduled_notification_id."
@@ -1641,6 +1709,10 @@
       "name": "షెడ్యూల్ చేసిన నోటిఫికేషన్ల జాబితా",
       "description": "మీ షెడ్యూల్ చేసిన నోటిఫికేషన్లను తిరిగి ఇవ్వండి: ఇంకా వేచి ఉన్నవాటికి (డిఫాల్ట్) అత్యంత సమీపమైనవి ముందుగా, ఇతర ఏ స్థితికైనా అత్యంత ఇటీవలివి ముందుగా. పునరావృతమయ్యే వాటిలో వాటి recurrence, ఎన్నిసార్లు పంపబడ్డాయి (occurrence) మరియు చివరిసారి ఎప్పుడు పంపబడ్డాయి (last_sent_at) ఉంటాయి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి ఒకటి కంటే ఎక్కువ PushWard ఖాతాలు జోడించినప్పుడు తప్పనిసరి."
+        },
         "status": {
           "name": "స్థితి",
           "description": "ఏవి తిరిగి ఇవ్వాలి. scheduled (డిఫాల్ట్) ఇంకా వేచి ఉన్నవాటిని చూపుతుంది; sent మరియు failed 7 రోజులు ఉంచబడతాయి. canceled 24 గంటలు ఉంచబడతాయి."
@@ -1651,6 +1723,10 @@
       "name": "నోటిఫికేషన్ సమాధానం పొందు",
       "description": "url లేని చర్యలతో పంపిన నోటిఫికేషన్ సమాధానం కోసం వేచి ఉండి, ఏ చర్య ట్యాప్ చేయబడింది (action_id), టైప్ చేసిన సమాధానం ఏదైనా (text) మరియు ఎప్పుడు (answered_at) అనేవి తిరిగి ఇవ్వండి. టైమ్‌అవుట్‌లోపు ఎవరూ సమాధానం ఇవ్వకపోతే, answered false అవుతుంది. సమాధానాలు 30 రోజులు ఉంచబడతాయి, కాబట్టి తర్వాత టైమ్‌అవుట్ 0 తో చేసే కాల్ వేచి ఉండకుండా సమాధానాన్ని చదవగలదు.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి ఒకటి కంటే ఎక్కువ PushWard ఖాతాలు జోడించినప్పుడు తప్పనిసరి."
+        },
         "notification_id": {
           "name": "నోటిఫికేషన్ ID",
           "description": "send_notification తిరిగి ఇచ్చే notification_id, లేదా పంపిన షెడ్యూల్ చేసిన నోటిఫికేషన్ యొక్క notification_id."
@@ -1665,6 +1741,10 @@
       "name": "నిర్ధారణ నోటిఫికేషన్‌లను రద్దు చేయి",
       "description": "నిర్ధారణ నోటిఫికేషన్‌లు పునరావృతం కావడాన్ని ఆపండి, ట్యాగ్‌తో పంపిన అన్ని క్రియాశీలమైనవి లేదా notification_id ద్వారా ఒకటి. ఇది ఈ ఇంటిగ్రేషన్ key తో పంపిన నోటిఫికేషన్‌లను మాత్రమే చేరుతుంది, వాటి callback పంపబడదు. ఐచ్ఛిక response లో ట్యాగ్ కోసం ఎన్ని రద్దయ్యాయో (canceled), లేదా notification_id కోసం రసీదు ఉంటుంది.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాలో ఒక ట్యాగ్‌ను రద్దు చేయడానికి ఖాళీగా ఉంచండి; ఒకటి కంటే ఎక్కువ ఉంటే notification_id తో తప్పనిసరి."
+        },
         "tag": {
           "name": "ట్యాగ్",
           "description": "ఈ ట్యాగ్‌తో పంపిన అన్ని క్రియాశీల నిర్ధారణ నోటిఫికేషన్‌లను రద్దు చేయండి."
@@ -1679,6 +1759,10 @@
       "name": "ఇమెయిల్ పంపు",
       "description": "PushWard ద్వారా లావాదేవీ ఇమెయిల్ పంపండి. టెక్స్ట్ బాడీ, HTML బాడీ, లేదా రెండింటినీ అందించండి. ఇంటిగ్రేషన్ కీకి \"emails\" సామర్థ్యం అవసరం.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి ఒకటి కంటే ఎక్కువ PushWard ఖాతాలు జోడించినప్పుడు తప్పనిసరి."
+        },
         "to": {
           "name": "కు",
           "description": "గ్రహీత ఇమెయిల్ చిరునామా. మీరు ఇప్పటికే PushWard iOS యాప్‌లో జోడించి, నిర్ధారించిన చిరునామా అయి ఉండాలి — ధృవీకరించని చిరునామాలు తిరస్కరించబడతాయి."
@@ -1701,6 +1785,10 @@
       "name": "విడ్జెట్ తొలగించు",
       "description": "సర్వర్ నుండి PushWard విడ్జెట్‌ను తొలగించండి. ఈ slug ను ఇంకా ట్రాక్ చేయబడిన-విడ్జెట్ కాన్ఫిగ్ ఎంట్రీ నడిపిస్తుంటే, తదుపరి రీస్టార్ట్/సింక్‌లో విడ్జెట్ మళ్ళీ సృష్టించబడుతుంది — శాశ్వతంగా తొలగించడానికి కాన్ఫిగ్ ఎంట్రీని తీసివేయండి. slug లేదా entity_id లో ఒకదాన్ని అందించండి.",
       "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
         "slug": {
           "name": "Slug",
           "description": "విడ్జెట్ slug గుర్తింపు. slug లేదా entity_id లో ఒకటి తప్పనిసరిగా అందించాలి."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "నోటిఫికేషన్ {notification_id} లో రద్దు చేయడానికి ఏమీ లేదు: అది acknowledge తో పంపబడలేదు, మరో ఇంటిగ్రేషన్ కీతో పంపబడింది, లేదా 7 రోజులకు పైగా క్రితమే ముగిసింది."
+    },
+    "config_entry_required": {
+      "message": "ఒకటి కంటే ఎక్కువ PushWard ఖాతాలు సెటప్ చేయబడ్డాయి, కాబట్టి {service} కి వాటిలో సరిగ్గా ఒకదాన్ని పేర్కొనే config_entry_id అవసరం."
+    },
+    "entry_not_loaded": {
+      "message": "లోడ్ అయిన ఏ PushWard ఖాతాకూ {config_entry_id} కాన్ఫిగ్ ఎంట్రీ ID లేదు."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "అనూహ్యమైన లోపం సంభవించింది."
     },
     "abort": {
-      "already_configured": "PushWard ఇప్పటికే కాన్ఫిగర్ చేయబడింది.",
+      "already_configured": "ఈ PushWard ఖాతా ఇప్పటికే కాన్ఫిగర్ చేయబడింది.",
       "reconfigure_successful": "PushWard కాన్ఫిగరేషన్ అప్‌డేట్ చేయబడింది.",
-      "reauth_successful": "పునఃప్రమాణీకరణ విజయవంతమైంది."
+      "reauth_successful": "పునఃప్రమాణీకరణ విజయవంతమైంది.",
+      "wrong_account": "ఈ ఇంటిగ్రేషన్ కీ వేరే PushWard ఖాతాకు చెందింది. ఈ ఎంట్రీని ఆ ఖాతాకు మార్చడానికి పునఃకాన్ఫిగర్ చేయండి ఉపయోగించండి, లేదా కీని కొత్త PushWard ఎంట్రీగా జోడించండి."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "`pushward.update_activity` చర్య నిరుపయోగం చేయబడింది. బదులుగా మీ ఆటోమేషన్‌లను టెంప్లేట్-నిర్దిష్ట చర్యకు మార్చండి — ఉదాహరణకు `pushward.update_activity_countdown` లేదా `pushward.update_activity_gauge`. పాత చర్య ప్రస్తుతానికి ఇంకా పనిచేస్తుంది కానీ భవిష్యత్ విడుదలలో తీసివేయబడుతుంది."
     },
     "usage_limit_notifications": {
-      "title": "PushWard నోటిఫికేషన్ పరిమితి చేరుకుంది",
+      "title": "{account} నోటిఫికేషన్ పరిమితి చేరుకుంది",
       "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} నోటిఫికేషన్లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త నోటిఫికేషన్ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
     },
     "usage_limit_live_activity": {
-      "title": "PushWard Live Activity అప్‌డేట్ పరిమితి చేరుకుంది",
+      "title": "{account} Live Activity అప్‌డేట్ పరిమితి చేరుకుంది",
       "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} Live Activity అప్‌డేట్లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త Live Activity అప్‌డేట్ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
     },
     "usage_limit_widgets": {
-      "title": "PushWard విడ్జెట్ అప్‌డేట్ పరిమితి చేరుకుంది",
+      "title": "{account} విడ్జెట్ అప్‌డేట్ పరిమితి చేరుకుంది",
       "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} విడ్జెట్ అప్‌డేట్లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త విడ్జెట్ అప్‌డేట్ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
     },
     "usage_limit_emails": {
-      "title": "PushWard ఇమెయిల్ పరిమితి చేరుకుంది",
+      "title": "{account} ఇమెయిల్ పరిమితి చేరుకుంది",
       "description": "మీ PushWard ఖాతా ప్రస్తుత వ్యవధికి దాని {limit} ఇమెయిల్‌లలో {used} ను ఉపయోగించింది, కాబట్టి కోటా రీసెట్ అయ్యే వరకు ({resets_at}) కొత్త ఇమెయిల్‌ల తిరస్కరించబడతాయి. పరిమితిని పెంచడానికి PushWard iOS యాప్‌లో మీ సబ్‌స్క్రిప్షన్‌ను అప్‌గ్రేడ్ చేయండి."
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard చేయవలసిన పనుల రిమైండర్‌లు పంపబడటం లేదు",
+      "title": "{account} చేయవలసిన పనుల రిమైండర్‌లు పంపబడటం లేదు",
       "description": "ఈ ఇంటిగ్రేషన్ కీ ఒక సంస్థకు చెందినది, సంస్థలు ఎండ్-టు-ఎండ్ ఎన్‌క్రిప్ట్ చేసిన నోటిఫికేషన్‌లను పంపలేవు, కాబట్టి ఎన్‌క్రిప్షన్ కీ సెట్ చేసి ఉన్నంత వరకు PushWard ప్రతి చేయవలసిన పని రిమైండర్‌ను తిరస్కరిస్తుంది. కాన్ఫిగర్ చేయండి లో ఎన్‌క్రిప్షన్ కీని తొలగించండి, లేదా వ్యక్తిగత ఇంటిగ్రేషన్ కీతో ఇంటిగ్రేషన్‌ను పునఃకాన్ఫిగర్ చేయండి."
     }
   },

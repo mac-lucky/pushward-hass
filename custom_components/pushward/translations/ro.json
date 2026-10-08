@@ -27,6 +27,10 @@
       "name": "Actualizați activitatea (deprecated)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -271,6 +275,10 @@
       "name": "Actualizați activitatea (Generic)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -407,6 +415,10 @@
       "name": "Actualizați activitatea (Countdown)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -543,6 +555,10 @@
       "name": "Actualizați activitatea (Steps)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -711,6 +727,10 @@
       "name": "Actualizați activitatea (Alert)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -835,6 +855,10 @@
       "name": "Actualizați activitatea (Gauge)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -959,6 +983,10 @@
       "name": "Actualizați activitatea (Timeline)",
       "description": "Actualizați starea și conținutul unui PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -1107,6 +1135,10 @@
       "name": "Actualizați activitatea (Board)",
       "description": "Actualizați un PushWard board Live Activity (1–4 casete).",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -1181,6 +1213,10 @@
       "name": "Actualizați activitatea (Log)",
       "description": "Actualizați un PushWard log Live Activity (1–20 linii, cele mai noi primele).",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -1255,6 +1291,10 @@
       "name": "Actualizați activitatea (Media)",
       "description": "Actualizați o Live Activity media PushWard: un card de player la distanță cu copertă, bară de progres în mișcare și butoane de transport care apelează propriile webhook-uri.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -1369,6 +1409,10 @@
       "name": "Actualizați activitatea (Approval)",
       "description": "Actualizează o Live Activity de aprobare PushWard: un card cu o întrebare și 2-4 butoane de răspuns care apelează webhook-urile tale sau înregistrează pe server opțiunea atinsă.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității."
@@ -1459,6 +1503,10 @@
       "name": "Creați activitatea",
       "description": "Creați un nou PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul unic slug al activității."
@@ -1503,6 +1551,10 @@
       "name": "Finalizați activitatea",
       "description": "Finalizați un PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității de finalizat."
@@ -1517,6 +1569,10 @@
       "name": "Ștergeți activitatea",
       "description": "Ștergeți un PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității de șters."
@@ -1527,6 +1583,10 @@
       "name": "Reîmprospătați widget-ul",
       "description": "Forțați reîmprospătarea unui widget PushWard urmărit. Ocolește memoria cache de diferențe, astfel încât widget-ul este redat din nou și trimis către iOS chiar dacă valoarea nu s-a schimbat.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al widget-ului. Trebuie furnizat fie slug, fie entity_id."
@@ -1541,6 +1601,10 @@
       "name": "Trimiteți notificare",
       "description": "Trimiteți o notificare push prin PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant; obligatoriu cu o variabilă de răspuns când este adăugat mai mult de unul."
+        },
         "title": {
           "name": "Titlu",
           "description": "Titlul notificării."
@@ -1631,6 +1695,10 @@
       "name": "Anulați notificarea programată",
       "description": "Anulați o notificare pusă în coadă cu send_at sau Repetare din send_notification. Anularea unei notificări repetate oprește întreaga serie, chiar și în timp ce este trimisă. Un id care nu mai există este ignorat. O notificare anulată apare ca anulată în aplicația PushWard timp de 24 de ore.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Obligatoriu când în Home Assistant este adăugat mai mult de un cont PushWard."
+        },
         "scheduled_notification_id": {
           "name": "ID notificare programată",
           "description": "scheduled_notification_id returnat de send_notification."
@@ -1641,6 +1709,10 @@
       "name": "Listați notificările programate",
       "description": "Returnează notificările dvs. programate: cele mai apropiate primele pentru cele încă în așteptare (implicit), cele mai recente primele pentru orice altă stare. Cele repetate includ recurrence, de câte ori au fost trimise (occurrence) și când au fost trimise ultima dată (last_sent_at).",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Obligatoriu când în Home Assistant este adăugat mai mult de un cont PushWard."
+        },
         "status": {
           "name": "Stare",
           "description": "Pe care să le returneze. scheduled (implicit) listează notificările încă în așteptare; sent și failed se păstrează 7 zile. canceled se păstrează 24 de ore."
@@ -1651,6 +1723,10 @@
       "name": "Obțineți răspunsul la notificare",
       "description": "Așteaptă răspunsul la o notificare trimisă cu acțiuni fără url și returnează ce acțiune a fost atinsă (action_id), eventualul răspuns tastat (text) și când (answered_at). Dacă nimeni nu răspunde în limita de timp, answered este false. Răspunsurile se păstrează 30 de zile, astfel încât un apel ulterior cu limita de timp 0 poate citi un răspuns fără să aștepte.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Obligatoriu când în Home Assistant este adăugat mai mult de un cont PushWard."
+        },
         "notification_id": {
           "name": "ID notificare",
           "description": "notification_id returnat de send_notification sau notification_id al unei notificări programate deja trimise."
@@ -1665,6 +1741,10 @@
       "name": "Anulați notificările cu confirmare",
       "description": "Opriți repetarea notificărilor cu confirmare, fie pe toate cele active trimise cu o etichetă, fie pe una după notification_id. Afectează doar notificările trimise cu cheia acestei integrări, iar callback-ul lor nu este trimis. Răspunsul opțional conține câte au fost anulate (canceled) pentru o etichetă sau confirmarea de primire pentru un notification_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a anula o etichetă pe fiecare cont PushWard adăugat în Home Assistant; obligatoriu cu un notification_id când este adăugat mai mult de unul."
+        },
         "tag": {
           "name": "Etichetă",
           "description": "Anulați toate notificările active cu confirmare trimise cu această etichetă."
@@ -1679,6 +1759,10 @@
       "name": "Trimiteți e-mail",
       "description": "Trimiteți un e-mail tranzacțional prin PushWard. Furnizați un corp text, un corp HTML sau ambele. Cheia de integrare necesită capacitatea „emails”.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Obligatoriu când în Home Assistant este adăugat mai mult de un cont PushWard."
+        },
         "to": {
           "name": "Către",
           "description": "Adresa de e-mail a destinatarului. Trebuie să fie o adresă pe care ați adăugat-o și confirmat-o deja în aplicația PushWard pentru iOS — adresele neverificate sunt respinse."
@@ -1701,6 +1785,10 @@
       "name": "Ștergeți widget-ul",
       "description": "Ștergeți un widget PushWard de pe server. Dacă o intrare de configurare de tip widget urmărit încă gestionează acest slug, widget-ul este recreat la următoarea repornire/sincronizare — eliminați intrarea de configurare pentru a-l șterge definitiv. Furnizați fie slug, fie entity_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al widget-ului. Trebuie furnizat fie slug, fie entity_id."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "Notificarea {notification_id} nu are nimic de anulat: nu a fost trimisă cu acknowledge, a fost trimisă cu altă cheie de integrare sau s-a încheiat acum mai mult de 7 zile."
+    },
+    "config_entry_required": {
+      "message": "Este configurat mai mult de un cont PushWard, așa că {service} are nevoie de un config_entry_id care să indice exact unul dintre ele."
+    },
+    "entry_not_loaded": {
+      "message": "Niciun cont PushWard încărcat nu are ID-ul intrării de configurare {config_entry_id}."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "A apărut o eroare neașteptată."
     },
     "abort": {
-      "already_configured": "PushWard este deja configurat.",
+      "already_configured": "Acest cont PushWard este deja configurat.",
       "reconfigure_successful": "Configurația PushWard a fost actualizată.",
-      "reauth_successful": "Reautentificare reușită."
+      "reauth_successful": "Reautentificare reușită.",
+      "wrong_account": "Această cheie de integrare aparține altui cont PushWard. Folosiți Reconfigurare pentru a muta această intrare pe acel cont sau adăugați cheia ca o nouă intrare PushWard."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "Acțiunea `pushward.update_activity` este deprecated. Comutați automatizările la acțiunea specifică șablonului — de exemplu `pushward.update_activity_countdown` sau `pushward.update_activity_gauge`. Vechea acțiune încă funcționează deocamdată, dar va fi eliminată într-o versiune viitoare."
     },
     "usage_limit_notifications": {
-      "title": "Limita de notificări PushWard a fost atinsă",
+      "title": "Limita de notificări {account} a fost atinsă",
       "description": "Contul dvs. PushWard a folosit {used} din cele {limit} notificări pentru perioada curentă, așa că noile notificări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
     },
     "usage_limit_live_activity": {
-      "title": "Limita de actualizări Live Activity PushWard a fost atinsă",
+      "title": "Limita de actualizări Live Activity {account} a fost atinsă",
       "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări Live Activity pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
     },
     "usage_limit_widgets": {
-      "title": "Limita de actualizări widget PushWard a fost atinsă",
+      "title": "Limita de actualizări widget {account} a fost atinsă",
       "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări de widget pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
     },
     "usage_limit_emails": {
-      "title": "Limita de e-mailuri PushWard a fost atinsă",
+      "title": "Limita de e-mailuri {account} a fost atinsă",
       "description": "Contul dvs. PushWard a folosit {used} din cele {limit} e-mailuri pentru perioada curentă, așa că noile e-mailuri vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
     },
     "todo_e2e_unavailable": {
-      "title": "Mementourile PushWard pentru sarcini nu sunt trimise",
+      "title": "Mementourile {account} pentru sarcini nu sunt trimise",
       "description": "Această cheie de integrare aparține unei organizații, iar organizațiile nu pot trimite notificări criptate end-to-end, așa că PushWard refuză fiecare memento pentru sarcini cât timp este setată o cheie de criptare. Eliminați cheia de criptare la Configurare sau reconfigurați integrarea cu o cheie de integrare personală."
     }
   },

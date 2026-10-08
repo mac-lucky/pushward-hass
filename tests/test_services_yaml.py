@@ -239,3 +239,18 @@ def _severity_label_descriptions(node: object) -> list[str]:
         for value in node:
             found.extend(_severity_label_descriptions(value))
     return found
+
+
+def test_every_api_action_takes_config_entry_id() -> None:
+    """Each action that calls the API lets the caller pick the PushWard account(s).
+
+    The field sits at the top level (outside any section) with a config_entry selector
+    scoped to this integration; generate_thumbhash never reaches the server.
+    """
+    for name, body in _services().items():
+        fields = body.get("fields") or {}
+        if name == "generate_thumbhash":
+            assert "config_entry_id" not in _leaf_fields(body)
+            continue
+        assert "config_entry_id" in fields, f"{name}: missing top-level config_entry_id"
+        assert fields["config_entry_id"]["selector"] == {"config_entry": {"integration": "pushward"}}

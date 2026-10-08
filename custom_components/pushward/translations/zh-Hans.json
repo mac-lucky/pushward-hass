@@ -27,6 +27,10 @@
       "name": "更新活动 (deprecated)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -271,6 +275,10 @@
       "name": "更新活动 (Generic)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -407,6 +415,10 @@
       "name": "更新活动 (Countdown)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -543,6 +555,10 @@
       "name": "更新活动 (Steps)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -711,6 +727,10 @@
       "name": "更新活动 (Alert)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -835,6 +855,10 @@
       "name": "更新活动 (Gauge)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -959,6 +983,10 @@
       "name": "更新活动 (Timeline)",
       "description": "更新 PushWard Live Activity 的状态和内容。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -1107,6 +1135,10 @@
       "name": "更新活动 (Board)",
       "description": "更新一个 PushWard board Live Activity（1-4 个磁贴）。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -1181,6 +1213,10 @@
       "name": "更新活动 (Log)",
       "description": "更新一个 PushWard log Live Activity（1-20 行、最新在前）。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -1255,6 +1291,10 @@
       "name": "更新活动 (Media)",
       "description": "更新 PushWard 媒体实时活动：一张带封面、走动进度条和调用你自己 Webhook 的播放控制按钮的远程播放器卡片。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -1369,6 +1409,10 @@
       "name": "更新活动 (Approval)",
       "description": "更新 PushWard 审批实时活动：带有 2-4 个回答按钮的问题卡片，按钮可调用你自己的 Webhook，或由服务器记录被点按的选项。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "活动的 slug 标识符。"
@@ -1459,6 +1503,10 @@
       "name": "创建活动",
       "description": "创建新的 PushWard Live Activity。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "唯一的活动 slug 标识符。"
@@ -1503,6 +1551,10 @@
       "name": "结束活动",
       "description": "结束一个 PushWard Live Activity。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "要结束的活动 slug 标识符。"
@@ -1517,6 +1569,10 @@
       "name": "删除活动",
       "description": "删除一个 PushWard Live Activity。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "标识符",
           "description": "要删除的活动 slug 标识符。"
@@ -1527,6 +1583,10 @@
       "name": "刷新小组件",
       "description": "强制刷新已追踪的 PushWard 小组件。绕过内存中的差异缓存，即使值未改变也会重新渲染小组件并推送到 iOS。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "Slug",
           "description": "小组件 slug 标识符。必须提供 slug 或 entity_id 之一。"
@@ -1541,6 +1601,10 @@
       "name": "发送通知",
       "description": "通过 PushWard 发送推送通知。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户；添加了多个账户时，使用响应变量必须填写。"
+        },
         "title": {
           "name": "标题",
           "description": "通知标题。"
@@ -1631,6 +1695,10 @@
       "name": "取消定时通知",
       "description": "取消通过 send_notification 的 send_at 或重复字段排队的通知。取消重复通知会停止整个系列，即使正在发送也是如此。已不存在的 ID 会被忽略。已取消的通知会在 PushWard 应用中显示为已取消，保留 24 小时。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。添加了多个 PushWard 账户时必填。"
+        },
         "scheduled_notification_id": {
           "name": "定时通知 ID",
           "description": "send_notification 返回的 scheduled_notification_id。"
@@ -1641,6 +1709,10 @@
       "name": "列出定时通知",
       "description": "返回你的定时通知：仍在等待的通知（默认）按发送时间由近到远排列，其他任何状态则按由新到旧排列。重复通知会附带其 recurrence、已发送次数（occurrence）和最近一次发送时间（last_sent_at）。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。添加了多个 PushWard 账户时必填。"
+        },
         "status": {
           "name": "状态",
           "description": "要返回哪些通知。scheduled（默认）列出仍在等待的通知；sent 和 failed 保留 7 天。canceled 保留 24 小时。"
@@ -1651,6 +1723,10 @@
       "name": "获取通知回答",
       "description": "对于带有无 url 动作的通知，等待其回答，并返回被点击的动作（action_id）、输入的回复（text，如有）及回答时间（answered_at）。若在超时时间内无人回答，answered 为 false。回答保留 30 天，因此之后以超时 0 调用可直接读取，无需等待。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。添加了多个 PushWard 账户时必填。"
+        },
         "notification_id": {
           "name": "通知 ID",
           "description": "send_notification 返回的 notification_id，或已发送定时通知的 notification_id。"
@@ -1665,6 +1741,10 @@
       "name": "取消需确认的通知",
       "description": "停止需确认通知的重复发送，可取消所有带某标签发送的活动通知，或按 notification_id 取消单条。仅影响使用此集成密钥发送的通知，且不会发送其回调。可选的响应包含某标签下已取消的数量（canceled），或某 notification_id 的回执。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则在添加到 Home Assistant 的每个 PushWard 账户上取消某个标签；添加了多个账户时，使用 notification_id 必须填写。"
+        },
         "tag": {
           "name": "标签",
           "description": "取消所有带此标签发送的活动中的需确认通知。"
@@ -1679,6 +1759,10 @@
       "name": "发送邮件",
       "description": "通过 PushWard 发送事务性邮件。可提供纯文本正文、HTML 正文或两者。集成密钥需要具备“emails”权限。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。添加了多个 PushWard 账户时必填。"
+        },
         "to": {
           "name": "收件人",
           "description": "收件人邮箱地址。必须是你已在 PushWard iOS 应用中添加并确认过的地址——未验证的地址会被拒绝。"
@@ -1701,6 +1785,10 @@
       "name": "删除小组件",
       "description": "从服务器删除 PushWard 小组件。如果仍有追踪小组件的配置项驱动此 slug，则该小组件会在下次重启/同步时重新创建——请移除该配置项以永久删除。请提供 slug 或 entity_id 之一。",
       "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
         "slug": {
           "name": "Slug",
           "description": "小组件 slug 标识符。必须提供 slug 或 entity_id 之一。"
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "通知 {notification_id} 没有可取消的内容：它不是通过 acknowledge 发送的，是用另一个集成密钥发送的，或已在 7 天前结束。"
+    },
+    "config_entry_required": {
+      "message": "已设置多个 PushWard 账户，因此 {service} 需要用 config_entry_id 指定其中恰好一个。"
+    },
+    "entry_not_loaded": {
+      "message": "没有已加载的 PushWard 账户的配置条目 ID 为 {config_entry_id}。"
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "发生意外错误。"
     },
     "abort": {
-      "already_configured": "PushWard 已配置。",
+      "already_configured": "此 PushWard 账户已配置。",
       "reconfigure_successful": "PushWard 配置已更新。",
-      "reauth_successful": "重新验证成功。"
+      "reauth_successful": "重新验证成功。",
+      "wrong_account": "此集成密钥属于另一个 PushWard 账户。请使用“重新配置”将此条目切换到该账户，或将该密钥添加为新的 PushWard 条目。"
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "`pushward.update_activity` 动作已弃用。请将你的自动化改用特定模板的动作——例如 `pushward.update_activity_countdown` 或 `pushward.update_activity_gauge`。旧动作目前仍可使用，但将在未来版本中移除。"
     },
     "usage_limit_notifications": {
-      "title": "已达到 PushWard 通知上限",
+      "title": "已达到 {account} 通知上限",
       "description": "你的 PushWard 账户在当前周期内已使用 {limit} 条通知中的 {used} 条，因此在配额重置（{resets_at}）之前，新通知将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
     },
     "usage_limit_live_activity": {
-      "title": "已达到 PushWard Live Activity 更新上限",
+      "title": "已达到 {account} Live Activity 更新上限",
       "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次 Live Activity 更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
     },
     "usage_limit_widgets": {
-      "title": "已达到 PushWard 小组件更新上限",
+      "title": "已达到 {account} 小组件更新上限",
       "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次小组件更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
     },
     "usage_limit_emails": {
-      "title": "已达到 PushWard 邮件上限",
+      "title": "已达到 {account} 邮件上限",
       "description": "你的 PushWard 账户在当前周期内已使用 {limit} 封邮件中的 {used} 封，因此在配额重置（{resets_at}）之前，新邮件将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard 待办事项提醒未能发送",
+      "title": "{account} 待办事项提醒未能发送",
       "description": "此集成密钥属于某个组织，而组织无法发送端到端加密通知，因此只要设置了加密密钥，PushWard 就会拒绝每条待办事项提醒。请在“配置”下移除加密密钥，或使用个人集成密钥重新配置此集成。"
     }
   },

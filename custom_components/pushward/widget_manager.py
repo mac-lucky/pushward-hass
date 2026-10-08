@@ -82,7 +82,6 @@ from .widget_mapper import map_widget_content, read_numeric_value, widget_name_f
 _LOGGER = logging.getLogger(__name__)
 
 _WIDGET_STORAGE_VERSION = 1
-_WIDGET_PERMISSION_NOTIFICATION = "pushward_widget_permission"
 # Floor on the heartbeat tick. A stale_after at the 60 s minimum would otherwise
 # ask for a push every 30 s, which is already more than the quota is worth.
 _HEARTBEAT_MIN_INTERVAL = 30
@@ -96,8 +95,14 @@ def build_widget_store(hass: HomeAssistant, entry_id: str) -> Store:
     return Store(hass, _WIDGET_STORAGE_VERSION, _widget_storage_key(entry_id), atomic_writes=True)
 
 
-def _forbidden_notification_id(slug: str) -> str:
-    return f"pushward_widget_forbidden_{slug}"
+# Persistent notification ids carry the entry: each account has its own key and its own
+# slugs, so one account's success must not dismiss another's notice.
+def _forbidden_notification_id(entry_id: str, slug: str) -> str:
+    return f"pushward_widget_forbidden_{entry_id}_{slug}"
+
+
+def _permission_notification_id(entry_id: str) -> str:
+    return f"pushward_widget_permission_{entry_id}"
 
 
 @dataclass
@@ -735,8 +740,8 @@ class WidgetManager:
             self._entry.async_start_reauth(self._hass)
 
     def _notify_widget_permission(self, message: str) -> None:
-        # One persistent notification covers the entire integration since the
-        # cause (missing widgets:true flag) is global to the integration key.
+        # One persistent notification covers the entry since the cause
+        # (missing widgets:true flag) is global to its integration key.
         if self._permission_notified:
             return
         self._permission_notified = True
@@ -747,8 +752,8 @@ class WidgetManager:
                 f"Enable the `widgets` permission on the key, then reload "
                 f"the integration. Server said: {message}"
             ),
-            title="PushWard — Widget permission required",
-            notification_id=_WIDGET_PERMISSION_NOTIFICATION,
+            title=f"{self._entry.title} — Widget permission required",
+            notification_id=_permission_notification_id(self._entry.entry_id),
         )
 
     @callback
@@ -758,8 +763,8 @@ class WidgetManager:
             tracked.quota_refused = False
         if self._permission_notified:
             self._permission_notified = False
-            persistent_notification.async_dismiss(self._hass, _WIDGET_PERMISSION_NOTIFICATION)
-        persistent_notification.async_dismiss(self._hass, _forbidden_notification_id(slug))
+            persistent_notification.async_dismiss(self._hass, _permission_notification_id(self._entry.entry_id))
+        persistent_notification.async_dismiss(self._hass, _forbidden_notification_id(self._entry.entry_id, slug))
         if slug in self._failed_slugs:
             self._failed_slugs.discard(slug)
             _LOGGER.info("PushWard widget %s: pushes succeeding again", slug)
@@ -785,8 +790,8 @@ class WidgetManager:
             persistent_notification.async_create(
                 self._hass,
                 f"PushWard widget: {err}",
-                title=f"PushWard widget — {slug}",
-                notification_id=_forbidden_notification_id(slug),
+                title=f"{self._entry.title} widget — {slug}",
+                notification_id=_forbidden_notification_id(self._entry.entry_id, slug),
             )
             self._log_push_failure(slug, "PushWard 403 while %s widget %s: %s", context, slug, err)
         except PushWardQuotaExceededError as err:

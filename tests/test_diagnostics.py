@@ -7,7 +7,7 @@ visible (subentry config + last rendered content).
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant
@@ -34,7 +34,7 @@ from custom_components.pushward.const import (
 from custom_components.pushward.diagnostics import async_get_config_entry_diagnostics
 from custom_components.pushward.e2e import key_id
 
-from .conftest import make_entity_config, make_usage_payload, make_widget_config
+from .conftest import async_setup_with_api, make_entity_config, make_usage_payload, make_widget_config
 
 MOCK_KEY = "hlk_secret_value"
 
@@ -77,18 +77,11 @@ def _entry_with_subentries() -> MockConfigEntry:
     )
 
 
-async def _setup(hass: HomeAssistant, entry: MockConfigEntry, api: AsyncMock) -> None:
-    entry.add_to_hass(hass)
-    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
-        await hass.config_entries.async_setup(entry.entry_id)
-        await hass.async_block_till_done()
-
-
 async def test_diagnostics_redacts_integration_key(hass: HomeAssistant) -> None:
     """The hlk_ integration key never appears in the diagnostics dump."""
     api = _mock_api()
     entry = _entry_with_subentries()
-    await _setup(hass, entry, api)
+    await async_setup_with_api(hass, entry, api)
 
     diag = await async_get_config_entry_diagnostics(hass, entry)
 
@@ -101,7 +94,7 @@ async def test_diagnostics_redacts_the_e2e_key_and_shows_its_key_id(hass: HomeAs
     entry = _entry_with_subentries()
     entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(entry, options={CONF_E2E_KEY: key_hex})
-    await _setup(hass, entry, _mock_api())
+    await async_setup_with_api(hass, entry, _mock_api())
 
     diag = await async_get_config_entry_diagnostics(hass, entry)
 
@@ -114,7 +107,7 @@ async def test_diagnostics_includes_subentries(hass: HomeAssistant) -> None:
     """Both the tracked entity and widget subentries appear with their config."""
     api = _mock_api()
     entry = _entry_with_subentries()
-    await _setup(hass, entry, api)
+    await async_setup_with_api(hass, entry, api)
 
     diag = await async_get_config_entry_diagnostics(hass, entry)
 
@@ -154,7 +147,7 @@ async def test_diagnostics_includes_board_last_content(hass: HomeAssistant) -> N
         ],
     )
     hass.states.async_set("sensor.cpu", "72")
-    await _setup(hass, entry, api)
+    await async_setup_with_api(hass, entry, api)
     hass.states.async_set("binary_sensor.home", "on")
     await hass.async_block_till_done()
 
@@ -196,7 +189,7 @@ async def test_diagnostics_redacts_tap_action_url(hass: HomeAssistant) -> None:
         ],
     )
     hass.states.async_set("binary_sensor.washer", "off")
-    await _setup(hass, entry, api)
+    await async_setup_with_api(hass, entry, api)
     hass.states.async_set("binary_sensor.washer", "on")
     await hass.async_block_till_done()
 

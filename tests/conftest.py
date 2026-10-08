@@ -10,6 +10,7 @@ import pytest
 from homeassistant.components.media_player import DATA_COMPONENT
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import DATA_CUSTOM_COMPONENTS
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.activity_manager import ActivityManager
 from custom_components.pushward.api import PushWardApiClient, PushWardQuotaExceededError
@@ -396,10 +397,19 @@ def make_quota_error(
     return PushWardQuotaExceededError(kind, used=used, limit=limit, reset_at=reset_at)
 
 
+async def async_setup_with_api(hass: HomeAssistant, entry: MockConfigEntry, api: AsyncMock) -> None:
+    """Add a config entry and set it up with every PushWardApiClient it builds replaced by api."""
+    entry.add_to_hass(hass)
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+
 def make_mock_entry(entry_id: str = "test_entry") -> MagicMock:
     """Mock ConfigEntry with the attributes the managers touch."""
     entry = MagicMock()
     entry.entry_id = entry_id
+    entry.title = "PushWard"
     entry.async_start_reauth = MagicMock()
     return entry
 

@@ -80,10 +80,10 @@ USAGE_SENSORS: tuple[PushWardUsageSensorDescription, ...] = (
 
 
 def _device_info(entry: ConfigEntry) -> DeviceInfo:
-    """One service device per config entry, grouping all usage sensors."""
+    """One service device per config entry (PushWard account), grouping all usage sensors."""
     return DeviceInfo(
         identifiers={(DOMAIN, entry.entry_id)},
-        name="PushWard",
+        name=entry.title,
         manufacturer="PushWard",
         entry_type=DeviceEntryType.SERVICE,
     )

@@ -188,7 +188,14 @@ from custom_components.pushward.const import (
     validate_url,
 )
 
-from .conftest import IMAGE_THUMBHASH, IMAGE_URL, make_entity_config, make_mock_state, make_widget_config
+from .conftest import (
+    IMAGE_THUMBHASH,
+    IMAGE_URL,
+    make_entity_config,
+    make_mock_state,
+    make_usage_payload,
+    make_widget_config,
+)
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -401,12 +408,12 @@ async def _add_entity_subentry(
 
 @pytest.fixture
 def mock_api_client():
-    """Mock PushWardApiClient with successful validate_connection."""
+    """Mock PushWardApiClient whose key reads back account user-123 ("Test")."""
     with patch(
         "custom_components.pushward.config_flow.PushWardApiClient",
     ) as mock_cls:
         instance = mock_cls.return_value
-        instance.validate_connection = AsyncMock(return_value=True)
+        instance.get_me = AsyncMock(return_value=make_usage_payload())
         yield instance
 
 
@@ -450,65 +457,105 @@ async def test_user_step_success(
     )
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == "PushWard"
+    assert result["title"] == "PushWard (Test)"
+    assert result["result"].unique_id == "user-123"
     assert result["data"] == {
         CONF_SERVER_URL: DEFAULT_SERVER_URL,
         CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
     }
-    mock_api_client.validate_connection.assert_awaited_once()
+    mock_api_client.get_me.assert_awaited_once()
 
 
-async def test_user_step_invalid_auth(hass: HomeAssistant) -> None:
+async def _submit_user_step(hass: HomeAssistant, key: str = MOCK_INTEGRATION_KEY) -> dict:
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    assert result["type"] is FlowResultType.FORM
+    return await hass.config_entries.flow.async_configure(result["flow_id"], user_input={CONF_INTEGRATION_KEY: key})
+
+
+async def test_user_step_invalid_auth(hass: HomeAssistant, mock_api_client) -> None:
     """Test user step with invalid auth."""
-    with patch(
-        "custom_components.pushward.config_flow.PushWardApiClient",
-    ) as mock_cls:
-        instance = mock_cls.return_value
-        instance.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key"))
-
-        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            user_input={
-                CONF_INTEGRATION_KEY: "bad-key",
-            },
-        )
+    mock_api_client.get_me.side_effect = PushWardAuthError("bad key")
+    result = await _submit_user_step(hass, "bad-key")
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_user_step_cannot_connect(hass: HomeAssistant) -> None:
+async def test_user_step_cannot_connect(hass: HomeAssistant, mock_api_client) -> None:
     """Test user step with connection failure."""
-    with patch(
-        "custom_components.pushward.config_flow.PushWardApiClient",
-    ) as mock_cls:
-        instance = mock_cls.return_value
-        instance.validate_connection = AsyncMock(side_effect=OSError("timeout"))
-
-        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            user_input={
-                CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
-            },
-        )
+    mock_api_client.get_me.side_effect = OSError("timeout")
+    result = await _submit_user_step(hass)
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_already_configured(
+async def test_same_account_already_configured(
     hass: HomeAssistant,
     mock_api_client,
 ) -> None:
-    """Test abort when already configured."""
-    entry = _mock_entry()
-    entry.add_to_hass(hass)
+    """A second key for an account that already has an entry aborts."""
+    _mock_entry(unique_id="user-123").add_to_hass(hass)
 
-    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
+    result = await _submit_user_step(hass, "another-key-same-account")
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "already_configured"
+
+
+async def test_second_account_gets_its_own_entry(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """A family member's key (another account) adds a second entry beside the first."""
+    _mock_entry(unique_id="user-123").add_to_hass(hass)
+    mock_api_client.get_me.return_value = make_usage_payload(id="user-456", nickname="Anna")
+
+    result = await _submit_user_step(hass, "anna-key")
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["title"] == "PushWard (Anna)"
+    assert result["result"].unique_id == "user-456"
+    assert len(hass.config_entries.async_entries(DOMAIN)) == 2
+
+
+@pytest.mark.parametrize(
+    ("overrides", "title"),
+    [
+        ({"nickname": None, "integration_key": {"id": "k1", "name": "Home Assistant"}}, "PushWard (Home Assistant)"),
+        ({"nickname": None}, "PushWard"),
+    ],
+)
+async def test_title_falls_back_to_key_name_then_brand(
+    hass: HomeAssistant, mock_api_client, overrides: dict, title: str
+) -> None:
+    mock_api_client.get_me.return_value = make_usage_payload(**overrides)
+
+    result = await _submit_user_step(hass)
+    assert result["title"] == title
+
+
+async def test_same_key_as_unmigrated_entry_aborts(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """An entry from before several accounts were allowed learns its account only once it
+    loads; until then re-adding its own key must not create a duplicate."""
+    _mock_entry().add_to_hass(hass)
+
+    result = await _submit_user_step(hass, MOCK_INTEGRATION_KEY)
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+
+
+async def test_user_step_without_account_id_cannot_connect(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """An /auth/me without an id cannot key the entry, so setup does not go ahead."""
+    mock_api_client.get_me.return_value = make_usage_payload(id=None)
+
+    result = await _submit_user_step(hass)
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": "cannot_connect"}
 
 
 # --- Reconfigure flow tests ---
@@ -537,26 +584,94 @@ async def test_reconfigure_success(
     assert result["reason"] == "reconfigure_successful"
     assert entry.data[CONF_SERVER_URL] == DEFAULT_SERVER_URL
     assert entry.data[CONF_INTEGRATION_KEY] == new_key
+    # An entry from before several accounts were allowed adopts the key's account.
+    assert entry.unique_id == "user-123"
 
 
-async def test_reconfigure_invalid_auth(hass: HomeAssistant) -> None:
+async def test_reconfigure_same_account_keeps_entry(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    entry = _mock_entry(unique_id="user-123")
+    entry.add_to_hass(hass)
+
+    result = await entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_INTEGRATION_KEY: "rotated-key"}
+    )
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.data[CONF_INTEGRATION_KEY] == "rotated-key"
+    assert entry.unique_id == "user-123"
+
+
+async def test_reconfigure_moves_entry_to_another_account(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """Reconfigure may switch accounts, e.g. an organization key for a personal one."""
+    entry = _mock_entry(unique_id="org-1", title="PushWard (Acme)")
+    entry.add_to_hass(hass)
+
+    result = await entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_INTEGRATION_KEY: "personal-key"}
+    )
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.data[CONF_INTEGRATION_KEY] == "personal-key"
+    assert entry.unique_id == "user-123"
+    assert entry.title == "PushWard (Test)"
+
+
+async def test_reconfigure_onto_another_entrys_account_aborts(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """Two entries never hold the same account."""
+    _mock_entry(unique_id="user-123", title="PushWard (Test)").add_to_hass(hass)
+    entry = _mock_entry(unique_id="user-456", title="PushWard (Anna)")
+    entry.add_to_hass(hass)
+
+    result = await entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_INTEGRATION_KEY: "key-for-user-123"}
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert entry.unique_id == "user-456"
+    assert entry.data[CONF_INTEGRATION_KEY] == MOCK_INTEGRATION_KEY
+
+
+async def test_reconfigure_legacy_entry_to_configured_account_aborts(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    """A legacy entry cannot adopt an account another entry already has."""
+    _mock_entry(unique_id="user-123", title="PushWard (Test)").add_to_hass(hass)
+    legacy = _mock_entry()
+    legacy.add_to_hass(hass)
+
+    result = await legacy.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_INTEGRATION_KEY: "key-for-user-123"}
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert legacy.unique_id == DOMAIN
+
+
+async def test_reconfigure_invalid_auth(hass: HomeAssistant, mock_api_client) -> None:
     """Test reconfigure with invalid auth shows error."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    with patch(
-        "custom_components.pushward.config_flow.PushWardApiClient",
-    ) as mock_cls:
-        instance = mock_cls.return_value
-        instance.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key"))
-
-        result = await entry.start_reconfigure_flow(hass)
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            user_input={
-                CONF_INTEGRATION_KEY: "bad-key",
-            },
-        )
+    mock_api_client.get_me.side_effect = PushWardAuthError("bad key")
+    result = await entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input={
+            CONF_INTEGRATION_KEY: "bad-key",
+        },
+    )
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "invalid_auth"}
@@ -586,45 +701,53 @@ async def test_reauth_success(
     assert result["reason"] == "reauth_successful"
     assert entry.data[CONF_INTEGRATION_KEY] == new_key
     assert entry.data[CONF_SERVER_URL] == DEFAULT_SERVER_URL
+    assert entry.unique_id == "user-123"
 
 
-async def test_reauth_invalid_key(hass: HomeAssistant) -> None:
+async def test_reauth_other_account_aborts(
+    hass: HomeAssistant,
+    mock_api_client,
+) -> None:
+    entry = _mock_entry(unique_id="user-123")
+    entry.add_to_hass(hass)
+    mock_api_client.get_me.return_value = make_usage_payload(id="user-456")
+
+    result = await entry.start_reauth_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], user_input={CONF_INTEGRATION_KEY: "someone-elses-key"}
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "wrong_account"
+    assert entry.data[CONF_INTEGRATION_KEY] == MOCK_INTEGRATION_KEY
+
+
+async def test_reauth_invalid_key(hass: HomeAssistant, mock_api_client) -> None:
     """Test reauth with an invalid key shows error."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    with patch(
-        "custom_components.pushward.config_flow.PushWardApiClient",
-    ) as mock_cls:
-        instance = mock_cls.return_value
-        instance.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key"))
-
-        result = await entry.start_reauth_flow(hass)
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            user_input={CONF_INTEGRATION_KEY: "still-bad-key"},
-        )
+    mock_api_client.get_me.side_effect = PushWardAuthError("bad key")
+    result = await entry.start_reauth_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input={CONF_INTEGRATION_KEY: "still-bad-key"},
+    )
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "invalid_auth"}
 
 
-async def test_reauth_cannot_connect(hass: HomeAssistant) -> None:
+async def test_reauth_cannot_connect(hass: HomeAssistant, mock_api_client) -> None:
     """Test reauth when server is unreachable shows error."""
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
-    with patch(
-        "custom_components.pushward.config_flow.PushWardApiClient",
-    ) as mock_cls:
-        instance = mock_cls.return_value
-        instance.validate_connection = AsyncMock(side_effect=OSError("timeout"))
-
-        result = await entry.start_reauth_flow(hass)
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            user_input={CONF_INTEGRATION_KEY: "some-key"},
-        )
+    mock_api_client.get_me.side_effect = OSError("timeout")
+    result = await entry.start_reauth_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        user_input={CONF_INTEGRATION_KEY: "some-key"},
+    )
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "cannot_connect"}
@@ -666,28 +789,23 @@ def test_validate_url_rejects_non_http_schemes(url: str) -> None:
 
 
 async def test_validate_integration_key_success(hass: HomeAssistant, mock_api_client) -> None:
-    """Successful validation returns empty errors dict."""
-    errors = await _validate_integration_key(hass, "valid-key", "test")
+    """Successful validation returns no errors and the account profile."""
+    errors, me = await _validate_integration_key(hass, "valid-key", "test")
     assert errors == {}
+    assert me["id"] == "user-123"
 
 
-async def test_validate_integration_key_auth_error(hass: HomeAssistant) -> None:
+async def test_validate_integration_key_auth_error(hass: HomeAssistant, mock_api_client) -> None:
     """Auth error returns invalid_auth."""
-    with patch(
-        "custom_components.pushward.config_flow.PushWardApiClient",
-    ) as mock_cls:
-        mock_cls.return_value.validate_connection = AsyncMock(side_effect=PushWardAuthError("bad key"))
-        errors = await _validate_integration_key(hass, "bad-key", "test")
+    mock_api_client.get_me.side_effect = PushWardAuthError("bad key")
+    errors, _ = await _validate_integration_key(hass, "bad-key", "test")
     assert errors == {"base": "invalid_auth"}
 
 
-async def test_validate_integration_key_unexpected_error(hass: HomeAssistant) -> None:
+async def test_validate_integration_key_unexpected_error(hass: HomeAssistant, mock_api_client) -> None:
     """Unexpected error returns cannot_connect."""
-    with patch(
-        "custom_components.pushward.config_flow.PushWardApiClient",
-    ) as mock_cls:
-        mock_cls.return_value.validate_connection = AsyncMock(side_effect=OSError("timeout"))
-        errors = await _validate_integration_key(hass, "some-key", "test")
+    mock_api_client.get_me.side_effect = OSError("timeout")
+    errors, _ = await _validate_integration_key(hass, "some-key", "test")
     assert errors == {"base": "cannot_connect"}
 
 

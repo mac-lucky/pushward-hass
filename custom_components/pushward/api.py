@@ -217,11 +217,6 @@ class PushWardApiClient:
         # text in the clear. Swapped in place when the options change.
         self.e2e_key = e2e_key
 
-    async def validate_connection(self) -> bool:
-        """Validate the connection and integration key via GET /auth/me."""
-        await self.get_me()
-        return True
-
     async def get_me(self) -> dict[str, Any]:
         """Fetch the account profile + usage counters via GET /auth/me.
 

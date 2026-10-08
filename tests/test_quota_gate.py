@@ -306,7 +306,12 @@ async def test_gate_timer_asks_coordinator_which_releases(hass: HomeAssistant) -
     assert api.get_me.await_count == 1
     issue = ir.async_get(hass).async_get_issue(DOMAIN, issue_id)
     assert issue is not None
-    assert issue.translation_placeholders == {"used": "250", "limit": "250", "resets_at": "2026-07-01"}
+    assert issue.translation_placeholders == {
+        "account": "PushWard",
+        "used": "250",
+        "limit": "250",
+        "resets_at": "2026-07-01",
+    }
 
     async_fire_time_changed(
         hass, dt_util.utcnow() + timedelta(seconds=QUOTA_BLOCK_MIN_SECONDS + QUOTA_RELEASE_JITTER_SECONDS + 1)

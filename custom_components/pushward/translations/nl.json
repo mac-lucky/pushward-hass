@@ -27,6 +27,10 @@
       "name": "Activiteit bijwerken (deprecated)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -271,6 +275,10 @@
       "name": "Activiteit bijwerken (Generic)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -407,6 +415,10 @@
       "name": "Activiteit bijwerken (Countdown)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -543,6 +555,10 @@
       "name": "Activiteit bijwerken (Steps)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -711,6 +727,10 @@
       "name": "Activiteit bijwerken (Alert)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -835,6 +855,10 @@
       "name": "Activiteit bijwerken (Gauge)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -959,6 +983,10 @@
       "name": "Activiteit bijwerken (Timeline)",
       "description": "Werk de status en inhoud van een PushWard Live Activity bij.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -1107,6 +1135,10 @@
       "name": "Activiteit bijwerken (Board)",
       "description": "Werk een PushWard board Live Activity bij (1–4 tegels).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -1181,6 +1213,10 @@
       "name": "Activiteit bijwerken (Log)",
       "description": "Werk een PushWard log Live Activity bij (1–20 regels, nieuwste eerst).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -1255,6 +1291,10 @@
       "name": "Activiteit bijwerken (Media)",
       "description": "Een PushWard media-Live Activity bijwerken: een afstandsbedieningskaart met albumhoes, een lopende voortgangsbalk en transportknoppen die je eigen webhooks aanroepen.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -1369,6 +1409,10 @@
       "name": "Activiteit bijwerken (Approval)",
       "description": "Werk een PushWard-goedkeurings-Live Activity bij: een vraagkaart met 2-4 antwoordknoppen die je eigen webhooks aanroepen of de aangetikte optie op de server vastleggen.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de activiteit."
@@ -1459,6 +1503,10 @@
       "name": "Activiteit aanmaken",
       "description": "Maak een nieuwe PushWard Live Activity aan.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Unieke slug-identificator voor de activiteit."
@@ -1503,6 +1551,10 @@
       "name": "Activiteit beëindigen",
       "description": "Beëindig een PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de te beëindigen activiteit."
@@ -1517,6 +1569,10 @@
       "name": "Activiteit verwijderen",
       "description": "Verwijder een PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de te verwijderen activiteit."
@@ -1527,6 +1583,10 @@
       "name": "Widget vernieuwen",
       "description": "Forceer het vernieuwen van een gevolgde PushWard-widget. Omzeilt de in-memory diff-cache zodat de widget opnieuw wordt gerenderd en naar iOS wordt gepusht, zelfs als de waarde niet is veranderd.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificatie van de widget. Geef óf slug óf entity_id op."
@@ -1541,6 +1601,10 @@
       "name": "Melding verzenden",
       "description": "Verstuur een pushmelding via PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd; verplicht met een responsvariabele wanneer er meer dan één is toegevoegd."
+        },
         "title": {
           "name": "Titel",
           "description": "Titel van de melding."
@@ -1631,6 +1695,10 @@
       "name": "Geplande melding annuleren",
       "description": "Annuleer een melding die met send_at of Herhalen van send_notification in de wachtrij is gezet. Een herhalende melding annuleren stopt de hele reeks, ook terwijl die wordt verstuurd. Een id die niet meer bestaat, wordt genegeerd. Een geannuleerde melding staat 24 uur als geannuleerd in de PushWard-app.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Verplicht wanneer meer dan één PushWard-account aan Home Assistant is toegevoegd."
+        },
         "scheduled_notification_id": {
           "name": "ID van geplande melding",
           "description": "De scheduled_notification_id die send_notification teruggeeft."
@@ -1641,6 +1709,10 @@
       "name": "Geplande meldingen weergeven",
       "description": "Geef je geplande meldingen terug: bij meldingen die nog wachten (standaard) de eerstvolgende eerst, bij elke andere status de meest recente eerst. Herhalende meldingen bevatten hun recurrence, hoe vaak ze zijn verstuurd (occurrence) en wanneer voor het laatst (last_sent_at).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Verplicht wanneer meer dan één PushWard-account aan Home Assistant is toegevoegd."
+        },
         "status": {
           "name": "Status",
           "description": "Welke je terugkrijgt. scheduled (standaard) toont de meldingen die nog wachten; sent en failed blijven 7 dagen bewaard. canceled blijven 24 uur bewaard."
@@ -1651,6 +1723,10 @@
       "name": "Antwoord op melding ophalen",
       "description": "Wacht op het antwoord op een melding die is verstuurd met acties zonder url, en geef terug welke actie is aangetikt (action_id), een eventueel getypt antwoord (text) en wanneer (answered_at). Antwoordt niemand binnen de time-out, dan is answered false. Antwoorden worden 30 dagen bewaard, dus een latere aanroep met time-out 0 kan er een lezen zonder te wachten.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Verplicht wanneer meer dan één PushWard-account aan Home Assistant is toegevoegd."
+        },
         "notification_id": {
           "name": "Meldings-ID",
           "description": "De notification_id die send_notification teruggeeft, of de notification_id van een verstuurde geplande melding."
@@ -1665,6 +1741,10 @@
       "name": "Te bevestigen meldingen annuleren",
       "description": "Stop het herhalen van te bevestigen meldingen, ofwel alle actieve met een tag verzonden meldingen of een enkele via zijn notification_id. Dit geldt alleen voor meldingen verzonden met de sleutel van deze integratie en hun callback wordt niet verstuurd. Het optionele antwoord bevat hoeveel er zijn geannuleerd (canceled) voor een tag, of de ontvangstbevestiging voor een notification_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om een tag te annuleren op elk PushWard-account dat aan Home Assistant is toegevoegd; verplicht met een notification_id wanneer er meer dan één is toegevoegd."
+        },
         "tag": {
           "name": "Tag",
           "description": "Annuleer alle actieve te bevestigen meldingen die met deze tag zijn verzonden."
@@ -1679,6 +1759,10 @@
       "name": "E-mail versturen",
       "description": "Verstuur een transactionele e-mail via PushWard. Geef een tekstinhoud, een HTML-inhoud of beide op. De integratiesleutel heeft de \"emails\"-capaciteit nodig.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Verplicht wanneer meer dan één PushWard-account aan Home Assistant is toegevoegd."
+        },
         "to": {
           "name": "Aan",
           "description": "E-mailadres van de ontvanger. Moet een adres zijn dat je al hebt toegevoegd en bevestigd in de PushWard iOS-app — niet-geverifieerde adressen worden geweigerd."
@@ -1701,6 +1785,10 @@
       "name": "Widget verwijderen",
       "description": "Verwijder een PushWard-widget van de server. Als een gevolgde-widget-configuratie-item deze slug nog aanstuurt, wordt de widget bij de volgende herstart/synchronisatie opnieuw aangemaakt — verwijder het configuratie-item om hem permanent te verwijderen. Geef óf slug óf entity_id op.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug-identificatie van de widget. Geef óf slug óf entity_id op."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "Melding {notification_id} heeft niets om te annuleren: ze is niet met acknowledge verstuurd, ze is met een andere integratiesleutel verstuurd, of ze is meer dan 7 dagen geleden afgelopen."
+    },
+    "config_entry_required": {
+      "message": "Er is meer dan één PushWard-account ingesteld, dus {service} heeft een config_entry_id nodig die er precies één noemt."
+    },
+    "entry_not_loaded": {
+      "message": "Geen geladen PushWard-account heeft de config entry-ID {config_entry_id}."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "Er is een onverwachte fout opgetreden."
     },
     "abort": {
-      "already_configured": "PushWard is al geconfigureerd.",
+      "already_configured": "Dit PushWard-account is al geconfigureerd.",
       "reconfigure_successful": "PushWard-configuratie bijgewerkt.",
-      "reauth_successful": "Herverificatie geslaagd."
+      "reauth_successful": "Herverificatie geslaagd.",
+      "wrong_account": "Deze integratiesleutel hoort bij een ander PushWard-account. Gebruik Opnieuw configureren om deze vermelding naar dat account te verplaatsen, of voeg de sleutel toe als nieuwe PushWard-vermelding."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "De actie `pushward.update_activity` is verouderd. Schakel je automatiseringen over naar de sjabloonspecifieke actie — bijvoorbeeld `pushward.update_activity_countdown` of `pushward.update_activity_gauge`. De oude actie werkt voorlopig nog, maar wordt in een toekomstige release verwijderd."
     },
     "usage_limit_notifications": {
-      "title": "PushWard-meldingslimiet bereikt",
+      "title": "{account}-meldingslimiet bereikt",
       "description": "Je PushWard-account heeft {used} van zijn {limit} meldingen voor de huidige periode gebruikt, dus nieuwe meldingen worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
     },
     "usage_limit_live_activity": {
-      "title": "PushWard Live Activity-updatelimiet bereikt",
+      "title": "{account} Live Activity-updatelimiet bereikt",
       "description": "Je PushWard-account heeft {used} van zijn {limit} Live Activity-updates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
     },
     "usage_limit_widgets": {
-      "title": "PushWard-widgetupdatelimiet bereikt",
+      "title": "{account}-widgetupdatelimiet bereikt",
       "description": "Je PushWard-account heeft {used} van zijn {limit} widgetupdates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
     },
     "usage_limit_emails": {
-      "title": "PushWard-e-maillimiet bereikt",
+      "title": "{account}-e-maillimiet bereikt",
       "description": "Je PushWard-account heeft {used} van zijn {limit} e-mails voor de huidige periode gebruikt, dus nieuwe e-mails worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard-herinneringen voor takenlijsten worden niet verstuurd",
+      "title": "{account}-herinneringen voor takenlijsten worden niet verstuurd",
       "description": "Deze integratiesleutel hoort bij een organisatie, en organisaties kunnen geen end-to-end versleutelde meldingen versturen. Daarom weigert PushWard elke takenherinnering zolang er een versleutelingssleutel is ingesteld. Verwijder de versleutelingssleutel onder Configureren, of configureer de integratie opnieuw met een persoonlijke integratiesleutel."
     }
   },

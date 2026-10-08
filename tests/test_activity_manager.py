@@ -17,9 +17,9 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
 
 from custom_components.pushward.activity_manager import (
-    _ACTIVITY_LIMIT_NOTIFICATION_ID,
     ActivityManager,
     TrackedEntity,
+    _activity_limit_notification_id,
     _companion_entity_ids,
     _downsample_evenly,
     _forbidden_notification_id,
@@ -93,6 +93,7 @@ def _mock_api() -> AsyncMock:
 def _mock_entry() -> MagicMock:
     """Create a mock ConfigEntry for the activity manager."""
     entry = MagicMock()
+    entry.title = "PushWard"
     entry.async_start_reauth = MagicMock()
     return entry
 
@@ -688,7 +689,7 @@ async def test_activity_limit_409_triggers_persistent_notification(hass: HomeAss
         await hass.async_block_till_done()
 
         mock_notify.assert_called_once()
-        assert mock_notify.call_args.kwargs.get("notification_id") == _ACTIVITY_LIMIT_NOTIFICATION_ID
+        assert mock_notify.call_args.kwargs.get("notification_id") == _activity_limit_notification_id(entry.entry_id)
 
     await manager.async_stop()
 
@@ -741,7 +742,7 @@ async def test_forbidden_403_triggers_persistent_notification_not_reauth(hass: H
 
         mock_notify.assert_called_once()
         call_args = mock_notify.call_args
-        assert call_args.kwargs.get("notification_id") == _forbidden_notification_id("ha-washer")
+        assert call_args.kwargs.get("notification_id") == _forbidden_notification_id(entry.entry_id, "ha-washer")
         message_arg = call_args.args[1] if len(call_args.args) > 1 else call_args.kwargs.get("message", "")
         assert "subscription" in message_arg.lower() or "active" in message_arg.lower()
 
@@ -765,7 +766,8 @@ async def test_forbidden_403_on_create_also_triggers_notification(hass: HomeAssi
         await hass.async_block_till_done()
 
         mock_notify.assert_called_once()
-        assert mock_notify.call_args.kwargs.get("notification_id") == _forbidden_notification_id("ha-washer")
+        expected_id = _forbidden_notification_id(entry.entry_id, "ha-washer")
+        assert mock_notify.call_args.kwargs.get("notification_id") == expected_id
 
     entry.async_start_reauth.assert_not_called()
     await manager.async_stop()
@@ -796,7 +798,8 @@ async def test_forbidden_403_on_end_also_triggers_notification(hass: HomeAssista
             await manager._async_end_activity("binary_sensor.washer")
 
         mock_notify.assert_called_once()
-        assert mock_notify.call_args.kwargs.get("notification_id") == _forbidden_notification_id("ha-washer")
+        expected_id = _forbidden_notification_id(entry.entry_id, "ha-washer")
+        assert mock_notify.call_args.kwargs.get("notification_id") == expected_id
 
     entry.async_start_reauth.assert_not_called()
     await manager.async_stop()

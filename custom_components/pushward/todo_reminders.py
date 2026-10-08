@@ -720,6 +720,7 @@ class TodoReminderManager:
             is_persistent=False,
             severity=ir.IssueSeverity.WARNING,
             translation_key="todo_e2e_unavailable",
+            translation_placeholders={"account": self._entry.title},
         )
 
     @callback

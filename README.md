@@ -121,9 +121,9 @@ Setup is UI-driven (config flow). The **only** value you enter is your integrati
 
 1. Go to **Settings > Devices & Services > Add Integration**
 2. Search for **PushWard**
-3. Paste your **integration key** (validated against `GET /auth/me`)
+3. Paste your **integration key** (validated against `GET /auth/me`; the entry is named after your account, e.g. `PushWard (Anna)`)
 
-Once the entry exists, add tracked entities and widgets through the integration's **Configure** / **Add tracked entity** / **Add tracked widget** subentry flows. The key can be replaced later via **Reconfigure**, and the integration auto-prompts for reauth if the key becomes invalid.
+Once the entry exists, add tracked entities and widgets through the integration's **Configure** / **Add tracked entity** / **Add tracked widget** subentry flows. The key can be replaced later via **Reconfigure** (a key of another account moves the entry to that account, as long as no other entry has it), and the integration auto-prompts for reauth if the key becomes invalid. Reauth only takes a key of the same account.
 
 | Setting | Required | Default | Description |
 |---------|:--------:|---------|-------------|
@@ -132,6 +132,16 @@ Once the entry exists, add tracked entities and widgets through the integration'
 | Encryption key | No | - | Set under **Configure**; turns on [end-to-end encryption](#end-to-end-encryption) of notification text. |
 
 Every field label and its help text is shown live in the Home Assistant config-flow UI, so the tables below are a reference, not something you need to read before setting up.
+
+### More than one account
+
+Each PushWard account gets its own entry. On a Family plan every member has their own account, so to reach someone else's iPhone they create an integration key in their PushWard app and you add the integration a second time with that key. A key for an account that already has an entry is refused.
+
+- Tracked entities, widgets and to-do lists belong to one entry and only push to that account. Add the same entity under both entries if both of you should get it.
+- Actions reach every account unless you pick one, see [Choosing the account](#choosing-the-account).
+- Each entry has its own [account sensors](#account-sensors) and its own quota.
+
+If all you want is to share Live Activities, the app can do it without a second entry. **Settings > Sharing > Create Pattern Share** with a pattern like `ha-*` gives a code the other person redeems once under **Join with Code**. The code expires after 7 days at most; the share doesn't. Every current and future activity whose slug matches reaches them, including the ones your automations end and create again. Notifications are not shared this way.
 
 ### Add a tracked entity (Live Activity)
 
@@ -483,7 +493,7 @@ The envelope format and test vectors are described at <https://pushward.app/docs
 
 ## Account sensors
 
-Each config entry registers **5 sensors** under one service device named **PushWard**, fed by a coordinator that polls `GET /auth/me` every **15 minutes**. They report your account's own consumption against its plan limits (these sensors stay *unavailable* on older servers that don't return usage to integration keys):
+Each config entry registers **5 sensors** under one service device named after the entry, fed by a coordinator that polls `GET /auth/me` every **15 minutes**. They report your account's own consumption against its plan limits (these sensors stay *unavailable* on older servers that don't return usage to integration keys):
 
 | Sensor | State | Attributes |
 |--------|-------|------------|
@@ -498,6 +508,19 @@ On premium, uncapped resources report `limit: unlimited`, and the notifications 
 ## Services
 
 All services live in the `pushward` domain. There are 22 in total: the twelve described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
+
+### Choosing the account
+
+Every action except `generate_thumbhash` takes an optional `config_entry_id` (**Account** in the UI): one entry id, or a list of them in YAML. With a single PushWard entry you never need it. With [more than one](#more-than-one-account), leaving it out does this:
+
+| Action | Without `config_entry_id` |
+|--------|---------------------------|
+| `create_activity`, `update_activity_<template>`, `end_activity`, `delete_activity`, `widget_refresh`, `delete_widget` | every account |
+| `send_notification` | every account; name one to read the response |
+| `cancel_notifications` | a `tag` is canceled on every account; a `notification_id` needs one |
+| `get_notification_answer`, `list_scheduled_notifications`, `cancel_scheduled_notification`, `send_email` | fails until you name one |
+
+Notification ids belong to the account that sent them, hence the single-account rows. `send_email` goes to the address you give it, so sending it from every account would only deliver copies. When one account fails (quota, missing permission) the others still get the call, and the action raises the first error once they are done.
 
 ### `pushward.create_activity`
 

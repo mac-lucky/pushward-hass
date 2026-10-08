@@ -27,6 +27,10 @@
       "name": "I-update ang Activity (deprecated)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -271,6 +275,10 @@
       "name": "I-update ang Activity (Generic)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -407,6 +415,10 @@
       "name": "I-update ang Activity (Countdown)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -543,6 +555,10 @@
       "name": "I-update ang Activity (Steps)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -711,6 +727,10 @@
       "name": "I-update ang Activity (Alert)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -835,6 +855,10 @@
       "name": "I-update ang Activity (Gauge)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -959,6 +983,10 @@
       "name": "I-update ang Activity (Timeline)",
       "description": "I-update ang estado at nilalaman ng isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -1107,6 +1135,10 @@
       "name": "I-update ang Activity (Board)",
       "description": "I-update ang isang PushWard board Live Activity (1–4 tile).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -1181,6 +1213,10 @@
       "name": "I-update ang Activity (Log)",
       "description": "I-update ang isang PushWard log Live Activity (1–20 newest-first na linya).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -1255,6 +1291,10 @@
       "name": "I-update ang Activity (Media)",
       "description": "I-update ang isang PushWard media Live Activity: isang remote player card na may cover art, tumatakbong progress bar, at mga transport button na tumatawag sa sarili mong mga webhook.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -1369,6 +1409,10 @@
       "name": "I-update ang Activity (Approval)",
       "description": "I-update ang isang PushWard approval Live Activity: isang question card na may 2-4 na answer button na tumatawag sa sarili mong mga webhook o nagtatala sa server ng na-tap na opsyon.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity."
@@ -1459,6 +1503,10 @@
       "name": "Lumikha ng Activity",
       "description": "Lumikha ng bagong PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Natatanging slug identifier ng activity."
@@ -1503,6 +1551,10 @@
       "name": "Tapusin ang Activity",
       "description": "Tapusin ang isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity na tatapusin."
@@ -1517,6 +1569,10 @@
       "name": "Burahin ang Activity",
       "description": "Burahin ang isang PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity na buburahin."
@@ -1527,6 +1583,10 @@
       "name": "I-refresh ang Widget",
       "description": "Pwersahang i-refresh ang isang na-track na PushWard widget. Nila-laktawan ang in-memory diff cache upang muling ma-render at maipadala sa iOS ang widget kahit hindi nagbago ang halaga.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng widget. Dapat ibigay ang alinman sa slug o entity_id."
@@ -1541,6 +1601,10 @@
       "name": "Magpadala ng Notification",
       "description": "Magpadala ng push notification sa pamamagitan ng PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant; kailangan kasama ng response variable kapag higit sa isa ang idinagdag."
+        },
         "title": {
           "name": "Pamagat",
           "description": "Pamagat ng notification."
@@ -1631,6 +1695,10 @@
       "name": "Kanselahin ang Naka-iskedyul na Notification",
       "description": "Kanselahin ang notification na nakapila gamit ang send_at o Ulitin ng send_notification. Ang pagkansela sa umuulit na notification ay nagpapahinto sa buong serye, kahit habang ipinapadala ito. Binabalewala ang id na wala na. Makikitang kinansela sa PushWard app ang kinanselang notification sa loob ng 24 na oras.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Kailangan kapag higit sa isang PushWard account ang idinagdag sa Home Assistant."
+        },
         "scheduled_notification_id": {
           "name": "ID ng naka-iskedyul na notification",
           "description": "Ang scheduled_notification_id na ibinalik ng send_notification."
@@ -1641,6 +1709,10 @@
       "name": "Ilista ang mga Naka-iskedyul na Notification",
       "description": "Ibalik ang iyong mga naka-iskedyul na notification: ang pinakamalapit muna para sa mga naghihintay pa (ang default), ang pinakabago muna para sa anumang ibang status. Kasama sa mga umuulit ang kanilang recurrence, kung ilang beses na silang naipadala (occurrence) at kung kailan huling naipadala (last_sent_at).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Kailangan kapag higit sa isang PushWard account ang idinagdag sa Home Assistant."
+        },
         "status": {
           "name": "Status",
           "description": "Alin ang ibabalik. Inililista ng scheduled (ang default) ang mga naghihintay pa; ang sent at failed ay itinatago nang 7 araw. Ang canceled ay itinatago nang 24 na oras."
@@ -1651,6 +1723,10 @@
       "name": "Kunin ang Sagot sa Notification",
       "description": "Hintayin ang sagot sa notification na ipinadala na may mga aksyong walang url, at ibalik kung aling aksyon ang na-tap (action_id), ang anumang typed reply (text) at kung kailan (answered_at). Kung walang sumagot sa loob ng timeout, false ang answered. Itinatago ang mga sagot nang 30 araw, kaya ang susunod na tawag na may timeout na 0 ay makakabasa nito nang hindi naghihintay.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Kailangan kapag higit sa isang PushWard account ang idinagdag sa Home Assistant."
+        },
         "notification_id": {
           "name": "Notification ID",
           "description": "Ang notification_id na ibinalik ng send_notification, o ang notification_id ng isang naipadalang naka-iskedyul na notification."
@@ -1665,6 +1741,10 @@
       "name": "Kanselahin ang mga Notification na Kinukumpirma",
       "description": "Ihinto ang pag-ulit ng mga notification na kinukumpirma, alinman sa lahat ng aktibong ipinadala na may tag o isa gamit ang notification_id nito. Naaabot lang nito ang mga notification na ipinadala gamit ang key ng integration na ito, at hindi ipinapadala ang kanilang callback. Ang opsyonal na sagot ay naglalaman ng dami ng nakansela (canceled) para sa isang tag, o ang resibo para sa isang notification_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para kanselahin ang isang tag sa bawat PushWard account na idinagdag sa Home Assistant; kailangan kasama ng notification_id kapag higit sa isa ang idinagdag."
+        },
         "tag": {
           "name": "Tag",
           "description": "Kanselahin ang lahat ng aktibong notification na kinukumpirma na ipinadala gamit ang tag na ito."
@@ -1679,6 +1759,10 @@
       "name": "Magpadala ng Email",
       "description": "Magpadala ng transactional na email sa pamamagitan ng PushWard. Magbigay ng text body, HTML body, o pareho. Kailangan ng integration key ang \"emails\" na kakayahan.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Kailangan kapag higit sa isang PushWard account ang idinagdag sa Home Assistant."
+        },
         "to": {
           "name": "Tatanggap",
           "description": "Email address ng tatanggap. Dapat itong isang address na naidagdag at nakumpirma mo na sa PushWard iOS app — tinatanggihan ang mga hindi na-verify na address."
@@ -1701,6 +1785,10 @@
       "name": "Tanggalin ang Widget",
       "description": "Tanggalin ang isang PushWard widget mula sa server. Kung may tracked-widget config entry pa ring nagpapatakbo sa slug na ito, muling gagawin ang widget sa susunod na restart/sync — alisin ang config entry upang permanenteng matanggal ito. Magbigay ng alinman sa slug o entity_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng widget. Dapat ibigay ang alinman sa slug o entity_id."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "Walang makakansela sa notification {notification_id}: hindi ito ipinadala nang may acknowledge, ipinadala ito gamit ang ibang integration key, o natapos ito mahigit 7 araw na ang nakalipas."
+    },
+    "config_entry_required": {
+      "message": "Higit sa isang PushWard account ang naka-set up, kaya kailangan ng {service} ang config_entry_id na tumutukoy sa eksaktong isa sa mga ito."
+    },
+    "entry_not_loaded": {
+      "message": "Walang naka-load na PushWard account na may config entry id na {config_entry_id}."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "May hindi inaasahang error na naganap."
     },
     "abort": {
-      "already_configured": "Naka-configure na ang PushWard.",
+      "already_configured": "Naka-configure na ang PushWard account na ito.",
       "reconfigure_successful": "Na-update na ang configuration ng PushWard.",
-      "reauth_successful": "Matagumpay na ang reauthentication."
+      "reauth_successful": "Matagumpay na ang reauthentication.",
+      "wrong_account": "Ang integration key na ito ay para sa ibang PushWard account. Gamitin ang Reconfigure para ilipat ang entry na ito sa account na iyon, o idagdag ang key bilang bagong PushWard entry."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "Hindi na ginagamit ang `pushward.update_activity` action. Ilipat ang iyong mga automation sa template-specific na action sa halip — halimbawa `pushward.update_activity_countdown` o `pushward.update_activity_gauge`. Gumagana pa ang lumang action sa ngayon ngunit aalisin sa hinaharap na release."
     },
     "usage_limit_notifications": {
-      "title": "Naabot na ang limitasyon ng notification sa PushWard",
+      "title": "Naabot na ang limitasyon ng notification sa {account}",
       "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na notification para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong notification hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
     },
     "usage_limit_live_activity": {
-      "title": "Naabot na ang limitasyon ng Live Activity update sa PushWard",
+      "title": "Naabot na ang limitasyon ng Live Activity update sa {account}",
       "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na Live Activity update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
     },
     "usage_limit_widgets": {
-      "title": "Naabot na ang limitasyon ng widget update sa PushWard",
+      "title": "Naabot na ang limitasyon ng widget update sa {account}",
       "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na widget update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
     },
     "usage_limit_emails": {
-      "title": "Naabot na ang limitasyon ng email sa PushWard",
+      "title": "Naabot na ang limitasyon ng email sa {account}",
       "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na email para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong email hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
     },
     "todo_e2e_unavailable": {
-      "title": "Hindi naipapadala ang mga paalala ng to-do ng PushWard",
+      "title": "Hindi naipapadala ang mga paalala ng to-do ng {account}",
       "description": "Pag-aari ng isang organisasyon ang integration key na ito, at hindi makapagpapadala ng end-to-end encrypted na notification ang mga organisasyon, kaya tinatanggihan ng PushWard ang bawat paalala ng to-do habang may nakatakdang encryption key. Alisin ang encryption key sa Configure, o i-reconfigure ang integration gamit ang personal na integration key."
     }
   },

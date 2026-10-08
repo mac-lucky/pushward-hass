@@ -27,6 +27,10 @@
       "name": "Cập Nhật Hoạt Động (deprecated)",
       "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -271,6 +275,10 @@
       "name": "Cập Nhật Hoạt Động (Generic)",
       "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -407,6 +415,10 @@
       "name": "Cập Nhật Hoạt Động (Countdown)",
       "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -543,6 +555,10 @@
       "name": "Cập Nhật Hoạt Động (Steps)",
       "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -711,6 +727,10 @@
       "name": "Cập Nhật Hoạt Động (Alert)",
       "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -835,6 +855,10 @@
       "name": "Cập Nhật Hoạt Động (Gauge)",
       "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -959,6 +983,10 @@
       "name": "Cập Nhật Hoạt Động (Timeline)",
       "description": "Cập nhật trạng thái và nội dung của PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -1107,6 +1135,10 @@
       "name": "Cập Nhật Hoạt Động (Board)",
       "description": "Cập nhật một PushWard board Live Activity (1–4 ô).",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -1181,6 +1213,10 @@
       "name": "Cập Nhật Hoạt Động (Log)",
       "description": "Cập nhật một PushWard log Live Activity (1–20 dòng, mới nhất trước).",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -1255,6 +1291,10 @@
       "name": "Cập Nhật Hoạt Động (Media)",
       "description": "Cập nhật một Live Activity đa phương tiện của PushWard: thẻ trình phát từ xa với ảnh bìa, thanh tiến trình chạy và các nút điều khiển gọi tới webhook của riêng bạn.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -1369,6 +1409,10 @@
       "name": "Cập Nhật Hoạt Động (Approval)",
       "description": "Cập nhật một Live Activity phê duyệt của PushWard: thẻ câu hỏi với 2-4 nút trả lời gọi webhook của riêng bạn hoặc ghi lại lựa chọn được nhấn ở phía máy chủ.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động."
@@ -1459,6 +1503,10 @@
       "name": "Tạo Hoạt Động",
       "description": "Tạo PushWard Live Activity mới.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug duy nhất cho hoạt động."
@@ -1503,6 +1551,10 @@
       "name": "Kết Thúc Hoạt Động",
       "description": "Kết thúc PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động cần kết thúc."
@@ -1517,6 +1569,10 @@
       "name": "Xóa Hoạt Động",
       "description": "Xóa PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động cần xóa."
@@ -1527,6 +1583,10 @@
       "name": "Làm mới widget",
       "description": "Buộc làm mới một widget PushWard đang được theo dõi. Bỏ qua bộ nhớ đệm khác biệt trong bộ nhớ để widget được kết xuất lại và đẩy tới iOS ngay cả khi giá trị không thay đổi.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Định danh slug của widget. Phải cung cấp slug hoặc entity_id."
@@ -1541,6 +1601,10 @@
       "name": "Gửi Thông Báo",
       "description": "Gửi thông báo đẩy qua PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant; bắt buộc khi dùng biến phản hồi và có nhiều hơn một tài khoản."
+        },
         "title": {
           "name": "Tiêu Đề",
           "description": "Tiêu đề thông báo."
@@ -1631,6 +1695,10 @@
       "name": "Hủy Thông Báo Đã Lên Lịch",
       "description": "Hủy một thông báo đã được xếp hàng bằng send_at hoặc Lặp lại của send_notification. Hủy một thông báo lặp lại sẽ dừng toàn bộ chuỗi, kể cả khi đang gửi. Id không còn tồn tại sẽ bị bỏ qua. Thông báo đã hủy hiển thị là đã hủy trong ứng dụng PushWard trong 24 giờ.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Bắt buộc khi có nhiều hơn một tài khoản PushWard được thêm vào Home Assistant."
+        },
         "scheduled_notification_id": {
           "name": "ID Thông Báo Đã Lên Lịch",
           "description": "scheduled_notification_id do send_notification trả về."
@@ -1641,6 +1709,10 @@
       "name": "Liệt Kê Thông Báo Đã Lên Lịch",
       "description": "Trả về các thông báo đã lên lịch của bạn: gần nhất trước với các thông báo vẫn đang chờ (mặc định), mới nhất trước với mọi trạng thái khác. Thông báo lặp lại kèm theo recurrence, số lần đã gửi (occurrence) và thời điểm gửi gần nhất (last_sent_at).",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Bắt buộc khi có nhiều hơn một tài khoản PushWard được thêm vào Home Assistant."
+        },
         "status": {
           "name": "Trạng Thái",
           "description": "Loại cần trả về. scheduled (mặc định) liệt kê các thông báo vẫn đang chờ; sent và failed được lưu giữ trong 7 ngày. canceled được lưu giữ trong 24 giờ."
@@ -1651,6 +1723,10 @@
       "name": "Lấy Câu Trả Lời Thông Báo",
       "description": "Chờ câu trả lời cho một thông báo được gửi với các hành động không có url, rồi trả về hành động nào đã được chạm (action_id), phản hồi văn bản nếu có (text) và thời điểm (answered_at). Nếu không ai trả lời trong thời gian chờ, answered là false. Câu trả lời được lưu giữ trong 30 ngày, nên một lần gọi sau với thời gian chờ 0 có thể đọc mà không cần chờ.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Bắt buộc khi có nhiều hơn một tài khoản PushWard được thêm vào Home Assistant."
+        },
         "notification_id": {
           "name": "ID Thông Báo",
           "description": "notification_id do send_notification trả về, hoặc notification_id của một thông báo đã lên lịch đã được gửi."
@@ -1665,6 +1741,10 @@
       "name": "Hủy Thông Báo Cần Xác Nhận",
       "description": "Dừng việc lặp lại các thông báo cần xác nhận, hoặc tất cả thông báo đang hoạt động được gửi kèm một thẻ, hoặc một thông báo theo notification_id. Chỉ tác động đến thông báo gửi bằng khóa của tích hợp này và callback của chúng không được gửi. Phản hồi tùy chọn cho biết số thông báo đã hủy (canceled) với một thẻ, hoặc biên nhận với một notification_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để hủy một thẻ trên mọi tài khoản PushWard đã thêm vào Home Assistant; bắt buộc với notification_id khi có nhiều hơn một tài khoản."
+        },
         "tag": {
           "name": "Thẻ",
           "description": "Hủy mọi thông báo cần xác nhận đang hoạt động được gửi kèm thẻ này."
@@ -1679,6 +1759,10 @@
       "name": "Gửi email",
       "description": "Gửi một email giao dịch qua PushWard. Cung cấp nội dung văn bản, nội dung HTML, hoặc cả hai. Khóa tích hợp cần có quyền \"emails\".",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Bắt buộc khi có nhiều hơn một tài khoản PushWard được thêm vào Home Assistant."
+        },
         "to": {
           "name": "Đến",
           "description": "Địa chỉ email người nhận. Phải là địa chỉ bạn đã thêm và xác nhận trong ứng dụng PushWard trên iOS — các địa chỉ chưa xác minh sẽ bị từ chối."
@@ -1701,6 +1785,10 @@
       "name": "Xóa widget",
       "description": "Xóa một widget PushWard khỏi máy chủ. Nếu một mục cấu hình widget được theo dõi vẫn điều khiển slug này, widget sẽ được tạo lại ở lần khởi động lại/đồng bộ tiếp theo — hãy gỡ mục cấu hình để xóa vĩnh viễn. Cung cấp slug hoặc entity_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Định danh slug của widget. Phải cung cấp slug hoặc entity_id."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "Thông báo {notification_id} không có gì để hủy: nó không được gửi kèm acknowledge, được gửi bằng khóa tích hợp khác, hoặc đã kết thúc hơn 7 ngày trước."
+    },
+    "config_entry_required": {
+      "message": "Có nhiều hơn một tài khoản PushWard được thiết lập, nên {service} cần config_entry_id chỉ định đúng một tài khoản."
+    },
+    "entry_not_loaded": {
+      "message": "Không có tài khoản PushWard nào đã tải có ID mục cấu hình {config_entry_id}."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "Đã xảy ra lỗi không mong muốn."
     },
     "abort": {
-      "already_configured": "PushWard đã được cấu hình.",
+      "already_configured": "Tài khoản PushWard này đã được cấu hình.",
       "reconfigure_successful": "Đã cập nhật cấu hình PushWard.",
-      "reauth_successful": "Xác thực lại thành công."
+      "reauth_successful": "Xác thực lại thành công.",
+      "wrong_account": "Khóa tích hợp này thuộc về một tài khoản PushWard khác. Dùng Cấu hình lại để chuyển mục này sang tài khoản đó, hoặc thêm khóa thành một mục PushWard mới."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "Hành động `pushward.update_activity` đã lỗi thời. Hãy chuyển các tự động hóa của bạn sang hành động dành riêng cho từng mẫu — ví dụ `pushward.update_activity_countdown` hoặc `pushward.update_activity_gauge`. Hành động cũ vẫn hoạt động hiện tại nhưng sẽ bị gỡ bỏ trong một bản phát hành tương lai."
     },
     "usage_limit_notifications": {
-      "title": "Đã đạt giới hạn thông báo của PushWard",
+      "title": "Đã đạt giới hạn thông báo của {account}",
       "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} thông báo cho kỳ hiện tại, nên các thông báo mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
     },
     "usage_limit_live_activity": {
-      "title": "Đã đạt giới hạn cập nhật Live Activity của PushWard",
+      "title": "Đã đạt giới hạn cập nhật Live Activity của {account}",
       "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật Live Activity cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
     },
     "usage_limit_widgets": {
-      "title": "Đã đạt giới hạn cập nhật widget của PushWard",
+      "title": "Đã đạt giới hạn cập nhật widget của {account}",
       "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật widget cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
     },
     "usage_limit_emails": {
-      "title": "Đã đạt giới hạn email của PushWard",
+      "title": "Đã đạt giới hạn email của {account}",
       "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} email cho kỳ hiện tại, nên các email mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
     },
     "todo_e2e_unavailable": {
-      "title": "Lời nhắc việc cần làm của PushWard không được gửi",
+      "title": "Lời nhắc việc cần làm của {account} không được gửi",
       "description": "Khóa tích hợp này thuộc về một tổ chức, và tổ chức không thể gửi thông báo mã hóa đầu cuối, nên PushWard từ chối mọi lời nhắc việc cần làm khi khóa mã hóa đang được đặt. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc cấu hình lại tích hợp bằng khóa tích hợp cá nhân."
     }
   },

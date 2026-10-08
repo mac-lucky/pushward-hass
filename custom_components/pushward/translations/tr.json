@@ -27,6 +27,10 @@
       "name": "Aktiviteyi Güncelle (deprecated)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -271,6 +275,10 @@
       "name": "Aktiviteyi Güncelle (Generic)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -407,6 +415,10 @@
       "name": "Aktiviteyi Güncelle (Countdown)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -543,6 +555,10 @@
       "name": "Aktiviteyi Güncelle (Steps)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -711,6 +727,10 @@
       "name": "Aktiviteyi Güncelle (Alert)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -835,6 +855,10 @@
       "name": "Aktiviteyi Güncelle (Gauge)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -959,6 +983,10 @@
       "name": "Aktiviteyi Güncelle (Timeline)",
       "description": "Bir PushWard Live Activity durumunu ve içeriğini güncelle.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -1107,6 +1135,10 @@
       "name": "Aktiviteyi Güncelle (Board)",
       "description": "Bir PushWard board Live Activity'sini güncelle (1–4 kutu).",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -1181,6 +1213,10 @@
       "name": "Aktiviteyi Güncelle (Log)",
       "description": "Bir PushWard log Live Activity'sini güncelle (en yeniden en eskiye 1–20 satır).",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -1255,6 +1291,10 @@
       "name": "Aktiviteyi Güncelle (Media)",
       "description": "Bir PushWard medya Live Activity'sini güncelle: kapak resmi, ilerleyen bir ilerleme çubuğu ve kendi webhook'larınızı çağıran taşıma düğmeleri olan bir uzak oynatıcı kartı.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -1369,6 +1409,10 @@
       "name": "Aktiviteyi Güncelle (Approval)",
       "description": "Bir PushWard onay Live Activity'sini günceller: kendi webhook'larınızı çağıran veya dokunulan seçeneği sunucu tarafında kaydeden 2-4 yanıt düğmeli bir soru kartı.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Aktivite slug tanımlayıcısı."
@@ -1459,6 +1503,10 @@
       "name": "Aktivite Oluştur",
       "description": "Yeni bir PushWard Live Activity oluştur.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Benzersiz aktivite slug tanımlayıcısı."
@@ -1503,6 +1551,10 @@
       "name": "Aktiviteyi Sonlandır",
       "description": "Bir PushWard Live Activity'yi sonlandır.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Sonlandırılacak aktivite slug tanımlayıcısı."
@@ -1517,6 +1569,10 @@
       "name": "Aktiviteyi Sil",
       "description": "Bir PushWard Live Activity'yi sil.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Silinecek aktivite slug tanımlayıcısı."
@@ -1527,6 +1583,10 @@
       "name": "Widget'ı Yenile",
       "description": "İzlenen bir PushWard widget'ını zorla yeniler. Bellekteki fark önbelleğini atlar, böylece değer değişmemiş olsa bile widget yeniden oluşturulur ve iOS'a gönderilir.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Widget slug tanımlayıcısı. slug veya entity_id'den biri sağlanmalıdır."
@@ -1541,6 +1601,10 @@
       "name": "Bildirim Gönder",
       "description": "PushWard aracılığıyla anlık bildirim gönder.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın; birden fazla hesap eklendiğinde yanıt değişkeniyle zorunludur."
+        },
         "title": {
           "name": "Başlık",
           "description": "Bildirim başlığı."
@@ -1631,6 +1695,10 @@
       "name": "Zamanlanmış Bildirimi İptal Et",
       "description": "send_notification'ın send_at veya Tekrarla alanıyla sıraya alınan bir bildirimi iptal eder. Tekrarlanan bir bildirimi iptal etmek, gönderilmekte olsa bile tüm seriyi durdurur. Artık var olmayan bir id yok sayılır. İptal edilen bildirim PushWard uygulamasında 24 saat boyunca iptal edildi olarak görünür.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a birden fazla PushWard hesabı eklendiğinde zorunludur."
+        },
         "scheduled_notification_id": {
           "name": "Zamanlanmış bildirim kimliği",
           "description": "send_notification tarafından döndürülen scheduled_notification_id."
@@ -1641,6 +1709,10 @@
       "name": "Zamanlanmış Bildirimleri Listele",
       "description": "Zamanlanmış bildirimlerinizi, hâlâ bekleyenler (varsayılan) için en yakın olandan, diğer tüm durumlar için en yeni olandan başlayarak döndürür. Tekrarlananlar recurrence bilgisini, kaç kez gönderildiklerini (occurrence) ve en son ne zaman gönderildiklerini (last_sent_at) içerir.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a birden fazla PushWard hesabı eklendiğinde zorunludur."
+        },
         "status": {
           "name": "Durum",
           "description": "Hangilerinin döndürüleceği. scheduled (varsayılan) hâlâ bekleyenleri listeler; sent ve failed 7 gün saklanır. canceled 24 saat saklanır."
@@ -1651,6 +1723,10 @@
       "name": "Bildirim Yanıtını Al",
       "description": "url içermeyen eylemlerle gönderilen bir bildirimin yanıtını bekler ve hangi eyleme dokunulduğunu (action_id), varsa yazılı yanıtı (text) ve ne zaman yanıtlandığını (answered_at) döndürür. Zaman aşımı içinde kimse yanıt vermezse answered false olur. Yanıtlar 30 gün saklanır; bu nedenle daha sonra zaman aşımı 0 ile yapılan bir çağrı, beklemeden bir yanıtı okuyabilir.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a birden fazla PushWard hesabı eklendiğinde zorunludur."
+        },
         "notification_id": {
           "name": "Bildirim kimliği",
           "description": "send_notification tarafından döndürülen notification_id veya gönderilmiş bir zamanlanmış bildirimin notification_id değeri."
@@ -1665,6 +1741,10 @@
       "name": "Onaylanan Bildirimleri İptal Et",
       "description": "Onay bekleyen bildirimlerin tekrarlanmasını durdur: bir etiketle gönderilen etkin olanların tümü ya da notification_id ile tek bir bildirim. Yalnızca bu entegrasyonun anahtarıyla gönderilen bildirimleri etkiler ve geri çağrıları gönderilmez. İsteğe bağlı yanıt, bir etiket için kaç tanesinin iptal edildiğini (canceled) veya bir notification_id için alındı bilgisini içerir.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabında bir etiketi iptal etmek için boş bırakın; birden fazla hesap eklendiğinde notification_id ile zorunludur."
+        },
         "tag": {
           "name": "Etiket",
           "description": "Bu etiketle gönderilen tüm etkin onay bekleyen bildirimleri iptal et."
@@ -1679,6 +1759,10 @@
       "name": "E-posta Gönder",
       "description": "PushWard üzerinden işlemsel bir e-posta gönderin. Bir metin gövdesi, bir HTML gövdesi veya her ikisini sağlayın. Entegrasyon anahtarının \"emails\" yetkisine sahip olması gerekir.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a birden fazla PushWard hesabı eklendiğinde zorunludur."
+        },
         "to": {
           "name": "Alıcı",
           "description": "Alıcı e-posta adresi. PushWard iOS uygulamasında daha önce eklediğiniz ve onayladığınız bir adres olmalıdır — doğrulanmamış adresler reddedilir."
@@ -1701,6 +1785,10 @@
       "name": "Widget'ı Sil",
       "description": "Bir PushWard widget'ını sunucudan siler. İzlenen widget yapılandırma girdisi bu slug'ı hâlâ yönetiyorsa, widget bir sonraki yeniden başlatma/eşitlemede yeniden oluşturulur — kalıcı olarak silmek için yapılandırma girdisini kaldırın. slug veya entity_id'den birini sağlayın.",
       "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
         "slug": {
           "name": "Slug",
           "description": "Widget slug tanımlayıcısı. slug veya entity_id'den biri sağlanmalıdır."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "{notification_id} bildirimi için iptal edilecek bir şey yok: acknowledge ile gönderilmedi, başka bir entegrasyon anahtarıyla gönderildi veya 7 günden daha önce sona erdi."
+    },
+    "config_entry_required": {
+      "message": "Birden fazla PushWard hesabı kurulu, bu yüzden {service} tam olarak birini belirten bir config_entry_id gerektirir."
+    },
+    "entry_not_loaded": {
+      "message": "Yüklü hiçbir PushWard hesabı {config_entry_id} yapılandırma girdisi kimliğine sahip değil."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "Beklenmeyen bir hata oluştu."
     },
     "abort": {
-      "already_configured": "PushWard zaten yapılandırılmış.",
+      "already_configured": "Bu PushWard hesabı zaten yapılandırılmış.",
       "reconfigure_successful": "PushWard yapılandırması güncellendi.",
-      "reauth_successful": "Yeniden kimlik doğrulama başarılı."
+      "reauth_successful": "Yeniden kimlik doğrulama başarılı.",
+      "wrong_account": "Bu entegrasyon anahtarı başka bir PushWard hesabına ait. Bu girdiyi o hesaba taşımak için Yeniden yapılandır'ı kullanın veya anahtarı yeni bir PushWard girdisi olarak ekleyin."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "`pushward.update_activity` eylemi kullanımdan kaldırıldı. Otomasyonlarınızı bunun yerine şablona özgü eyleme geçirin — örneğin `pushward.update_activity_countdown` veya `pushward.update_activity_gauge`. Eski eylem şimdilik hâlâ çalışıyor ancak gelecekteki bir sürümde kaldırılacak."
     },
     "usage_limit_notifications": {
-      "title": "PushWard bildirim limitine ulaşıldı",
+      "title": "{account} bildirim limitine ulaşıldı",
       "description": "PushWard hesabınız mevcut dönem için {limit} bildiriminin {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni bildirimler reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
     },
     "usage_limit_live_activity": {
-      "title": "PushWard Live Activity güncelleme limitine ulaşıldı",
+      "title": "{account} Live Activity güncelleme limitine ulaşıldı",
       "description": "PushWard hesabınız mevcut dönem için {limit} Live Activity güncellemesinin {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni güncellemeler reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
     },
     "usage_limit_widgets": {
-      "title": "PushWard widget güncelleme limitine ulaşıldı",
+      "title": "{account} widget güncelleme limitine ulaşıldı",
       "description": "PushWard hesabınız mevcut dönem için {limit} widget güncellemesinin {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni güncellemeler reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
     },
     "usage_limit_emails": {
-      "title": "PushWard e-posta limitine ulaşıldı",
+      "title": "{account} e-posta limitine ulaşıldı",
       "description": "PushWard hesabınız mevcut dönem için {limit} e-postasının {used} tanesini kullandı, bu nedenle kota sıfırlanana kadar ({resets_at}) yeni e-postalar reddedilecek. Limiti yükseltmek için PushWard iOS uygulamasında aboneliğinizi yükseltin."
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard yapılacaklar hatırlatıcıları gönderilmiyor",
+      "title": "{account} yapılacaklar hatırlatıcıları gönderilmiyor",
       "description": "Bu entegrasyon anahtarı bir kuruma ait ve kurumlar uçtan uca şifreli bildirim gönderemez; bu yüzden bir şifreleme anahtarı ayarlı olduğu sürece PushWard her yapılacaklar hatırlatıcısını reddeder. Şifreleme anahtarını Yapılandır altından kaldırın veya entegrasyonu kişisel bir entegrasyon anahtarıyla yeniden yapılandırın."
     }
   },

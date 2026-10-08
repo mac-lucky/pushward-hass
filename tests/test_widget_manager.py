@@ -6,7 +6,7 @@ import asyncio
 import logging
 import time
 from datetime import timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.const import STATE_UNAVAILABLE
@@ -48,9 +48,9 @@ from custom_components.pushward.const import (
 from custom_components.pushward.quota import quota_released_signal
 from custom_components.pushward.widget_manager import (
     _GROUP_ROW_SOURCES,
-    _WIDGET_PERMISSION_NOTIFICATION,
     WidgetManager,
     _entity_ids_for_widget,
+    _permission_notification_id,
 )
 
 from .conftest import make_mock_entry, make_quota_error, make_widget_config
@@ -72,7 +72,7 @@ async def test_reload_deletes_removed_widget(hass: HomeAssistant) -> None:
     kept = make_widget_config(slug="ha-users", entity_id="sensor.users")
     removed = make_widget_config(slug="ha-power", entity_id="sensor.power")
 
-    manager = WidgetManager(hass, api, [kept, removed], _mock_entry())
+    manager = WidgetManager(hass, api, [kept, removed], make_mock_entry())
     await manager.async_start()
 
     # Reload with only the kept widget → the removed one must be deleted server-side.
@@ -89,7 +89,7 @@ async def test_reload_without_removal_deletes_nothing(hass: HomeAssistant) -> No
     hass.states.async_set("sensor.users", "42")
     config = make_widget_config()
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
     await manager.async_reload([config])
@@ -108,7 +108,7 @@ async def test_reload_isolates_delete_failures(hass: HomeAssistant) -> None:
     one = make_widget_config(slug="ha-a", entity_id="sensor.a")
     two = make_widget_config(slug="ha-b", entity_id="sensor.b")
 
-    manager = WidgetManager(hass, api, [one, two], _mock_entry())
+    manager = WidgetManager(hass, api, [one, two], make_mock_entry())
     await manager.async_start()
 
     # Remove both → both deletes attempted even though the first raises.
@@ -125,7 +125,7 @@ async def test_slug_for_entity_resolves_and_misses(hass: HomeAssistant) -> None:
     api = _mock_api()
     hass.states.async_set("sensor.users", "42")
     config = make_widget_config(slug="ha-users", entity_id="sensor.users")
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
     assert manager.slug_for_entity("sensor.users") == "ha-users"
@@ -135,19 +135,12 @@ async def test_slug_for_entity_resolves_and_misses(hass: HomeAssistant) -> None:
     await manager.async_stop()
 
 
-def _mock_entry() -> MagicMock:
-    entry = MagicMock()
-    entry.entry_id = "test_entry"
-    entry.async_start_reauth = MagicMock()
-    return entry
-
-
 async def test_initial_post_on_start(hass: HomeAssistant) -> None:
     api = _mock_api()
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
     api.create_widget.assert_awaited_once()
@@ -165,7 +158,7 @@ async def test_state_change_patches_only_when_changed(hass: HomeAssistant) -> No
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
     api.reset_mock()
@@ -193,7 +186,7 @@ async def test_patch_404_recreates_widget(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()  # initial create
     assert api.create_widget.await_count == 1
 
@@ -219,7 +212,7 @@ async def test_unavailable_state_skipped(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.reset_mock()
 
@@ -238,7 +231,7 @@ async def test_poll_mode_couples_push_throttle(hass: HomeAssistant) -> None:
     config = make_widget_config(**{CONF_WIDGET_TRIGGER_MODE: WIDGET_TRIGGER_POLL, CONF_WIDGET_POLL_INTERVAL: 30})
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
     api.create_widget.assert_awaited_once()
@@ -252,7 +245,7 @@ async def test_event_mode_omits_push_throttle(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
     assert api.create_widget.call_args.kwargs["push_throttle"] is None
@@ -266,7 +259,7 @@ async def test_manual_refresh_force_patches_unchanged(hass: HomeAssistant) -> No
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.reset_mock()
 
@@ -281,7 +274,7 @@ async def test_manual_refresh_by_entity_id(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.reset_mock()
 
@@ -293,7 +286,7 @@ async def test_manual_refresh_by_entity_id(hass: HomeAssistant) -> None:
 
 async def test_manual_refresh_unknown_raises(hass: HomeAssistant) -> None:
     api = _mock_api()
-    manager = WidgetManager(hass, api, [], _mock_entry())
+    manager = WidgetManager(hass, api, [], make_mock_entry())
     await manager.async_start()
 
     with pytest.raises(ValueError):
@@ -314,10 +307,11 @@ async def test_widget_permission_403_surfaces_notification(hass: HomeAssistant) 
     hass.states.async_set("sensor.users", "42")
 
     with patch("custom_components.pushward.widget_manager.persistent_notification.async_create") as create_notif:
-        manager = WidgetManager(hass, api, [config], _mock_entry())
+        entry = make_mock_entry()
+        manager = WidgetManager(hass, api, [config], entry)
         await manager.async_start()
         assert create_notif.called
-        assert create_notif.call_args.kwargs["notification_id"] == _WIDGET_PERMISSION_NOTIFICATION
+        assert create_notif.call_args.kwargs["notification_id"] == _permission_notification_id(entry.entry_id)
 
     await manager.async_stop()
 
@@ -329,7 +323,7 @@ async def test_auth_error_triggers_reauth(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    entry = _mock_entry()
+    entry = make_mock_entry()
     manager = WidgetManager(hass, api, [config], entry)
     await manager.async_start()
     entry.async_start_reauth.assert_called_once_with(hass)
@@ -347,7 +341,7 @@ async def test_reload_swaps_widget_set(hass: HomeAssistant) -> None:
     hass.states.async_set("sensor.a", "1")
     hass.states.async_set("sensor.b", "2")
 
-    manager = WidgetManager(hass, api, [config_a], _mock_entry())
+    manager = WidgetManager(hass, api, [config_a], make_mock_entry())
     await manager.async_start()
     assert "ha-a" in manager._tracked
 
@@ -364,7 +358,7 @@ async def test_gauge_initial_sync_defers_when_value_unavailable(hass: HomeAssist
     api = _mock_api()
     config = make_widget_config(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_GAUGE})
     # Entity has no state yet — gauge requires a numeric value, so create is deferred.
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.create_widget.assert_not_called()
 
@@ -393,7 +387,7 @@ async def test_stat_list_initial_sync_with_multiple_entities(hass: HomeAssistant
     hass.states.async_set("sensor.users", "42")
     hass.states.async_set("sensor.active", "10")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
     api.create_widget.assert_awaited_once()
@@ -418,7 +412,7 @@ async def test_cache_survives_restart(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.create_widget.assert_awaited_once()
     await manager.async_stop()
@@ -426,7 +420,7 @@ async def test_cache_survives_restart(hass: HomeAssistant) -> None:
     # Same entry_id → same Store key. New manager should load cache and find
     # the content unchanged, so no PATCH on identical state.
     api2 = _mock_api()
-    manager2 = WidgetManager(hass, api2, [config], _mock_entry())
+    manager2 = WidgetManager(hass, api2, [config], make_mock_entry())
     await manager2.async_start()
     api2.create_widget.assert_awaited_once()  # initial sync is idempotent upsert
     api2.reset_mock()
@@ -449,7 +443,7 @@ async def test_patch_404_recreate_rearms_on_redeletion(hass: HomeAssistant) -> N
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.reset_mock()
     api.patch_widget = AsyncMock(side_effect=PushWardNotFoundError("widget not found", status_code=404))
@@ -486,7 +480,7 @@ async def test_patch_404_recreate_guard_holds_when_create_fails(hass: HomeAssist
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()  # initial create succeeds -> created=True
     api.reset_mock()
     api.patch_widget = AsyncMock(side_effect=PushWardNotFoundError("widget not found", status_code=404))
@@ -513,7 +507,7 @@ async def test_widget_burst_trailing_resend(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.reset_mock()
 
@@ -556,7 +550,7 @@ async def test_refresh_waits_for_inflight_send(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()  # widget created; PATCH is the update path now
 
     gate = asyncio.Event()
@@ -608,7 +602,7 @@ async def test_initial_sync_coalesces_startup_state_change(hass: HomeAssistant) 
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
 
     gate = asyncio.Event()
     started = asyncio.Event()
@@ -651,7 +645,7 @@ async def test_push_failure_warns_once_per_streak(hass: HomeAssistant, caplog: p
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.reset_mock()
 
@@ -686,7 +680,7 @@ async def test_stale_after_on_create_and_patch(hass: HomeAssistant) -> None:
     config = make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     assert api.create_widget.call_args.kwargs["stale_after"] == 3600
 
@@ -702,7 +696,7 @@ async def test_stale_after_clamped_to_server_bounds(hass: HomeAssistant) -> None
     api = _mock_api()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [make_widget_config(**{CONF_WIDGET_STALE_AFTER: 5})], _mock_entry())
+    manager = WidgetManager(hass, api, [make_widget_config(**{CONF_WIDGET_STALE_AFTER: 5})], make_mock_entry())
     await manager.async_start()
     assert api.create_widget.call_args.kwargs["stale_after"] == WIDGET_STALE_AFTER_MIN
     await manager.async_stop()
@@ -714,7 +708,7 @@ async def test_patch_clears_stale_after_when_unset(hass: HomeAssistant) -> None:
     config = make_widget_config()
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     hass.states.async_set("sensor.users", "43")
     await hass.async_block_till_done()
@@ -730,12 +724,12 @@ async def test_heartbeat_armed_only_with_stale_after(hass: HomeAssistant) -> Non
     api = _mock_api()
     hass.states.async_set("sensor.users", "42")
 
-    plain = WidgetManager(hass, api, [make_widget_config()], _mock_entry())
+    plain = WidgetManager(hass, api, [make_widget_config()], make_mock_entry())
     await plain.async_start()
     assert plain._tracked["ha-users"].unsub_heartbeat is None
     await plain.async_stop()
 
-    ticking = WidgetManager(hass, api, [make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})], _mock_entry())
+    ticking = WidgetManager(hass, api, [make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})], make_mock_entry())
     await ticking.async_start()
     tracked = ticking._tracked["ha-users"]
     assert tracked.unsub_heartbeat is not None
@@ -750,7 +744,7 @@ async def test_heartbeat_patches_despite_identical_content(hass: HomeAssistant) 
     config = make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     api.patch_widget.assert_not_called()
     tracked = manager._tracked["ha-users"]
@@ -772,7 +766,7 @@ async def test_heartbeat_skipped_after_recent_send(hass: HomeAssistant) -> None:
     config = make_widget_config(**{CONF_WIDGET_STALE_AFTER: 3600})
     hass.states.async_set("sensor.users", "42")
 
-    manager = WidgetManager(hass, api, [config], _mock_entry())
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
     # A real update just landed, so the tick has nothing to keep alive.
     manager._tracked["ha-users"].last_synced = time.monotonic()
@@ -803,7 +797,7 @@ async def test_trend_defers_create_until_two_points(hass: HomeAssistant) -> None
     api = _mock_api()
     hass.states.async_set("sensor.power", "100")
 
-    manager = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    manager = WidgetManager(hass, api, [_trend_config()], make_mock_entry())
     await manager.async_start()
     # One sample is not a sparkline; the create defers like gauge does.
     api.create_widget.assert_not_called()
@@ -820,7 +814,7 @@ async def test_trend_buffer_dedupes_unchanged_value(hass: HomeAssistant) -> None
     api = _mock_api()
     hass.states.async_set("sensor.power", "100")
 
-    manager = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    manager = WidgetManager(hass, api, [_trend_config()], make_mock_entry())
     await manager.async_start()
     tracked = manager._tracked["ha-trend"]
 
@@ -841,7 +835,7 @@ async def test_trend_points_persist_and_restore(hass: HomeAssistant) -> None:
     api = _mock_api()
     hass.states.async_set("sensor.power", "100")
 
-    manager = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    manager = WidgetManager(hass, api, [_trend_config()], make_mock_entry())
     await manager.async_start()
     hass.states.async_set("sensor.power", "120")
     await hass.async_block_till_done()
@@ -849,7 +843,7 @@ async def test_trend_points_persist_and_restore(hass: HomeAssistant) -> None:
     assert cached["points"] == [[pytest.approx(ts), v] for ts, v in manager._tracked["ha-trend"].points_buffer]
     await manager.async_stop()
 
-    manager2 = WidgetManager(hass, api, [_trend_config()], _mock_entry())
+    manager2 = WidgetManager(hass, api, [_trend_config()], make_mock_entry())
     await manager2.async_start()
     # The restored buffer is what keeps a restart from pushing a flat two-point line.
     assert [v for _ts, v in manager2._tracked["ha-trend"].points_buffer] == [100.0, 120.0]
@@ -866,7 +860,7 @@ async def test_trend_seeds_from_recorder_when_history_configured(hass: HomeAssis
         "custom_components.pushward.widget_manager.async_recorder_states",
         AsyncMock(return_value=history),
     ) as seed:
-        manager = WidgetManager(hass, api, [config], _mock_entry())
+        manager = WidgetManager(hass, api, [config], make_mock_entry())
         await manager.async_start()
 
     seed.assert_awaited_once()
@@ -886,13 +880,13 @@ async def test_trend_seed_skipped_when_buffer_restored(hass: HomeAssistant) -> N
         "custom_components.pushward.widget_manager.async_recorder_states",
         AsyncMock(return_value={"sensor.power": [{"timestamp": 1, "value": 1.0}]}),
     ):
-        manager = WidgetManager(hass, api, [config], _mock_entry())
+        manager = WidgetManager(hass, api, [config], make_mock_entry())
         await manager.async_start()
         hass.states.async_set("sensor.power", "120")
         await hass.async_block_till_done()
         await manager.async_stop()
 
-        manager2 = WidgetManager(hass, api, [config], _mock_entry())
+        manager2 = WidgetManager(hass, api, [config], make_mock_entry())
         with patch("custom_components.pushward.widget_manager.async_recorder_states", AsyncMock()) as reseed:
             await manager2.async_start()
         reseed.assert_not_awaited()
@@ -939,7 +933,7 @@ async def test_single_entity_template_subscribes_to_subtitle_timer_entity(hass: 
 async def test_battery_and_flow_skip_registry_icon(hass: HomeAssistant) -> None:
     """No anchoring entity means no registry icon lookup - only the static config icon applies."""
     api = _mock_api()
-    manager = WidgetManager(hass, api, [], _mock_entry())
+    manager = WidgetManager(hass, api, [], make_mock_entry())
     for template in (WIDGET_TEMPLATE_BATTERY, WIDGET_TEMPLATE_FLOW, WIDGET_TEMPLATE_STAT_LIST):
         assert manager._lookup_registry_icon(make_widget_config(**{CONF_WIDGET_TEMPLATE: template})) is None
 

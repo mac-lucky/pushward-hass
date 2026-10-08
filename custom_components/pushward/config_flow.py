@@ -36,6 +36,7 @@ from homeassistant.helpers.selector import (
     TextSelectorType,
     TimeSelector,
 )
+from homeassistant.helpers.typing import UNDEFINED
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
@@ -786,21 +787,32 @@ async def _validate_integration_key(
     key: str,
     context: str,
     server_url: str = DEFAULT_SERVER_URL,
-) -> dict[str, str]:
+) -> tuple[dict[str, str], dict[str, Any]]:
     """Validate an integration key against the PushWard API.
 
-    Returns an error dict (empty on success).
+    Returns an error dict (empty on success) and the account's /auth/me profile, whose
+    id keys the config entry: one entry per PushWard account.
     """
     session = async_get_clientsession(hass)
     client = PushWardApiClient(session, server_url, key)
     try:
-        await client.validate_connection()
+        me = await client.get_me()
     except PushWardAuthError:
-        return {"base": "invalid_auth"}
+        return {"base": "invalid_auth"}, {}
     except (PushWardApiError, aiohttp.ClientError, TimeoutError, OSError) as err:
         _LOGGER.warning("PushWard %s failed: %s", context, err)
-        return {"base": "cannot_connect"}
-    return {}
+        return {"base": "cannot_connect"}, {}
+    if not me.get("id"):
+        _LOGGER.warning("PushWard %s failed: /auth/me returned no account id", context)
+        return {"base": "cannot_connect"}, {}
+    return {}, me
+
+
+def _account_title(me: Mapping[str, Any]) -> str:
+    """Entry title naming the account, so entries for several accounts tell apart."""
+    key = me.get("integration_key")
+    name = me.get("nickname") or (key.get("name") if isinstance(key, Mapping) else None)
+    return f"PushWard ({name})" if name else "PushWard"
 
 
 def _entity_domain(entity_id: str) -> str:
@@ -2075,21 +2087,21 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:
-        """Handle the initial setup step."""
-        await self.async_set_unique_id(DOMAIN)
-        self._abort_if_unique_id_configured()
-
+        """Handle the initial setup step: one entry per PushWard account."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            errors = await _validate_integration_key(self.hass, user_input[CONF_INTEGRATION_KEY], "setup")
+            key = user_input[CONF_INTEGRATION_KEY]
+            errors, me = await _validate_integration_key(self.hass, key, "setup")
             if not errors:
+                # An entry from before several accounts were allowed learns its account
+                # only once it loads; until then the same key is the sign it is this one.
+                self._async_abort_entries_match({CONF_INTEGRATION_KEY: key})
+                await self.async_set_unique_id(str(me["id"]))
+                self._abort_if_unique_id_configured()
                 return self.async_create_entry(
-                    title="PushWard",
-                    data={
-                        CONF_SERVER_URL: DEFAULT_SERVER_URL,
-                        CONF_INTEGRATION_KEY: user_input[CONF_INTEGRATION_KEY],
-                    },
+                    title=_account_title(me),
+                    data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: key},
                 )
 
         return self.async_show_form(
@@ -2105,10 +2117,18 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            errors = await _validate_integration_key(self.hass, user_input[CONF_INTEGRATION_KEY], "reconfigure")
+            errors, me = await _validate_integration_key(self.hass, user_input[CONF_INTEGRATION_KEY], "reconfigure")
             if not errors:
+                # Reconfigure may move the entry to another account (an organization key
+                # swapped for a personal one), just not onto one another entry holds.
+                account_id = str(me["id"])
+                if self._account_taken(entry, account_id):
+                    return self.async_abort(reason="already_configured")
+                switched = entry.unique_id not in (DOMAIN, account_id)
                 return self.async_update_reload_and_abort(
                     entry,
+                    unique_id=account_id,
+                    title=_account_title(me) if switched else UNDEFINED,
                     data={
                         CONF_SERVER_URL: DEFAULT_SERVER_URL,
                         CONF_INTEGRATION_KEY: user_input[CONF_INTEGRATION_KEY],
@@ -2120,6 +2140,11 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=_INTEGRATION_KEY_SCHEMA,
             errors=errors,
         )
+
+    def _account_taken(self, entry: config_entries.ConfigEntry, account_id: str) -> bool:
+        """Whether an entry other than this one already holds the account."""
+        other = self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, account_id)
+        return other is not None and other.entry_id != entry.entry_id
 
     async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> config_entries.ConfigFlowResult:
         """Handle reauth when the integration key becomes invalid."""
@@ -2134,12 +2159,21 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             entry = self._get_reauth_entry()
             server_url = entry.data[CONF_SERVER_URL]
-            errors = await _validate_integration_key(
+            errors, me = await _validate_integration_key(
                 self.hass, user_input[CONF_INTEGRATION_KEY], "reauth", server_url=server_url
             )
             if not errors:
+                # Reauth renews the key of the same account; switching accounts is what
+                # Reconfigure is for. An entry from before several accounts were allowed
+                # still carries the domain as its id and adopts the key's account.
+                account_id = str(me["id"])
+                if entry.unique_id not in (DOMAIN, account_id):
+                    return self.async_abort(reason="wrong_account")
+                if self._account_taken(entry, account_id):
+                    return self.async_abort(reason="already_configured")
                 return self.async_update_reload_and_abort(
                     entry,
+                    unique_id=account_id,
                     data_updates={
                         CONF_INTEGRATION_KEY: user_input[CONF_INTEGRATION_KEY],
                     },

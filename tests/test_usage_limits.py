@@ -83,6 +83,7 @@ async def test_issue_raised_when_over_limit(hass: HomeAssistant) -> None:
     assert issue.translation_key == "usage_limit_notifications"
     assert issue.learn_more_url == APP_STORE_URL
     assert issue.translation_placeholders == {
+        "account": "PushWard",
         "used": "600",
         "limit": "500",
         "resets_at": "2026-07-01",
@@ -253,7 +254,7 @@ def test_usage_limit_resources_match_sensors() -> None:
 def test_usage_limit_translations_exist() -> None:
     en = json.loads((Path(pushward_pkg.__file__).parent / "translations" / "en.json").read_text())
     issues = en["issues"]
-    injected = {"used", "limit", "resets_at"}  # the only placeholders the coordinator supplies
+    injected = {"account", "used", "limit", "resets_at"}  # the only placeholders the coordinator supplies
     for resource in USAGE_LIMIT_RESOURCES:
         issue = issues[resource.translation_key]
         assert issue["title"] and issue["description"]

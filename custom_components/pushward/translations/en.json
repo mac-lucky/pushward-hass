@@ -27,6 +27,10 @@
       "name": "Update Activity (deprecated)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -271,6 +275,10 @@
       "name": "Update Activity (Generic)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -407,6 +415,10 @@
       "name": "Update Activity (Countdown)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -543,6 +555,10 @@
       "name": "Update Activity (Steps)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -711,6 +727,10 @@
       "name": "Update Activity (Alert)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -835,6 +855,10 @@
       "name": "Update Activity (Gauge)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -959,6 +983,10 @@
       "name": "Update Activity (Timeline)",
       "description": "Update a PushWard Live Activity state and content.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -1107,6 +1135,10 @@
       "name": "Update Activity (Board)",
       "description": "Update a PushWard board Live Activity (1–4 tiles).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -1181,6 +1213,10 @@
       "name": "Update Activity (Log)",
       "description": "Update a PushWard log Live Activity (1–20 newest-first lines).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -1255,6 +1291,10 @@
       "name": "Update Activity (Media)",
       "description": "Update a PushWard media Live Activity: a remote player card with cover art, a ticking scrubber and transport buttons that call your own webhooks.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -1369,6 +1409,10 @@
       "name": "Update Activity (Approval)",
       "description": "Update a PushWard approval Live Activity: a question card with 2-4 answer buttons that call your own webhooks or record the tapped option server-side.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier."
@@ -1459,6 +1503,10 @@
       "name": "Create Activity",
       "description": "Create a new PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Unique activity slug identifier."
@@ -1503,6 +1551,10 @@
       "name": "End Activity",
       "description": "End a PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier to end."
@@ -1517,6 +1569,10 @@
       "name": "Delete Activity",
       "description": "Delete a PushWard Live Activity.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier to delete."
@@ -1527,6 +1583,10 @@
       "name": "Refresh Widget",
       "description": "Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to iOS even when the value hasn't changed.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Widget slug identifier. Either slug or entity_id must be provided."
@@ -1541,6 +1601,10 @@
       "name": "Send Notification",
       "description": "Send a push notification via PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant; required with a response variable when more than one is added."
+        },
         "title": {
           "name": "Title",
           "description": "Notification title."
@@ -1631,6 +1695,10 @@
       "name": "Cancel Scheduled Notification",
       "description": "Cancel a notification queued with send_notification's send_at or Repeat. Canceling a repeating one stops the whole series, even while it is being sent. A canceled notification shows as canceled in the PushWard app for 24 hours. An id that no longer exists is ignored.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+        },
         "scheduled_notification_id": {
           "name": "Scheduled notification ID",
           "description": "The scheduled_notification_id returned by send_notification."
@@ -1641,6 +1709,10 @@
       "name": "List Scheduled Notifications",
       "description": "Return your scheduled notifications: soonest first for pending ones (the default), latest first for any other status. Repeating ones carry their recurrence, how many times they have sent (occurrence) and when they last sent (last_sent_at).",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+        },
         "status": {
           "name": "Status",
           "description": "Which ones to return. scheduled (the default) lists the ones still waiting; sent and failed keep for 7 days, canceled for 24 hours."
@@ -1651,6 +1723,10 @@
       "name": "Get Notification Answer",
       "description": "Wait for the answer to a notification sent with actions that have no url, and return which action was tapped (action_id), any typed reply (text) and when (answered_at). If nobody answers within the timeout, answered is false. Answers are kept for 30 days, so a later call with timeout 0 can read one without waiting.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+        },
         "notification_id": {
           "name": "Notification ID",
           "description": "The notification_id returned by send_notification, or the notification_id of a sent scheduled notification."
@@ -1665,6 +1741,10 @@
       "name": "Cancel Acknowledged Notifications",
       "description": "Stop acknowledged notifications from repeating, either every active one sent with a tag or one by its notification_id. It reaches only notifications sent with this integration's key, and their callback is not sent. The optional response holds how many were canceled (canceled) for a tag, or the receipt for a notification_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to cancel a tag on every PushWard account added to Home Assistant; required with a notification_id when more than one is added."
+        },
         "tag": {
           "name": "Tag",
           "description": "Cancel every active acknowledged notification sent with this tag."
@@ -1679,6 +1759,10 @@
       "name": "Send Email",
       "description": "Send a transactional email via PushWard. Provide a text body, an HTML body, or both. The integration key needs the \"emails\" capability.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Required when more than one PushWard account is added to Home Assistant."
+        },
         "to": {
           "name": "To",
           "description": "Recipient email address. Must be an address you have already added and confirmed in the PushWard iOS app — unverified addresses are rejected."
@@ -1701,6 +1785,10 @@
       "name": "Delete Widget",
       "description": "Delete a PushWard widget from the server. If a tracked-widget config entry still drives this slug, the widget is recreated on the next restart/sync — remove the config entry to delete it permanently. Provide either slug or entity_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
         "slug": {
           "name": "Slug",
           "description": "Widget slug identifier. Either slug or entity_id must be provided."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "Notification {notification_id} has nothing to cancel: it was not sent with acknowledge, it was sent with another integration key, or it finished more than 7 days ago."
+    },
+    "config_entry_required": {
+      "message": "More than one PushWard account is set up, so {service} needs config_entry_id naming exactly one of them."
+    },
+    "entry_not_loaded": {
+      "message": "No loaded PushWard account has the config entry id {config_entry_id}."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "An unexpected error occurred."
     },
     "abort": {
-      "already_configured": "PushWard is already configured.",
+      "already_configured": "This PushWard account is already configured.",
       "reconfigure_successful": "PushWard configuration updated.",
-      "reauth_successful": "Reauthentication successful."
+      "reauth_successful": "Reauthentication successful.",
+      "wrong_account": "This integration key belongs to a different PushWard account. Use Reconfigure to move this entry to that account, or add the key as a new PushWard entry."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "The `pushward.update_activity` action is deprecated. Switch your automations to the template-specific action instead — for example `pushward.update_activity_countdown` or `pushward.update_activity_gauge`. The old action still works for now but will be removed in a future release."
     },
     "usage_limit_notifications": {
-      "title": "PushWard notification limit reached",
+      "title": "{account} notification limit reached",
       "description": "Your PushWard account has used {used} of its {limit} notifications for the current period, so new notifications will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
     },
     "usage_limit_live_activity": {
-      "title": "PushWard Live Activity update limit reached",
+      "title": "{account} Live Activity update limit reached",
       "description": "Your PushWard account has used {used} of its {limit} Live Activity updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
     },
     "usage_limit_widgets": {
-      "title": "PushWard widget update limit reached",
+      "title": "{account} widget update limit reached",
       "description": "Your PushWard account has used {used} of its {limit} widget updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
     },
     "usage_limit_emails": {
-      "title": "PushWard email limit reached",
+      "title": "{account} email limit reached",
       "description": "Your PushWard account has used {used} of its {limit} emails for the current period, so new emails will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
     },
     "todo_e2e_unavailable": {
-      "title": "PushWard to-do reminders are not going out",
+      "title": "{account} to-do reminders are not going out",
       "description": "This integration key belongs to an organization, and organizations cannot send end-to-end encrypted notifications, so PushWard refuses every to-do reminder while an encryption key is set. Remove the encryption key under Configure, or reconfigure the integration with a personal integration key."
     }
   },

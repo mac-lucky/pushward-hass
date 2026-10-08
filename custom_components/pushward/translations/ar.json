@@ -27,6 +27,10 @@
       "name": "تحديث النشاط (deprecated)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -271,6 +275,10 @@
       "name": "تحديث النشاط (Generic)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -407,6 +415,10 @@
       "name": "تحديث النشاط (Countdown)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -543,6 +555,10 @@
       "name": "تحديث النشاط (Steps)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -711,6 +727,10 @@
       "name": "تحديث النشاط (Alert)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -835,6 +855,10 @@
       "name": "تحديث النشاط (Gauge)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -959,6 +983,10 @@
       "name": "تحديث النشاط (Timeline)",
       "description": "تحديث حالة Live Activity في PushWard ومحتواها.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -1107,6 +1135,10 @@
       "name": "تحديث النشاط (Board)",
       "description": "تحديث Live Activity من نوع board في PushWard (1–4 بلاطات).",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -1181,6 +1213,10 @@
       "name": "تحديث النشاط (Log)",
       "description": "تحديث Live Activity من نوع log في PushWard (1–20 سطرًا، الأحدث أولاً).",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -1255,6 +1291,10 @@
       "name": "تحديث النشاط (Media)",
       "description": "تحديث Live Activity من نوع الوسائط في PushWard: بطاقة مشغّل عن بُعد مع صورة الغلاف وشريط تقدّم يتحرّك وأزرار تحكّم تستدعي خطاطيف الويب (webhooks) الخاصة بك.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -1369,6 +1409,10 @@
       "name": "تحديث النشاط (Approval)",
       "description": "تحديث نشاط PushWard من نوع الموافقة: بطاقة سؤال بها 2-4 أزرار إجابة تستدعي Webhooks خاصة بك أو يسجل الخادم الخيار الذي تم النقر عليه.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط."
@@ -1459,6 +1503,10 @@
       "name": "إنشاء نشاط",
       "description": "إنشاء Live Activity جديد في PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط الفريد."
@@ -1503,6 +1551,10 @@
       "name": "إنهاء النشاط",
       "description": "إنهاء Live Activity في PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط المراد إنهاؤه."
@@ -1517,6 +1569,10 @@
       "name": "حذف النشاط",
       "description": "حذف Live Activity من PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف",
           "description": "معرّف النشاط المراد حذفه."
@@ -1527,6 +1583,10 @@
       "name": "تحديث الأداة",
       "description": "فرض تحديث أداة PushWard متتبَّعة. يتجاوز ذاكرة التخزين المؤقت للفروقات في الذاكرة بحيث يُعاد عرض الأداة ودفعها إلى iOS حتى عندما لا تتغير القيمة.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف النصي",
           "description": "معرّف slug للأداة. يجب توفير slug أو entity_id."
@@ -1541,6 +1601,10 @@
       "name": "إرسال إشعار",
       "description": "إرسال إشعار فوري عبر PushWard.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant؛ مطلوب مع متغير الاستجابة عند إضافة أكثر من حساب."
+        },
         "title": {
           "name": "العنوان",
           "description": "عنوان الإشعار."
@@ -1631,6 +1695,10 @@
       "name": "إلغاء إشعار مجدول",
       "description": "إلغاء إشعار أُضيف إلى قائمة الانتظار عبر send_at أو التكرار في send_notification. يؤدي إلغاء إشعار متكرر إلى إيقاف السلسلة بأكملها، حتى أثناء إرساله. يُتجاهل أي معرّف لم يعد موجودًا. يظهر الإشعار الملغى في تطبيق PushWard على أنه ملغى لمدة 24 ساعة.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. مطلوب عند إضافة أكثر من حساب PushWard إلى Home Assistant."
+        },
         "scheduled_notification_id": {
           "name": "معرّف الإشعار المجدول",
           "description": "قيمة scheduled_notification_id التي يعيدها send_notification."
@@ -1641,6 +1709,10 @@
       "name": "عرض الإشعارات المجدولة",
       "description": "إرجاع إشعاراتك المجدولة: الأقرب موعدًا أولًا للإشعارات التي لا تزال في الانتظار (الحالة الافتراضية)، والأحدث أولًا لأي حالة أخرى. تتضمن الإشعارات المتكررة قيمة recurrence الخاصة بها، وعدد مرات إرسالها (occurrence)، ووقت آخر إرسال (last_sent_at).",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. مطلوب عند إضافة أكثر من حساب PushWard إلى Home Assistant."
+        },
         "status": {
           "name": "الحالة",
           "description": "الإشعارات المطلوب إرجاعها. تعرض scheduled (الافتراضية) الإشعارات التي لا تزال في الانتظار؛ وتُحفظ sent و failed لمدة 7 أيام. وتُحفظ canceled لمدة 24 ساعة."
@@ -1651,6 +1723,10 @@
       "name": "الحصول على رد الإشعار",
       "description": "انتظار الرد على إشعار أُرسل بإجراءات لا تحتوي على url، وإرجاع الإجراء الذي نُقر (action_id)، وأي رد مكتوب (text)، ووقت الرد (answered_at). إذا لم يرد أحد خلال مهلة الانتظار، تكون قيمة answered هي false. تُحفظ الردود لمدة 30 يومًا، لذا يمكن لاستدعاء لاحق بمهلة انتظار 0 قراءة الرد دون انتظار.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. مطلوب عند إضافة أكثر من حساب PushWard إلى Home Assistant."
+        },
         "notification_id": {
           "name": "معرّف الإشعار",
           "description": "قيمة notification_id التي يعيدها send_notification، أو notification_id لإشعار مجدول تم إرساله."
@@ -1665,6 +1741,10 @@
       "name": "إلغاء الإشعارات المطلوب تأكيدها",
       "description": "أوقف تكرار الإشعارات المطلوب تأكيدها، إما جميع النشطة المرسلة بوسم أو إشعارًا واحدًا عبر notification_id الخاص به. يصل فقط إلى الإشعارات المرسلة بمفتاح هذا التكامل، ولا يُرسل الاستدعاء الخاص بها. يحتوي الرد الاختياري على عدد ما أُلغي (canceled) لوسم، أو الإيصال لـ notification_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لإلغاء وسم على كل حسابات PushWard المضافة إلى Home Assistant؛ مطلوب مع notification_id عند إضافة أكثر من حساب."
+        },
         "tag": {
           "name": "الوسم",
           "description": "ألغِ جميع الإشعارات النشطة المطلوب تأكيدها المرسلة بهذا الوسم."
@@ -1679,6 +1759,10 @@
       "name": "إرسال بريد إلكتروني",
       "description": "إرسال بريد إلكتروني معاملاتي عبر PushWard. قدّم نص الرسالة أو نص HTML أو كليهما. يحتاج مفتاح التكامل إلى صلاحية \"emails\".",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. مطلوب عند إضافة أكثر من حساب PushWard إلى Home Assistant."
+        },
         "to": {
           "name": "إلى",
           "description": "عنوان البريد الإلكتروني للمستلم. يجب أن يكون عنوانًا أضفته وأكّدته بالفعل في تطبيق PushWard على iOS — تُرفض العناوين غير المُتحقَّق منها."
@@ -1701,6 +1785,10 @@
       "name": "حذف الأداة",
       "description": "حذف أداة PushWard من الخادم. إذا كان لا يزال هناك إدخال إعداد لأداة متتبَّعة يقود هذا الـ slug، فستُعاد الأداة عند إعادة التشغيل/المزامنة التالية — أزل إدخال الإعداد لحذفها نهائيًا. قدّم slug أو entity_id.",
       "fields": {
+        "config_entry_id": {
+          "name": "الحساب",
+          "description": "حساب PushWard المراد استخدامه. اتركه فارغًا لاستخدام كل حسابات PushWard المضافة إلى Home Assistant."
+        },
         "slug": {
           "name": "المعرّف النصي",
           "description": "معرّف slug للأداة. يجب توفير slug أو entity_id."
@@ -1736,6 +1824,12 @@
     },
     "receipt_not_found": {
       "message": "لا يوجد ما يمكن إلغاؤه في الإشعار {notification_id}: لم يُرسل باستخدام acknowledge، أو أُرسل بمفتاح تكامل آخر، أو انتهى منذ أكثر من 7 أيام."
+    },
+    "config_entry_required": {
+      "message": "تم إعداد أكثر من حساب PushWard، لذا يحتاج {service} إلى config_entry_id يحدد حسابًا واحدًا منها بالضبط."
+    },
+    "entry_not_loaded": {
+      "message": "لا يوجد حساب PushWard محمّل بمعرّف إدخال الإعداد {config_entry_id}."
     }
   },
   "config": {
@@ -1778,9 +1872,10 @@
       "unknown": "حدث خطأ غير متوقع."
     },
     "abort": {
-      "already_configured": "PushWard مُهيَّأ بالفعل.",
+      "already_configured": "حساب PushWard هذا مُهيَّأ بالفعل.",
       "reconfigure_successful": "تم تحديث إعداد PushWard.",
-      "reauth_successful": "تمت إعادة المصادقة بنجاح."
+      "reauth_successful": "تمت إعادة المصادقة بنجاح.",
+      "wrong_account": "مفتاح التكامل هذا يخص حساب PushWard آخر. استخدم إعادة التهيئة لنقل هذا الإدخال إلى ذلك الحساب، أو أضف المفتاح كإدخال PushWard جديد."
     }
   },
   "options": {
@@ -2310,23 +2405,23 @@
       "description": "إجراء `pushward.update_activity` مهمَل. بدّل عمليات الأتمتة لديك إلى الإجراء الخاص بالقالب بدلًا منه — على سبيل المثال `pushward.update_activity_countdown` أو `pushward.update_activity_gauge`. لا يزال الإجراء القديم يعمل حاليًا لكنه سيُزال في إصدار مستقبلي."
     },
     "usage_limit_notifications": {
-      "title": "تم بلوغ حد إشعارات PushWard",
+      "title": "تم بلوغ حد إشعارات {account}",
       "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} إشعار للفترة الحالية، لذا ستُرفض الإشعارات الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
     },
     "usage_limit_live_activity": {
-      "title": "تم بلوغ حد تحديثات النشاط المباشر في PushWard",
+      "title": "تم بلوغ حد تحديثات النشاط المباشر في {account}",
       "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} تحديث للنشاط المباشر للفترة الحالية، لذا ستُرفض التحديثات الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
     },
     "usage_limit_widgets": {
-      "title": "تم بلوغ حد تحديثات الأدوات في PushWard",
+      "title": "تم بلوغ حد تحديثات الأدوات في {account}",
       "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} تحديث للأدوات للفترة الحالية، لذا ستُرفض التحديثات الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
     },
     "usage_limit_emails": {
-      "title": "تم بلوغ حد رسائل البريد الإلكتروني في PushWard",
+      "title": "تم بلوغ حد رسائل البريد الإلكتروني في {account}",
       "description": "استخدم حساب PushWard الخاص بك {used} من أصل {limit} رسالة بريد إلكتروني للفترة الحالية، لذا ستُرفض الرسائل الجديدة حتى تُعاد تهيئة الحصة ({resets_at}). قم بترقية اشتراكك في تطبيق PushWard على iOS لرفع الحد."
     },
     "todo_e2e_unavailable": {
-      "title": "تذكيرات قائمة المهام في PushWard لا تُرسَل",
+      "title": "تذكيرات قائمة المهام في {account} لا تُرسَل",
       "description": "مفتاح التكامل هذا تابع لمؤسسة، ولا يمكن للمؤسسات إرسال إشعارات مشفرة من طرف إلى طرف، لذلك يرفض PushWard كل تذكير بالمهام ما دام مفتاح التشفير مضبوطًا. أزل مفتاح التشفير ضمن إعدادات التكامل (تكوين)، أو أعد تهيئة التكامل باستخدام مفتاح تكامل شخصي."
     }
   },

@@ -40,31 +40,6 @@ from .server_contract import (
     assert_valid_receipts_canceled,
 )
 
-# --- validate_connection ---
-
-
-async def test_validate_connection_success():
-    payload = {"id": "u1"}
-    session = _make_session(_mock_response(200, json_body=payload))
-
-    client = _make_client(session)
-    result = await client.validate_connection()
-
-    assert result is True
-    session.request.assert_called_once()
-    call = session.request.call_args
-    assert call[0][0] == "GET"
-    assert "/auth/me" in call[0][1]
-    assert call[1]["headers"]["Authorization"] == "Bearer test-key"
-
-
-async def test_validate_connection_auth_error():
-    session = _make_session(_mock_response(401))
-    client = _make_client(session)
-    with pytest.raises(PushWardAuthError):
-        await client.validate_connection()
-
-
 # --- get_me ---
 
 
