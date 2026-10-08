@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "确认",
-          "description": "重复发送该推送，直到有人确认：true 表示使用默认值，或传入包含 repeat_seconds（30-3600，默认 60）、expire_seconds（60-10800，默认 3600）和 action_title（按钮文字，默认 Acknowledge）中任意项的对象。点按任何没有 url 的动作即视为确认；若没有任何动作，PushWard 会添加一个 Acknowledge 按钮。需要 push，且 level 不能是 passive。同时最多可重复 25 条。请求响应可获得回执；cancel_notifications 可停止重复。"
+          "description": "重复发送该推送，直到有人确认：true 表示使用默认值，或传入包含 repeat_seconds（30-3600，默认 60）、expire_seconds（60-10800，默认 3600）和 action_title（按钮文字，默认 Acknowledge）中任意项的对象。点按任何没有 url 的动作即视为确认；若没有任何动作，PushWard 会添加一个 Acknowledge 按钮。需要 push，且 level 不能是 passive。同时最多可重复 25 条；超出后，立即发送的通知只发送一次，不再重复。请求响应可获得回执；cancel_notifications 可停止重复。"
         },
         "tags": {
           "name": "标签",

@@ -16,6 +16,7 @@ from custom_components.pushward.api import (
     PushWardEmailPermissionError,
     PushWardForbiddenError,
     PushWardNotFoundError,
+    PushWardQuotaExceededError,
     PushWardRateLimitedError,
 )
 from custom_components.pushward.const import (
@@ -493,13 +494,145 @@ async def test_cancel_notification_receipt_returns_the_receipt():
 
 
 async def test_a_refusal_carries_the_problem_code():
-    problem = json.dumps({"status": 409, "code": "notification_receipt.limit_exceeded", "detail": "limit reached"})
-    client = _make_client(_make_session(_mock_response(409, text=problem)))
+    problem = json.dumps({"status": 422, "code": "notification.encryption_unavailable", "detail": "org key"})
+    client = _make_client(_make_session(_mock_response(422, text=problem)))
+
+    with pytest.raises(PushWardApiError) as exc_info:
+        await client.create_notification("t", "b")
+    assert exc_info.value.status_code == 422
+    assert exc_info.value.code == "notification.encryption_unavailable"
+
+
+def _problem(status: int, code: str) -> AsyncMock:
+    body = {"status": status, "detail": "refused"}
+    if code:
+        body["code"] = code
+    return _mock_response(status, text=json.dumps(body))
+
+
+_ACK_REFUSAL_CASES = [
+    (409, "notification_receipt.limit_exceeded", "receipt_limit"),
+    (422, "notification_receipt.disabled", "receipts_disabled"),
+    (422, "notification.answer_url_unavailable", "answer_url"),
+    (422, "notification.encrypted_too_large", "encrypted_too_large"),
+]
+
+
+@pytest.mark.parametrize(("status", "code", "reason"), _ACK_REFUSAL_CASES)
+async def test_refused_acknowledge_is_sent_once_without_it(status, code, reason, caplog):
+    # The 25 receipts are per account: other senders can fill them, and the water
+    # leak must still go out.
+    session = _make_session(_problem(status, code), _mock_response(201, json_body={"id": 8, "answerable": True}))
+    client = _make_client(session)
+
+    created = await client.create_notification(
+        "Water leak",
+        "Kitchen sink",
+        level="time-sensitive",
+        collapse_id="leak",
+        actions=[{"id": "open", "title": "Open", "url": "https://example.com"}],
+        acknowledge={"repeat_seconds": 120},
+        tags=["leak"],
+        callback_url="https://hooks.example.com/pushward",
+    )
+
+    assert created == {"id": 8, "answerable": True, "acknowledge_refused": reason}
+    first, second = (call[1]["json"] for call in session.request.call_args_list)
+    assert first["acknowledge"] == {"repeat_seconds": 120}
+    assert second == {key: val for key, val in first.items() if key not in ("acknowledge", "tags", "callback_url")}
+    assert second["collapse_id"] == "leak"
+    assert_valid_notification_request(second)
+    assert reason in caplog.text
+    assert "test-key" not in caplog.text
+
+
+async def test_refused_acknowledge_resends_the_same_envelope():
+    session = _make_session(
+        _problem(409, "notification_receipt.limit_exceeded"), _mock_response(201, json_body={"id": 8})
+    )
+    client = _make_client(session)
+    client.e2e_key = _E2E_KEY
+
+    await client.create_notification("Water leak", "Kitchen sink", subtitle="Basement", acknowledge={})
+
+    first, second = (call[1]["json"] for call in session.request.call_args_list)
+    assert second["encrypted"] == first["encrypted"]
+    assert not {"title", "body", "subtitle", "acknowledge"} & set(second)
+    assert open_envelope(_E2E_KEY, second["encrypted"]) == {
+        "title": "Water leak",
+        "body": "Kitchen sink",
+        "subtitle": "Basement",
+    }
+    assert_valid_notification_request(second)
+
+
+async def test_refused_acknowledge_is_resent_only_once():
+    session = _make_session(
+        _problem(409, "notification_receipt.limit_exceeded"),
+        _problem(400, "notification.invalid"),
+    )
+    client = _make_client(session)
 
     with pytest.raises(PushWardApiError) as exc_info:
         await client.create_notification("t", "b", acknowledge={})
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.code == "notification_receipt.limit_exceeded"
+    assert exc_info.value.code == "notification.invalid"
+    assert session.request.call_count == 2
+
+
+@pytest.mark.parametrize(
+    ("response", "error"),
+    [
+        (_mock_response(401), PushWardAuthError),
+        (_mock_response(403, text='{"detail": "subscription required"}'), PushWardForbiddenError),
+        (
+            _mock_response(429, text='{"code": "quota.exceeded", "kind": "notifications", "used": 5, "limit": 5}'),
+            PushWardQuotaExceededError,
+        ),
+        (_problem(409, ""), PushWardApiError),
+        (_problem(422, "notification.encryption_unavailable"), PushWardApiError),
+        (_problem(400, ""), PushWardApiError),
+        # The service schema already checked the acknowledge rules: these mean another field is wrong.
+        (_problem(400, "notification.invalid"), PushWardApiError),
+        (_problem(422, ""), PushWardApiError),
+        (_problem(404, ""), PushWardNotFoundError),
+    ],
+    ids=["401", "403", "quota", "409-no-code", "422-other", "400-no-code", "400-invalid", "422-no-code", "404"],
+)
+async def test_other_refusals_of_an_acknowledged_send_are_not_resent(response, error):
+    session = _make_session(response)
+    client = _make_client(session)
+
+    with pytest.raises(error):
+        await client.create_notification("t", "b", acknowledge={})
+    session.request.assert_called_once()
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_acknowledged_send_that_never_got_through_is_not_resent(mock_sleep):
+    # 5xx and a lost connection: the server may already have taken one of the attempts.
+    session = _make_session(*[_mock_response(503, text="unavailable")] * (MAX_RETRIES - 1))
+    session.request.side_effect = [*session.request.side_effect, aiohttp.ClientConnectionError("reset")]
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError):
+        await client.create_notification("t", "b", acknowledge={})
+    assert session.request.call_count == MAX_RETRIES
+    assert all("acknowledge" in call[1]["json"] for call in session.request.call_args_list)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [{}, {"send_at": datetime(2030, 1, 1, tzinfo=UTC), "acknowledge": {}}],
+    ids=["no-acknowledge", "scheduled"],
+)
+async def test_refusal_without_an_acknowledged_send_now_is_not_resent(kwargs):
+    session = _make_session(_problem(422, "notification_receipt.disabled"))
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError) as exc_info:
+        await client.create_notification("t", "b", **kwargs)
+    assert exc_info.value.code == "notification_receipt.disabled"
+    session.request.assert_called_once()
 
 
 async def test_cancel_notification_receipt_without_one_is_not_found():

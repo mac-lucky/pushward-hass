@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Acknowledge",
-          "description": "Re-send the push until someone acknowledges it: true for the defaults, or an object with any of repeat_seconds (30-3600, default 60), expire_seconds (60-10800, default 3600) and action_title (the button label, default Acknowledge). A tap on any action without a url acknowledges it; when there is none, PushWard adds an Acknowledge button. Needs push, and not level passive. At most 25 can repeat at once. Request a response for the receipt; cancel_notifications stops it."
+          "description": "Re-send the push until someone acknowledges it: true for the defaults, or an object with any of repeat_seconds (30-3600, default 60), expire_seconds (60-10800, default 3600) and action_title (the button label, default Acknowledge). A tap on any action without a url acknowledges it; when there is none, PushWard adds an Acknowledge button. Needs push, and not level passive. At most 25 can repeat at once; past that, a notification sent now goes out once without repeats. Request a response for the receipt; cancel_notifications stops it."
         },
         "tags": {
           "name": "Tags",

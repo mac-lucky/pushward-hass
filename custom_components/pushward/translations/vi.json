@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Xác nhận",
-          "description": "Gửi lại push cho đến khi có người xác nhận: true cho giá trị mặc định, hoặc một đối tượng với bất kỳ mục nào của repeat_seconds (30-3600, mặc định 60), expire_seconds (60-10800, mặc định 3600) và action_title (nhãn nút, mặc định Acknowledge). Chạm vào bất kỳ hành động nào không có url sẽ xác nhận thông báo; nếu không có hành động nào, PushWard thêm một nút Acknowledge. Cần push, và level không phải passive. Tối đa 25 thông báo có thể lặp lại cùng lúc. Yêu cầu phản hồi để nhận biên nhận; cancel_notifications sẽ dừng việc lặp."
+          "description": "Gửi lại push cho đến khi có người xác nhận: true cho giá trị mặc định, hoặc một đối tượng với bất kỳ mục nào của repeat_seconds (30-3600, mặc định 60), expire_seconds (60-10800, mặc định 3600) và action_title (nhãn nút, mặc định Acknowledge). Chạm vào bất kỳ hành động nào không có url sẽ xác nhận thông báo; nếu không có hành động nào, PushWard thêm một nút Acknowledge. Cần push, và level không phải passive. Tối đa 25 thông báo có thể lặp lại cùng lúc; vượt quá giới hạn đó, thông báo gửi ngay sẽ được gửi một lần, không lặp lại. Yêu cầu phản hồi để nhận biên nhận; cancel_notifications sẽ dừng việc lặp."
         },
         "tags": {
           "name": "Thẻ",

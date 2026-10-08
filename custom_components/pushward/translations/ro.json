@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Confirmare",
-          "description": "Retrimite push-ul până când cineva îl confirmă: true pentru valorile implicite sau un obiect cu oricare dintre repeat_seconds (30-3600, implicit 60), expire_seconds (60-10800, implicit 3600) și action_title (eticheta butonului, implicit Acknowledge). Atingerea oricărei acțiuni fără url o confirmă; dacă nu există niciuna, PushWard adaugă un buton Acknowledge. Necesită push și un level diferit de passive. Cel mult 25 se pot repeta simultan. Solicitați un răspuns pentru confirmarea de primire; cancel_notifications o oprește."
+          "description": "Retrimite push-ul până când cineva îl confirmă: true pentru valorile implicite sau un obiect cu oricare dintre repeat_seconds (30-3600, implicit 60), expire_seconds (60-10800, implicit 3600) și action_title (eticheta butonului, implicit Acknowledge). Atingerea oricărei acțiuni fără url o confirmă; dacă nu există niciuna, PushWard adaugă un buton Acknowledge. Necesită push și un level diferit de passive. Cel mult 25 se pot repeta simultan; peste această limită, o notificare trimisă imediat pleacă o singură dată, fără repetări. Solicitați un răspuns pentru confirmarea de primire; cancel_notifications o oprește."
         },
         "tags": {
           "name": "Etichete",

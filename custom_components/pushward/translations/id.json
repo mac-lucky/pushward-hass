@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Konfirmasi",
-          "description": "Kirim ulang push sampai seseorang mengonfirmasinya: true untuk nilai bawaan, atau objek dengan salah satu dari repeat_seconds (30-3600, bawaan 60), expire_seconds (60-10800, bawaan 3600), dan action_title (label tombol, bawaan Acknowledge). Mengetuk aksi apa pun tanpa url akan mengonfirmasinya; jika tidak ada, PushWard menambahkan tombol Acknowledge. Memerlukan push, dan level bukan passive. Paling banyak 25 yang dapat berulang sekaligus. Minta respons untuk mendapatkan tanda terima; cancel_notifications menghentikannya."
+          "description": "Kirim ulang push sampai seseorang mengonfirmasinya: true untuk nilai bawaan, atau objek dengan salah satu dari repeat_seconds (30-3600, bawaan 60), expire_seconds (60-10800, bawaan 3600), dan action_title (label tombol, bawaan Acknowledge). Mengetuk aksi apa pun tanpa url akan mengonfirmasinya; jika tidak ada, PushWard menambahkan tombol Acknowledge. Memerlukan push, dan level bukan passive. Paling banyak 25 yang dapat berulang sekaligus; selebihnya, notifikasi yang dikirim langsung terkirim sekali tanpa pengulangan. Minta respons untuk mendapatkan tanda terima; cancel_notifications menghentikannya."
         },
         "tags": {
           "name": "Tag",

@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Conferma",
-          "description": "Reinvia il push finché qualcuno non lo conferma: true per i valori predefiniti, oppure un oggetto con uno qualsiasi tra repeat_seconds (30-3600, predefinito 60), expire_seconds (60-10800, predefinito 3600) e action_title (l'etichetta del pulsante, predefinito Acknowledge). Toccare un'azione senza url la conferma; se non ce n'è nessuna, PushWard aggiunge un pulsante Acknowledge. Richiede push e un level diverso da passive. Al massimo 25 possono ripetersi contemporaneamente. Richiedi una risposta per la ricevuta; cancel_notifications lo interrompe."
+          "description": "Reinvia il push finché qualcuno non lo conferma: true per i valori predefiniti, oppure un oggetto con uno qualsiasi tra repeat_seconds (30-3600, predefinito 60), expire_seconds (60-10800, predefinito 3600) e action_title (l'etichetta del pulsante, predefinito Acknowledge). Toccare un'azione senza url la conferma; se non ce n'è nessuna, PushWard aggiunge un pulsante Acknowledge. Richiede push e un level diverso da passive. Al massimo 25 possono ripetersi contemporaneamente; oltre questo limite, una notifica inviata subito parte una sola volta, senza ripetizioni. Richiedi una risposta per la ricevuta; cancel_notifications lo interrompe."
         },
         "tags": {
           "name": "Tag",

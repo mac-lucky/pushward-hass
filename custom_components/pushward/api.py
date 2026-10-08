@@ -51,6 +51,21 @@ _TIMEOUT = aiohttp.ClientTimeout(total=30)
 # `rate_limit.exceeded`, the per-client request limiter, which is worth retrying).
 QUOTA_EXCEEDED_CODE = "quota.exceeded"
 
+# Refusals of an acknowledged send that a plain one would not get, by (status, Problem
+# code), each with the reason create_notification reports. The 25 active receipts are
+# shared by every sender on the account, so the cap can fill up without Home Assistant
+# sending a single one. The 400 notification.invalid and the codeless 422 are left out:
+# the service schema checks every acknowledge rule first, so from here they mean some
+# other field is wrong. A 401, 403, 429, 5xx or lost connection is left out too: the plain
+# send would fail the same way, or the server may already have taken the first.
+_ACK_REFUSALS = {
+    (HTTPStatus.CONFLICT, "notification_receipt.limit_exceeded"): "receipt_limit",
+    (HTTPStatus.UNPROCESSABLE_ENTITY, "notification_receipt.disabled"): "receipts_disabled",
+    (HTTPStatus.UNPROCESSABLE_ENTITY, "notification.answer_url_unavailable"): "answer_url",
+    (HTTPStatus.UNPROCESSABLE_ENTITY, "notification.encrypted_too_large"): "encrypted_too_large",
+}
+_ACK_ONLY_FIELDS = ("acknowledge", "tags", "callback_url")
+
 
 def parse_http_date(header: str | None) -> datetime | None:
     """Parse an RFC 7231 date header to an aware datetime (None when absent/invalid)."""
@@ -381,7 +396,10 @@ class PushWardApiClient:
         ``acknowledge`` (``{repeat_seconds, expire_seconds, action_title}``, all
         optional) repeats the push until it is answered; the response then
         carries the ``receipt``. ``tags`` and ``callback_url`` need it. Sent now
-        without a collapse_id, it gets a random one.
+        without a collapse_id, it gets a random one. When the server refuses the
+        acknowledge itself (see _ACK_REFUSALS), a notification sent now goes out
+        once more without it, tags and callback_url, the same sealed envelope
+        included, and the response carries ``acknowledge_refused`` with the reason.
         """
         if self.e2e_key is not None:
             if trim_to_fit:
@@ -425,9 +443,25 @@ class PushWardApiClient:
         if recurrence is not None:
             payload["recurrence"] = _recurrence_payload(recurrence)
             path = "/notifications/scheduled"
-        return await self._request_with_retry(
-            "POST", path, json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
+        try:
+            return await self._request_with_retry(
+                "POST", path, json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
+            )
+        except PushWardApiError as err:
+            # Only a send going out now: a schedule refused this way would be stored
+            # without repeats for good, so its refusal reaches the caller instead.
+            reason = _ACK_REFUSALS.get((err.status_code, err.code))
+            if acknowledge is None or path != "/notifications" or reason is None:
+                raise
+            _LOGGER.warning(
+                "PushWard refused the acknowledge (%s), sending the notification once without repeats: %s", reason, err
+            )
+        # Asking for repeats must never cost the alert itself.
+        plain = {key: val for key, val in payload.items() if key not in _ACK_ONLY_FIELDS}
+        created = await self._request_with_retry(
+            "POST", path, json=plain, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
         )
+        return {**(created or {}), "acknowledge_refused": reason}
 
     async def list_scheduled_notifications(self, status: str = "scheduled") -> list[dict]:
         """GET /notifications/scheduled, following next_cursor.

@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Kumpirmahin",
-          "description": "Ipadala muli ang push hanggang may mag-kumpirma nito: true para sa mga default, o isang object na may alinman sa repeat_seconds (30-3600, default 60), expire_seconds (60-10800, default 3600), at action_title (ang label ng button, default Acknowledge). Kapag pinindot ang anumang aksyon na walang url, makukumpirma ito; kung wala, magdaragdag ang PushWard ng Acknowledge button. Kailangan ng push, at hindi level passive. Hanggang 25 lang ang puwedeng umulit nang sabay. Humiling ng sagot para sa resibo; hihinto ito sa cancel_notifications."
+          "description": "Ipadala muli ang push hanggang may mag-kumpirma nito: true para sa mga default, o isang object na may alinman sa repeat_seconds (30-3600, default 60), expire_seconds (60-10800, default 3600), at action_title (ang label ng button, default Acknowledge). Kapag pinindot ang anumang aksyon na walang url, makukumpirma ito; kung wala, magdaragdag ang PushWard ng Acknowledge button. Kailangan ng push, at hindi level passive. Hanggang 25 lang ang puwedeng umulit nang sabay; kapag lampas doon, ang notification na ipinadala agad ay isang beses lang lalabas, nang walang ulit. Humiling ng sagot para sa resibo; hihinto ito sa cancel_notifications."
         },
         "tags": {
           "name": "Mga Tag",

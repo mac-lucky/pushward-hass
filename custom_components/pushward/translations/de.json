@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Bestätigen",
-          "description": "Die Push-Benachrichtigung erneut senden, bis jemand sie bestätigt: true für die Standardwerte oder ein Objekt mit beliebigen Angaben aus repeat_seconds (30-3600, Standard 60), expire_seconds (60-10800, Standard 3600) und action_title (Beschriftung der Schaltfläche, Standard Acknowledge). Das Antippen einer Aktion ohne url bestätigt sie; gibt es keine, fügt PushWard eine Acknowledge-Schaltfläche hinzu. Erfordert push und nicht level passive. Höchstens 25 können gleichzeitig wiederholt werden. Eine Antwort anfordern, um die Quittung zu erhalten; cancel_notifications beendet das Wiederholen."
+          "description": "Die Push-Benachrichtigung erneut senden, bis jemand sie bestätigt: true für die Standardwerte oder ein Objekt mit beliebigen Angaben aus repeat_seconds (30-3600, Standard 60), expire_seconds (60-10800, Standard 3600) und action_title (Beschriftung der Schaltfläche, Standard Acknowledge). Das Antippen einer Aktion ohne url bestätigt sie; gibt es keine, fügt PushWard eine Acknowledge-Schaltfläche hinzu. Erfordert push und nicht level passive. Höchstens 25 können gleichzeitig wiederholt werden; darüber hinaus wird eine sofort gesendete Benachrichtigung einmal ohne Wiederholungen gesendet. Eine Antwort anfordern, um die Quittung zu erhalten; cancel_notifications beendet das Wiederholen."
         },
         "tags": {
           "name": "Tags",

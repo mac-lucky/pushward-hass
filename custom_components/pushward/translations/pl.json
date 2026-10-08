@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Potwierdź",
-          "description": "Wysyłaj push ponownie, aż ktoś go potwierdzi: true dla wartości domyślnych albo obiekt z dowolnymi z repeat_seconds (30-3600, domyślnie 60), expire_seconds (60-10800, domyślnie 3600) i action_title (etykieta przycisku, domyślnie Acknowledge). Dotknięcie dowolnej akcji bez url potwierdza powiadomienie; gdy jej nie ma, PushWard dodaje przycisk Acknowledge. Wymaga push i level innego niż passive. Jednocześnie może się powtarzać najwyżej 25. Poproś o odpowiedź, aby otrzymać potwierdzenie odbioru; cancel_notifications to zatrzymuje."
+          "description": "Wysyłaj push ponownie, aż ktoś go potwierdzi: true dla wartości domyślnych albo obiekt z dowolnymi z repeat_seconds (30-3600, domyślnie 60), expire_seconds (60-10800, domyślnie 3600) i action_title (etykieta przycisku, domyślnie Acknowledge). Dotknięcie dowolnej akcji bez url potwierdza powiadomienie; gdy jej nie ma, PushWard dodaje przycisk Acknowledge. Wymaga push i level innego niż passive. Jednocześnie może się powtarzać najwyżej 25; powyżej tego limitu powiadomienie wysyłane od razu wychodzi raz, bez powtórzeń. Poproś o odpowiedź, aby otrzymać potwierdzenie odbioru; cancel_notifications to zatrzymuje."
         },
         "tags": {
           "name": "Tagi",

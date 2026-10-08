@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Bevestigen",
-          "description": "Stuur de push opnieuw tot iemand hem bevestigt: true voor de standaardwaarden, of een object met een of meer van repeat_seconds (30-3600, standaard 60), expire_seconds (60-10800, standaard 3600) en action_title (het label van de knop, standaard Acknowledge). Tikken op een actie zonder url bevestigt de melding; is er geen, dan voegt PushWard een Acknowledge-knop toe. Vereist push en level niet passive. Maximaal 25 kunnen tegelijk herhalen. Vraag een antwoord aan voor de ontvangstbevestiging; cancel_notifications stopt het."
+          "description": "Stuur de push opnieuw tot iemand hem bevestigt: true voor de standaardwaarden, of een object met een of meer van repeat_seconds (30-3600, standaard 60), expire_seconds (60-10800, standaard 3600) en action_title (het label van de knop, standaard Acknowledge). Tikken op een actie zonder url bevestigt de melding; is er geen, dan voegt PushWard een Acknowledge-knop toe. Vereist push en level niet passive. Maximaal 25 kunnen tegelijk herhalen; daarboven gaat een direct verstuurde melding één keer uit, zonder herhalingen. Vraag een antwoord aan voor de ontvangstbevestiging; cancel_notifications stopt het."
         },
         "tags": {
           "name": "Tags",

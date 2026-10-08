@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "確認",
-          "description": "誰かが確認するまでプッシュを再送します。true で既定値を使用、または repeat_seconds（30-3600、既定 60）、expire_seconds（60-10800、既定 3600）、action_title（ボタンのラベル、既定 Acknowledge）のいずれかを含むオブジェクトを指定します。url のないアクションをタップすると確認されます。アクションがない場合、PushWard は Acknowledge ボタンを追加します。push が必要で、level は passive 以外にしてください。同時に繰り返せるのは最大 25 件です。受信確認を得るには回答を要求してください。cancel_notifications で停止できます。"
+          "description": "誰かが確認するまでプッシュを再送します。true で既定値を使用、または repeat_seconds（30-3600、既定 60）、expire_seconds（60-10800、既定 3600）、action_title（ボタンのラベル、既定 Acknowledge）のいずれかを含むオブジェクトを指定します。url のないアクションをタップすると確認されます。アクションがない場合、PushWard は Acknowledge ボタンを追加します。push が必要で、level は passive 以外にしてください。同時に繰り返せるのは最大 25 件です。それを超えると、すぐに送信する通知は繰り返しなしで 1 回だけ送信されます。受信確認を得るには回答を要求してください。cancel_notifications で停止できます。"
         },
         "tags": {
           "name": "タグ",

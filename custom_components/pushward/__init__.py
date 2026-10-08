@@ -1055,7 +1055,8 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
     instead of sent now, and the optional response carries the id to cancel it
     with. Sent now, the response says whether the server records an answer
     (answerable: at least one action had no url), read with get_notification_answer,
-    and for an acknowledged notification carries its receipt.
+    and for an acknowledged notification carries its receipt, or acknowledge_refused
+    when the server refused the acknowledge and it went out once without repeats.
     """
     api = _get_api(hass)
     kwargs: dict = {field: call.data[field] for field in _NOTIFICATION_FIELDS if field in call.data}
@@ -1080,6 +1081,8 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
         response: dict = {"notification_id": created.get("id"), "answerable": bool(created.get("answerable"))}
         if created.get("receipt") is not None:
             response["receipt"] = created["receipt"]
+        if created.get("acknowledge_refused"):
+            response["acknowledge_refused"] = created["acknowledge_refused"]
         return response
     return {
         "scheduled_notification_id": created.get("id"),

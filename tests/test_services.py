@@ -539,6 +539,21 @@ async def test_service_send_notification_acknowledge_true_asks_for_the_defaults(
     assert_valid_notification_receipt(response["receipt"])
 
 
+async def test_service_send_notification_reports_an_acknowledge_sent_without_repeats(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.create_notification = AsyncMock(
+        return_value={"id": 992, "answerable": True, "acknowledge_refused": "receipt_limit"}
+    )
+    await _setup_entry(hass, api)
+
+    data = {"title": "Water leak", "body": "Kitchen sink", "acknowledge": True}
+    response = await hass.services.async_call(DOMAIN, "send_notification", data, blocking=True, return_response=True)
+    await hass.services.async_call(DOMAIN, "send_notification", data, blocking=True)
+
+    assert response == {"notification_id": 992, "answerable": True, "acknowledge_refused": "receipt_limit"}
+    assert api.create_notification.await_count == 2
+
+
 async def test_service_send_notification_acknowledge_options_and_a_single_tag(hass: HomeAssistant) -> None:
     api = _mock_api()
     await _setup_entry(hass, api)

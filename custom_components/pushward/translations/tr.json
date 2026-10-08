@@ -1615,7 +1615,7 @@
         },
         "acknowledge": {
           "name": "Onayla",
-          "description": "Biri onaylayana kadar push'u yeniden gönder: varsayılanlar için true veya repeat_seconds (30-3600, varsayılan 60), expire_seconds (60-10800, varsayılan 3600) ve action_title (düğme etiketi, varsayılan Acknowledge) alanlarından herhangi birini içeren bir nesne. url içermeyen herhangi bir eyleme dokunmak bildirimi onaylar; hiç yoksa PushWard bir Acknowledge düğmesi ekler. push gerekir ve level passive olmamalıdır. Aynı anda en fazla 25 tanesi tekrarlanabilir. Alındı bilgisi için bir yanıt isteyin; cancel_notifications bunu durdurur."
+          "description": "Biri onaylayana kadar push'u yeniden gönder: varsayılanlar için true veya repeat_seconds (30-3600, varsayılan 60), expire_seconds (60-10800, varsayılan 3600) ve action_title (düğme etiketi, varsayılan Acknowledge) alanlarından herhangi birini içeren bir nesne. url içermeyen herhangi bir eyleme dokunmak bildirimi onaylar; hiç yoksa PushWard bir Acknowledge düğmesi ekler. push gerekir ve level passive olmamalıdır. Aynı anda en fazla 25 tanesi tekrarlanabilir; bu sınırın üzerinde hemen gönderilen bildirim tekrarsız olarak bir kez gider. Alındı bilgisi için bir yanıt isteyin; cancel_notifications bunu durdurur."
         },
         "tags": {
           "name": "Etiketler",
