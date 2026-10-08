@@ -71,8 +71,8 @@ async def test_each_account_has_its_own_device(hass: HomeAssistant, two_accounts
     (me_entry, _), (anna_entry, _) = two_accounts
     devices = dr.async_get(hass)
     for entry in (me_entry, anna_entry):
-        device = devices.async_get_device(identifiers={(DOMAIN, entry.entry_id)})
-        assert device is not None
+        [device] = dr.async_entries_for_config_entry(devices, entry.entry_id)
+        assert device.identifiers == {(DOMAIN, entry.entry_id)}
         assert device.name == entry.title
 
 
