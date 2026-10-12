@@ -246,13 +246,16 @@ async def test_gate_arm_warns_once_and_asks_the_coordinator(
 
 async def test_gate_rearms_only_when_reset_moves_later(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
     gate = QuotaGate(hass, ENTRY_ID)
+    # A fixed server clock keeps both resets in the future; against the wall clock
+    # they expire and both clamp to QUOTA_BLOCK_MIN_SECONDS.
+    server_now = RESET_AT - timedelta(days=3)
 
     with caplog.at_level(logging.WARNING, logger="custom_components.pushward.quota"):
-        gate.arm(_error())
+        gate.arm(_error(), server_now=server_now)
         # Same reset, different jitter draw: still the same pause.
         with patch("custom_components.pushward.quota.random.uniform", return_value=QUOTA_RELEASE_JITTER_SECONDS):
-            gate.arm(_error())
-        gate.arm(_error(reset_at=RESET_AT + timedelta(days=10)))
+            gate.arm(_error(), server_now=server_now)
+        gate.arm(_error(reset_at=RESET_AT + timedelta(days=10)), server_now=server_now)
 
     assert sum(1 for r in caplog.records if r.levelno == logging.WARNING) == 2
     assert gate.snapshot()["live_activity_updates"] == (RESET_AT + timedelta(days=10)).isoformat()
