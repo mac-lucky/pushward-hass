@@ -1817,7 +1817,7 @@
       "message": "Acknowledged notifications are temporarily unavailable on PushWard. Send this one without acknowledge, or try again later."
     },
     "e2e_unavailable": {
-      "message": "This integration key belongs to an organization, and organizations cannot send end-to-end encrypted notifications. Remove the encryption key under Configure, or use a personal integration key."
+      "message": "PushWard has not enabled end-to-end encrypted notifications for organizations, so it refuses encrypted ones from this organization's integration key. Remove the encryption key under Configure, or use a personal integration key for now."
     },
     "e2e_too_large": {
       "message": "Together with its other fields, this encrypted notification goes over the 4 KB push limit. Shorten the title or body, the actions or the media and icon URLs, or turn Push off to keep it in the inbox only."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "End-to-end encryption",
-        "description": "Home Assistant encrypts the title, subtitle, body and URL of every notification this integration sends with this key, and only devices that hold the same key can read them. Create the key in the PushWard app under Settings > End-to-End Encryption and paste it here. Level, sound, actions, media and metadata stay readable to PushWard, which needs them to deliver the push; Live Activities and widgets are not encrypted. A device without the key, or with a PushWard app older than 1.17, shows a placeholder instead of the text. An integration key that belongs to an organization cannot send encrypted notifications.\n\nKey ID in use: {key_id}",
+        "description": "Home Assistant encrypts the title, subtitle, body and URL of every notification this integration sends with this key, and only devices that hold the same key can read them. Create the key in the PushWard app under Settings > End-to-End Encryption and paste it here. Level, sound, actions, media and metadata stay readable to PushWard, which needs them to deliver the push; Live Activities and widgets are not encrypted. A device without the key, or with a PushWard app older than 1.17, shows a placeholder instead of the text. With an organization's integration key, use the key the organization's admin hands out instead; the admin creates it outside the app, for example with `pushward e2e generate`, not with Create Key, which makes a personal key. Members can read the notifications once they add it in PushWard 1.18 or later under Settings > End-to-End Encryption > Organization Keys.\n\nKey ID in use: {key_id}",
         "data": {
           "e2e_key": "End-to-end encryption key",
           "remove_e2e_key": "Remove the encryption key"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "{account} to-do reminders are not going out",
-      "description": "This integration key belongs to an organization, and organizations cannot send end-to-end encrypted notifications, so PushWard refuses every to-do reminder while an encryption key is set. Remove the encryption key under Configure, or reconfigure the integration with a personal integration key."
+      "description": "PushWard has not enabled end-to-end encrypted notifications for organizations, so it refuses every to-do reminder from this organization's integration key while an encryption key is set. Remove the encryption key under Configure, or reconfigure the integration with a personal integration key for now."
     }
   },
   "selector": {

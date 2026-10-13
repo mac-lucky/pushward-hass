@@ -1817,7 +1817,7 @@
       "message": "Meldingen met bevestiging zijn tijdelijk niet beschikbaar bij PushWard. Verstuur deze zonder acknowledge, of probeer het later opnieuw."
     },
     "e2e_unavailable": {
-      "message": "Deze integratiesleutel hoort bij een organisatie, en organisaties kunnen geen end-to-end versleutelde meldingen versturen. Verwijder de versleutelingssleutel onder Configureren, of gebruik een persoonlijke integratiesleutel."
+      "message": "PushWard heeft end-to-end versleutelde meldingen voor organisaties niet ingeschakeld en weigert daarom versleutelde meldingen van deze integratiesleutel van de organisatie. Verwijder de versleutelingssleutel onder Configureren, of gebruik voorlopig een persoonlijke integratiesleutel."
     },
     "e2e_too_large": {
       "message": "Samen met de overige velden gaat deze versleutelde melding over de pushlimiet van 4 KB. Kort de titel of tekst, de acties of de media- en pictogram-URL's in, of zet Push uit om de melding alleen in het postvak te bewaren."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "End-to-end-versleuteling",
-        "description": "Home Assistant versleutelt de titel, ondertitel, tekst en URL van elke melding die deze integratie verstuurt met deze sleutel, en alleen apparaten met dezelfde sleutel kunnen ze lezen. Maak de sleutel aan in de PushWard-app onder Instellingen > End-to-end-versleuteling en plak hem hier. Niveau, geluid, acties, media en metadata blijven leesbaar voor PushWard, dat ze nodig heeft om de push af te leveren; Live Activities en widgets worden niet versleuteld. Een apparaat zonder de sleutel, of met een PushWard-app ouder dan 1.17, toont een tijdelijke tekst in plaats van de inhoud. Een integratiesleutel die bij een organisatie hoort, kan geen versleutelde meldingen versturen.\n\nGebruikte sleutel-ID: {key_id}",
+        "description": "Home Assistant versleutelt de titel, ondertitel, tekst en URL van elke melding die deze integratie verstuurt met deze sleutel, en alleen apparaten met dezelfde sleutel kunnen ze lezen. Maak de sleutel aan in de PushWard-app onder Instellingen > End-to-end-versleuteling en plak hem hier. Niveau, geluid, acties, media en metadata blijven leesbaar voor PushWard, dat ze nodig heeft om de push af te leveren; Live Activities en widgets worden niet versleuteld. Een apparaat zonder de sleutel, of met een PushWard-app ouder dan 1.17, toont een tijdelijke tekst in plaats van de inhoud. Gebruik bij een integratiesleutel van een organisatie in plaats daarvan de sleutel die de beheerder van de organisatie uitdeelt; de beheerder maakt die buiten de app aan, bijvoorbeeld met `pushward e2e generate`, niet met \"Sleutel aanmaken\", want dat maakt een persoonlijke sleutel. Leden kunnen de meldingen lezen zodra ze die in PushWard 1.18 of nieuwer hebben toegevoegd onder Instellingen > End-to-end-versleuteling > Organisatiesleutels.\n\nGebruikte sleutel-ID: {key_id}",
         "data": {
           "e2e_key": "End-to-end-versleutelingssleutel",
           "remove_e2e_key": "Versleutelingssleutel verwijderen"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "{account}-herinneringen voor takenlijsten worden niet verstuurd",
-      "description": "Deze integratiesleutel hoort bij een organisatie, en organisaties kunnen geen end-to-end versleutelde meldingen versturen. Daarom weigert PushWard elke takenherinnering zolang er een versleutelingssleutel is ingesteld. Verwijder de versleutelingssleutel onder Configureren, of configureer de integratie opnieuw met een persoonlijke integratiesleutel."
+      "description": "PushWard heeft end-to-end versleutelde meldingen voor organisaties niet ingeschakeld en weigert daarom elke takenherinnering van deze integratiesleutel van de organisatie zolang er een versleutelingssleutel is ingesteld. Verwijder de versleutelingssleutel onder Configureren, of configureer de integratie voorlopig opnieuw met een persoonlijke integratiesleutel."
     }
   },
   "selector": {

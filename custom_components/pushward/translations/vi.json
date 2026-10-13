@@ -1817,7 +1817,7 @@
       "message": "Thông báo cần xác nhận tạm thời không khả dụng trên PushWard. Hãy gửi thông báo này không kèm acknowledge, hoặc thử lại sau."
     },
     "e2e_unavailable": {
-      "message": "Khóa tích hợp này thuộc về một tổ chức, và tổ chức không thể gửi thông báo mã hóa đầu cuối. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc dùng khóa tích hợp cá nhân."
+      "message": "PushWard chưa bật thông báo mã hóa đầu cuối cho tổ chức, nên từ chối các thông báo mã hóa từ khóa tích hợp của tổ chức này. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc tạm thời dùng khóa tích hợp cá nhân."
     },
     "e2e_too_large": {
       "message": "Cùng với các trường khác, thông báo mã hóa này vượt quá giới hạn 4 KB của một thông báo đẩy. Hãy rút ngắn tiêu đề hoặc nội dung, các hành động hoặc URL phương tiện và biểu tượng, hoặc tắt Đẩy để chỉ lưu nó trong hộp thư đến."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Mã hóa đầu cuối",
-        "description": "Home Assistant mã hóa tiêu đề, phụ đề, nội dung và URL của mọi thông báo mà tích hợp này gửi bằng khóa này, và chỉ các thiết bị có cùng khóa mới đọc được. Tạo khóa trong ứng dụng PushWard tại Cài đặt > Mã hóa đầu cuối rồi dán vào đây. Mức độ, âm thanh, hành động, phương tiện và siêu dữ liệu vẫn đọc được đối với PushWard, nơi cần chúng để gửi thông báo đẩy; Hoạt động trực tiếp và widget không được mã hóa. Thiết bị không có khóa, hoặc dùng ứng dụng PushWard cũ hơn 1.17, sẽ hiển thị văn bản giữ chỗ thay cho nội dung. Khóa tích hợp thuộc về một tổ chức không thể gửi thông báo được mã hóa.\n\nID khóa đang dùng: {key_id}",
+        "description": "Home Assistant mã hóa tiêu đề, phụ đề, nội dung và URL của mọi thông báo mà tích hợp này gửi bằng khóa này, và chỉ các thiết bị có cùng khóa mới đọc được. Tạo khóa trong ứng dụng PushWard tại Cài đặt > Mã hóa đầu cuối rồi dán vào đây. Mức độ, âm thanh, hành động, phương tiện và siêu dữ liệu vẫn đọc được đối với PushWard, nơi cần chúng để gửi thông báo đẩy; Hoạt động trực tiếp và widget không được mã hóa. Thiết bị không có khóa, hoặc dùng ứng dụng PushWard cũ hơn 1.17, sẽ hiển thị văn bản giữ chỗ thay cho nội dung. Với khóa tích hợp của một tổ chức, hãy dùng khóa do quản trị viên của tổ chức phát thay vào đó; quản trị viên tạo khóa này bên ngoài ứng dụng, ví dụ bằng `pushward e2e generate`, chứ không phải bằng \"Tạo khóa\", vốn tạo khóa cá nhân. Thành viên đọc được thông báo sau khi thêm khóa đó trong PushWard 1.18 trở lên tại Cài đặt > Mã hóa đầu cuối > Khóa tổ chức.\n\nID khóa đang dùng: {key_id}",
         "data": {
           "e2e_key": "Khóa mã hóa đầu cuối",
           "remove_e2e_key": "Xóa khóa mã hóa"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "Lời nhắc việc cần làm của {account} không được gửi",
-      "description": "Khóa tích hợp này thuộc về một tổ chức, và tổ chức không thể gửi thông báo mã hóa đầu cuối, nên PushWard từ chối mọi lời nhắc việc cần làm khi khóa mã hóa đang được đặt. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc cấu hình lại tích hợp bằng khóa tích hợp cá nhân."
+      "description": "PushWard chưa bật thông báo mã hóa đầu cuối cho tổ chức, nên từ chối mọi lời nhắc việc cần làm từ khóa tích hợp của tổ chức này khi khóa mã hóa đang được đặt. Hãy xóa khóa mã hóa trong Định cấu hình, hoặc tạm thời cấu hình lại tích hợp bằng khóa tích hợp cá nhân."
     }
   },
   "selector": {

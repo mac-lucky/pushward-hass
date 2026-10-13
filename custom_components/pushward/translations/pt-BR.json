@@ -1817,7 +1817,7 @@
       "message": "As notificações com confirmação estão temporariamente indisponíveis no PushWard. Envie esta sem acknowledge ou tente novamente mais tarde."
     },
     "e2e_unavailable": {
-      "message": "Esta chave de integração pertence a uma organização, e organizações não podem enviar notificações com criptografia de ponta a ponta. Remova a chave de criptografia em Configurar ou use uma chave de integração pessoal."
+      "message": "O PushWard não ativou as notificações com criptografia de ponta a ponta para organizações, então recusa as criptografadas enviadas com esta chave de integração da organização. Remova a chave de criptografia em Configurar ou, por enquanto, use uma chave de integração pessoal."
     },
     "e2e_too_large": {
       "message": "Junto com os outros campos, esta notificação criptografada ultrapassa o limite de 4 KB de um push. Encurte o título ou o corpo, as ações ou as URLs de mídia e do ícone, ou desative Push para guardá-la apenas na caixa de entrada."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Criptografia de ponta a ponta",
-        "description": "O Home Assistant criptografa com esta chave o título, o subtítulo, o corpo e a URL de cada notificação enviada por esta integração, e somente dispositivos que tenham a mesma chave conseguem lê-los. Crie a chave no app PushWard em Ajustes > Criptografia de Ponta a Ponta e cole aqui. Nível, som, ações, mídia e metadados continuam legíveis para o PushWard, que precisa deles para entregar o push; as Atividades ao Vivo e os widgets não são criptografados. Um dispositivo sem a chave, ou com um app PushWard anterior à 1.17, mostra um texto provisório no lugar do conteúdo. Uma chave de integração que pertence a uma organização não pode enviar notificações criptografadas.\n\nID da chave em uso: {key_id}",
+        "description": "O Home Assistant criptografa com esta chave o título, o subtítulo, o corpo e a URL de cada notificação enviada por esta integração, e somente dispositivos que tenham a mesma chave conseguem lê-los. Crie a chave no app PushWard em Ajustes > Criptografia de Ponta a Ponta e cole aqui. Nível, som, ações, mídia e metadados continuam legíveis para o PushWard, que precisa deles para entregar o push; as Atividades ao Vivo e os widgets não são criptografados. Um dispositivo sem a chave, ou com um app PushWard anterior à 1.17, mostra um texto provisório no lugar do conteúdo. Com uma chave de integração de organização, use a chave que o administrador da organização distribui; o administrador a cria fora do app, por exemplo com `pushward e2e generate`, e não com \"Criar Chave\", que cria uma chave pessoal. Os membros conseguem ler as notificações assim que a adicionam no PushWard 1.18 ou posterior em Ajustes > Criptografia de Ponta a Ponta > Chaves de Organização.\n\nID da chave em uso: {key_id}",
         "data": {
           "e2e_key": "Chave de criptografia de ponta a ponta",
           "remove_e2e_key": "Remover a chave de criptografia"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "Os lembretes de tarefas do {account} não estão sendo enviados",
-      "description": "Esta chave de integração pertence a uma organização, e organizações não podem enviar notificações com criptografia de ponta a ponta, então o PushWard recusa todos os lembretes de tarefas enquanto houver uma chave de criptografia definida. Remova a chave de criptografia em Configurar ou reconfigure a integração com uma chave de integração pessoal."
+      "description": "O PushWard não ativou as notificações com criptografia de ponta a ponta para organizações, então recusa todos os lembretes de tarefas desta chave de integração da organização enquanto houver uma chave de criptografia definida. Remova a chave de criptografia em Configurar ou, por enquanto, reconfigure a integração com uma chave de integração pessoal."
     }
   },
   "selector": {

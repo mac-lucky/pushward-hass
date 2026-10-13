@@ -1817,7 +1817,7 @@
       "message": "Notificările cu confirmare sunt temporar indisponibile în PushWard. Trimiteți-o pe aceasta fără acknowledge sau încercați din nou mai târziu."
     },
     "e2e_unavailable": {
-      "message": "Această cheie de integrare aparține unei organizații, iar organizațiile nu pot trimite notificări criptate end-to-end. Eliminați cheia de criptare la Configurare sau folosiți o cheie de integrare personală."
+      "message": "PushWard nu a activat notificările criptate end-to-end pentru organizații, așa că refuză notificările criptate trimise cu această cheie de integrare a organizației. Eliminați cheia de criptare la Configurare sau folosiți deocamdată o cheie de integrare personală."
     },
     "e2e_too_large": {
       "message": "Împreună cu celelalte câmpuri, această notificare criptată depășește limita de 4 KB a unui push. Scurtați titlul sau corpul, acțiunile ori URL-urile media și ale pictogramei, sau dezactivați Push pentru a o păstra doar în inbox."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Criptare end-to-end",
-        "description": "Home Assistant criptează cu această cheie titlul, subtitlul, conținutul și URL-ul fiecărei notificări trimise de această integrare, iar doar dispozitivele care dețin aceeași cheie le pot citi. Creați cheia în aplicația PushWard la Setări > Criptare end-to-end și lipiți-o aici. Nivelul, sunetul, acțiunile, conținutul media și metadatele rămân lizibile pentru PushWard, care are nevoie de ele pentru a livra notificarea; Activitățile live și widgeturile nu sunt criptate. Un dispozitiv fără cheie sau cu o aplicație PushWard mai veche de 1.17 afișează un substituent în loc de text. O cheie de integrare care aparține unei organizații nu poate trimite notificări criptate.\n\nID cheie în uz: {key_id}",
+        "description": "Home Assistant criptează cu această cheie titlul, subtitlul, conținutul și URL-ul fiecărei notificări trimise de această integrare, iar doar dispozitivele care dețin aceeași cheie le pot citi. Creați cheia în aplicația PushWard la Setări > Criptare end-to-end și lipiți-o aici. Nivelul, sunetul, acțiunile, conținutul media și metadatele rămân lizibile pentru PushWard, care are nevoie de ele pentru a livra notificarea; Activitățile live și widgeturile nu sunt criptate. Un dispozitiv fără cheie sau cu o aplicație PushWard mai veche de 1.17 afișează un substituent în loc de text. Cu cheia de integrare a unei organizații, folosiți în schimb cheia distribuită de administratorul organizației; administratorul o creează în afara aplicației, de exemplu cu `pushward e2e generate`, nu cu „Creează cheie”, care creează o cheie personală. Membrii pot citi notificările după ce o adaugă în PushWard 1.18 sau mai nou la Setări > Criptare end-to-end > Cheile organizațiilor.\n\nID cheie în uz: {key_id}",
         "data": {
           "e2e_key": "Cheie de criptare end-to-end",
           "remove_e2e_key": "Elimină cheia de criptare"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "Mementourile {account} pentru sarcini nu sunt trimise",
-      "description": "Această cheie de integrare aparține unei organizații, iar organizațiile nu pot trimite notificări criptate end-to-end, așa că PushWard refuză fiecare memento pentru sarcini cât timp este setată o cheie de criptare. Eliminați cheia de criptare la Configurare sau reconfigurați integrarea cu o cheie de integrare personală."
+      "description": "PushWard nu a activat notificările criptate end-to-end pentru organizații, așa că refuză fiecare memento pentru sarcini trimis cu această cheie de integrare a organizației cât timp este setată o cheie de criptare. Eliminați cheia de criptare la Configurare sau reconfigurați deocamdată integrarea cu o cheie de integrare personală."
     }
   },
   "selector": {

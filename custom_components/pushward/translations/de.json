@@ -1817,7 +1817,7 @@
       "message": "Zu bestätigende Benachrichtigungen sind bei PushWard vorübergehend nicht verfügbar. Sende diese ohne acknowledge oder versuche es später erneut."
     },
     "e2e_unavailable": {
-      "message": "Dieser Integrationsschlüssel gehört zu einer Organisation, und Organisationen können keine Ende-zu-Ende-verschlüsselten Benachrichtigungen senden. Entferne den Verschlüsselungsschlüssel unter Konfigurieren oder verwende einen persönlichen Integrationsschlüssel."
+      "message": "PushWard hat Ende-zu-Ende-verschlüsselte Benachrichtigungen für Organisationen nicht aktiviert und lehnt deshalb verschlüsselte Benachrichtigungen von diesem Integrationsschlüssel der Organisation ab. Entferne den Verschlüsselungsschlüssel unter Konfigurieren oder verwende vorerst einen persönlichen Integrationsschlüssel."
     },
     "e2e_too_large": {
       "message": "Zusammen mit den übrigen Feldern überschreitet diese verschlüsselte Benachrichtigung das Push-Limit von 4 KB. Kürze Titel oder Text, die Aktionen oder die Medien- und Symbol-URLs, oder schalte Push aus, damit sie nur im Posteingang landet."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Ende-zu-Ende-Verschlüsselung",
-        "description": "Home Assistant verschlüsselt Titel, Untertitel, Text und URL jeder Benachrichtigung, die diese Integration sendet, mit diesem Schlüssel, und nur Geräte mit demselben Schlüssel können sie lesen. Den Schlüssel in der PushWard-App unter Einstellungen > Ende-zu-Ende-Verschlüsselung erstellen und hier einfügen. Stufe, Ton, Aktionen, Medien und Metadaten bleiben für PushWard lesbar, das sie für die Zustellung der Push-Nachricht benötigt; Live-Aktivitäten und Widgets werden nicht verschlüsselt. Ein Gerät ohne den Schlüssel oder mit einer PushWard-App älter als 1.17 zeigt statt des Texts einen Platzhalter an. Ein Integrationsschlüssel, der zu einer Organisation gehört, kann keine verschlüsselten Benachrichtigungen senden.\n\nVerwendete Schlüssel-ID: {key_id}",
+        "description": "Home Assistant verschlüsselt Titel, Untertitel, Text und URL jeder Benachrichtigung, die diese Integration sendet, mit diesem Schlüssel, und nur Geräte mit demselben Schlüssel können sie lesen. Den Schlüssel in der PushWard-App unter Einstellungen > Ende-zu-Ende-Verschlüsselung erstellen und hier einfügen. Stufe, Ton, Aktionen, Medien und Metadaten bleiben für PushWard lesbar, das sie für die Zustellung der Push-Nachricht benötigt; Live-Aktivitäten und Widgets werden nicht verschlüsselt. Ein Gerät ohne den Schlüssel oder mit einer PushWard-App älter als 1.17 zeigt statt des Texts einen Platzhalter an. Bei einem Integrationsschlüssel einer Organisation verwende stattdessen den Schlüssel, den der Admin der Organisation verteilt; der Admin erstellt ihn außerhalb der App, etwa mit `pushward e2e generate`, nicht mit \"Schlüssel erstellen\", das einen persönlichen Schlüssel anlegt. Mitglieder können die Benachrichtigungen lesen, sobald sie ihn in PushWard 1.18 oder neuer unter Einstellungen > Ende-zu-Ende-Verschlüsselung > Organisationsschlüssel hinzugefügt haben.\n\nVerwendete Schlüssel-ID: {key_id}",
         "data": {
           "e2e_key": "Ende-zu-Ende-Verschlüsselungsschlüssel",
           "remove_e2e_key": "Verschlüsselungsschlüssel entfernen"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "{account}-Erinnerungen für To-do-Listen werden nicht gesendet",
-      "description": "Dieser Integrationsschlüssel gehört zu einer Organisation, und Organisationen können keine Ende-zu-Ende-verschlüsselten Benachrichtigungen senden. Deshalb lehnt PushWard jede To-do-Erinnerung ab, solange ein Verschlüsselungsschlüssel gesetzt ist. Entferne den Verschlüsselungsschlüssel unter Konfigurieren oder konfiguriere die Integration mit einem persönlichen Integrationsschlüssel neu."
+      "description": "PushWard hat Ende-zu-Ende-verschlüsselte Benachrichtigungen für Organisationen nicht aktiviert und lehnt deshalb jede To-do-Erinnerung von diesem Integrationsschlüssel der Organisation ab, solange ein Verschlüsselungsschlüssel gesetzt ist. Entferne den Verschlüsselungsschlüssel unter Konfigurieren oder konfiguriere die Integration vorerst mit einem persönlichen Integrationsschlüssel neu."
     }
   },
   "selector": {

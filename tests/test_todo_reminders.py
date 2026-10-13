@@ -602,7 +602,7 @@ async def test_org_key_refusing_encryption_raises_one_repair_issue(setup, hass: 
     assert api.create_notification.await_count == 2
     assert _e2e_issue(hass) is None
 
-    # A new key that still cannot encrypt raises it again.
+    # A new key that is still refused raises it again.
     api.create_notification = AsyncMock(side_effect=refusal)
     manager.async_retry_refused()
     await hass.async_block_till_done()

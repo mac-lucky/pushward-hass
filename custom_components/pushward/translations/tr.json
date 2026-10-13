@@ -1817,7 +1817,7 @@
       "message": "Onay gerektiren bildirimler PushWard'da geçici olarak kullanılamıyor. Bunu acknowledge olmadan gönderin veya daha sonra tekrar deneyin."
     },
     "e2e_unavailable": {
-      "message": "Bu entegrasyon anahtarı bir kuruma ait ve kurumlar uçtan uca şifreli bildirim gönderemez. Şifreleme anahtarını Yapılandır altından kaldırın veya kişisel bir entegrasyon anahtarı kullanın."
+      "message": "PushWard kurumlar için uçtan uca şifreli bildirimleri etkinleştirmedi, bu yüzden bu kurum entegrasyon anahtarından gelen şifreli bildirimleri reddediyor. Şifreleme anahtarını Yapılandır altından kaldırın veya şimdilik kişisel bir entegrasyon anahtarı kullanın."
     },
     "e2e_too_large": {
       "message": "Diğer alanlarıyla birlikte bu şifreli bildirim 4 KB'lık anlık bildirim sınırını aşıyor. Başlığı veya gövdeyi, eylemleri ya da medya ve simge URL'lerini kısaltın veya yalnızca gelen kutusunda kalması için Gönder seçeneğini kapatın."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Uçtan uca şifreleme",
-        "description": "Home Assistant, bu entegrasyonun gönderdiği her bildirimin başlığını, alt başlığını, gövdesini ve URL'sini bu anahtarla şifreler; yalnızca aynı anahtara sahip cihazlar bunları okuyabilir. Anahtarı PushWard uygulamasında Ayarlar > Uçtan Uca Şifreleme bölümünde oluşturun ve buraya yapıştırın. Seviye, ses, eylemler, medya ve meta veriler, bildirimi iletmek için bunlara ihtiyaç duyan PushWard tarafından okunabilir kalır; Canlı Etkinlikler ve widget'lar şifrelenmez. Anahtarı olmayan veya 1.17'den eski bir PushWard uygulaması olan cihaz, metin yerine bir yer tutucu gösterir. Bir kuruma ait entegrasyon anahtarı şifreli bildirim gönderemez.\n\nKullanılan anahtar kimliği: {key_id}",
+        "description": "Home Assistant, bu entegrasyonun gönderdiği her bildirimin başlığını, alt başlığını, gövdesini ve URL'sini bu anahtarla şifreler; yalnızca aynı anahtara sahip cihazlar bunları okuyabilir. Anahtarı PushWard uygulamasında Ayarlar > Uçtan Uca Şifreleme bölümünde oluşturun ve buraya yapıştırın. Seviye, ses, eylemler, medya ve meta veriler, bildirimi iletmek için bunlara ihtiyaç duyan PushWard tarafından okunabilir kalır; Canlı Etkinlikler ve widget'lar şifrelenmez. Anahtarı olmayan veya 1.17'den eski bir PushWard uygulaması olan cihaz, metin yerine bir yer tutucu gösterir. Bir kurumun entegrasyon anahtarıyla bunun yerine kurum yöneticisinin dağıttığı anahtarı kullanın; yönetici bu anahtarı uygulamanın dışında, örneğin `pushward e2e generate` ile oluşturur; kişisel bir anahtar oluşturan \"Anahtar Oluştur\" ile değil. Üyeler bu anahtarı PushWard 1.18 veya sonrasında Ayarlar > Uçtan Uca Şifreleme > Kuruluş Anahtarları altında eklediklerinde bildirimleri okuyabilir.\n\nKullanılan anahtar kimliği: {key_id}",
         "data": {
           "e2e_key": "Uçtan uca şifreleme anahtarı",
           "remove_e2e_key": "Şifreleme anahtarını kaldır"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "{account} yapılacaklar hatırlatıcıları gönderilmiyor",
-      "description": "Bu entegrasyon anahtarı bir kuruma ait ve kurumlar uçtan uca şifreli bildirim gönderemez; bu yüzden bir şifreleme anahtarı ayarlı olduğu sürece PushWard her yapılacaklar hatırlatıcısını reddeder. Şifreleme anahtarını Yapılandır altından kaldırın veya entegrasyonu kişisel bir entegrasyon anahtarıyla yeniden yapılandırın."
+      "description": "PushWard kurumlar için uçtan uca şifreli bildirimleri etkinleştirmedi; bu yüzden bir şifreleme anahtarı ayarlı olduğu sürece bu kurum entegrasyon anahtarından gelen her yapılacaklar hatırlatıcısını reddediyor. Şifreleme anahtarını Yapılandır altından kaldırın veya entegrasyonu şimdilik kişisel bir entegrasyon anahtarıyla yeniden yapılandırın."
     }
   },
   "selector": {

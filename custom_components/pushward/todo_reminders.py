@@ -121,7 +121,8 @@ _WATCH_SHORT_PAUSE_SECONDS = 10
 # Tries at completing an item for a Done tap before the tap is given up.
 _COMPLETE_ATTEMPTS = 3
 
-# The server refuses every encrypted notification from an organization's key.
+# The server refuses encrypted notifications from an organization's key while
+# PushWard has encryption for organizations turned off.
 _E2E_UNAVAILABLE_CODE = "notification.encryption_unavailable"
 
 
@@ -245,7 +246,7 @@ def _fingerprint(version: str, cfg: dict, date_only: bool) -> str:
 
 
 def e2e_unavailable_issue_id(entry_id: str) -> str:
-    """Repair issue for an entry whose reminders are refused because its key cannot encrypt."""
+    """Repair issue for an entry whose encrypted reminders PushWard refuses with encryption_unavailable."""
     return f"todo_e2e_unavailable_{entry_id}"
 
 
@@ -338,7 +339,7 @@ class TodoReminderManager:
             async with lock:
                 pass
         # A new integration key reloads the entry; the issue comes back on the
-        # next refusal if that key belongs to an organization too.
+        # next refusal if the new key is refused too.
         self._clear_e2e_issue()
         await self._store.async_save(self._serialize())
 

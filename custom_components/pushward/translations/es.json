@@ -1817,7 +1817,7 @@
       "message": "Las notificaciones con confirmación no están disponibles temporalmente en PushWard. Envía esta sin acknowledge o inténtalo de nuevo más tarde."
     },
     "e2e_unavailable": {
-      "message": "Esta clave de integración pertenece a una organización, y las organizaciones no pueden enviar notificaciones con cifrado de extremo a extremo. Elimina la clave de cifrado en Configurar o usa una clave de integración personal."
+      "message": "PushWard no ha activado las notificaciones con cifrado de extremo a extremo para organizaciones, así que rechaza las cifradas que envía esta clave de integración de la organización. Elimina la clave de cifrado en Configurar o, por ahora, usa una clave de integración personal."
     },
     "e2e_too_large": {
       "message": "Junto con sus demás campos, esta notificación cifrada supera el límite de 4 KB de un push. Acorta el título o el cuerpo, las acciones o las URL de multimedia e icono, o desactiva Push para guardarla solo en la bandeja de entrada."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Cifrado de extremo a extremo",
-        "description": "Home Assistant cifra el título, el subtítulo, el cuerpo y la URL de cada notificación que envía esta integración con esta clave, y solo los dispositivos que tengan la misma clave pueden leerlos. Crea la clave en la app de PushWard en Ajustes > Cifrado de extremo a extremo y pégala aquí. El nivel, el sonido, las acciones, los medios y los metadatos siguen siendo legibles para PushWard, que los necesita para entregar la notificación; las Actividades en vivo y los widgets no se cifran. Un dispositivo sin la clave, o con una app de PushWard anterior a la 1.17, muestra un marcador de posición en lugar del texto. Una clave de integración que pertenece a una organización no puede enviar notificaciones cifradas.\n\nID de clave en uso: {key_id}",
+        "description": "Home Assistant cifra el título, el subtítulo, el cuerpo y la URL de cada notificación que envía esta integración con esta clave, y solo los dispositivos que tengan la misma clave pueden leerlos. Crea la clave en la app de PushWard en Ajustes > Cifrado de extremo a extremo y pégala aquí. El nivel, el sonido, las acciones, los medios y los metadatos siguen siendo legibles para PushWard, que los necesita para entregar la notificación; las Actividades en vivo y los widgets no se cifran. Un dispositivo sin la clave, o con una app de PushWard anterior a la 1.17, muestra un marcador de posición en lugar del texto. Con una clave de integración de una organización, usa en su lugar la clave que reparte el administrador de la organización; el administrador la crea fuera de la app, por ejemplo con `pushward e2e generate`, no con «Crear clave», que crea una clave personal. Los miembros pueden leer las notificaciones en cuanto la añaden en PushWard 1.18 o posterior en Ajustes > Cifrado de extremo a extremo > Claves de organización.\n\nID de clave en uso: {key_id}",
         "data": {
           "e2e_key": "Clave de cifrado de extremo a extremo",
           "remove_e2e_key": "Eliminar la clave de cifrado"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "Los recordatorios de tareas de {account} no se están enviando",
-      "description": "Esta clave de integración pertenece a una organización, y las organizaciones no pueden enviar notificaciones con cifrado de extremo a extremo, así que PushWard rechaza todos los recordatorios de tareas mientras haya una clave de cifrado configurada. Elimina la clave de cifrado en Configurar o reconfigura la integración con una clave de integración personal."
+      "description": "PushWard no ha activado las notificaciones con cifrado de extremo a extremo para organizaciones, así que rechaza todos los recordatorios de tareas de esta clave de integración de la organización mientras haya una clave de cifrado configurada. Elimina la clave de cifrado en Configurar o, por ahora, reconfigura la integración con una clave de integración personal."
     }
   },
   "selector": {

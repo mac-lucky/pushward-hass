@@ -1817,7 +1817,7 @@
       "message": "Pansamantalang hindi available ang mga notification na kailangang kilalanin sa PushWard. Ipadala ito nang walang acknowledge, o subukan ulit mamaya."
     },
     "e2e_unavailable": {
-      "message": "Pag-aari ng isang organisasyon ang integration key na ito, at hindi makapagpapadala ng end-to-end encrypted na notification ang mga organisasyon. Alisin ang encryption key sa Configure, o gumamit ng personal na integration key."
+      "message": "Hindi pa pinapagana ng PushWard ang end-to-end encrypted na notification para sa mga organisasyon, kaya tinatanggihan nito ang mga naka-encrypt na notification mula sa integration key ng organisasyong ito. Alisin ang encryption key sa Configure, o gumamit muna ng personal na integration key."
     },
     "e2e_too_large": {
       "message": "Kasama ang iba pang field nito, lumalampas ang encrypted na notification na ito sa 4 KB na limitasyon ng push. Paikliin ang pamagat o body, ang mga aksyon, o ang mga URL ng media at icon, o i-off ang Push para sa inbox lang ito mapunta."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "End-to-end encryption",
-        "description": "Ine-encrypt ng Home Assistant gamit ang key na ito ang pamagat, subtitle, nilalaman, at URL ng bawat notification na ipinapadala ng integration na ito, at ang mga device lang na may parehong key ang makakabasa ng mga ito. Gumawa ng key sa PushWard app sa Settings > End-to-End Encryption at i-paste ito rito. Nananatiling nababasa ng PushWard ang level, tunog, mga action, media, at metadata, dahil kailangan nito ang mga iyon para maihatid ang push; hindi ine-encrypt ang Live Activities at mga widget. Ang device na walang key, o may PushWard app na mas luma sa 1.17, ay magpapakita ng placeholder sa halip na ang teksto. Ang integration key na pag-aari ng isang organisasyon ay hindi makapagpapadala ng mga naka-encrypt na notification.\n\nKey ID na ginagamit: {key_id}",
+        "description": "Ine-encrypt ng Home Assistant gamit ang key na ito ang pamagat, subtitle, nilalaman, at URL ng bawat notification na ipinapadala ng integration na ito, at ang mga device lang na may parehong key ang makakabasa ng mga ito. Gumawa ng key sa PushWard app sa Settings > End-to-End Encryption at i-paste ito rito. Nananatiling nababasa ng PushWard ang level, tunog, mga action, media, at metadata, dahil kailangan nito ang mga iyon para maihatid ang push; hindi ine-encrypt ang Live Activities at mga widget. Ang device na walang key, o may PushWard app na mas luma sa 1.17, ay magpapakita ng placeholder sa halip na ang teksto. Kung integration key ng isang organisasyon ang gamit, gamitin sa halip ang key na ibinibigay ng admin ng organisasyon; ginagawa ito ng admin sa labas ng app, halimbawa gamit ang `pushward e2e generate`, hindi gamit ang Create Key, na gumagawa ng personal na key. Mababasa ng mga miyembro ang mga notification kapag naidagdag na nila ito sa PushWard 1.18 o mas bago sa Settings > End-to-End Encryption > Organization Keys.\n\nKey ID na ginagamit: {key_id}",
         "data": {
           "e2e_key": "End-to-end encryption key",
           "remove_e2e_key": "Alisin ang encryption key"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "Hindi naipapadala ang mga paalala ng to-do ng {account}",
-      "description": "Pag-aari ng isang organisasyon ang integration key na ito, at hindi makapagpapadala ng end-to-end encrypted na notification ang mga organisasyon, kaya tinatanggihan ng PushWard ang bawat paalala ng to-do habang may nakatakdang encryption key. Alisin ang encryption key sa Configure, o i-reconfigure ang integration gamit ang personal na integration key."
+      "description": "Hindi pa pinapagana ng PushWard ang end-to-end encrypted na notification para sa mga organisasyon, kaya tinatanggihan nito ang bawat paalala ng to-do mula sa integration key ng organisasyong ito habang may nakatakdang encryption key. Alisin ang encryption key sa Configure, o i-reconfigure muna ang integration gamit ang personal na integration key."
     }
   },
   "selector": {

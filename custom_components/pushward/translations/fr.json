@@ -1817,7 +1817,7 @@
       "message": "Les notifications avec accusé de réception sont temporairement indisponibles sur PushWard. Envoyez celle-ci sans acknowledge, ou réessayez plus tard."
     },
     "e2e_unavailable": {
-      "message": "Cette clé d'intégration appartient à une organisation, et les organisations ne peuvent pas envoyer de notifications chiffrées de bout en bout. Supprimez la clé de chiffrement sous Configurer, ou utilisez une clé d'intégration personnelle."
+      "message": "PushWard n'a pas activé les notifications chiffrées de bout en bout pour les organisations : il refuse donc les notifications chiffrées envoyées avec cette clé d'intégration d'organisation. Supprimez la clé de chiffrement sous Configurer, ou utilisez pour l'instant une clé d'intégration personnelle."
     },
     "e2e_too_large": {
       "message": "Avec ses autres champs, cette notification chiffrée dépasse la limite de 4 Ko d'un push. Raccourcissez le titre ou le corps, les actions ou les URL du média et de l'icône, ou désactivez Push pour la garder uniquement dans la boîte de réception."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Chiffrement de bout en bout",
-        "description": "Home Assistant chiffre avec cette clé le titre, le sous-titre, le corps et l'URL de chaque notification envoyée par cette intégration, et seuls les appareils qui possèdent la même clé peuvent les lire. Créez la clé dans l'application PushWard sous Réglages > Chiffrement de bout en bout et collez-la ici. Le niveau, le son, les actions, les médias et les métadonnées restent lisibles par PushWard, qui en a besoin pour distribuer la notification ; les Activités en direct et les widgets ne sont pas chiffrés. Un appareil sans la clé, ou avec une application PushWard antérieure à la 1.17, affiche un texte de remplacement à la place du contenu. Une clé d'intégration appartenant à une organisation ne peut pas envoyer de notifications chiffrées.\n\nID de clé utilisé : {key_id}",
+        "description": "Home Assistant chiffre avec cette clé le titre, le sous-titre, le corps et l'URL de chaque notification envoyée par cette intégration, et seuls les appareils qui possèdent la même clé peuvent les lire. Créez la clé dans l'application PushWard sous Réglages > Chiffrement de bout en bout et collez-la ici. Le niveau, le son, les actions, les médias et les métadonnées restent lisibles par PushWard, qui en a besoin pour distribuer la notification ; les Activités en direct et les widgets ne sont pas chiffrés. Un appareil sans la clé, ou avec une application PushWard antérieure à la 1.17, affiche un texte de remplacement à la place du contenu. Avec une clé d'intégration d'organisation, utilisez plutôt la clé que distribue l'administrateur de l'organisation ; l'administrateur la crée en dehors de l'application, par exemple avec `pushward e2e generate`, et non avec « Créer une clé », qui crée une clé personnelle. Les membres peuvent lire les notifications dès qu'ils l'ont ajoutée dans PushWard 1.18 ou ultérieur sous Réglages > Chiffrement de bout en bout > Clés d'organisation.\n\nID de clé utilisé : {key_id}",
         "data": {
           "e2e_key": "Clé de chiffrement de bout en bout",
           "remove_e2e_key": "Supprimer la clé de chiffrement"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "Les rappels de tâches {account} ne sont pas envoyés",
-      "description": "Cette clé d'intégration appartient à une organisation, et les organisations ne peuvent pas envoyer de notifications chiffrées de bout en bout : PushWard refuse donc chaque rappel de tâche tant qu'une clé de chiffrement est définie. Supprimez la clé de chiffrement sous Configurer, ou reconfigurez l'intégration avec une clé d'intégration personnelle."
+      "description": "PushWard n'a pas activé les notifications chiffrées de bout en bout pour les organisations : il refuse donc chaque rappel de tâche envoyé avec cette clé d'intégration d'organisation tant qu'une clé de chiffrement est définie. Supprimez la clé de chiffrement sous Configurer, ou reconfigurez pour l'instant l'intégration avec une clé d'intégration personnelle."
     }
   },
   "selector": {

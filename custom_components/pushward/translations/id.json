@@ -1817,7 +1817,7 @@
       "message": "Notifikasi yang perlu diakui untuk sementara tidak tersedia di PushWard. Kirim notifikasi ini tanpa acknowledge, atau coba lagi nanti."
     },
     "e2e_unavailable": {
-      "message": "Kunci integrasi ini milik organisasi, dan organisasi tidak dapat mengirim notifikasi terenkripsi ujung ke ujung. Hapus kunci enkripsi di bawah Konfigurasikan, atau gunakan kunci integrasi pribadi."
+      "message": "PushWard belum mengaktifkan notifikasi terenkripsi ujung ke ujung untuk organisasi, sehingga menolak notifikasi terenkripsi dari kunci integrasi organisasi ini. Hapus kunci enkripsi di bawah Konfigurasikan, atau untuk sementara gunakan kunci integrasi pribadi."
     },
     "e2e_too_large": {
       "message": "Bersama kolom lainnya, notifikasi terenkripsi ini melebihi batas push 4 KB. Persingkat judul atau isi, aksi, atau URL media dan ikon, atau matikan Push agar hanya disimpan di kotak masuk."
@@ -1882,7 +1882,7 @@
     "step": {
       "init": {
         "title": "Enkripsi ujung ke ujung",
-        "description": "Home Assistant mengenkripsi judul, subjudul, isi, dan URL setiap notifikasi yang dikirim integrasi ini dengan kunci ini, dan hanya perangkat yang memiliki kunci yang sama yang dapat membacanya. Buat kunci di aplikasi PushWard pada Pengaturan > Enkripsi End-to-End lalu tempel di sini. Level, suara, aksi, media, dan metadata tetap dapat dibaca oleh PushWard, yang membutuhkannya untuk mengirimkan push; Aktivitas Langsung dan widget tidak dienkripsi. Perangkat tanpa kunci, atau dengan aplikasi PushWard yang lebih lama dari 1.17, menampilkan teks pengganti sebagai ganti isi. Kunci integrasi milik organisasi tidak dapat mengirim notifikasi terenkripsi.\n\nID Kunci yang digunakan: {key_id}",
+        "description": "Home Assistant mengenkripsi judul, subjudul, isi, dan URL setiap notifikasi yang dikirim integrasi ini dengan kunci ini, dan hanya perangkat yang memiliki kunci yang sama yang dapat membacanya. Buat kunci di aplikasi PushWard pada Pengaturan > Enkripsi End-to-End lalu tempel di sini. Level, suara, aksi, media, dan metadata tetap dapat dibaca oleh PushWard, yang membutuhkannya untuk mengirimkan push; Aktivitas Langsung dan widget tidak dienkripsi. Perangkat tanpa kunci, atau dengan aplikasi PushWard yang lebih lama dari 1.17, menampilkan teks pengganti sebagai ganti isi. Dengan kunci integrasi organisasi, gunakan kunci yang dibagikan admin organisasi sebagai gantinya; admin membuatnya di luar aplikasi, misalnya dengan `pushward e2e generate`, bukan dengan \"Buat Kunci\", yang membuat kunci pribadi. Anggota dapat membaca notifikasi setelah menambahkannya di PushWard 1.18 atau yang lebih baru pada Pengaturan > Enkripsi End-to-End > Kunci Organisasi.\n\nID Kunci yang digunakan: {key_id}",
         "data": {
           "e2e_key": "Kunci enkripsi ujung ke ujung",
           "remove_e2e_key": "Hapus kunci enkripsi"
@@ -2422,7 +2422,7 @@
     },
     "todo_e2e_unavailable": {
       "title": "Pengingat tugas {account} tidak terkirim",
-      "description": "Kunci integrasi ini milik organisasi, dan organisasi tidak dapat mengirim notifikasi terenkripsi ujung ke ujung, sehingga PushWard menolak setiap pengingat tugas selama kunci enkripsi diatur. Hapus kunci enkripsi di bawah Konfigurasikan, atau konfigurasi ulang integrasi dengan kunci integrasi pribadi."
+      "description": "PushWard belum mengaktifkan notifikasi terenkripsi ujung ke ujung untuk organisasi, sehingga menolak setiap pengingat tugas dari kunci integrasi organisasi ini selama kunci enkripsi diatur. Hapus kunci enkripsi di bawah Konfigurasikan, atau untuk sementara konfigurasi ulang integrasi dengan kunci integrasi pribadi."
     }
   },
   "selector": {
