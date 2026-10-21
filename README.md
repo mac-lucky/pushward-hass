@@ -8,7 +8,7 @@
 [![Release](https://img.shields.io/github/v/release/mac-lucky/pushward-hass?sort=semver)](https://github.com/mac-lucky/pushward-hass/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Mirror Home Assistant entities onto iPhone via [PushWard](https://pushward.app), as **Live Activities** (Dynamic Island + Lock Screen) and **Home/Lock Screen widgets**, plus account usage sensors and services to send push notifications, transactional email, and activity/widget updates from your automations.
+Mirror Home Assistant entities onto your phone via [PushWard](https://pushward.app), as **Live Activities** (Dynamic Island + Lock Screen) and **Home/Lock Screen widgets**, plus account usage sensors and services to send push notifications, transactional email, and activity/widget updates from your automations.
 
 > **New to PushWard?** Learn more at **[pushward.app](https://pushward.app)**. The iOS app is on the **[App Store](https://apps.apple.com/app/id6759689999)**; you control everything from this integration and your automations.
 
@@ -30,7 +30,7 @@ The entity you track shows up on the phone as a Live Activity, a Home/Lock Scree
 
 ## How it works
 
-The integration watches HA entity state changes and surfaces them on your iPhone two independent ways, while polling your account's own usage counters for sensors:
+The integration watches HA entity state changes and surfaces them on your phone two independent ways, while polling your account's own usage counters for sensors:
 
 ```mermaid
 flowchart LR
@@ -41,7 +41,7 @@ flowchart LR
     SVC["pushward.* services"]
     API["PushWard API (api.pushward.app)"]
     APNS["APNs"]
-    IOS["iPhone: Live Activity, widget, push, email"]
+    PHONE["Phone: Live Activity, widget, push, email"]
     SENS["Account usage and quota sensors"]
 
     HA --> AM
@@ -51,7 +51,7 @@ flowchart LR
     WM --> API
     SVC --> API
     API --> APNS
-    APNS --> IOS
+    APNS --> PHONE
     API -.->|"GET /auth/me every 15 min"| SENS
 ```
 
@@ -90,10 +90,10 @@ The surfaces are independent (separate config, managers, and caches) and share o
 ## Prerequisites
 
 - **Home Assistant 2025.7.0** or newer
-- A **PushWard account** with an **integration key** (`hlk_` prefix), created in the PushWard iOS app under **Settings > Integration Keys** (recommended scope `ha-*`)
+- A **PushWard account** with an **integration key** (`hlk_` prefix), created in the PushWard app under **Settings > Integration Keys** (recommended scope `ha-*`)
   - The key needs the **`widgets`** permission to publish widgets
   - The key needs the **`emails`** capability *and* a verified recipient to use `send_email`
-- The **[PushWard iOS app](https://pushward.app)** installed on the iPhone that will display the Live Activities / widgets
+- The **[PushWard app](https://pushward.app)** installed on the phone that will display the Live Activities / widgets
 
 ## Installation
 
@@ -135,7 +135,7 @@ Every field label and its help text is shown live in the Home Assistant config-f
 
 ### More than one account
 
-Each PushWard account gets its own entry. On a Family plan every member has their own account, so to reach someone else's iPhone they create an integration key in their PushWard app and you add the integration a second time with that key. A key for an account that already has an entry is refused.
+Each PushWard account gets its own entry. On a Family plan every member has their own account, so to reach someone else's phone they create an integration key in their PushWard app and you add the integration a second time with that key. A key for an account that already has an entry is refused.
 
 - Tracked entities, widgets and to-do lists belong to one entry and only push to that account. Add the same entity under both entries if both of you should get it.
 - Actions reach every account unless you pick one, see [Choosing the account](#choosing-the-account).
@@ -167,7 +167,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Field | Description |
 |-------|-------------|
 | Slug | Unique ID, max 128 chars (auto-generated from entity if blank) |
-| Activity Name | Display name on iPhone |
+| Activity Name | Display name on the phone |
 | Icon / Icon Attribute | Static MDI/SF Symbol, or an entity attribute for a dynamic icon |
 | Priority | 0-10 (default: 1) |
 | Start / End States | States that trigger start or end |
@@ -223,7 +223,7 @@ A **timeline** can plot up to **10 named series** on one chart, each its own lin
 - **Series** is a row table, one row per attribute of the tracked entity, mapping the attribute to a series label.
 - **Series Entities** is a row table that binds *separate* entities as lines, so values from unrelated sensors share one chart (a PM2.5 sensor per room, solar arrays, etc.). Each row takes an **entity** (required; its state, or an **attribute** you name) and an optional **label**. Left off, the label defaults to the entity's friendly name (with the attribute name appended for attribute sources so two attributes of one entity stay distinct). Labels are frozen when you save (the server merges series by label), truncated to 32 chars, and de-duplicated with a numeric suffix.
 
-Each series entity is tracked as a companion, so a change to any one re-samples the chart while the anchor entity owns start/end. Units auto-default from each state-sourced entity's `unit_of_measurement`; the **Per-Series Units** table (a series label and its unit per row) overrides them. Numeric attributes in the 0-255 range (e.g. `brightness`) are rescaled to 0-100. The 10-line cap covers Series and Series Entities combined; the server and iOS app already render multi-series timelines, so this is a Home Assistant configuration option only.
+Each series entity is tracked as a companion, so a change to any one re-samples the chart while the anchor entity owns start/end. Units auto-default from each state-sourced entity's `unit_of_measurement`; the **Per-Series Units** table (a series label and its unit per row) overrides them. Numeric attributes in the 0-255 range (e.g. `brightness`) are rescaled to 0-100. The 10-line cap covers Series and Series Entities combined; the server and the app already render multi-series timelines, so this is a Home Assistant configuration option only.
 
 </details>
 
@@ -282,7 +282,7 @@ Everything on it is read from the player's own attributes, so there is nothing t
 
 - **Title**: `media_title`, else `media_series_title`, else `media_channel`, else `source`.
 - **Subtitle**: `media_artist`, else `media_album_name`, else `app_name`. Setting a Subtitle Entity or Attribute overrides that chain.
-- **Scrubber**: `media_position` paired with `media_position_updated_at`, plus `media_duration`. The position is sent *with* the moment it was read, and iOS advances it from there while the state is playing - so the bar keeps moving between pushes. A player that reports a position but not the timestamp gets no scrubber rather than a wrong one, and a stale anchor (a player paused since yesterday) is dropped for the same reason.
+- **Scrubber**: `media_position` paired with `media_position_updated_at`, plus `media_duration`. The position is sent *with* the moment it was read, and the app advances it from there while the state is playing - so the bar keeps moving between pushes. A player that reports a position but not the timestamp gets no scrubber rather than a wrong one, and a stale anchor (a player paused since yesterday) is dropped for the same reason.
 - **Volume**: `volume_level`.
 - **Playback state**: `playing`, `paused` and `buffering` map straight through; anything else reads as stopped.
 
@@ -365,7 +365,7 @@ The original five templates are unaffected.
 | Expired Text | Shown once the end date passes, max 64 chars (countdown) |
 | Devices | Rows binding a separate entity to a battery ring, max 8 (battery) |
 | Period Attributes / Start Key / Value Key | Where to read the period arrays and their keys (schedule) |
-| Low Band Maximum / High Band Minimum | Optional band thresholds; leave both empty to let iOS derive them (schedule) |
+| Low Band Maximum / High Band Minimum | Optional band thresholds; leave both empty to let the app derive them (schedule) |
 | Flow Nodes | Rows binding a separate entity to a slot, max 3 inputs (flow) |
 | Label / Label Attribute | Static label or an entity attribute |
 | Subtitle Attribute | Subtitle text from an attribute |
@@ -375,7 +375,7 @@ The original five templates are unaffected.
 | Tap Action URL / Foreground | Deep link opened when the widget is tapped |
 | Trigger Mode | `event` (state-change) or `poll` |
 | Poll Interval | Seconds between re-evaluations in poll mode (10-3600, default 60) |
-| Stale After | Seconds before iOS greys the widget out; blank = never (60-604800) |
+| Stale After | Seconds before the widget greys out; blank = never (60-604800) |
 
 </details>
 
@@ -393,7 +393,7 @@ A flow row's **Slot** decides where it renders: up to three `input` rows, plus o
 `storage` and `exchange`. `Rate` comes from the row's entity (or its attribute); `Total entity` supplies a
 cumulative total for the day and `Level entity` a 0-100 fill for a storage node.
 
-The sign convention is yours to choose, but the iOS rendering assumes the energy one: **exchange is positive
+The sign convention is yours to choose, but the app's rendering assumes the energy one: **exchange is positive
 inbound** (importing) and negative outbound (exporting), and **storage is positive while filling** and
 negative while draining. Nothing in the template is energy-specific though - water, data and money use the
 same four slots.
@@ -431,13 +431,13 @@ read the value.
 #### Timers
 
 **Timer Entity / Attribute / Style** renders the subtitle as a live countdown (future date) or count-up (past
-date), re-rendered by iOS itself rather than by a push. `timer` ticks like `01:23:45`; `relative` shows coarse
+date), re-rendered on the device itself rather than by a push. `timer` ticks like `01:23:45`; `relative` shows coarse
 units like `2 min`. Stat rows get the same treatment per row: set a row's **Timer** and, when its value parses
 as a date, it renders as a timer while the plain string stays as the fallback.
 
 #### Staleness and the heartbeat
 
-**Stale After** tells iOS how long after the last update the widget should render as stale. Because that
+**Stale After** tells the app how long after the last update the widget should render as stale. Because that
 clock keeps running even when nothing in HA changes, setting it also arms a heartbeat: every `stale_after / 2`
 seconds (minimum 30) the integration re-sends the current content. Identical content is a no-op server-side
 that re-stamps `updated_at` without pushing to the device.
@@ -529,7 +529,7 @@ Create a new activity.
 | Field | Required | Description |
 |-------|:--------:|-------------|
 | `slug` | Yes | Unique activity identifier |
-| `name` | Yes | Display name on iPhone |
+| `name` | Yes | Display name on the phone |
 | `priority` | No | 0-10 (default: 1) |
 | `ended_ttl` | No | Seconds after end before auto-delete (1-2592000) |
 | `stale_ttl` | No | Seconds of inactivity before auto-end (1-2592000) |
@@ -606,7 +606,7 @@ implied by the action name; you no longer pass a `template` field.
 
 > `duration` (integer seconds or a string like `"30m"` / `"1h30m"`) is the set-and-forget
 > alternative to `end_date`: the server re-anchors `start_date = now` and
-> `end_date = now + duration`, which is what lets iOS animate the countdown's progress bar.
+> `end_date = now + duration`, which is what lets the app animate the countdown's progress bar.
 > Send `end_date` directly for mid-flight updates that must preserve the original timer;
 > **if both are sent, `duration` wins** (it overwrites start/end). `timeline`'s `history`
 > is a one-time seed (`{ series: [{ timestamp, value }] }`); the server owns the series
@@ -992,7 +992,7 @@ When PushWard refuses the acknowledge itself, most often because 25 are already 
 
 ### `pushward.send_email`
 
-Send a transactional email. Requires the key's **`emails`** capability; the recipient must already be added and confirmed in the PushWard iOS app (the integration cannot verify recipients itself).
+Send a transactional email. Requires the key's **`emails`** capability; the recipient must already be added and confirmed in the PushWard app (the integration cannot verify recipients itself).
 
 | Field | Required | Description |
 |-------|:--------:|-------------|
@@ -1137,7 +1137,7 @@ Narrow to one area with `custom_components.pushward.api` (HTTP calls) or `custom
 
 **Common failures:**
 
-- **Setup / reauth fails**: the integration key is invalid or expired (401). Create a fresh key in the iOS app and re-enter it.
+- **Setup / reauth fails**: the integration key is invalid or expired (401). Create a fresh key in the PushWard app and re-enter it.
 - **Service call rejected with a server reason**: fixable problems surface as a validation error (e.g. a missing `widgets`/`emails` capability, or an unverified email recipient). Read the `custom_components.pushward.api` debug lines for the HTTP status and body.
 - **`slug` doesn't match an existing activity**: create it first with `pushward.create_activity`.
 - **Wrong field for the chosen template**: see [which fields apply to which template](#pushwardupdate_activity_template).
@@ -1151,6 +1151,6 @@ Narrow to one area with `custom_components.pushward.api` (HTTP calls) or `custom
 - **Home Assistant 2025.7.0+** (set in `hacs.json`)
 - **Python 3.13.2+**
 - A [PushWard](https://pushward.app) account and integration key
-- The PushWard iOS app on your iPhone ([App Store](https://apps.apple.com/app/id6759689999))
+- The PushWard app on your phone ([App Store](https://apps.apple.com/app/id6759689999))
 
 Licensed under [MIT](LICENSE).
