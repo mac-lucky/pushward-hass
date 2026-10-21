@@ -467,6 +467,22 @@
           "name": "Sekundy drzemki",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Kierunek",
+          "description": "down (domyślnie) odlicza do daty zakończenia. up liczy w górę od daty rozpoczęcia (domyślnie teraz, może być w przeszłości) i nie przyjmuje daty zakończenia, czasu trwania, progu ostrzeżenia, alarmu ani komunikatu zakończenia."
+        },
+        "goal": {
+          "name": "Cel",
+          "description": "Cel dla licznika w górę: sekundy albo czas w postaci \"2h\". Linijka wypełnia się do celu, potem zegar robi się pomarańczowy i liczy czas ponad cel. Tylko dla kierunku up."
+        },
+        "show_ruler": {
+          "name": "Pokaż linijkę",
+          "description": "Pokazuje linijkę postępu. Domyślnie włączone."
+        },
+        "paused": {
+          "name": "Wstrzymany",
+          "description": "Włączone zatrzymuje zegar, wyłączone go wznawia. Wysłanie stanu, w którym już jest, niczego nie zmienia."
+        },
         "accent_color": {
           "name": "Kolor akcentu",
           "description": "Kolor akcentu dla Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Identyfikator (slug)",
           "description": "Identyfikator slug Live Activity do usunięcia."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Wstrzymaj timer",
+      "description": "Wstrzymaj Live Activity countdown (timer) albo wznów ją, wyłączając Wstrzymany.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Konto PushWard do użycia. Zostaw puste, aby użyć każdego konta PushWard dodanego do Home Assistant."
+        },
+        "slug": {
+          "name": "Identyfikator (slug)",
+          "description": "Slug aktywności countdown."
+        },
+        "paused": {
+          "name": "Wstrzymany",
+          "description": "Włączone zatrzymuje zegar, wyłączone go wznawia. Domyślnie włączone."
         }
       }
     },

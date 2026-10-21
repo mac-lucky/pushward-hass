@@ -467,6 +467,22 @@
           "name": "Snooze Seconds",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Requires alarm (iOS 26+, countdown template only)."
         },
+        "direction": {
+          "name": "Direction",
+          "description": "down (default) counts down to the end date. up counts up from the start date (default now, may be in the past) and takes no end date, duration, warning threshold, alarm or completion message."
+        },
+        "goal": {
+          "name": "Goal",
+          "description": "Target for an up timer: seconds or a duration string like \"2h\". The ruler fills toward it, then the clock turns orange as overtime. Direction up only."
+        },
+        "show_ruler": {
+          "name": "Show Ruler",
+          "description": "Show the progress ruler. On by default."
+        },
+        "paused": {
+          "name": "Paused",
+          "description": "On freezes the clock, off resumes it. Sending the state it is already in changes nothing."
+        },
         "accent_color": {
           "name": "Accent Color",
           "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Activity slug identifier to delete."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Pause Timer",
+      "description": "Pause a countdown (Timer) Live Activity, or resume it with Paused off.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug of the countdown activity."
+        },
+        "paused": {
+          "name": "Paused",
+          "description": "On pauses the clock, off resumes it. Defaults to on."
         }
       }
     },

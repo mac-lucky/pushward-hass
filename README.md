@@ -85,7 +85,7 @@ The surfaces are independent (separate config, managers, and caches) and share o
 - **6-level icon fallback**: attribute -> config -> entity -> registry -> device class -> domain default
 - **Color support**: RGB, HSV, XY, Kelvin, named colors
 - **TTL controls**: auto-delete after end, auto-end on stale activity, auto-dismiss from the Lock Screen
-- **Services** for the whole surface: create/update/end/delete activities (with a per-template update action), send notifications, send email, refresh/delete widgets, generate a ThumbHash
+- **Services** for the whole surface: create/update/end/delete activities (with a per-template update action), pause and resume timers, send notifications, send email, refresh/delete widgets, generate a ThumbHash
 
 ## Prerequisites
 
@@ -581,7 +581,7 @@ implied by the action name; you no longer pass a `template` field.
 | Action | Extra fields |
 |--------|--------------|
 | `update_activity_generic` | `live_progress`, `image_url`, `image_shape`, `image_thumbhash` |
-| `update_activity_countdown` | `end_date`, `duration`, `start_date`, `warning_threshold`, `alarm`, `snooze_seconds` |
+| `update_activity_countdown` | `end_date`, `duration`, `start_date`, `warning_threshold`, `alarm`, `snooze_seconds`, `direction`, `goal`, `show_ruler`, `paused` |
 | `update_activity_steps` | `total_steps` (max 64), `current_step`, `step_labels`, `step_rows`, `step_weights`, `step_colors`, `duration`, `live_progress`, `image_url`, `image_shape`, `image_thumbhash` |
 | `update_activity_alert` | `severity`, `fired_at` |
 | `update_activity_gauge` | `value`, `min_value`, `max_value`, `unit` |
@@ -611,6 +611,31 @@ implied by the action name; you no longer pass a `template` field.
 > **if both are sent, `duration` wins** (it overwrites start/end). `timeline`'s `history`
 > is a one-time seed (`{ series: [{ timestamp, value }] }`); the server owns the series
 > after the first update.
+
+> **Counting up and pausing.** `countdown` (also called Timer) runs either way.
+> `direction: up` counts from `start_date` instead of toward an end: leave `start_date` out
+> to start now, or give a past timestamp ("asleep since 18:19"). An up timer has no end, so the
+> action refuses `end_date`, `duration`, `warning_threshold`, `alarm`, `snooze_seconds` and a
+> `completion_message` next to it; leave the message out of `end_activity` for it as well, the
+> server refuses that too. `goal` (seconds, or a string like `"2h"`; up only) fills the ruler
+> toward a target, and past it the clock turns orange and keeps counting as overtime.
+> `show_ruler: false` hides the bar in either direction. `paused: true` freezes the clock and
+> `paused: false` starts it again. Counting up, the paused time is left out of the count, so
+> the start time on the card stays right; counting down, the end moves on by the length of the
+> pause. Sending the state the timer is already in changes nothing, so an automation can send
+> `paused` on every update; [`pause_timer`](#pushwardpause_timer) sends nothing else. The
+> app needs version 1.19 or newer for both: older builds show an up timer as finished and keep
+> counting down through a pause.
+>
+> ```yaml
+> - action: pushward.update_activity_countdown
+>   data:
+>     slug: kid-nap
+>     state: ongoing
+>     state_text: Asleep
+>     direction: up
+>     goal: 2h
+> ```
 
 > `live_progress` (generic + steps) fills the progress bar smoothly and counts down an ETA to
 > the finish time using the remaining-time source; on steps it fills the current step rather
@@ -804,6 +829,24 @@ Delete an activity immediately (no completion animation).
 | Field | Required | Description |
 |-------|:--------:|-------------|
 | `slug` | Yes | Activity identifier |
+
+### `pushward.pause_timer`
+
+Pause a countdown, or start it again with `paused: false`. Only the switch is sent: an ended
+timer stays ended and the template stays what it is. On any other template the server refuses
+it and the action fails with its message.
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `slug` | Yes | Activity identifier |
+| `paused` | No | `true` (default) pauses, `false` resumes |
+
+```yaml
+- action: pushward.pause_timer
+  data:
+    slug: kid-nap
+    paused: false
+```
 
 ### `pushward.send_notification`
 

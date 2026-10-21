@@ -467,6 +467,22 @@
           "name": "स्नूझ सेकंद",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "दिशा",
+          "description": "down (डीफॉल्ट) समाप्ती तारखेपर्यंत उलटी मोजणी करते. up सुरुवातीच्या तारखेपासून पुढे मोजते (डीफॉल्ट आता, भूतकाळातही असू शकते) आणि समाप्ती तारीख, कालावधी, इशारा थ्रेशोल्ड, अलार्म किंवा पूर्णता संदेश घेत नाही."
+        },
+        "goal": {
+          "name": "लक्ष्य",
+          "description": "up टाइमरचे लक्ष्य: सेकंद किंवा \"2h\" सारखा कालावधी. रूलर त्याच्याकडे भरत जातो, नंतर जादा वेळेत घड्याळ नारिंगी होते. फक्त up दिशेसाठी."
+        },
+        "show_ruler": {
+          "name": "रूलर दाखवा",
+          "description": "प्रगती रूलर दाखवा. डीफॉल्टनुसार चालू."
+        },
+        "paused": {
+          "name": "थांबवलेले",
+          "description": "चालू केल्यास घड्याळ थांबते, बंद केल्यास पुन्हा सुरू होते. ज्या स्थितीत ते आधीच आहे ती पुन्हा पाठवल्याने काहीही बदलत नाही."
+        },
         "accent_color": {
           "name": "Accent रंग",
           "description": "Activity साठी accent रंग. Hex (#RRGGBB) किंवा नामित रंग."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "स्लग",
           "description": "हटवण्यासाठी Activity चा slug ओळखकर्ता."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "टाइमर थांबवा",
+      "description": "countdown (टाइमर) Live Activity थांबवा, किंवा थांबवलेले बंद करून पुन्हा सुरू करा.",
+      "fields": {
+        "config_entry_id": {
+          "name": "खाते",
+          "description": "वापरायचे PushWard खाते. Home Assistant मध्ये जोडलेले प्रत्येक PushWard खाते वापरण्यासाठी रिकामे ठेवा."
+        },
+        "slug": {
+          "name": "स्लग",
+          "description": "countdown Activity चा स्लग."
+        },
+        "paused": {
+          "name": "थांबवलेले",
+          "description": "चालू केल्यास घड्याळ थांबते, बंद केल्यास पुन्हा सुरू होते. डीफॉल्टनुसार चालू."
         }
       }
     },

@@ -467,6 +467,22 @@
           "name": "Segundos de soneca",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Direção",
+          "description": "down (padrão) faz a contagem regressiva até a data de término. up conta para cima a partir da data de início (padrão agora, pode estar no passado) e não aceita data de término, duração, limite de aviso, alarme nem mensagem de conclusão."
+        },
+        "goal": {
+          "name": "Meta",
+          "description": "Meta de um timer progressivo: segundos ou uma duração como \"2h\". A régua se enche até ela, depois o relógio fica laranja como tempo extra. Somente com direção up."
+        },
+        "show_ruler": {
+          "name": "Mostrar régua",
+          "description": "Mostra a régua de progresso. Ativado por padrão."
+        },
+        "paused": {
+          "name": "Pausado",
+          "description": "Ativado congela o relógio, desativado o retoma. Enviar o estado em que ele já está não muda nada."
+        },
         "accent_color": {
           "name": "Cor de Destaque",
           "description": "Cor de destaque para a atividade. Hexadecimal (#RRGGBB) ou nome de cor."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Identificador slug da atividade a excluir."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Pausar timer",
+      "description": "Pausar uma Live Activity countdown (timer), ou retomá-la com Pausado desativado.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Conta",
+          "description": "Conta PushWard a usar. Deixe vazio para usar todas as contas PushWard adicionadas ao Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug da atividade countdown."
+        },
+        "paused": {
+          "name": "Pausado",
+          "description": "Ativado pausa o relógio, desativado o retoma. Ativado por padrão."
         }
       }
     },

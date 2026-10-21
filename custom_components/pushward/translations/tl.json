@@ -467,6 +467,22 @@
           "name": "Snooze na Segundo",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Direksyon",
+          "description": "down (default) ay nagbibilang pababa hanggang sa petsa ng pagtatapos. up ay nagbibilang pataas mula sa petsa ng simula (default ngayon, puwedeng nasa nakaraan) at hindi tumatanggap ng petsa ng pagtatapos, tagal, babala na threshold, alarma o mensahe ng pagkumpleto."
+        },
+        "goal": {
+          "name": "Layunin",
+          "description": "Layunin ng timer na nagbibilang pataas: segundo o tagal tulad ng \"2h\". Napupuno ang ruler papunta rito, saka nagiging kahel ang orasan bilang sobrang oras. Para lang sa direksyong up."
+        },
+        "show_ruler": {
+          "name": "Ipakita ang Ruler",
+          "description": "Ipinapakita ang ruler ng progreso. Naka-on bilang default."
+        },
+        "paused": {
+          "name": "Naka-pause",
+          "description": "Kapag naka-on, humihinto ang orasan; kapag naka-off, nagpapatuloy ito. Walang nagbabago kapag ipinadala ang estado na kinalalagyan na nito."
+        },
         "accent_color": {
           "name": "Accent na Kulay",
           "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Slug identifier ng activity na buburahin."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "I-pause ang Timer",
+      "description": "I-pause ang isang countdown (Timer) Live Activity, o ituloy ito kapag naka-off ang Naka-pause.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug ng countdown na activity."
+        },
+        "paused": {
+          "name": "Naka-pause",
+          "description": "Kapag naka-on, humihinto ang orasan; kapag naka-off, nagpapatuloy ito. Naka-on bilang default."
         }
       }
     },

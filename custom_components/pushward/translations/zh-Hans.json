@@ -467,6 +467,22 @@
           "name": "稍后提醒秒数",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "方向",
+          "description": "down (默认) 倒计时到结束日期。up 从开始日期正向计时 (默认为现在，可以是过去的时间)，不接受结束日期、时长、警告阈值、闹钟或完成消息。"
+        },
+        "goal": {
+          "name": "目标",
+          "description": "正计时的目标：秒数或类似 \"2h\" 的时长。标尺会填充到目标，之后时钟变为橙色表示超时。仅用于 up 方向。"
+        },
+        "show_ruler": {
+          "name": "显示标尺",
+          "description": "显示进度标尺。默认开启。"
+        },
+        "paused": {
+          "name": "已暂停",
+          "description": "开启会冻结时钟，关闭会继续计时。重复发送当前状态不会改变任何内容。"
+        },
         "accent_color": {
           "name": "强调色",
           "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "标识符",
           "description": "要删除的活动 slug 标识符。"
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "暂停计时器",
+      "description": "暂停 countdown (计时器) Live Activity，关闭已暂停即可继续。",
+      "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
+        "slug": {
+          "name": "标识符",
+          "description": "countdown 活动的标识符。"
+        },
+        "paused": {
+          "name": "已暂停",
+          "description": "开启会暂停时钟，关闭会继续计时。默认开启。"
         }
       }
     },

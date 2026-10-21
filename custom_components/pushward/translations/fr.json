@@ -467,6 +467,22 @@
           "name": "Secondes de report",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Sens",
+          "description": "down (par défaut) décompte jusqu'à la date de fin. up compte à partir de la date de début (par défaut maintenant, peut être dans le passé) et n'accepte ni date de fin, ni durée, ni seuil d'avertissement, ni alarme, ni message de fin."
+        },
+        "goal": {
+          "name": "Objectif",
+          "description": "Objectif d'un minuteur croissant : secondes ou une durée comme \"2h\". La règle se remplit jusqu'à lui, puis l'horloge passe à l'orange en dépassement. Sens up uniquement."
+        },
+        "show_ruler": {
+          "name": "Afficher la règle",
+          "description": "Affiche la règle de progression. Activé par défaut."
+        },
+        "paused": {
+          "name": "En pause",
+          "description": "Activé fige l'horloge, désactivé la relance. Renvoyer l'état dans lequel elle est déjà ne change rien."
+        },
         "accent_color": {
           "name": "Couleur d'accentuation",
           "description": "Couleur d'accentuation de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Identifiant slug de la Live Activity à supprimer."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Mettre le minuteur en pause",
+      "description": "Mettre en pause une Live Activity countdown (minuteur), ou la relancer avec En pause désactivé.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Compte",
+          "description": "Compte PushWard à utiliser. Laissez vide pour utiliser chaque compte PushWard ajouté à Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug de l'activité countdown."
+        },
+        "paused": {
+          "name": "En pause",
+          "description": "Activé fige l'horloge, désactivé la relance. Activé par défaut."
         }
       }
     },

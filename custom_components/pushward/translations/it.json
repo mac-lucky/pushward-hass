@@ -467,6 +467,22 @@
           "name": "Secondi di posticipo",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Direzione",
+          "description": "down (predefinito) conta alla rovescia fino alla data di fine. up conta in avanti dalla data di inizio (predefinita adesso, può essere nel passato) e non accetta data di fine, durata, soglia di avviso, sveglia o messaggio di completamento."
+        },
+        "goal": {
+          "name": "Obiettivo",
+          "description": "Obiettivo di un timer in avanti: secondi o una durata come \"2h\". Il righello si riempie fino a lì, poi l'orologio diventa arancione come tempo extra. Solo con direzione up."
+        },
+        "show_ruler": {
+          "name": "Mostra righello",
+          "description": "Mostra il righello di avanzamento. Attivo per impostazione predefinita."
+        },
+        "paused": {
+          "name": "In pausa",
+          "description": "Attivo ferma l'orologio, disattivo lo riprende. Inviare lo stato in cui si trova già non cambia nulla."
+        },
         "accent_color": {
           "name": "Colore accento",
           "description": "Colore accento per l'attività. Esadecimale (#RRGGBB) o nome del colore."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Identificatore slug dell'attività da eliminare."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Metti in pausa il timer",
+      "description": "Mettere in pausa una Live Activity countdown (timer), o riprenderla con In pausa disattivato.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Account PushWard da usare. Lascia vuoto per usare ogni account PushWard aggiunto a Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug dell'attività countdown."
+        },
+        "paused": {
+          "name": "In pausa",
+          "description": "Attivo ferma l'orologio, disattivo lo riprende. Attivo per impostazione predefinita."
         }
       }
     },

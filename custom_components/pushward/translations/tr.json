@@ -467,6 +467,22 @@
           "name": "Erteleme Saniyeleri",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Yön",
+          "description": "down (varsayılan) bitiş tarihine kadar geri sayar. up başlangıç tarihinden ileri sayar (varsayılan şimdi, geçmişte olabilir) ve bitiş tarihi, süre, uyarı eşiği, alarm veya tamamlanma mesajı kabul etmez."
+        },
+        "goal": {
+          "name": "Hedef",
+          "description": "İleri sayan zamanlayıcının hedefi: saniye ya da \"2h\" gibi bir süre. Cetvel hedefe doğru dolar, ardından saat ek süre olarak turuncuya döner. Yalnızca up yönü için."
+        },
+        "show_ruler": {
+          "name": "Cetveli Göster",
+          "description": "İlerleme cetvelini gösterir. Varsayılan olarak açık."
+        },
+        "paused": {
+          "name": "Duraklatıldı",
+          "description": "Açık saati durdurur, kapalı devam ettirir. Zaten bulunduğu durumu yeniden göndermek hiçbir şeyi değiştirmez."
+        },
         "accent_color": {
           "name": "Vurgu Rengi",
           "description": "Aktivite için vurgu rengi. Hex (#RRGGBB) veya adlandırılmış renk."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Silinecek aktivite slug tanımlayıcısı."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Zamanlayıcıyı Duraklat",
+      "description": "Bir countdown (zamanlayıcı) Live Activity'sini duraklat veya Duraklatıldı kapalıyken devam ettir.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "countdown aktivitesinin slug'ı."
+        },
+        "paused": {
+          "name": "Duraklatıldı",
+          "description": "Açık saati durdurur, kapalı devam ettirir. Varsayılan olarak açık."
         }
       }
     },

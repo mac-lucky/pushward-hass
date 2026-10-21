@@ -467,6 +467,22 @@
           "name": "Snooze Seconds",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "దిశ",
+          "description": "down (డిఫాల్ట్) ముగింపు తేదీ వరకు వెనక్కి లెక్కిస్తుంది. up ప్రారంభ తేదీ నుండి ముందుకు లెక్కిస్తుంది (డిఫాల్ట్ ఇప్పుడు, గతంలో కూడా ఉండవచ్చు); ముగింపు తేదీ, వ్యవధి, హెచ్చరిక థ్రెషోల్డ్, అలారం, పూర్తి సందేశం అంగీకరించదు."
+        },
+        "goal": {
+          "name": "లక్ష్యం",
+          "description": "ముందుకు లెక్కించే టైమర్ లక్ష్యం: సెకన్లు లేదా \"2h\" వంటి వ్యవధి. రూలర్ దాని వైపు నిండుతుంది, తర్వాత అదనపు సమయంలో గడియారం నారింజ రంగులోకి మారుతుంది. up దిశకు మాత్రమే."
+        },
+        "show_ruler": {
+          "name": "రూలర్ చూపించు",
+          "description": "ప్రోగ్రెస్ రూలర్ చూపిస్తుంది. అప్రమేయంగా ఆన్."
+        },
+        "paused": {
+          "name": "పాజ్ చేయబడింది",
+          "description": "ఆన్ చేస్తే గడియారం ఆగుతుంది, ఆఫ్ చేస్తే మళ్లీ నడుస్తుంది. ఇప్పటికే ఉన్న స్థితిని మళ్లీ పంపితే ఏమీ మారదు."
+        },
         "accent_color": {
           "name": "యాక్సెంట్ రంగు",
           "description": "Activity కోసం యాక్సెంట్ రంగు. Hex (#RRGGBB) లేదా పేరున్న రంగు."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "తొలగించాల్సిన activity slug గుర్తింపు."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "టైమర్ పాజ్ చేయి",
+      "description": "countdown (టైమర్) Live Activity ని పాజ్ చేయి, లేదా పాజ్ చేయబడింది ఆఫ్ చేసి మళ్లీ ప్రారంభించు.",
+      "fields": {
+        "config_entry_id": {
+          "name": "ఖాతా",
+          "description": "ఉపయోగించాల్సిన PushWard ఖాతా. Home Assistant కి జోడించిన ప్రతి PushWard ఖాతాను ఉపయోగించడానికి ఖాళీగా ఉంచండి."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "countdown Activity యొక్క slug."
+        },
+        "paused": {
+          "name": "పాజ్ చేయబడింది",
+          "description": "ఆన్ చేస్తే గడియారం ఆగుతుంది, ఆఫ్ చేస్తే మళ్లీ నడుస్తుంది. అప్రమేయంగా ఆన్."
         }
       }
     },

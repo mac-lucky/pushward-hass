@@ -94,6 +94,7 @@ _BASE_SERVICES = (
     "create_activity",
     "end_activity",
     "delete_activity",
+    "pause_timer",
     "send_notification",
     "send_email",
     "cancel_scheduled_notification",
@@ -1700,6 +1701,24 @@ async def test_deprecated_update_activity_raises_repair_issue(hass: HomeAssistan
     assert issue.severity == ir.IssueSeverity.WARNING
 
 
+async def test_deprecated_update_activity_maps_timer_to_countdown(hass: HomeAssistant) -> None:
+    """The docs call countdown "timer"; the alias sends the name stored rows carry."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "nap", "state": "ongoing", "template": "timer", "direction": "up", "goal": "2h"},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "countdown"
+    assert content["direction"] == "up"
+    assert content["goal"] == "2h"
+
+
 async def test_update_activity_service_accepts_warning_threshold(hass: HomeAssistant) -> None:
     """warning_threshold appears in content dict."""
     api = _mock_api()
@@ -1952,6 +1971,225 @@ async def test_update_activity_countdown_rejects_zero_duration(hass: HomeAssista
             {"slug": "c", "state": "ongoing", "duration": 0},
             blocking=True,
         )
+    api.update_activity.assert_not_awaited()
+
+
+# --- countdown clock: direction / goal / show_ruler / paused ---
+
+
+async def test_update_activity_countdown_forwards_clock_fields(hass: HomeAssistant) -> None:
+    """An up timer: direction, goal, show_ruler and paused go into content as sent."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {
+            "slug": "nap",
+            "state": "ongoing",
+            "direction": "up",
+            "start_date": 1700000000,
+            "goal": "2h",
+            "show_ruler": False,
+            "paused": True,
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "countdown"
+    assert content["direction"] == "up"
+    assert content["start_date"] == 1700000000
+    assert content["goal"] == "2h"
+    assert content["show_ruler"] is False
+    assert content["paused"] is True
+
+
+async def test_update_activity_countdown_goal_in_seconds(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "nap", "state": "ongoing", "direction": "up", "goal": 5400},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args[0][2]["goal"] == 5400
+
+
+async def test_update_activity_countdown_down_can_pause(hass: HomeAssistant) -> None:
+    """paused works counting down too; the server moves the window on the resume."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "oven", "state": "ongoing", "direction": "down", "end_date": 1700000600, "paused": False},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["direction"] == "down"
+    assert content["paused"] is False
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        {"end_date": 1700000600},
+        {"duration": "30m"},
+        {"warning_threshold": 60},
+        {"alarm": False},
+        {"snooze_seconds": 300},
+        {"completion_message": "Awake"},
+    ],
+)
+async def test_update_activity_countdown_up_refuses_down_only_fields(hass: HomeAssistant, extra: dict) -> None:
+    """An up clock has no end; the server 422s every field measured against one."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid, match="direction is up"):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_countdown",
+            {"slug": "nap", "state": "ongoing", "direction": "up", **extra},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_countdown_up_allows_empty_completion_message(hass: HomeAssistant) -> None:
+    """An empty message is no message: the server does not count it as set, so neither does the action."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "nap", "state": "ongoing", "direction": "up", "completion_message": ""},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args[0][2]["completion_message"] == ""
+
+
+async def test_update_activity_countdown_refuses_goal_counting_down(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid, match="goal is only used"):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_countdown",
+            {"slug": "oven", "state": "ongoing", "direction": "down", "goal": "1h"},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_countdown_goal_without_direction_is_the_servers_call(hass: HomeAssistant) -> None:
+    """Without direction the call inherits the stored one, so a bare goal is forwarded."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "nap", "state": "ongoing", "goal": "45m"},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args[0][2]["goal"] == "45m"
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [{"direction": "sideways"}, {"goal": 0}, {"goal": "soon"}, {"goal": True}],
+)
+async def test_update_activity_countdown_refuses_bad_clock_values(hass: HomeAssistant, extra: dict) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_countdown",
+            {"slug": "nap", "state": "ongoing", **extra},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_gauge_refuses_clock_fields(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_gauge",
+            {"slug": "g", "state": "ongoing", "paused": True},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_count_up_update_satisfies_server_contract(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "nap", "state": "ongoing", "direction": "up", "goal": "2h", "show_ruler": True},
+        blocking=True,
+    )
+
+    assert_valid_activity_content(api.update_activity.call_args[0][2])
+
+
+async def test_pause_timer_sends_only_the_switch(hass: HomeAssistant) -> None:
+    """No state (ongoing would restart an ended timer) and no template (it would switch another card)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(DOMAIN, "pause_timer", {"slug": "nap"}, blocking=True)
+
+    api.update_activity.assert_awaited_once_with("nap", None, {"paused": True})
+
+
+async def test_pause_timer_resumes_with_paused_off(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(DOMAIN, "pause_timer", {"slug": "nap", "paused": False}, blocking=True)
+
+    api.update_activity.assert_awaited_once_with("nap", None, {"paused": False})
+
+
+async def test_pause_timer_surfaces_the_server_refusal(hass: HomeAssistant) -> None:
+    """Off the countdown template the server 422s the switch; the message reaches the user."""
+    api = _mock_api()
+    api.update_activity = AsyncMock(
+        side_effect=PushWardApiError('paused is only supported by the "timer" template (also accepted as "countdown")')
+    )
+    await _setup_entry(hass, api)
+
+    with pytest.raises(HomeAssistantError, match="paused is only supported"):
+        await hass.services.async_call(DOMAIN, "pause_timer", {"slug": "washer"}, blocking=True)
+
+
+async def test_pause_timer_rejects_a_bad_slug(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(DOMAIN, "pause_timer", {"slug": "-bad slug"}, blocking=True)
     api.update_activity.assert_not_awaited()
 
 

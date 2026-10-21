@@ -268,6 +268,21 @@ UPDATE_INTERVAL_MIN = 1
 WARNING_THRESHOLD_MAX = 86400  # 24 h
 SNOOZE_SECONDS_MIN = 60
 SNOOZE_SECONDS_MAX = 3600
+# Countdown clock (mirror pushward-server/internal/model/activity.go). Direction
+# "up" counts up from start_date with no end at all, so the fields that only make
+# sense against an end are refused on it; goal is the up clock's optional target
+# and the server refuses it on a down clock.
+COUNTDOWN_DIRECTION_DOWN = "down"
+COUNTDOWN_DIRECTION_UP = "up"
+COUNTDOWN_DIRECTIONS = (COUNTDOWN_DIRECTION_DOWN, COUNTDOWN_DIRECTION_UP)
+COUNTDOWN_DOWN_ONLY_FIELDS = (
+    "end_date",
+    "duration",
+    "warning_threshold",
+    "alarm",
+    "snooze_seconds",
+    "completion_message",
+)
 # Mirrors the server's dismissal_ttl bound (0 = remove on end, 14400 = the iOS 4h ceiling).
 DISMISSAL_TTL_MIN = 0
 DISMISSAL_TTL_MAX = 14400
@@ -433,6 +448,9 @@ TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "boa
 # flow grows an options editor - a flow-created approval config could not name
 # its answer buttons, so every create would 422.
 SERVICE_TEMPLATES = (*TEMPLATES, "approval")
+# Template names the server accepts as input for another one. The docs call the
+# countdown template "Timer"; stored rows and pushes keep saying "countdown".
+TEMPLATE_ALIASES = {"timer": "countdown"}
 
 # Media template caps (mirror pushward-server/internal/model/activity.go).
 # media_title is the big line of the player card (the activity name is the source
@@ -1193,6 +1211,22 @@ def validate_action_headers(value: dict) -> dict:
 _DURATION_RE = re.compile(r"\d+|(?:\d+h)?(?:\d+m)?(?:\d+s)?")
 
 
+def _seconds_or_duration(value: object, field: str) -> object:
+    if isinstance(value, bool):
+        raise vol.Invalid(f"{field} must be seconds or a duration string")
+    if isinstance(value, (int, float)):
+        seconds = int(value)
+        if seconds < 1:
+            raise vol.Invalid(f"{field} must be at least 1 second")
+        return seconds
+    if not isinstance(value, str):
+        raise vol.Invalid(f"{field} must be an integer or a duration string")
+    text = value.strip()
+    if not _DURATION_RE.fullmatch(text) or not any(ch in "123456789" for ch in text):
+        raise vol.Invalid(f'invalid {field}; use seconds (90) or units like "1h30m"')
+    return value
+
+
 def validate_duration(value: object) -> object:
     """Validate a countdown duration: int seconds (>=1) or a Go-style string ("60s", "1h30m").
 
@@ -1201,19 +1235,12 @@ def validate_duration(value: object) -> object:
     server 400. Integer/float input is coerced to int; string input passes through
     for the server to expand.
     """
-    if isinstance(value, bool):
-        raise vol.Invalid("duration must be seconds or a duration string")
-    if isinstance(value, (int, float)):
-        seconds = int(value)
-        if seconds < 1:
-            raise vol.Invalid("duration must be at least 1 second")
-        return seconds
-    if not isinstance(value, str):
-        raise vol.Invalid("duration must be an integer or a duration string")
-    text = value.strip()
-    if not _DURATION_RE.fullmatch(text) or not any(ch in "123456789" for ch in text):
-        raise vol.Invalid('invalid duration; use seconds (90) or units like "1h30m"')
-    return value
+    return _seconds_or_duration(value, "duration")
+
+
+def validate_goal(value: object) -> object:
+    """Validate a count-up goal: the same forms as duration and the same 1-second floor."""
+    return _seconds_or_duration(value, "goal")
 
 
 _SLUG_RE = re.compile(rf"^[a-zA-Z0-9][a-zA-Z0-9_-]{{0,{MAX_SLUG_LEN - 1}}}$")

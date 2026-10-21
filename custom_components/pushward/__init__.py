@@ -65,6 +65,10 @@ from .const import (
     CONF_SERVER_URL,
     CONF_SLUG,
     CONF_SUBENTRY_ID,
+    COUNTDOWN_DIRECTION_DOWN,
+    COUNTDOWN_DIRECTION_UP,
+    COUNTDOWN_DIRECTIONS,
+    COUNTDOWN_DOWN_ONLY_FIELDS,
     DEFAULT_PRIORITY,
     DISMISSAL_TTL_MAX,
     DISMISSAL_TTL_MIN,
@@ -100,12 +104,14 @@ from .const import (
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TAP_ACTION_METHODS,
+    TEMPLATE_ALIASES,
     TIMELINE_SERIES_LABEL_MAX,
     USAGE_LIMIT_RESOURCES,
     usage_limit_issue_id,
     validate_action_headers,
     validate_callback_url,
     validate_duration,
+    validate_goal,
     validate_image_url,
     validate_notification_tag,
     validate_slug,
@@ -140,6 +146,7 @@ SERVICE_UPDATE_TEMPLATE_PREFIX = "update_activity_"
 SERVICE_CREATE_ACTIVITY = "create_activity"
 SERVICE_END_ACTIVITY = "end_activity"
 SERVICE_DELETE_ACTIVITY = "delete_activity"
+SERVICE_PAUSE_TIMER = "pause_timer"
 SERVICE_GENERATE_THUMBHASH = "generate_thumbhash"
 SERVICE_SEND_NOTIFICATION = "send_notification"
 SERVICE_SEND_EMAIL = "send_email"
@@ -340,7 +347,35 @@ _COUNTDOWN_TEMPLATE_FIELDS = {
     vol.Optional("warning_threshold"): vol.All(vol.Coerce(int), vol.Range(min=0)),
     vol.Optional("alarm"): cv.boolean,
     vol.Optional("snooze_seconds"): vol.All(vol.Coerce(int), vol.Range(min=60, max=3600)),
+    # The clock: "up" counts up from start_date (the server starts it now when the
+    # call leaves start_date out) toward an optional goal; show_ruler hides the bar.
+    # paused is the server's write-only switch: true freezes the clock, false
+    # resumes it, and sending the state it is already in changes nothing.
+    vol.Optional("direction"): vol.In(COUNTDOWN_DIRECTIONS),
+    vol.Optional("show_ruler"): cv.boolean,
+    vol.Optional("goal"): validate_goal,
+    vol.Optional("paused"): cv.boolean,
 }
+
+
+def _validate_countdown_update(data: dict) -> dict:
+    """Refuse the direction pairings the server would 422, as far as this payload shows them.
+
+    An up clock has no end, so the fields measured against one go when the call
+    itself says up, and goal goes when it says down. A call without direction
+    inherits the stored one, which only the server knows; it gets the server's
+    message instead. An empty completion_message is no message, so it passes.
+    """
+    direction = data.get("direction")
+    if direction == COUNTDOWN_DIRECTION_UP:
+        sent = [key for key in COUNTDOWN_DOWN_ONLY_FIELDS if key in data and data[key] != ""]
+        if sent:
+            raise vol.Invalid(f"{', '.join(sent)} cannot be used when direction is up (use goal for a target)")
+    elif direction == COUNTDOWN_DIRECTION_DOWN and "goal" in data:
+        raise vol.Invalid("goal is only used when direction is up")
+    return data
+
+
 _STEPS_TEMPLATE_FIELDS = {
     vol.Optional("total_steps"): vol.Coerce(int),
     vol.Optional("current_step"): vol.Coerce(int),
@@ -589,7 +624,7 @@ def _update_template_schema(*template_fields: dict) -> vol.Schema:
 
 _UPDATE_TEMPLATE_SCHEMAS = {
     "generic": _update_template_schema(_LIVE_PROGRESS_FIELDS, _IMAGE_FIELDS),
-    "countdown": _update_template_schema(_COUNTDOWN_TEMPLATE_FIELDS),
+    "countdown": vol.All(_update_template_schema(_COUNTDOWN_TEMPLATE_FIELDS), _validate_countdown_update),
     "steps": _update_template_schema(_LIVE_PROGRESS_FIELDS, _STEPS_TEMPLATE_FIELDS, _IMAGE_FIELDS),
     "alert": _update_template_schema(_ALERT_TEMPLATE_FIELDS),
     "gauge": _update_template_schema(_GAUGE_TEMPLATE_FIELDS),
@@ -655,6 +690,14 @@ SCHEMA_DELETE_ACTIVITY = vol.Schema(
     {
         **_ENTRY_TARGET_FIELD,
         vol.Required("slug"): validate_slug,
+    }
+)
+
+SCHEMA_PAUSE_TIMER = vol.Schema(
+    {
+        **_ENTRY_TARGET_FIELD,
+        vol.Required("slug"): validate_slug,
+        vol.Optional("paused", default=True): cv.boolean,
     }
 )
 
@@ -1025,6 +1068,10 @@ async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, templ
         content["state"] = content.pop("state_text")
     if template is not None:
         content["template"] = template
+    elif (canonical := TEMPLATE_ALIASES.get(content.get("template"))) is not None:
+        # Only the deprecated alias lets the caller name the template; "timer" is
+        # what the docs call countdown.
+        content["template"] = canonical
     # An automation that names a picture should not also have to hash it; a failure
     # here is silent and just leaves the activity relying on the URL alone.
     await async_ensure_thumbhash(hass, content)
@@ -1095,6 +1142,18 @@ async def _async_handle_end_activity(hass: HomeAssistant, call: ServiceCall) -> 
 async def _async_handle_delete_activity(hass: HomeAssistant, call: ServiceCall) -> None:
     """Handle the delete_activity service call."""
     await _fan_out(_target_entries(hass, call), lambda data: data["api"].delete_activity(call.data["slug"]))
+
+
+async def _async_handle_pause_timer(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Handle the pause_timer service call: pause or resume a countdown's clock.
+
+    The PATCH names neither state nor template. "ongoing" on an ended activity
+    starts a new run, and a template would turn any other card into a countdown;
+    without either the server keeps both, and refuses paused off the countdown.
+    """
+    slug = call.data["slug"]
+    content = {"paused": call.data["paused"]}
+    await _fan_out(_target_entries(hass, call), lambda data: data["api"].update_activity(slug, None, content))
 
 
 async def _async_handle_generate_thumbhash(hass: HomeAssistant, call: ServiceCall) -> dict[str, str]:
@@ -1329,6 +1388,9 @@ def _register_services(hass: HomeAssistant) -> None:
     )
     hass.services.async_register(
         DOMAIN, SERVICE_DELETE_ACTIVITY, partial(_async_handle_delete_activity, hass), SCHEMA_DELETE_ACTIVITY
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_PAUSE_TIMER, partial(_async_handle_pause_timer, hass), SCHEMA_PAUSE_TIMER
     )
     hass.services.async_register(
         DOMAIN,

@@ -467,6 +467,22 @@
           "name": "Segundos de posposición",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Dirección",
+          "description": "down (predeterminado) cuenta atrás hasta la fecha de fin. up cuenta hacia arriba desde la fecha de inicio (por defecto ahora, puede estar en el pasado) y no admite fecha de fin, duración, umbral de advertencia, alarma ni mensaje de finalización."
+        },
+        "goal": {
+          "name": "Objetivo",
+          "description": "Objetivo de un temporizador ascendente: segundos o una duración como \"2h\". La regla se llena hasta él y después el reloj se vuelve naranja como tiempo extra. Solo con dirección up."
+        },
+        "show_ruler": {
+          "name": "Mostrar regla",
+          "description": "Muestra la regla de progreso. Activado por defecto."
+        },
+        "paused": {
+          "name": "En pausa",
+          "description": "Activado detiene el reloj, desactivado lo reanuda. Enviar el estado en el que ya está no cambia nada."
+        },
         "accent_color": {
           "name": "Color de acento",
           "description": "Color de acento para la actividad. Hexadecimal (#RRGGBB) o nombre de color."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Identificador slug de la actividad a eliminar."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Pausar temporizador",
+      "description": "Pausar una Live Activity countdown (temporizador), o reanudarla con En pausa desactivado.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cuenta",
+          "description": "Cuenta de PushWard que se usará. Déjalo vacío para usar todas las cuentas de PushWard añadidas a Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug de la actividad countdown."
+        },
+        "paused": {
+          "name": "En pausa",
+          "description": "Activado detiene el reloj, desactivado lo reanuda. Activado por defecto."
         }
       }
     },

@@ -467,6 +467,22 @@
           "name": "स्नूज़ सेकंड",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "दिशा",
+          "description": "down (डिफ़ॉल्ट) समाप्ति तिथि तक उलटी गिनती करता है। up प्रारंभ तिथि से आगे गिनता है (डिफ़ॉल्ट अभी, अतीत में भी हो सकती है) और समाप्ति तिथि, अवधि, चेतावनी सीमा, अलार्म या पूर्णता संदेश नहीं लेता।"
+        },
+        "goal": {
+          "name": "लक्ष्य",
+          "description": "up टाइमर का लक्ष्य: सेकंड या \"2h\" जैसी अवधि। रूलर उसकी ओर भरता है, फिर ओवरटाइम में घड़ी नारंगी हो जाती है। केवल up दिशा के लिए।"
+        },
+        "show_ruler": {
+          "name": "रूलर दिखाएं",
+          "description": "प्रगति रूलर दिखाएं। डिफ़ॉल्ट रूप से चालू।"
+        },
+        "paused": {
+          "name": "रोका गया",
+          "description": "चालू करने पर घड़ी रुक जाती है, बंद करने पर फिर चलती है। जिस स्थिति में वह पहले से है, उसे दोबारा भेजने से कुछ नहीं बदलता।"
+        },
         "accent_color": {
           "name": "Accent रंग",
           "description": "Activity के लिए accent रंग। Hex (#RRGGBB) या नामित रंग।"
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "स्लग",
           "description": "हटाने के लिए activity का slug पहचानकर्ता।"
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "टाइमर रोकें",
+      "description": "countdown (टाइमर) Live Activity को रोकें, या रोका गया बंद करके फिर से चलाएं।",
+      "fields": {
+        "config_entry_id": {
+          "name": "खाता",
+          "description": "उपयोग करने के लिए PushWard खाता। Home Assistant में जोड़े गए हर PushWard खाते का उपयोग करने के लिए खाली छोड़ें।"
+        },
+        "slug": {
+          "name": "स्लग",
+          "description": "countdown Activity का स्लग।"
+        },
+        "paused": {
+          "name": "रोका गया",
+          "description": "चालू करने पर घड़ी रुक जाती है, बंद करने पर फिर चलती है। डिफ़ॉल्ट रूप से चालू।"
         }
       }
     },

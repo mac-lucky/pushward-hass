@@ -467,6 +467,22 @@
           "name": "Secunde amânare",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Direcție",
+          "description": "down (implicit) numără invers până la data de încheiere. up numără crescător de la data de început (implicit acum, poate fi în trecut) și nu acceptă dată de încheiere, durată, prag de avertizare, alarmă sau mesaj de finalizare."
+        },
+        "goal": {
+          "name": "Țintă",
+          "description": "Ținta unui cronometru crescător: secunde sau o durată precum \"2h\". Rigla se umple până la ea, apoi ceasul devine portocaliu ca timp suplimentar. Doar cu direcția up."
+        },
+        "show_ruler": {
+          "name": "Afișați rigla",
+          "description": "Afișează rigla de progres. Activată implicit."
+        },
+        "paused": {
+          "name": "În pauză",
+          "description": "Activat oprește ceasul, dezactivat îl reia. Trimiterea stării în care se află deja nu schimbă nimic."
+        },
         "accent_color": {
           "name": "Culoare accent",
           "description": "Culoarea de accent pentru activitate. Hex (#RRGGBB) sau culoare numită."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Identificatorul slug al activității de șters."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Puneți cronometrul pe pauză",
+      "description": "Puneți pe pauză o Live Activity countdown (cronometru) sau reluați-o cu În pauză dezactivat.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-ul activității countdown."
+        },
+        "paused": {
+          "name": "În pauză",
+          "description": "Activat oprește ceasul, dezactivat îl reia. Activat implicit."
         }
       }
     },

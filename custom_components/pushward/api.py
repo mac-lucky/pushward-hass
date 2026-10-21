@@ -275,7 +275,7 @@ class PushWardApiClient:
     async def update_activity(
         self,
         slug: str,
-        state: str,
+        state: str | None,
         content: dict,
         *,
         sound: str | None = None,
@@ -284,8 +284,13 @@ class PushWardApiClient:
         stale_ttl: int | None = None,
         dismissal_ttl: int | None = None,
     ) -> None:
-        """PATCH /activities/{slug}: sound, priority, and the TTLs are top-level, not content."""
-        body: dict = {"state": state, "content": content}
+        """PATCH /activities/{slug}: sound, priority, and the TTLs are top-level, not content.
+
+        A None state leaves the key out, and the server keeps the stored state.
+        """
+        body: dict = {"content": content}
+        if state is not None:
+            body["state"] = state
         if sound is not None:
             body["sound"] = sound
         if priority is not None:

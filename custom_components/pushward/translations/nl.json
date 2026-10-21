@@ -467,6 +467,22 @@
           "name": "Snooze-seconden",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Richting",
+          "description": "down (standaard) telt af naar de einddatum. up telt op vanaf de startdatum (standaard nu, mag in het verleden liggen) en neemt geen einddatum, duur, waarschuwingsdrempel, alarm of voltooiingsbericht."
+        },
+        "goal": {
+          "name": "Doel",
+          "description": "Doel voor een optellende timer: seconden of een duur zoals \"2h\". De liniaal vult zich tot het doel, daarna wordt de klok oranje als overtijd. Alleen bij richting up."
+        },
+        "show_ruler": {
+          "name": "Liniaal tonen",
+          "description": "Toont de voortgangsliniaal. Standaard aan."
+        },
+        "paused": {
+          "name": "Gepauzeerd",
+          "description": "Aan zet de klok stil, uit laat hem verder lopen. De status opnieuw sturen waarin hij al staat, verandert niets."
+        },
         "accent_color": {
           "name": "Accentkleur",
           "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Slug-identificator van de te verwijderen activiteit."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Timer pauzeren",
+      "description": "Pauzeer een countdown-Live Activity (timer), of hervat hem met Gepauzeerd uit.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug van de countdown-activiteit."
+        },
+        "paused": {
+          "name": "Gepauzeerd",
+          "description": "Aan zet de klok stil, uit laat hem verder lopen. Standaard aan."
         }
       }
     },

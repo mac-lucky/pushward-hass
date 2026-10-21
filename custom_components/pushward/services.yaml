@@ -664,6 +664,23 @@ update_activity_countdown:
               max: 3600
               mode: box
               unit_of_measurement: seconds
+        direction:
+          example: "up"
+          selector:
+            select:
+              options:
+                - "down"
+                - "up"
+        goal:
+          example: "2h"
+          selector:
+            text:
+        show_ruler:
+          selector:
+            boolean:
+        paused:
+          selector:
+            boolean:
     action_buttons:
       collapsed: true
       fields:
@@ -2050,6 +2067,30 @@ delete_activity:
       example: "ha-washer"
       selector:
         text:
+
+pause_timer:
+  name: Pause Timer
+  description: Pause a countdown (Timer) Live Activity, or resume it with Paused off.
+  fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
+    slug:
+      name: Slug
+      description: Slug of the countdown activity.
+      required: true
+      example: "kid-nap"
+      selector:
+        text:
+    paused:
+      name: Paused
+      description: On pauses the clock, off resumes it. Defaults to on.
+      default: true
+      selector:
+        boolean:
 
 send_notification:
   name: Send Notification

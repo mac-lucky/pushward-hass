@@ -467,6 +467,22 @@
           "name": "Schlummersekunden",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Richtung",
+          "description": "down (Standard) zählt bis zum Enddatum herunter. up zählt ab dem Startdatum hoch (Standard: jetzt, darf in der Vergangenheit liegen) und nimmt kein Enddatum, keine Dauer, Warnschwelle, keinen Alarm und keine Abschlussnachricht."
+        },
+        "goal": {
+          "name": "Ziel",
+          "description": "Ziel eines hochzählenden Timers: Sekunden oder eine Dauer wie \"2h\". Das Lineal füllt sich bis dorthin, danach wird die Uhr als Überzeit orange. Nur bei Richtung up."
+        },
+        "show_ruler": {
+          "name": "Lineal anzeigen",
+          "description": "Zeigt das Fortschrittslineal. Standardmäßig an."
+        },
+        "paused": {
+          "name": "Pausiert",
+          "description": "An hält die Uhr an, aus lässt sie weiterlaufen. Den Zustand erneut zu senden, in dem sie schon ist, ändert nichts."
+        },
         "accent_color": {
           "name": "Akzentfarbe",
           "description": "Akzentfarbe für die Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Slug-Kennung der zu löschenden Live Activity."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Timer pausieren",
+      "description": "Eine countdown-Live-Activity (Timer) pausieren oder mit ausgeschaltetem Pausiert fortsetzen.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Zu verwendendes PushWard-Konto. Leer lassen, um jedes in Home Assistant hinzugefügte PushWard-Konto zu verwenden."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug der countdown-Aktivität."
+        },
+        "paused": {
+          "name": "Pausiert",
+          "description": "An hält die Uhr an, aus lässt sie weiterlaufen. Standardmäßig an."
         }
       }
     },

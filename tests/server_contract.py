@@ -54,6 +54,9 @@ from custom_components.pushward.const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    COUNTDOWN_DIRECTION_UP,
+    COUNTDOWN_DIRECTIONS,
+    COUNTDOWN_DOWN_ONLY_FIELDS,
     IMAGE_SHAPES,
     IMAGE_THUMBHASH_MAX,
     IMAGE_URL_MAX,
@@ -164,6 +167,11 @@ MEDIA_FIELDS = (
 # `answer` (who tapped what, when) is server-owned and a violation even on
 # approval itself, so it rides the leak tuple AND gets a key-presence check there.
 APPROVAL_FIELDS = ("options", "source", "details", "on_expire", "answer")
+# The countdown clock fields; the server 422s them on every other template.
+# paused_at / paused_seconds are server-owned and never sent, so they are refused
+# on countdown too. COUNTDOWN_DOWN_ONLY_FIELDS comes from const.py like the caps.
+CLOCK_FIELDS = ("direction", "show_ruler", "goal", "paused")
+CLOCK_SERVER_OWNED = ("paused_at", "paused_seconds")
 # Restated rather than imported, like the template allowlists above: the same
 # leading-alphanumeric / [a-zA-Z0-9_-] / 64-char rule as an activity slug.
 # \Z, not $: Python's $ also matches before a trailing newline; the server's does not.
@@ -295,6 +303,12 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     _assert_media(content, where, template)
     # And the approval fields, for the same reason.
     _assert_approval(content, where, template)
+    # And the countdown clock fields.
+    if template != "countdown" and (present := [f for f in CLOCK_FIELDS if f in content]):
+        _fail(where, f"{present} are only supported by the 'countdown' template, got {template!r}")
+    for field in CLOCK_SERVER_OWNED:
+        if field in content:
+            _fail(where, f"{field} is server-owned and must not be sent")
 
     if template == "generic":
         _assert_generic(content, where)
@@ -583,6 +597,20 @@ def _assert_generic(content: dict, where: str) -> None:
 
 
 def _assert_countdown(content: dict, where: str) -> None:
+    direction = content.get("direction")
+    if direction is not None and direction not in COUNTDOWN_DIRECTIONS:
+        _fail(where, f"direction must be one of {COUNTDOWN_DIRECTIONS}, got {direction!r}")
+    for field in ("show_ruler", "paused"):
+        if field in content and not isinstance(content[field], bool):
+            _fail(where, f"{field} must be a boolean, got {content[field]!r}")
+    goal = content.get("goal")
+    if goal is not None and not isinstance(goal, str) and (not _is_int(goal) or goal < 1):
+        _fail(where, f"goal must be at least 1 second or a duration string, got {goal!r}")
+    if direction == COUNTDOWN_DIRECTION_UP:
+        _assert_count_up(content, where)
+        return
+    if goal is not None:
+        _fail(where, "goal is only used when direction is 'up'")
     end_date = content.get("end_date")
     if not _is_int(end_date) or end_date <= 0:
         _fail(where, f"countdown requires a positive end_date, got {end_date!r}")
@@ -600,6 +628,23 @@ def _assert_countdown(content: dict, where: str) -> None:
     snooze = content.get("snooze_seconds")
     if snooze is not None and (not _is_int(snooze) or not (SNOOZE_SECONDS_MIN <= snooze <= SNOOZE_SECONDS_MAX)):
         _fail(where, f"snooze_seconds must be an int in [{SNOOZE_SECONDS_MIN}, {SNOOZE_SECONDS_MAX}], got {snooze!r}")
+
+
+def _assert_count_up(content: dict, where: str) -> None:
+    """An up clock: no end at all, and a start that is not ahead of now.
+
+    start_date may be left out (the server starts the clock at the write). An empty
+    completion_message is no message, which is how the server reads it too.
+    """
+    for field in COUNTDOWN_DOWN_ONLY_FIELDS:
+        if field in content and content[field] != "":
+            _fail(where, f"{field} is not used when direction is 'up'")
+    start_date = content.get("start_date")
+    if start_date is not None:
+        if not _is_int(start_date) or start_date <= 0:
+            _fail(where, f"countdown start_date must be a positive timestamp, got {start_date!r}")
+        if start_date > _now() + MAX_CLOCK_SKEW:
+            _fail(where, f"an up countdown's start_date must not be in the future, got {start_date}")
 
 
 def _assert_steps(content: dict, where: str) -> None:

@@ -195,6 +195,17 @@ async def test_update_activity_success():
     assert call_args[1]["json"] == {"state": "ongoing", "content": {"progress": 0.5}}
 
 
+async def test_update_activity_without_state_leaves_it_out():
+    """A None state is no state key at all, so the server keeps the stored one."""
+    resp = _mock_response(200)
+    session = _make_session(resp)
+    client = _make_client(session)
+
+    await client.update_activity("nap", None, {"paused": True})
+
+    assert session.request.call_args[1]["json"] == {"content": {"paused": True}}
+
+
 # --- delete_activity ---
 
 

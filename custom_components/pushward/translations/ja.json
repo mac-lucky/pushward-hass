@@ -467,6 +467,22 @@
           "name": "スヌーズ秒数",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "方向",
+          "description": "down (既定) は終了日時までカウントダウンします。up は開始日時からカウントアップし (既定は現在、過去も可)、終了日時、継続時間、警告しきい値、アラーム、完了メッセージは使えません。"
+        },
+        "goal": {
+          "name": "目標",
+          "description": "カウントアップの目標: 秒数、または \"2h\" のような時間の文字列。ルーラーが目標まで満ち、超えると時計がオレンジ色になります。方向 up のときのみ。"
+        },
+        "show_ruler": {
+          "name": "ルーラーを表示",
+          "description": "進捗ルーラーを表示します。既定でオン。"
+        },
+        "paused": {
+          "name": "一時停止",
+          "description": "オンで時計を止め、オフで再開します。すでにその状態のときに送っても何も変わりません。"
+        },
         "accent_color": {
           "name": "アクセントカラー",
           "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "スラッグ",
           "description": "削除するアクティビティのスラッグ識別子。"
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "タイマーを一時停止",
+      "description": "countdown (タイマー) の Live Activity を一時停止します。一時停止をオフにすると再開します。",
+      "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
+        "slug": {
+          "name": "スラッグ",
+          "description": "countdown アクティビティのスラッグ。"
+        },
+        "paused": {
+          "name": "一時停止",
+          "description": "オンで時計を止め、オフで再開します。既定でオン。"
         }
       }
     },

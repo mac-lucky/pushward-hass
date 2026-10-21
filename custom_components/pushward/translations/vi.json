@@ -467,6 +467,22 @@
           "name": "Số giây hoãn",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Hướng",
+          "description": "down (mặc định) đếm ngược đến ngày kết thúc. up đếm lên từ ngày bắt đầu (mặc định là bây giờ, có thể ở trong quá khứ) và không nhận ngày kết thúc, thời lượng, ngưỡng cảnh báo, chuông báo hay thông báo hoàn thành."
+        },
+        "goal": {
+          "name": "Mục tiêu",
+          "description": "Mục tiêu của bộ hẹn giờ đếm lên: số giây hoặc thời lượng như \"2h\". Thước đầy dần tới mục tiêu, sau đó đồng hồ chuyển sang màu cam khi vượt giờ. Chỉ dùng với hướng up."
+        },
+        "show_ruler": {
+          "name": "Hiện thước",
+          "description": "Hiện thước tiến độ. Bật theo mặc định."
+        },
+        "paused": {
+          "name": "Tạm dừng",
+          "description": "Bật sẽ dừng đồng hồ, tắt sẽ chạy tiếp. Gửi lại trạng thái hiện tại không thay đổi gì."
+        },
         "accent_color": {
           "name": "Màu Nhấn",
           "description": "Màu nhấn cho hoạt động. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Mã định danh slug của hoạt động cần xóa."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Tạm dừng hẹn giờ",
+      "description": "Tạm dừng một Live Activity countdown (hẹn giờ), hoặc chạy tiếp bằng cách tắt Tạm dừng.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug của hoạt động countdown."
+        },
+        "paused": {
+          "name": "Tạm dừng",
+          "description": "Bật sẽ dừng đồng hồ, tắt sẽ chạy tiếp. Bật theo mặc định."
         }
       }
     },

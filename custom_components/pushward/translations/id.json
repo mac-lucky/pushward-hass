@@ -467,6 +467,22 @@
           "name": "Detik Tunda",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "Arah",
+          "description": "down (bawaan) menghitung mundur ke tanggal akhir. up menghitung maju dari tanggal mulai (bawaan sekarang, boleh di masa lalu) dan tidak menerima tanggal akhir, durasi, ambang peringatan, alarm, atau pesan penyelesaian."
+        },
+        "goal": {
+          "name": "Target",
+          "description": "Target untuk timer yang menghitung maju: detik atau durasi seperti \"2h\". Penggaris terisi menuju target, lalu jam berubah oranye sebagai waktu lebih. Hanya untuk arah up."
+        },
+        "show_ruler": {
+          "name": "Tampilkan Penggaris",
+          "description": "Tampilkan penggaris progres. Aktif secara bawaan."
+        },
+        "paused": {
+          "name": "Dijeda",
+          "description": "Aktif membekukan jam, nonaktif melanjutkannya. Mengirim status yang sudah berlaku tidak mengubah apa pun."
+        },
         "accent_color": {
           "name": "Warna Aksen",
           "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "Identifikasi slug aktivitas yang akan dihapus."
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "Jeda Timer",
+      "description": "Jeda Live Activity countdown (Timer), atau lanjutkan dengan Dijeda nonaktif.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug aktivitas countdown."
+        },
+        "paused": {
+          "name": "Dijeda",
+          "description": "Aktif menjeda jam, nonaktif melanjutkannya. Aktif secara bawaan."
         }
       }
     },

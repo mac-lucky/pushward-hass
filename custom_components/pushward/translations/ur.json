@@ -467,6 +467,22 @@
           "name": "Snooze Seconds",
           "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
         },
+        "direction": {
+          "name": "سمت",
+          "description": "down (ڈیفالٹ) اختتام کی تاریخ تک الٹی گنتی کرتا ہے۔ up آغاز کی تاریخ سے آگے گنتا ہے (ڈیفالٹ ابھی، ماضی میں بھی ہو سکتی ہے) اور اختتام کی تاریخ، دورانیہ، انتباہ کی حد، الارم یا تکمیل کا پیغام قبول نہیں کرتا۔"
+        },
+        "goal": {
+          "name": "ہدف",
+          "description": "آگے گننے والے ٹائمر کا ہدف: سیکنڈ یا \"2h\" جیسا دورانیہ۔ پیمانہ اس کی طرف بھرتا ہے، پھر اضافی وقت میں گھڑی نارنجی ہو جاتی ہے۔ صرف up سمت کے لیے۔"
+        },
+        "show_ruler": {
+          "name": "پیمانہ دکھائیں",
+          "description": "پیش رفت کا پیمانہ دکھاتا ہے۔ ڈیفالٹ طور پر آن۔"
+        },
+        "paused": {
+          "name": "موقوف",
+          "description": "آن کرنے پر گھڑی رک جاتی ہے، آف کرنے پر دوبارہ چلتی ہے۔ جس حالت میں وہ پہلے سے ہے، اسے دوبارہ بھیجنے سے کچھ نہیں بدلتا۔"
+        },
         "accent_color": {
           "name": "لہجے کا رنگ",
           "description": "سرگرمی کے لیے لہجے کا رنگ۔ Hex (#RRGGBB) یا نامزد رنگ۔"
@@ -1576,6 +1592,24 @@
         "slug": {
           "name": "Slug",
           "description": "حذف کی جانے والی سرگرمی کی slug شناخت۔"
+        }
+      }
+    },
+    "pause_timer": {
+      "name": "ٹائمر موقوف کریں",
+      "description": "countdown (ٹائمر) Live Activity کو موقوف کریں، یا موقوف آف کر کے دوبارہ چلائیں۔",
+      "fields": {
+        "config_entry_id": {
+          "name": "اکاؤنٹ",
+          "description": "استعمال ہونے والا PushWard اکاؤنٹ۔ Home Assistant میں شامل ہر PushWard اکاؤنٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "countdown سرگرمی کا slug۔"
+        },
+        "paused": {
+          "name": "موقوف",
+          "description": "آن کرنے پر گھڑی رک جاتی ہے، آف کرنے پر دوبارہ چلتی ہے۔ ڈیفالٹ طور پر آن۔"
         }
       }
     },
