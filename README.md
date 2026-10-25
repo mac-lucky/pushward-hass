@@ -623,9 +623,9 @@ implied by the action name; you no longer pass a `template` field.
 > `paused: false` starts it again. Counting up, the paused time is left out of the count, so
 > the start time on the card stays right; counting down, the end moves on by the length of the
 > pause. Sending the state the timer is already in changes nothing, so an automation can send
-> `paused` on every update; [`pause_timer`](#pushwardpause_timer) sends nothing else. The
-> app needs version 1.19 or newer for both: older builds show an up timer as finished and keep
-> counting down through a pause.
+> `paused` on every update; [`pause_timer`](#pushwardpause_timer) sends nothing else. Both
+> need PushWard 1.19.0 or newer on the phone: older builds show an up timer as finished and
+> keep counting down through a pause.
 >
 > ```yaml
 > - action: pushward.update_activity_countdown
@@ -834,7 +834,8 @@ Delete an activity immediately (no completion animation).
 
 Pause a countdown, or start it again with `paused: false`. Only the switch is sent: an ended
 timer stays ended and the template stays what it is. On any other template the server refuses
-it and the action fails with its message.
+it and the action fails with its message. The phone needs PushWard 1.19.0 or newer to show the
+pause.
 
 | Field | Required | Description |
 |-------|:--------:|-------------|
