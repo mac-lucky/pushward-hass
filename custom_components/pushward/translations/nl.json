@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Timer pauzeren",
-      "description": "Pauzeer een countdown-Live Activity (timer), of hervat hem met Gepauzeerd uit.",
+      "description": "Pauzeer een countdown-Live Activity (timer), of hervat hem met Gepauzeerd uit. Een timer pauzeren die al is afgelopen verandert de eindtijd op zijn kaart, en een timer die de activiteitenlimiet van de telefoon heeft gehaald wordt geweigerd.",
       "fields": {
         "config_entry_id": {
           "name": "Account",

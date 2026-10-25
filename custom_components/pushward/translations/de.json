@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Timer pausieren",
-      "description": "Eine countdown-Live-Activity (Timer) pausieren oder mit ausgeschaltetem Pausiert fortsetzen.",
+      "description": "Eine countdown-Live-Activity (Timer) pausieren oder mit ausgeschaltetem Pausiert fortsetzen. Einen bereits beendeten Timer zu pausieren ändert die Endzeit auf seiner Karte, und ein Timer, den das Aktivitätslimit vom Telefon genommen hat, wird abgelehnt.",
       "fields": {
         "config_entry_id": {
           "name": "Konto",

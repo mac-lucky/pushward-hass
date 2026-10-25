@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Pausar temporizador",
-      "description": "Pausar una Live Activity countdown (temporizador), o reanudarla con En pausa desactivado.",
+      "description": "Pausar una Live Activity countdown (temporizador), o reanudarla con En pausa desactivado. Pausar un temporizador que ya terminó cambia la hora final de su tarjeta, y se rechaza un temporizador que el límite de actividades sacó del teléfono.",
       "fields": {
         "config_entry_id": {
           "name": "Cuenta",

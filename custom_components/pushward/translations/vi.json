@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Tạm dừng hẹn giờ",
-      "description": "Tạm dừng một Live Activity countdown (hẹn giờ), hoặc chạy tiếp bằng cách tắt Tạm dừng.",
+      "description": "Tạm dừng một Live Activity countdown (hẹn giờ), hoặc chạy tiếp bằng cách tắt Tạm dừng. Tạm dừng một bộ hẹn giờ đã kết thúc sẽ thay đổi thời điểm cuối trên thẻ của nó, và bộ hẹn giờ bị giới hạn hoạt động gỡ khỏi điện thoại sẽ bị từ chối.",
       "fields": {
         "config_entry_id": {
           "name": "Tài khoản",

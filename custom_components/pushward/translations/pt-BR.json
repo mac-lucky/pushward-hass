@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Pausar timer",
-      "description": "Pausar uma Live Activity countdown (timer), ou retomá-la com Pausado desativado.",
+      "description": "Pausar uma Live Activity countdown (timer), ou retomá-la com Pausado desativado. Pausar um timer que já terminou muda o horário final no cartão, e um timer tirado do telefone pelo limite de atividades é recusado.",
       "fields": {
         "config_entry_id": {
           "name": "Conta",
