@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Mettre le minuteur en pause",
-      "description": "Mettre en pause une Live Activity countdown (minuteur), ou la relancer avec En pause désactivé. Mettre en pause un minuteur déjà terminé change l'heure finale affichée sur sa carte, et un minuteur retiré du téléphone par la limite d'activités est refusé.",
+      "description": "Mettre en pause une Live Activity countdown (minuteur), ou la relancer avec En pause désactivé. Un minuteur déjà terminé l'ignore, et un minuteur retiré du téléphone par la limite d'activités est refusé.",
       "fields": {
         "config_entry_id": {
           "name": "Compte",

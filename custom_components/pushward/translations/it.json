@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Metti in pausa il timer",
-      "description": "Mettere in pausa una Live Activity countdown (timer), o riprenderla con In pausa disattivato. Mettere in pausa un timer già terminato cambia l'ora finale sulla sua scheda, e un timer tolto dal telefono dal limite di attività viene rifiutato.",
+      "description": "Mettere in pausa una Live Activity countdown (timer), o riprenderla con In pausa disattivato. Un timer già terminato lo ignora, e un timer tolto dal telefono dal limite di attività viene rifiutato.",
       "fields": {
         "config_entry_id": {
           "name": "Account",

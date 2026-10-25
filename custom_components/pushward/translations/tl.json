@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "I-pause ang Timer",
-      "description": "I-pause ang isang countdown (Timer) Live Activity, o ituloy ito kapag naka-off ang Naka-pause. Ang pag-pause sa timer na tapos na ay nagbabago sa huling oras sa card nito, at tinatanggihan ang timer na inalis sa telepono ng limit ng activity.",
+      "description": "I-pause ang isang countdown (Timer) Live Activity, o ituloy ito kapag naka-off ang Naka-pause. Binabalewala ito ng timer na tapos na, at tinatanggihan ang timer na inalis sa telepono ng limit ng activity.",
       "fields": {
         "config_entry_id": {
           "name": "Account",

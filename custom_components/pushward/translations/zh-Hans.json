@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "暂停计时器",
-      "description": "暂停 countdown (计时器) Live Activity，关闭已暂停即可继续。暂停已经结束的计时器会改变其卡片上的最终时间，被活动数量上限移出手机的计时器会被拒绝。",
+      "description": "暂停 countdown (计时器) Live Activity，关闭已暂停即可继续。已经结束的计时器会忽略此操作，被活动数量上限移出手机的计时器会被拒绝。",
       "fields": {
         "config_entry_id": {
           "name": "账户",

@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Wstrzymaj timer",
-      "description": "Wstrzymaj Live Activity countdown (timer) albo wznów ją, wyłączając Wstrzymany. Wstrzymanie timera, który już się zakończył, zmienia końcowy czas na jego karcie, a timer zdjęty z telefonu przez limit aktywności zostaje odrzucony.",
+      "description": "Wstrzymaj Live Activity countdown (timer) albo wznów ją, wyłączając Wstrzymany. Timer, który już się zakończył, to ignoruje, a timer zdjęty z telefonu przez limit aktywności zostaje odrzucony.",
       "fields": {
         "config_entry_id": {
           "name": "Konto",

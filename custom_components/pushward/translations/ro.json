@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Puneți cronometrul pe pauză",
-      "description": "Puneți pe pauză o Live Activity countdown (cronometru) sau reluați-o cu În pauză dezactivat. Punerea pe pauză a unui cronometru deja încheiat schimbă ora finală de pe cardul său, iar un cronometru scos de pe telefon de limita de activități este refuzat.",
+      "description": "Puneți pe pauză o Live Activity countdown (cronometru) sau reluați-o cu În pauză dezactivat. Un cronometru deja încheiat ignoră acest lucru, iar un cronometru scos de pe telefon de limita de activități este refuzat.",
       "fields": {
         "config_entry_id": {
           "name": "Cont",

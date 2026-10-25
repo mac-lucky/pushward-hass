@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Pause Timer",
-      "description": "Pause a countdown (Timer) Live Activity, or resume it with Paused off. Pausing a timer that has already ended changes the final time on its card, and a timer moved off the phone by the activity limit is refused.",
+      "description": "Pause a countdown (Timer) Live Activity, or resume it with Paused off. A timer that has already ended ignores it, and one moved off the phone by the activity limit is refused.",
       "fields": {
         "config_entry_id": {
           "name": "Account",

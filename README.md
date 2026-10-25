@@ -834,12 +834,8 @@ Delete an activity immediately (no completion animation).
 
 ### `pushward.pause_timer`
 
-Pause a countdown, or start it again with `paused: false`. Only the switch is sent: an ended
-timer stays ended and the template stays what it is. The time it stopped at does not stay put,
-though. The server still records the pause, and the phone reads an ended timer at its pause
-time, so a pause sent after the end adds the minutes since then to an up timer and takes them
-off a down timer that `end_activity` stopped early, and a resume after that shifts it again.
-Keep automations from pausing timers that are already over.
+Pause a countdown, or start it again with `paused: false`. Only the switch is sent and the
+template stays what it is. An ended timer ignores it, so the time it stopped at stays put.
 
 On any other template the server refuses it and the action fails with its message. A timer
 that the 5-activity limit has moved off the phone fails too, with

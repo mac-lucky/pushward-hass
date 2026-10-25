@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Zamanlayıcıyı Duraklat",
-      "description": "Bir countdown (zamanlayıcı) Live Activity'sini duraklat veya Duraklatıldı kapalıyken devam ettir. Zaten bitmiş bir zamanlayıcıyı duraklatmak kartındaki son zamanı değiştirir ve etkinlik sınırı nedeniyle telefondan kaldırılan bir zamanlayıcı reddedilir.",
+      "description": "Bir countdown (zamanlayıcı) Live Activity'sini duraklat veya Duraklatıldı kapalıyken devam ettir. Zaten bitmiş bir zamanlayıcı bunu yok sayar ve etkinlik sınırı nedeniyle telefondan kaldırılan bir zamanlayıcı reddedilir.",
       "fields": {
         "config_entry_id": {
           "name": "Hesap",

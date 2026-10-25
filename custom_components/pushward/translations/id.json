@@ -1597,7 +1597,7 @@
     },
     "pause_timer": {
       "name": "Jeda Timer",
-      "description": "Jeda Live Activity countdown (Timer), atau lanjutkan dengan Dijeda nonaktif. Menjeda timer yang sudah berakhir mengubah waktu akhir di kartunya, dan timer yang dipindahkan dari ponsel oleh batas aktivitas ditolak.",
+      "description": "Jeda Live Activity countdown (Timer), atau lanjutkan dengan Dijeda nonaktif. Timer yang sudah berakhir mengabaikannya, dan timer yang dipindahkan dari ponsel oleh batas aktivitas ditolak.",
       "fields": {
         "config_entry_id": {
           "name": "Akun",
