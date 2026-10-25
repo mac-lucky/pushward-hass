@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Richting",
-          "description": "down (standaard) telt af naar de einddatum. up telt op vanaf de startdatum (standaard nu, mag in het verleden liggen) en neemt geen einddatum, duur, waarschuwingsdrempel, alarm of voltooiingsbericht."
+          "description": "down (standaard) telt af naar de einddatum. up telt op vanaf de startdatum (standaard nu, mag in het verleden liggen) en neemt geen einddatum, duur, waarschuwingsdrempel, alarm, snooze-seconden of voltooiingsbericht."
         },
         "goal": {
           "name": "Doel",

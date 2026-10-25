@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Direção",
-          "description": "down (padrão) faz a contagem regressiva até a data de término. up conta para cima a partir da data de início (padrão agora, pode estar no passado) e não aceita data de término, duração, limite de aviso, alarme nem mensagem de conclusão."
+          "description": "down (padrão) faz a contagem regressiva até a data de término. up conta para cima a partir da data de início (padrão agora, pode estar no passado) e não aceita data de término, duração, limite de aviso, alarme, segundos de soneca nem mensagem de conclusão."
         },
         "goal": {
           "name": "Meta",

@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Sens",
-          "description": "down (par défaut) décompte jusqu'à la date de fin. up compte à partir de la date de début (par défaut maintenant, peut être dans le passé) et n'accepte ni date de fin, ni durée, ni seuil d'avertissement, ni alarme, ni message de fin."
+          "description": "down (par défaut) décompte jusqu'à la date de fin. up compte à partir de la date de début (par défaut maintenant, peut être dans le passé) et n'accepte ni date de fin, ni durée, ni seuil d'avertissement, ni alarme, ni secondes de report, ni message de fin."
         },
         "goal": {
           "name": "Objectif",

@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Hướng",
-          "description": "down (mặc định) đếm ngược đến ngày kết thúc. up đếm lên từ ngày bắt đầu (mặc định là bây giờ, có thể ở trong quá khứ) và không nhận ngày kết thúc, thời lượng, ngưỡng cảnh báo, chuông báo hay thông báo hoàn thành."
+          "description": "down (mặc định) đếm ngược đến ngày kết thúc. up đếm lên từ ngày bắt đầu (mặc định là bây giờ, có thể ở trong quá khứ) và không nhận ngày kết thúc, thời lượng, ngưỡng cảnh báo, chuông báo, số giây hoãn hay thông báo hoàn thành."
         },
         "goal": {
           "name": "Mục tiêu",

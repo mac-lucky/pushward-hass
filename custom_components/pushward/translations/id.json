@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Arah",
-          "description": "down (bawaan) menghitung mundur ke tanggal akhir. up menghitung maju dari tanggal mulai (bawaan sekarang, boleh di masa lalu) dan tidak menerima tanggal akhir, durasi, ambang peringatan, alarm, atau pesan penyelesaian."
+          "description": "down (bawaan) menghitung mundur ke tanggal akhir. up menghitung maju dari tanggal mulai (bawaan sekarang, boleh di masa lalu) dan tidak menerima tanggal akhir, durasi, ambang peringatan, alarm, detik tunda, atau pesan penyelesaian."
         },
         "goal": {
           "name": "Target",

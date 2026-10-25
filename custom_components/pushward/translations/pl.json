@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Kierunek",
-          "description": "down (domyślnie) odlicza do daty zakończenia. up liczy w górę od daty rozpoczęcia (domyślnie teraz, może być w przeszłości) i nie przyjmuje daty zakończenia, czasu trwania, progu ostrzeżenia, alarmu ani komunikatu zakończenia."
+          "description": "down (domyślnie) odlicza do daty zakończenia. up liczy w górę od daty rozpoczęcia (domyślnie teraz, może być w przeszłości) i nie przyjmuje daty zakończenia, czasu trwania, progu ostrzeżenia, alarmu, sekund drzemki ani komunikatu zakończenia."
         },
         "goal": {
           "name": "Cel",

@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Richtung",
-          "description": "down (Standard) zählt bis zum Enddatum herunter. up zählt ab dem Startdatum hoch (Standard: jetzt, darf in der Vergangenheit liegen) und nimmt kein Enddatum, keine Dauer, Warnschwelle, keinen Alarm und keine Abschlussnachricht."
+          "description": "down (Standard) zählt bis zum Enddatum herunter. up zählt ab dem Startdatum hoch (Standard: jetzt, darf in der Vergangenheit liegen) und nimmt kein Enddatum, keine Dauer, Warnschwelle, keinen Alarm, keine Schlummersekunden und keine Abschlussnachricht."
         },
         "goal": {
           "name": "Ziel",

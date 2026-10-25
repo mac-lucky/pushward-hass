@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Direksyon",
-          "description": "down (default) ay nagbibilang pababa hanggang sa petsa ng pagtatapos. up ay nagbibilang pataas mula sa petsa ng simula (default ngayon, puwedeng nasa nakaraan) at hindi tumatanggap ng petsa ng pagtatapos, tagal, babala na threshold, alarma o mensahe ng pagkumpleto."
+          "description": "down (default) ay nagbibilang pababa hanggang sa petsa ng pagtatapos. up ay nagbibilang pataas mula sa petsa ng simula (default ngayon, puwedeng nasa nakaraan) at hindi tumatanggap ng petsa ng pagtatapos, tagal, babala na threshold, alarma, snooze na segundo o mensahe ng pagkumpleto."
         },
         "goal": {
           "name": "Layunin",

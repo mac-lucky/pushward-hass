@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Dirección",
-          "description": "down (predeterminado) cuenta atrás hasta la fecha de fin. up cuenta hacia arriba desde la fecha de inicio (por defecto ahora, puede estar en el pasado) y no admite fecha de fin, duración, umbral de advertencia, alarma ni mensaje de finalización."
+          "description": "down (predeterminado) cuenta atrás hasta la fecha de fin. up cuenta hacia arriba desde la fecha de inicio (por defecto ahora, puede estar en el pasado) y no admite fecha de fin, duración, umbral de advertencia, alarma, segundos de posposición ni mensaje de finalización."
         },
         "goal": {
           "name": "Objetivo",

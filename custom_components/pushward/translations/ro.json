@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Direcție",
-          "description": "down (implicit) numără invers până la data de încheiere. up numără crescător de la data de început (implicit acum, poate fi în trecut) și nu acceptă dată de încheiere, durată, prag de avertizare, alarmă sau mesaj de finalizare."
+          "description": "down (implicit) numără invers până la data de încheiere. up numără crescător de la data de început (implicit acum, poate fi în trecut) și nu acceptă dată de încheiere, durată, prag de avertizare, alarmă, secunde de amânare sau mesaj de finalizare."
         },
         "goal": {
           "name": "Țintă",

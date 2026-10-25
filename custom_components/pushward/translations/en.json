@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Direction",
-          "description": "down (default) counts down to the end date. up counts up from the start date (default now, may be in the past) and takes no end date, duration, warning threshold, alarm or completion message."
+          "description": "down (default) counts down to the end date. up counts up from the start date (default now, may be in the past) and takes no end date, duration, warning threshold, alarm, snooze seconds or completion message."
         },
         "goal": {
           "name": "Goal",

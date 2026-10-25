@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Yön",
-          "description": "down (varsayılan) bitiş tarihine kadar geri sayar. up başlangıç tarihinden ileri sayar (varsayılan şimdi, geçmişte olabilir) ve bitiş tarihi, süre, uyarı eşiği, alarm veya tamamlanma mesajı kabul etmez."
+          "description": "down (varsayılan) bitiş tarihine kadar geri sayar. up başlangıç tarihinden ileri sayar (varsayılan şimdi, geçmişte olabilir) ve bitiş tarihi, süre, uyarı eşiği, alarm, erteleme saniyeleri veya tamamlanma mesajı kabul etmez."
         },
         "goal": {
           "name": "Hedef",

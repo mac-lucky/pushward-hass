@@ -469,7 +469,7 @@
         },
         "direction": {
           "name": "Direzione",
-          "description": "down (predefinito) conta alla rovescia fino alla data di fine. up conta in avanti dalla data di inizio (predefinita adesso, può essere nel passato) e non accetta data di fine, durata, soglia di avviso, sveglia o messaggio di completamento."
+          "description": "down (predefinito) conta alla rovescia fino alla data di fine. up conta in avanti dalla data di inizio (predefinita adesso, può essere nel passato) e non accetta data di fine, durata, soglia di avviso, sveglia, secondi di posticipo o messaggio di completamento."
         },
         "goal": {
           "name": "Obiettivo",
