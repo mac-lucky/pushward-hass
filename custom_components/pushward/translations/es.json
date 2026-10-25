@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Objetivo",
-          "description": "Objetivo de un temporizador ascendente: segundos o una duración como \"2h\". La regla se llena hasta él y después el reloj se vuelve naranja como tiempo extra. Solo con dirección up."
+          "description": "Objetivo de un temporizador ascendente: segundos o una duración como \"2h\". La regla se llena hasta él y después el reloj se vuelve naranja como tiempo extra. Solo con dirección up. Se mantiene en la siguiente ejecución del mismo slug; goal: null en YAML lo quita."
         },
         "show_ruler": {
           "name": "Mostrar regla",

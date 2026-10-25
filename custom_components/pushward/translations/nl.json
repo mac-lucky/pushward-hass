@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Doel",
-          "description": "Doel voor een optellende timer: seconden of een duur zoals \"2h\". De liniaal vult zich tot het doel, daarna wordt de klok oranje als overtijd. Alleen bij richting up."
+          "description": "Doel voor een optellende timer: seconden of een duur zoals \"2h\". De liniaal vult zich tot het doel, daarna wordt de klok oranje als overtijd. Alleen bij richting up. Het blijft staan voor de volgende run van dezelfde slug; goal: null in YAML haalt het weg."
         },
         "show_ruler": {
           "name": "Liniaal tonen",

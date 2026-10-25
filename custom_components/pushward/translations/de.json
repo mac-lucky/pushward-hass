@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Ziel",
-          "description": "Ziel eines hochzählenden Timers: Sekunden oder eine Dauer wie \"2h\". Das Lineal füllt sich bis dorthin, danach wird die Uhr als Überzeit orange. Nur bei Richtung up."
+          "description": "Ziel eines hochzählenden Timers: Sekunden oder eine Dauer wie \"2h\". Das Lineal füllt sich bis dorthin, danach wird die Uhr als Überzeit orange. Nur bei Richtung up. Es bleibt für den nächsten Lauf desselben Slugs; goal: null in YAML entfernt es."
         },
         "show_ruler": {
           "name": "Lineal anzeigen",

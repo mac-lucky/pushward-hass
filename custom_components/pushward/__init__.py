@@ -351,9 +351,12 @@ _COUNTDOWN_TEMPLATE_FIELDS = {
     # call leaves start_date out) toward an optional goal; show_ruler hides the bar.
     # paused is the server's write-only switch: true freezes the clock, false
     # resumes it, and sending the state it is already in changes nothing.
+    # goal: None goes out as JSON null, which the merge reads as "delete": the only
+    # way to drop a stored goal, since a restarted up timer keeps it and the
+    # server refuses "" as an empty duration.
     vol.Optional("direction"): vol.In(COUNTDOWN_DIRECTIONS),
     vol.Optional("show_ruler"): cv.boolean,
-    vol.Optional("goal"): validate_goal,
+    vol.Optional("goal"): vol.Any(validate_goal, None),
     vol.Optional("paused"): cv.boolean,
 }
 
@@ -364,14 +367,15 @@ def _validate_countdown_update(data: dict) -> dict:
     An up clock has no end, so the fields measured against one go when the call
     itself says up, and goal goes when it says down. A call without direction
     inherits the stored one, which only the server knows; it gets the server's
-    message instead. An empty completion_message is no message, so it passes.
+    message instead. An empty completion_message is no message, so it passes,
+    and so does goal: None, the clear, in either direction.
     """
     direction = data.get("direction")
     if direction == COUNTDOWN_DIRECTION_UP:
         sent = [key for key in COUNTDOWN_DOWN_ONLY_FIELDS if key in data and data[key] != ""]
         if sent:
             raise vol.Invalid(f"{', '.join(sent)} cannot be used when direction is up (use goal for a target)")
-    elif direction == COUNTDOWN_DIRECTION_DOWN and "goal" in data:
+    elif direction == COUNTDOWN_DIRECTION_DOWN and data.get("goal") is not None:
         raise vol.Invalid("goal is only used when direction is up")
     return data
 

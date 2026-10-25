@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Objectif",
-          "description": "Objectif d'un minuteur croissant : secondes ou une durée comme \"2h\". La règle se remplit jusqu'à lui, puis l'horloge passe à l'orange en dépassement. Sens up uniquement."
+          "description": "Objectif d'un minuteur croissant : secondes ou une durée comme \"2h\". La règle se remplit jusqu'à lui, puis l'horloge passe à l'orange en dépassement. Sens up uniquement. Il reste pour la prochaine exécution du même slug. goal: null en YAML le supprime."
         },
         "show_ruler": {
           "name": "Afficher la règle",

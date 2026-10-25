@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Cel",
-          "description": "Cel dla licznika w górę: sekundy albo czas w postaci \"2h\". Linijka wypełnia się do celu, potem zegar robi się pomarańczowy i liczy czas ponad cel. Tylko dla kierunku up."
+          "description": "Cel dla licznika w górę: sekundy albo czas w postaci \"2h\". Linijka wypełnia się do celu, potem zegar robi się pomarańczowy i liczy czas ponad cel. Tylko dla kierunku up. Zostaje przy kolejnym uruchomieniu tego samego sluga; goal: null w YAML go usuwa."
         },
         "show_ruler": {
           "name": "Pokaż linijkę",

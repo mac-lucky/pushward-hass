@@ -2107,9 +2107,29 @@ async def test_update_activity_countdown_goal_without_direction_is_the_servers_c
     assert api.update_activity.call_args[0][2]["goal"] == "45m"
 
 
+@pytest.mark.parametrize("extra", [{"direction": "up"}, {"direction": "down", "end_date": 1700000600}, {}])
+async def test_update_activity_countdown_goal_none_clears_it(hass: HomeAssistant, extra: dict) -> None:
+    """goal: null is the only way to drop a stored goal; a restarted up timer keeps it otherwise."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_countdown",
+        {"slug": "nap", "state": "ongoing", "goal": None, **extra},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert "goal" in content
+    assert content["goal"] is None
+    if extra:
+        assert_valid_activity_content(content)
+
+
 @pytest.mark.parametrize(
     "extra",
-    [{"direction": "sideways"}, {"goal": 0}, {"goal": "soon"}, {"goal": True}],
+    [{"direction": "sideways"}, {"goal": 0}, {"goal": "soon"}, {"goal": True}, {"goal": ""}],
 )
 async def test_update_activity_countdown_refuses_bad_clock_values(hass: HomeAssistant, extra: dict) -> None:
     api = _mock_api()

@@ -603,6 +603,8 @@ def _assert_countdown(content: dict, where: str) -> None:
     for field in ("show_ruler", "paused"):
         if field in content and not isinstance(content[field], bool):
             _fail(where, f"{field} must be a boolean, got {content[field]!r}")
+    # A null goal is the clear: the merge deletes the key before anything reads it,
+    # so it passes in either direction.
     goal = content.get("goal")
     if goal is not None and not isinstance(goal, str) and (not _is_int(goal) or goal < 1):
         _fail(where, f"goal must be at least 1 second or a duration string, got {goal!r}")

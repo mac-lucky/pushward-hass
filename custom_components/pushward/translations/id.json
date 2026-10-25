@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Target",
-          "description": "Target untuk timer yang menghitung maju: detik atau durasi seperti \"2h\". Penggaris terisi menuju target, lalu jam berubah oranye sebagai waktu lebih. Hanya untuk arah up."
+          "description": "Target untuk timer yang menghitung maju: detik atau durasi seperti \"2h\". Penggaris terisi menuju target, lalu jam berubah oranye sebagai waktu lebih. Hanya untuk arah up. Target tetap ada untuk putaran berikutnya dengan slug yang sama; goal: null di YAML menghapusnya."
         },
         "show_ruler": {
           "name": "Tampilkan Penggaris",

@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Țintă",
-          "description": "Ținta unui cronometru crescător: secunde sau o durată precum \"2h\". Rigla se umple până la ea, apoi ceasul devine portocaliu ca timp suplimentar. Doar cu direcția up."
+          "description": "Ținta unui cronometru crescător: secunde sau o durată precum \"2h\". Rigla se umple până la ea, apoi ceasul devine portocaliu ca timp suplimentar. Doar cu direcția up. Rămâne și la următoarea rulare a aceluiași slug; goal: null în YAML o elimină."
         },
         "show_ruler": {
           "name": "Afișați rigla",

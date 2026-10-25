@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Obiettivo",
-          "description": "Obiettivo di un timer in avanti: secondi o una durata come \"2h\". Il righello si riempie fino a lì, poi l'orologio diventa arancione come tempo extra. Solo con direzione up."
+          "description": "Obiettivo di un timer in avanti: secondi o una durata come \"2h\". Il righello si riempie fino a lì, poi l'orologio diventa arancione come tempo extra. Solo con direzione up. Resta anche per la corsa successiva dello stesso slug; goal: null in YAML lo rimuove."
         },
         "show_ruler": {
           "name": "Mostra righello",

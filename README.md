@@ -618,7 +618,9 @@ implied by the action name; you no longer pass a `template` field.
 > action refuses `end_date`, `duration`, `warning_threshold`, `alarm`, `snooze_seconds` and a
 > `completion_message` next to it; leave the message out of `end_activity` for it as well, the
 > server refuses that too. `goal` (seconds, or a string like `"2h"`; up only) fills the ruler
-> toward a target, and past it the clock turns orange and keeps counting as overtime.
+> toward a target, and past it the clock turns orange and keeps counting as overtime. The goal
+> stays on the slug, so a restarted timer still has yesterday's target: send `goal: null` to
+> remove it (an empty string does not work, the server reads it as an empty duration).
 > `show_ruler: false` hides the bar in either direction. `paused: true` freezes the clock and
 > `paused: false` starts it again. Counting up, the paused time is left out of the count, so
 > the start time on the card stays right; counting down, the end moves on by the length of the

@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Goal",
-          "description": "Target for an up timer: seconds or a duration string like \"2h\". The ruler fills toward it, then the clock turns orange as overtime. Direction up only."
+          "description": "Target for an up timer: seconds or a duration string like \"2h\". The ruler fills toward it, then the clock turns orange as overtime. Direction up only. It carries over to the next run of the same slug; goal: null in YAML removes it."
         },
         "show_ruler": {
           "name": "Show Ruler",

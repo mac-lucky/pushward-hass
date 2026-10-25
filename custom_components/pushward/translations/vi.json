@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Mục tiêu",
-          "description": "Mục tiêu của bộ hẹn giờ đếm lên: số giây hoặc thời lượng như \"2h\". Thước đầy dần tới mục tiêu, sau đó đồng hồ chuyển sang màu cam khi vượt giờ. Chỉ dùng với hướng up."
+          "description": "Mục tiêu của bộ hẹn giờ đếm lên: số giây hoặc thời lượng như \"2h\". Thước đầy dần tới mục tiêu, sau đó đồng hồ chuyển sang màu cam khi vượt giờ. Chỉ dùng với hướng up. Mục tiêu vẫn được giữ cho lần chạy tiếp theo của cùng slug; goal: null trong YAML sẽ xóa nó."
         },
         "show_ruler": {
           "name": "Hiện thước",

@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Meta",
-          "description": "Meta de um timer progressivo: segundos ou uma duração como \"2h\". A régua se enche até ela, depois o relógio fica laranja como tempo extra. Somente com direção up."
+          "description": "Meta de um timer progressivo: segundos ou uma duração como \"2h\". A régua se enche até ela, depois o relógio fica laranja como tempo extra. Somente com direção up. Ela continua na próxima execução do mesmo slug; goal: null no YAML a remove."
         },
         "show_ruler": {
           "name": "Mostrar régua",

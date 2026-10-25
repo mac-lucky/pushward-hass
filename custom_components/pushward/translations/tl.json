@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Layunin",
-          "description": "Layunin ng timer na nagbibilang pataas: segundo o tagal tulad ng \"2h\". Napupuno ang ruler papunta rito, saka nagiging kahel ang orasan bilang sobrang oras. Para lang sa direksyong up."
+          "description": "Layunin ng timer na nagbibilang pataas: segundo o tagal tulad ng \"2h\". Napupuno ang ruler papunta rito, saka nagiging kahel ang orasan bilang sobrang oras. Para lang sa direksyong up. Nananatili ito sa susunod na takbo ng parehong slug; inaalis ito ng goal: null sa YAML."
         },
         "show_ruler": {
           "name": "Ipakita ang Ruler",

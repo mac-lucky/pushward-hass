@@ -473,7 +473,7 @@
         },
         "goal": {
           "name": "Hedef",
-          "description": "İleri sayan zamanlayıcının hedefi: saniye ya da \"2h\" gibi bir süre. Cetvel hedefe doğru dolar, ardından saat ek süre olarak turuncuya döner. Yalnızca up yönü için."
+          "description": "İleri sayan zamanlayıcının hedefi: saniye ya da \"2h\" gibi bir süre. Cetvel hedefe doğru dolar, ardından saat ek süre olarak turuncuya döner. Yalnızca up yönü için. Aynı slug'ın sonraki çalışmasında da kalır; YAML'da goal: null onu kaldırır."
         },
         "show_ruler": {
           "name": "Cetveli Göster",
