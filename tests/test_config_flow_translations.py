@@ -197,6 +197,8 @@ _ENTITY_COMMON: set[str] = {
     "update_interval",
     "state_labels",
     "compact_label",
+    "compact_trailing_label",
+    "compact_trailing_icon",
     "accent_color",
     "accent_color_attribute",
     "background_color",

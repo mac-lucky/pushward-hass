@@ -63,6 +63,14 @@
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
+        },
         "accent_color": {
           "name": "Culoare accent",
           "description": "Culoarea de accent pentru activitate. Hex (#RRGGBB) sau culoare numită."
@@ -299,6 +307,14 @@
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
         },
         "icon": {
           "name": "Pictogramă",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
         },
         "icon": {
           "name": "Pictogramă",
@@ -775,6 +807,14 @@
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
         },
         "icon": {
           "name": "Pictogramă",
@@ -1179,6 +1235,14 @@
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
         },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
+        },
         "icon": {
           "name": "Pictogramă",
           "description": "Numele unui SF Symbol sau pictogramă MDI (ex. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
         },
         "playback_state": {
           "name": "Starea redării",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Etichetă Island",
           "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
         },
         "icon": {
           "name": "Pictogramă",
@@ -2093,7 +2181,9 @@
                 "sound": "Sunet",
                 "update_interval": "Interval minim de actualizare (secunde)",
                 "state_labels": "Etichete stări",
-                "compact_label": "Etichetă Island"
+                "compact_label": "Etichetă Island",
+                "compact_trailing_label": "Etichetă Island din spate",
+                "compact_trailing_icon": "Pictogramă Island din spate"
               },
               "data_description": {
                 "slug": "Identificator unic pentru această activitate. Lăsați gol pentru a genera automat din ID-ul entității. Exemplu: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS.",
                 "update_interval": "Numărul minim de secunde între actualizări. Modificările rapide ale stării sunt limitate ca rată.",
                 "state_labels": "Text de afișare personalizat pentru stări. Un rând pe stare: valoarea stării și eticheta de afișat. Exemplu: heating și Se încălzește. Un șir vechi stare=Etichetă, stare2=Etichetă 2 este încă acceptat.",
-                "compact_label": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră. Lăsați gol pentru a păstra conținutul propriu al șablonului."
+                "compact_label": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră. Lăsați gol pentru a păstra conținutul propriu al șablonului.",
+                "compact_trailing_label": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Lăsați gol pentru a păstra conținutul propriu al șablonului. Necesită PushWard 1.19.1 sau mai nou.",
+                "compact_trailing_icon": "Pictogramă afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Funcționează atât pictogramele MDI (ex. mdi:airplane-takeoff), cât și SF Symbols (ex. airplane.departure). Ignorată când este setată o etichetă Island din spate. Lăsați gol pentru a păstra conținutul propriu al șablonului. Necesită PushWard 1.19.1 sau mai nou."
               }
             },
             "colors": {

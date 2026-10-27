@@ -75,6 +75,18 @@ update_activity:
       example: "WASH"
       selector:
         text:
+    compact_trailing_label:
+      name: Island Trailing Label
+      description: Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later.
+      example: "TKOF"
+      selector:
+        text:
+    compact_trailing_icon:
+      name: Island Trailing Icon
+      description: SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later.
+      example: "mdi:airplane-takeoff"
+      selector:
+        text:
     completion_message:
       name: Completion Message
       description: Message shown when the activity ends.
@@ -442,6 +454,14 @@ update_activity_generic:
           example: "WASH"
           selector:
             text:
+        compact_trailing_label:
+          example: "TKOF"
+          selector:
+            text:
+        compact_trailing_icon:
+          example: "mdi:airplane-takeoff"
+          selector:
+            text:
         icon:
           example: "arrow.down.circle.fill"
           selector:
@@ -623,6 +643,14 @@ update_activity_countdown:
             text:
         compact_label:
           example: "WASH"
+          selector:
+            text:
+        compact_trailing_label:
+          example: "TKOF"
+          selector:
+            text:
+        compact_trailing_icon:
+          example: "mdi:airplane-takeoff"
           selector:
             text:
         icon:
@@ -811,6 +839,14 @@ update_activity_steps:
             text:
         compact_label:
           example: "WASH"
+          selector:
+            text:
+        compact_trailing_label:
+          example: "TKOF"
+          selector:
+            text:
+        compact_trailing_icon:
+          example: "mdi:airplane-takeoff"
           selector:
             text:
         icon:
@@ -1013,6 +1049,14 @@ update_activity_alert:
           example: "WASH"
           selector:
             text:
+        compact_trailing_label:
+          example: "TKOF"
+          selector:
+            text:
+        compact_trailing_icon:
+          example: "mdi:airplane-takeoff"
+          selector:
+            text:
         icon:
           example: "arrow.down.circle.fill"
           selector:
@@ -1180,6 +1224,14 @@ update_activity_gauge:
           example: "WASH"
           selector:
             text:
+        compact_trailing_label:
+          example: "TKOF"
+          selector:
+            text:
+        compact_trailing_icon:
+          example: "mdi:airplane-takeoff"
+          selector:
+            text:
         icon:
           example: "arrow.down.circle.fill"
           selector:
@@ -1322,6 +1374,14 @@ update_activity_timeline:
             text:
         compact_label:
           example: "WASH"
+          selector:
+            text:
+        compact_trailing_label:
+          example: "TKOF"
+          selector:
+            text:
+        compact_trailing_icon:
+          example: "mdi:airplane-takeoff"
           selector:
             text:
         icon:
@@ -1498,6 +1558,14 @@ update_activity_board:
       example: "WASH"
       selector:
         text:
+    compact_trailing_label:
+      example: "TKOF"
+      selector:
+        text:
+    compact_trailing_icon:
+      example: "mdi:airplane-takeoff"
+      selector:
+        text:
     icon:
       example: "square.grid.2x2.fill"
       selector:
@@ -1600,6 +1668,14 @@ update_activity_log:
       example: "WASH"
       selector:
         text:
+    compact_trailing_label:
+      example: "TKOF"
+      selector:
+        text:
+    compact_trailing_icon:
+      example: "mdi:airplane-takeoff"
+      selector:
+        text:
     icon:
       example: "list.bullet.rectangle"
       selector:
@@ -1695,6 +1771,14 @@ update_activity_media:
         text:
     compact_label:
       example: "WASH"
+      selector:
+        text:
+    compact_trailing_label:
+      example: "TKOF"
+      selector:
+        text:
+    compact_trailing_icon:
+      example: "mdi:airplane-takeoff"
       selector:
         text:
     playback_state:
@@ -1878,6 +1962,14 @@ update_activity_approval:
         text:
     compact_label:
       example: "WASH"
+      selector:
+        text:
+    compact_trailing_label:
+      example: "TKOF"
+      selector:
+        text:
+    compact_trailing_icon:
+      example: "mdi:airplane-takeoff"
       selector:
         text:
     icon:

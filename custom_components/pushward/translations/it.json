@@ -63,6 +63,14 @@
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
+        },
         "accent_color": {
           "name": "Colore accento",
           "description": "Colore accento per l'attività. Esadecimale (#RRGGBB) o nome del colore."
@@ -299,6 +307,14 @@
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
         },
         "icon": {
           "name": "Icona",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
         },
         "icon": {
           "name": "Icona",
@@ -775,6 +807,14 @@
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
         },
         "icon": {
           "name": "Icona",
@@ -1179,6 +1235,14 @@
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
         },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
+        },
         "icon": {
           "name": "Icona",
           "description": "Nome icona SF Symbol o MDI (es. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
         },
         "playback_state": {
           "name": "Stato di riproduzione",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Etichetta Island",
           "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetta Island posteriore",
+          "description": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Richiede PushWard 1.19.1 o successivo."
+        },
+        "compact_trailing_icon": {
+          "name": "Icona Island posteriore",
+          "description": "Icona SF Symbol o MDI (es. airplane.departure, mdi:airplane-takeoff) mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Ignorata quando è impostata un'etichetta Island posteriore. Richiede PushWard 1.19.1 o successivo."
         },
         "icon": {
           "name": "Icona",
@@ -2093,7 +2181,9 @@
                 "sound": "Suono",
                 "update_interval": "Intervallo minimo aggiornamento (secondi)",
                 "state_labels": "Etichette stato",
-                "compact_label": "Etichetta Island"
+                "compact_label": "Etichetta Island",
+                "compact_trailing_label": "Etichetta Island posteriore",
+                "compact_trailing_icon": "Icona Island posteriore"
               },
               "data_description": {
                 "slug": "Identificatore univoco per questa attività. Lasciare vuoto per generarlo automaticamente dall'ID entità. Esempio: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Suono riprodotto ad ogni aggiornamento per questa entità. Lasciare vuoto per non forzare alcun suono.",
                 "update_interval": "Secondi minimi tra un aggiornamento e l'altro. I cambi di stato rapidi vengono limitati.",
                 "state_labels": "Testo personalizzato per gli stati. Una riga per stato: il valore dello stato e l'etichetta da mostrare. Esempio: heating e In riscaldamento. Una vecchia stringa stato=Etichetta, stato2=Etichetta 2 è ancora accettata.",
-                "compact_label": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora. Lascia vuoto per mantenere il contenuto proprio del modello."
+                "compact_label": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora. Lascia vuoto per mantenere il contenuto proprio del modello.",
+                "compact_trailing_label": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Lascia vuoto per mantenere il contenuto proprio del modello. Richiede PushWard 1.19.1 o successivo.",
+                "compact_trailing_icon": "Icona mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Funzionano sia le icone MDI (es. mdi:airplane-takeoff) sia gli SF Symbols (es. airplane.departure). Ignorata quando è impostata un'etichetta Island posteriore. Lascia vuoto per mantenere il contenuto proprio del modello. Richiede PushWard 1.19.1 o successivo."
               }
             },
             "colors": {

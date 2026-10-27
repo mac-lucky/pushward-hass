@@ -16,9 +16,15 @@ import json
 import re
 from pathlib import Path
 
+import pytest
 import yaml
 
-from custom_components.pushward.const import MAX_COMPACT_LABEL_LEN, MAX_SEVERITY_LABEL_LEN, SERVICE_TEMPLATES
+from custom_components.pushward.const import (
+    MAX_COMPACT_LABEL_LEN,
+    MAX_COMPACT_TRAILING_LABEL_LEN,
+    MAX_SEVERITY_LABEL_LEN,
+    SERVICE_TEMPLATES,
+)
 
 _COMPONENT = Path(__file__).parent.parent / "custom_components" / "pushward"
 _SERVICES_YAML = _COMPONENT / "services.yaml"
@@ -198,22 +204,32 @@ _COMPACT_LABEL_PROSE_PATHS = (
     ),
     "config_subentries.tracked_entity.step.details.sections.display_options.data_description.compact_label",
 )
+_COMPACT_TRAILING_LABEL_PROSE_PATHS = tuple(
+    path.replace("compact_label", "compact_trailing_label") for path in _COMPACT_LABEL_PROSE_PATHS
+)
 
 
-def test_compact_label_prose_matches_the_constant() -> None:
-    """Every compact_label help text must quote the real cap, in every locale.
+@pytest.mark.parametrize(
+    "paths, cap",
+    [
+        pytest.param(_COMPACT_LABEL_PROSE_PATHS, MAX_COMPACT_LABEL_LEN, id="compact_label"),
+        pytest.param(_COMPACT_TRAILING_LABEL_PROSE_PATHS, MAX_COMPACT_TRAILING_LABEL_LEN, id="compact_trailing_label"),
+    ],
+)
+def test_compact_label_prose_matches_the_constant(paths: tuple[str, ...], cap: int) -> None:
+    """Every island label help text must quote the real cap, in every locale.
 
-    Same trap as severity_label, twelve strings per file this time. Keyed on the
-    exact JSON paths rather than a length heuristic: the zh-Hans descriptions are
-    23 characters, shorter than several field labels.
+    Same trap as severity_label, twelve strings per file and label this time. Keyed
+    on the exact JSON paths rather than a length heuristic: the zh-Hans descriptions
+    are 23 characters, shorter than several field labels.
     """
     bengali = str.maketrans("0123456789", "০১২৩৪৫৬৭৮৯")
-    want_ascii = str(MAX_COMPACT_LABEL_LEN)
+    want_ascii = str(cap)
     want_bengali = want_ascii.translate(bengali)
 
     for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
         data = json.loads(locale_file.read_text())
-        for path in _COMPACT_LABEL_PROSE_PATHS:
+        for path in paths:
             node = data
             for key in path.split("."):
                 node = node[key]

@@ -60,6 +60,7 @@ from .const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    COMPACT_TRAILING_ICON_PATTERN,
     CONF_E2E_KEY,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
@@ -78,6 +79,8 @@ from .const import (
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
     MAX_COMPACT_LABEL_LEN,
+    MAX_COMPACT_TRAILING_ICON_LEN,
+    MAX_COMPACT_TRAILING_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_BODY_LEN,
     MAX_TAP_ACTION_ICON_LEN,
@@ -288,8 +291,9 @@ def _clearable(validator):
     automation can take artwork off an activity again - and every image validator
     refuses "" on its own, so without this the field could be set but never unset.
     Trimming matches what the config flow does with the same three values.
-    compact_label goes through it only for the trim: an empty label is valid
-    there on its own, the server reads it as "show the template's default".
+    The island ear fields (compact_label and the trailing pair) go through it only
+    for the trim: an empty value is valid there on its own, the server reads it as
+    "show the template's default".
     """
 
     def _validate(value):
@@ -302,10 +306,20 @@ def _clearable(validator):
     return _validate
 
 
+_COMPACT_TRAILING_ICON = vol.All(
+    vol.Length(max=MAX_COMPACT_TRAILING_ICON_LEN),
+    vol.Match(
+        COMPACT_TRAILING_ICON_PATTERN,
+        msg="compact_trailing_icon may contain only letters, digits, '.', '-', '_' and ':'",
+    ),
+)
+
 _UNIVERSAL_LABEL_FIELDS = {
     vol.Optional("state_text"): str,
     vol.Optional("subtitle"): str,
     vol.Optional("compact_label"): vol.All(str, _clearable(vol.Length(max=MAX_COMPACT_LABEL_LEN))),
+    vol.Optional("compact_trailing_label"): vol.All(str, _clearable(vol.Length(max=MAX_COMPACT_TRAILING_LABEL_LEN))),
+    vol.Optional("compact_trailing_icon"): vol.All(str, _clearable(_COMPACT_TRAILING_ICON)),
     vol.Optional("icon"): str,
     vol.Optional("progress"): vol.Coerce(float),
 }
@@ -581,6 +595,8 @@ _BOARD_LOG_LABEL_FIELDS = {
     vol.Optional("state_text"): str,
     vol.Optional("subtitle"): str,
     vol.Optional("compact_label"): vol.All(str, _clearable(vol.Length(max=MAX_COMPACT_LABEL_LEN))),
+    vol.Optional("compact_trailing_label"): vol.All(str, _clearable(vol.Length(max=MAX_COMPACT_TRAILING_LABEL_LEN))),
+    vol.Optional("compact_trailing_icon"): vol.All(str, _clearable(_COMPACT_TRAILING_ICON)),
     vol.Optional("icon"): str,
 }
 _BOARD_LOG_APPEARANCE_FIELDS = {

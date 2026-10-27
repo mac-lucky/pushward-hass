@@ -63,6 +63,14 @@
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
+        },
         "accent_color": {
           "name": "强调色",
           "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
@@ -299,6 +307,14 @@
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
         },
         "icon": {
           "name": "图标",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
         },
         "icon": {
           "name": "图标",
@@ -775,6 +807,14 @@
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
@@ -911,6 +951,14 @@
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 arrow.down.circle.fill、mdi:download）。"
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
         },
         "icon": {
           "name": "图标",
@@ -1179,6 +1235,14 @@
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 square.grid.2x2.fill、mdi:view-dashboard）。"
@@ -1257,6 +1321,14 @@
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
         },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
+        },
         "icon": {
           "name": "图标",
           "description": "SF Symbol 或 MDI 图标名称（例如 list.bullet.rectangle、mdi:format-list-bulleted）。"
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
         },
         "playback_state": {
           "name": "播放状态",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "灵动岛标签",
           "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+        },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
         },
         "icon": {
           "name": "图标",
@@ -2093,7 +2181,9 @@
                 "sound": "声音",
                 "update_interval": "最小更新间隔（秒）",
                 "state_labels": "状态标签",
-                "compact_label": "灵动岛标签"
+                "compact_label": "灵动岛标签",
+                "compact_trailing_label": "灵动岛尾端标签",
+                "compact_trailing_icon": "灵动岛尾端图标"
               },
               "data_description": {
                 "slug": "此活动的唯一标识符。留空则自动从实体 ID 生成。示例：ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
                 "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
                 "state_labels": "状态的自定义显示文本。每个状态一行：状态值和要显示的标签。示例：heating 和 加热中。仍接受旧的 state=标签, state2=标签2 字符串。",
-                "compact_label": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。留空则保留模板自身的内容。"
+                "compact_label": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。留空则保留模板自身的内容。",
+                "compact_trailing_label": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。留空则保留模板自身的内容。需要 PushWard 1.19.1 或更高版本。",
+                "compact_trailing_icon": "显示在灵动岛紧凑视图的尾端区域中的图标，代替模板在此处显示的内容，并以强调色着色。MDI 图标（例如 mdi:airplane-takeoff）和 SF Symbols（例如 airplane.departure）均可使用。设置了灵动岛尾端标签时会被忽略。留空则保留模板自身的内容。需要 PushWard 1.19.1 或更高版本。"
               }
             },
             "colors": {

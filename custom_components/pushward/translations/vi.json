@@ -63,6 +63,14 @@
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
+        },
         "accent_color": {
           "name": "Màu Nhấn",
           "description": "Màu nhấn cho hoạt động. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
@@ -299,6 +307,14 @@
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
         },
         "icon": {
           "name": "Biểu Tượng",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
         },
         "icon": {
           "name": "Biểu Tượng",
@@ -775,6 +807,14 @@
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
         },
         "icon": {
           "name": "Biểu Tượng",
@@ -1179,6 +1235,14 @@
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
         },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
+        },
         "icon": {
           "name": "Biểu Tượng",
           "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
         },
         "playback_state": {
           "name": "Trạng Thái Phát",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Nhãn Island",
           "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+        },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
         },
         "icon": {
           "name": "Biểu Tượng",
@@ -2093,7 +2181,9 @@
                 "sound": "Âm Thanh",
                 "update_interval": "Khoảng Cập Nhật Tối Thiểu (giây)",
                 "state_labels": "Nhãn Trạng Thái",
-                "compact_label": "Nhãn Island"
+                "compact_label": "Nhãn Island",
+                "compact_trailing_label": "Nhãn Cuối Island",
+                "compact_trailing_icon": "Biểu Tượng Cuối Island"
               },
               "data_description": {
                 "slug": "Mã định danh duy nhất cho hoạt động này. Để trống để tự tạo từ ID thực thể. Ví dụ: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Tên âm thanh thông báo cho bản cập nhật này. Để trống để dùng âm thanh hệ thống iOS.",
                 "update_interval": "Số giây tối thiểu giữa các lần cập nhật. Các thay đổi trạng thái nhanh sẽ bị giới hạn tốc độ.",
                 "state_labels": "Văn bản hiển thị tùy chỉnh cho các trạng thái. Mỗi trạng thái một hàng: giá trị trạng thái và nhãn hiển thị. Ví dụ: heating và Đang Sưởi. Chuỗi cũ state=Label, state2=Label 2 vẫn được chấp nhận.",
-                "compact_label": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này. Để trống để giữ nội dung riêng của mẫu."
+                "compact_label": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này. Để trống để giữ nội dung riêng của mẫu.",
+                "compact_trailing_label": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Để trống để giữ nội dung riêng của mẫu. Cần PushWard 1.19.1 trở lên.",
+                "compact_trailing_icon": "Biểu tượng hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Cả biểu tượng MDI (ví dụ: mdi:airplane-takeoff) và SF Symbols (ví dụ: airplane.departure) đều dùng được. Bị bỏ qua khi đã đặt nhãn cuối Island. Để trống để giữ nội dung riêng của mẫu. Cần PushWard 1.19.1 trở lên."
               }
             },
             "colors": {

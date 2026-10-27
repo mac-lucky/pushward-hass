@@ -62,6 +62,8 @@ CONF_CURRENT_STEP_ATTR = "current_step_attribute"
 CONF_SEVERITY = "severity"
 CONF_SEVERITY_LABEL = "severity_label"
 CONF_COMPACT_LABEL = "compact_label"
+CONF_COMPACT_TRAILING_LABEL = "compact_trailing_label"
+CONF_COMPACT_TRAILING_ICON = "compact_trailing_icon"
 CONF_SUBTITLE_ATTRIBUTE = "subtitle_attribute"
 CONF_STATE_LABELS = "state_labels"
 CONF_ENDED_TTL = "ended_ttl"
@@ -312,6 +314,16 @@ MAX_SEVERITY_LABEL_LEN = 40
 # Optional text for the Dynamic Island compact leading ear, shown instead of the
 # icon. Mirrors the server's 4-rune cap; the ear is ~52pt wide.
 MAX_COMPACT_LABEL_LEN = 4
+# Text or icon for the trailing ear, replacing that template's own atom there (the
+# step counter, the timer); the label wins when both are set. Mirrors the server's
+# 4-rune label cap, and the icon takes the activity icon's 128 (some SF Symbol
+# names run past 64).
+MAX_COMPACT_TRAILING_LABEL_LEN = 4
+MAX_COMPACT_TRAILING_ICON_LEN = 128
+# Every SF Symbol and mdi name fits this set, and the server refuses anything else,
+# which keeps the 128-rune cap a byte bound in the push payload. \Z for the same
+# trailing-newline reason as APPROVAL_OPTION_ID_PATTERN.
+COMPACT_TRAILING_ICON_PATTERN = r"^[A-Za-z0-9._:-]+\Z"
 MAX_TAP_ACTION_TITLE_LEN = 64
 MAX_TAP_ACTION_ICON_LEN = 64
 MAX_TAP_ACTION_BODY_LEN = 1024  # server maxTapActionBodyRunes

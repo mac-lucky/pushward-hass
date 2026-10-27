@@ -21,6 +21,8 @@ from custom_components.pushward.const import (
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPACT_LABEL,
+    CONF_COMPACT_TRAILING_ICON,
+    CONF_COMPACT_TRAILING_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -76,6 +78,7 @@ from custom_components.pushward.const import (
     CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
     IMAGE_THUMBHASH_MAX,
+    MAX_COMPACT_TRAILING_ICON_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MEDIA_DURATION_MAX,
     MEDIA_POSITION_MAX_AGE,
@@ -567,6 +570,99 @@ def test_map_completion_content_keeps_compact_label():
     assert content["compact_label"] == "WASH"
     assert_valid_activity_content(content)
     assert "compact_label" not in map_completion_content({CONF_TEMPLATE: "generic", CONF_ICON: "washer"})
+
+
+def test_map_content_compact_trailing_fields_from_config():
+    """A steps card can trade its N/M counter for a glyph, or for a 4-char label, on the trailing ear."""
+    state = _make_state("on", {"friendly_name": "Flight"})
+    config = {
+        CONF_TEMPLATE: "steps",
+        CONF_ICON: "airplane",
+        CONF_COMPACT_LABEL: "A359",
+        CONF_COMPACT_TRAILING_ICON: "mdi:airplane-takeoff",
+        CONF_COMPACT_TRAILING_LABEL: "TKOF",
+    }
+
+    content = map_content(state, config)
+    assert content["compact_trailing_icon"] == "mdi:airplane-takeoff"
+    assert content["compact_trailing_label"] == "TKOF"
+    assert_valid_activity_content(content)
+
+    # a config written before the fields existed sends neither
+    content = map_content(state, {CONF_TEMPLATE: "steps", CONF_ICON: "airplane"})
+    assert "compact_trailing_icon" not in content
+    assert "compact_trailing_label" not in content
+
+
+def test_map_content_cleared_compact_trailing_fields_ship_empty():
+    """Clearing either field in the flow has to reach the server as "", it merge-patches content."""
+    state = _make_state("on", {"friendly_name": "Flight"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "airplane",
+        CONF_COMPACT_TRAILING_ICON: "",
+        CONF_COMPACT_TRAILING_LABEL: "",
+    }
+
+    content = map_content(state, config)
+    assert content["compact_trailing_icon"] == ""
+    assert content["compact_trailing_label"] == ""
+    assert_valid_activity_content(content)
+
+    last = {"progress": 0.5, "compact_trailing_icon": "mdi:airplane-takeoff", "compact_trailing_label": "TKOF"}
+    content = map_completion_content(config, last_content=last)
+    assert content["compact_trailing_icon"] == ""
+    assert content["compact_trailing_label"] == ""
+
+
+def test_map_content_compact_trailing_fields_trimmed_and_capped():
+    state = _make_state("on", {"friendly_name": "Flight"})
+    config = {
+        CONF_TEMPLATE: "generic",
+        CONF_ICON: "airplane",
+        CONF_COMPACT_TRAILING_LABEL: "  GOAROUND ",
+        CONF_COMPACT_TRAILING_ICON: " " + "i" * (MAX_COMPACT_TRAILING_ICON_LEN + 10),
+    }
+
+    content = map_content(state, config)
+    assert content["compact_trailing_label"] == "GOAR"
+    assert content["compact_trailing_icon"] == "i" * MAX_COMPACT_TRAILING_ICON_LEN
+    assert_valid_activity_content(content)
+
+    content = map_completion_content(config)
+    assert content["compact_trailing_label"] == "GOAR"
+    assert len(content["compact_trailing_icon"]) == MAX_COMPACT_TRAILING_ICON_LEN
+
+
+@pytest.mark.parametrize("bad", ["mdi:air plane", "&", "\U0001f6eb", "air/plane"])
+def test_map_content_drops_a_trailing_icon_the_server_would_refuse(bad: str):
+    """A free-text icon outside [A-Za-z0-9._:-] ships as "" rather than 422ing the whole push."""
+    state = _make_state("on", {"friendly_name": "Flight"})
+    config = {CONF_TEMPLATE: "steps", CONF_ICON: "airplane", CONF_COMPACT_TRAILING_ICON: f"x{bad}"}
+
+    content = map_content(state, config)
+    assert content["compact_trailing_icon"] == ""
+    assert_valid_activity_content(content)
+    assert map_completion_content(config)["compact_trailing_icon"] == ""
+
+
+def test_map_completion_content_keeps_compact_trailing_fields():
+    config = {
+        CONF_TEMPLATE: "steps",
+        CONF_ICON: "airplane",
+        CONF_TOTAL_STEPS: 2,
+        CONF_COMPACT_TRAILING_ICON: "airplane.arrival",
+        CONF_COMPACT_TRAILING_LABEL: "LAND",
+    }
+
+    content = map_completion_content(config, last_content={"progress": 0.5, "subtitle": "LOT 282"})
+
+    assert content["compact_trailing_icon"] == "airplane.arrival"
+    assert content["compact_trailing_label"] == "LAND"
+    assert_valid_activity_content(content)
+    bare = map_completion_content({CONF_TEMPLATE: "generic", CONF_ICON: "washer"})
+    assert "compact_trailing_icon" not in bare
+    assert "compact_trailing_label" not in bare
 
 
 def test_map_completion_content_preserves_last():

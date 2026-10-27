@@ -63,6 +63,14 @@
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
+        },
         "accent_color": {
           "name": "Akzentfarbe",
           "description": "Akzentfarbe für die Live Activity. Hexadezimal (#RRGGBB) oder Farbname."
@@ -299,6 +307,14 @@
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
         },
         "icon": {
           "name": "Symbol",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
         },
         "icon": {
           "name": "Symbol",
@@ -775,6 +807,14 @@
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
         },
         "icon": {
           "name": "Symbol",
@@ -1179,6 +1235,14 @@
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
         },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
+        },
         "icon": {
           "name": "Symbol",
           "description": "Name eines SF Symbols oder MDI-Symbols (z. B. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
         },
         "playback_state": {
           "name": "Wiedergabestatus",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Island-Beschriftung",
           "description": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie."
+        },
+        "compact_trailing_label": {
+          "name": "Hintere Island-Beschriftung",
+          "description": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Erfordert PushWard 1.19.1 oder neuer."
+        },
+        "compact_trailing_icon": {
+          "name": "Hinteres Island-Symbol",
+          "description": "SF Symbol oder MDI-Symbol (z. B. airplane.departure, mdi:airplane-takeoff), das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Erfordert PushWard 1.19.1 oder neuer."
         },
         "icon": {
           "name": "Symbol",
@@ -2093,7 +2181,9 @@
                 "sound": "Ton",
                 "update_interval": "Min. Aktualisierungsintervall (Sekunden)",
                 "state_labels": "Zustandsbeschriftungen",
-                "compact_label": "Island-Beschriftung"
+                "compact_label": "Island-Beschriftung",
+                "compact_trailing_label": "Hintere Island-Beschriftung",
+                "compact_trailing_icon": "Hinteres Island-Symbol"
               },
               "data_description": {
                 "slug": "Eindeutige Kennung für diese Live Activity. Leer lassen, um aus der Entitäts-ID automatisch zu generieren. Beispiel: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Ton, der bei jedem Update für diese Entität abgespielt wird. Leer lassen, um keine Überschreibung zu verwenden.",
                 "update_interval": "Mindestanzahl Sekunden zwischen Aktualisierungen. Schnelle Zustandsänderungen werden gedrosselt.",
                 "state_labels": "Benutzerdefinierte Anzeigetexte für Zustände. Eine Zeile pro Zustand: der Zustandswert und die anzuzeigende Beschriftung. Beispiel: heating und Heizt auf. Eine alte Zeichenkette state=Label, state2=Label 2 wird weiterhin akzeptiert.",
-                "compact_label": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie. Leer lassen, um den eigenen Inhalt der Vorlage zu behalten."
+                "compact_label": "Bis zu 4 Zeichen, die im vorderen Bereich der kompakten Dynamic-Island-Ansicht anstelle des Standardinhalts der Vorlage angezeigt werden (Symbol, Schrittering oder Hoch/Tief-Stapel der Zeitleiste). Die minimale Darstellung ignoriert sie. Leer lassen, um den eigenen Inhalt der Vorlage zu behalten.",
+                "compact_trailing_label": "Bis zu 4 Zeichen, die im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt werden und ersetzen, was die Vorlage dort zeigt, etwa den Schrittzähler oder den Timer. Hat Vorrang vor dem hinteren Symbol, wenn beide gesetzt sind. Die minimale Darstellung ignoriert sie. Leer lassen, um den eigenen Inhalt der Vorlage zu behalten. Erfordert PushWard 1.19.1 oder neuer.",
+                "compact_trailing_icon": "Symbol, das in der Akzentfarbe eingefärbt im hinteren Bereich der kompakten Dynamic-Island-Ansicht angezeigt wird und ersetzt, was die Vorlage dort zeigt. MDI-Symbole (z. B. mdi:airplane-takeoff) und SF Symbols (z. B. airplane.departure) funktionieren beide. Wird ignoriert, wenn eine hintere Island-Beschriftung gesetzt ist. Leer lassen, um den eigenen Inhalt der Vorlage zu behalten. Erfordert PushWard 1.19.1 oder neuer."
               }
             },
             "colors": {

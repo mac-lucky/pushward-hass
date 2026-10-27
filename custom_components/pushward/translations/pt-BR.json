@@ -63,6 +63,14 @@
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
+        },
         "accent_color": {
           "name": "Cor de Destaque",
           "description": "Cor de destaque para a atividade. Hexadecimal (#RRGGBB) ou nome de cor."
@@ -299,6 +307,14 @@
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
         },
         "icon": {
           "name": "Ícone",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
         },
         "icon": {
           "name": "Ícone",
@@ -775,6 +807,14 @@
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
         },
         "icon": {
           "name": "Ícone",
@@ -1179,6 +1235,14 @@
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
         },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
+        },
         "icon": {
           "name": "Ícone",
           "description": "Nome do ícone SF Symbol ou MDI (ex.: list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
         },
         "playback_state": {
           "name": "Estado de Reprodução",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Rótulo da Island",
           "description": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora."
+        },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
         },
         "icon": {
           "name": "Ícone",
@@ -2093,7 +2181,9 @@
                 "sound": "Som",
                 "update_interval": "Intervalo Mínimo de Atualização (segundos)",
                 "state_labels": "Rótulos de Estado",
-                "compact_label": "Rótulo da Island"
+                "compact_label": "Rótulo da Island",
+                "compact_trailing_label": "Rótulo traseiro da Island",
+                "compact_trailing_icon": "Ícone traseiro da Island"
               },
               "data_description": {
                 "slug": "Identificador único desta atividade. Deixe vazio para gerar automaticamente a partir do ID da entidade. Exemplo: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Som reproduzido em cada atualização para esta entidade. Deixe vazio para não usar substituição.",
                 "update_interval": "Intervalo mínimo em segundos entre atualizações. Mudanças de estado rápidas são limitadas.",
                 "state_labels": "Texto de exibição personalizado para estados. Uma linha por estado: o valor do estado e o rótulo a exibir. Exemplo: heating e Aquecendo. Uma string antiga estado=Rótulo, estado2=Rótulo 2 ainda é aceita.",
-                "compact_label": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora. Deixe vazio para manter o conteúdo próprio do modelo."
+                "compact_label": "Até 4 caracteres exibidos na parte frontal da visualização compacta da Dynamic Island no lugar do conteúdo padrão do modelo (o ícone, o anel de etapas ou a pilha máximo/mínimo da linha do tempo). A apresentação mínima os ignora. Deixe vazio para manter o conteúdo próprio do modelo.",
+                "compact_trailing_label": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Deixe vazio para manter o conteúdo próprio do modelo. Requer PushWard 1.19.1 ou posterior.",
+                "compact_trailing_icon": "Ícone exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Funcionam tanto ícones MDI (ex.: mdi:airplane-takeoff) quanto SF Symbols (ex.: airplane.departure). Ignorado quando um rótulo traseiro da Island está definido. Deixe vazio para manter o conteúdo próprio do modelo. Requer PushWard 1.19.1 ou posterior."
               }
             },
             "colors": {

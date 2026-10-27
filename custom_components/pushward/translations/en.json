@@ -63,6 +63,14 @@
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
+        },
         "accent_color": {
           "name": "Accent Color",
           "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
@@ -299,6 +307,14 @@
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
         },
         "icon": {
           "name": "Icon",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
         },
         "icon": {
           "name": "Icon",
@@ -775,6 +807,14 @@
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
         },
         "icon": {
           "name": "Icon",
@@ -1179,6 +1235,14 @@
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
         },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
+        },
         "icon": {
           "name": "Icon",
           "description": "SF Symbol or MDI icon name (e.g. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
         },
         "playback_state": {
           "name": "Playback State",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+        },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
         },
         "icon": {
           "name": "Icon",
@@ -2093,7 +2181,9 @@
                 "sound": "Sound",
                 "update_interval": "Min. Update Interval (seconds)",
                 "state_labels": "State Labels",
-                "compact_label": "Island Label"
+                "compact_label": "Island Label",
+                "compact_trailing_label": "Island Trailing Label",
+                "compact_trailing_icon": "Island Trailing Icon"
               },
               "data_description": {
                 "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Sound played on every update for this entity. Leave empty to use no override.",
                 "update_interval": "Minimum seconds between updates. Rapid state changes are throttled.",
                 "state_labels": "Custom display text for states. One row per state: the state value and the label to show. Example: heating and Heating Up. A legacy state=Label, state2=Label 2 string is still accepted.",
-                "compact_label": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it. Leave empty to keep the template's own content."
+                "compact_label": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it. Leave empty to keep the template's own content.",
+                "compact_trailing_label": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Leave empty to keep the template's own content. Needs PushWard 1.19.1 or later.",
+                "compact_trailing_icon": "Icon shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. MDI icons (e.g. mdi:airplane-takeoff) and SF Symbols (e.g. airplane.departure) both work. Ignored when an island trailing label is set. Leave empty to keep the template's own content. Needs PushWard 1.19.1 or later."
               }
             },
             "colors": {

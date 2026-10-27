@@ -30,6 +30,7 @@ from custom_components.pushward.const import (
     DEFAULT_SERVER_URL,
     DOMAIN,
     IMAGE_THUMBHASH_MAX,
+    MAX_COMPACT_TRAILING_ICON_LEN,
     MAX_URL_LEN,
     SERVICE_TEMPLATES,
     SUBENTRY_TYPE_WIDGET,
@@ -1195,6 +1196,86 @@ async def test_update_activity_compact_label_over_cap_rejected(hass: HomeAssista
             DOMAIN,
             service,
             {"slug": "x", "state": "ongoing", "compact_label": "WASHX"},
+            blocking=True,
+        )
+    api.update_activity.assert_not_called()
+
+
+@pytest.mark.parametrize("service", [*(f"update_activity_{t}" for t in SERVICE_TEMPLATES), "update_activity"])
+async def test_update_activity_compact_trailing_fields_land_in_content(hass: HomeAssistant, service: str) -> None:
+    """Both trailing ear fields ride content on every template, the lean schema and the alias included."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        service,
+        {
+            "slug": "x",
+            "state": "ongoing",
+            "compact_label": "A359",
+            "compact_trailing_label": "TKOF",
+            "compact_trailing_icon": "mdi:airplane-takeoff",
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["compact_trailing_label"] == "TKOF"
+    assert content["compact_trailing_icon"] == "mdi:airplane-takeoff"
+
+
+@pytest.mark.parametrize(
+    "field, raw, sent",
+    [
+        ("compact_trailing_label", " GA ", "GA"),
+        ("compact_trailing_label", "TKOF ", "TKOF"),
+        ("compact_trailing_label", "   ", ""),
+        ("compact_trailing_icon", " airplane.departure ", "airplane.departure"),
+        ("compact_trailing_icon", "mdi:airplane-takeoff", "mdi:airplane-takeoff"),
+        ("compact_trailing_icon", "arrow.up_right:2-x", "arrow.up_right:2-x"),
+        ("compact_trailing_icon", "", ""),
+    ],
+)
+async def test_update_activity_compact_trailing_fields_trimmed_and_clearable(
+    hass: HomeAssistant, field: str, raw: str, sent: str
+) -> None:
+    """Trimmed before the cap; a blank value ships as "" so the ear goes back to the template default."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_steps",
+        {"slug": "x", "state": "ongoing", field: raw},
+        blocking=True,
+    )
+
+    assert api.update_activity.call_args[0][2][field] == sent
+
+
+@pytest.mark.parametrize("service", ["update_activity_generic", "update_activity_board", "update_activity"])
+@pytest.mark.parametrize(
+    "field, value",
+    [
+        pytest.param("compact_trailing_label", "TKOFF", id="label_over_cap"),
+        pytest.param("compact_trailing_icon", "i" * (MAX_COMPACT_TRAILING_ICON_LEN + 1), id="icon_over_cap"),
+        pytest.param("compact_trailing_icon", "mdi:air plane", id="icon_space"),
+        pytest.param("compact_trailing_icon", "&", id="icon_ampersand"),
+        pytest.param("compact_trailing_icon", "\U0001f6eb", id="icon_emoji"),
+    ],
+)
+async def test_update_activity_compact_trailing_over_cap_rejected(
+    hass: HomeAssistant, service: str, field: str, value: str
+) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.MultipleInvalid):
+        await hass.services.async_call(
+            DOMAIN,
+            service,
+            {"slug": "x", "state": "ongoing", field: value},
             blocking=True,
         )
     api.update_activity.assert_not_called()

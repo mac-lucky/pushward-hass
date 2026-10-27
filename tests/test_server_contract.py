@@ -17,6 +17,7 @@ from custom_components.pushward.const import (
     IMAGE_SHAPES,
     IMAGE_THUMBHASH_MAX,
     LOG_LINE_TEXT_MAX,
+    MAX_COMPACT_TRAILING_ICON_LEN,
     MAX_URL_LEN,
     MEDIA_POSITION_MAX_AGE,
 )
@@ -229,6 +230,14 @@ def test_valid_steps_weights_and_colors_pass() -> None:
     assert_valid_activity_content(_mut(valid_steps, step_weights=[1, 2.5, 1], step_colors=["green", "", "#ff0000"]))
 
 
+def test_valid_compact_trailing_fields_at_their_caps_pass() -> None:
+    """The plane-spotting steps card: leading type label, trailing glyph or a 4-char label, both at the cap."""
+    icon = "i" * MAX_COMPACT_TRAILING_ICON_LEN
+    assert_valid_activity_content(
+        _mut(valid_steps, compact_label="A359", compact_trailing_label="TKOF", compact_trailing_icon=icon)
+    )
+
+
 # --- activity: violations are rejected -------------------------------------
 
 _ACTIVITY_INVALID = [
@@ -312,6 +321,12 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_generic, progress=float("inf")), id="progress_not_finite"),
     pytest.param(lambda: _mut(valid_generic, subtitle="x" * 256), id="subtitle_too_long"),
     pytest.param(lambda: _mut(valid_generic, compact_label="WASHX"), id="compact_label_too_long"),
+    pytest.param(lambda: _mut(valid_generic, compact_trailing_label="TKOFF"), id="compact_trailing_label_too_long"),
+    pytest.param(
+        lambda: _mut(valid_steps, compact_trailing_icon="i" * (MAX_COMPACT_TRAILING_ICON_LEN + 1)),
+        id="compact_trailing_icon_too_long",
+    ),
+    pytest.param(lambda: _mut(valid_steps, compact_trailing_icon="mdi:air plane"), id="compact_trailing_icon_bad_char"),
     pytest.param(lambda: _mut(valid_generic, completion_message="x" * 1025), id="completion_message_too_long"),
     pytest.param(lambda: _mut(valid_generic, state=123), id="state_not_string"),
     pytest.param(lambda: _mut(valid_generic, accent_color=123), id="colour_not_string"),

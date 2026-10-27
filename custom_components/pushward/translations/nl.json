@@ -63,6 +63,14 @@
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
+        },
         "accent_color": {
           "name": "Accentkleur",
           "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
@@ -299,6 +307,14 @@
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
         },
         "icon": {
           "name": "Pictogram",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
         },
         "icon": {
           "name": "Pictogram",
@@ -775,6 +807,14 @@
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
         },
         "icon": {
           "name": "Pictogram",
@@ -1179,6 +1235,14 @@
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
         },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
+        },
         "icon": {
           "name": "Pictogram",
           "description": "SF Symbol- of MDI-pictogramnaam (bijv. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
         },
         "playback_state": {
           "name": "Afspeelstatus",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Island-label",
           "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+        },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
         },
         "icon": {
           "name": "Pictogram",
@@ -2093,7 +2181,9 @@
                 "sound": "Geluid",
                 "update_interval": "Min. bijwerkinterval (seconden)",
                 "state_labels": "Statuslabels",
-                "compact_label": "Island-label"
+                "compact_label": "Island-label",
+                "compact_trailing_label": "Achterste Island-label",
+                "compact_trailing_icon": "Achterste Island-pictogram"
               },
               "data_description": {
                 "slug": "Unieke identificator voor deze activiteit. Laat leeg om automatisch te genereren vanuit de entiteits-ID. Voorbeeld: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
                 "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
                 "state_labels": "Aangepaste weergavetekst voor statussen. Eén rij per status: de statuswaarde en het te tonen label. Voorbeeld: heating en Bezig met opwarmen. Een oude tekenreeks status=Label, status2=Label 2 wordt nog steeds geaccepteerd.",
-                "compact_label": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze. Laat leeg om de eigen inhoud van de sjabloon te behouden."
+                "compact_label": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze. Laat leeg om de eigen inhoud van de sjabloon te behouden.",
+                "compact_trailing_label": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Laat leeg om de eigen inhoud van de sjabloon te behouden. Vereist PushWard 1.19.1 of nieuwer.",
+                "compact_trailing_icon": "Pictogram dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. MDI-pictogrammen (bijv. mdi:airplane-takeoff) en SF Symbols (bijv. airplane.departure) werken allebei. Wordt genegeerd als een achterste Island-label is ingesteld. Laat leeg om de eigen inhoud van de sjabloon te behouden. Vereist PushWard 1.19.1 of nieuwer."
               }
             },
             "colors": {

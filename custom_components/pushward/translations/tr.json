@@ -63,6 +63,14 @@
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
+        },
         "accent_color": {
           "name": "Vurgu Rengi",
           "description": "Aktivite için vurgu rengi. Hex (#RRGGBB) veya adlandırılmış renk."
@@ -299,6 +307,14 @@
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
         },
         "icon": {
           "name": "Simge",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
         },
         "icon": {
           "name": "Simge",
@@ -775,6 +807,14 @@
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
         },
         "icon": {
           "name": "Simge",
@@ -1179,6 +1235,14 @@
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
         },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
+        },
         "icon": {
           "name": "Simge",
           "description": "SF Symbol veya MDI simge adı (örn. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
         },
         "playback_state": {
           "name": "Oynatma Durumu",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Island Etiketi",
           "description": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar."
+        },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
         },
         "icon": {
           "name": "Simge",
@@ -2093,7 +2181,9 @@
                 "sound": "Ses",
                 "update_interval": "Min. Güncelleme Aralığı (saniye)",
                 "state_labels": "Durum Etiketleri",
-                "compact_label": "Island Etiketi"
+                "compact_label": "Island Etiketi",
+                "compact_trailing_label": "Island Arka Etiketi",
+                "compact_trailing_icon": "Island Arka Simgesi"
               },
               "data_description": {
                 "slug": "Bu aktivite için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın. Örnek: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Bu güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın.",
                 "update_interval": "Güncellemeler arasındaki minimum saniye. Hızlı durum değişiklikleri kısıtlanır.",
                 "state_labels": "Durumlar için özel görüntü metni. Her durum için bir satır: durum değeri ve gösterilecek etiket. Örnek: heating ve Isınıyor. Eski durum=Etiket, durum2=Etiket 2 dizesi hâlâ kabul edilir.",
-                "compact_label": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar. Şablonun kendi içeriğini korumak için boş bırakın."
+                "compact_label": "Dynamic Island kompakt görünümünün ön kısmında şablonun varsayılan içeriği (simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını) yerine gösterilen en fazla 4 karakter. Minimal görünüm bunu yok sayar. Şablonun kendi içeriğini korumak için boş bırakın.",
+                "compact_trailing_label": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. Şablonun kendi içeriğini korumak için boş bırakın. PushWard 1.19.1 veya sonrası gerekir.",
+                "compact_trailing_icon": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen simge. MDI simgeleri (örn. mdi:airplane-takeoff) ve SF Symbols (örn. airplane.departure) ikisi de çalışır. Bir Island arka etiketi ayarlandığında yok sayılır. Şablonun kendi içeriğini korumak için boş bırakın. PushWard 1.19.1 veya sonrası gerekir."
               }
             },
             "colors": {

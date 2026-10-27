@@ -196,6 +196,8 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
 | State Labels | Rows giving custom display text per state (a state and its label, e.g. `on` shows `Running`) |
 | Island Label | Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it |
+| Island Trailing Label | Up to 4 characters for the compact trailing ear, in place of what that template shows there (the step counter, the timer). Wins over Island Trailing Icon when both are set. Needs PushWard 1.19.1 or later |
+| Island Trailing Icon | SF Symbol or `mdi:` icon for the same ear, tinted with the accent color. Needs PushWard 1.19.1 or later; the minimal presentation ignores both trailing fields |
 | Completion Message | Text shown at end (default: "Complete") |
 | Accent / Background / Text Color (+ Attribute) | Static hex / named color, or an entity attribute |
 | URL / Secondary URL | Deep-link URLs, http/https (steps/alert templates) |
@@ -555,6 +557,8 @@ implied by the action name; you no longer pass a `template` field.
 | `state_text` | No | Display text |
 | `subtitle` | No | Subtitle text |
 | `compact_label` | No | Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it |
+| `compact_trailing_label` | No | Up to 4 characters for the compact trailing ear, in place of what that template shows there (the step counter, the timer, a value). Wins over `compact_trailing_icon` |
+| `compact_trailing_icon` | No | SF Symbol or `mdi:` icon for the trailing ear, tinted with `accent_color`. The name may use letters, digits, '.', '-', '_' and ':' (max 128 chars) |
 | `icon` | No | SF Symbol or MDI icon |
 | `progress` | No | 0.0-1.0 |
 | `completion_message` | No | End display message |
@@ -576,6 +580,23 @@ implied by the action name; you no longer pass a `template` field.
 > silent HTTP webhook and are only valid on an `http(s)` URL. The legacy `url`/`secondary_url`
 > strings remain as a shorthand for a plain tap target.
 
+> **The trailing ear.** `compact_trailing_label` and `compact_trailing_icon` work on every
+> template, and `""` puts the template's own content back. They need PushWard 1.19.1 or later
+> on the phone; older builds ignore them. A Steps card following a plane overhead, with the
+> aircraft type on the left and the kind of flight on the right instead of `2/2`:
+>
+> ```yaml
+> - action: pushward.update_activity_steps
+>   data:
+>     slug: overhead-flight
+>     state: ongoing
+>     state_text: Airborne
+>     total_steps: 2
+>     current_step: 2
+>     compact_label: "A359"
+>     compact_trailing_icon: "mdi:airplane-takeoff"
+> ```
+
 **Template-specific fields** added by the matching action:
 
 | Action | Extra fields |
@@ -593,7 +614,8 @@ implied by the action name; you no longer pass a `template` field.
 
 > **`board` / `log` / `media` / `approval` use a lean schema.** They render no progress bar and no
 > whole-activity button slots, so `update_activity_board`, `update_activity_log`,
-> `update_activity_media` and `update_activity_approval` accept only the labels (`state_text`, `subtitle`, `compact_label`, `icon`), appearance
+> `update_activity_media` and `update_activity_approval` accept only the labels (`state_text`,
+> `subtitle`, `compact_label`, `compact_trailing_label`, `compact_trailing_icon`, `icon`), appearance
 > (`completion_message`, the colors, `sound`, `priority`, the TTLs
 > `ended_ttl`/`stale_ttl`/`dismissal_ttl`), the whole-activity `tap_action`, and their template
 > fields (`tiles` / `lines` / the media fields / the approval fields), **not** `progress`,

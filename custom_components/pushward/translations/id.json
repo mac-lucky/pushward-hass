@@ -63,6 +63,14 @@
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
         "accent_color": {
           "name": "Warna Aksen",
           "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
@@ -299,6 +307,14 @@
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
         },
         "icon": {
           "name": "Ikon",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
         },
         "icon": {
           "name": "Ikon",
@@ -775,6 +807,14 @@
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
         },
         "icon": {
           "name": "Ikon",
@@ -1179,6 +1235,14 @@
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
         },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
         "icon": {
           "name": "Ikon",
           "description": "Nama ikon SF Symbol atau MDI (misalnya list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
         },
         "playback_state": {
           "name": "Status Pemutaran",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Label Island",
           "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+        },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
         },
         "icon": {
           "name": "Ikon",
@@ -2093,7 +2181,9 @@
                 "sound": "Suara",
                 "update_interval": "Interval Pembaruan Min. (detik)",
                 "state_labels": "Label Status",
-                "compact_label": "Label Island"
+                "compact_label": "Label Island",
+                "compact_trailing_label": "Label Island Belakang",
+                "compact_trailing_icon": "Ikon Island Belakang"
               },
               "data_description": {
                 "slug": "Identifikasi unik untuk aktivitas ini. Kosongkan untuk dibuat otomatis dari ID entitas. Contoh: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
                 "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
                 "state_labels": "Teks tampilan kustom untuk status. Satu baris per status: nilai status dan label yang ditampilkan. Contoh: heating dan Sedang Memanaskan. String lama state=Label, state2=Label 2 masih diterima.",
-                "compact_label": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya. Kosongkan untuk mempertahankan konten templat itu sendiri."
+                "compact_label": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya. Kosongkan untuk mempertahankan konten templat itu sendiri.",
+                "compact_trailing_label": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Kosongkan untuk mempertahankan konten templat itu sendiri. Memerlukan PushWard 1.19.1 atau yang lebih baru.",
+                "compact_trailing_icon": "Ikon yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Ikon MDI (misalnya mdi:airplane-takeoff) dan SF Symbols (misalnya airplane.departure) sama-sama didukung. Diabaikan jika label Island belakang diatur. Kosongkan untuk mempertahankan konten templat itu sendiri. Memerlukan PushWard 1.19.1 atau yang lebih baru."
               }
             },
             "colors": {

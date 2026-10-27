@@ -63,6 +63,14 @@
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
         },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
         "accent_color": {
           "name": "Couleur d'accentuation",
           "description": "Couleur d'accentuation de la Live Activity. Hexadécimal (#RRGGBB) ou couleur nommée."
@@ -299,6 +307,14 @@
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
         },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
         "icon": {
           "name": "Icône",
           "description": "Nom d'icône SF Symbol ou MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
+        },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
         },
         "icon": {
           "name": "Icône",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
+        },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
         },
         "icon": {
           "name": "Icône",
@@ -775,6 +807,14 @@
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
         },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
         "icon": {
           "name": "Icône",
           "description": "Nom d'icône SF Symbol ou MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
         },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
         "icon": {
           "name": "Icône",
           "description": "Nom d'icône SF Symbol ou MDI (ex. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
+        },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
         },
         "icon": {
           "name": "Icône",
@@ -1179,6 +1235,14 @@
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
         },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
         "icon": {
           "name": "Icône",
           "description": "Nom d'icône SF Symbol ou MDI (ex. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
         },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
         "icon": {
           "name": "Icône",
           "description": "Nom d'icône SF Symbol ou MDI (ex. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
+        },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
         },
         "playback_state": {
           "name": "État de lecture",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Libellé de l'Island",
           "description": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore."
+        },
+        "compact_trailing_label": {
+          "name": "Libellé arrière de l'Island",
+          "description": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Nécessite PushWard 1.19.1 ou ultérieur."
+        },
+        "compact_trailing_icon": {
+          "name": "Icône arrière de l'Island",
+          "description": "Icône SF Symbol ou MDI (ex. airplane.departure, mdi:airplane-takeoff) affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Ignorée lorsqu'un libellé arrière de l'Island est défini. Nécessite PushWard 1.19.1 ou ultérieur."
         },
         "icon": {
           "name": "Icône",
@@ -2093,7 +2181,9 @@
                 "sound": "Son",
                 "update_interval": "Intervalle min. de mise à jour (secondes)",
                 "state_labels": "Libellés d'états",
-                "compact_label": "Libellé de l'Island"
+                "compact_label": "Libellé de l'Island",
+                "compact_trailing_label": "Libellé arrière de l'Island",
+                "compact_trailing_icon": "Icône arrière de l'Island"
               },
               "data_description": {
                 "slug": "Identifiant unique pour cette Live Activity. Laisser vide pour générer automatiquement à partir de l'ID de l'entité. Exemple : ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Son joué à chaque mise à jour pour cette entité. Laisser vide pour ne pas forcer de son.",
                 "update_interval": "Nombre minimal de secondes entre les mises à jour. Les changements d'état rapides sont limités.",
                 "state_labels": "Texte d'affichage personnalisé pour les états. Une ligne par état : la valeur de l'état et le libellé à afficher. Exemple : heating et Chauffage. Une ancienne chaîne état=Libellé, état2=Libellé 2 est toujours acceptée.",
-                "compact_label": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore. Laisser vide pour conserver le contenu propre au modèle."
+                "compact_label": "Jusqu'à 4 caractères affichés dans la partie avant de la vue compacte de la Dynamic Island à la place du contenu par défaut du modèle (l'icône, l'anneau des étapes ou la pile haut/bas de la chronologie). La présentation minimale l'ignore. Laisser vide pour conserver le contenu propre au modèle.",
+                "compact_trailing_label": "Jusqu'à 4 caractères affichés dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, comme le compteur d'étapes ou le minuteur. Prioritaire sur l'icône arrière quand les deux sont définis. La présentation minimale l'ignore. Laisser vide pour conserver le contenu propre au modèle. Nécessite PushWard 1.19.1 ou ultérieur.",
+                "compact_trailing_icon": "Icône affichée dans la partie arrière de la vue compacte de la Dynamic Island à la place de ce que le modèle y affiche, teintée de la couleur d'accentuation. Les icônes MDI (ex. mdi:airplane-takeoff) comme les SF Symbols (ex. airplane.departure) fonctionnent. Ignorée lorsqu'un libellé arrière de l'Island est défini. Laisser vide pour conserver le contenu propre au modèle. Nécessite PushWard 1.19.1 ou ultérieur."
               }
             },
             "colors": {

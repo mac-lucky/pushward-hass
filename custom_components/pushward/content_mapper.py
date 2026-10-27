@@ -38,6 +38,7 @@ from .const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    COMPACT_TRAILING_ICON_PATTERN,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ALARM,
@@ -47,6 +48,8 @@ from .const import (
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_COMPACT_LABEL,
+    CONF_COMPACT_TRAILING_ICON,
+    CONF_COMPACT_TRAILING_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -122,6 +125,8 @@ from .const import (
     LOG_LEVELS,
     LOG_LINE_TEXT_MAX,
     MAX_COMPACT_LABEL_LEN,
+    MAX_COMPACT_TRAILING_ICON_LEN,
+    MAX_COMPACT_TRAILING_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_ICON_LEN,
     MEDIA_DURATION_MAX,
@@ -899,6 +904,32 @@ def _apply_steps_live_progress(
     content["end_date"] = end
 
 
+# Dynamic Island compact ear overrides: (option key, wire key, cap).
+_COMPACT_EAR_FIELDS = (
+    (CONF_COMPACT_LABEL, "compact_label", MAX_COMPACT_LABEL_LEN),
+    (CONF_COMPACT_TRAILING_LABEL, "compact_trailing_label", MAX_COMPACT_TRAILING_LABEL_LEN),
+    (CONF_COMPACT_TRAILING_ICON, "compact_trailing_icon", MAX_COMPACT_TRAILING_ICON_LEN),
+)
+_COMPACT_TRAILING_ICON_RE = re.compile(COMPACT_TRAILING_ICON_PATTERN)
+
+
+def _add_compact_ear_fields(content: dict, entity_config: dict) -> None:
+    """Copy the island ear overrides into content, trimmed and capped.
+
+    Sent whenever the option exists, "" included: the server merge-patches content
+    and keeps an absent key, so clearing a label or icon in the flow must ship "".
+    """
+    for key, wire_key, cap in _COMPACT_EAR_FIELDS:
+        if key in entity_config:
+            content[wire_key] = entity_config[key].strip()[:cap]
+    # The flow's icon picker takes free text, and the server 422s a name outside
+    # [A-Za-z0-9._:-]. Send "" instead so the ear keeps the template default and the
+    # rest of the push still lands.
+    icon = content.get("compact_trailing_icon")
+    if icon and not _COMPACT_TRAILING_ICON_RE.match(icon):
+        content["compact_trailing_icon"] = ""
+
+
 def map_content(
     state: State,
     entity_config: dict,
@@ -941,10 +972,7 @@ def map_content(
         "accent_color": accent,
     }
 
-    # Sent whenever the option exists, "" included: the server merge-patches content
-    # and keeps an absent key, so clearing the label in the flow must ship "".
-    if CONF_COMPACT_LABEL in entity_config:
-        content["compact_label"] = entity_config[CONF_COMPACT_LABEL].strip()[:MAX_COMPACT_LABEL_LEN]
+    _add_compact_ear_fields(content, entity_config)
     if background_color:
         content["background_color"] = background_color
     if text_color:
@@ -1084,9 +1112,8 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         "subtitle": last_content.get("subtitle", "") if last_content else "",
         "accent_color": "green",
     }
-    # The island is still up during the completion frame, so the label stays too.
-    if CONF_COMPACT_LABEL in entity_config:
-        content["compact_label"] = entity_config[CONF_COMPACT_LABEL].strip()[:MAX_COMPACT_LABEL_LEN]
+    # The island is still up during the completion frame, so the ear overrides stay too.
+    _add_compact_ear_fields(content, entity_config)
 
     _add_activity_actions(content, entity_config)
 

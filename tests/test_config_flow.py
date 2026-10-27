@@ -56,6 +56,8 @@ from custom_components.pushward.const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
     CONF_COMPACT_LABEL,
+    CONF_COMPACT_TRAILING_ICON,
+    CONF_COMPACT_TRAILING_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -157,6 +159,7 @@ from custom_components.pushward.const import (
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
     MAX_COMPACT_LABEL_LEN,
+    MAX_COMPACT_TRAILING_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_URL_LEN,
     SUBENTRY_TYPE_ENTITY,
@@ -187,6 +190,7 @@ from custom_components.pushward.const import (
     WIDGET_TRIGGER_POLL,
     validate_url,
 )
+from custom_components.pushward.content_mapper import map_content
 
 from .conftest import (
     IMAGE_THUMBHASH,
@@ -3390,6 +3394,114 @@ async def test_compact_label_is_stripped(hass: HomeAssistant) -> None:
         hass, entry, core_overrides={CONF_ENTITY_ID: "sensor.other"}, details_overrides={CONF_COMPACT_LABEL: "ABCD "}
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
+
+
+async def test_compact_trailing_label_over_cap_rejected(hass: HomeAssistant) -> None:
+    """The trailing ear label has the same 4-character cap as the leading one."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_core_input(**{CONF_TEMPLATE: "steps"}),
+    )
+    assert result["step_id"] == "details"
+
+    with pytest.raises(InvalidData):
+        await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input=_mock_details_input(
+                "steps", **{CONF_COMPACT_TRAILING_LABEL: "x" * (MAX_COMPACT_TRAILING_LABEL_LEN + 1)}
+            ),
+        )
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_mock_details_input(
+            "steps", **{CONF_COMPACT_TRAILING_LABEL: "TKOF", CONF_COMPACT_TRAILING_ICON: "mdi:airplane-takeoff"}
+        ),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    assert data[CONF_COMPACT_TRAILING_LABEL] == "TKOF"
+    assert data[CONF_COMPACT_TRAILING_ICON] == "mdi:airplane-takeoff"
+
+
+async def test_compact_trailing_label_is_stripped(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_COMPACT_TRAILING_LABEL: " GA "})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    assert data[CONF_COMPACT_TRAILING_LABEL] == "GA"
+    # an icon the user never picked is stored empty, so the mapper ships "" and the ear keeps its default
+    assert data[CONF_COMPACT_TRAILING_ICON] == ""
+
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        core_overrides={CONF_ENTITY_ID: "sensor.other"},
+        details_overrides={CONF_COMPACT_TRAILING_LABEL: "TKOF "},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    other = next(sub.data for sub in entry.subentries.values() if sub.data[CONF_ENTITY_ID] == "sensor.other")
+    assert other[CONF_COMPACT_TRAILING_LABEL] == "TKOF"
+
+
+async def test_reconfigure_clearing_island_labels_saves_empty(hass: HomeAssistant) -> None:
+    """A label cleared in the reconfigure form is stored and shipped as "", not re-filled.
+
+    The frontend drops a cleared optional string from the submission, like an emptied
+    attribute selector, so a vol.Optional default would bring the saved label back.
+    """
+    entry = _mock_entry(subentries_data=[_entity_subentry_data(compact_trailing_label="TKOF")])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+    assert entry.subentries[subentry_id].data[CONF_COMPACT_TRAILING_LABEL] == "TKOF"
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=_mock_core_input())
+    assert result["step_id"] == "details"
+
+    details = _mock_details_input("generic")
+    _omit_fields(details, CONF_COMPACT_TRAILING_LABEL)
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=details)
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+
+    data = entry.subentries[subentry_id].data
+    assert data[CONF_COMPACT_TRAILING_LABEL] == ""
+    content = map_content(make_mock_state("on", {"friendly_name": "Washer"}), dict(data))
+    assert content["compact_trailing_label"] == ""
+
+
+async def test_reconfigure_config_saved_before_the_trailing_fields(hass: HomeAssistant) -> None:
+    """A subentry from an older release has neither trailing key; it reconfigures and stores "" for both."""
+    old = _entity_subentry_data()
+    del old["data"][CONF_COMPACT_TRAILING_LABEL]
+    del old["data"][CONF_COMPACT_TRAILING_ICON]
+    entry = _mock_entry(subentries_data=[old])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=_mock_core_input())
+    assert result["step_id"] == "details"
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_details_input("generic")
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+
+    data = entry.subentries[subentry_id].data
+    assert data[CONF_COMPACT_TRAILING_LABEL] == ""
+    assert data[CONF_COMPACT_TRAILING_ICON] == ""
 
 
 # --- NumberSelector fields stored as int ---

@@ -57,6 +57,8 @@ from .const import (
     CONF_BATTERY_DEVICES,
     CONF_CHARGING_ENTITY,
     CONF_COMPACT_LABEL,
+    CONF_COMPACT_TRAILING_ICON,
+    CONF_COMPACT_TRAILING_LABEL,
     CONF_COMPLETION_MESSAGE,
     CONF_CURRENT_STEP_ATTR,
     CONF_CURRENT_STEP_ENTITY,
@@ -202,6 +204,7 @@ from .const import (
     LOG_COLUMN_LABEL_MAX,
     LOG_MAX_COLUMNS,
     MAX_COMPACT_LABEL_LEN,
+    MAX_COMPACT_TRAILING_LABEL_LEN,
     MAX_LONG_TEXT_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_SLUG_LEN,
@@ -617,6 +620,8 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_UPDATE_INTERVAL,
         CONF_STATE_LABELS,
         CONF_COMPACT_LABEL,
+        CONF_COMPACT_TRAILING_LABEL,
+        CONF_COMPACT_TRAILING_ICON,
     ),
     "colors": (
         CONF_ACCENT_COLOR,
@@ -1329,6 +1334,15 @@ def _details_schema(
             default=d.get(CONF_COMPACT_LABEL, ""),
         )
     ] = vol.All(str, _TrimmedLength(max=MAX_COMPACT_LABEL_LEN))
+    # suggested_value, not default: the frontend drops a cleared optional string, and a
+    # default would put the saved label straight back on reconfigure.
+    fields[
+        vol.Optional(
+            CONF_COMPACT_TRAILING_LABEL,
+            description={"suggested_value": d.get(CONF_COMPACT_TRAILING_LABEL, "")},
+        )
+    ] = vol.All(str, _TrimmedLength(max=MAX_COMPACT_TRAILING_LABEL_LEN))
+    fields[_attr_suggest_key(CONF_COMPACT_TRAILING_ICON, d)] = IconSelector(IconSelectorConfig())
     if template == "countdown":
         fields[
             vol.Optional(
@@ -2030,6 +2044,8 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_STATE_LABELS: _kv_rows_to_map(user_input.get(CONF_STATE_LABELS, ""), "state", CONF_LABEL),
         CONF_COMPLETION_MESSAGE: user_input.get(CONF_COMPLETION_MESSAGE, ""),
         CONF_COMPACT_LABEL: user_input.get(CONF_COMPACT_LABEL, ""),
+        CONF_COMPACT_TRAILING_LABEL: user_input.get(CONF_COMPACT_TRAILING_LABEL, ""),
+        CONF_COMPACT_TRAILING_ICON: user_input.get(CONF_COMPACT_TRAILING_ICON, ""),
         CONF_TOTAL_STEPS: int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS)),
         CONF_CURRENT_STEP_ATTR: user_input.get(CONF_CURRENT_STEP_ATTR, ""),
         CONF_CURRENT_STEP_ENTITY: user_input.get(CONF_CURRENT_STEP_ENTITY, ""),

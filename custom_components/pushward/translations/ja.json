@@ -63,6 +63,14 @@
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
+        },
         "accent_color": {
           "name": "アクセントカラー",
           "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
@@ -299,6 +307,14 @@
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
         },
         "icon": {
           "name": "アイコン",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
         },
         "icon": {
           "name": "アイコン",
@@ -775,6 +807,14 @@
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
@@ -911,6 +951,14 @@
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: arrow.down.circle.fill, mdi:download）。"
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
         },
         "icon": {
           "name": "アイコン",
@@ -1179,6 +1235,14 @@
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: square.grid.2x2.fill, mdi:view-dashboard）。"
@@ -1257,6 +1321,14 @@
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
         },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
+        },
         "icon": {
           "name": "アイコン",
           "description": "SF Symbol またはMDIアイコン名（例: list.bullet.rectangle, mdi:format-list-bulleted）。"
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
         },
         "playback_state": {
           "name": "再生状態",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Islandラベル",
           "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+        },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
         },
         "icon": {
           "name": "アイコン",
@@ -2093,7 +2181,9 @@
                 "sound": "サウンド",
                 "update_interval": "最小更新間隔（秒）",
                 "state_labels": "状態ラベル",
-                "compact_label": "Islandラベル"
+                "compact_label": "Islandラベル",
+                "compact_trailing_label": "Island末尾ラベル",
+                "compact_trailing_icon": "Island末尾アイコン"
               },
               "data_description": {
                 "slug": "このアクティビティの一意の識別子。空白のままにするとエンティティIDから自動生成されます。例: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
                 "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
                 "state_labels": "状態のカスタム表示テキスト。状態ごとに1行: 状態の値と表示するラベル。例: heating と 加熱中。従来の state=Label, state2=Label 2 文字列も引き続き使用できます。",
-                "compact_label": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。空のままにするとテンプレート本来の内容が表示されます。"
+                "compact_label": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。空のままにするとテンプレート本来の内容が表示されます。",
+                "compact_trailing_label": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。空のままにするとテンプレート本来の内容が表示されます。PushWard 1.19.1 以降が必要です。",
+                "compact_trailing_icon": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示されるアイコン。MDIアイコン（例: mdi:airplane-takeoff）とSF Symbols（例: airplane.departure）のどちらも使えます。Island末尾ラベルが設定されている場合は無視されます。空のままにするとテンプレート本来の内容が表示されます。PushWard 1.19.1 以降が必要です。"
               }
             },
             "colors": {

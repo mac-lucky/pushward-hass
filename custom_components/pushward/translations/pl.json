@@ -63,6 +63,14 @@
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
+        },
         "accent_color": {
           "name": "Kolor akcentu",
           "description": "Kolor akcentu dla Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
@@ -299,6 +307,14 @@
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
         },
         "icon": {
           "name": "Ikona",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
         },
         "icon": {
           "name": "Ikona",
@@ -775,6 +807,14 @@
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
         },
         "icon": {
           "name": "Ikona",
@@ -1179,6 +1235,14 @@
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
         },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
+        },
         "icon": {
           "name": "Ikona",
           "description": "Nazwa ikony SF Symbol lub MDI (np. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
         },
         "playback_state": {
           "name": "Stan odtwarzania",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Etykieta Island",
           "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+        },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
         },
         "icon": {
           "name": "Ikona",
@@ -2093,7 +2181,9 @@
                 "sound": "Dźwięk",
                 "update_interval": "Min. interwał aktualizacji (sekundy)",
                 "state_labels": "Etykiety stanów",
-                "compact_label": "Etykieta Island"
+                "compact_label": "Etykieta Island",
+                "compact_trailing_label": "Tylna etykieta Island",
+                "compact_trailing_icon": "Tylna ikona Island"
               },
               "data_description": {
                 "slug": "Unikalny identyfikator dla tego Live Activity. Pozostaw puste, aby wygenerować automatycznie z ID encji. Przykład: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Dźwięk odtwarzany przy każdej aktualizacji dla tej encji. Pozostaw puste, aby nie używać żadnego nadpisania.",
                 "update_interval": "Minimalna liczba sekund między aktualizacjami. Szybkie zmiany stanu są ograniczane.",
                 "state_labels": "Własny tekst wyświetlany dla stanów. Jeden wiersz na stan: wartość stanu i etykieta do wyświetlenia. Przykład: heating i Nagrzewanie. Stary ciąg stan=Etykieta, stan2=Etykieta 2 jest nadal akceptowany.",
-                "compact_label": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje. Pozostaw puste, aby zachować własną zawartość szablonu."
+                "compact_label": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje. Pozostaw puste, aby zachować własną zawartość szablonu.",
+                "compact_trailing_label": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Pozostaw puste, aby zachować własną zawartość szablonu. Wymaga PushWard 1.19.1 lub nowszego.",
+                "compact_trailing_icon": "Ikona wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Działają zarówno ikony MDI (np. mdi:airplane-takeoff), jak i SF Symbols (np. airplane.departure). Ignorowana, gdy ustawiono tylną etykietę Island. Pozostaw puste, aby zachować własną zawartość szablonu. Wymaga PushWard 1.19.1 lub nowszego."
               }
             },
             "colors": {

@@ -63,6 +63,14 @@
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
         },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
         "accent_color": {
           "name": "Accent na Kulay",
           "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
@@ -299,6 +307,14 @@
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
         },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
         "icon": {
           "name": "Icon",
           "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
@@ -446,6 +462,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+        },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
         },
         "icon": {
           "name": "Icon",
@@ -602,6 +626,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+        },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
         },
         "icon": {
           "name": "Icon",
@@ -775,6 +807,14 @@
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
         },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
         "icon": {
           "name": "Icon",
           "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
@@ -911,6 +951,14 @@
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
         },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
         "icon": {
           "name": "Icon",
           "description": "Pangalan ng SF Symbol o MDI icon (hal. arrow.down.circle.fill, mdi:download)."
@@ -1030,6 +1078,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+        },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
         },
         "icon": {
           "name": "Icon",
@@ -1179,6 +1235,14 @@
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
         },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
         "icon": {
           "name": "Icon",
           "description": "Pangalan ng SF Symbol o MDI icon (hal. square.grid.2x2.fill, mdi:view-dashboard)."
@@ -1257,6 +1321,14 @@
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
         },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
         "icon": {
           "name": "Icon",
           "description": "Pangalan ng SF Symbol o MDI icon (hal. list.bullet.rectangle, mdi:format-list-bulleted)."
@@ -1330,6 +1402,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+        },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
         },
         "playback_state": {
           "name": "Estado ng Playback",
@@ -1468,6 +1548,14 @@
         "compact_label": {
           "name": "Island Label",
           "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+        },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
         },
         "icon": {
           "name": "Icon",
@@ -2093,7 +2181,9 @@
                 "sound": "Tunog",
                 "update_interval": "Pinakamababang Agwat ng Update (segundo)",
                 "state_labels": "Mga Label ng Estado",
-                "compact_label": "Island Label"
+                "compact_label": "Island Label",
+                "compact_trailing_label": "Likurang Island Label",
+                "compact_trailing_icon": "Likurang Island Icon"
               },
               "data_description": {
                 "slug": "Natatanging identifier para sa activity na ito. Iwanan itong blangko para awtomatikong buuin mula sa entity ID. Halimbawa: ha-living-room-lamp",
@@ -2104,7 +2194,9 @@
                 "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
                 "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
                 "state_labels": "Custom na display na teksto para sa mga estado. Isang hilera bawat estado: ang halaga ng estado at ang label na ipapakita. Halimbawa: heating at Nagpapainit. Tinatanggap pa rin ang lumang state=Label, state2=Label 2 na string.",
-                "compact_label": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon. Iwanang blangko para panatilihin ang sariling nilalaman ng template."
+                "compact_label": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon. Iwanang blangko para panatilihin ang sariling nilalaman ng template.",
+                "compact_trailing_label": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Iwanang blangko para panatilihin ang sariling nilalaman ng template. Kailangan ang PushWard 1.19.1 o mas bago.",
+                "compact_trailing_icon": "Icon na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Gumagana ang parehong MDI icon (hal. mdi:airplane-takeoff) at SF Symbols (hal. airplane.departure). Binabalewala ito kapag may nakatakdang likurang Island label. Iwanang blangko para panatilihin ang sariling nilalaman ng template. Kailangan ang PushWard 1.19.1 o mas bago."
               }
             },
             "colors": {

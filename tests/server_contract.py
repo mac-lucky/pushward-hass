@@ -64,6 +64,8 @@ from custom_components.pushward.const import (
     LOG_LINE_TEXT_MAX,
     LOG_MAX_LINES,
     MAX_COMPACT_LABEL_LEN,
+    MAX_COMPACT_TRAILING_ICON_LEN,
+    MAX_COMPACT_TRAILING_LABEL_LEN,
     MAX_LONG_TEXT_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_ICON_LEN,
@@ -145,6 +147,9 @@ MAX_TIMELINE_SERIES = TIMELINE_MAX_SERIES
 # minutes into the future to tolerate clock skew.
 MAX_FUTURE_OFFSET = 5 * 365 * 24 * 3600 + 30 * 3600
 MAX_CLOCK_SKEW = 5 * 60
+# The server's charset for compact_trailing_icon, restated rather than imported
+# so a wrong pattern in const.py cannot pass its own check.
+_ICON_NAME_CHARS = re.compile(r"[A-Za-z0-9._:-]+")
 
 # Restated rather than imported from const.py: this module deliberately re-states
 # the public REST contract from the outside, not the integration's own view of it.
@@ -279,6 +284,11 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     _check_len(content.get("state"), MAX_TEXT_LEN, "state", where)
     _check_len(content.get("subtitle"), MAX_TEXT_LEN, "subtitle", where)
     _check_len(content.get("compact_label"), MAX_COMPACT_LABEL_LEN, "compact_label", where)
+    _check_len(content.get("compact_trailing_label"), MAX_COMPACT_TRAILING_LABEL_LEN, "compact_trailing_label", where)
+    _check_len(content.get("compact_trailing_icon"), MAX_COMPACT_TRAILING_ICON_LEN, "compact_trailing_icon", where)
+    trailing_icon = content.get("compact_trailing_icon")
+    if trailing_icon and not _ICON_NAME_CHARS.fullmatch(trailing_icon):
+        _fail(where, f"compact_trailing_icon may use only [A-Za-z0-9._:-], got {trailing_icon!r}")
     _check_len(content.get("completion_message"), MAX_LONG_TEXT_LEN, "completion_message", where)
     _check_len(content.get("icon"), ICON_MAX, "icon", where)
 
