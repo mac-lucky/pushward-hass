@@ -3459,9 +3459,10 @@ async def test_reconfigure_clearing_island_labels_saves_empty(hass: HomeAssistan
     The frontend drops a cleared optional string from the submission, like an emptied
     attribute selector, so a vol.Optional default would bring the saved label back.
     """
-    entry = _mock_entry(subentries_data=[_entity_subentry_data(compact_trailing_label="TKOF")])
+    entry = _mock_entry(subentries_data=[_entity_subentry_data(compact_label="A359", compact_trailing_label="TKOF")])
     entry.add_to_hass(hass)
     subentry_id = next(iter(entry.subentries))
+    assert entry.subentries[subentry_id].data[CONF_COMPACT_LABEL] == "A359"
     assert entry.subentries[subentry_id].data[CONF_COMPACT_TRAILING_LABEL] == "TKOF"
 
     result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
@@ -3469,14 +3470,16 @@ async def test_reconfigure_clearing_island_labels_saves_empty(hass: HomeAssistan
     assert result["step_id"] == "details"
 
     details = _mock_details_input("generic")
-    _omit_fields(details, CONF_COMPACT_TRAILING_LABEL)
+    _omit_fields(details, CONF_COMPACT_LABEL, CONF_COMPACT_TRAILING_LABEL)
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=details)
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
 
     data = entry.subentries[subentry_id].data
+    assert data[CONF_COMPACT_LABEL] == ""
     assert data[CONF_COMPACT_TRAILING_LABEL] == ""
     content = map_content(make_mock_state("on", {"friendly_name": "Washer"}), dict(data))
+    assert content["compact_label"] == ""
     assert content["compact_trailing_label"] == ""
 
 

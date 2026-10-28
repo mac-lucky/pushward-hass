@@ -1328,14 +1328,14 @@ def _details_schema(
     # Custom display text per state (a two-column row editor: state -> label). A
     # legacy 'state=Label, ...' string is still accepted by _parse_entity_input.
     fields[_object_rows_key(CONF_STATE_LABELS, d, required=False)] = _STATE_LABELS_SELECTOR
+    # The island labels use suggested_value, not default: the frontend drops a cleared
+    # optional string, and a default would put the saved label straight back on reconfigure.
     fields[
         vol.Optional(
             CONF_COMPACT_LABEL,
-            default=d.get(CONF_COMPACT_LABEL, ""),
+            description={"suggested_value": d.get(CONF_COMPACT_LABEL, "")},
         )
     ] = vol.All(str, _TrimmedLength(max=MAX_COMPACT_LABEL_LEN))
-    # suggested_value, not default: the frontend drops a cleared optional string, and a
-    # default would put the saved label straight back on reconfigure.
     fields[
         vol.Optional(
             CONF_COMPACT_TRAILING_LABEL,
