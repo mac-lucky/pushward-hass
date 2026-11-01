@@ -544,7 +544,7 @@ The message goes out like a `pushward.send_notification` with only a title and b
 
 ## Services
 
-All services live in the `pushward` domain. There are 23 in total: the thirteen described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
+All services live in the `pushward` domain. There are 24 in total: the fourteen described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
 
 ### Choosing the account
 
