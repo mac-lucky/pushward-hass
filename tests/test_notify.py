@@ -80,7 +80,9 @@ async def test_send_message_sends_a_notification(hass: HomeAssistant) -> None:
     entity_id = _notify_entity_id(hass, entry)
     await _send(hass, entity_id, message="The front door was opened.", title="Front door")
 
-    api.create_notification.assert_awaited_once_with(title="Front door", body="The front door was opened.")
+    api.create_notification.assert_awaited_once_with(
+        title="Front door", body="The front door was opened.", trim_to_fit=True
+    )
     # The entity's state is the time of the last message.
     assert hass.states.get(entity_id).state not in ("unknown", "unavailable")
 
@@ -97,7 +99,7 @@ async def test_send_message_without_a_title_uses_the_location_name(hass: HomeAss
         data["title"] = title
     await _send(hass, _notify_entity_id(hass, entry), **data)
 
-    api.create_notification.assert_awaited_once_with(title="Lake House", body="Leak under the sink")
+    api.create_notification.assert_awaited_once_with(title="Lake House", body="Leak under the sink", trim_to_fit=True)
 
 
 async def test_send_message_without_a_location_name_falls_back(hass: HomeAssistant) -> None:
@@ -134,8 +136,8 @@ async def test_send_message_at_quota_raises_a_validation_error(hass: HomeAssista
         await _send(hass, _notify_entity_id(hass, entry), message="Hi")
 
 
-async def test_send_message_is_sealed_when_the_entry_has_an_e2e_key(hass: HomeAssistant) -> None:
-    """The real client path: the entry's key seals title and body, nothing else carries them."""
+async def _send_sealed(hass: HomeAssistant, **data) -> dict:
+    """Send through the real client on an entry with an e2e key; return the request body."""
     session = make_mock_session(make_mock_response(201, json_body={"id": 7}))
     entry = _entry(options={CONF_E2E_KEY: _E2E_KEY.hex()})
     entry.add_to_hass(hass)
@@ -146,12 +148,30 @@ async def test_send_message_is_sealed_when_the_entry_has_an_e2e_key(hass: HomeAs
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-        await _send(hass, _notify_entity_id(hass, entry), message="Opened", title="Door")
+        await _send(hass, _notify_entity_id(hass, entry), **data)
 
     method, url = session.request.call_args.args[:2]
     assert method == "POST"
     assert url.endswith("/notifications")
     body = session.request.call_args.kwargs["json"]
     assert_valid_notification_request(body)
+    return body
+
+
+async def test_send_message_is_sealed_when_the_entry_has_an_e2e_key(hass: HomeAssistant) -> None:
+    """The real client path: the entry's key seals title and body, nothing else carries them."""
+    body = await _send_sealed(hass, message="Opened", title="Door")
+
     assert set(body) == {"encrypted", "push"}
     assert open_envelope(_E2E_KEY, body["encrypted"]) == {"title": "Door", "body": "Opened"}
+
+
+async def test_a_message_too_long_to_seal_is_shortened(hass: HomeAssistant) -> None:
+    """Sealed whole, 5000 characters would not fit the envelope and the send would fail."""
+    message = "The dishwasher reports a fault. " * 160
+    body = await _send_sealed(hass, message=message, title="Dishwasher")
+
+    opened = open_envelope(_E2E_KEY, body["encrypted"])
+    assert opened["title"] == "Dishwasher"
+    assert 0 < len(opened["body"]) < len(message)
+    assert opened["body"].startswith("The dishwasher reports a fault.")

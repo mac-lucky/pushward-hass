@@ -50,4 +50,6 @@ class PushWardNotifyEntity(NotifyEntity):
         if not title or not title.strip():
             title = self.hass.config.location_name or DEFAULT_TITLE
         with _surface_api_errors():
-            await self._api.create_notification(title=title, body=message)
+            # A notify target cannot pass options, so a message too long to seal with
+            # the entry's key is shortened rather than refused.
+            await self._api.create_notification(title=title, body=message, trim_to_fit=True)
