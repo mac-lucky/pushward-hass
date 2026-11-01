@@ -1052,6 +1052,7 @@ Each answer to a notification this integration's key sent fires `pushward_notifi
 | `collapse_id` | `tag` | The `collapse_id` it was sent with, else null |
 | `thread_id` | `group` | The `thread_id` it was sent with, else null |
 | `answered_at` | | When it was answered (RFC 3339) |
+| `late` | | `true` when it was answered more than 2 minutes before the event fired, because Home Assistant read it after a restart or an outage |
 | `config_entry_id` | | The PushWard entry whose key sent it |
 
 The event carries no action title, nor the notification's title and body; with end-to-end encryption on, PushWard never has them in the clear.
@@ -1082,7 +1083,14 @@ The Companion app pattern, with a per-run action id so two runs of the same scri
 
 Matching on `notification_id: "{{ sent.notification_id }}"` from a `response_variable` works too. A text reply arrives in `{{ wait.trigger.event.data.reply_text }}`.
 
-Home Assistant reads answers with a long-poll per PushWard entry, and only while something can still be answered: a notification sent in the last 7 days with no answer yet (a scheduled one counts from when it goes out). With nothing like that, no connection is held. The stream's position is kept in `.storage`, so an answer given while Home Assistant was restarting fires once it is back, as long as that notification is still waited for. An answer read late to anything else (more than 7 days after the send, or while nothing was waiting) fires only if it was given in the last 10 minutes, so an old tap never runs an automation at a random moment; it is skipped otherwise. `get_notification_answer` reads answers on its own and is not affected.
+Home Assistant reads answers with a long-poll per PushWard entry, and only while something can still be answered: a notification sent in the last 7 days with no answer yet (a scheduled one counts from when it goes out). With nothing like that, no connection is held. The stream's position is kept in `.storage`, so an answer given while Home Assistant was restarting fires once it is back, as long as that notification is still waited for and the answer is less than an hour old. An answer read late to anything else (more than 7 days after the send, or while nothing was waiting) fires only if it was given in the last 10 minutes. Older answers are skipped, so a tap from yesterday never runs an automation at a random moment. For an automation that must only act on a tap as it happens, add a condition on `late`:
+
+```yaml
+- condition: template
+  value_template: "{{ not wait.trigger.event.data.late }}"
+```
+
+`get_notification_answer` reads answers on its own and is not affected.
 
 #### Snooze
 

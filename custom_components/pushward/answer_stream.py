@@ -16,9 +16,12 @@ is then waited for like any other send. A repeating one does that at each send.
 A schedule this install cancels is dropped at once (on_schedule_canceled).
 
 The cursor and the pending sends live in .storage, so a restart picks up where
-the stream stopped. An answer read late that way fires only when it is to a send
-still waited for, or was given in the last ANSWER_STREAM_FRESH_SECONDS: a tap from
-last week must not run an automation now. Cursors are opaque strings that are
+the stream stopped. An answer read late that way fires only when it was given in
+the last ANSWER_STREAM_FRESH_SECONDS, or in the last
+ANSWER_STREAM_AWAITED_MAX_AGE_SECONDS to a send still waited for: a tap from
+yesterday must not run an automation now. The event's ``late`` is true for an
+answer given more than ANSWER_STREAM_LATE_SECONDS before it fired, so an
+automation can leave those alone too. Cursors are opaque strings that are
 decimal integers today: the stream compares them as such to start far enough
 back, and keeps its own when one is not a number.
 """
@@ -57,10 +60,12 @@ from .const import (
     ANSWER_PLAIN_POLL_INTERVAL,
     ANSWER_STATUS_ANSWERED,
     ANSWER_STREAM_ANSWERED_MAX,
+    ANSWER_STREAM_AWAITED_MAX_AGE_SECONDS,
     ANSWER_STREAM_BACKOFF_BASE_SECONDS,
     ANSWER_STREAM_BACKOFF_MAX_SECONDS,
     ANSWER_STREAM_EARLY_RETURN_JITTER_SECONDS,
     ANSWER_STREAM_FRESH_SECONDS,
+    ANSWER_STREAM_LATE_SECONDS,
     ANSWER_STREAM_MIN_JITTER_SECONDS,
     ANSWER_STREAM_PAGE_LIMIT,
     ANSWER_STREAM_PENDING_DAYS,
@@ -177,9 +182,10 @@ def _drop_oldest(table: dict[str, dict], cap: int, when: Callable[[dict], dateti
     return True
 
 
-def _event_data(entry_id: str, item: dict) -> dict:
+def _event_data(entry_id: str, item: dict, now: datetime) -> dict:
     """The event's data, named after the Companion app's mobile_app_notification_action where it can be."""
     action_id = item.get("action_id")
+    answered_at = _from_iso(item.get("answered_at"))
     return {
         "config_entry_id": entry_id,
         "notification_id": item["notification_id"],
@@ -190,7 +196,20 @@ def _event_data(entry_id: str, item: dict) -> dict:
         "collapse_id": item.get("collapse_id"),
         "thread_id": item.get("thread_id"),
         "answered_at": item.get("answered_at"),
+        # Read after a restart or an outage rather than as it happened.
+        "late": answered_at is not None and now - answered_at > timedelta(seconds=ANSWER_STREAM_LATE_SECONDS),
     }
+
+
+def _fires(item: dict, waited: bool, now: datetime) -> bool:
+    """Whether an answer read now fires the event: given just now, or not long ago to a send waited for."""
+    answered_at = _from_iso(item.get("answered_at"))
+    if answered_at is None:
+        return waited  # no time to judge it by
+    age = now - answered_at
+    if age <= timedelta(seconds=ANSWER_STREAM_FRESH_SECONDS):
+        return True
+    return waited and age <= timedelta(seconds=ANSWER_STREAM_AWAITED_MAX_AGE_SECONDS)
 
 
 class AnswerStream:
@@ -214,7 +233,7 @@ class AnswerStream:
         self._schedules: dict[str, dict] = {}
         # notification id -> action id of the latest answers read, oldest first; persisted.
         self._answered: dict[str, str | None] = {}
-        # notification id -> event data of the answers among those that were read late and
+        # notification id -> feed item of the answers among those that were read late and
         # not fired, in case their schedule turns out to be one waited for.
         self._skipped: dict[str, dict] = {}
         # Schedules waiting for the cursor read that _take_schedule_cursor started.
@@ -623,7 +642,7 @@ class AnswerStream:
         self._save()
 
     def _consume(self, after: str, feed: dict) -> None:
-        fresh_since = dt_util.utcnow() - timedelta(seconds=ANSWER_STREAM_FRESH_SECONDS)
+        now = dt_util.utcnow()
         for item in feed["items"]:
             notification_id = item.get("notification_id")
             if not _is_id(notification_id):
@@ -631,14 +650,19 @@ class AnswerStream:
             key = str(notification_id)
             waited = self._pending.pop(key, None)
             self._remember_answer(key, item.get("action_id"))
-            data = _event_data(self._entry.entry_id, item)
-            answered_at = _from_iso(item.get("answered_at"))
-            if waited is not None or (answered_at is not None and answered_at >= fresh_since):
-                self._hass.bus.async_fire(EVENT_NOTIFICATION_ACTION, data)
+            if _fires(item, waited is not None, now):
+                self._fire(item, now)
+            elif waited is not None:
+                # Waited for, but Home Assistant was down for over an hour since:
+                # acting on it now would run an automation at a moment nobody chose.
+                _LOGGER.debug(
+                    "Not firing the answer to PushWard notification %s given at %s: read more than an hour late",
+                    notification_id,
+                    item.get("answered_at"),
+                )
             else:
-                # Read late (the stream was off), to a send nothing waits for: firing it
-                # now would run an automation at a moment nobody chose.
-                self._skipped[key] = data
+                # Read late (the stream was off), to a send nothing waits for.
+                self._skipped[key] = item
                 _LOGGER.debug(
                     "Not firing the answer to PushWard notification %s given at %s: read late, no send waits for it",
                     notification_id,
@@ -664,6 +688,9 @@ class AnswerStream:
         # every 25 seconds, and Home Assistant often runs from an SD card.
         if changed:
             self._save()
+
+    def _fire(self, item: dict, now: datetime) -> None:
+        self._hass.bus.async_fire(EVENT_NOTIFICATION_ACTION, _event_data(self._entry.entry_id, item, now))
 
     def _remember_answer(self, key: str, action_id: Any) -> None:
         self._answered.pop(key, None)
@@ -746,8 +773,8 @@ class AnswerStream:
         if key in self._answered:
             # Answered before the schedule read as sent (the server's sweep was slow).
             # The event fired then, unless the answer was read late; it is waited for now.
-            if (data := self._skipped.pop(key, None)) is not None:
-                self._hass.bus.async_fire(EVENT_NOTIFICATION_ACTION, data)
+            if (item := self._skipped.pop(key, None)) is not None and _fires(item, True, now):
+                self._fire(item, now)
             action_id = self._answered[key]
             answer = {"notification_id": notification_id, "status": ANSWER_STATUS_ANSWERED, "action_id": action_id}
             async_dispatcher_send(self._hass, notification_answer_signal(self._entry.entry_id), answer, int(sid))

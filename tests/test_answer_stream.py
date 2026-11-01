@@ -181,6 +181,7 @@ async def test_answerable_send_starts_the_loop_and_fires_the_event(hass: HomeAss
             "collapse_id": "garage",
             "thread_id": "house",
             "answered_at": "2026-11-01T18:00:00Z",
+            "late": False,
         }
     ]
     assert stream.snapshot() == {"running": False, "pending": 0, "schedules": 0, "has_cursor": True}
@@ -604,22 +605,47 @@ async def test_a_late_answer_fires_only_for_a_send_still_waited_for(
     """After a restart the stored cursor replays everything since: old answers to untracked sends stay quiet."""
     caplog.set_level(logging.DEBUG, logger="custom_components.pushward.answer_stream")
     events = async_capture_events(hass, EVENT_NOTIFICATION_ACTION)
-    _seed(hass_storage, cursor="60", pending={"42": {"sent_at": (NOW - timedelta(hours=1)).isoformat()}})
+    sent_at = (NOW - timedelta(days=3)).isoformat()
+    _seed(hass_storage, cursor="60", pending={"42": {"sent_at": sent_at}, "43": {"sent_at": sent_at}})
 
     stream = await streams()
     await _until(lambda: feed.calls, "the first read")
     feed.reply(
         _answer(41, action_id="OPEN_GARAGE", answered_at=(NOW - timedelta(days=2)).isoformat()),
-        _answer(42, answered_at=(NOW - timedelta(minutes=50)).isoformat()),  # waited for: fires however late
+        _answer(42, answered_at=(NOW - timedelta(minutes=50)).isoformat()),  # waited for, under an hour: fires
+        _answer(43, answered_at=(NOW - timedelta(days=2)).isoformat()),  # waited for, but two days ago
         _answer(7, answered_at=(NOW - timedelta(minutes=5)).isoformat()),  # fresh: fires
         _answer(8, answered_at=None),  # no time to judge by
         cursor="64",
     )
     await _until(lambda: not stream.running, "the loop to go idle")
 
-    assert [event.data["notification_id"] for event in events] == [42, 7]
+    assert [(event.data["notification_id"], event.data["late"]) for event in events] == [(42, True), (7, True)]
     assert "Not firing the answer to PushWard notification 41" in caplog.text
+    assert "Not firing the answer to PushWard notification 43" in caplog.text
+    assert stream._pending == {}  # waited for no more, fired or not
     assert stream._cursor == "64"  # skipped answers are read past all the same
+
+
+async def test_late_is_true_only_for_an_answer_older_than_two_minutes(hass: HomeAssistant, streams, feed) -> None:
+    events = async_capture_events(hass, EVENT_NOTIFICATION_ACTION)
+    stream = await streams()
+    stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
+    await _until(lambda: feed.calls, "the first read")
+
+    feed.reply(
+        _answer(41, answered_at=(NOW - timedelta(seconds=119)).isoformat()),
+        _answer(40, answered_at=(NOW - timedelta(seconds=121)).isoformat()),
+        _answer(39, answered_at=(NOW + timedelta(seconds=30)).isoformat()),  # a clock ahead of Home Assistant
+        cursor="60",
+    )
+    await _until(lambda: len(events) == 3, "the events")
+
+    assert [(event.data["notification_id"], event.data["late"]) for event in events] == [
+        (41, False),
+        (40, True),
+        (39, False),
+    ]
 
 
 async def test_an_answer_from_a_clock_ahead_of_home_assistant_still_fires(hass: HomeAssistant, streams, feed) -> None:
@@ -739,7 +765,7 @@ async def test_a_schedule_that_went_out_while_home_assistant_was_down_is_read_fr
     await stream.async_stop()
 
     feed.fresh = "150"  # answers to other sends moved the feed on meanwhile
-    freezer.move_to(send_at + timedelta(hours=2))
+    freezer.move_to(send_at + timedelta(minutes=40))
     api.get_scheduled_notification.return_value = _sent_row(7, 99, send_at)
     await streams()
     await _until(lambda: feed.calls[1:], "the read after the restart")
@@ -748,6 +774,7 @@ async def test_a_schedule_that_went_out_while_home_assistant_was_down_is_read_fr
     feed.reply(_answer(99, answered_at=(send_at + timedelta(minutes=5)).isoformat()), cursor="151")
     await _until(lambda: events, "the event")
     assert events[0].data["notification_id"] == 99
+    assert events[0].data["late"] is True
 
 
 async def test_a_schedules_own_cursor_is_carried_into_its_send(streams, feed, api, freezer, hass_storage) -> None:
@@ -998,27 +1025,36 @@ async def test_a_late_answer_to_a_schedule_read_later_still_fires(
 ) -> None:
     """The schedule could not be read on restart, so its answer came first and was held back; it fires once read."""
     events = async_capture_events(hass, EVENT_NOTIFICATION_ACTION)
-    due = NOW - timedelta(hours=2)
+    due = NOW - timedelta(minutes=30)
     _seed(
         hass_storage,
         cursor="60",
-        schedules={"7": {"active_at": due.isoformat(), "check_at": due.isoformat(), "recurring": False}},
+        schedules={
+            "7": {"active_at": due.isoformat(), "check_at": due.isoformat(), "recurring": False},
+            "8": {"active_at": due.isoformat(), "check_at": due.isoformat(), "recurring": False},
+        },
     )
     api.get_scheduled_notification.side_effect = PushWardApiError("boom", status_code=503)
     stream = await streams()
     await _until(lambda: feed.calls, "the first read")
 
-    feed.reply(_answer(99, answered_at=(due + timedelta(minutes=1)).isoformat()), cursor="61")
+    feed.reply(
+        _answer(99, answered_at=(due + timedelta(minutes=1)).isoformat()),
+        _answer(98, answered_at=(NOW - timedelta(hours=2)).isoformat()),
+        cursor="61",
+    )
     await _until(lambda: len(feed.calls) == 2, "the next read")
     assert events == []
 
     api.get_scheduled_notification.side_effect = None
-    api.get_scheduled_notification.return_value = _sent_row(7, 99, due)
+    rows = {7: _sent_row(7, 99, due), 8: _sent_row(8, 98, due - timedelta(hours=2))}
+    api.get_scheduled_notification.side_effect = lambda sid: rows[sid]
     freezer.move_to(NOW + timedelta(minutes=6))
     feed.reply(cursor="61")
-    await _until(lambda: events, "the held-back event")
+    await _until(lambda: not stream._schedules, "both schedules to be read")
 
-    assert events[0].data["notification_id"] == 99
+    # 98 was answered over an hour ago: waited for or not, it stays quiet.
+    assert [(event.data["notification_id"], event.data["late"]) for event in events] == [(99, True)]
     assert stream._pending == {}
 
 
