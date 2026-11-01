@@ -94,12 +94,13 @@ The surfaces are independent (separate config, managers, and caches) and share o
 The PushWard app is on [Google Play](https://play.google.com/store/apps/details?id=com.maclucky.pushward) for Android 12 and later. Nothing in this integration is set per platform: an activity, widget or notification reaches every phone on the account, and each app draws what its system allows. What stays different on Android:
 
 - Activities are Live Updates. Android 16 promotes them to the top of the shade and the lock screen, and 16 QPR2 adds a status-bar chip. Android 14 and 15 show an ongoing notification, 12 and 13 a plain one that updates in place.
-- There is no Dynamic Island, so the compact trailing slot (`compact_trailing_label`, `compact_trailing_icon`) has no equivalent. `compact_label` becomes the chip's text; the chip fits 7 characters.
-- `background_color` and `text_color` don't apply, because Android does not colorize promoted notifications.
+- There is no Dynamic Island, so the compact trailing slot (`compact_trailing_label`, `compact_trailing_icon`) has no equivalent. `compact_label` becomes the chip's text. It is still capped at 4 characters, though the chip fits 7 when it shows the template's own text.
+- On activities, `background_color` and `text_color` don't apply, because Android does not colorize promoted notifications. Widgets do use them.
 - The notification shade shows at most 3 action buttons. The notification's detail screen in the app lists all of them.
+- An approval activity shows at most 3 of its up to 4 options as buttons.
 - A notification `media` of type video or audio is not shown in the shade. Images are.
 - `level: critical` needs Do Not Disturb access, granted in the app, and `volume` is ignored.
-- Widgets are home-screen widgets only; Android has no lock-screen widgets.
+- The PushWard widget is a home-screen widget on Android; there is no lock-screen widget.
 
 pushward.app compares the two per template: <https://pushward.app/docs/live-activities/ios-vs-android>.
 
@@ -211,7 +212,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Favorite Script | Script the heart button runs; hidden when empty (media template) |
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
 | State Labels | Rows giving custom display text per state (a state and its label, e.g. `on` shows `Running`) |
-| Island Label | Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it |
+| Island Label | Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text |
 | Island Trailing Label | Up to 4 characters for the compact trailing ear, in place of what that template shows there (the step counter, the timer). Wins over Island Trailing Icon when both are set. Needs PushWard 1.19.1 or later |
 | Island Trailing Icon | SF Symbol or `mdi:` icon for the same ear, tinted with the accent color. Needs PushWard 1.19.1 or later; the minimal presentation ignores both trailing fields |
 | Completion Message | Text shown at end (default: "Complete") |
@@ -525,7 +526,7 @@ On premium, uncapped resources report `limit: unlimited`, and the notifications 
 
 ## Notify entity
 
-Each entry also gets a notify entity on the same device, named after the entry: `notify.pushward_push_notification` for an entry titled PushWard. It takes `notify.send_message` and can be a member of a notify group, next to the Companion app or any other notifier:
+Each entry also gets a notify entity on the same device, named after the entry: `notify.pushward_push_notification` for an entry titled PushWard. It takes `notify.send_message`:
 
 ```yaml
 - action: notify.send_message
@@ -536,7 +537,9 @@ Each entry also gets a notify entity on the same device, named after the entry: 
     message: The washer is done.
 ```
 
-The message goes out like a `pushward.send_notification` with only a title and body, so an [encryption key](#end-to-end-encryption) seals it and a used-up notification quota refuses it. PushWard needs a title and `notify.send_message` doesn't always carry one; without it the title is your Home Assistant's name from **Settings > System > General** ("Home" unless you changed it), so the phone shows which home sent it. For levels, links, buttons or scheduling use `pushward.send_notification`.
+It can also be a member of a notify group with other notify entities. The Companion app's `notify.mobile_app_*` is a legacy notify service, not an entity, so it cannot sit in the same group.
+
+The message goes out like a `pushward.send_notification` with only a title and body, so an [encryption key](#end-to-end-encryption) seals it (a message too long for the sealed envelope is shortened to fit) and a used-up notification quota refuses it. PushWard needs a title and `notify.send_message` doesn't always carry one; without it the title is your Home Assistant's name from **Settings > System > General** ("Home" unless you changed it), so the phone shows which home sent it. For levels, links, buttons or scheduling use `pushward.send_notification`.
 
 ## Services
 
@@ -559,7 +562,34 @@ Notification ids belong to the account that sent them, hence the single-account 
 
 A tap or button `url` that starts with a single `/`, like `/lovelace/kitchen` or `/api/webhook/close-valve`, is a path on your Home Assistant. Before the call goes out it becomes a full URL on Home Assistant's external URL (**Settings > System > Network**, Internet), or on the Home Assistant Cloud URL when no external URL is set. The internal URL is never used, since the phone may be away from home when someone taps. Without either, the action fails and says so. Full URLs (`https://...`, `homeassistant://...`) are sent as they are.
 
-That covers `url` and the action `url`s of `send_notification`, and `url`, `secondary_url`, `tap_action`, `url_action`, `secondary_url_action`, board tiles' `url_action`, media `controls` and approval `options` on the activity update actions. `media`, `icon_url`, `image_url` and `callback_url` still take full URLs only. A path to a webhook makes a silent button (`method: POST`). To open a dashboard in the Companion app rather than the browser, keep using `homeassistant://navigate/lovelace/kitchen`.
+That covers `url` and the action `url`s of `send_notification`, and `url`, `secondary_url`, `tap_action`, `url_action`, `secondary_url_action`, board tiles' `url_action`, media `controls` and approval `options` on the activity update actions. `media`, `icon_url`, `image_url` and `callback_url` still take full URLs only. To open a dashboard in the Companion app rather than the browser, keep using `homeassistant://navigate/lovelace/kitchen`.
+
+Silent buttons need https. Media controls, approval options, and every action object or notification button without `foreground: true` are requests the phone sends in the background; iOS refuses cleartext for them and Android drops the button. With an `http://` external URL such a path goes out on the Cloud URL instead, and without Home Assistant Cloud the action fails. Plain `url` / `secondary_url` strings and `foreground: true` actions open in the browser, so they may stay on http. A dashboard path on an action without `foreground: true` is fetched in the background, not opened.
+
+A path to a webhook makes a silent button. Give it `method: POST` (media controls and approval options already default to POST), because a webhook trigger only takes POST and PUT unless you change `allowed_methods`. The request arrives through the external or Cloud URL, so the trigger needs **Only accessible from the local network** turned off. With the default `local_only: true` Home Assistant answers 200, logs "Received remote request for local webhook", and the automation never runs.
+
+```yaml
+- action: pushward.send_notification
+  data:
+    title: Water leak
+    body: Kitchen sensor is wet
+    actions:
+      - id: close
+        title: Close valve
+        url: /api/webhook/close-valve
+        method: POST
+
+# the automation behind it
+- triggers:
+    - trigger: webhook
+      webhook_id: close-valve
+      allowed_methods: [POST]
+      local_only: false
+  actions:
+    - action: valve.close_valve
+      target:
+        entity_id: valve.main_water
+```
 
 ### `pushward.create_activity`
 
@@ -593,7 +623,7 @@ implied by the action name; you no longer pass a `template` field.
 | `state` | Yes | `ongoing` or `ended` |
 | `state_text` | No | Display text |
 | `subtitle` | No | Subtitle text |
-| `compact_label` | No | Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it |
+| `compact_label` | No | Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text |
 | `compact_trailing_label` | No | Up to 4 characters for the compact trailing ear, in place of what that template shows there (the step counter, the timer, a value). Wins over `compact_trailing_icon` |
 | `compact_trailing_icon` | No | SF Symbol or `mdi:` icon for the trailing ear, tinted with `accent_color`. The name may use letters, digits, '.', '-', '_' and ':' (max 128 chars) |
 | `icon` | No | SF Symbol or MDI icon |
@@ -733,6 +763,9 @@ implied by the action name; you no longer pass a `template` field.
 >       play_pause: { url: "https://ha.example.com/api/webhook/pw-toggle" }
 >       next: { url: "https://ha.example.com/api/webhook/pw-next" }
 > ```
+>
+> The webhook triggers behind these buttons need `local_only: false`, see
+> [Links into Home Assistant](#links-into-home-assistant).
 
 > **`approval`** is a question card driven entirely by this action (the config flow does not
 > offer the template): the question rides `state_text`, `source` (max 24) names
@@ -1217,6 +1250,6 @@ Narrow to one area with `custom_components.pushward.api` (HTTP calls) or `custom
 - **Home Assistant 2025.7.0+** (set in `hacs.json`)
 - **Python 3.13.2+**
 - A [PushWard](https://pushward.app) account and integration key
-- The PushWard app on your phone ([App Store](https://apps.apple.com/app/id6759689999))
+- The PushWard app on your phone ([App Store](https://apps.apple.com/app/id6759689999), [Google Play](https://play.google.com/store/apps/details?id=com.maclucky.pushward))
 
 Licensed under [MIT](LICENSE).
