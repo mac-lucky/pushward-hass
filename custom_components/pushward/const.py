@@ -406,6 +406,24 @@ ANSWER_MAX_TIMEOUT = 86400
 ANSWER_STATUS_ANSWERED = "answered"
 ANSWER_STATUS_PENDING = "pending"
 
+# The answer stream (GET /notifications/answers): one long-poll per entry, held
+# only while something it sent can still be answered, firing
+# EVENT_NOTIFICATION_ACTION for each answer. Its waits have their own server
+# budget, separate from the per-notification ones above, so it takes no local
+# wait slot. "Pending" is an answerable send from the last 7 days that has no
+# answer yet; at most ANSWER_STREAM_PENDING_MAX are kept, the oldest dropped.
+EVENT_NOTIFICATION_ACTION = f"{DOMAIN}_notification_action"
+ANSWER_STREAM_WAIT_SECONDS = 25
+ANSWER_STREAM_PAGE_LIMIT = 100
+ANSWER_STREAM_PENDING_DAYS = 7
+ANSWER_STREAM_PENDING_MAX = 200
+ANSWER_STREAM_BACKOFF_BASE_SECONDS = 2
+ANSWER_STREAM_BACKOFF_MAX_SECONDS = 300
+# A scheduled send has no notification id until it goes out: its schedule is read
+# this long after each send comes due (and again while it is still being sent).
+ANSWER_STREAM_SCHEDULE_RETRY_SECONDS = 60
+CURSOR_INVALID_CODE = "cursor.invalid"
+
 # snooze on send_notification: 1-3 distinct durations in minutes, never with
 # acknowledge, and together with the actions at most NOTIFICATION_ACTIONS_MAX
 # buttons.

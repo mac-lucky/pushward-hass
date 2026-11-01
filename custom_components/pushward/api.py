@@ -7,6 +7,7 @@ import json
 import logging
 import random
 import time
+from collections.abc import Callable
 from datetime import datetime
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
@@ -27,6 +28,7 @@ from .const import (
     ANSWER_REQUEST_MARGIN_SECONDS,
     ANSWER_STATUS_ANSWERED,
     ANSWER_STATUS_PENDING,
+    ANSWER_STREAM_PAGE_LIMIT,
     MAX_CONCURRENT_REQUESTS,
     MAX_RETRIES,
     QUOTA_KIND_EMAILS,
@@ -92,6 +94,18 @@ def _recurrence_payload(recurrence: dict) -> dict:
     if isinstance(payload.get("until"), datetime):
         payload["until"] = _aware_isoformat(payload["until"], "recurrence.until")
     return payload
+
+
+def records_answer(actions: list[dict] | None, acknowledge: dict | None) -> bool:
+    """Whether the server will record an answer: an action without url or foreground, or acknowledge.
+
+    An acknowledged send without such an action gets the server's own url-less
+    Acknowledge button. Only scheduled sends need this guess; a send now is told
+    by the response's ``answerable``.
+    """
+    if acknowledge is not None:
+        return True
+    return any(isinstance(a, dict) and not a.get("url") and not a.get("foreground") for a in actions or [])
 
 
 def _answer_result(notification_id: int, answer: dict, *, answered: bool) -> dict:
@@ -216,6 +230,9 @@ class PushWardApiClient:
         # The end-to-end encryption key from the entry options; None sends notification
         # text in the clear. Swapped in place when the options change.
         self.e2e_key = e2e_key
+        # Set by the entry's answer stream; told about every created notification or
+        # schedule whose answer the server records, whichever path sent it.
+        self.on_answerable_send: Callable[[dict, bool], None] | None = None
 
     async def get_me(self) -> dict[str, Any]:
         """Fetch the account profile + usage counters via GET /auth/me.
@@ -404,6 +421,9 @@ class PushWardApiClient:
 
         ``snooze`` (1-3 minute durations) adds snooze buttons; the device shows the
         notification again after the chosen time. It never goes with acknowledge.
+
+        A send the server records the answer to is reported to
+        ``on_answerable_send`` (the created body, and whether it was scheduled).
         """
         if self.e2e_key is not None:
             if trim_to_fit:
@@ -448,25 +468,48 @@ class PushWardApiClient:
         if recurrence is not None:
             payload["recurrence"] = _recurrence_payload(recurrence)
             path = "/notifications/scheduled"
+        scheduled = path != "/notifications"
         try:
-            return await self._request_with_retry(
+            created = await self._request_with_retry(
                 "POST", path, json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
             )
         except PushWardApiError as err:
             # Only a send going out now: a schedule refused this way would be stored
             # without repeats for good, so its refusal reaches the caller instead.
             reason = _ACK_REFUSALS.get((err.status_code, err.code))
-            if acknowledge is None or path != "/notifications" or reason is None:
+            if acknowledge is None or scheduled or reason is None:
                 raise
             _LOGGER.warning(
                 "PushWard refused the acknowledge (%s), sending the notification once without repeats: %s", reason, err
             )
+        else:
+            answerable = records_answer(actions, acknowledge) if scheduled else None
+            self._report_answerable(created, schedule_answerable=answerable)
+            return created
         # Asking for repeats must never cost the alert itself.
         plain = {key: val for key, val in payload.items() if key not in _ACK_ONLY_FIELDS}
         created = await self._request_with_retry(
             "POST", path, json=plain, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
         )
+        self._report_answerable(created)
         return {**(created or {}), "acknowledge_refused": reason}
+
+    def _report_answerable(self, created: Any, *, schedule_answerable: bool | None = None) -> None:
+        """Tell the answer stream about a send it should listen for.
+
+        A send now says so itself (``answerable`` in the response). A schedule has
+        no notification yet, so its request decides (``schedule_answerable``).
+        """
+        if self.on_answerable_send is None or not isinstance(created, dict):
+            return
+        scheduled = schedule_answerable is not None
+        if not (schedule_answerable if scheduled else created.get("answerable") is True):
+            return
+        try:
+            self.on_answerable_send(created, scheduled)
+        except Exception:
+            # Listening for the answer is extra; the notification already went out.
+            _LOGGER.exception("PushWard could not start listening for a notification's answer")
 
     async def retract_notifications(self, collapse_id: str) -> int:
         """POST /notifications/retract: take back the notifications sent with ``collapse_id``.
@@ -518,6 +561,39 @@ class PushWardApiClient:
         path = f"/notifications/answers/{int(notification_id)}"
         if wait > 0:
             path += f"?wait={int(wait)}"
+        return await self._get_once(path, wait=wait)
+
+    async def list_notification_answers(
+        self, after: str | None = None, *, wait: int = 0, limit: int = ANSWER_STREAM_PAGE_LIMIT
+    ) -> dict:
+        """GET /notifications/answers once: ``{items, cursor}``, the answers recorded after ``after``.
+
+        Without ``after`` the server answers at once with no items and the current
+        cursor. With it, ``wait`` (max 25) holds the request until an answer lands.
+        One attempt, no retry, outside the shared request semaphore: the answer
+        stream owns the backoff. A malformed cursor is a 400 with code
+        ``cursor.invalid``; a 429 raises PushWardRateLimitedError, or
+        PushWardQuotaExceededError (and arms the quota gate) for ``quota.exceeded``.
+        """
+        query: dict[str, str | int] = {}
+        if after is not None:
+            query = {"after": after, "wait": max(0, int(wait)), "limit": int(limit)}
+        path = "/notifications/answers"
+        if query:
+            path += f"?{urlencode(query)}"
+        data = await self._get_once(path, wait=wait if after is not None else 0, quota=True)
+        items = data.get("items")
+        cursor = data.get("cursor")
+        if not isinstance(items, list) or not isinstance(cursor, str) or not cursor:
+            raise PushWardApiError(f"GET {path} returned an unexpected body")
+        return {"items": [item for item in items if isinstance(item, dict)], "cursor": cursor}
+
+    async def _get_once(self, path: str, *, wait: int, quota: bool = False) -> dict:
+        """One GET of a JSON object, for the answer reads that may hold a long-poll.
+
+        ``quota`` turns a ``quota.exceeded`` 429 into PushWardQuotaExceededError and
+        arms the gate; otherwise every 429 is PushWardRateLimitedError.
+        """
         timeout = aiohttp.ClientTimeout(total=max(0, wait) + ANSWER_REQUEST_MARGIN_SECONDS)
         try:
             async with self._session.request(
@@ -533,17 +609,22 @@ class PushWardApiClient:
                     return data
                 if resp.status == HTTPStatus.UNAUTHORIZED:
                     raise PushWardAuthError("Invalid integration key", status_code=resp.status)
-                _, detail, raw, _ = await self._parse_problem(resp)
+                code, detail, raw, problem = await self._parse_problem(resp)
                 message = f"GET {path} failed ({resp.status}): {self._truncate(detail or raw)}"
                 if resp.status == HTTPStatus.FORBIDDEN:
                     raise PushWardForbiddenError(self._truncate(detail or raw) or "Forbidden", status_code=resp.status)
                 if resp.status == HTTPStatus.NOT_FOUND:
                     raise PushWardNotFoundError(message, status_code=resp.status)
                 if resp.status == HTTPStatus.TOO_MANY_REQUESTS:
+                    if quota and code == QUOTA_EXCEEDED_CODE:
+                        err = self._quota_error_from(str(problem.get("kind") or ""), problem)
+                        if self._quota_gate is not None and err.kind:
+                            self._quota_gate.arm(err, server_now=parse_http_date(resp.headers.get("Date")))
+                        raise err
                     raise PushWardRateLimitedError(
                         message, retry_after=self._parse_retry_after(resp.headers.get("Retry-After", ""))
                     )
-                raise PushWardApiError(message, status_code=resp.status)
+                raise PushWardApiError(message, status_code=resp.status, code=code)
         except (aiohttp.ClientError, TimeoutError) as err:
             raise PushWardApiError(f"GET {path} connection error: {self._truncate(str(err))}") from err
 

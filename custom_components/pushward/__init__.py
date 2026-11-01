@@ -27,6 +27,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
 from .activity_manager import ActivityManager, build_history_store
+from .answer_stream import AnswerStream, build_answer_store
 from .api import (
     PushWardApiClient,
     PushWardApiError,
@@ -1701,6 +1702,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_config_entry_first_refresh()
     _adopt_account_id(hass, entry, coordinator.data)
 
+    # Before the managers start: the to-do reminders they schedule are answerable too.
+    answer_stream = AnswerStream(hass, api, entry, entry.data[CONF_INTEGRATION_KEY])
+    await answer_stream.async_start()
+    entry.async_on_unload(answer_stream.async_stop)
+
     entities = _entity_configs(entry)
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
     manager = ActivityManager(hass, api, entities, entry)
@@ -1715,6 +1721,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "todo_manager": todo_manager,
         "coordinator": coordinator,
         "quota_gate": quota_gate,
+        "answer_stream": answer_stream,
         "e2e_key": entry.options.get(CONF_E2E_KEY),
     }
 
@@ -1815,3 +1822,4 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     await async_cancel_stored_schedules(hass, api, entry.entry_id)
     await build_history_store(hass, entry.entry_id).async_remove()
     await build_widget_store(hass, entry.entry_id).async_remove()
+    await build_answer_store(hass, entry.entry_id).async_remove()

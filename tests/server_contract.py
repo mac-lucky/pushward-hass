@@ -1328,7 +1328,28 @@ def assert_valid_receipts_canceled(body: object, *, where: str = "receipts_cance
         _fail(where, f"expected {{'canceled': <non-negative int>}}, got {body!r}")
 
 
-# --- Retract (POST /notifications/retract) -------------------------------------------
+# --- Answer stream and retract (GET /notifications/answers, POST /notifications/retract) ----
+
+
+def assert_valid_answer_feed(body: object, *, where: str = "answer_feed") -> None:
+    """Assert a GET /notifications/answers page: ``{items, cursor}``, every item answered."""
+    if not isinstance(body, dict) or not isinstance(body.get("items"), list):
+        _fail(where, f"expected {{'items': [...], 'cursor': str}}, got {body!r}")
+    cursor = body.get("cursor")
+    if not isinstance(cursor, str) or not cursor:
+        _fail(where, "cursor must be a non-empty opaque string")
+    for i, item in enumerate(body["items"]):
+        at = f"{where}.items[{i}]"
+        if not isinstance(item, dict) or not _is_int(item.get("notification_id")):
+            _fail(at, "an item needs an int notification_id")
+        if item.get("status") != "answered":
+            _fail(at, f"status must be answered, got {item.get('status')!r}")
+        for field in ("action_id", "text", "collapse_id", "thread_id"):
+            if item.get(field) is not None and not isinstance(item[field], str):
+                _fail(at, f"{field} must be a string")
+        _check_timestamp(item.get("answered_at"), "answered_at", at)
+        if "title" in item:
+            _fail(at, "the feed carries no action title")
 
 
 def assert_valid_retract_request(body: object, *, where: str = "retract") -> None:

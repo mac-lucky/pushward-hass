@@ -61,6 +61,7 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigE
     widget_manager: WidgetManager | None = data.get("widget_manager")
     coordinator = data.get("coordinator")
     quota_gate = data.get("quota_gate")
+    answer_stream = data.get("answer_stream")
 
     subentries: list[dict[str, Any]] = []
     for sub in entry.subentries.values():
@@ -98,4 +99,6 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigE
         # Metered request kinds currently paused after a quota 429, with the
         # server's reset time; empty when nothing is paused.
         "quota_blocks": quota_gate.snapshot() if quota_gate is not None else {},
+        # Whether the answer long-poll is on, and how many sends it waits on.
+        "answer_stream": answer_stream.snapshot() if answer_stream is not None else None,
     }

@@ -25,6 +25,7 @@ from custom_components.pushward.const import (
 from .server_contract import (
     PushWardContractError,
     assert_valid_activity_content,
+    assert_valid_answer_feed,
     assert_valid_notification_receipt,
     assert_valid_notification_request,
     assert_valid_priority,
@@ -978,6 +979,32 @@ def test_receipts_canceled_response() -> None:
     for bad in ({}, {"canceled": -1}, {"canceled": True}, {"canceled": "2"}, []):
         with pytest.raises(PushWardContractError):
             assert_valid_receipts_canceled(bad)
+
+
+_ANSWER = {
+    "notification_id": 42,
+    "status": "answered",
+    "action_id": "close",
+    "text": "in 5 min",
+    "answered_at": "2026-11-01T18:00:00Z",
+    "collapse_id": "garage",
+    "thread_id": "house",
+}
+
+
+def test_answer_feed_shape() -> None:
+    assert_valid_answer_feed({"items": [], "cursor": "57"})
+    assert_valid_answer_feed({"items": [_ANSWER, {"notification_id": 7, "status": "answered"}], "cursor": "58"})
+    for bad in (
+        {"items": []},
+        {"items": [], "cursor": ""},
+        {"items": [{**_ANSWER, "status": "pending"}], "cursor": "58"},
+        {"items": [{**_ANSWER, "notification_id": "42"}], "cursor": "58"},
+        {"items": [{**_ANSWER, "answered_at": "now"}], "cursor": "58"},
+        {"items": [{**_ANSWER, "title": "Close"}], "cursor": "58"},
+    ):
+        with pytest.raises(PushWardContractError):
+            assert_valid_answer_feed(bad)
 
 
 def test_retract_request_and_response() -> None:

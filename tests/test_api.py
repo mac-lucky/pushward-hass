@@ -35,6 +35,7 @@ from .conftest import make_api_client as _make_client
 from .conftest import make_mock_response as _mock_response
 from .conftest import make_mock_session as _make_session
 from .server_contract import (
+    assert_valid_answer_feed,
     assert_valid_notification_receipt,
     assert_valid_notification_request,
     assert_valid_receipts_canceled,
@@ -1359,7 +1360,7 @@ def test_email_permission_error_is_subclass_of_forbidden():
     assert issubclass(PushWardEmailPermissionError, PushWardForbiddenError)
 
 
-# --- snooze and retract ---
+# --- snooze, retract and the answer feed ---
 
 
 async def test_create_notification_sends_snooze():
@@ -1404,3 +1405,163 @@ async def test_retract_notifications_posts_the_collapse_id_and_returns_devices()
 async def test_retract_notifications_reads_a_bad_body_as_zero():
     client = _make_client(_make_session(_mock_response(202, json_body={"devices": "3"})))
     assert await client.retract_notifications("x") == 0
+
+
+async def test_list_notification_answers_first_call_has_no_query():
+    session = _make_session(_mock_response(200, json_body={"items": [], "cursor": "57"}))
+    client = _make_client(session)
+
+    assert await client.list_notification_answers() == {"items": [], "cursor": "57"}
+    assert session.request.call_args[0][1].endswith("/notifications/answers")
+
+
+async def test_list_notification_answers_long_polls_after_the_cursor():
+    feed = {
+        "items": [
+            {
+                "notification_id": 42,
+                "status": "answered",
+                "action_id": "close",
+                "text": "in 5 min",
+                "answered_at": "2026-11-01T18:00:00Z",
+                "collapse_id": "garage",
+                "thread_id": "house",
+            }
+        ],
+        "cursor": "58",
+    }
+    assert_valid_answer_feed(feed)
+    session = _make_session(_mock_response(200, json_body=feed))
+    client = _make_client(session)
+
+    assert await client.list_notification_answers("57", wait=25) == feed
+    call_args = session.request.call_args
+    assert call_args[0][0] == "GET"
+    assert call_args[0][1].endswith("/notifications/answers?after=57&wait=25&limit=100")
+    assert call_args[1]["timeout"].total > 25
+
+
+async def test_list_notification_answers_rejects_a_malformed_body():
+    for body in ({"items": []}, {"items": None, "cursor": "1"}, {"items": [], "cursor": ""}):
+        client = _make_client(_make_session(_mock_response(200, json_body=body)))
+        with pytest.raises(PushWardApiError):
+            await client.list_notification_answers("1")
+
+
+async def test_list_notification_answers_maps_errors():
+    client = _make_client(
+        _make_session(_mock_response(400, text='{"code": "cursor.invalid", "detail": "malformed cursor"}'))
+    )
+    with pytest.raises(PushWardApiError) as exc:
+        await client.list_notification_answers("x")
+    assert exc.value.code == "cursor.invalid"
+    assert exc.value.status_code == 400
+
+    client = _make_client(
+        _make_session(_mock_response(429, text='{"code": "answer_wait.limit_exceeded"}', headers={"Retry-After": "2"}))
+    )
+    with pytest.raises(PushWardRateLimitedError) as rate:
+        await client.list_notification_answers("57", wait=25)
+    assert rate.value.retry_after == 2
+
+    client = _make_client(_make_session(_mock_response(401)))
+    with pytest.raises(PushWardAuthError):
+        await client.list_notification_answers("57")
+
+    client = _make_client(_make_session(_mock_response(403, text='{"detail": "no notifications permission"}')))
+    with pytest.raises(PushWardForbiddenError):
+        await client.list_notification_answers("57")
+
+
+async def test_list_notification_answers_quota_refusal_arms_the_gate():
+    reset_at = "2026-12-01T00:00:00Z"
+    resp = _mock_response(
+        429,
+        text=json.dumps(
+            {"code": "quota.exceeded", "kind": "notifications", "used": 5, "limit": 5, "reset_at": reset_at}
+        ),
+    )
+    gate = MagicMock()
+    client = PushWardApiClient(_make_session(resp), "https://api.example.com", "test-key", quota_gate=gate)
+
+    with pytest.raises(PushWardQuotaExceededError) as exc:
+        await client.list_notification_answers("57", wait=25)
+
+    assert exc.value.kind == "notifications"
+    gate.arm.assert_called_once()
+
+
+async def test_get_notification_answer_still_reads_a_quota_429_as_rate_limited():
+    """The per-notification read keeps its old mapping: every 429 is a wait-cap retry."""
+    client = _make_client(_make_session(_mock_response(429, text='{"code": "quota.exceeded", "kind": "x"}')))
+    with pytest.raises(PushWardRateLimitedError):
+        await client.get_notification_answer(7, wait=20)
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "response", "expected"),
+    [
+        ({"actions": [{"id": "close", "title": "Close"}]}, {"id": 42, "answerable": True}, ({"id": 42}, False)),
+        ({}, {"id": 43}, None),
+        ({"actions": [{"id": "close", "title": "Close"}]}, {"id": 44, "answerable": False}, None),
+    ],
+)
+async def test_an_answerable_send_now_is_reported(kwargs, response, expected):
+    client = _make_client(_make_session(_mock_response(201, json_body=response)))
+    client.on_answerable_send = MagicMock()
+
+    await client.create_notification("Garage", "Close it?", **kwargs)
+
+    if expected is None:
+        client.on_answerable_send.assert_not_called()
+    else:
+        created, scheduled = client.on_answerable_send.call_args[0]
+        assert created["id"] == expected[0]["id"]
+        assert scheduled is expected[1]
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "reported"),
+    [
+        ({"actions": [{"id": "done", "title": "Done"}]}, True),
+        ({"acknowledge": {}}, True),
+        ({"actions": [{"id": "open", "title": "Open", "url": "https://example.com"}]}, False),
+        ({"actions": [{"id": "open", "title": "Open", "foreground": True}]}, False),
+        ({}, False),
+    ],
+)
+async def test_an_answerable_schedule_is_reported_from_its_request(kwargs, reported):
+    """A schedule has no answerable flag yet, so its actions decide (the to-do Done button is one)."""
+    created = {"id": 7, "status": "scheduled", "send_at": "2026-11-02T08:00:00Z"}
+    client = _make_client(_make_session(_mock_response(201, json_body=created)))
+    client.on_answerable_send = MagicMock()
+
+    await client.create_notification("Bins", "Tonight", send_at=datetime(2026, 11, 2, 8, 0, tzinfo=UTC), **kwargs)
+
+    if reported:
+        client.on_answerable_send.assert_called_once_with(created, True)
+    else:
+        client.on_answerable_send.assert_not_called()
+
+
+async def test_the_plain_resend_after_an_acknowledge_refusal_is_reported():
+    refused = _mock_response(409, text='{"code": "notification_receipt.limit_exceeded"}')
+    sent = _mock_response(201, json_body={"id": 45, "answerable": True})
+    client = _make_client(_make_session(refused, sent))
+    client.on_answerable_send = MagicMock()
+
+    result = await client.create_notification("Leak", "Kitchen", acknowledge={}, actions=[{"id": "ok", "title": "OK"}])
+
+    assert result["acknowledge_refused"] == "receipt_limit"
+    client.on_answerable_send.assert_called_once_with({"id": 45, "answerable": True}, False)
+
+
+async def test_a_failing_answer_listener_never_fails_the_send(caplog):
+    client = _make_client(_make_session(_mock_response(201, json_body={"id": 42, "answerable": True})))
+    client.on_answerable_send = MagicMock(side_effect=RuntimeError("boom"))
+
+    assert await client.create_notification("t", "b", actions=[{"id": "a", "title": "A"}]) == {
+        "id": 42,
+        "answerable": True,
+    }
+    assert "could not start listening" in caplog.text

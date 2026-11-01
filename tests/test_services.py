@@ -841,6 +841,38 @@ async def test_service_send_notification_keeps_snooze_on_scheduled_sends(hass: H
     assert api.create_notification.call_args[1]["snooze"] == [60]
 
 
+# --- the answer stream's wiring ---
+
+
+async def test_entry_setup_listens_for_answerable_sends_and_unload_stops(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    entry = await _setup_entry(hass, api)
+
+    stream = hass.data[DOMAIN][entry.entry_id]["answer_stream"]
+    assert api.on_answerable_send == stream.async_track_send
+    assert not stream.running
+
+    await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert api.on_answerable_send is None
+
+
+async def test_entry_removal_deletes_the_answer_store(hass: HomeAssistant, hass_storage) -> None:
+    api = _mock_api()
+    entry = await _setup_entry(hass, api)
+    store_key = f"{DOMAIN}.answers.{entry.entry_id}"
+    await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert store_key in hass_storage
+
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        await hass.config_entries.async_remove(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert store_key not in hass_storage
+
+
 @pytest.mark.parametrize("data", [{}, {"tag": "a", "notification_id": 1}, {"tag": "two words"}, {"notification_id": 0}])
 async def test_service_cancel_notifications_needs_one_target(hass: HomeAssistant, data: dict) -> None:
     api = _mock_api()
