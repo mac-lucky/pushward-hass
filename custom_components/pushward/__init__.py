@@ -1098,47 +1098,76 @@ async def _fan_out(
     return results
 
 
-def _url_holders(payload: dict) -> list[tuple[dict, str]]:
-    """(object, key) for every tap target and button url an activity or notification payload carries."""
-    actions = [payload.get(key) for key in ("tap_action", "url_action", "secondary_url_action")]
-    actions += [tile.get("url_action") for tile in payload.get("tiles") or []]
+def _url_holders(payload: dict) -> list[tuple[dict, str, bool]]:
+    """(object, key, silent) for every tap target and button url an activity or notification payload carries.
+
+    silent marks a url the phone requests in the background rather than opens: media
+    controls and approval options always, any other action object unless it sets
+    foreground. The plain url / secondary_url strings are always opened.
+    """
+    routed = [payload.get(key) for key in ("tap_action", "url_action", "secondary_url_action")]
+    routed += [tile.get("url_action") for tile in payload.get("tiles") or []]
+    routed += payload.get("actions") or []  # notification buttons
     controls = payload.get("controls") or {}
-    actions += [control for slot, control in controls.items() if slot != "extra"]
-    actions += controls.get("extra") or []
-    actions += payload.get("options") or []  # approval
-    actions += payload.get("actions") or []  # notification buttons
-    holders = [(payload, "url"), (payload, "secondary_url")]
-    holders += [(action, "url") for action in actions if isinstance(action, dict)]
+    webhooks = [control for slot, control in controls.items() if slot != "extra"]
+    webhooks += controls.get("extra") or []
+    webhooks += payload.get("options") or []  # approval
+    holders = [(payload, "url", False), (payload, "secondary_url", False)]
+    holders += [(action, "url", not action.get("foreground")) for action in routed if isinstance(action, dict)]
+    holders += [(action, "url", True) for action in webhooks if isinstance(action, dict)]
     return holders
 
 
-def _resolve_ha_paths(hass: HomeAssistant, payload: dict, *, url_validator=validate_tap_action_url) -> dict:
-    """The payload with every Home Assistant path (/lovelace/kitchen) turned into a URL the phone can open.
+def _ha_base_url(hass: HomeAssistant, path: str, *, https: bool) -> str:
+    """Home Assistant's external URL, else its Home Assistant Cloud URL, to put path on.
 
-    The base is Home Assistant's external URL, or its Home Assistant Cloud URL, never
-    the internal one: the phone that gets the push is often away from home. A payload
-    without a path comes back untouched, as the same object. url_validator checks the
-    payload's own url (send_notification's is http(s) only); button urls get
+    Never the internal one: the phone that gets the push is often away from home.
+    allow_ip keeps an external URL on a bare IP, which get_url skips by default once
+    Home Assistant serves TLS itself. https is for a silent request: the iOS extensions
+    that fire those ship no App Transport Security exception, and Android drops a
+    cleartext button, so an http external URL gives way to the Cloud URL. get_url's
+    require_ssl also refuses https on a bare IP, hence the second lookup only after the
+    first one came back http.
+    """
+    try:
+        url = get_url(hass, allow_internal=False, allow_ip=True)
+    except NoURLAvailableError as err:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="external_url_required",
+            translation_placeholders={"path": path},
+        ) from err
+    if https and urlparse(url).scheme != "https":
+        try:
+            url = get_url(hass, allow_internal=False, require_ssl=True)
+        except NoURLAvailableError as err:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="https_external_url_required",
+                translation_placeholders={"path": path},
+            ) from err
+    return url.rstrip("/")
+
+
+def _resolve_ha_paths(hass: HomeAssistant, payload: dict, *, url_validator=validate_tap_action_url) -> dict:
+    """The payload with every Home Assistant path (/lovelace/kitchen) turned into a URL the phone can use.
+
+    The base comes from _ha_base_url, https for a silent request. A payload without a
+    path comes back untouched, as the same object. url_validator checks the payload's
+    own url (send_notification's is http(s) only); button urls get
     validate_tap_action_url, like the schema gives them.
     """
-    if not any(_is_ha_path(holder.get(key)) for holder, key in _url_holders(payload)):
+    if not any(_is_ha_path(holder.get(key)) for holder, key, _ in _url_holders(payload)):
         return payload
     payload = copy.deepcopy(payload)
-    base: str | None = None
-    for holder, key in _url_holders(payload):
+    bases: dict[bool, str] = {}
+    for holder, key, silent in _url_holders(payload):
         path = holder.get(key)
         if not _is_ha_path(path):
             continue
-        if base is None:
-            try:
-                base = get_url(hass, allow_internal=False).rstrip("/")
-            except NoURLAvailableError as err:
-                raise ServiceValidationError(
-                    translation_domain=DOMAIN,
-                    translation_key="external_url_required",
-                    translation_placeholders={"path": path},
-                ) from err
-        url = base + path
+        if silent not in bases:
+            bases[silent] = _ha_base_url(hass, path, https=silent)
+        url = bases[silent] + path
         validator = url_validator if holder is payload else validate_tap_action_url
         try:
             holder[key] = validator(url)

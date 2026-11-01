@@ -6,7 +6,7 @@ import json
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 import voluptuous as vol
@@ -18,6 +18,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward import async_remove_entry
 from custom_components.pushward.api import (
+    PushWardApiClient,
     PushWardApiError,
     PushWardAuthError,
     PushWardEmailPermissionError,
@@ -25,6 +26,7 @@ from custom_components.pushward.api import (
     PushWardNotFoundError,
 )
 from custom_components.pushward.const import (
+    CONF_E2E_KEY,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
@@ -36,7 +38,7 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_WIDGET,
     validate_tap_action_url,
 )
-from custom_components.pushward.e2e import E2EError
+from custom_components.pushward.e2e import E2EError, open_envelope
 from custom_components.pushward.widget_manager import WidgetManager
 
 from .conftest import (
@@ -44,6 +46,8 @@ from .conftest import (
     IMAGE_URL,
     async_setup_with_api,
     expected_thumbhash,
+    make_mock_response,
+    make_mock_session,
     make_quota_error,
     make_usage_payload,
     make_widget_config,
@@ -51,7 +55,11 @@ from .conftest import (
     patch_image_fetch_failure,
     png_bytes,
 )
-from .server_contract import assert_valid_activity_content, assert_valid_notification_receipt
+from .server_contract import (
+    assert_valid_activity_content,
+    assert_valid_notification_receipt,
+    assert_valid_notification_request,
+)
 
 MOCK_INTEGRATION_KEY = "test-key-123"
 
@@ -3724,7 +3732,7 @@ async def test_a_path_resolves_against_the_cloud_url(hass: HomeAssistant) -> Non
             DOMAIN, "send_notification", {"title": "t", "body": "b", "url": "/lovelace/0"}, blocking=True
         )
 
-    get_url.assert_called_once_with(hass, allow_internal=False)
+    get_url.assert_called_once_with(hass, allow_internal=False, allow_ip=True)
     assert api.create_notification.call_args.kwargs["url"] == "https://abc.ui.nabu.casa/lovelace/0"
 
 
@@ -3851,3 +3859,190 @@ async def test_update_activity_resolves_tile_control_and_option_paths(hass: Home
     assert content["options"][0]["url"] == "https://ha.example.com/api/webhook/approve-gate"
     assert "url" not in content["options"][1]
     assert_valid_activity_content(content, where="update_activity_approval")
+
+
+_HTTP_EXTERNAL_URL = "http://ha.example.com:8123"
+
+
+@pytest.mark.parametrize(
+    ("service", "data"),
+    [
+        (
+            "send_notification",
+            {"actions": [{"id": "valve", "title": "Close", "url": "/api/webhook/close-valve", "method": "post"}]},
+        ),
+        # No method: still a silent GET, since only foreground opens the url.
+        ("send_notification", {"actions": [{"id": "ping", "title": "Ping", "url": "/api/webhook/ping"}]}),
+        ("update_activity_generic", {"tap_action": {"url": "/api/webhook/pause-washer"}}),
+        ("update_activity_generic", {"url_action": {"url": "/api/webhook/pause-washer", "title": "Pause"}}),
+        (
+            "update_activity_board",
+            {"tiles": [{"label": "Garage", "value": "Open", "url_action": {"url": "/api/webhook/garage"}}]},
+        ),
+        ("update_activity_media", {"controls": {"play_pause": {"url": "/api/webhook/pw-toggle"}}}),
+        ("update_activity_media", {"controls": {"extra": [{"url": "/api/webhook/pw-shuffle", "icon": "shuffle"}]}}),
+        (
+            "update_activity_approval",
+            {
+                "state_text": "Open the gate?",
+                "options": [
+                    {"id": "approve", "title": "Approve", "url": "/api/webhook/approve-gate"},
+                    {"id": "deny", "title": "Deny"},
+                ],
+            },
+        ),
+    ],
+)
+async def test_a_silent_path_needs_an_https_url(hass: HomeAssistant, service: str, data: dict) -> None:
+    """The phone sends a background request only over https, so an http external URL cannot carry one."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = _HTTP_EXTERNAL_URL
+    if service == "send_notification":
+        data = {"title": "t", "body": "b", **data}
+    else:
+        data = {"slug": "pw-test", "state": "ongoing", **data}
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await hass.services.async_call(DOMAIN, service, data, blocking=True)
+
+    assert exc_info.value.translation_key == "https_external_url_required"
+    assert exc_info.value.translation_placeholders["path"].startswith("/api/webhook/")
+    api.create_notification.assert_not_awaited()
+    api.update_activity.assert_not_awaited()
+
+
+async def test_an_opened_path_keeps_an_http_external_url(hass: HomeAssistant) -> None:
+    """A url the phone opens in the browser may be http; only background requests need https."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = _HTTP_EXTERNAL_URL
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "t",
+            "body": "b",
+            "url": "/lovelace/kitchen",
+            "actions": [{"id": "open", "title": "Open", "url": "/lovelace/kitchen", "foreground": True}],
+        },
+        blocking=True,
+    )
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["url"] == "http://ha.example.com:8123/lovelace/kitchen"
+    assert kwargs["actions"][0]["url"] == "http://ha.example.com:8123/lovelace/kitchen"
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {
+            "slug": "ha-washer",
+            "state": "ongoing",
+            "url": "/lovelace/laundry",
+            "secondary_url": "/lovelace/energy",
+            "tap_action": {"url": "/lovelace/laundry", "foreground": True},
+        },
+        blocking=True,
+    )
+    content = api.update_activity.call_args[0][2]
+    assert content["url"] == "http://ha.example.com:8123/lovelace/laundry"
+    assert content["secondary_url"] == "http://ha.example.com:8123/lovelace/energy"
+    assert content["tap_action"]["url"] == "http://ha.example.com:8123/lovelace/laundry"
+
+
+async def test_a_silent_path_moves_to_the_cloud_url_when_the_external_url_is_http(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    def fake_get_url(_hass, *, allow_internal, allow_ip=None, require_ssl=False):
+        # get_url(require_ssl=True) skips an http external URL and falls back to the Cloud URL.
+        return "https://abc.ui.nabu.casa" if require_ssl else _HTTP_EXTERNAL_URL
+
+    with patch("custom_components.pushward.get_url", side_effect=fake_get_url):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {
+                "title": "t",
+                "body": "b",
+                "url": "/lovelace/kitchen",
+                "actions": [
+                    {"id": "valve", "title": "Close", "url": "/api/webhook/close-valve", "method": "post"},
+                    {"id": "ping", "title": "Ping", "url": "/api/webhook/ping"},
+                ],
+            },
+            blocking=True,
+        )
+
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["url"] == "http://ha.example.com:8123/lovelace/kitchen"
+    assert [action["url"] for action in kwargs["actions"]] == [
+        "https://abc.ui.nabu.casa/api/webhook/close-valve",
+        "https://abc.ui.nabu.casa/api/webhook/ping",
+    ]
+
+
+async def test_an_https_external_url_on_an_ip_is_used(hass: HomeAssistant) -> None:
+    """get_url skips an IP external URL by default once Home Assistant serves TLS itself,
+    and its require_ssl skips one always, so neither path may lean on those defaults."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = "https://203.0.113.7:8123"
+    hass.config.api = MagicMock(use_ssl=True)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "t",
+            "body": "b",
+            "url": "/lovelace/kitchen",
+            "actions": [{"id": "valve", "title": "Close", "url": "/api/webhook/close-valve", "method": "post"}],
+        },
+        blocking=True,
+    )
+
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["url"] == "https://203.0.113.7:8123/lovelace/kitchen"
+    assert kwargs["actions"][0]["url"] == "https://203.0.113.7:8123/api/webhook/close-valve"
+
+
+async def test_a_path_url_is_resolved_before_it_is_sealed(hass: HomeAssistant) -> None:
+    """With an e2e key the url travels only inside the envelope, so it has to be a full URL by then."""
+    e2e_key = bytes(range(32))
+    session = make_mock_session(make_mock_response(201, json_body={"id": 7}))
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="PushWard",
+        data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY},
+        options={CONF_E2E_KEY: e2e_key.hex()},
+        version=2,
+        unique_id=DOMAIN,
+    )
+    entry.add_to_hass(hass)
+    hass.config.external_url = _EXTERNAL_URL
+    with (
+        patch("custom_components.pushward.async_get_clientsession", return_value=session),
+        patch.object(PushWardApiClient, "get_me", AsyncMock(return_value=make_usage_payload())),
+    ):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {
+                "title": "Kitchen",
+                "body": "Leak detected",
+                "url": "/lovelace/kitchen",
+                "actions": [{"id": "open", "title": "Open", "url": "/lovelace/kitchen", "foreground": True}],
+            },
+            blocking=True,
+        )
+
+    body = session.request.call_args.kwargs["json"]
+    assert_valid_notification_request(body)
+    assert "url" not in body
+    assert open_envelope(e2e_key, body["encrypted"])["url"] == "https://ha.example.com/lovelace/kitchen"
+    assert body["actions"][0]["url"] == "https://ha.example.com/lovelace/kitchen"

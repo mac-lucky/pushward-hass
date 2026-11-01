@@ -1963,6 +1963,9 @@
     },
     "ha_path_invalid": {
       "message": "{url} is not a valid URL: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} is a silent request, which the phone only sends over https, and Home Assistant's external URL is http. Set an https Internet URL under Settings > System > Network or connect Home Assistant Cloud, or send a full https URL instead."
     }
   },
   "config": {
