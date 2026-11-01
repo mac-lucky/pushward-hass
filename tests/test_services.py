@@ -109,6 +109,7 @@ _BASE_SERVICES = (
     "cancel_scheduled_notification",
     "list_scheduled_notifications",
     "cancel_notifications",
+    "clear_notification",
 )
 
 
@@ -719,6 +720,125 @@ async def test_service_send_notification_other_refusals_keep_the_server_message(
     with pytest.raises(HomeAssistantError, match="failed \\(400\\): bad") as exc_info:
         await hass.services.async_call(DOMAIN, "send_notification", {"title": "t", "body": "b"}, blocking=True)
     assert not isinstance(exc_info.value, ServiceValidationError)
+
+
+# --- clear_notification and snooze ---
+
+
+async def test_service_clear_notification_retracts_the_collapse_id(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.retract_notifications = AsyncMock(return_value=3)
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(DOMAIN, "clear_notification", {"collapse_id": "garage-door"}, blocking=True)
+    response = await hass.services.async_call(
+        DOMAIN, "clear_notification", {"collapse_id": "garage-door"}, blocking=True, return_response=True
+    )
+
+    assert api.retract_notifications.await_args_list[0].args == ("garage-door",)
+    assert response == {"devices": 3}
+
+
+@pytest.mark.parametrize("data", [{}, {"collapse_id": ""}, {"collapse_id": "x" * 65}])
+async def test_service_clear_notification_needs_a_collapse_id(hass: HomeAssistant, data: dict) -> None:
+    api = _mock_api()
+    api.retract_notifications = AsyncMock()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(DOMAIN, "clear_notification", data, blocking=True)
+    api.retract_notifications.assert_not_awaited()
+
+
+async def test_service_clear_notification_surfaces_a_refusal(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.retract_notifications = AsyncMock(side_effect=PushWardForbiddenError("no send permission", status_code=403))
+    await _setup_entry(hass, api)
+
+    with pytest.raises(ServiceValidationError, match="no send permission"):
+        await hass.services.async_call(DOMAIN, "clear_notification", {"collapse_id": "garage"}, blocking=True)
+
+
+@pytest.mark.parametrize(
+    ("snooze", "expected"),
+    [
+        ([15, 60], [15, 60]),
+        (["5", "1440"], [5, 1440]),  # the UI field sends strings
+        (30, [30]),
+        ([1, 2, 3], [1, 2, 3]),
+    ],
+)
+async def test_service_send_notification_passes_snooze(hass: HomeAssistant, snooze, expected) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN, "send_notification", {"title": "Washer", "body": "Done", "snooze": snooze}, blocking=True
+    )
+
+    assert api.create_notification.call_args[1]["snooze"] == expected
+
+
+async def test_service_send_notification_an_empty_snooze_is_left_out(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN, "send_notification", {"title": "t", "body": "b", "snooze": []}, blocking=True
+    )
+
+    assert "snooze" not in api.create_notification.call_args[1]
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        {"snooze": [0]},
+        {"snooze": [1441]},
+        {"snooze": [15, 15]},
+        {"snooze": [5, 10, 15, 30]},
+        {"snooze": ["soon"]},
+        {"snooze": [15], "acknowledge": True},
+        {"snooze": [15], "acknowledge": {"repeat_seconds": 60}},
+        {"snooze": [5, 10, 15], "actions": [_LINK] * 8},
+    ],
+)
+async def test_service_send_notification_refuses_bad_snooze(hass: HomeAssistant, extra: dict) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(DOMAIN, "send_notification", {"title": "t", "body": "b", **extra}, blocking=True)
+    api.create_notification.assert_not_awaited()
+
+
+async def test_service_send_notification_snooze_with_acknowledge_false_is_fine(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "t", "body": "b", "snooze": [10], "acknowledge": False, "actions": [_LINK] * 9},
+        blocking=True,
+    )
+
+    kwargs = api.create_notification.call_args[1]
+    assert kwargs["snooze"] == [10]
+    assert "acknowledge" not in kwargs
+
+
+@pytest.mark.parametrize("extra", [{"send_at": "2026-10-01T18:00:00+02:00"}, {"recurrence": {"cron": "0 8 * * 1-5"}}])
+async def test_service_send_notification_keeps_snooze_on_scheduled_sends(hass: HomeAssistant, extra: dict) -> None:
+    api = _mock_api()
+    api.create_notification = AsyncMock(return_value={"id": 42, "send_at": "2026-10-01T16:00:00Z"})
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN, "send_notification", {"title": "Bins", "body": "Tonight", "snooze": [60], **extra}, blocking=True
+    )
+
+    assert api.create_notification.call_args[1]["snooze"] == [60]
 
 
 @pytest.mark.parametrize("data", [{}, {"tag": "a", "notification_id": 1}, {"tag": "two words"}, {"notification_id": 0}])

@@ -38,6 +38,8 @@ from .server_contract import (
     assert_valid_notification_receipt,
     assert_valid_notification_request,
     assert_valid_receipts_canceled,
+    assert_valid_retract_request,
+    assert_valid_retract_response,
 )
 
 # --- get_me ---
@@ -1355,3 +1357,50 @@ def test_forbidden_exception_is_subclass_of_api_error():
 
 def test_email_permission_error_is_subclass_of_forbidden():
     assert issubclass(PushWardEmailPermissionError, PushWardForbiddenError)
+
+
+# --- snooze and retract ---
+
+
+async def test_create_notification_sends_snooze():
+    session = _make_session(_mock_response(201, json_body={"id": 991, "snooze": [15, 60]}))
+    client = _make_client(session)
+
+    await client.create_notification("Washer", "Done", snooze=[15, 60])
+
+    body = session.request.call_args[1]["json"]
+    assert body["snooze"] == [15, 60]
+    assert_valid_notification_request(body)
+
+
+async def test_create_notification_keeps_snooze_on_scheduled_and_recurring_sends():
+    for extra in (
+        {"send_at": datetime(2026, 11, 2, 8, 0, tzinfo=UTC)},
+        {"recurrence": {"cron": "0 8 * * *", "timezone": "UTC"}},
+    ):
+        session = _make_session(_mock_response(201, json_body={"id": 7, "status": "scheduled"}))
+        client = _make_client(session)
+
+        await client.create_notification("Bins", "Tonight", snooze=[30], **extra)
+
+        assert session.request.call_args[0][1].endswith("/notifications/scheduled")
+        assert session.request.call_args[1]["json"]["snooze"] == [30]
+
+
+async def test_retract_notifications_posts_the_collapse_id_and_returns_devices():
+    session = _make_session(_mock_response(202, json_body={"devices": 3}))
+    client = _make_client(session)
+
+    assert await client.retract_notifications("garage-door") == 3
+
+    call_args = session.request.call_args
+    assert call_args[0][0] == "POST"
+    assert call_args[0][1].endswith("/notifications/retract")
+    assert_valid_retract_request(call_args[1]["json"])
+    assert call_args[1]["json"] == {"collapse_id": "garage-door"}
+    assert_valid_retract_response({"devices": 3})
+
+
+async def test_retract_notifications_reads_a_bad_body_as_zero():
+    client = _make_client(_make_session(_mock_response(202, json_body={"devices": "3"})))
+    assert await client.retract_notifications("x") == 0

@@ -406,6 +406,15 @@ ANSWER_MAX_TIMEOUT = 86400
 ANSWER_STATUS_ANSWERED = "answered"
 ANSWER_STATUS_PENDING = "pending"
 
+# snooze on send_notification: 1-3 distinct durations in minutes, never with
+# acknowledge, and together with the actions at most NOTIFICATION_ACTIONS_MAX
+# buttons.
+SNOOZE_MAX = 3
+SNOOZE_MINUTES_MIN = 1
+SNOOZE_MINUTES_MAX = 1440
+
+RETRACT_COLLAPSE_ID_MAX = 64
+
 # Tracked to-do lists (tracked_todo subentries): each open item with a due date
 # gets a PushWard scheduled notification. The entity is CONF_ENTITY_ID.
 CONF_TODO_OFFSET_MINUTES = "offset_minutes"

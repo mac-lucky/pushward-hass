@@ -377,6 +377,7 @@ class PushWardApiClient:
         acknowledge: dict | None = None,
         tags: list[str] | None = None,
         callback_url: str | None = None,
+        snooze: list[int] | None = None,
         trim_to_fit: bool = False,
     ) -> dict | None:
         """Create a notification via POST /notifications and return it.
@@ -400,6 +401,9 @@ class PushWardApiClient:
         acknowledge itself (see _ACK_REFUSALS), a notification sent now goes out
         once more without it, tags and callback_url, the same sealed envelope
         included, and the response carries ``acknowledge_refused`` with the reason.
+
+        ``snooze`` (1-3 minute durations) adds snooze buttons; the device shows the
+        notification again after the chosen time. It never goes with acknowledge.
         """
         if self.e2e_key is not None:
             if trim_to_fit:
@@ -433,6 +437,7 @@ class PushWardApiClient:
             ("acknowledge", acknowledge),
             ("tags", tags),
             ("callback_url", callback_url),
+            ("snooze", snooze),
         ]:
             if val is not None:
                 payload[key] = val
@@ -462,6 +467,20 @@ class PushWardApiClient:
             "POST", path, json=plain, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
         )
         return {**(created or {}), "acknowledge_refused": reason}
+
+    async def retract_notifications(self, collapse_id: str) -> int:
+        """POST /notifications/retract: take back the notifications sent with ``collapse_id``.
+
+        The devices remove them from view and mark them read; nothing is deleted on
+        the server, and the caller's acknowledged notifications with that collapse_id
+        stop repeating. Best effort (a silent push). Returns how many devices it was
+        sent to. Not metered.
+        """
+        data = await self._request_with_retry(
+            "POST", "/notifications/retract", json={"collapse_id": collapse_id}, return_json=True
+        )
+        devices = data.get("devices") if isinstance(data, dict) else None
+        return devices if isinstance(devices, int) and not isinstance(devices, bool) else 0
 
     async def list_scheduled_notifications(self, status: str = "scheduled") -> list[dict]:
         """GET /notifications/scheduled, following next_cursor.

@@ -101,10 +101,14 @@ from .const import (
     PRIORITY_MIN,
     RECURRENCE_CRON_MAX_LEN,
     RECURRENCE_MAX_COUNT,
+    RETRACT_COLLAPSE_ID_MAX,
     SCALES,
     SCHEDULED_NOTIFICATION_STATUSES,
     SERVICE_TEMPLATES,
     SEVERITIES,
+    SNOOZE_MAX,
+    SNOOZE_MINUTES_MAX,
+    SNOOZE_MINUTES_MIN,
     SOUNDS,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
@@ -161,6 +165,7 @@ SERVICE_CANCEL_SCHEDULED_NOTIFICATION = "cancel_scheduled_notification"
 SERVICE_LIST_SCHEDULED_NOTIFICATIONS = "list_scheduled_notifications"
 SERVICE_GET_NOTIFICATION_ANSWER = "get_notification_answer"
 SERVICE_CANCEL_NOTIFICATIONS = "cancel_notifications"
+SERVICE_CLEAR_NOTIFICATION = "clear_notification"
 
 
 def _entry_ids(value: object) -> list[str] | None:
@@ -876,6 +881,24 @@ def _validate_acknowledge(data: dict) -> dict:
     return data
 
 
+def _distinct(values: list) -> list:
+    if len(set(values)) != len(values):
+        raise vol.Invalid("snooze durations must be different from each other")
+    return values
+
+
+def _validate_snooze(data: dict) -> dict:
+    """snooze rules that span fields, as the server checks them."""
+    if not data.get("snooze"):
+        data.pop("snooze", None)  # an emptied UI field
+        return data
+    if "acknowledge" in data:
+        raise vol.Invalid("snooze cannot be combined with acknowledge: an acknowledged notification repeats instead")
+    if len(data.get("actions") or []) + len(data["snooze"]) > NOTIFICATION_ACTIONS_MAX:
+        raise vol.Invalid(f"actions and snooze together make at most {NOTIFICATION_ACTIONS_MAX} buttons")
+    return data
+
+
 SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
     {
         **_ENTRY_TARGET_FIELD,
@@ -903,9 +926,16 @@ SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
             cv.ensure_list, [validate_notification_tag], vol.Length(max=NOTIFICATION_TAGS_MAX)
         ),
         vol.Optional("callback_url"): validate_callback_url,
+        # Minutes; the UI field sends them as strings.
+        vol.Optional("snooze"): vol.All(
+            cv.ensure_list,
+            [vol.All(vol.Coerce(int), vol.Range(min=SNOOZE_MINUTES_MIN, max=SNOOZE_MINUTES_MAX))],
+            vol.Length(max=SNOOZE_MAX),
+            _distinct,
+        ),
     }
 )
-SCHEMA_SEND_NOTIFICATION = vol.All(SCHEMA_SEND_NOTIFICATION_FIELDS, _validate_acknowledge)
+SCHEMA_SEND_NOTIFICATION = vol.All(SCHEMA_SEND_NOTIFICATION_FIELDS, _validate_acknowledge, _validate_snooze)
 
 SCHEMA_CANCEL_SCHEDULED_NOTIFICATION = vol.Schema(
     {
@@ -933,6 +963,13 @@ SCHEMA_CANCEL_NOTIFICATIONS = vol.All(
         }
     ),
     cv.has_at_least_one_key("tag", "notification_id"),
+)
+
+SCHEMA_CLEAR_NOTIFICATION = vol.Schema(
+    {
+        **_ENTRY_TARGET_FIELD,
+        vol.Required("collapse_id"): vol.All(cv.string, vol.Length(min=1, max=RETRACT_COLLAPSE_ID_MAX)),
+    }
 )
 
 SCHEMA_LIST_SCHEDULED_NOTIFICATIONS = vol.Schema(
@@ -1331,6 +1368,7 @@ _NOTIFICATION_FIELDS = [
     "acknowledge",
     "tags",
     "callback_url",
+    "snooze",
 ]
 
 
@@ -1423,6 +1461,13 @@ async def _async_handle_cancel_notifications(hass: HomeAssistant, call: ServiceC
                 translation_placeholders={"notification_id": str(notification_id)},
             ) from err
     return response if call.return_response else None
+
+
+async def _async_handle_clear_notification(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
+    """Take back the notifications sent with a collapse_id, on every targeted account."""
+    collapse_id = call.data["collapse_id"]
+    counts = await _fan_out(_target_entries(hass, call), lambda data: data["api"].retract_notifications(collapse_id))
+    return {"devices": sum(counts)} if call.return_response else None
 
 
 async def _async_handle_list_scheduled_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
@@ -1567,6 +1612,13 @@ def _register_services(hass: HomeAssistant) -> None:
         SERVICE_CANCEL_NOTIFICATIONS,
         partial(_async_handle_cancel_notifications, hass),
         SCHEMA_CANCEL_NOTIFICATIONS,
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_CLEAR_NOTIFICATION,
+        partial(_async_handle_clear_notification, hass),
+        SCHEMA_CLEAR_NOTIFICATION,
         supports_response=SupportsResponse.OPTIONAL,
     )
     hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)

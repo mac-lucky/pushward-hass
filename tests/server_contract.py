@@ -1147,6 +1147,10 @@ _LOCAL_HOST_SUFFIXES = (".localhost", ".local", ".internal", ".svc", ".cluster.l
 RECEIPT_STATUSES = ("active", "acknowledged", "expired", "canceled")
 RECEIPT_CANCEL_REASONS = ("api", "tag", "superseded", "key_revoked", "org_disabled")
 RECEIPT_CALLBACK_STATUSES = ("pending", "delivered", "failed")
+# snooze: 1-3 distinct minute durations, each 1-1440.
+_SNOOZE_MAX = 3
+_SNOOZE_MINUTES = (1, 1440)
+_COLLAPSE_ID_MAX = 64
 
 
 def _check_callback_url(url: object, where: str) -> None:
@@ -1209,6 +1213,18 @@ def assert_valid_notification_request(payload: dict, *, where: str = "notificati
     actions = payload.get("actions") or []
     if not isinstance(actions, list) or len(actions) > NOTIFICATION_ACTIONS_MAX:
         _fail(where, f"actions must be a list of at most {NOTIFICATION_ACTIONS_MAX}")
+
+    snooze = payload.get("snooze")
+    if snooze is not None:
+        low, high = _SNOOZE_MINUTES
+        if not isinstance(snooze, list) or not 1 <= len(snooze) <= _SNOOZE_MAX:
+            _fail(where, f"snooze must be a list of 1-{_SNOOZE_MAX} durations")
+        if not all(_is_int(m) and low <= m <= high for m in snooze) or len(set(snooze)) != len(snooze):
+            _fail(where, f"snooze durations must be distinct ints in [{low}, {high}], got {snooze!r}")
+        if payload.get("acknowledge") is not None:
+            _fail(where, "snooze cannot be combined with acknowledge (422 notification.snooze_invalid)")
+        if len(actions) + len(snooze) > NOTIFICATION_ACTIONS_MAX:
+            _fail(where, f"actions plus snooze exceed {NOTIFICATION_ACTIONS_MAX} (422 notification.snooze_invalid)")
 
     ack = payload.get("acknowledge")
     tags = payload.get("tags")
@@ -1310,3 +1326,21 @@ def assert_valid_receipts_canceled(body: object, *, where: str = "receipts_cance
     """Assert the POST /notifications/receipts/cancel response: ``{"canceled": n}``."""
     if not isinstance(body, dict) or not _is_int(body.get("canceled")) or body["canceled"] < 0:
         _fail(where, f"expected {{'canceled': <non-negative int>}}, got {body!r}")
+
+
+# --- Retract (POST /notifications/retract) -------------------------------------------
+
+
+def assert_valid_retract_request(body: object, *, where: str = "retract") -> None:
+    """Assert a POST /notifications/retract body: ``{"collapse_id": 1-64 characters}`` and nothing else."""
+    if not isinstance(body, dict) or set(body) != {"collapse_id"}:
+        _fail(where, f"expected {{'collapse_id': str}} only, got {body!r}")
+    collapse_id = body["collapse_id"]
+    if not isinstance(collapse_id, str) or not 1 <= len(collapse_id) <= _COLLAPSE_ID_MAX:
+        _fail(where, f"collapse_id must be 1-{_COLLAPSE_ID_MAX} characters")
+
+
+def assert_valid_retract_response(body: object, *, where: str = "retract_response") -> None:
+    """Assert the 202 body of POST /notifications/retract: ``{"devices": n}``."""
+    if not isinstance(body, dict) or not _is_int(body.get("devices")) or body["devices"] < 0:
+        _fail(where, f"expected {{'devices': <non-negative int>}}, got {body!r}")

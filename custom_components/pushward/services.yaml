@@ -2332,6 +2332,14 @@ send_notification:
       selector:
         text:
           type: url
+    snooze:
+      name: Snooze
+      description: Up to 3 snooze buttons, each a different number of minutes from 1 to 1440. Tapping one hides the notification and shows it again on that device after that time. Not with Acknowledge, and together with the actions at most 10 buttons.
+      example: "[15, 60]"
+      selector:
+        text:
+          type: number
+          multiple: true
 
 cancel_scheduled_notification:
   name: Cancel Scheduled Notification
@@ -2430,6 +2438,24 @@ cancel_notifications:
         number:
           min: 1
           mode: box
+
+clear_notification:
+  name: Clear Notification
+  description: Take back the notifications sent with a collapse_id. Each device removes them from view and marks them read in the PushWard app, and acknowledged notifications with that collapse_id stop repeating. Best effort, like the Companion app's clear_notification. The optional response holds how many devices it was sent to (devices).
+  fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to clear on every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
+    collapse_id:
+      name: Collapse ID
+      description: The collapse_id the notifications were sent with, up to 64 characters.
+      required: true
+      example: "garage-door"
+      selector:
+        text:
 
 send_email:
   name: Send Email

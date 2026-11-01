@@ -29,6 +29,8 @@ from .server_contract import (
     assert_valid_notification_request,
     assert_valid_priority,
     assert_valid_receipts_canceled,
+    assert_valid_retract_request,
+    assert_valid_retract_response,
     assert_valid_sound,
     assert_valid_widget_content,
 )
@@ -866,6 +868,8 @@ def valid_receipt(**overrides) -> dict:
         {"title": "t", "body": "b", "acknowledge": {}, "actions": [LINK] * 9},
         {"title": "t", "body": "b", "acknowledge": {}, "actions": [LINK] * 9 + [{"id": "ok", "title": "OK"}]},
         {"encrypted": ENVELOPE, "acknowledge": {}, "callback_url": "https://8.8.8.8/hook"},
+        {"title": "t", "body": "b", "snooze": [15, 60]},
+        {"title": "t", "body": "b", "snooze": [1, 720, 1440], "actions": [LINK] * 7},
     ],
 )
 def test_valid_notification_requests_pass(payload) -> None:
@@ -907,6 +911,14 @@ def test_valid_notification_requests_pass(payload) -> None:
         ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://[::ffff:10.0.0.1]/"}, "non-public"),
         ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://ha.local/hook"}, "is local"),
         ({"title": "t", "body": "b", "acknowledge": {}, "callback_url": "https://homeassistant/hook"}, "is local"),
+        ({"title": "t", "body": "b", "snooze": []}, "1-3 durations"),
+        ({"title": "t", "body": "b", "snooze": [5, 10, 15, 30]}, "1-3 durations"),
+        ({"title": "t", "body": "b", "snooze": [0]}, "distinct ints"),
+        ({"title": "t", "body": "b", "snooze": [1441]}, "distinct ints"),
+        ({"title": "t", "body": "b", "snooze": [15, 15]}, "distinct ints"),
+        ({"title": "t", "body": "b", "snooze": ["15"]}, "distinct ints"),
+        ({"title": "t", "body": "b", "snooze": [15], "acknowledge": {}}, "acknowledge"),
+        ({"title": "t", "body": "b", "snooze": [5, 10], "actions": [LINK] * 9}, "exceed 10"),
     ],
 )
 def test_invalid_notification_requests_rejected(payload, rule) -> None:
@@ -966,3 +978,15 @@ def test_receipts_canceled_response() -> None:
     for bad in ({}, {"canceled": -1}, {"canceled": True}, {"canceled": "2"}, []):
         with pytest.raises(PushWardContractError):
             assert_valid_receipts_canceled(bad)
+
+
+def test_retract_request_and_response() -> None:
+    assert_valid_retract_request({"collapse_id": "garage-door"})
+    assert_valid_retract_request({"collapse_id": "x" * 64})
+    for bad in ({}, {"collapse_id": ""}, {"collapse_id": "x" * 65}, {"collapse_id": "a", "org_id": "b"}):
+        with pytest.raises(PushWardContractError):
+            assert_valid_retract_request(bad)
+    assert_valid_retract_response({"devices": 0})
+    for bad in ({}, {"devices": -1}, {"devices": True}):
+        with pytest.raises(PushWardContractError):
+            assert_valid_retract_response(bad)
