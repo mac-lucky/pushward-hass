@@ -96,6 +96,7 @@ from .const import (
     TODO_TITLE_MAX,
     TODO_WATCH_ACTIVE_MINUTES,
     TODO_WATCH_ERROR_BACKOFF_SECONDS,
+    TODO_WATCH_FINAL_READ_MINUTES,
     TODO_WATCH_HOURS,
     TODO_WATCH_IDLE_SECONDS,
 )
@@ -304,12 +305,20 @@ class TodoReminderManager:
         self._watch_task: asyncio.Task | None = None
         self._watch_wakeup = asyncio.Event()
         self._unsub_answers: CALLBACK_TYPE | None = None
+        # Answers the stream read while the store was loading, acted on once it is.
+        self._early_answers: list[tuple[dict, int | None]] | None = None
         # Reminders whose answer is being acted on, by (subentry id, item uid).
         self._answering: set[tuple[str, str]] = set()
         self._done_label = "Done"
         self._stopped = False
 
     async def async_start(self) -> None:
+        # The answer stream is already running: listen before the first await, and
+        # hold what comes until the store says which reminders the answers are for.
+        self._early_answers = []
+        self._unsub_answers = async_dispatcher_connect(
+            self._hass, notification_answer_signal(self._entry.entry_id), self._on_stream_answer
+        )
         data = await self._store.async_load()
         data = data if isinstance(data, dict) else {}
         lists = data.get("lists")
@@ -324,6 +333,9 @@ class TodoReminderManager:
                 for uid in [uid for uid, rec in items.items() if rec.get("status") == _SCHEDULED]:
                     del items[uid]
             self._orphans = []
+        early, self._early_answers = self._early_answers, None
+        for item, schedule_id in early:
+            self._on_stream_answer(item, schedule_id)
         self._done_label = await self._async_done_label()
         for sub_id in self._configs:
             self._track(sub_id)
@@ -331,9 +343,6 @@ class TodoReminderManager:
             self._hass, self._async_interval_reconcile, timedelta(minutes=TODO_RECONCILE_INTERVAL_MINUTES)
         )
         self._unsub_started = async_at_started(self._hass, self._async_on_started)
-        self._unsub_answers = async_dispatcher_connect(
-            self._hass, notification_answer_signal(self._entry.entry_id), self._on_stream_answer
-        )
         self._watch_task = self._entry.async_create_background_task(
             self._hass, self._async_watch_loop(), name=f"{DOMAIN} to-do reminder answers"
         )
@@ -825,6 +834,14 @@ class TodoReminderManager:
         stream = self._answer_stream
         return stream is not None and stream.delivers_answer(rec.get("schedule_id"), rec.get("notification_id"))
 
+    @staticmethod
+    def _final_read_at(rec: dict) -> datetime | None:
+        """When a reminder the stream reads gets its one read here; None once it had it."""
+        watch_until = _from_iso(rec.get("watch_until"))
+        if rec.get("final_read") or watch_until is None:
+            return None
+        return watch_until - timedelta(minutes=TODO_WATCH_FINAL_READ_MINUTES)
+
     async def _async_watch_loop(self) -> None:
         """Watch sent reminders for a Done tap, one read at a time.
 
@@ -833,32 +850,52 @@ class TodoReminderManager:
         TODO_WATCH_ACTIVE_MINUTES each round is a server long-poll (through the
         install's shared wait slots); after that a round is a plain read every
         TODO_WATCH_IDLE_SECONDS, until the watch ends TODO_WATCH_HOURS after the
-        send.
+        send. A reminder the stream tracks still gets one plain read here in the
+        last TODO_WATCH_FINAL_READ_MINUTES of its watch: a stream that missed its
+        answer (it could not note the feed's position when the reminder was
+        made) would never bring it.
         """
         turn = 0
         while not self._stopped:
             now = dt_util.utcnow()
             watches = self._watches(now)
-            own = [w for w in watches if not self._stream_delivers(w[2])]
-            if not own:
+            own: list[tuple[str, str, dict]] = []
+            finals: list[datetime] = []
+            final = None
+            for watch in watches:
+                if not self._stream_delivers(watch[2]):
+                    own.append(watch)
+                elif (at := self._final_read_at(watch[2])) is not None:
+                    if at <= now:
+                        final = final or watch
+                    finals.append(at)
+            if not own and final is None:
                 self._watch_wakeup.clear()
                 if watches:
                     # Look again now and then: the stream lets a reminder go when it
                     # learns that it failed or was canceled, and the read moves here.
+                    wait = min([TODO_WATCH_IDLE_SECONDS, *((at - now).total_seconds() for at in finals)])
                     with contextlib.suppress(TimeoutError):
-                        await asyncio.wait_for(self._watch_wakeup.wait(), TODO_WATCH_IDLE_SECONDS)
+                        await asyncio.wait_for(self._watch_wakeup.wait(), max(1.0, wait))
                 else:
                     await self._watch_wakeup.wait()
                 continue
-            active_since = now - timedelta(minutes=TODO_WATCH_ACTIVE_MINUTES)
-            active = any((_from_iso(w[2]["send_at"]) or now) > active_since for w in own)
-            sub_id, uid, rec = own[turn % len(own)]
-            turn += 1
+            if final is not None:
+                active = False
+                sub_id, uid, rec = final
+            else:
+                active_since = now - timedelta(minutes=TODO_WATCH_ACTIVE_MINUTES)
+                active = any((_from_iso(w[2]["send_at"]) or now) > active_since for w in own)
+                sub_id, uid, rec = own[turn % len(own)]
+                turn += 1
             started = asyncio.get_running_loop().time()
-            pause: float = 0 if active else TODO_WATCH_IDLE_SECONDS
+            pause: float = 0 if active or final is not None else TODO_WATCH_IDLE_SECONDS
             try:
                 held = await self._async_watch_once(sub_id, uid, rec, hold=ANSWER_LONG_POLL_SECONDS if active else 0)
-                if active and not held:
+                if final is not None:
+                    rec["final_read"] = True
+                    self._save()
+                elif active and not held:
                     pause = _WATCH_SHORT_PAUSE_SECONDS
             except PushWardRateLimitedError as err:
                 pause = max(pause, err.retry_after, TODO_WATCH_ERROR_BACKOFF_SECONDS)
@@ -934,6 +971,9 @@ class TodoReminderManager:
     def _on_stream_answer(self, item: dict, schedule_id: int | None) -> None:
         """An answer the entry's answer stream read: the same as one this manager read itself."""
         if self._stopped:
+            return
+        if self._early_answers is not None:
+            self._early_answers.append((item, schedule_id))
             return
         notification_id = item.get("notification_id")
         found = self._find_record(notification_id, schedule_id)

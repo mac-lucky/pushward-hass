@@ -1184,6 +1184,26 @@ async def test_an_answer_read_before_its_schedule_goes_out_again_with_the_schedu
     assert received[1] == ({"notification_id": 99, "status": "answered", "action_id": "done"}, 7)
 
 
+async def test_a_loop_that_dies_stops_delivering_until_it_starts_again(streams, feed, api, caplog) -> None:
+    """An unexpected error ends the task; the stream must not go on claiming answers it no longer reads."""
+    stream = await streams()
+    api.get_scheduled_notification.side_effect = RuntimeError("bug")
+    due = NOW - timedelta(minutes=1)  # read at once
+    stream.async_track_send({"id": 7, "status": "scheduled", "send_at": due.isoformat()}, True)
+    await _until(lambda: not stream.running, "the loop to die")
+
+    assert "7" in stream._schedules
+    assert not stream.delivers_answer(7, None)
+    assert "stopped reading notification answers after an unexpected error" in caplog.text
+    assert "RuntimeError: bug" in caplog.text
+
+    api.get_scheduled_notification.side_effect = None
+    stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
+    await _until(lambda: feed.calls[1:], "the read after the restart")
+    assert stream.running
+    assert stream.delivers_answer(None, 42)
+
+
 async def test_a_refused_key_stops_delivering(streams, feed) -> None:
     stream = await streams()
     stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)

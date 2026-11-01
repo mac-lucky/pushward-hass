@@ -558,6 +558,16 @@ class AnswerStream:
     # --- the loop ---------------------------------------------------------
 
     async def _async_run(self) -> None:
+        try:
+            await self._async_loop()
+        except Exception:
+            # A loop that died must not go on claiming the answers it no longer reads:
+            # halted, delivers_answer says no, and the to-do Done watch reads its own.
+            # The next answerable send or schedule coming due starts it again.
+            _LOGGER.exception("PushWard stopped reading notification answers after an unexpected error")
+            self._halted = True
+
+    async def _async_loop(self) -> None:
         loop = asyncio.get_running_loop()
         failures = 0
         # 429s on a wait since the last wait that went through.

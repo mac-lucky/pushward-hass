@@ -508,6 +508,9 @@ TODO_WATCH_HOURS = 24
 TODO_WATCH_ACTIVE_MINUTES = 60
 TODO_WATCH_IDLE_SECONDS = 300
 TODO_WATCH_ERROR_BACKOFF_SECONDS = 60
+# A reminder whose answer the answer stream reads still gets one plain read of
+# its own in the last this-many minutes of its watch, in case the stream missed it.
+TODO_WATCH_FINAL_READ_MINUTES = 30
 
 # Templates offered by the tracked-entity config flow (each has a mapper).
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log", "media"]

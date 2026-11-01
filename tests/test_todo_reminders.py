@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.storage import Store
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.pushward.answer_stream import notification_answer_signal
@@ -934,6 +935,57 @@ async def test_a_stream_answer_after_the_watch_ended_is_ignored(hass: HomeAssist
     await hass.async_block_till_done()
 
     assert todo.updates == []
+
+
+async def test_a_stream_answer_while_the_store_loads_is_acted_on(hass: HomeAssistant, setup, hass_storage) -> None:
+    """The stream starts first: an answer it reads during the manager's start must not be lost."""
+    sent = {
+        "schedule_id": 5,
+        "status": "sent",
+        "notification_id": 55,
+        "send_at": NOW.isoformat(),
+        "due_at": (NOW + timedelta(hours=1)).isoformat(),
+        "watch_until": (NOW + timedelta(hours=24)).isoformat(),
+    }
+    await build_todo_store(hass, "entry-1").async_save({"lists": {SUB: {"entity_id": ENTITY, "items": {"a": sent}}}})
+    load = Store.async_load
+
+    async def load_after_an_answer(store):
+        async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(55), 5)
+        return await load(store)
+
+    with patch.object(Store, "async_load", load_after_an_answer):
+        manager, _, todo = await setup(list(_CALL), answer_stream=_FakeStream())
+
+    assert todo.updates == [{"item": "a", "status": "completed", "entity_id": ENTITY}]
+    assert _records(manager)["a"]["watch_until"] is None
+
+
+async def test_a_reminder_the_stream_reads_gets_one_read_of_its_own_at_the_end(
+    hass: HomeAssistant, setup, freezer
+) -> None:
+    stream = _FakeStream()
+    manager, api, _ = await setup(list(_CALL), answer_stream=stream)
+    rec = _records(manager)["a"]
+    stream.tracked.add(rec["schedule_id"])
+    rec.update(status="sent", notification_id=55, watch_until=(NOW + timedelta(hours=24)).isoformat())
+    api.poll_notification_answer = AsyncMock(return_value=({"status": "pending"}, False))
+
+    manager._watch_wakeup.set()
+    for _ in range(5):
+        await hass.async_block_till_done()
+    api.poll_notification_answer.assert_not_awaited()
+
+    freezer.move_to(NOW + timedelta(hours=23, minutes=31))
+    manager._watch_wakeup.set()
+    for _ in range(5):
+        await hass.async_block_till_done()
+    manager._watch_wakeup.set()
+    for _ in range(5):
+        await hass.async_block_till_done()
+
+    api.poll_notification_answer.assert_awaited_once_with(55, hold=0)
+    assert rec["final_read"] is True
 
 
 async def test_a_failed_completion_from_the_stream_is_retried_by_an_own_read(hass: HomeAssistant, setup) -> None:
