@@ -1,6 +1,7 @@
 [![HACS](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://hacs.xyz)
 [![Website](https://img.shields.io/badge/pushward.app-5B4FE5?style=for-the-badge&logo=safari&logoColor=white)](https://pushward.app)
 [![App Store](https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/id6759689999)
+[![Google Play](https://img.shields.io/badge/Google_Play-Download-34A853?style=for-the-badge&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.maclucky.pushward)
 
 # PushWard for Home Assistant
 
@@ -8,9 +9,9 @@
 [![Release](https://img.shields.io/github/v/release/mac-lucky/pushward-hass?sort=semver)](https://github.com/mac-lucky/pushward-hass/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Mirror Home Assistant entities onto your phone via [PushWard](https://pushward.app), as **Live Activities** (Dynamic Island + Lock Screen) and **Home/Lock Screen widgets**, plus account usage sensors and services to send push notifications, transactional email, and activity/widget updates from your automations.
+Mirror Home Assistant entities onto your phone via [PushWard](https://pushward.app), as **Live Activities** (Dynamic Island + Lock Screen; Live Updates on Android) and **Home/Lock Screen widgets**, plus account usage sensors and services to send push notifications, transactional email, and activity/widget updates from your automations.
 
-> **New to PushWard?** Learn more at **[pushward.app](https://pushward.app)**. The iOS app is on the **[App Store](https://apps.apple.com/app/id6759689999)**; you control everything from this integration and your automations.
+> **New to PushWard?** Learn more at **[pushward.app](https://pushward.app)**. The app is on the **[App Store](https://apps.apple.com/app/id6759689999)** and **[Google Play](https://play.google.com/store/apps/details?id=com.maclucky.pushward)**; you control everything from this integration and your automations.
 
 ## What it looks like
 
@@ -26,7 +27,7 @@ The entity you track shows up on the phone as a Live Activity, a Home/Lock Scree
 
 ## Contents
 
-[What it looks like](#what-it-looks-like) · [How it works](#how-it-works) · [Features](#features) · [Prerequisites](#prerequisites) · [Installation](#installation) · [Configuration](#configuration) · [Account sensors](#account-sensors) · [Services](#services) · [Domain Defaults](#domain-defaults) · [Contributing](#contributing) · [Support](#support) · [Translations](#translations) · [Development](#development) · [CI/CD & Releases](#cicd--releases) · [Server compatibility](#server-compatibility) · [Troubleshooting](#troubleshooting) · [Requirements & License](#requirements--license)
+[What it looks like](#what-it-looks-like) | [How it works](#how-it-works) | [Features](#features) | [Android](#android) | [Prerequisites](#prerequisites) | [Installation](#installation) | [Configuration](#configuration) | [Account sensors](#account-sensors) | [Notify entity](#notify-entity) | [Services](#services) | [Domain Defaults](#domain-defaults) | [Contributing](#contributing) | [Support](#support) | [Translations](#translations) | [Development](#development) | [CI/CD & Releases](#cicd--releases) | [Server compatibility](#server-compatibility) | [Troubleshooting](#troubleshooting) | [Requirements & License](#requirements--license)
 
 ## How it works
 
@@ -40,7 +41,7 @@ flowchart LR
     WM["WidgetManager"]
     SVC["pushward.* services"]
     API["PushWard API (api.pushward.app)"]
-    APNS["APNs"]
+    APNS["APNs / FCM"]
     PHONE["Phone: Live Activity, widget, push, email"]
     SENS["Account usage and quota sensors"]
 
@@ -86,6 +87,21 @@ The surfaces are independent (separate config, managers, and caches) and share o
 - **Color support**: RGB, HSV, XY, Kelvin, named colors
 - **TTL controls**: auto-delete after end, auto-end on stale activity, auto-dismiss from the Lock Screen
 - **Services** for the whole surface: create/update/end/delete activities (with a per-template update action), pause and resume timers, send notifications, send email, refresh/delete widgets, generate a ThumbHash
+- **Notify entity** per account, for `notify.send_message` and notify groups
+
+## Android
+
+The PushWard app is on [Google Play](https://play.google.com/store/apps/details?id=com.maclucky.pushward) for Android 12 and later. Nothing in this integration is set per platform: an activity, widget or notification reaches every phone on the account, and each app draws what its system allows. What stays different on Android:
+
+- Activities are Live Updates. Android 16 promotes them to the top of the shade and the lock screen, and 16 QPR2 adds a status-bar chip. Android 14 and 15 show an ongoing notification, 12 and 13 a plain one that updates in place.
+- There is no Dynamic Island, so the compact trailing slot (`compact_trailing_label`, `compact_trailing_icon`) has no equivalent. `compact_label` becomes the chip's text; the chip fits 7 characters.
+- `background_color` and `text_color` don't apply, because Android does not colorize promoted notifications.
+- The notification shade shows at most 3 action buttons. The notification's detail screen in the app lists all of them.
+- A notification `media` of type video or audio is not shown in the shade. Images are.
+- `level: critical` needs Do Not Disturb access, granted in the app, and `volume` is ignored.
+- Widgets are home-screen widgets only; Android has no lock-screen widgets.
+
+pushward.app compares the two per template: <https://pushward.app/docs/live-activities/ios-vs-android>.
 
 ## Prerequisites
 
@@ -507,6 +523,21 @@ Each config entry registers **5 sensors** under one service device named after t
 
 On premium, uncapped resources report `limit: unlimited`, and the notifications counter switches to a daily cap (hence `used_this_month` / `daily_resets_at`).
 
+## Notify entity
+
+Each entry also gets a notify entity on the same device, named after the entry: `notify.pushward_push_notification` for an entry titled PushWard. It takes `notify.send_message` and can be a member of a notify group, next to the Companion app or any other notifier:
+
+```yaml
+- action: notify.send_message
+  target:
+    entity_id: notify.pushward_push_notification
+  data:
+    title: Washer
+    message: The washer is done.
+```
+
+The message goes out like a `pushward.send_notification` with only a title and body, so an [encryption key](#end-to-end-encryption) seals it and a used-up notification quota refuses it. PushWard needs a title and `notify.send_message` doesn't always carry one; without it the title is your Home Assistant's name from **Settings > System > General** ("Home" unless you changed it), so the phone shows which home sent it. For levels, links, buttons or scheduling use `pushward.send_notification`.
+
 ## Services
 
 All services live in the `pushward` domain. There are 22 in total: the twelve described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
@@ -523,6 +554,12 @@ Every action except `generate_thumbhash` takes an optional `config_entry_id` (**
 | `get_notification_answer`, `list_scheduled_notifications`, `cancel_scheduled_notification`, `send_email` | fails until you name one |
 
 Notification ids belong to the account that sent them, hence the single-account rows. `send_email` goes to the address you give it, so sending it from every account would only deliver copies. When one account fails (quota, missing permission) the others still get the call, and the action raises the first error once they are done.
+
+### Links into Home Assistant
+
+A tap or button `url` that starts with a single `/`, like `/lovelace/kitchen` or `/api/webhook/close-valve`, is a path on your Home Assistant. Before the call goes out it becomes a full URL on Home Assistant's external URL (**Settings > System > Network**, Internet), or on the Home Assistant Cloud URL when no external URL is set. The internal URL is never used, since the phone may be away from home when someone taps. Without either, the action fails and says so. Full URLs (`https://...`, `homeassistant://...`) are sent as they are.
+
+That covers `url` and the action `url`s of `send_notification`, and `url`, `secondary_url`, `tap_action`, `url_action`, `secondary_url_action`, board tiles' `url_action`, media `controls` and approval `options` on the activity update actions. `media`, `icon_url`, `image_url` and `callback_url` still take full URLs only. A path to a webhook makes a silent button (`method: POST`). To open a dashboard in the Companion app rather than the browser, keep using `homeassistant://navigate/lovelace/kitchen`.
 
 ### `pushward.create_activity`
 
@@ -886,18 +923,18 @@ Send a push notification.
 | `title` | Yes | Notification title |
 | `body` | Yes | Notification body text |
 | `subtitle` | No | Subtitle below the title |
-| `level` | No | iOS interruption level: passive, active, time-sensitive, critical |
-| `volume` | No | Alert volume 0.0-1.0, applied only when `level` is critical |
-| `thread_id` | No | Groups notifications in Notification Center |
-| `collapse_id` | No | APNs dedup key, replaces same-key notification (max 64 chars) |
+| `level` | No | Interruption level: passive, active, time-sensitive, critical (on Android, critical needs Do Not Disturb access) |
+| `volume` | No | Alert volume 0.0-1.0, applied only when `level` is critical. Ignored on Android |
+| `thread_id` | No | Groups notifications on the device |
+| `collapse_id` | No | Dedup key, replaces same-key notification (max 64 chars) |
 | `source` / `source_display_name` | No | Grouping ID + label in the PushWard inbox |
 | `activity_slug` | No | Link the notification to an existing Live Activity |
-| `url` | No | Deep-link URL opened on tap |
-| `media` | No | Object `{ url, type }`, type is image, video, or audio |
+| `url` | No | Deep-link URL opened on tap. A path like `/lovelace/kitchen` opens on your external URL, see [Links into Home Assistant](#links-into-home-assistant) |
+| `media` | No | Object `{ url, type }`, type is image, video, or audio. Android shows only images in the shade |
 | `icon_url` | No | Custom icon URL |
 | `metadata` | No | Arbitrary key-value pairs for custom app handling |
-| `actions` | No | List of action buttons `{ id, title, url, foreground, destructive, authentication_required, icon }`. `url` may use a custom scheme, and `method`/`headers`/`body` make the button a silent HTTP webhook (http(s) only). Without a `url` (and without `foreground`) PushWard records the tap itself, see [Answers](#answers). A silent action can also set `text_input: true` (with optional `text_input_placeholder`, `text_input_button_title`) to prompt for a typed reply: recorded by PushWard when the action has no `url`, otherwise delivered to your webhook as JSON `{ "text": ... }` or via the `{{input}}` body placeholder |
-| `push` | No | Send as APNs push (default: true); when false, inbox-only |
+| `actions` | No | List of action buttons `{ id, title, url, foreground, destructive, authentication_required, icon }`. `url` may use a custom scheme or be a Home Assistant path, and `method`/`headers`/`body` make the button a silent HTTP webhook (http(s) only). Android shows the first 3 buttons in the shade. Without a `url` (and without `foreground`) PushWard records the tap itself, see [Answers](#answers). A silent action can also set `text_input: true` (with optional `text_input_placeholder`, `text_input_button_title`) to prompt for a typed reply: recorded by PushWard when the action has no `url`, otherwise delivered to your webhook as JSON `{ "text": ... }` or via the `{{input}}` body placeholder |
+| `push` | No | Send as a push (default: true); when false, inbox-only |
 | `send_at` | No | Send later instead of now, at most 365 days ahead. A time without a UTC offset is read in Home Assistant's time zone |
 | `recurrence` | No | Repeat on a schedule: `{ cron, timezone, until, count }`, see below |
 | `acknowledge` | No | Re-send the push until someone acknowledges it: `true`, or `{ repeat_seconds, expire_seconds, action_title }`, see [Acknowledged notifications](#acknowledged-notifications) |
