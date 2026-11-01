@@ -129,12 +129,12 @@ update_activity:
               unit_of_measurement: seconds
         alarm:
           name: Alarm
-          description: Trigger a device alarm when the countdown expires. Countdown template only (iOS 26+).
+          description: Ring an alarm on the device when the countdown expires. Countdown template only. Needs iOS 26 or later on iPhone; on Android the app needs the Alarms & reminders permission.
           selector:
             boolean:
         snooze_seconds:
           name: Snooze Seconds
-          description: How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+).
+          description: How long the alarm's Snooze button extends the countdown (60-3600). Defaults to 300 (5 min). Only applies with alarm enabled.
           example: 600
           selector:
             number:
@@ -191,7 +191,7 @@ update_activity:
       fields:
         image_url:
           name: Image URL
-          description: https URL of a picture shown beside the icon. The iPhone downloads it directly, so it must be reachable from the public internet - a LAN address will not load. Generic and steps templates only.
+          description: https URL of a picture shown beside the icon. The phone downloads it directly, so it must be reachable from the public internet - a LAN address will not load. Generic and steps templates only.
           example: "https://example.com/cover.jpg"
           selector:
             text:
@@ -2107,7 +2107,7 @@ generate_thumbhash:
   fields:
     image_url:
       name: Image URL
-      description: http or https URL of the image. Anything Home Assistant can reach works, including a LAN camera the iPhone cannot see.
+      description: http or https URL of the image. Anything Home Assistant can reach works, including a LAN camera the phone cannot see.
       example: "http://192.168.1.50/snapshot.jpg"
       selector:
         text:
@@ -2217,7 +2217,7 @@ send_notification:
         text:
     level:
       name: Level
-      description: iOS interruption level. Controls how the notification is delivered.
+      description: Interruption level. Controls how the notification is delivered. On Android, critical needs Do Not Disturb access granted in the PushWard app.
       example: "active"
       selector:
         select:
@@ -2228,7 +2228,7 @@ send_notification:
             - "critical"
     volume:
       name: Volume
-      description: Sound volume for critical alerts (0.0-1.0). Only used when level is critical.
+      description: Sound volume for critical alerts (0.0-1.0). Only used when level is critical. Ignored on Android.
       example: 0.8
       selector:
         number:
@@ -2237,13 +2237,13 @@ send_notification:
           step: 0.1
     thread_id:
       name: Thread ID
-      description: Groups notifications together in Notification Center.
+      description: Groups notifications together on the device.
       example: "home-security"
       selector:
         text:
     collapse_id:
       name: Collapse ID
-      description: APNs deduplication key. Replaces previous notification with the same key. Max 64 characters.
+      description: Deduplication key. Replaces the previous notification with the same key. Max 64 characters.
       example: "door-alert"
       selector:
         text:
@@ -2267,13 +2267,13 @@ send_notification:
         text:
     url:
       name: URL
-      description: Primary deep-link URL opened when the notification is tapped.
+      description: Primary deep-link URL opened when the notification is tapped. A path like /lovelace/kitchen opens on Home Assistant's external URL.
       example: "https://example.com"
       selector:
         text:
     media:
       name: Media
-      description: Media attachment as an object with `url` (HTTPS) and `type` (image, video, or audio).
+      description: Media attachment as an object with `url` (HTTPS) and `type` (image, video, or audio). Android shows only images in the notification shade.
       example: '{"url": "https://example.com/image.png", "type": "image"}'
       selector:
         object:
@@ -2290,13 +2290,13 @@ send_notification:
         object:
     actions:
       name: Actions
-      description: 'List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`. For an http(s) `url` you can also send a silent webhook with `method` (GET/POST/PUT/PATCH/DELETE/HEAD), `headers`, and `body`. Leave out `url` (and `foreground`) and PushWard records the tap itself; read it with get_notification_answer. Set `text_input: true` on a silent action to prompt for a typed reply (optional `text_input_placeholder` and `text_input_button_title`): without a url PushWard records the reply, with an http(s) url it is sent to your webhook as JSON with a `text` field. To embed it in `body` instead, use the `{{input}}` placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent.'
+      description: 'List of action buttons. Each action is an object with `id`, `title`, optional `url`, `foreground`, `destructive`, `authentication_required`, and `icon`. A `url` that is a path, like /lovelace/kitchen, opens on Home Assistant''s external URL. Android shows the first 3 buttons in the notification shade and all of them in the app. For an http(s) `url` you can also send a silent webhook with `method` (GET/POST/PUT/PATCH/DELETE/HEAD), `headers`, and `body`. Leave out `url` (and `foreground`) and PushWard records the tap itself; read it with get_notification_answer. Set `text_input: true` on a silent action to prompt for a typed reply (optional `text_input_placeholder` and `text_input_button_title`): without a url PushWard records the reply, with an http(s) url it is sent to your webhook as JSON with a `text` field. To embed it in `body` instead, use the `{{input}}` placeholder and wrap the body in a Jinja raw block in your automation, so Home Assistant does not render it away before the action is sent.'
       example: '[{"id": "open", "title": "Open", "url": "https://example.com", "foreground": true}, {"id": "ack", "title": "Acknowledge"}, {"id": "reply", "title": "Reply", "text_input": true, "text_input_placeholder": "Type a reply"}]'
       selector:
         object:
     push:
       name: Push
-      description: Send as an APNs push alert to all devices. When false, the notification is stored in the inbox only.
+      description: Send as a push alert to all devices. When false, the notification is stored in the inbox only.
       default: true
       selector:
         boolean:
@@ -2443,7 +2443,7 @@ send_email:
           integration: pushward
     to:
       name: To
-      description: Recipient email address. Must be an address you have already added and confirmed in the PushWard iOS app — unverified addresses are rejected.
+      description: Recipient email address. Must be an address you have already added and confirmed in the PushWard app; unverified addresses are rejected.
       required: true
       example: "alerts@example.com"
       selector:
@@ -2473,7 +2473,7 @@ send_email:
 
 widget_refresh:
   name: Refresh Widget
-  description: Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to iOS even when the value hasn't changed.
+  description: Force-refresh a tracked PushWard widget. Bypasses the in-memory diff cache so the widget is re-rendered and pushed to your devices even when the value hasn't changed.
   fields:
     config_entry_id:
       name: Account

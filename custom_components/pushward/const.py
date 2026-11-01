@@ -353,8 +353,8 @@ ACTIVITY_STATES = [ACTIVITY_STATE_ONGOING, ACTIVITY_STATE_ENDED]
 # Alert severities
 SEVERITIES = ["critical", "warning", "info"]
 
-# Notification interruption levels
-# "critical" is kept for backward compat — UI dropdown hides it until Apple approves entitlement
+# Notification interruption levels (server enum). services.yaml offers all four; on
+# Android, critical needs Do Not Disturb access granted in the PushWard app.
 NOTIFICATION_LEVELS = ["passive", "active", "time-sensitive", "critical"]
 
 # GET /notifications/scheduled?status= filter values. "scheduled" (the server
