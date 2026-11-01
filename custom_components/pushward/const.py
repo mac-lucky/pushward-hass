@@ -412,11 +412,14 @@ ANSWER_STATUS_PENDING = "pending"
 # budget, separate from the per-notification ones above, so it takes no local
 # wait slot. "Pending" is an answerable send from the last 7 days that has no
 # answer yet; at most ANSWER_STREAM_PENDING_MAX are kept, the oldest dropped.
+# Schedules are capped apart, at ANSWER_STREAM_SCHEDULES_MAX (the server keeps 25
+# live per account), so they never push out a pending send.
 EVENT_NOTIFICATION_ACTION = f"{DOMAIN}_notification_action"
 ANSWER_STREAM_WAIT_SECONDS = 25
 ANSWER_STREAM_PAGE_LIMIT = 100
 ANSWER_STREAM_PENDING_DAYS = 7
 ANSWER_STREAM_PENDING_MAX = 200
+ANSWER_STREAM_SCHEDULES_MAX = 50
 ANSWER_STREAM_BACKOFF_BASE_SECONDS = 2
 ANSWER_STREAM_BACKOFF_MAX_SECONDS = 300
 # The narrowest spread of the backoff jitter, so installs that lost the same server

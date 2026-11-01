@@ -695,6 +695,35 @@ async def test_cancel_scheduled_notification_swallows_404():
     assert call_args[0][1].endswith("/notifications/scheduled/42")
 
 
+@pytest.mark.parametrize("status", [204, 404])
+async def test_a_canceled_schedule_is_reported(status):
+    client = _make_client(_make_session(_mock_response(status)))
+    client.on_schedule_canceled = MagicMock()
+
+    await client.cancel_scheduled_notification(42, purge=True)
+
+    client.on_schedule_canceled.assert_called_once_with(42)
+
+
+async def test_a_cancel_that_failed_is_not_reported():
+    client = _make_client(_make_session(*[_mock_response(400, text='{"code": "x"}')] * 4))
+    client.on_schedule_canceled = MagicMock()
+
+    with pytest.raises(PushWardApiError):
+        await client.cancel_scheduled_notification(42)
+
+    client.on_schedule_canceled.assert_not_called()
+
+
+async def test_a_failing_cancel_listener_never_fails_the_cancel(caplog):
+    client = _make_client(_make_session(_mock_response(204)))
+    client.on_schedule_canceled = MagicMock(side_effect=RuntimeError("boom"))
+
+    await client.cancel_scheduled_notification(42)
+
+    assert "canceled schedule" in caplog.text
+
+
 async def test_create_notification_with_recurrence_schedules_without_send_at():
     """recurrence alone posts to /notifications/scheduled with no send_at and until as RFC 3339."""
     session = _make_session(_mock_response(201, json_body={"id": 7, "status": "scheduled"}))

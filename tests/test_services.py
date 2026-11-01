@@ -850,12 +850,14 @@ async def test_entry_setup_listens_for_answerable_sends_and_unload_stops(hass: H
 
     stream = hass.data[DOMAIN][entry.entry_id]["answer_stream"]
     assert api.on_answerable_send == stream.async_track_send
+    assert api.on_schedule_canceled == stream.async_schedule_canceled
     assert not stream.running
 
     await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
 
     assert api.on_answerable_send is None
+    assert api.on_schedule_canceled is None
 
 
 async def test_entry_removal_deletes_the_answer_store(hass: HomeAssistant, hass_storage) -> None:

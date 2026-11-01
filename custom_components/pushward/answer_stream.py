@@ -13,6 +13,7 @@ send one, so they hold no connection. A scheduled send has no notification id
 until it goes out, so its schedule is tracked instead: it starts the stream when
 it comes due and is read just after, to learn the notification it became, which
 is then waited for like any other send. A repeating one does that at each send.
+A schedule this install cancels is dropped at once (on_schedule_canceled).
 
 The cursor and the pending sends live in .storage, so a restart picks up where
 the stream stopped. An answer read late that way fires only when it is to a send
@@ -30,6 +31,7 @@ import hashlib
 import logging
 import math
 import random
+from collections.abc import Callable
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -66,6 +68,7 @@ from .const import (
     ANSWER_STREAM_PLAIN_MAX_SECONDS,
     ANSWER_STREAM_SCHEDULE_FIRST_READ_SECONDS,
     ANSWER_STREAM_SCHEDULE_RETRY_SECONDS,
+    ANSWER_STREAM_SCHEDULES_MAX,
     ANSWER_STREAM_WAIT_SECONDS,
     CURSOR_INVALID_CODE,
     DOMAIN,
@@ -163,6 +166,17 @@ def _load_schedule(rec: dict) -> dict:
     return loaded
 
 
+def _drop_oldest(table: dict[str, dict], cap: int, when: Callable[[dict], datetime | None]) -> bool:
+    """Drop the records of ``table`` past ``cap``, the oldest by ``when`` first; True when any went."""
+    excess = len(table) - cap
+    if excess <= 0:
+        return False
+    epoch = datetime.min.replace(tzinfo=dt_util.UTC)
+    for key in sorted(table, key=lambda key: when(table[key]) or epoch)[:excess]:
+        del table[key]
+    return True
+
+
 def _event_data(entry_id: str, item: dict) -> dict:
     """The event's data, named after the Companion app's mobile_app_notification_action where it can be."""
     action_id = item.get("action_id")
@@ -243,6 +257,7 @@ class AnswerStream:
         )
         self._unsub_ha_stop = self._hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, self._on_ha_stop)
         self._api.on_answerable_send = self.async_track_send
+        self._api.on_schedule_canceled = self.async_schedule_canceled
         self._kick()
 
     async def async_stop(self) -> None:
@@ -255,6 +270,8 @@ class AnswerStream:
         self._stopped = True
         if self._api.on_answerable_send == self.async_track_send:
             self._api.on_answerable_send = None
+        if self._api.on_schedule_canceled == self.async_schedule_canceled:
+            self._api.on_schedule_canceled = None
         for unsub in (self._unsub_released, self._unsub_timer):
             if unsub is not None:
                 unsub()
@@ -340,6 +357,31 @@ class AnswerStream:
         self._kick()
 
     @callback
+    def async_schedule_canceled(self, schedule_id: int) -> None:
+        """Stop reading a schedule this install canceled (PushWardApiClient.on_schedule_canceled).
+
+        A series whose last send the stream could not name still listens out the
+        window after that send. The notifications a series already became stay
+        waited for: canceling it does not take them back.
+        """
+        if self._stopped or not _is_id(schedule_id):
+            return
+        key = str(schedule_id)
+        self._awaiting_cursor.discard(key)
+        rec = self._schedules.get(key)
+        if rec is None:
+            return
+        now = dt_util.utcnow()
+        busy_until = _from_iso(rec["busy_until"])
+        if busy_until is not None and busy_until > now:
+            rec["active_at"] = rec["check_at"] = None
+        else:
+            del self._schedules[key]
+        self._save()
+        if not self.running:
+            self._arm_timer(now)
+
+    @callback
     def _take_schedule_cursor(self, schedule_id: str) -> None:
         """Note the feed's position now for a schedule made while the stream has no cursor.
 
@@ -370,20 +412,19 @@ class AnswerStream:
             self._cursor = cursor
         self._save()
 
-    def _cap(self) -> None:
-        """Keep at most ANSWER_STREAM_PENDING_MAX sends, dropping the oldest."""
-        excess = len(self._pending) + len(self._schedules) - ANSWER_STREAM_PENDING_MAX
-        if excess <= 0:
-            return
-        epoch = datetime.min.replace(tzinfo=dt_util.UTC)
-        entries = [(_from_iso(rec["sent_at"]) or epoch, self._pending, key) for key, rec in self._pending.items()]
-        entries += [
-            (_from_iso(rec["active_at"]) or _from_iso(rec["busy_until"]) or epoch, self._schedules, key)
-            for key, rec in self._schedules.items()
-        ]
-        entries.sort(key=lambda entry: entry[0])
-        for _, table, key in entries[:excess]:
-            del table[key]
+    def _cap(self) -> bool:
+        """Keep at most ANSWER_STREAM_PENDING_MAX sends and ANSWER_STREAM_SCHEDULES_MAX schedules.
+
+        Each drops its oldest. They are capped apart, so schedules never push out
+        a send waiting for its answer. True when anything was dropped.
+        """
+        dropped = _drop_oldest(self._pending, ANSWER_STREAM_PENDING_MAX, lambda rec: _from_iso(rec["sent_at"]))
+        dropped |= _drop_oldest(
+            self._schedules,
+            ANSWER_STREAM_SCHEDULES_MAX,
+            lambda rec: _from_iso(rec["active_at"]) or _from_iso(rec["busy_until"]),
+        )
+        return dropped
 
     def _prune(self, now: datetime) -> None:
         horizon = now - timedelta(days=ANSWER_STREAM_PENDING_DAYS)

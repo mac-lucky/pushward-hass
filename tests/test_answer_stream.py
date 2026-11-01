@@ -32,6 +32,7 @@ from custom_components.pushward.api import (
 )
 from custom_components.pushward.const import (
     ANSWER_STREAM_PENDING_MAX,
+    ANSWER_STREAM_SCHEDULES_MAX,
     ANSWER_STREAM_WAIT_SECONDS,
     DOMAIN,
     EVENT_NOTIFICATION_ACTION,
@@ -106,6 +107,7 @@ def feed() -> FakeFeed:
 def api(feed: FakeFeed) -> MagicMock:
     api = MagicMock()
     api.on_answerable_send = None
+    api.on_schedule_canceled = None
     api.list_notification_answers = feed
     api.get_scheduled_notification = AsyncMock(return_value=None)
     return api
@@ -152,6 +154,7 @@ async def test_nothing_pending_holds_no_connection(streams, api, feed) -> None:
     stream = await streams()
 
     assert api.on_answerable_send == stream.async_track_send
+    assert api.on_schedule_canceled == stream.async_schedule_canceled
     assert not stream.running
     assert feed.calls == []
 
@@ -239,7 +242,7 @@ async def test_reads_that_bring_nothing_new_write_nothing(streams, feed) -> None
 
 
 async def test_unload_stops_the_loop_and_keeps_the_pending_send(
-    hass: HomeAssistant, streams, feed, hass_storage
+    hass: HomeAssistant, streams, feed, api, hass_storage
 ) -> None:
     stream = await streams()
     stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
@@ -251,6 +254,8 @@ async def test_unload_stops_the_loop_and_keeps_the_pending_send(
     stored = _stored(hass_storage)
     assert stored["cursor"] == "57"
     assert stored["pending"] == {"42": {"sent_at": NOW.isoformat(), "cursor": "57"}}
+    assert api.on_answerable_send is None
+    assert api.on_schedule_canceled is None
     # A send after the stop is not tracked.
     stream.async_track_send({"id": 43, "answerable": True}, False)
     assert "43" not in stream._pending
@@ -565,6 +570,22 @@ async def test_pending_set_is_capped_dropping_the_oldest(streams, freezer) -> No
     assert "5" in stream._pending
 
 
+async def test_schedules_are_capped_apart_and_never_push_out_a_pending_send(streams, freezer) -> None:
+    stream = await streams()
+    stream._kick = MagicMock()
+    for n in range(ANSWER_STREAM_PENDING_MAX):
+        stream.async_track_send({"id": n, "answerable": True}, False)
+    for n in range(ANSWER_STREAM_SCHEDULES_MAX + 5):
+        freezer.move_to(NOW + timedelta(seconds=n))
+        send_at = NOW + timedelta(days=1, minutes=n)
+        stream.async_track_send({"id": 1000 + n, "status": "scheduled", "send_at": send_at.isoformat()}, True)
+
+    assert len(stream._pending) == ANSWER_STREAM_PENDING_MAX
+    assert len(stream._schedules) == ANSWER_STREAM_SCHEDULES_MAX
+    assert "1004" not in stream._schedules  # the soonest went first
+    assert "1005" in stream._schedules
+
+
 async def test_bad_ids_are_ignored(streams) -> None:
     stream = await streams()
     for created in ({"answerable": True}, {"id": "42", "answerable": True}, {"id": True, "answerable": True}):
@@ -797,6 +818,39 @@ async def test_a_canceled_scheduled_send_is_dropped(hass: HomeAssistant, streams
 
     assert stream._schedules == {}
     assert feed.calls == [(None, 0), ("100", 10)]
+
+
+async def test_a_schedule_canceled_here_is_dropped_at_once(hass: HomeAssistant, streams, feed, api) -> None:
+    """Canceled through this install (the cancel action, a to-do reminder), it is not read again."""
+    stream = await streams()
+    later = NOW + timedelta(hours=1)
+    stream.async_track_send({"id": 7, "status": "scheduled", "send_at": later.isoformat()}, True)
+    stream.async_track_send({"id": 8, "status": "scheduled", "send_at": later.isoformat()}, True)
+    assert stream._unsub_timer is not None
+
+    stream.async_schedule_canceled(7)
+    stream.async_schedule_canceled(9)  # not tracked
+    stream.async_schedule_canceled("8")  # not an id
+
+    assert set(stream._schedules) == {"8"}
+    stream.async_schedule_canceled(8)
+    assert stream._schedules == {}
+    assert stream._unsub_timer is None
+    api.get_scheduled_notification.assert_not_awaited()
+
+
+async def test_a_canceled_series_still_waits_out_its_last_unnamed_send(streams, freezer) -> None:
+    stream = await streams()
+    stream._kick = MagicMock()
+    stream.async_track_send(
+        {"id": 8, "status": "scheduled", "send_at": NOW.isoformat(), "recurrence": {"cron": "0 18 1 * *"}}, True
+    )
+    stream._schedules["8"]["busy_until"] = (NOW + timedelta(days=6)).isoformat()
+
+    stream.async_schedule_canceled(8)
+
+    assert stream._schedules["8"]["active_at"] is None
+    assert stream._schedules["8"]["check_at"] is None
 
 
 async def test_a_series_waits_for_each_send_like_a_one_shot(hass: HomeAssistant, streams, feed, api, freezer) -> None:

@@ -233,6 +233,8 @@ class PushWardApiClient:
         # Set by the entry's answer stream; told about every created notification or
         # schedule whose answer the server records, whichever path sent it.
         self.on_answerable_send: Callable[[dict, bool], None] | None = None
+        # Set by the same stream; told the id of every schedule this client canceled.
+        self.on_schedule_canceled: Callable[[int], None] | None = None
 
     async def get_me(self) -> dict[str, Any]:
         """Fetch the account profile + usage counters via GET /auth/me.
@@ -698,11 +700,19 @@ class PushWardApiClient:
         A plain cancel leaves the schedule readable as ``canceled`` for 24 hours
         (the app shows it). ``purge`` removes it outright, for a schedule that is
         only being replaced; a server without purge treats it as a plain cancel.
+
+        Once canceled (or found gone), the id goes to ``on_schedule_canceled``.
         """
         path = f"/notifications/scheduled/{int(scheduled_id)}"
         if purge:
             path += "?purge=true"
         await self._request_with_retry("DELETE", path, allow_404=True)
+        if self.on_schedule_canceled is not None:
+            try:
+                self.on_schedule_canceled(int(scheduled_id))
+            except Exception:
+                # The answer stream drops the schedule on its own once it reads it canceled.
+                _LOGGER.exception("PushWard could not stop listening for a canceled schedule's answer")
 
     async def cancel_notification_receipt(self, notification_id: int) -> dict:
         """POST /notifications/receipts/{id}/cancel and return the receipt.
