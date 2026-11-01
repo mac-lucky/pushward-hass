@@ -611,13 +611,18 @@ class AnswerStream:
             )
         # Every send that was already waiting when this read started is covered from
         # here on; its own cursor is no longer needed after a restart.
+        changed = bool(feed["items"]) or feed["cursor"] != self._cursor
         floor = _seq(after)
         for rec in (*self._pending.values(), *self._schedules.values()):
             seq = _seq(rec.get("cursor"))
             if "cursor" in rec and (seq is None or floor is None or seq >= floor):
                 del rec["cursor"]
+                changed = True
         self._cursor = feed["cursor"]
-        self._save()
+        # A read that brought nothing new writes nothing: a long-poll comes back
+        # every 25 seconds, and Home Assistant often runs from an SD card.
+        if changed:
+            self._save()
 
     def _remember_answer(self, key: str, action_id: Any) -> None:
         self._answered.pop(key, None)
@@ -631,10 +636,12 @@ class AnswerStream:
 
     async def _async_check_schedules(self, now: datetime) -> bool:
         """Read the schedules that came due; False when the key was refused."""
+        read = False
         for sid, rec in list(self._schedules.items()):
             active_at, check_at = _from_iso(rec["active_at"]), _from_iso(rec["check_at"])
             if active_at is None or active_at > now or (check_at is not None and check_at > now):
                 continue  # not due, or a series that ended and only waits out its last answers
+            read = True
             try:
                 row = await self._api.get_scheduled_notification(int(sid))
             except PushWardAuthError:
@@ -647,8 +654,9 @@ class AnswerStream:
                 continue
             if sid in self._schedules:
                 self._apply_schedule(sid, rec, row if isinstance(row, dict) else None, now)
-        self._cap()
-        self._save()
+        if read:
+            self._cap()
+            self._save()
         return True
 
     def _apply_schedule(self, sid: str, rec: dict, row: dict | None, now: datetime) -> None:

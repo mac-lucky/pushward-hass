@@ -215,6 +215,29 @@ async def test_full_page_reads_the_next_one_at_once(hass: HomeAssistant, streams
     assert feed.calls[1][0] == "101"
 
 
+async def test_reads_that_bring_nothing_new_write_nothing(streams, feed) -> None:
+    """A long-poll comes back every 25 seconds; rewriting .storage each time wears out an SD card."""
+    stream = await streams()
+    stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
+    stream.async_track_send({"id": 7, "status": "scheduled", "send_at": (NOW + timedelta(hours=1)).isoformat()}, True)
+    await _until(lambda: feed.calls, "the first read")
+    feed.reply(cursor="57")  # covers 42's answer_cursor, which is a change
+    await _until(lambda: len(feed.calls) == 2, "the second read")
+
+    with patch.object(stream, "_save", wraps=stream._save) as save:
+        for n in range(3, 23):
+            feed.reply(cursor="57")
+            await _until(lambda n=n: len(feed.calls) == n, f"read {n}")
+        assert save.call_count == 0
+
+        feed.reply(cursor="58")  # the cursor moved
+        await _until(lambda: len(feed.calls) == 23, "the read after the move")
+        assert save.call_count == 1
+        feed.reply(_answer(41), cursor="58")
+        await _until(lambda: len(feed.calls) == 24, "the read after an answer")
+        assert save.call_count == 2
+
+
 async def test_unload_stops_the_loop_and_keeps_the_pending_send(
     hass: HomeAssistant, streams, feed, hass_storage
 ) -> None:
