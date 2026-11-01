@@ -8,8 +8,10 @@ from unittest.mock import AsyncMock
 import pytest
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
+from custom_components.pushward.answer_stream import notification_answer_signal
 from custom_components.pushward.api import PushWardApiError, PushWardNotFoundError
 from custom_components.pushward.const import (
     CONF_ENTITY_ID,
@@ -93,10 +95,10 @@ async def setup(hass: HomeAssistant, freezer):
     entry.add_to_hass(hass)
     managers: list[TodoReminderManager] = []
 
-    async def _start(items: list[dict], api: AsyncMock | None = None, **cfg) -> tuple:
+    async def _start(items: list[dict], api: AsyncMock | None = None, answer_stream=None, **cfg) -> tuple:
         todo = _TodoList(hass, items)
         api = api or _api()
-        manager = TodoReminderManager(hass, api, [_config(**cfg)], entry, "hlk_test")
+        manager = TodoReminderManager(hass, api, [_config(**cfg)], entry, "hlk_test", answer_stream=answer_stream)
         managers.append(manager)
         await manager.async_start()
         await hass.async_block_till_done()
@@ -786,3 +788,113 @@ async def test_renaming_after_the_reminder_went_out_does_not_send_it_again(setup
     todo.items[0] = {**todo.items[0], "due": "2026-10-01T09:00:00+00:00"}  # moved: remind again
     await manager._async_reconcile(SUB)
     assert api.create_notification.await_count == 2
+
+
+# --- Done taps from the answer stream -------------------------------------------
+
+
+class _FakeStream:
+    """Stands in for the entry's AnswerStream: delivers the answers of the schedules in ``tracked``."""
+
+    def __init__(self) -> None:
+        self.tracked: set[int] = set()
+
+    def delivers_answer(self, schedule_id, notification_id) -> bool:
+        return schedule_id in self.tracked
+
+
+def _done(notification_id: int = 55, action_id: str = "done") -> dict:
+    return {"notification_id": notification_id, "status": "answered", "action_id": action_id}
+
+
+_CALL = [{"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T09:00:00+00:00"}]
+
+
+async def test_reminders_the_stream_tracks_get_no_read_of_their_own(hass: HomeAssistant, setup) -> None:
+    stream = _FakeStream()
+    manager, api, todo = await setup(_CALL, answer_stream=stream)
+    rec = _records(manager)["a"]
+    stream.tracked.add(rec["schedule_id"])
+    rec.update(status="sent", watch_until=(NOW + timedelta(hours=24)).isoformat())
+
+    manager._watch_wakeup.set()
+    for _ in range(5):
+        await hass.async_block_till_done()
+
+    api.get_scheduled_notification.assert_not_awaited()
+    api.poll_notification_answer.assert_not_awaited()
+
+    async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(), rec["schedule_id"])
+    await hass.async_block_till_done()
+
+    assert todo.updates == [{"item": "a", "status": "completed", "entity_id": ENTITY}]
+    assert rec["watch_until"] is None
+    assert rec["notification_id"] == 55
+    api.poll_notification_answer.assert_not_awaited()
+
+
+async def test_a_stream_answer_before_the_reminder_is_marked_sent(hass: HomeAssistant, setup, freezer) -> None:
+    manager, _, todo = await setup(_CALL, answer_stream=_FakeStream())
+    rec = _records(manager)["a"]
+    assert rec["status"] == "scheduled"
+
+    freezer.move_to(NOW + timedelta(hours=1, seconds=5))  # sent, and tapped before the pass after it
+    async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(), rec["schedule_id"])
+    await hass.async_block_till_done()
+
+    assert rec["status"] == "sent"
+    assert todo.updates == [{"item": "a", "status": "completed", "entity_id": ENTITY}]
+    assert rec["watch_until"] is None
+
+
+async def test_a_stream_answer_matches_by_notification_id(hass: HomeAssistant, setup) -> None:
+    manager, _, todo = await setup(_CALL, answer_stream=_FakeStream())
+    rec = _records(manager)["a"]
+    rec.update(status="sent", notification_id=55, watch_until=(NOW + timedelta(hours=24)).isoformat())
+
+    async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(55), None)
+    async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(56), None)  # someone else's
+    await hass.async_block_till_done()
+
+    assert todo.updates == [{"item": "a", "status": "completed", "entity_id": ENTITY}]
+
+
+async def test_a_stream_answer_other_than_done_ends_the_watch(hass: HomeAssistant, setup) -> None:
+    manager, _, todo = await setup(_CALL, answer_stream=_FakeStream())
+    rec = _records(manager)["a"]
+    rec.update(status="sent", watch_until=(NOW + timedelta(hours=24)).isoformat())
+
+    async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(action_id="other"), rec["schedule_id"])
+    await hass.async_block_till_done()
+
+    assert todo.updates == []
+    assert rec["watch_until"] is None
+
+
+async def test_a_stream_answer_after_the_watch_ended_is_ignored(hass: HomeAssistant, setup) -> None:
+    manager, _, todo = await setup(_CALL, answer_stream=_FakeStream())
+    rec = _records(manager)["a"]
+    rec.update(status="sent", watch_until=(NOW - timedelta(minutes=1)).isoformat())
+
+    async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(), rec["schedule_id"])
+    await hass.async_block_till_done()
+
+    assert todo.updates == []
+
+
+async def test_a_failed_completion_from_the_stream_is_retried_by_an_own_read(hass: HomeAssistant, setup) -> None:
+    """The stream reads an answer once: when completing fails, the manager reads it again itself."""
+    stream = _FakeStream()
+    manager, api, todo = await setup(_CALL, answer_stream=stream)
+    rec = _records(manager)["a"]
+    rec.update(status="sent", watch_until=(NOW + timedelta(hours=24)).isoformat())
+    hass.states.async_set(ENTITY, "unavailable")
+
+    async_dispatcher_send(hass, notification_answer_signal("entry-1"), _done(), rec["schedule_id"])
+    for _ in range(5):
+        await hass.async_block_till_done()
+
+    assert todo.updates == []
+    assert rec["complete_failures"] == 1
+    assert rec["watch_until"] is not None
+    api.poll_notification_answer.assert_awaited_with(55, hold=20)

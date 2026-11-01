@@ -17,7 +17,9 @@ notes).
   open and gets no new reminder until its due date or time changes. The same goes
   for a reminder that already went out: renaming the item does not send it again.
 - With the Done button on, the reminder carries a url-less "done" action. The
-  server records the tap; the manager watches for it and completes the item.
+  server records the tap; the manager completes the item when it learns of it.
+  The entry's answer stream reads it for every reminder it tracks; the manager
+  reads the others itself, one reminder at a time.
 """
 
 from __future__ import annotations
@@ -30,7 +32,7 @@ import logging
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
@@ -39,6 +41,7 @@ from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.debounce import Debouncer
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import (
     async_track_point_in_utc_time,
     async_track_state_change_event,
@@ -50,6 +53,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.helpers.translation import async_get_translations
 from homeassistant.util import dt as dt_util
 
+from .answer_stream import notification_answer_signal
 from .api import (
     PushWardApiClient,
     PushWardApiError,
@@ -95,6 +99,9 @@ from .const import (
     TODO_WATCH_IDLE_SECONDS,
 )
 from .e2e import E2EError
+
+if TYPE_CHECKING:
+    from .answer_stream import AnswerStream
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -265,11 +272,14 @@ class TodoReminderManager:
         configs: list[dict],
         entry: ConfigEntry,
         integration_key: str,
+        answer_stream: AnswerStream | None = None,
     ) -> None:
         self._hass = hass
         self._api = api
         self._entry = entry
         self._key_hash = _key_hash(integration_key)
+        # Reads the Done taps of the reminders it tracks, so those need no read here.
+        self._answer_stream = answer_stream
         self._configs: dict[str, dict] = {cfg[CONF_SUBENTRY_ID]: cfg for cfg in configs}
         self._store = build_todo_store(hass, entry.entry_id)
         # subentry id -> {"entity_id": str, "items": {uid: record}}; persisted.
@@ -292,6 +302,9 @@ class TodoReminderManager:
         self._unsub_started: CALLBACK_TYPE | None = None
         self._watch_task: asyncio.Task | None = None
         self._watch_wakeup = asyncio.Event()
+        self._unsub_answers: CALLBACK_TYPE | None = None
+        # Reminders whose answer is being acted on, by (subentry id, item uid).
+        self._answering: set[tuple[str, str]] = set()
         self._done_label = "Done"
         self._stopped = False
 
@@ -317,6 +330,9 @@ class TodoReminderManager:
             self._hass, self._async_interval_reconcile, timedelta(minutes=TODO_RECONCILE_INTERVAL_MINUTES)
         )
         self._unsub_started = async_at_started(self._hass, self._async_on_started)
+        self._unsub_answers = async_dispatcher_connect(
+            self._hass, notification_answer_signal(self._entry.entry_id), self._on_stream_answer
+        )
         self._watch_task = self._entry.async_create_background_task(
             self._hass, self._async_watch_loop(), name=f"{DOMAIN} to-do reminder answers"
         )
@@ -325,10 +341,10 @@ class TodoReminderManager:
         self._stopped = True
         for sub_id in list(self._unsubs):
             self._untrack(sub_id)
-        for unsub in (self._unsub_interval, self._unsub_started):
+        for unsub in (self._unsub_interval, self._unsub_started, self._unsub_answers):
             if unsub is not None:
                 unsub()
-        self._unsub_interval = self._unsub_started = None
+        self._unsub_interval = self._unsub_started = self._unsub_answers = None
         if self._watch_task is not None:
             self._watch_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
@@ -787,10 +803,15 @@ class TodoReminderManager:
                     watches.append((sub_id, uid, rec))
         return watches
 
+    def _stream_delivers(self, rec: dict) -> bool:
+        stream = self._answer_stream
+        return stream is not None and stream.delivers_answer(rec.get("schedule_id"), rec.get("notification_id"))
+
     async def _async_watch_loop(self) -> None:
         """Watch sent reminders for a Done tap, one read at a time.
 
-        Rotates over every watched reminder. While any was sent within the last
+        Skips the reminders the answer stream tracks (their answers come from
+        it) and rotates over the rest. While any was sent within the last
         TODO_WATCH_ACTIVE_MINUTES each round is a server long-poll (through the
         install's shared wait slots); after that a round is a plain read every
         TODO_WATCH_IDLE_SECONDS, until the watch ends TODO_WATCH_HOURS after the
@@ -800,13 +821,20 @@ class TodoReminderManager:
         while not self._stopped:
             now = dt_util.utcnow()
             watches = self._watches(now)
-            if not watches:
+            own = [w for w in watches if not self._stream_delivers(w[2])]
+            if not own:
                 self._watch_wakeup.clear()
-                await self._watch_wakeup.wait()
+                if watches:
+                    # Look again now and then: the stream lets a reminder go when it
+                    # learns that it failed or was canceled, and the read moves here.
+                    with contextlib.suppress(TimeoutError):
+                        await asyncio.wait_for(self._watch_wakeup.wait(), TODO_WATCH_IDLE_SECONDS)
+                else:
+                    await self._watch_wakeup.wait()
                 continue
             active_since = now - timedelta(minutes=TODO_WATCH_ACTIVE_MINUTES)
-            active = any((_from_iso(w[2]["send_at"]) or now) > active_since for w in watches)
-            sub_id, uid, rec = watches[turn % len(watches)]
+            active = any((_from_iso(w[2]["send_at"]) or now) > active_since for w in own)
+            sub_id, uid, rec = own[turn % len(own)]
             turn += 1
             started = asyncio.get_running_loop().time()
             pause: float = 0 if active else TODO_WATCH_IDLE_SECONDS
@@ -854,17 +882,73 @@ class TodoReminderManager:
         answer, held = await self._api.poll_notification_answer(notification_id, hold=hold)
         if answer.get("status") != ANSWER_STATUS_ANSWERED:
             return held
-        cfg = self._configs.get(sub_id)
-        done = cfg is not None and answer.get("action_id") == TODO_DONE_ACTION_ID
-        if done and not await self._async_complete(cfg[CONF_ENTITY_ID], uid):
-            # Keep watching: the answer stays readable, so a later round tries again.
-            rec["complete_failures"] = rec.get("complete_failures", 0) + 1
-            if rec["complete_failures"] < _COMPLETE_ATTEMPTS:
-                self._save()
-                return False
-        rec["watch_until"] = None
-        self._save()
+        if not await self._async_apply_answer(sub_id, uid, rec, answer):
+            return False
         return held
+
+    async def _async_apply_answer(self, sub_id: str, uid: str, rec: dict, answer: dict) -> bool:
+        """Act on a reminder's answer; False when completing its item failed and is tried again."""
+        key = (sub_id, uid)
+        if key in self._answering:
+            return True  # already being acted on
+        self._answering.add(key)
+        try:
+            cfg = self._configs.get(sub_id)
+            done = cfg is not None and answer.get("action_id") == TODO_DONE_ACTION_ID
+            if done and not await self._async_complete(cfg[CONF_ENTITY_ID], uid):
+                # Keep watching: the answer stays readable, so a later round tries again.
+                rec["complete_failures"] = rec.get("complete_failures", 0) + 1
+                if rec["complete_failures"] < _COMPLETE_ATTEMPTS:
+                    self._save()
+                    return False
+            rec["watch_until"] = None
+            self._save()
+            return True
+        finally:
+            self._answering.discard(key)
+
+    @callback
+    def _on_stream_answer(self, item: dict, schedule_id: int | None) -> None:
+        """An answer the entry's answer stream read: the same as one this manager read itself."""
+        if self._stopped:
+            return
+        notification_id = item.get("notification_id")
+        found = self._find_record(notification_id, schedule_id)
+        if found is None:
+            return
+        sub_id, uid, rec, cfg = found
+        if not isinstance(rec.get("notification_id"), int) and isinstance(notification_id, int):
+            rec["notification_id"] = notification_id
+        if rec["status"] == _SCHEDULED:
+            # Answered, so it went out before the pass that marks it sent came round.
+            self._mark_sent(rec, cfg)
+            self._blocked.discard(sub_id)
+        watch_until = _from_iso(rec.get("watch_until"))
+        if rec["status"] != _SENT or watch_until is None or watch_until <= dt_util.utcnow():
+            self._save()
+            return  # not watched (any more): the same answer read here would be ignored too
+        self._entry.async_create_background_task(
+            self._hass, self._async_stream_answer(sub_id, uid, rec, item), name=f"{DOMAIN} to-do reminder answer"
+        )
+
+    async def _async_stream_answer(self, sub_id: str, uid: str, rec: dict, answer: dict) -> None:
+        if not await self._async_apply_answer(sub_id, uid, rec, answer):
+            # The stream reads an answer once and has let the reminder go: the watch
+            # loop reads it again for the next try.
+            self._watch_wakeup.set()
+
+    def _find_record(self, notification_id: Any, schedule_id: int | None) -> tuple[str, str, dict, dict] | None:
+        has_id = isinstance(notification_id, int) and not isinstance(notification_id, bool)
+        for sub_id, lst in self._lists.items():
+            cfg = self._configs.get(sub_id)
+            if cfg is None:
+                continue
+            for uid, rec in (lst.get("items") or {}).items():
+                if (has_id and rec.get("notification_id") == notification_id) or (
+                    schedule_id is not None and rec.get("schedule_id") == schedule_id
+                ):
+                    return sub_id, uid, rec, cfg
+        return None
 
     async def _async_complete(self, entity_id: str, uid: str) -> bool:
         """Complete the item a Done tap was for; True when done (or nothing is left to do)."""

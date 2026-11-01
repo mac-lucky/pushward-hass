@@ -1711,7 +1711,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
     manager = ActivityManager(hass, api, entities, entry)
     widget_manager = WidgetManager(hass, api, widgets, entry)
-    todo_manager = TodoReminderManager(hass, api, todo_configs(entry), entry, entry.data[CONF_INTEGRATION_KEY])
+    todo_manager = TodoReminderManager(
+        hass, api, todo_configs(entry), entry, entry.data[CONF_INTEGRATION_KEY], answer_stream=answer_stream
+    )
     await asyncio.gather(manager.async_start(), widget_manager.async_start(), todo_manager.async_start())
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {

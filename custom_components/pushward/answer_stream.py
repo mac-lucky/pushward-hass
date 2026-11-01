@@ -4,7 +4,8 @@ Each config entry reads GET /notifications/answers, the server's feed of the
 answers to what this integration key sent, with a long-poll, and fires
 EVENT_NOTIFICATION_ACTION for each one. It covers every way a notification goes
 out (send_notification, the notify entity, the to-do Done button), because the
-API client reports each answerable send here.
+API client reports each answerable send here. Each answer also goes out on
+notification_answer_signal; the to-do reminders take their Done taps from it.
 
 The long-poll runs only while something can still be answered: a send from the
 last ANSWER_STREAM_PENDING_DAYS days that has no answer yet. Most installs never
@@ -35,7 +36,7 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers.dispatcher import async_dispatcher_connect, async_dispatcher_send
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
@@ -52,6 +53,7 @@ from .const import (
     ANSWER_MIN_POLL_INTERVAL,
     ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS,
     ANSWER_PLAIN_POLL_INTERVAL,
+    ANSWER_STATUS_ANSWERED,
     ANSWER_STREAM_ANSWERED_MAX,
     ANSWER_STREAM_BACKOFF_BASE_SECONDS,
     ANSWER_STREAM_BACKOFF_MAX_SECONDS,
@@ -83,6 +85,15 @@ _SCHEDULE_TIMES = ("active_at", "check_at", "busy_until")
 
 def build_answer_store(hass: HomeAssistant, entry_id: str) -> Store:
     return Store(hass, _STORAGE_VERSION, f"{DOMAIN}.answers.{entry_id}", atomic_writes=True)
+
+
+def notification_answer_signal(entry_id: str) -> str:
+    """Dispatcher signal for each answer the entry's stream reads.
+
+    Sent with the feed item and the id of the schedule the notification came
+    from, when the stream knows it (else None).
+    """
+    return f"{DOMAIN}_notification_answer_{entry_id}"
 
 
 def _key_hash(integration_key: str) -> str:
@@ -198,6 +209,8 @@ class AnswerStream:
         self._task: asyncio.Task | None = None
         self._wake = asyncio.Event()
         self._stopped = False
+        # The loop gave up (the key was refused) until something starts it again.
+        self._halted = False
         self._unsub_timer: CALLBACK_TYPE | None = None
         self._unsub_released: CALLBACK_TYPE | None = None
         self._unsub_ha_stop: CALLBACK_TYPE | None = None
@@ -277,6 +290,22 @@ class AnswerStream:
             "schedules": len(self._schedules),
             "has_cursor": self._cursor is not None,
         }
+
+    def delivers_answer(self, schedule_id: Any, notification_id: Any) -> bool:
+        """Whether the answer to this send will come on notification_answer_signal.
+
+        True while the stream waits for it: the schedule is tracked, or the
+        notification is pending. A reader of its own can then skip it.
+        """
+        if self._stopped or self._halted:
+            return False
+        if _is_id(notification_id) and str(notification_id) in self._pending:
+            return True
+        if not _is_id(schedule_id):
+            return False
+        if str(schedule_id) in self._schedules:
+            return True
+        return any(rec.get("schedule_id") == schedule_id for rec in self._pending.values())
 
     # --- tracking ---------------------------------------------------------
 
@@ -393,6 +422,7 @@ class AnswerStream:
         if not self._active(now):
             self._arm_timer(now)
             return
+        self._halted = False
         self._task = self._entry.async_create_background_task(
             self._hass, self._async_run(), name=f"{DOMAIN} notification answers"
         )
@@ -426,6 +456,7 @@ class AnswerStream:
             now = dt_util.utcnow()
             self._prune(now)
             if not await self._async_check_schedules(now):
+                self._halted = True
                 return
             if not self._active(now):
                 self._save()
@@ -452,11 +483,13 @@ class AnswerStream:
                 delay = max(err.retry_after, self._backoff(failures))
             except PushWardAuthError:
                 _LOGGER.warning("PushWard refused the integration key while reading notification answers")
+                self._halted = True
                 self._entry.async_start_reauth(self._hass)
                 return
             except PushWardForbiddenError as err:
                 # The key lost the notifications permission; the next answerable send tries again.
                 _LOGGER.warning("PushWard stopped reading notification answers: %s", err)
+                self._halted = True
                 return
             except PushWardApiError as err:
                 failures += 1
@@ -570,6 +603,12 @@ class AnswerStream:
                     notification_id,
                     item.get("answered_at"),
                 )
+            async_dispatcher_send(
+                self._hass,
+                notification_answer_signal(self._entry.entry_id),
+                item,
+                (waited or {}).get("schedule_id"),
+            )
         # Every send that was already waiting when this read started is covered from
         # here on; its own cursor is no longer needed after a restart.
         floor = _seq(after)
@@ -660,6 +699,9 @@ class AnswerStream:
             # The event fired then, unless the answer was read late; it is waited for now.
             if (data := self._skipped.pop(key, None)) is not None:
                 self._hass.bus.async_fire(EVENT_NOTIFICATION_ACTION, data)
+            action_id = self._answered[key]
+            answer = {"notification_id": notification_id, "status": ANSWER_STATUS_ANSWERED, "action_id": action_id}
+            async_dispatcher_send(self._hass, notification_answer_signal(self._entry.entry_id), answer, int(sid))
             return
         pending: dict = {"sent_at": _iso(sent_at), "schedule_id": int(sid)}
         if (cursor := rec.get("cursor")) is not None:

@@ -486,7 +486,7 @@ How it stays in step:
 - Adding or editing an item (title, description, due date) schedules or replaces its reminder right away; completing or deleting it cancels the reminder. PushWard sends the push at its time, so it arrives even if Home Assistant is offline then.
 - An item due more than 365 days out is scheduled once it comes within range. An item whose reminder time has already passed gets its reminder within a minute, unless it is more than 90 minutes past due; then it gets none.
 - If you stop a reminder in the PushWard app, the item stays open and gets no new reminder until you change its due date or time. Renaming an item whose reminder already went out does not send it again either.
-- After a reminder goes out, the item stays open for you to tick off. With the Done button, the integration watches for the tap for 24 hours: a long-lived request at a time for the first hour, then a quick check every 5 minutes.
+- After a reminder goes out, the item stays open for you to tick off. With the Done button, a tap within 24 hours completes it. The tap reaches Home Assistant through the same long-poll as the [`pushward_notification_action` event](#the-pushward_notification_action-event); a reminder it does not track (one made by an older version) is watched on its own, a long-lived request at a time for the first hour, then a quick check every 5 minutes.
 - The pairing between items and reminders is kept in Home Assistant's storage, not in the item, so notes synced to other apps stay clean. Removing the list (or the integration) cancels its pending reminders.
 
 ### End-to-end encryption

@@ -9,8 +9,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect, async_dispatcher_send
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
     async_capture_events,
@@ -20,6 +20,7 @@ from pytest_homeassistant_custom_component.common import (
 from custom_components.pushward.answer_stream import (
     AnswerStream,
     _key_hash,
+    notification_answer_signal,
     older_cursor,
 )
 from custom_components.pushward.api import (
@@ -962,3 +963,67 @@ async def test_schedules_survive_a_restart(streams, feed, hass_storage) -> None:
         "recurring": False,
     }
     assert stream._unsub_timer is not None
+
+
+# --- answers for the to-do reminders ------------------------------------------
+
+
+async def test_each_answer_goes_out_on_the_signal_with_its_schedule(
+    hass: HomeAssistant, streams, feed, api, entry, freezer
+) -> None:
+    received: list[tuple[dict, int | None]] = []
+    async_dispatcher_connect(
+        hass, notification_answer_signal(entry.entry_id), callback(lambda item, sid: received.append((item, sid)))
+    )
+    stream = await streams()
+    api.get_scheduled_notification.return_value = _sent_row(7, 99, NOW)
+    stream.async_track_send({"id": 7, "status": "scheduled", "send_at": NOW.isoformat()}, True)
+    await _until(lambda: len(feed.calls) == 2, "the first read")
+    freezer.move_to(NOW + FIRST_READ)
+    feed.reply(cursor="100")
+    await _until(lambda: len(feed.calls) == 3, "the read after the schedule")
+
+    assert stream.delivers_answer(7, None)
+    assert stream.delivers_answer(None, 99)
+    assert not stream.delivers_answer(8, 98)
+
+    feed.reply(_answer(99, action_id="done"), _answer(5), cursor="102")
+    await _until(lambda: len(received) == 2, "both answers")
+
+    assert [(item["notification_id"], sid) for item, sid in received] == [(99, 7), (5, None)]
+    assert not stream.delivers_answer(7, 99)
+
+
+async def test_an_answer_read_before_its_schedule_goes_out_again_with_the_schedule(
+    hass: HomeAssistant, streams, feed, api, entry, freezer
+) -> None:
+    received: list[tuple[dict, int | None]] = []
+    async_dispatcher_connect(
+        hass, notification_answer_signal(entry.entry_id), callback(lambda item, sid: received.append((item, sid)))
+    )
+    stream = await streams()
+    api.get_scheduled_notification.return_value = {"id": 7, "status": "sending", "send_at": NOW.isoformat()}
+    stream.async_track_send({"id": 7, "status": "scheduled", "send_at": NOW.isoformat()}, True)
+    await _until(lambda: len(feed.calls) == 2, "the first read")
+    feed.reply(_answer(99, action_id="done"), cursor="101")
+    await _until(lambda: len(feed.calls) == 3, "the read after the answer")
+    assert received[0][1] is None  # the stream does not know yet where 99 came from
+
+    api.get_scheduled_notification.return_value = _sent_row(7, 99, NOW)
+    freezer.move_to(NOW + FIRST_READ)
+    feed.reply(cursor="101")
+    await _until(lambda: len(received) == 2, "the answer again, with its schedule")
+
+    assert received[1] == ({"notification_id": 99, "status": "answered", "action_id": "done"}, 7)
+
+
+async def test_a_refused_key_stops_delivering(streams, feed) -> None:
+    stream = await streams()
+    stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
+    await _until(lambda: feed.calls, "the first read")
+    assert stream.delivers_answer(None, 42)
+
+    feed.fail(PushWardForbiddenError("no notifications permission", status_code=403))
+    await _until(lambda: not stream.running, "the loop to stop")
+
+    assert not stream.delivers_answer(None, 42)
