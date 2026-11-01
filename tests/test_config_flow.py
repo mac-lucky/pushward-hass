@@ -44,6 +44,7 @@ from custom_components.pushward.config_flow import (
     _widget_details_schema,
 )
 from custom_components.pushward.const import (
+    APP_STORE_URL,
     BOARD_MAX_TILES,
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
@@ -162,6 +163,7 @@ from custom_components.pushward.const import (
     MAX_COMPACT_TRAILING_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_URL_LEN,
+    PLAY_STORE_URL,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
@@ -452,6 +454,7 @@ async def test_user_step_success(
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": config_entries.SOURCE_USER})
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "user"
+    assert result["description_placeholders"] == {"app_store_url": APP_STORE_URL, "play_store_url": PLAY_STORE_URL}
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],

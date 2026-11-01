@@ -212,6 +212,7 @@ from .const import (
     MAX_TEXT_LEN,
     MAX_URL_LEN,
     NAMED_COLORS,
+    PLAY_STORE_URL,
     PRIORITY_MAX,
     PRIORITY_MIN,
     SCALES,
@@ -2124,7 +2125,7 @@ class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=_INTEGRATION_KEY_SCHEMA,
             errors=errors,
-            description_placeholders={"app_store_url": APP_STORE_URL},
+            description_placeholders={"app_store_url": APP_STORE_URL, "play_store_url": PLAY_STORE_URL},
         )
 
     async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> config_entries.ConfigFlowResult:

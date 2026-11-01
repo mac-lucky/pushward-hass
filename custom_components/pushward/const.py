@@ -243,6 +243,9 @@ CONF_LEVEL_ENTITY = "level_entity"
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
 APP_STORE_URL = "https://apps.apple.com/app/id6759689999"
+PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.maclucky.pushward"
+# Learn more on the quota repair: the plans, whichever store the phone subscribes through.
+PRICING_URL = "https://pushward.app/pricing"
 DEFAULT_PRIORITY = 1
 DEFAULT_UPDATE_INTERVAL = 5
 DEFAULT_TOTAL_STEPS = 1

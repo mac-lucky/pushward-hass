@@ -22,11 +22,11 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 import custom_components.pushward as pushward_pkg
 from custom_components.pushward.api import PushWardApiError
 from custom_components.pushward.const import (
-    APP_STORE_URL,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
     DOMAIN,
+    PRICING_URL,
     USAGE_LIMIT_RESOURCES,
     usage_limit_issue_id,
 )
@@ -81,7 +81,7 @@ async def test_issue_raised_when_over_limit(hass: HomeAssistant) -> None:
     assert issue.is_fixable is False
     assert issue.is_persistent is False  # premise of the async_unload_entry cleanup
     assert issue.translation_key == "usage_limit_notifications"
-    assert issue.learn_more_url == APP_STORE_URL
+    assert issue.learn_more_url == PRICING_URL
     assert issue.translation_placeholders == {
         "account": "PushWard",
         "used": "600",

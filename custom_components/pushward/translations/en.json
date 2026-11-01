@@ -1972,12 +1972,12 @@
     "step": {
       "user": {
         "title": "Connect to PushWard",
-        "description": "Enter your PushWard integration key to get started. Get the PushWard iOS app from the App Store: {app_store_url}",
+        "description": "Enter your PushWard integration key to get started. Get the PushWard app from the App Store ({app_store_url}) or Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Open the PushWard iOS app (App Store: {app_store_url}) → Settings → Integration Keys. You can paste the default key, or create a new one with scope 'ha-*'."
+          "integration_key": "Open the PushWard app > Settings > Integration Keys. You can paste the default key, or create a new one with scope 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1987,7 +1987,7 @@
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Create one in the PushWard iOS app under Settings → Integration Keys with scope 'ha-*'."
+          "integration_key": "Create one in the PushWard app under Settings > Integration Keys with scope 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1997,7 +1997,7 @@
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Create one in the PushWard iOS app under Settings → Integration Keys with scope 'ha-*'."
+          "integration_key": "Create one in the PushWard app under Settings > Integration Keys with scope 'ha-*'."
         }
       }
     },
@@ -2069,8 +2069,8 @@
             "series_entities": "Series Entities",
             "completion_message": "Completion Message",
             "warning_threshold": "Warning Threshold (seconds)",
-            "alarm": "Alarm (iOS 26+)",
-            "snooze_seconds": "Snooze Seconds (iOS 26+)",
+            "alarm": "Alarm",
+            "snooze_seconds": "Snooze Seconds",
             "tiles": "Board Tiles",
             "log_columns": "Log Columns"
           },
@@ -2090,8 +2090,8 @@
             "series_entities": "Bind separate entities as named lines on one chart (e.g. a PM2.5 sensor per room): each row is a label, an entity, and an optional attribute. The label defaults to the entity's friendly name; leave the attribute empty to plot the entity's state. Combines with Series; up to 10 lines total. A comma-separated [Label=]entity_id[:attribute] string is still accepted.",
             "completion_message": "Text shown when the activity ends. Leave empty for 'Complete'. Example: Wash Done",
             "warning_threshold": "Seconds before the end of a countdown when the server sends a warning push. Leave empty to disable. Countdown template only.",
-            "alarm": "Trigger an AlarmKit alarm when the countdown expires (iOS 26+). Countdown template only.",
-            "snooze_seconds": "How long the iOS Snooze button extends the countdown (60–3600). Leave empty for the 300s (5 min) default. Requires Alarm. Countdown template only.",
+            "alarm": "Ring an alarm on the device when the countdown expires. Needs iOS 26 or later on iPhone; on Android the app needs the Alarms & reminders permission. Countdown template only.",
+            "snooze_seconds": "How long the alarm's Snooze button extends the countdown (60-3600). Leave empty for the 300s (5 min) default. Requires Alarm. Countdown template only.",
             "tiles": "Up to 4 tiles, each reading a separate entity: label, entity, plus optional attribute, unit, icon, color, and tap URL. A comma-separated string is still accepted. Board template only.",
             "log_columns": "Extra values appended to each log line (max 6): each row is a label, an entity, an attribute, and a unit. An attribute with no entity reads this entity; an entity with no attribute reads that entity's state; setting both reads that entity's attribute. A comma-separated [Label=]source[|unit] string is still accepted. Log template only."
           },
@@ -2158,7 +2158,7 @@
                 "image_thumbhash": "Image ThumbHash"
               },
               "data_description": {
-                "image_url": "https URL of a picture shown beside the icon. The iPhone downloads it directly, so it has to be reachable from the public internet; a LAN address will not load, but its ThumbHash still will.",
+                "image_url": "https URL of a picture shown beside the icon. The phone downloads it directly, so it has to be reachable from the public internet; a LAN address will not load, but its ThumbHash still will.",
                 "image_shape": "How the picture is framed: poster keeps a tall crop, square is the default, circle crops it round.",
                 "image_thumbhash": "Blurred inline preview drawn when the URL cannot be fetched, and the only tier that renders for an image on your LAN. Leave it empty to have one computed from the URL automatically, or use the Generate ThumbHash action to build one from any image Home Assistant can read."
               }
@@ -2201,7 +2201,7 @@
               },
               "data_description": {
                 "slug": "Unique identifier for this activity. Leave empty to auto-generate from entity ID. Example: ha-living-room-lamp",
-                "activity_name": "Display name shown on the iPhone Live Activity. Defaults to the entity's friendly name.",
+                "activity_name": "Display name shown on the activity on your phone. Defaults to the entity's friendly name.",
                 "icon": "Override icon. Leave empty to use the entity’s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",
                 "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon and entity icon when set.",
                 "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
@@ -2365,7 +2365,7 @@
             "flow_nodes": "Flow Nodes"
           },
           "data_description": {
-            "widget_name": "Display name shown in the iOS widget picker. Defaults to the entity's friendly name.",
+            "widget_name": "Display name shown in the widget picker on your phone. Defaults to the entity's friendly name.",
             "value_attribute": "Entity attribute holding the value. Leave empty to use the entity's primary state.",
             "unit": "Display unit shown next to the value. Max 32 characters.",
             "value_scale": "How to read the progress value. Auto treats a % unit or anything above 1 as a percent, and everything else as a 0.0-1.0 fraction. Pick percent or fraction to override. Progress template only.",
@@ -2546,19 +2546,19 @@
     },
     "usage_limit_notifications": {
       "title": "{account} notification limit reached",
-      "description": "Your PushWard account has used {used} of its {limit} notifications for the current period, so new notifications will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+      "description": "Your PushWard account has used {used} of its {limit} notifications for the current period, so new notifications will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard app to raise the limit."
     },
     "usage_limit_live_activity": {
       "title": "{account} Live Activity update limit reached",
-      "description": "Your PushWard account has used {used} of its {limit} Live Activity updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+      "description": "Your PushWard account has used {used} of its {limit} Live Activity updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard app to raise the limit."
     },
     "usage_limit_widgets": {
       "title": "{account} widget update limit reached",
-      "description": "Your PushWard account has used {used} of its {limit} widget updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+      "description": "Your PushWard account has used {used} of its {limit} widget updates for the current period, so new updates will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard app to raise the limit."
     },
     "usage_limit_emails": {
       "title": "{account} email limit reached",
-      "description": "Your PushWard account has used {used} of its {limit} emails for the current period, so new emails will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard iOS app to raise the limit."
+      "description": "Your PushWard account has used {used} of its {limit} emails for the current period, so new emails will be rejected until the quota resets ({resets_at}). Upgrade your subscription in the PushWard app to raise the limit."
     },
     "todo_e2e_unavailable": {
       "title": "{account} to-do reminders are not going out",

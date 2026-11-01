@@ -20,8 +20,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
-    APP_STORE_URL,
     DOMAIN,
+    PRICING_URL,
     QUOTA_RESET_KEY,
     USAGE_LIMIT_RESOURCES,
     USAGE_UPDATE_INTERVAL,
@@ -128,5 +128,5 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     "limit": str(limit),
                     "resets_at": _format_reset(reset),
                 },
-                learn_more_url=APP_STORE_URL,
+                learn_more_url=PRICING_URL,
             )
