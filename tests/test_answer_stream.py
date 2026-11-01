@@ -122,7 +122,10 @@ async def streams(hass: HomeAssistant, api: MagicMock, entry: MockConfigEntry, f
         started.append(stream)
         return stream
 
-    with patch("custom_components.pushward.answer_stream.ANSWER_MIN_POLL_INTERVAL", 0):
+    with (
+        patch("custom_components.pushward.answer_stream.ANSWER_MIN_POLL_INTERVAL", 0),
+        patch("custom_components.pushward.answer_stream.ANSWER_STREAM_EARLY_RETURN_JITTER_SECONDS", 0),
+    ):
         yield start
         for stream in started:
             await stream.async_stop()
@@ -364,19 +367,73 @@ async def test_errors_back_off_exponentially_with_jitter(streams, feed) -> None:
 
     for n, delay in enumerate(delays, start=1):
         cap = 2 * 2 ** (n - 1)
-        assert cap / 2 <= delay <= cap
+        # Never narrower than 4 seconds, even on the first retry.
+        assert cap / 2 <= delay <= cap / 2 + max(cap / 2, 4)
     # A success resets the streak.
     feed.reply(cursor="57")
     await _until(lambda: len(delays) == 5, "the delay after a success")
     feed.fail(PushWardApiError("boom", status_code=503))
     await _until(lambda: len(delays) == 6, "the next backoff")
-    assert 1 <= delays[5] <= 2
+    assert 1 <= delays[5] <= 5
 
 
 async def test_backoff_is_capped(streams) -> None:
     with patch("custom_components.pushward.answer_stream.random.random", return_value=1.0):
-        assert AnswerStream._backoff(1) == 2
+        assert AnswerStream._backoff(1) == 5
+        assert AnswerStream._backoff(4) == 16
         assert AnswerStream._backoff(20) == 300
+    with patch("custom_components.pushward.answer_stream.random.random", return_value=0.0):
+        assert AnswerStream._backoff(1) == 1
+
+
+async def test_a_wait_back_early_with_nothing_pauses_a_random_moment(streams, feed) -> None:
+    """A replica shutting its waits down must not bring every reader back at the same instant."""
+    stream = await streams()
+    delays: list[float] = []
+
+    async def record(delay: float) -> None:
+        delays.append(delay)
+
+    stream._async_sleep = record
+    with (
+        patch("custom_components.pushward.answer_stream.ANSWER_STREAM_EARLY_RETURN_JITTER_SECONDS", 3),
+        patch("custom_components.pushward.answer_stream.random.random", return_value=0.5),
+    ):
+        stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
+        await _until(lambda: feed.calls, "the first read")
+        feed.reply(cursor="57")
+        await _until(lambda: len(delays) == 1, "the pause after the early return")
+        # An answer is no early return: the next read follows at once.
+        feed.reply(_answer(41), cursor="58")
+        await _until(lambda: len(delays) == 2, "the pause after the answer")
+
+    assert delays == [1.5, 0.0]
+
+
+def test_plain_reads_last_longer_after_each_refused_wait() -> None:
+    assert [AnswerStream._plain_span(n) for n in range(7)] == [60, 60, 120, 240, 480, 600, 600]
+
+
+async def test_consecutive_wait_refusals_are_counted_until_a_wait_goes_through(streams, feed) -> None:
+    stream = await streams()
+    stream._async_sleep = AsyncMock()
+    spans: list[int] = []
+
+    def span(refusals: int) -> float:
+        spans.append(refusals)
+        return 0  # no plain reads in between, so every read here is a wait
+
+    stream._plain_span = span
+    stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
+    await _until(lambda: feed.calls, "the first read")
+    feed.fail(PushWardRateLimitedError("too many concurrent waits", retry_after=1))
+    feed.fail(PushWardRateLimitedError("too many concurrent waits", retry_after=1))
+    feed.reply(cursor="57")
+    feed.fail(PushWardRateLimitedError("too many concurrent waits", retry_after=1))
+    await _until(lambda: len(spans) == 3, "three refusals")
+
+    assert spans == [1, 2, 1]
+    assert all(wait == ANSWER_STREAM_WAIT_SECONDS for _, wait in feed.calls)
 
 
 async def test_wait_limit_429_reads_without_waiting_for_a_while(streams, feed) -> None:

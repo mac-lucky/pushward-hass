@@ -419,6 +419,16 @@ ANSWER_STREAM_PENDING_DAYS = 7
 ANSWER_STREAM_PENDING_MAX = 200
 ANSWER_STREAM_BACKOFF_BASE_SECONDS = 2
 ANSWER_STREAM_BACKOFF_MAX_SECONDS = 300
+# The narrowest spread of the backoff jitter, so installs that lost the same server
+# (a replica restarting) do not all come back within the same second.
+ANSWER_STREAM_MIN_JITTER_SECONDS = 4
+# A wait that came back early with nothing (a replica shutting its waits down) is
+# followed by a random pause of up to this long before the next one.
+ANSWER_STREAM_EARLY_RETURN_JITTER_SECONDS = 3
+# After a 429 on a wait the stream reads without waiting for
+# ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS, twice as long after each further 429 on a
+# wait, up to this; a wait that goes through resets it.
+ANSWER_STREAM_PLAIN_MAX_SECONDS = 600
 # A scheduled send has no notification id until it goes out: its schedule is read
 # this long after each send comes due (the server's sweep needs a moment), and
 # again every ANSWER_STREAM_SCHEDULE_RETRY_SECONDS while it is still being sent.

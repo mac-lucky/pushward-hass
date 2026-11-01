@@ -55,10 +55,13 @@ from .const import (
     ANSWER_STREAM_ANSWERED_MAX,
     ANSWER_STREAM_BACKOFF_BASE_SECONDS,
     ANSWER_STREAM_BACKOFF_MAX_SECONDS,
+    ANSWER_STREAM_EARLY_RETURN_JITTER_SECONDS,
     ANSWER_STREAM_FRESH_SECONDS,
+    ANSWER_STREAM_MIN_JITTER_SECONDS,
     ANSWER_STREAM_PAGE_LIMIT,
     ANSWER_STREAM_PENDING_DAYS,
     ANSWER_STREAM_PENDING_MAX,
+    ANSWER_STREAM_PLAIN_MAX_SECONDS,
     ANSWER_STREAM_SCHEDULE_FIRST_READ_SECONDS,
     ANSWER_STREAM_SCHEDULE_RETRY_SECONDS,
     ANSWER_STREAM_WAIT_SECONDS,
@@ -414,6 +417,8 @@ class AnswerStream:
     async def _async_run(self) -> None:
         loop = asyncio.get_running_loop()
         failures = 0
+        # 429s on a wait since the last wait that went through.
+        wait_refusals = 0
         plain_until = 0.0
         # Starting (again): read from far enough back for every send still waiting.
         self._rewind()
@@ -438,9 +443,12 @@ class AnswerStream:
                 # The gate logs it; the coordinator's release wakes the stream early.
                 delay = block_delay_seconds(err.reset_at, None)
             except PushWardRateLimitedError as err:
-                # Too many waits held across the account: read without one for a while.
+                # Too many waits held across the account: read without one for a while,
+                # longer each time the waits are refused again.
                 failures += 1
-                plain_until = loop.time() + ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS
+                if hold:
+                    wait_refusals += 1
+                plain_until = loop.time() + self._plain_span(wait_refusals)
                 delay = max(err.retry_after, self._backoff(failures))
             except PushWardAuthError:
                 _LOGGER.warning("PushWard refused the integration key while reading notification answers")
@@ -465,6 +473,8 @@ class AnswerStream:
                 delay = self._backoff(failures)
             else:
                 failures = 0
+                if hold:
+                    wait_refusals = 0
                 self._consume(after, feed)
                 if len(feed["items"]) >= ANSWER_STREAM_PAGE_LIMIT:
                     continue  # a full page: the next one is already waiting
@@ -472,7 +482,11 @@ class AnswerStream:
                     delay = ANSWER_PLAIN_POLL_INTERVAL
                 else:
                     # A wait that came back early (a server shutting it down) must not spin.
-                    delay = max(0.0, ANSWER_MIN_POLL_INTERVAL - (loop.time() - started))
+                    elapsed = loop.time() - started
+                    delay = max(0.0, ANSWER_MIN_POLL_INTERVAL - elapsed)
+                    if not feed["items"] and elapsed < hold - 1:
+                        # Nor bring back every reader that server held at the same instant.
+                        delay += random.random() * ANSWER_STREAM_EARLY_RETURN_JITTER_SECONDS
             await self._async_sleep(delay)
 
     def _hold(self, now: datetime) -> int:
@@ -497,8 +511,15 @@ class AnswerStream:
     @staticmethod
     def _backoff(failures: int) -> float:
         delay = min(ANSWER_STREAM_BACKOFF_BASE_SECONDS * 2 ** (failures - 1), ANSWER_STREAM_BACKOFF_MAX_SECONDS)
-        # Jitter, so installs that lost the server together do not come back in step.
-        return delay * (0.5 + random.random() * 0.5)
+        # Jitter, so installs that lost the server together do not come back in step;
+        # never narrower than ANSWER_STREAM_MIN_JITTER_SECONDS, even on the first retry.
+        return delay / 2 + random.random() * max(delay / 2, ANSWER_STREAM_MIN_JITTER_SECONDS)
+
+    @staticmethod
+    def _plain_span(wait_refusals: int) -> float:
+        """How long to read without waiting after a 429, the wait_refusals-th on a wait in a row."""
+        span = ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS * 2 ** max(0, wait_refusals - 1)
+        return min(span, ANSWER_STREAM_PLAIN_MAX_SECONDS)
 
     def _rewind(self) -> None:
         """Move the cursor back to the oldest cursor of a send or schedule still waiting.
