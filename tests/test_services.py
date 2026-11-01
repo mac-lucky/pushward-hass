@@ -3629,3 +3629,225 @@ async def test_generate_thumbhash_requires_exactly_one_source(hass: HomeAssistan
             blocking=True,
             return_response=True,
         )
+
+
+# --- Home Assistant paths in urls ---
+
+_EXTERNAL_URL = "https://ha.example.com"
+
+
+async def test_send_notification_resolves_paths_against_the_external_url(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = _EXTERNAL_URL
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {
+            "title": "Kitchen",
+            "body": "Leak detected",
+            "url": "/lovelace/kitchen",
+            "actions": [
+                {"id": "open", "title": "Open", "url": "/lovelace/kitchen?tab=water", "foreground": True},
+                # A path is http(s) once resolved, so it can be a silent webhook.
+                {"id": "valve", "title": "Close valve", "url": "/api/webhook/close-valve", "method": "post"},
+                {"id": "ack", "title": "OK"},
+            ],
+        },
+        blocking=True,
+    )
+
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["url"] == "https://ha.example.com/lovelace/kitchen"
+    assert [action.get("url") for action in kwargs["actions"]] == [
+        "https://ha.example.com/lovelace/kitchen?tab=water",
+        "https://ha.example.com/api/webhook/close-valve",
+        None,
+    ]
+    assert kwargs["actions"][1]["method"] == "POST"
+
+
+async def test_send_notification_keeps_absolute_urls_without_an_external_url(hass: HomeAssistant) -> None:
+    """Full URLs never need the external URL, so a setup without one sends them as before."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = None
+
+    with patch("custom_components.pushward.get_url") as get_url:
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {
+                "title": "t",
+                "body": "b",
+                "url": "https://example.com/a",
+                "actions": [{"id": "app", "title": "App", "url": "homeassistant://navigate/lovelace/0"}],
+            },
+            blocking=True,
+        )
+
+    get_url.assert_not_called()
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["url"] == "https://example.com/a"
+    assert kwargs["actions"][0]["url"] == "homeassistant://navigate/lovelace/0"
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"url": "/lovelace/kitchen"},
+        {"actions": [{"id": "open", "title": "Open", "url": "/lovelace/kitchen"}]},
+    ],
+)
+async def test_a_path_without_an_external_url_is_refused(hass: HomeAssistant, data: dict) -> None:
+    """The internal URL does not count: the phone may be away from home when it is tapped."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = None
+    hass.config.internal_url = "http://192.168.1.10:8123"
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await hass.services.async_call(DOMAIN, "send_notification", {"title": "t", "body": "b", **data}, blocking=True)
+
+    assert exc_info.value.translation_key == "external_url_required"
+    assert exc_info.value.translation_placeholders == {"path": "/lovelace/kitchen"}
+    api.create_notification.assert_not_awaited()
+
+
+async def test_a_path_resolves_against_the_cloud_url(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with patch("custom_components.pushward.get_url", return_value="https://abc.ui.nabu.casa") as get_url:
+        await hass.services.async_call(
+            DOMAIN, "send_notification", {"title": "t", "body": "b", "url": "/lovelace/0"}, blocking=True
+        )
+
+    get_url.assert_called_once_with(hass, allow_internal=False)
+    assert api.create_notification.call_args.kwargs["url"] == "https://abc.ui.nabu.casa/lovelace/0"
+
+
+@pytest.mark.parametrize("url", ["//evil.example.com/x", "lovelace/kitchen"])
+async def test_only_a_single_leading_slash_makes_a_path(hass: HomeAssistant, url: str) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = _EXTERNAL_URL
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            "send_notification",
+            {"title": "t", "body": "b", "url": url},
+            blocking=True,
+        )
+
+
+async def test_a_path_too_long_once_resolved_is_refused(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = _EXTERNAL_URL
+    path = "/" + "a" * (MAX_URL_LEN - 1)
+
+    with pytest.raises(ServiceValidationError) as exc_info:
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_generic",
+            {"slug": "ha-washer", "state": "ongoing", "url": path},
+            blocking=True,
+        )
+
+    assert exc_info.value.translation_key == "ha_path_invalid"
+    api.update_activity.assert_not_awaited()
+
+
+async def test_update_activity_resolves_every_action_path(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = _EXTERNAL_URL
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_generic",
+        {
+            "slug": "ha-washer",
+            "state": "ongoing",
+            "state_text": "Running",
+            "progress": 0.5,
+            "url": "/lovelace/laundry",
+            "secondary_url": "https://example.com/manual",
+            "tap_action": {"url": "/api/webhook/pause-washer", "foreground": False},
+            "url_action": {"url": "/lovelace/laundry", "title": "Open"},
+            "secondary_url_action": {"url": "homeassistant://navigate/energy", "title": "Energy"},
+        },
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["url"] == "https://ha.example.com/lovelace/laundry"
+    assert content["secondary_url"] == "https://example.com/manual"
+    assert content["tap_action"] == {"url": "https://ha.example.com/api/webhook/pause-washer", "foreground": False}
+    assert content["url_action"]["url"] == "https://ha.example.com/lovelace/laundry"
+    assert content["secondary_url_action"]["url"] == "homeassistant://navigate/energy"
+    assert_valid_activity_content(content, where="update_activity_generic")
+
+
+async def test_update_activity_resolves_tile_control_and_option_paths(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    hass.config.external_url = _EXTERNAL_URL
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_board",
+        {
+            "slug": "home-board",
+            "state": "ongoing",
+            "tiles": [
+                {"label": "Garage", "value": "Open", "url_action": {"url": "/lovelace/garage"}},
+                {"label": "Temp", "value": "21"},
+            ],
+        },
+        blocking=True,
+    )
+    tiles = api.update_activity.call_args[0][2]["tiles"]
+    assert tiles[0]["url_action"]["url"] == "https://ha.example.com/lovelace/garage"
+    assert "url_action" not in tiles[1]
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_media",
+        {
+            "slug": "living-room-player",
+            "state": "ongoing",
+            "controls": {
+                "play_pause": {"url": "/api/webhook/pw-toggle"},
+                "stop": None,
+                "extra": [{"url": "/api/webhook/pw-shuffle", "icon": "shuffle"}],
+            },
+        },
+        blocking=True,
+    )
+    controls = api.update_activity.call_args[0][2]["controls"]
+    assert controls["play_pause"]["url"] == "https://ha.example.com/api/webhook/pw-toggle"
+    assert controls["stop"] is None
+    assert controls["extra"][0]["url"] == "https://ha.example.com/api/webhook/pw-shuffle"
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_approval",
+        {
+            "slug": "gate-request",
+            "state": "ongoing",
+            "state_text": "Open the gate?",
+            "options": [
+                {"id": "approve", "title": "Approve", "url": "/api/webhook/approve-gate"},
+                {"id": "deny", "title": "Deny"},
+            ],
+        },
+        blocking=True,
+    )
+    content = api.update_activity.call_args[0][2]
+    assert content["options"][0]["url"] == "https://ha.example.com/api/webhook/approve-gate"
+    assert "url" not in content["options"][1]
+    assert_valid_activity_content(content, where="update_activity_approval")

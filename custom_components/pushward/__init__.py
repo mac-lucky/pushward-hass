@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import logging
 from collections.abc import Callable, Coroutine
 from contextlib import contextmanager
@@ -21,6 +22,7 @@ from homeassistant.exceptions import (
 )
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util import dt as dt_util
 
@@ -185,9 +187,39 @@ _HTTP_ACTION_FIELDS = {
 }
 
 
+def _is_ha_path(value: object) -> bool:
+    """A path on Home Assistant itself, like /lovelace/kitchen: one leading slash, no host.
+
+    "//host/path" is a scheme-relative URL, not a path, and stays refused.
+    """
+    return isinstance(value, str) and value.startswith("/") and not value.startswith("//")
+
+
+def _ha_path_or(validator):
+    """Accept a Home Assistant path as is, and hand anything else to validator.
+
+    A schema has no hass to read the external URL from, so the handler resolves
+    the path (_resolve_ha_paths) and runs validator on the full URL then.
+    """
+
+    def _validate(value):
+        if _is_ha_path(value):
+            if len(value) > MAX_URL_LEN:
+                raise vol.Invalid(f"URL must be at most {MAX_URL_LEN} characters")
+            return value
+        return validator(value)
+
+    return _validate
+
+
+# Tap targets and action buttons. A path resolves to an http(s) URL on Home Assistant.
+_SERVICE_ACTION_URL = _ha_path_or(validate_tap_action_url)
+
+
 def _action_url_is_http(data: dict) -> bool:
-    """True when the action's url carries an http(s) scheme (the silent-webhook shape)."""
-    return urlparse(str(data.get("url", ""))).scheme.lower() in ("http", "https")
+    """True when the action's url is http(s) (the silent-webhook shape), a Home Assistant path included."""
+    url = str(data.get("url", ""))
+    return _is_ha_path(url) or urlparse(url).scheme.lower() in ("http", "https")
 
 
 def _validate_http_action_fields(data: dict) -> dict:
@@ -227,7 +259,7 @@ def _validate_text_input_fields(data: dict) -> dict:
 # extends this with the button-facing label/icon, so the shared slot is defined once.
 _TAP_ACTION_BASE = vol.Schema(
     {
-        vol.Required("url"): validate_tap_action_url,
+        vol.Required("url"): _SERVICE_ACTION_URL,
         vol.Optional("foreground"): cv.boolean,
         **_HTTP_ACTION_FIELDS,
     }
@@ -262,8 +294,8 @@ def _silent_action_schema(extra_fields: dict) -> vol.All:
 # tapActionProperties). Legacy url/secondary_url strings sit alongside the richer
 # *_action objects; the server allows custom-scheme URLs here, hence validate_tap_action_url.
 _UNIVERSAL_ACTION_FIELDS = {
-    vol.Optional("url"): validate_tap_action_url,
-    vol.Optional("secondary_url"): validate_tap_action_url,
+    vol.Optional("url"): _SERVICE_ACTION_URL,
+    vol.Optional("secondary_url"): _SERVICE_ACTION_URL,
     vol.Optional("tap_action"): _TAP_ACTION_SCHEMA,
     vol.Optional("url_action"): _URL_ACTION_SCHEMA,
     vol.Optional("secondary_url_action"): _URL_ACTION_SCHEMA,
@@ -518,7 +550,7 @@ _APPROVAL_OPTION_SCHEMA = vol.All(
             vol.Required("title"): vol.All(str, vol.Length(min=1, max=APPROVAL_OPTION_TITLE_MAX)),
             vol.Optional("style"): vol.In(APPROVAL_OPTION_STYLES),
             vol.Optional("icon"): vol.All(str, vol.Length(min=1, max=MAX_TAP_ACTION_ICON_LEN)),
-            vol.Optional("url"): validate_tap_action_url,
+            vol.Optional("url"): _SERVICE_ACTION_URL,
             **_HTTP_ACTION_FIELDS,
         }
     ),
@@ -753,7 +785,7 @@ SCHEMA_ACTION = vol.All(
             vol.Required("title"): vol.All(str, vol.Length(min=1)),
             # The server accepts any non-blocked scheme on a notification action (deep links
             # like homeassistant:// / tel: / mailto:), matching the activity tap-action fields.
-            vol.Optional("url"): validate_tap_action_url,
+            vol.Optional("url"): _SERVICE_ACTION_URL,
             vol.Optional("foreground"): cv.boolean,
             vol.Optional("destructive"): cv.boolean,
             vol.Optional("authentication_required"): cv.boolean,
@@ -857,7 +889,7 @@ SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
         vol.Optional("source"): str,
         vol.Optional("source_display_name"): str,
         vol.Optional("activity_slug"): validate_slug,
-        vol.Optional("url"): validate_url,
+        vol.Optional("url"): _ha_path_or(validate_url),
         vol.Optional("media"): SCHEMA_MEDIA,
         vol.Optional("icon_url"): validate_url,
         vol.Optional("metadata"): vol.Schema({str: str}),
@@ -1066,6 +1098,59 @@ async def _fan_out(
     return results
 
 
+def _url_holders(payload: dict) -> list[tuple[dict, str]]:
+    """(object, key) for every tap target and button url an activity or notification payload carries."""
+    actions = [payload.get(key) for key in ("tap_action", "url_action", "secondary_url_action")]
+    actions += [tile.get("url_action") for tile in payload.get("tiles") or []]
+    controls = payload.get("controls") or {}
+    actions += [control for slot, control in controls.items() if slot != "extra"]
+    actions += controls.get("extra") or []
+    actions += payload.get("options") or []  # approval
+    actions += payload.get("actions") or []  # notification buttons
+    holders = [(payload, "url"), (payload, "secondary_url")]
+    holders += [(action, "url") for action in actions if isinstance(action, dict)]
+    return holders
+
+
+def _resolve_ha_paths(hass: HomeAssistant, payload: dict, *, url_validator=validate_tap_action_url) -> dict:
+    """The payload with every Home Assistant path (/lovelace/kitchen) turned into a URL the phone can open.
+
+    The base is Home Assistant's external URL, or its Home Assistant Cloud URL, never
+    the internal one: the phone that gets the push is often away from home. A payload
+    without a path comes back untouched, as the same object. url_validator checks the
+    payload's own url (send_notification's is http(s) only); button urls get
+    validate_tap_action_url, like the schema gives them.
+    """
+    if not any(_is_ha_path(holder.get(key)) for holder, key in _url_holders(payload)):
+        return payload
+    payload = copy.deepcopy(payload)
+    base: str | None = None
+    for holder, key in _url_holders(payload):
+        path = holder.get(key)
+        if not _is_ha_path(path):
+            continue
+        if base is None:
+            try:
+                base = get_url(hass, allow_internal=False).rstrip("/")
+            except NoURLAvailableError as err:
+                raise ServiceValidationError(
+                    translation_domain=DOMAIN,
+                    translation_key="external_url_required",
+                    translation_placeholders={"path": path},
+                ) from err
+        url = base + path
+        validator = url_validator if holder is payload else validate_tap_action_url
+        try:
+            holder[key] = validator(url)
+        except vol.Invalid as err:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="ha_path_invalid",
+                translation_placeholders={"url": url, "error": str(err)},
+            ) from err
+    return payload
+
+
 async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, template: str | None = None) -> None:
     """PATCH an activity from a service call.
 
@@ -1092,6 +1177,7 @@ async def _send_activity_update(hass: HomeAssistant, call: ServiceCall, *, templ
         # Only the deprecated alias lets the caller name the template; "timer" is
         # what the docs call countdown.
         content["template"] = canonical
+    content = _resolve_ha_paths(hass, content)
     # An automation that names a picture should not also have to hash it; a failure
     # here is silent and just leaves the activity relying on the URL alone.
     await async_ensure_thumbhash(hass, content)
@@ -1232,6 +1318,7 @@ async def _async_handle_send_notification(hass: HomeAssistant, call: ServiceCall
     # The response carries ids that belong to one account, so asking for it means naming one.
     targets = _target_entries(hass, call, single=call.return_response)
     kwargs: dict = {field: call.data[field] for field in _NOTIFICATION_FIELDS if field in call.data}
+    kwargs = _resolve_ha_paths(hass, kwargs, url_validator=validate_url)
     send_at = call.data.get("send_at")
     recurrence = call.data.get("recurrence")
     if recurrence is not None:

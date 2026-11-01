@@ -1957,6 +1957,12 @@
     },
     "entry_not_loaded": {
       "message": "No loaded PushWard account has the config entry id {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "{path} is a Home Assistant path, and the phone can only open it on Home Assistant's external URL. Set the Internet URL under Settings > System > Network or connect Home Assistant Cloud, or send a full URL instead."
+    },
+    "ha_path_invalid": {
+      "message": "{url} is not a valid URL: {error}"
     }
   },
   "config": {
