@@ -66,7 +66,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -310,7 +310,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -466,7 +466,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -630,7 +630,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -810,7 +810,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -954,7 +954,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -1082,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -1238,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -1324,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -1406,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -1552,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it."
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
         },
         "compact_trailing_label": {
           "name": "Island Trailing Label",
@@ -2208,7 +2208,7 @@
                 "sound": "Sound played on every update for this entity. Leave empty to use no override.",
                 "update_interval": "Minimum seconds between updates. Rapid state changes are throttled.",
                 "state_labels": "Custom display text for states. One row per state: the state value and the label to show. Example: heating and Heating Up. A legacy state=Label, state2=Label 2 string is still accepted.",
-                "compact_label": "Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it. Leave empty to keep the template's own content.",
+                "compact_label": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text. Leave empty to keep the template's own content.",
                 "compact_trailing_label": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Leave empty to keep the template's own content. Needs PushWard 1.19.1 or later.",
                 "compact_trailing_icon": "Icon shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. MDI icons (e.g. mdi:airplane-takeoff) and SF Symbols (e.g. airplane.departure) both work. Ignored when an island trailing label is set. Leave empty to keep the template's own content. Needs PushWard 1.19.1 or later."
               }

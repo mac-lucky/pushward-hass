@@ -71,7 +71,7 @@ update_activity:
         text:
     compact_label:
       name: Island Label
-      description: Up to 4 characters shown in the Dynamic Island compact leading ear in place of that template's default (the icon, the steps ring, or the timeline high/low stack). The minimal presentation ignores it.
+      description: Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text.
       example: "WASH"
       selector:
         text:
