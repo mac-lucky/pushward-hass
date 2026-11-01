@@ -1145,7 +1145,7 @@ _ACK_ACTION_ID = "pw_ack"
 _TAG_RE = re.compile(rf"^[\x21-\x7e]{{1,{NOTIFICATION_TAG_MAX_LEN}}}\Z")
 _LOCAL_HOST_SUFFIXES = (".localhost", ".local", ".internal", ".svc", ".cluster.local", ".home.arpa")
 RECEIPT_STATUSES = ("active", "acknowledged", "expired", "canceled")
-RECEIPT_CANCEL_REASONS = ("api", "tag", "superseded", "key_revoked", "org_disabled")
+RECEIPT_CANCEL_REASONS = ("api", "tag", "superseded", "key_revoked", "org_disabled", "retracted")
 RECEIPT_CALLBACK_STATUSES = ("pending", "delivered", "failed")
 # snooze: 1-3 distinct minute durations, each 1-1440.
 _SNOOZE_MAX = 3
