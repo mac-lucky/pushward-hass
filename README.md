@@ -71,6 +71,7 @@ The surfaces are independent (separate config, managers, and caches) and share o
   staleness heartbeat that keeps a rarely-changing widget from greying out
 - **To-do reminders**: a push for every dated item on a to-do list, with a Done button that completes the item
 - **Acknowledged notifications** that repeat until someone answers, with tags to cancel them and an optional signed callback
+- **Answers as events**: a `pushward_notification_action` event for every tapped button or typed reply, shaped like the Companion app's, plus `clear_notification` and snooze buttons
 - **End-to-end encryption** of notification text with a key only your devices hold
 - **Account usage sensors**: notifications, Live Activity updates, widget updates, and emails consumed vs. plan limits, plus subscription tier
 - **Template auto-suggestion** picks the best activity template from entity domain and device class
@@ -543,7 +544,7 @@ The message goes out like a `pushward.send_notification` with only a title and b
 
 ## Services
 
-All services live in the `pushward` domain. There are 22 in total: the twelve described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
+All services live in the `pushward` domain. There are 23 in total: the thirteen described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
 
 ### Choosing the account
 
@@ -554,6 +555,7 @@ Every action except `generate_thumbhash` takes an optional `config_entry_id` (**
 | `create_activity`, `update_activity_<template>`, `end_activity`, `delete_activity`, `widget_refresh`, `delete_widget` | every account |
 | `send_notification` | every account; name one to read the response |
 | `cancel_notifications` | a `tag` is canceled on every account; a `notification_id` needs one |
+| `clear_notification` | every account |
 | `get_notification_answer`, `list_scheduled_notifications`, `cancel_scheduled_notification`, `send_email` | fails until you name one |
 
 Notification ids belong to the account that sent them, hence the single-account rows. `send_email` goes to the address you give it, so sending it from every account would only deliver copies. When one account fails (quota, missing permission) the others still get the call, and the action raises the first error once they are done.
@@ -973,6 +975,7 @@ Send a push notification.
 | `acknowledge` | No | Re-send the push until someone acknowledges it: `true`, or `{ repeat_seconds, expire_seconds, action_title }`, see [Acknowledged notifications](#acknowledged-notifications) |
 | `tags` | No | Up to 10 labels for canceling acknowledged notifications as a group. Needs `acknowledge` |
 | `callback_url` | No | Public https URL that gets the receipt when the notification is acknowledged or expires. Needs `acknowledge` |
+| `snooze` | No | Up to 3 snooze buttons, in minutes (1-1440 each, all different), e.g. `[15, 60]`. See [Snooze](#snooze) |
 
 With `send_at`, PushWard holds the notification and sends it at that time; it counts toward your notification quota when it is sent, not when you schedule it. Up to 25 can be waiting at once. Ask for a response to get the id you need to cancel it:
 
@@ -1004,7 +1007,7 @@ With `send_at`, PushWard holds the notification and sends it at that time; it co
 
 #### Answers
 
-Give a notification actions without a `url` and PushWard records which one was tapped, and the typed reply of a `text_input` action. The response of `send_notification` says `answerable: true` when it will. `pushward.get_notification_answer` then waits for the answer:
+Give a notification actions without a `url` and PushWard records which one was tapped, and the typed reply of a `text_input` action. The response of `send_notification` says `answerable: true` when it will. Every answer then fires a [`pushward_notification_action` event](#the-pushward_notification_action-event), and `pushward.get_notification_answer` can wait for one notification's answer:
 
 | Field | Required | Description |
 |-------|:--------:|-------------|
@@ -1035,6 +1038,55 @@ It returns `answered`, `status` (`answered` or `pending`), `action_id`, `text` a
       target:
         entity_id: cover.garage_door
 ```
+
+#### The `pushward_notification_action` event
+
+Each answer to a notification this integration's key sent fires `pushward_notification_action` on the event bus: a tapped action without a `url`, a typed reply, an Acknowledge tap, a to-do reminder's Done. It works like the Companion app's `mobile_app_notification_action`, so automations that wait for that event port over by changing the event type and the send action:
+
+| Event data | Companion app counterpart | Description |
+|------------|---------------------------|-------------|
+| `action` | `action` | The `id` of the tapped action (`pw_ack` for the Acknowledge button PushWard adds) |
+| `reply_text` | `reply_text` | What was typed into a `text_input` action, else null |
+| `action_id` | | Same as `action`, under PushWard's own name |
+| `notification_id` | | The `notification_id` from the `send_notification` response |
+| `collapse_id` | `tag` | The `collapse_id` it was sent with, else null |
+| `thread_id` | `group` | The `thread_id` it was sent with, else null |
+| `answered_at` | | When it was answered (RFC 3339) |
+| `config_entry_id` | | The PushWard entry whose key sent it |
+
+The event carries no action title, nor the notification's title and body; with end-to-end encryption on, PushWard never has them in the clear.
+
+The Companion app pattern, with a per-run action id so two runs of the same script don't answer each other:
+
+```yaml
+- variables:
+    action_close: "{{ 'CLOSE_' ~ context.id }}"
+- action: pushward.send_notification
+  data:
+    title: "Garage door is open"
+    body: "Close it?"
+    actions:
+      - id: "{{ action_close }}"
+        title: Close
+- wait_for_trigger:
+    - trigger: event
+      event_type: pushward_notification_action
+      event_data:
+        action: "{{ action_close }}"
+  timeout: "00:30:00"
+  continue_on_timeout: false
+- action: cover.close_cover
+  target:
+    entity_id: cover.garage_door
+```
+
+Matching on `notification_id: "{{ sent.notification_id }}"` from a `response_variable` works too. A text reply arrives in `{{ wait.trigger.event.data.reply_text }}`.
+
+Home Assistant reads answers with a long-poll per PushWard entry, and only while something can still be answered: a notification sent in the last 7 days with no answer yet (a scheduled one counts from when it goes out). With nothing like that, no connection is held. The stream's position is kept in `.storage`, so answers given while Home Assistant was restarting fire once it is back. An answer given more than 7 days after the send, or while nothing else was waiting, fires the next time the stream runs, not when it happens. `get_notification_answer` reads answers on its own and is not affected.
+
+#### Snooze
+
+`snooze` adds snooze buttons after your actions, one per duration: `snooze: [15, 60]` gives 15-minute and 1-hour buttons. A tap hides the notification and shows it again on that device when the time is up; nothing is sent to PushWard or Home Assistant, so a snooze is not an answer. 1-3 durations, each 1-1440 minutes and all different. It does not work with `acknowledge` (an acknowledged notification repeats anyway), and actions plus snooze buttons are at most 10. Scheduled and repeating sends keep it.
 
 #### Acknowledged notifications
 
@@ -1087,6 +1139,28 @@ When PushWard refuses the acknowledge itself, most often because 25 are already 
     - action: pushward.cancel_notifications
       data:
         tag: leak
+```
+
+### `pushward.clear_notification`
+
+Take back the notifications sent with a `collapse_id`, like the Companion app's `clear_notification`. Every device the account's notifications reach gets a silent push and removes them from the notification shade or Notification Center; in the PushWard app they are marked read, not deleted. An acknowledged notification with that `collapse_id` also stops repeating.
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `collapse_id` | Yes | The `collapse_id` the notifications were sent with, up to 64 characters |
+
+The optional response is `{ devices: <count> }`, the number of devices the retraction was sent to. It is best effort: iOS does not deliver silent pushes to an app that was force-quit, Low Power Mode can hold them back, Apple devices need PushWard 1.20 or later, and the Apple Watch is skipped. PushWard limits it to about 10 a minute per account.
+
+```yaml
+- alias: Garage closed, take the alert back
+  triggers:
+    - trigger: state
+      entity_id: cover.garage_door
+      to: closed
+  actions:
+    - action: pushward.clear_notification
+      data:
+        collapse_id: garage-door
 ```
 
 ### `pushward.send_email`
