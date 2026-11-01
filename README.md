@@ -1082,7 +1082,7 @@ The Companion app pattern, with a per-run action id so two runs of the same scri
 
 Matching on `notification_id: "{{ sent.notification_id }}"` from a `response_variable` works too. A text reply arrives in `{{ wait.trigger.event.data.reply_text }}`.
 
-Home Assistant reads answers with a long-poll per PushWard entry, and only while something can still be answered: a notification sent in the last 7 days with no answer yet (a scheduled one counts from when it goes out). With nothing like that, no connection is held. The stream's position is kept in `.storage`, so answers given while Home Assistant was restarting fire once it is back. An answer given more than 7 days after the send, or while nothing else was waiting, fires the next time the stream runs, not when it happens. `get_notification_answer` reads answers on its own and is not affected.
+Home Assistant reads answers with a long-poll per PushWard entry, and only while something can still be answered: a notification sent in the last 7 days with no answer yet (a scheduled one counts from when it goes out). With nothing like that, no connection is held. The stream's position is kept in `.storage`, so an answer given while Home Assistant was restarting fires once it is back, as long as that notification is still waited for. An answer read late to anything else (more than 7 days after the send, or while nothing was waiting) fires only if it was given in the last 10 minutes, so an old tap never runs an automation at a random moment; it is skipped otherwise. `get_notification_answer` reads answers on its own and is not affected.
 
 #### Snooze
 

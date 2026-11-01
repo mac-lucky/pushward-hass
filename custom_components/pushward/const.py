@@ -420,8 +420,16 @@ ANSWER_STREAM_PENDING_MAX = 200
 ANSWER_STREAM_BACKOFF_BASE_SECONDS = 2
 ANSWER_STREAM_BACKOFF_MAX_SECONDS = 300
 # A scheduled send has no notification id until it goes out: its schedule is read
-# this long after each send comes due (and again while it is still being sent).
+# this long after each send comes due (the server's sweep needs a moment), and
+# again every ANSWER_STREAM_SCHEDULE_RETRY_SECONDS while it is still being sent.
+ANSWER_STREAM_SCHEDULE_FIRST_READ_SECONDS = 10
 ANSWER_STREAM_SCHEDULE_RETRY_SECONDS = 60
+# An answer read late (the stream was off, or Home Assistant down) fires only when
+# it is to a send still waited for, or was given within this many seconds.
+ANSWER_STREAM_FRESH_SECONDS = 600
+# The ids of this many of the latest answers are kept, so a schedule read as sent
+# after its answer was already read is not waited for.
+ANSWER_STREAM_ANSWERED_MAX = 200
 CURSOR_INVALID_CODE = "cursor.invalid"
 
 # snooze on send_notification: 1-3 distinct durations in minutes, never with

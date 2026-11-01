@@ -10,13 +10,15 @@ The long-poll runs only while something can still be answered: a send from the
 last ANSWER_STREAM_PENDING_DAYS days that has no answer yet. Most installs never
 send one, so they hold no connection. A scheduled send has no notification id
 until it goes out, so its schedule is tracked instead: it starts the stream when
-it comes due and is read then to learn the notification it became. A repeating
-one does that at each send and keeps the stream on for the window after it.
+it comes due and is read just after, to learn the notification it became, which
+is then waited for like any other send. A repeating one does that at each send.
 
 The cursor and the pending sends live in .storage, so a restart picks up where
-the stream stopped. Cursors are opaque strings that are decimal integers today:
-the stream compares them as such to start far enough back, and keeps its own
-when one is not a number.
+the stream stopped. An answer read late that way fires only when it is to a send
+still waited for, or was given in the last ANSWER_STREAM_FRESH_SECONDS: a tap from
+last week must not run an automation now. Cursors are opaque strings that are
+decimal integers today: the stream compares them as such to start far enough
+back, and keeps its own when one is not a number.
 """
 
 from __future__ import annotations
@@ -25,6 +27,7 @@ import asyncio
 import contextlib
 import hashlib
 import logging
+import math
 import random
 from datetime import datetime, timedelta
 from typing import Any
@@ -49,11 +52,14 @@ from .const import (
     ANSWER_MIN_POLL_INTERVAL,
     ANSWER_PLAIN_AFTER_WAIT_LIMIT_SECONDS,
     ANSWER_PLAIN_POLL_INTERVAL,
+    ANSWER_STREAM_ANSWERED_MAX,
     ANSWER_STREAM_BACKOFF_BASE_SECONDS,
     ANSWER_STREAM_BACKOFF_MAX_SECONDS,
+    ANSWER_STREAM_FRESH_SECONDS,
     ANSWER_STREAM_PAGE_LIMIT,
     ANSWER_STREAM_PENDING_DAYS,
     ANSWER_STREAM_PENDING_MAX,
+    ANSWER_STREAM_SCHEDULE_FIRST_READ_SECONDS,
     ANSWER_STREAM_SCHEDULE_RETRY_SECONDS,
     ANSWER_STREAM_WAIT_SECONDS,
     CURSOR_INVALID_CODE,
@@ -78,6 +84,10 @@ def build_answer_store(hass: HomeAssistant, entry_id: str) -> Store:
 
 def _key_hash(integration_key: str) -> str:
     return hashlib.sha256(integration_key.encode()).hexdigest()[:16]
+
+
+def _is_id(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def _iso(value: datetime) -> str:
@@ -120,6 +130,25 @@ def older_cursor(stored: str | None, other: str | None) -> str | None:
     return other if b < a else stored
 
 
+def _load_pending(rec: dict) -> dict:
+    loaded = {"sent_at": rec["sent_at"]}
+    if (cursor := _cursor(rec.get("cursor"))) is not None:
+        loaded["cursor"] = cursor
+    if _is_id(rec.get("schedule_id")):
+        loaded["schedule_id"] = rec["schedule_id"]
+    return loaded
+
+
+def _load_schedule(rec: dict) -> dict:
+    loaded: dict = {key: rec.get(key) if _from_iso(rec.get(key)) else None for key in _SCHEDULE_TIMES}
+    loaded["recurring"] = bool(rec.get("recurring"))
+    if (cursor := _cursor(rec.get("cursor"))) is not None:
+        loaded["cursor"] = cursor
+    if _is_id(rec.get("last_nid")):
+        loaded["last_nid"] = rec["last_nid"]
+    return loaded
+
+
 def _event_data(entry_id: str, item: dict) -> dict:
     """The event's data, named after the Companion app's mobile_app_notification_action where it can be."""
     action_id = item.get("action_id")
@@ -146,12 +175,23 @@ class AnswerStream:
         self._key_hash = _key_hash(integration_key)
         self._store = build_answer_store(hass, entry.entry_id)
         self._cursor: str | None = None
-        # notification id -> {"sent_at": iso, "cursor": the create response's answer_cursor}
+        # notification id -> {"sent_at": iso, "cursor": the create response's answer_cursor
+        # (or its schedule's), "schedule_id": the schedule it came from}
         self._pending: dict[str, dict] = {}
         # schedule id -> {"active_at": its next send (None once it has none), "check_at": when
-        # to read it next, "busy_until": the end of the answer window after its last send,
-        # "recurring": bool}; isos.
+        # to read it next, "busy_until": the end of the answer window after a send whose
+        # notification it could not learn, "recurring": bool, "cursor": the feed's position
+        # when it was scheduled, if the stream had none, "last_nid": the latest notification
+        # it became}; isos.
         self._schedules: dict[str, dict] = {}
+        # notification id -> action id of the latest answers read, oldest first; persisted.
+        self._answered: dict[str, str | None] = {}
+        # notification id -> event data of the answers among those that were read late and
+        # not fired, in case their schedule turns out to be one waited for.
+        self._skipped: dict[str, dict] = {}
+        # Schedules waiting for the cursor read that _take_schedule_cursor started.
+        self._awaiting_cursor: set[str] = set()
+        self._cursor_task: asyncio.Task | None = None
         self._task: asyncio.Task | None = None
         self._wake = asyncio.Event()
         self._stopped = False
@@ -169,16 +209,19 @@ class AnswerStream:
         if data.get("key") == self._key_hash:
             self._cursor = _cursor(data.get("cursor"))
             self._pending = {
-                nid: {"sent_at": rec["sent_at"], **({"cursor": c} if (c := _cursor(rec.get("cursor"))) else {})}
+                nid: _load_pending(rec)
                 for nid, rec in (data.get("pending") or {}).items()
                 if isinstance(rec, dict) and _from_iso(rec.get("sent_at")) is not None
             }
             self._schedules = {
-                sid: {key: rec.get(key) if _from_iso(rec.get(key)) else None for key in _SCHEDULE_TIMES}
-                | {"recurring": bool(rec.get("recurring"))}
+                sid: _load_schedule(rec)
                 for sid, rec in (data.get("schedules") or {}).items()
                 if isinstance(rec, dict) and (_from_iso(rec.get("active_at")) or _from_iso(rec.get("busy_until")))
             }
+            answered = data.get("answered")
+            if isinstance(answered, dict):
+                kept = [(nid, action) for nid, action in answered.items() if action is None or isinstance(action, str)]
+                self._answered = dict(kept[-ANSWER_STREAM_ANSWERED_MAX:])
         self._unsub_released = async_dispatcher_connect(
             self._hass, quota_released_signal(self._entry.entry_id), self._on_quota_released
         )
@@ -201,11 +244,12 @@ class AnswerStream:
                 unsub()
         self._unsub_released = self._unsub_timer = None
         self._wake.set()
-        if self._task is not None:
-            self._task.cancel()
-            with contextlib.suppress(asyncio.CancelledError):
-                await self._task
-            self._task = None
+        for task in (self._task, self._cursor_task):
+            if task is not None:
+                task.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await task
+        self._task = self._cursor_task = None
         await self._store.async_save(self._serialize())
 
     async def _on_ha_stop(self, _event: Event) -> None:
@@ -239,17 +283,19 @@ class AnswerStream:
         if self._stopped:
             return
         send_id = created.get("id")
-        if not isinstance(send_id, int) or isinstance(send_id, bool):
+        if not _is_id(send_id):
             return
         now = dt_util.utcnow()
         if scheduled:
-            active_at = _iso(_from_iso(created.get("send_at")) or now)
+            send_at = _from_iso(created.get("send_at")) or now
             self._schedules[str(send_id)] = {
-                "active_at": active_at,
-                "check_at": active_at,
+                "active_at": _iso(send_at),
+                "check_at": _iso(send_at + timedelta(seconds=ANSWER_STREAM_SCHEDULE_FIRST_READ_SECONDS)),
                 "busy_until": None,
                 "recurring": created.get("recurrence") is not None,
             }
+            if self._cursor is None:
+                self._take_schedule_cursor(str(send_id))
         else:
             rec: dict = {"sent_at": _iso(now)}
             if (answer_cursor := _cursor(created.get("answer_cursor"))) is not None:
@@ -260,6 +306,37 @@ class AnswerStream:
         self._cap()
         self._save()
         self._kick()
+
+    @callback
+    def _take_schedule_cursor(self, schedule_id: str) -> None:
+        """Note the feed's position now for a schedule made while the stream has no cursor.
+
+        Its answers come after it goes out, so after this cursor: a stream that
+        first runs once it went out (Home Assistant was down then) still reads
+        them. A schedule response carries no answer_cursor of its own.
+        """
+        self._awaiting_cursor.add(schedule_id)
+        if self._cursor_task is not None and not self._cursor_task.done():
+            return  # the read under way is older than this schedule, so it covers it too
+        self._cursor_task = self._entry.async_create_background_task(
+            self._hass, self._async_schedule_cursor(), name=f"{DOMAIN} notification answer cursor"
+        )
+
+    async def _async_schedule_cursor(self) -> None:
+        try:
+            feed = await self._api.list_notification_answers()
+        except Exception as err:  # best effort: the stream takes a cursor of its own when it runs
+            _LOGGER.debug("Reading the PushWard answer cursor for a scheduled notification failed: %s", err)
+            self._awaiting_cursor.clear()
+            return
+        cursor = feed["cursor"]
+        for sid in self._awaiting_cursor:
+            if (rec := self._schedules.get(sid)) is not None:
+                rec.setdefault("cursor", cursor)
+        self._awaiting_cursor.clear()
+        if self._cursor is None:
+            self._cursor = cursor
+        self._save()
 
     def _cap(self) -> None:
         """Keep at most ANSWER_STREAM_PENDING_MAX sends, dropping the oldest."""
@@ -349,7 +426,7 @@ class AnswerStream:
                 self._save()
                 self._arm_timer(now)
                 return
-            hold = 0 if loop.time() < plain_until else ANSWER_STREAM_WAIT_SECONDS
+            hold = 0 if loop.time() < plain_until else self._hold(now)
             started = loop.time()
             after = self._cursor
             try:
@@ -398,6 +475,18 @@ class AnswerStream:
                     delay = max(0.0, ANSWER_MIN_POLL_INTERVAL - (loop.time() - started))
             await self._async_sleep(delay)
 
+    def _hold(self, now: datetime) -> int:
+        """The next read's wait: the longest allowed, cut short to read a schedule when it is due."""
+        checks = [
+            t
+            for rec in self._schedules.values()
+            if rec["active_at"] is not None and (t := _from_iso(rec["check_at"])) is not None and t > now
+        ]
+        if not checks:
+            return ANSWER_STREAM_WAIT_SECONDS
+        until = math.ceil((min(checks) - now).total_seconds())
+        return max(1, min(ANSWER_STREAM_WAIT_SECONDS, until))
+
     async def _async_sleep(self, delay: float) -> None:
         if delay <= 0 or self._stopped:
             return
@@ -412,13 +501,14 @@ class AnswerStream:
         return delay * (0.5 + random.random() * 0.5)
 
     def _rewind(self) -> None:
-        """Move the cursor back to the oldest answer_cursor of a send still waiting.
+        """Move the cursor back to the oldest cursor of a send or schedule still waiting.
 
-        A pending send keeps its answer_cursor only until a read from at or before
-        it succeeded, so this only reaches back past the stored cursor for one the
-        stream has not covered yet (a fresh cursor taken after it was sent).
+        A pending send keeps its answer_cursor (a schedule, the cursor taken when
+        it was made) only until a read from at or before it succeeded, so this
+        only reaches back past the stored cursor for one the stream has not
+        covered yet (a fresh cursor taken after it was sent).
         """
-        for rec in self._pending.values():
+        for rec in (*self._pending.values(), *self._schedules.values()):
             self._cursor = older_cursor(self._cursor, rec.get("cursor"))
 
     async def _async_fresh_cursor(self) -> None:
@@ -432,27 +522,50 @@ class AnswerStream:
 
     def _forget_cursor(self, refused: str | None) -> None:
         self._cursor = None
-        for rec in self._pending.values():
+        for rec in (*self._pending.values(), *self._schedules.values()):
             if rec.get("cursor") == refused:
                 del rec["cursor"]
         self._save()
 
     def _consume(self, after: str, feed: dict) -> None:
+        fresh_since = dt_util.utcnow() - timedelta(seconds=ANSWER_STREAM_FRESH_SECONDS)
         for item in feed["items"]:
             notification_id = item.get("notification_id")
-            if not isinstance(notification_id, int) or isinstance(notification_id, bool):
+            if not _is_id(notification_id):
                 continue
-            self._pending.pop(str(notification_id), None)
-            self._hass.bus.async_fire(EVENT_NOTIFICATION_ACTION, _event_data(self._entry.entry_id, item))
+            key = str(notification_id)
+            waited = self._pending.pop(key, None)
+            self._remember_answer(key, item.get("action_id"))
+            data = _event_data(self._entry.entry_id, item)
+            answered_at = _from_iso(item.get("answered_at"))
+            if waited is not None or (answered_at is not None and answered_at >= fresh_since):
+                self._hass.bus.async_fire(EVENT_NOTIFICATION_ACTION, data)
+            else:
+                # Read late (the stream was off), to a send nothing waits for: firing it
+                # now would run an automation at a moment nobody chose.
+                self._skipped[key] = data
+                _LOGGER.debug(
+                    "Not firing the answer to PushWard notification %s given at %s: read late, no send waits for it",
+                    notification_id,
+                    item.get("answered_at"),
+                )
         # Every send that was already waiting when this read started is covered from
-        # here on; its own answer_cursor is no longer needed after a restart.
+        # here on; its own cursor is no longer needed after a restart.
         floor = _seq(after)
-        for rec in self._pending.values():
+        for rec in (*self._pending.values(), *self._schedules.values()):
             seq = _seq(rec.get("cursor"))
             if "cursor" in rec and (seq is None or floor is None or seq >= floor):
                 del rec["cursor"]
         self._cursor = feed["cursor"]
         self._save()
+
+    def _remember_answer(self, key: str, action_id: Any) -> None:
+        self._answered.pop(key, None)
+        self._answered[key] = action_id if isinstance(action_id, str) else None
+        while len(self._answered) > ANSWER_STREAM_ANSWERED_MAX:
+            oldest = next(iter(self._answered))
+            del self._answered[oldest]
+            self._skipped.pop(oldest, None)
 
     # --- scheduled sends --------------------------------------------------
 
@@ -474,31 +587,63 @@ class AnswerStream:
                 continue
             if sid in self._schedules:
                 self._apply_schedule(sid, rec, row if isinstance(row, dict) else None, now)
+        self._cap()
         self._save()
         return True
 
     def _apply_schedule(self, sid: str, rec: dict, row: dict | None, now: datetime) -> None:
-        status = (row or {}).get("status")
-        last_sent = _from_iso((row or {}).get("last_sent_at")) or _from_iso((row or {}).get("sent_at"))
+        row = row or {}
+        status = row.get("status")
+        last_sent = _from_iso(row.get("last_sent_at")) or _from_iso(row.get("sent_at"))
+        notification_id = row["notification_id"] if _is_id(row.get("notification_id")) else None
         if rec["recurring"] and last_sent is not None:
-            rec["busy_until"] = _iso(last_sent + timedelta(days=ANSWER_STREAM_PENDING_DAYS))
+            if notification_id is not None:
+                # Its latest send is waited for like a one-shot: answered, the stream can idle.
+                self._track_sent(sid, rec, notification_id, last_sent, now)
+            else:
+                # A send the stream cannot name: listen for the window after it.
+                rec["busy_until"] = _iso(last_sent + timedelta(days=ANSWER_STREAM_PENDING_DAYS))
         if status in _SCHEDULE_LIVE:
-            # Not sent yet (being sent, or late), or a series waiting for its next send:
-            # read it again just after that send.
             next_at = _from_iso(row.get("send_at")) or now
             rec["active_at"] = _iso(next_at)
-            retry = timedelta(seconds=ANSWER_STREAM_SCHEDULE_RETRY_SECONDS)
-            rec["check_at"] = _iso(max(next_at, now) + retry)
+            if next_at > now:
+                # A series waiting for its next send: read it just after that one.
+                rec["check_at"] = _iso(next_at + timedelta(seconds=ANSWER_STREAM_SCHEDULE_FIRST_READ_SECONDS))
+            else:
+                # Not sent yet (being sent, or late): read it again in a while.
+                rec["check_at"] = _iso(now + timedelta(seconds=ANSWER_STREAM_SCHEDULE_RETRY_SECONDS))
             return
-        notification_id = (row or {}).get("notification_id")
         if rec["recurring"] and last_sent is not None:
-            # The series is over; its last sends can still be answered for a while.
-            rec["active_at"] = rec["check_at"] = None
+            # The series is over; a send it could not name can still be answered for a while.
+            busy_until = _from_iso(rec["busy_until"])
+            if busy_until is not None and busy_until > now:
+                rec["active_at"] = rec["check_at"] = None
+            else:
+                del self._schedules[sid]
             return
         del self._schedules[sid]
-        if status == "sent" and isinstance(notification_id, int) and last_sent is not None:
+        if status == "sent" and notification_id is not None and last_sent is not None:
             # Now a plain pending send: its answer takes it off the list.
-            self._pending[str(notification_id)] = {"sent_at": _iso(last_sent)}
+            self._track_sent(sid, rec, notification_id, last_sent, now)
+
+    def _track_sent(self, sid: str, rec: dict, notification_id: int, sent_at: datetime, now: datetime) -> None:
+        """Wait for the notification a schedule became, unless its answer was read already."""
+        if rec.get("last_nid") == notification_id:
+            return  # a series read again before its next send
+        rec["last_nid"] = notification_id
+        if sent_at <= now - timedelta(days=ANSWER_STREAM_PENDING_DAYS):
+            return  # past the answer window
+        key = str(notification_id)
+        if key in self._answered:
+            # Answered before the schedule read as sent (the server's sweep was slow).
+            # The event fired then, unless the answer was read late; it is waited for now.
+            if (data := self._skipped.pop(key, None)) is not None:
+                self._hass.bus.async_fire(EVENT_NOTIFICATION_ACTION, data)
+            return
+        pending: dict = {"sent_at": _iso(sent_at), "schedule_id": int(sid)}
+        if (cursor := rec.get("cursor")) is not None:
+            pending["cursor"] = cursor
+        self._pending[key] = pending
 
     # --- storage ----------------------------------------------------------
 
@@ -508,6 +653,7 @@ class AnswerStream:
             "cursor": self._cursor,
             "pending": self._pending,
             "schedules": self._schedules,
+            "answered": self._answered,
         }
 
     def _save(self) -> None:
