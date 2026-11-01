@@ -1094,7 +1094,7 @@ Home Assistant reads answers with a long-poll per PushWard entry, and only while
 
 #### Snooze
 
-`snooze` adds snooze buttons after your actions, one per duration: `snooze: [15, 60]` gives 15-minute and 1-hour buttons. A tap hides the notification and shows it again on that device when the time is up; nothing is sent to PushWard or Home Assistant, so a snooze is not an answer. 1-3 durations, each 1-1440 minutes and all different. It does not work with `acknowledge` (an acknowledged notification repeats anyway), and actions plus snooze buttons are at most 10. Scheduled and repeating sends keep it.
+`snooze` adds snooze buttons after your actions, one per duration: `snooze: [15, 60]` gives 15-minute and 1-hour buttons. A tap hides the notification and shows it again on that device when the time is up; nothing is sent to PushWard or Home Assistant, so a snooze is not an answer. 1-3 durations, each 1-1440 minutes and all different. It does not work with `acknowledge` (an acknowledged notification repeats anyway), and actions plus snooze buttons are at most 10. Scheduled and repeating sends keep it. Apple devices need PushWard 1.20 or later for the snooze buttons (older versions show none), and the Apple Watch gets none.
 
 #### Acknowledged notifications
 
@@ -1151,13 +1151,13 @@ When PushWard refuses the acknowledge itself, most often because 25 are already 
 
 ### `pushward.clear_notification`
 
-Take back the notifications sent with a `collapse_id`, like the Companion app's `clear_notification`. Every device the account's notifications reach gets a silent push and removes them from the notification shade or Notification Center; in the PushWard app they are marked read, not deleted. An acknowledged notification with that `collapse_id` also stops repeating.
+Take back the notifications sent with a `collapse_id`, like the Companion app's `clear_notification`. Every device the account's notifications reach gets a silent push and removes them from the notification shade or Notification Center; in the PushWard app they are marked read, not deleted. An acknowledged notification that this integration's key sent with that `collapse_id` also stops repeating; one sent with another key keeps repeating.
 
 | Field | Required | Description |
 |-------|:--------:|-------------|
 | `collapse_id` | Yes | The `collapse_id` the notifications were sent with, up to 64 characters |
 
-The optional response is `{ devices: <count> }`, the number of devices the retraction was sent to. It is best effort: iOS does not deliver silent pushes to an app that was force-quit, Low Power Mode can hold them back, Apple devices need PushWard 1.20 or later, and the Apple Watch is skipped. PushWard limits it to about 10 a minute per account.
+The optional response is `{ devices: <count> }`, the number of devices the retraction was sent to. It is best effort: iOS does not deliver silent pushes to an app that was force-quit, Low Power Mode can hold them back, Apple devices need PushWard 1.20 or later, and the Apple Watch is skipped. PushWard allows 10 a minute per account or organization, counted across all of its keys, with at most 5 in a quick burst.
 
 ```yaml
 - alias: Garage closed, take the alert back
