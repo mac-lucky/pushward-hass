@@ -2441,7 +2441,7 @@ cancel_notifications:
 
 clear_notification:
   name: Clear Notification
-  description: Take back the notifications sent with a collapse_id. Each device removes them from view and marks them read in the PushWard app, and acknowledged notifications with that collapse_id stop repeating. Best effort, like the Companion app's clear_notification. The optional response holds how many devices it was sent to (devices).
+  description: Take back the notifications sent with a collapse_id. Each device removes them from view and marks them read in the PushWard app, and acknowledged notifications of the account or organization with that collapse_id stop repeating, whichever integration key sent them (with an organization key limited to groups or tags, only the ones that key sent). Best effort, like the Companion app's clear_notification. The optional response holds how many devices it was sent to (devices).
   fields:
     config_entry_id:
       name: Account

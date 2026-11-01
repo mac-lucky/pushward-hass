@@ -1151,7 +1151,7 @@ When PushWard refuses the acknowledge itself, most often because 25 are already 
 
 ### `pushward.clear_notification`
 
-Take back the notifications sent with a `collapse_id`, like the Companion app's `clear_notification`. Every device the account's notifications reach gets a silent push and removes them from the notification shade or Notification Center; in the PushWard app they are marked read, not deleted. An acknowledged notification that this integration's key sent with that `collapse_id` also stops repeating; one sent with another key keeps repeating.
+Take back the notifications sent with a `collapse_id`, like the Companion app's `clear_notification`. Every device the account's notifications reach gets a silent push and removes them from the notification shade or Notification Center; in the PushWard app they are marked read, not deleted. Acknowledged notifications of the account or organization with that `collapse_id` also stop repeating, whichever integration key sent them; with an organization key limited to some groups or tags, only the ones that key sent.
 
 | Field | Required | Description |
 |-------|:--------:|-------------|

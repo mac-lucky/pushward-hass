@@ -523,9 +523,10 @@ class PushWardApiClient:
         """POST /notifications/retract: take back the notifications sent with ``collapse_id``.
 
         The devices remove them from view and mark them read; nothing is deleted on
-        the server, and the caller's acknowledged notifications with that collapse_id
-        stop repeating. Best effort (a silent push). Returns how many devices it was
-        sent to. Not metered.
+        the server, and the account's or organization's acknowledged notifications with
+        that collapse_id stop repeating, whichever key sent them (an organization key
+        limited to groups or tags stops only its own). Best effort (a silent push).
+        Returns how many devices it was sent to. Not metered.
         """
         data = await self._request_with_retry(
             "POST", "/notifications/retract", json={"collapse_id": collapse_id}, return_json=True
