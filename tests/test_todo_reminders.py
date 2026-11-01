@@ -12,8 +12,8 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.storage import Store
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
-from custom_components.pushward.answer_stream import notification_answer_signal
-from custom_components.pushward.api import PushWardApiError, PushWardNotFoundError
+from custom_components.pushward.answer_stream import AnswerStream, notification_answer_signal
+from custom_components.pushward.api import PushWardApiError, PushWardForbiddenError, PushWardNotFoundError
 from custom_components.pushward.const import (
     CONF_ENTITY_ID,
     CONF_SUBENTRY_ID,
@@ -33,6 +33,9 @@ from custom_components.pushward.todo_reminders import (
     build_todo_store,
     e2e_unavailable_issue_id,
 )
+
+from .test_answer_stream import FakeFeed, _until
+from .test_answer_stream import _answer as _feed_answer
 
 NOW = datetime(2026, 10, 1, 8, 0, tzinfo=UTC)  # 10:00 in Europe/Warsaw
 ENTITY = "todo.reminders"
@@ -1004,3 +1007,141 @@ async def test_a_failed_completion_from_the_stream_is_retried_by_an_own_read(has
     assert rec["complete_failures"] == 1
     assert rec["watch_until"] is not None
     api.poll_notification_answer.assert_awaited_with(55, hold=20)
+
+
+# --- with the real answer stream ----------------------------------------------
+
+SEND_AT = NOW + timedelta(hours=1)  # _CALL is due then, and the list has no lead time
+SENT_ROW = {
+    "id": 100,
+    "status": "sent",
+    "send_at": SEND_AT.isoformat(),
+    "sent_at": SEND_AT.isoformat(),
+    "notification_id": 55,
+}
+
+
+def _wired_api(feed: FakeFeed) -> AsyncMock:
+    """_api() whose creates and cancels reach the answer stream the way the real client's do."""
+    api = _api()
+    api.on_answerable_send = None
+    api.on_schedule_canceled = None
+    api.list_notification_answers = feed
+    ids = iter(range(100, 1000))
+
+    async def create(*args, **kwargs):
+        created = {"id": next(ids), "status": "scheduled", "send_at": kwargs["send_at"].isoformat()}
+        if kwargs.get("actions") and api.on_answerable_send is not None:
+            api.on_answerable_send(created, True, window=kwargs.get("answer_window"))
+        return created
+
+    async def cancel(schedule_id, *, purge=False):
+        if api.on_schedule_canceled is not None:
+            api.on_schedule_canceled(schedule_id)
+
+    api.create_notification = AsyncMock(side_effect=create)
+    api.cancel_scheduled_notification = AsyncMock(side_effect=cancel)
+    api.get_scheduled_notification = AsyncMock(return_value=SENT_ROW)
+    return api
+
+
+@pytest.fixture
+async def wired(hass: HomeAssistant, setup):
+    """A to-do manager and the entry's real AnswerStream over one fake feed."""
+    streams: list[AnswerStream] = []
+
+    async def _start() -> tuple:
+        feed = FakeFeed()
+        api = _wired_api(feed)
+        stream = AnswerStream(hass, api, hass.config_entries.async_get_entry("entry-1"), "hlk_test")
+        await stream.async_start()
+        streams.append(stream)
+        manager, api, todo = await setup(list(_CALL), api=api, answer_stream=stream)
+        return manager, api, todo, stream, feed
+
+    with (
+        patch("custom_components.pushward.answer_stream.ANSWER_MIN_POLL_INTERVAL", 0),
+        patch("custom_components.pushward.answer_stream.ANSWER_STREAM_EARLY_RETURN_JITTER_SECONDS", 0),
+    ):
+        yield _start
+        for stream in streams:
+            await stream.async_stop()
+
+
+async def _until_sent_and_waited_for(hass: HomeAssistant, freezer, stream, feed) -> None:
+    """The reminder goes out as notification 55, and the stream learns it."""
+    freezer.move_to(SEND_AT)
+    async_fire_time_changed(hass, SEND_AT)
+    await _until(lambda: len(feed.calls) == 2, "the stream's first read")
+    freezer.move_to(SEND_AT + timedelta(seconds=10))
+    feed.reply(cursor="100")
+    await _until(lambda: "55" in stream._pending, "the notification the reminder became")
+
+
+async def test_a_done_tap_the_stream_reads_completes_the_item(hass: HomeAssistant, wired, freezer) -> None:
+    manager, api, todo, stream, feed = await wired()
+    rec = _records(manager)["a"]
+    assert stream._schedules["100"]["window"] == 24 * 3600
+    await _until_sent_and_waited_for(hass, freezer, stream, feed)
+
+    feed.reply(_feed_answer(55, action_id="done", answered_at=SEND_AT.isoformat()), cursor="101")
+    await _until(lambda: todo.updates, "the item to be completed")
+
+    assert todo.updates == [{"item": "a", "status": "completed", "entity_id": ENTITY}]
+    assert rec["notification_id"] == 55
+    await _until(lambda: rec["watch_until"] is None, "the watch to end")
+    await _until(lambda: not stream.running, "the stream to go idle")
+    api.poll_notification_answer.assert_not_awaited()
+
+
+async def test_a_failed_completion_moves_to_the_watch_loops_own_reads(hass: HomeAssistant, wired, freezer) -> None:
+    manager, api, todo, stream, feed = await wired()
+    rec = _records(manager)["a"]
+    await _until_sent_and_waited_for(hass, freezer, stream, feed)
+    hass.states.async_set(ENTITY, "unavailable")
+
+    async def poll(notification_id, *, hold):
+        todo.write()  # the list is back by the time the manager reads the answer again
+        return {"notification_id": notification_id, "status": "answered", "action_id": "done"}, True
+
+    api.poll_notification_answer = AsyncMock(side_effect=poll)
+    feed.reply(_feed_answer(55, action_id="done", answered_at=SEND_AT.isoformat()), cursor="101")
+    await _until(lambda: todo.updates, "the item to be completed on the retry")
+
+    assert rec["complete_failures"] == 1
+    api.poll_notification_answer.assert_awaited_once_with(55, hold=20)
+    assert todo.updates == [{"item": "a", "status": "completed", "entity_id": ENTITY}]
+    await _until(lambda: rec["watch_until"] is None, "the watch to end")
+
+
+async def test_a_halted_stream_hands_its_reminders_back(hass: HomeAssistant, wired, freezer) -> None:
+    manager, api, _, stream, feed = await wired()
+    rec = _records(manager)["a"]
+    await _until_sent_and_waited_for(hass, freezer, stream, feed)
+    await manager._async_reconcile(SUB)  # marked sent, and watched
+    assert rec["status"] == "sent"
+    manager._watch_wakeup.set()
+    for _ in range(5):
+        await hass.async_block_till_done()
+    api.poll_notification_answer.assert_not_awaited()  # the stream reads it
+
+    feed.fail(PushWardForbiddenError("no notifications permission", status_code=403))
+    await _until(lambda: not stream.running, "the stream to halt")
+    manager._watch_wakeup.set()  # its next look, at most TODO_WATCH_IDLE_SECONDS later
+    await _until(lambda: api.poll_notification_answer.await_count, "a read of its own")
+
+    api.poll_notification_answer.assert_awaited_with(55, hold=20)
+
+
+async def test_a_reminder_canceled_before_its_time_leaves_the_stream(hass: HomeAssistant, wired) -> None:
+    manager, api, todo, stream, _ = await wired()
+    assert set(stream._schedules) == {"100"}
+    assert stream._unsub_timer is not None
+
+    todo.items.clear()  # ticked off before the reminder went out
+    await manager._async_reconcile(SUB)
+
+    api.cancel_scheduled_notification.assert_awaited_once_with(100, purge=False)
+    assert stream._schedules == {}
+    assert stream._unsub_timer is None
+    assert not stream.running
