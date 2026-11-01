@@ -138,7 +138,7 @@ from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.NOTIFY, Platform.SENSOR]
 
 
 SERVICE_UPDATE_ACTIVITY = "update_activity"

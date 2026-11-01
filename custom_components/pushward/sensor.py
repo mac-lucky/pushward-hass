@@ -29,12 +29,12 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, QUOTA_DAILY_RESET_KEY, QUOTA_RESET_KEY
 from .coordinator import PushWardUsageCoordinator
+from .entity import account_device_info
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -79,16 +79,6 @@ USAGE_SENSORS: tuple[PushWardUsageSensorDescription, ...] = (
 )
 
 
-def _device_info(entry: ConfigEntry) -> DeviceInfo:
-    """One service device per config entry (PushWard account), grouping all usage sensors."""
-    return DeviceInfo(
-        identifiers={(DOMAIN, entry.entry_id)},
-        name=entry.title,
-        manufacturer="PushWard",
-        entry_type=DeviceEntryType.SERVICE,
-    )
-
-
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -116,7 +106,7 @@ class _PushWardSensorBase(CoordinatorEntity[PushWardUsageCoordinator], SensorEnt
     def __init__(self, coordinator: PushWardUsageCoordinator, entry: ConfigEntry, unique_suffix: str) -> None:
         super().__init__(coordinator)
         self._attr_unique_id = f"{entry.entry_id}_{unique_suffix}"
-        self._attr_device_info = _device_info(entry)
+        self._attr_device_info = account_device_info(entry)
 
     @property
     def available(self) -> bool:

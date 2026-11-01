@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Push notification"
+      }
     }
   },
   "services": {
