@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Pushmelding"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "Alarm",
-          "description": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+, alleen voor het sjabloon countdown)."
+          "description": "Laat een alarm afgaan op het apparaat wanneer de countdown verstrijkt. Alleen voor het sjabloon countdown. Vereist iOS 26 of later op de iPhone; op Android heeft de app de toestemming Wekkers en herinneringen nodig."
         },
         "snooze_seconds": {
           "name": "Snooze-seconden",
-          "description": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Standaard 300 (5 min). Vereist alarm (alleen iOS 26+, aftelsjabloon)."
+          "description": "Hoelang de snoozeknop van het alarm het aftellen verlengt (60-3600). Standaard 300 (5 min). Vereist alarm (alleen aftelsjabloon)."
         },
         "step_labels": {
           "name": "Staplabels",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "Afbeeldings-URL",
-          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De telefoon downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
         },
         "image_shape": {
           "name": "Afbeeldingsvorm",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "Afbeeldings-URL",
-          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De telefoon downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
         },
         "image_shape": {
           "name": "Afbeeldingsvorm",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "Alarm",
-          "description": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+, alleen voor het sjabloon countdown)."
+          "description": "Laat een alarm afgaan op het apparaat wanneer de countdown verstrijkt. Alleen voor het sjabloon countdown. Vereist iOS 26 of later op de iPhone; op Android heeft de app de toestemming Wekkers en herinneringen nodig."
         },
         "snooze_seconds": {
           "name": "Snooze-seconden",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "Hoelang de snoozeknop van het alarm het aftellen verlengt (60-3600). Standaard 300 (5 min). Vereist alarm (alleen aftelsjabloon)."
         },
         "direction": {
           "name": "Richting",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "Afbeeldings-URL",
-          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De telefoon downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
         },
         "image_shape": {
           "name": "Afbeeldingsvorm",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "Afbeeldings-URL",
-          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
+          "description": "https-URL van een afbeelding die naast het pictogram wordt getoond. De telefoon downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel."
         },
         "image_shape": {
           "name": "Afbeeldingsvorm",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Island-label",
-          "description": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze."
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
         },
         "compact_trailing_label": {
           "name": "Achterste Island-label",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "Afbeeldings-URL",
-          "description": "http- of https-URL van de afbeelding. Alles wat Home Assistant kan bereiken werkt, ook een camera in het lokale netwerk die de iPhone niet ziet."
+          "description": "http- of https-URL van de afbeelding. Alles wat Home Assistant kan bereiken werkt, ook een camera in het lokale netwerk die de telefoon niet ziet."
         },
         "image_path": {
           "name": "Afbeeldingspad",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "Widget vernieuwen",
-      "description": "Forceer het vernieuwen van een gevolgde PushWard-widget. Omzeilt de in-memory diff-cache zodat de widget opnieuw wordt gerenderd en naar iOS wordt gepusht, zelfs als de waarde niet is veranderd.",
+      "description": "Forceer het vernieuwen van een gevolgde PushWard-widget. Omzeilt de in-memory diff-cache zodat de widget opnieuw wordt gerenderd en naar je apparaten wordt gepusht, zelfs als de waarde niet is veranderd.",
       "fields": {
         "config_entry_id": {
           "name": "Account",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "Niveau",
-          "description": "iOS-onderbrekingsniveau. Bepaalt hoe de melding wordt afgeleverd."
+          "description": "Onderbrekingsniveau. Bepaalt hoe de melding wordt afgeleverd. Op Android heeft critical toegang tot Niet storen nodig, te verlenen in de PushWard-app."
         },
         "volume": {
           "name": "Volume",
-          "description": "Geluidsvolume voor kritieke alerts (0.0-1.0). Alleen gebruikt wanneer level critical is."
+          "description": "Geluidsvolume voor kritieke meldingen (0.0-1.0). Alleen gebruikt wanneer level critical is. Genegeerd op Android."
         },
         "thread_id": {
           "name": "Thread-ID",
-          "description": "Groepeert meldingen in het Berichtencentrum."
+          "description": "Groepeert meldingen op het apparaat."
         },
         "collapse_id": {
           "name": "Samenvouwings-ID",
-          "description": "APNs-deduplicatiesleutel. Vervangt een eerdere melding met dezelfde sleutel."
+          "description": "Deduplicatiesleutel. Vervangt de vorige melding met dezelfde sleutel."
         },
         "source": {
           "name": "Bron",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "Push",
-          "description": "Verzend als APNs push alert naar alle apparaten. Als uitgeschakeld, wordt de melding alleen in de inbox opgeslagen."
+          "description": "Verstuur als pushmelding naar alle apparaten. Indien uitgeschakeld, wordt de melding alleen in de inbox opgeslagen."
         },
         "url": {
           "name": "URL",
-          "description": "URL die wordt geopend wanneer op de melding wordt getikt."
+          "description": "URL die wordt geopend wanneer op de melding wordt getikt. Een pad zoals /lovelace/kitchen opent op de externe URL van Home Assistant."
         },
         "media": {
           "name": "Media",
-          "description": "Mediabijlage als object met `url` (HTTPS) en `type` (image, video of audio)."
+          "description": "Mediabijlage als object met `url` (HTTPS) en `type` (image, video of audio). Android toont in het meldingenpaneel alleen afbeeldingen."
         },
         "icon_url": {
           "name": "Pictogram-URL",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "Acties",
-          "description": "Lijst met actieknoppen. Elke actie is een object met id, title, optionele url, foreground, destructive, authentication_required en icon. Voor een http(s)-url kun je ook een stille webhook versturen met method (GET/POST/PUT/PATCH/DELETE/HEAD), headers en body. Laat je url (en foreground) weg, dan legt PushWard de tik zelf vast; lees die uit met get_notification_answer. Zet text_input: true op een stille actie om een getypt antwoord op te vragen (optioneel text_input_placeholder en text_input_button_title): zonder url legt PushWard het antwoord vast, met een http(s)-url wordt het als JSON met een veld text naar je webhook gestuurd. Wil je het in plaats daarvan in body opnemen, gebruik dan de placeholder {{input}} en zet body in je automatisering in een Jinja-raw-blok, zodat Home Assistant hem niet al verwerkt voordat de actie wordt verstuurd."
+          "description": "Lijst met actieknoppen. Elke actie is een object met id, title, optionele url, foreground, destructive, authentication_required en icon. Een url die een pad is, zoals /lovelace/kitchen, opent op de externe URL van Home Assistant. Android toont de eerste 3 knoppen in het meldingenpaneel en ze allemaal in de app. Voor een http(s)-url kun je ook een stille webhook versturen met method (GET/POST/PUT/PATCH/DELETE/HEAD), headers en body. Laat je url (en foreground) weg, dan legt PushWard de tik zelf vast; lees die uit met get_notification_answer of gebruik het event pushward_notification_action als trigger. Zet text_input: true op een stille actie om een getypt antwoord op te vragen (optioneel text_input_placeholder en text_input_button_title): zonder url legt PushWard het antwoord vast, met een http(s)-url wordt het als JSON met een veld text naar je webhook gestuurd. Wil je het in plaats daarvan in body opnemen, gebruik dan de placeholder {{input}} en zet body in je automatisering in een Jinja-raw-blok, zodat Home Assistant hem niet al verwerkt voordat de actie wordt verstuurd."
         },
         "send_at": {
           "name": "Verzendtijd",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "Callback-URL",
           "description": "Openbare https-URL waarnaar PushWard de ontvangstbevestiging met POST verstuurt zodra de melding is bevestigd of verloopt, ondertekend met een geheim afgeleid van de integratiesleutel. Lokale adressen worden geweigerd, dus een Home Assistant-webhook heeft zijn Home Assistant Cloud-URL of een andere openbare URL nodig. Vereist Bevestigen."
+        },
+        "snooze": {
+          "name": "Snooze",
+          "description": "Maximaal 3 snoozeknoppen, elk met een ander aantal minuten van 1 tot 1440. Tikken op een knop verbergt de melding en toont hem na die tijd opnieuw op dat apparaat. Niet samen met Bevestigen, en samen met de acties maximaal 10 knoppen."
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "Melding intrekken",
+      "description": "Trek de meldingen in die met een collapse_id zijn verstuurd. Elk apparaat haalt ze uit beeld en markeert ze als gelezen in de PushWard-app, en te bevestigen meldingen van het account of de organisatie met die collapse_id worden niet meer herhaald, ongeacht welke integratiesleutel ze heeft verstuurd (bij een organisatiesleutel die beperkt is tot groepen of tags, alleen de meldingen die die sleutel heeft verstuurd). Zonder garantie, net als clear_notification van de Companion-app. Het optionele antwoord bevat naar hoeveel apparaten het verzoek is verstuurd (devices).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om in te trekken op elk PushWard-account dat aan Home Assistant is toegevoegd."
+        },
+        "collapse_id": {
+          "name": "Samenvouwings-ID",
+          "description": "De collapse_id waarmee de meldingen zijn verstuurd, maximaal 64 tekens."
+        }
+      }
+    },
     "send_email": {
       "name": "E-mail versturen",
       "description": "Verstuur een transactionele e-mail via PushWard. Geef een tekstinhoud, een HTML-inhoud of beide op. De integratiesleutel heeft de \"emails\"-capaciteit nodig.",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "Aan",
-          "description": "E-mailadres van de ontvanger. Moet een adres zijn dat je al hebt toegevoegd en bevestigd in de PushWard iOS-app — niet-geverifieerde adressen worden geweigerd."
+          "description": "E-mailadres van de ontvanger. Moet een adres zijn dat je al hebt toegevoegd en bevestigd in de PushWard-app; niet-geverifieerde adressen worden geweigerd."
         },
         "subject": {
           "name": "Onderwerp",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "Geen geladen PushWard-account heeft de config entry-ID {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "{path} is een Home Assistant-pad, en de telefoon kan het alleen openen op de externe URL van Home Assistant. Stel de internet-URL in onder Instellingen > Systeem > Netwerk of verbind Home Assistant Cloud, of stuur in plaats daarvan een volledige URL."
+    },
+    "ha_path_invalid": {
+      "message": "{url} is geen geldige URL: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} is een stil verzoek, dat de telefoon alleen via https verstuurt, en de externe URL van Home Assistant is http. Stel een https-internet-URL in onder Instellingen > Systeem > Netwerk of verbind Home Assistant Cloud, of stuur in plaats daarvan een volledige https-URL."
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "Verbinding maken met PushWard",
-        "description": "Voer je PushWard-integratiesleutel in om te beginnen. Download de PushWard iOS-app uit de App Store: {app_store_url}",
+        "description": "Voer je PushWard-integratiesleutel in om te beginnen. Download de PushWard-app uit de App Store ({app_store_url}) of Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Integratiesleutel"
         },
         "data_description": {
-          "integration_key": "Open de PushWard iOS-app (App Store: {app_store_url}) → Instellingen → Integratiesleutels. Je kunt de standaardsleutel plakken of een nieuwe aanmaken met scope 'ha-*'."
+          "integration_key": "Open de PushWard-app > Instellingen > Integratiesleutels. Je kunt de standaardsleutel plakken of een nieuwe aanmaken met scope 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "Integratiesleutel"
         },
         "data_description": {
-          "integration_key": "Maak er een aan in de PushWard iOS-app via Instellingen → Integratiesleutels met bereik 'ha-*'."
+          "integration_key": "Maak er een aan in de PushWard-app via Instellingen > Integratiesleutels met scope 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "Integratiesleutel"
         },
         "data_description": {
-          "integration_key": "Maak er een aan in de PushWard iOS-app via Instellingen → Integratiesleutels met bereik 'ha-*'."
+          "integration_key": "Maak er een aan in de PushWard-app via Instellingen > Integratiesleutels met scope 'ha-*'."
         }
       }
     },
@@ -2055,8 +2087,8 @@
             "series_entities": "Reeksentiteiten",
             "completion_message": "Voltooiingsbericht",
             "warning_threshold": "Waarschuwingsdrempel (seconden)",
-            "alarm": "Alarm (iOS 26+)",
-            "snooze_seconds": "Snooze-seconden (iOS 26+)",
+            "alarm": "Alarm",
+            "snooze_seconds": "Snooze-seconden",
             "tiles": "Bordtegels",
             "log_columns": "Logkolommen"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "Koppel aparte entiteiten als benoemde lijnen in één grafiek (bijv. een PM2.5-sensor per kamer): elke rij heeft een label, een entiteit en een optioneel attribuut. Het label is standaard de vriendelijke naam van de entiteit; laat het attribuut leeg om de status van de entiteit weer te geven. Combineert met Reeksen; maximaal 10 lijnen in totaal. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd.",
             "completion_message": "Tekst bij het beëindigen van de activiteit. Laat leeg voor 'Voltooid'. Voorbeeld: Was klaar",
             "warning_threshold": "Seconden vóór het einde van de countdown waarop de server een waarschuwingspush verzendt. Laat leeg om uit te schakelen. Alleen voor het sjabloon countdown.",
-            "alarm": "AlarmKit-alarm activeren bij het verstrijken van de countdown (iOS 26+). Alleen voor het sjabloon countdown.",
-            "snooze_seconds": "Hoelang de iOS-snoozeknop het aftellen verlengt (60–3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
+            "alarm": "Laat een alarm afgaan op het apparaat wanneer de countdown verstrijkt. Vereist iOS 26 of later op de iPhone; op Android heeft de app de toestemming Wekkers en herinneringen nodig. Alleen voor het sjabloon countdown.",
+            "snooze_seconds": "Hoelang de snoozeknop van het alarm het aftellen verlengt (60-3600). Laat leeg voor de standaard van 300s (5 min). Vereist alarm. Alleen aftelsjabloon.",
             "tiles": "Tot 4 tegels, elk leest een aparte entiteit: label, entiteit en optioneel attribuut, eenheid, pictogram, kleur en tik-URL. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Alleen voor de sjabloon board.",
             "log_columns": "Extra waarden die aan elke logregel worden toegevoegd (max. 6): elke rij heeft een label, een entiteit, een attribuut en een eenheid. Een attribuut zonder entiteit leest deze entiteit; een entiteit zonder attribuut leest de status ervan; beide lezen het attribuut van die entiteit. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Alleen logsjabloon."
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "Afbeeldings-ThumbHash"
               },
               "data_description": {
-                "image_url": "https-URL van een afbeelding die naast het pictogram wordt getoond. De iPhone downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel.",
+                "image_url": "https-URL van een afbeelding die naast het pictogram wordt getoond. De telefoon downloadt hem zelf, dus hij moet vanaf internet bereikbaar zijn; een adres in je lokale netwerk laadt niet, de ThumbHash ervan wel.",
                 "image_shape": "Hoe de afbeelding wordt bijgesneden: poster houdt een staande uitsnede, square is de standaard, circle snijdt rond bij.",
                 "image_thumbhash": "Vervaagde ingesloten voorvertoning die wordt getekend als de URL niet opgehaald kan worden, en de enige laag die verschijnt voor een afbeelding in je lokale netwerk. Laat leeg om hem automatisch uit de URL te berekenen, of gebruik de actie Generate ThumbHash om er een te maken van elke afbeelding die Home Assistant kan lezen."
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "Unieke identificator voor deze activiteit. Laat leeg om automatisch te genereren vanuit de entiteits-ID. Voorbeeld: ha-living-room-lamp",
-                "activity_name": "Weergavenaam op de iPhone Live Activity. Standaard is de vriendelijke naam van de entiteit.",
+                "activity_name": "Weergavenaam op de activiteit op je telefoon. Standaard is de vriendelijke naam van de entiteit.",
                 "icon": "Pictogram overschrijven. Laat leeg om het eigen pictogram van de entiteit te gebruiken (bijv. mdi:thermometer). SF Symbols worden ook ondersteund (bijv. lamp.desk.fill).",
                 "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Heeft voorrang op statisch pictogram en entiteitspictogram wanneer ingesteld.",
                 "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
                 "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
                 "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
                 "state_labels": "Aangepaste weergavetekst voor statussen. Eén rij per status: de statuswaarde en het te tonen label. Voorbeeld: heating en Bezig met opwarmen. Een oude tekenreeks status=Label, status2=Label 2 wordt nog steeds geaccepteerd.",
-                "compact_label": "Maximaal 4 tekens die aan de voorkant van de compacte Dynamic Island-weergave worden getoond in plaats van de standaardinhoud van de sjabloon (het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn). De minimale weergave negeert ze. Laat leeg om de eigen inhoud van de sjabloon te behouden.",
+                "compact_label": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk. Laat leeg om de eigen inhoud van de sjabloon te behouden.",
                 "compact_trailing_label": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Laat leeg om de eigen inhoud van de sjabloon te behouden. Vereist PushWard 1.19.1 of nieuwer.",
                 "compact_trailing_icon": "Pictogram dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. MDI-pictogrammen (bijv. mdi:airplane-takeoff) en SF Symbols (bijv. airplane.departure) werken allebei. Wordt genegeerd als een achterste Island-label is ingesteld. Laat leeg om de eigen inhoud van de sjabloon te behouden. Vereist PushWard 1.19.1 of nieuwer."
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "Stroomknooppunten"
           },
           "data_description": {
-            "widget_name": "Weergavenaam in de iOS-widgetkiezer. Standaard de vriendelijke naam van de entiteit.",
+            "widget_name": "Weergavenaam in de widgetkiezer op je telefoon. Standaard de vriendelijke naam van de entiteit.",
             "value_attribute": "Entiteitsattribuut dat de waarde bevat. Laat leeg om de primaire status van de entiteit te gebruiken.",
             "unit": "Weergegeven eenheid naast de waarde. Max. 32 tekens.",
             "value_scale": "Hoe de voortgangswaarde gelezen wordt. auto behandelt een %-eenheid of een waarde boven 1 als percent, en al het andere als een 0.0-1.0 fraction. Kies percent of fraction om dit te overschrijven. Alleen voor het sjabloon progress.",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "{account}-meldingslimiet bereikt",
-      "description": "Je PushWard-account heeft {used} van zijn {limit} meldingen voor de huidige periode gebruikt, dus nieuwe meldingen worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+      "description": "Je PushWard-account heeft {used} van zijn {limit} meldingen voor de huidige periode gebruikt, dus nieuwe meldingen worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard-app om de limiet te verhogen."
     },
     "usage_limit_live_activity": {
       "title": "{account} Live Activity-updatelimiet bereikt",
-      "description": "Je PushWard-account heeft {used} van zijn {limit} Live Activity-updates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+      "description": "Je PushWard-account heeft {used} van zijn {limit} Live Activity-updates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard-app om de limiet te verhogen."
     },
     "usage_limit_widgets": {
       "title": "{account}-widgetupdatelimiet bereikt",
-      "description": "Je PushWard-account heeft {used} van zijn {limit} widgetupdates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+      "description": "Je PushWard-account heeft {used} van zijn {limit} widgetupdates voor de huidige periode gebruikt, dus nieuwe updates worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard-app om de limiet te verhogen."
     },
     "usage_limit_emails": {
       "title": "{account}-e-maillimiet bereikt",
-      "description": "Je PushWard-account heeft {used} van zijn {limit} e-mails voor de huidige periode gebruikt, dus nieuwe e-mails worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard iOS-app om de limiet te verhogen."
+      "description": "Je PushWard-account heeft {used} van zijn {limit} e-mails voor de huidige periode gebruikt, dus nieuwe e-mails worden geweigerd totdat het quotum wordt gereset ({resets_at}). Upgrade je abonnement in de PushWard-app om de limiet te verhogen."
     },
     "todo_e2e_unavailable": {
       "title": "{account}-herinneringen voor takenlijsten worden niet verstuurd",

@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Notifica push"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "Sveglia",
-          "description": "Attivare la sveglia AlarmKit alla scadenza del countdown (iOS 26+, solo per il modello countdown)."
+          "description": "Fa suonare una sveglia sul dispositivo alla scadenza del countdown. Solo per il modello countdown. Su iPhone richiede iOS 26 o versioni successive; su Android l'app ha bisogno dell'autorizzazione Sveglie e promemoria."
         },
         "snooze_seconds": {
           "name": "Secondi di posticipo",
-          "description": "Di quanto il pulsante Posticipa di iOS estende il conto alla rovescia (60–3600). Valore predefinito 300 (5 min). Richiede una sveglia (iOS 26+, solo modello conto alla rovescia)."
+          "description": "Di quanto il pulsante Posticipa della sveglia estende il conto alla rovescia (60-3600). Valore predefinito 300 (5 min). Richiede una sveglia (solo modello countdown)."
         },
         "step_labels": {
           "name": "Etichette passi",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "URL dell'immagine",
-          "description": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
+          "description": "URL https di un'immagine mostrata accanto all'icona. Il telefono la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
         },
         "image_shape": {
           "name": "Forma dell'immagine",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "URL dell'immagine",
-          "description": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
+          "description": "URL https di un'immagine mostrata accanto all'icona. Il telefono la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
         },
         "image_shape": {
           "name": "Forma dell'immagine",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "Sveglia",
-          "description": "Attivare la sveglia AlarmKit alla scadenza del countdown (iOS 26+, solo per il modello countdown)."
+          "description": "Fa suonare una sveglia sul dispositivo alla scadenza del countdown. Solo per il modello countdown. Su iPhone richiede iOS 26 o versioni successive; su Android l'app ha bisogno dell'autorizzazione Sveglie e promemoria."
         },
         "snooze_seconds": {
           "name": "Secondi di posticipo",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "Di quanto il pulsante Posticipa della sveglia estende il conto alla rovescia (60-3600). Valore predefinito 300 (5 min). Richiede una sveglia (solo modello countdown)."
         },
         "direction": {
           "name": "Direzione",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "URL dell'immagine",
-          "description": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
+          "description": "URL https di un'immagine mostrata accanto all'icona. Il telefono la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
         },
         "image_shape": {
           "name": "Forma dell'immagine",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "URL dell'immagine",
-          "description": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
+          "description": "URL https di un'immagine mostrata accanto all'icona. Il telefono la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì."
         },
         "image_shape": {
           "name": "Forma dell'immagine",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Etichetta Island",
-          "description": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora."
+          "description": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato."
         },
         "compact_trailing_label": {
           "name": "Etichetta Island posteriore",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "URL dell'immagine",
-          "description": "URL http o https dell'immagine. Va bene tutto ciò che Home Assistant riesce a raggiungere, compresa una telecamera sulla rete locale che l'iPhone non vede."
+          "description": "URL http o https dell'immagine. Va bene tutto ciò che Home Assistant riesce a raggiungere, compresa una telecamera sulla rete locale che il telefono non vede."
         },
         "image_path": {
           "name": "Percorso dell'immagine",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "Aggiorna widget",
-      "description": "Forza l'aggiornamento di un widget PushWard monitorato. Ignora la cache delle differenze in memoria, così il widget viene rigenerato e inviato a iOS anche quando il valore non è cambiato.",
+      "description": "Forza l'aggiornamento di un widget PushWard monitorato. Ignora la cache delle differenze in memoria, così il widget viene rigenerato e inviato ai tuoi dispositivi anche quando il valore non è cambiato.",
       "fields": {
         "config_entry_id": {
           "name": "Account",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "Livello",
-          "description": "Livello di interruzione iOS. Controlla la modalità di consegna della notifica."
+          "description": "Livello di interruzione. Controlla la modalità di consegna della notifica. Su Android, critical richiede l'accesso a Non disturbare concesso nell'app PushWard."
         },
         "volume": {
           "name": "Volume",
-          "description": "Volume del suono per gli alert critici (0.0-1.0). Usato solo quando level è critical."
+          "description": "Volume del suono per gli avvisi critici (0.0-1.0). Usato solo quando level è critical. Ignorato su Android."
         },
         "thread_id": {
           "name": "ID thread",
-          "description": "Raggruppa le notifiche nel Centro Notifiche."
+          "description": "Raggruppa le notifiche sul dispositivo."
         },
         "collapse_id": {
           "name": "ID collasso",
-          "description": "Chiave di deduplicazione APNs. Sostituisce la notifica precedente con la stessa chiave."
+          "description": "Chiave di deduplicazione. Sostituisce la notifica precedente con la stessa chiave."
         },
         "source": {
           "name": "Sorgente",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "Push",
-          "description": "Inviare come alert push APNs a tutti i dispositivi. Se falso, la notifica viene salvata solo nella casella."
+          "description": "Inviare come avviso push a tutti i dispositivi. Se falso, la notifica viene salvata solo nella casella."
         },
         "url": {
           "name": "URL",
-          "description": "URL da aprire quando si tocca la notifica."
+          "description": "URL da aprire quando si tocca la notifica. Un percorso come /lovelace/kitchen si apre sull'URL esterno di Home Assistant."
         },
         "media": {
           "name": "Media",
-          "description": "Allegato multimediale come oggetto con `url` (HTTPS) e `type` (image, video o audio)."
+          "description": "Allegato multimediale come oggetto con `url` (HTTPS) e `type` (image, video o audio). Android mostra solo le immagini nell'area notifiche."
         },
         "icon_url": {
           "name": "URL icona",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "Azioni",
-          "description": "Elenco di pulsanti di azione. Ogni azione è un oggetto con id, title, e facoltativamente url, foreground, destructive, authentication_required e icon. Per un url http(s) puoi anche inviare un webhook silenzioso con method (GET/POST/PUT/PATCH/DELETE/HEAD), headers e body. Senza url (e foreground) PushWard registra direttamente il tocco; leggilo con get_notification_answer. Imposta text_input: true su un'azione silenziosa per chiedere una risposta scritta (facoltativi text_input_placeholder e text_input_button_title): senza url PushWard registra la risposta, con un url http(s) viene inviata al tuo webhook come JSON con un campo text. Per inserirla invece in body, usa il segnaposto {{input}} e racchiudi body in un blocco raw di Jinja nella tua automazione, così Home Assistant non lo elabora prima dell'invio dell'azione."
+          "description": "Elenco di pulsanti di azione. Ogni azione è un oggetto con id, title, e facoltativamente url, foreground, destructive, authentication_required e icon. Un url che è un percorso, come /lovelace/kitchen, si apre sull'URL esterno di Home Assistant. Android mostra i primi 3 pulsanti nell'area notifiche e tutti nell'app. Per un url http(s) puoi anche inviare un webhook silenzioso con method (GET/POST/PUT/PATCH/DELETE/HEAD), headers e body. Senza url (e foreground) PushWard registra direttamente il tocco; leggilo con get_notification_answer o usa l'evento pushward_notification_action come attivazione. Imposta text_input: true su un'azione silenziosa per chiedere una risposta scritta (facoltativi text_input_placeholder e text_input_button_title): senza url PushWard registra la risposta, con un url http(s) viene inviata al tuo webhook come JSON con un campo text. Per inserirla invece in body, usa il segnaposto {{input}} e racchiudi body in un blocco raw di Jinja nella tua automazione, così Home Assistant non lo elabora prima dell'invio dell'azione."
         },
         "send_at": {
           "name": "Orario di invio",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "URL di callback",
           "description": "URL https pubblico a cui PushWard invia la ricevuta con POST quando la notifica viene confermata o scade, firmata con un segreto derivato dalla chiave di integrazione. Gli indirizzi locali vengono rifiutati, quindi un webhook di Home Assistant richiede il suo URL Home Assistant Cloud o un altro URL pubblico. Richiede Conferma."
+        },
+        "snooze": {
+          "name": "Posticipa",
+          "description": "Fino a 3 pulsanti per posticipare, ognuno con un numero di minuti diverso da 1 a 1440. Toccandone uno, la notifica viene nascosta e mostrata di nuovo su quel dispositivo dopo quel tempo. Non insieme a Conferma, e insieme alle azioni al massimo 10 pulsanti."
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "Ritira notifica",
+      "description": "Ritira le notifiche inviate con un collapse_id. Ogni dispositivo le toglie dalla vista e le segna come lette nell'app PushWard, e le notifiche da confermare dell'account o dell'organizzazione con quel collapse_id smettono di ripetersi, qualunque chiave di integrazione le abbia inviate (con una chiave di organizzazione limitata a gruppi o tag, solo quelle inviate da quella chiave). Senza garanzia, come il clear_notification dell'app Companion. La risposta facoltativa indica a quanti dispositivi è stata inviata (devices).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Account PushWard da usare. Lascia vuoto per ritirare su ogni account PushWard aggiunto a Home Assistant."
+        },
+        "collapse_id": {
+          "name": "ID collasso",
+          "description": "Il collapse_id con cui sono state inviate le notifiche, fino a 64 caratteri."
+        }
+      }
+    },
     "send_email": {
       "name": "Invia email",
       "description": "Invia un'email transazionale tramite PushWard. Fornisci un corpo di testo, un corpo HTML o entrambi. La chiave di integrazione deve avere la capacità \"emails\".",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "A",
-          "description": "Indirizzo email del destinatario. Deve essere un indirizzo che hai già aggiunto e confermato nell'app PushWard per iOS — gli indirizzi non verificati vengono rifiutati."
+          "description": "Indirizzo email del destinatario. Deve essere un indirizzo che hai già aggiunto e confermato nell'app PushWard; gli indirizzi non verificati vengono rifiutati."
         },
         "subject": {
           "name": "Oggetto",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "Nessun account PushWard caricato ha l'ID della voce di configurazione {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "{path} è un percorso di Home Assistant, e il telefono può aprirlo solo sull'URL esterno di Home Assistant. Imposta l'URL Internet in Impostazioni > Sistema > Rete o collega Home Assistant Cloud, oppure invia un URL completo."
+    },
+    "ha_path_invalid": {
+      "message": "{url} non è un URL valido: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} è una richiesta silenziosa, che il telefono invia solo tramite https, e l'URL esterno di Home Assistant è http. Imposta un URL Internet https in Impostazioni > Sistema > Rete o collega Home Assistant Cloud, oppure invia un URL https completo."
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "Connetti a PushWard",
-        "description": "Inserisci la tua chiave di integrazione PushWard per iniziare. Scarica l'app PushWard per iOS dall'App Store: {app_store_url}",
+        "description": "Inserisci la tua chiave di integrazione PushWard per iniziare. Scarica l'app PushWard dall'App Store ({app_store_url}) o da Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Chiave di integrazione"
         },
         "data_description": {
-          "integration_key": "Apri l'app PushWard per iOS (App Store: {app_store_url}) → Impostazioni → Chiavi di integrazione. Puoi incollare la chiave predefinita o crearne una nuova con ambito 'ha-*'."
+          "integration_key": "Apri l'app PushWard > Impostazioni > Chiavi di integrazione. Puoi incollare la chiave predefinita o crearne una nuova con ambito 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "Chiave di integrazione"
         },
         "data_description": {
-          "integration_key": "Creare una chiave nell'app PushWard iOS in Impostazioni → Chiavi di integrazione con ambito 'ha-*'."
+          "integration_key": "Creane una nell'app PushWard in Impostazioni > Chiavi di integrazione con ambito 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "Chiave di integrazione"
         },
         "data_description": {
-          "integration_key": "Creare una chiave nell'app PushWard iOS in Impostazioni → Chiavi di integrazione con ambito 'ha-*'."
+          "integration_key": "Creane una nell'app PushWard in Impostazioni > Chiavi di integrazione con ambito 'ha-*'."
         }
       }
     },
@@ -2055,8 +2087,8 @@
             "series_entities": "Entità serie",
             "completion_message": "Messaggio di completamento",
             "warning_threshold": "Soglia di avviso (secondi)",
-            "alarm": "Sveglia (iOS 26+)",
-            "snooze_seconds": "Secondi di posticipo (iOS 26+)",
+            "alarm": "Sveglia",
+            "snooze_seconds": "Secondi di posticipo",
             "tiles": "Riquadri del pannello",
             "log_columns": "Colonne del registro"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "Associa entità separate come linee denominate su un unico grafico (es. un sensore PM2.5 per stanza): ogni riga ha un'etichetta, un'entità e un attributo facoltativo. L'etichetta usa come predefinito il nome descrittivo dell'entità; lascia vuoto l'attributo per tracciare lo stato dell'entità. Si combina con Serie; fino a 10 linee in totale. È ancora accettata una stringa separata da virgole.",
             "completion_message": "Testo visualizzato al termine dell'attività. Lasciare vuoto per 'Completato'. Esempio: Lavaggio terminato",
             "warning_threshold": "Secondi prima della fine del countdown in cui il server invia un push di avviso. Lasciare vuoto per disabilitare. Solo per il modello countdown.",
-            "alarm": "Attivare la sveglia AlarmKit alla scadenza del countdown (iOS 26+). Solo per il modello countdown.",
-            "snooze_seconds": "Di quanto il pulsante Posticipa di iOS estende il conto alla rovescia (60–3600). Lascia vuoto per il valore predefinito di 300s (5 min). Richiede una sveglia. Solo modello conto alla rovescia.",
+            "alarm": "Fa suonare una sveglia sul dispositivo alla scadenza del countdown. Su iPhone richiede iOS 26 o versioni successive; su Android l'app ha bisogno dell'autorizzazione Sveglie e promemoria. Solo per il modello countdown.",
+            "snooze_seconds": "Di quanto il pulsante Posticipa della sveglia estende il conto alla rovescia (60-3600). Lascia vuoto per il valore predefinito di 300s (5 min). Richiede una sveglia. Solo modello countdown.",
             "tiles": "Fino a 4 riquadri, ognuno legge un'entità distinta: etichetta, entità e, in opzione, attributo, unità, icona, colore e URL al tocco. È ancora accettata una stringa separata da virgole. Solo per il modello board.",
             "log_columns": "Valori aggiuntivi aggiunti a ogni riga del registro (max 6): ogni riga ha un'etichetta, un'entità, un attributo e un'unità. Un attributo senza entità legge questa entità; un'entità senza attributo ne legge lo stato; entrambi leggono l'attributo di quell'entità. È ancora accettata una stringa separata da virgole. Solo modello registro."
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "ThumbHash dell'immagine"
               },
               "data_description": {
-                "image_url": "URL https di un'immagine mostrata accanto all'icona. L'iPhone la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì.",
+                "image_url": "URL https di un'immagine mostrata accanto all'icona. Il telefono la scarica da solo, quindi deve essere raggiungibile da internet; un indirizzo della rete locale non si caricherà, ma il suo ThumbHash sì.",
                 "image_shape": "Come viene ritagliata l'immagine: poster mantiene un taglio verticale, square è il valore predefinito, circle la ritaglia tonda.",
                 "image_thumbhash": "Anteprima sfocata incorporata, disegnata quando l'URL non può essere scaricato, e l'unico livello che compare per un'immagine sulla rete locale. Lascia vuoto per calcolarlo automaticamente dall'URL, oppure usa l'azione Generate ThumbHash per crearlo da qualsiasi immagine leggibile da Home Assistant."
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "Identificatore univoco per questa attività. Lasciare vuoto per generarlo automaticamente dall'ID entità. Esempio: ha-living-room-lamp",
-                "activity_name": "Nome visualizzato sulla Live Activity iPhone. Il valore predefinito è il nome descrittivo dell'entità.",
+                "activity_name": "Nome visualizzato sull'attività sul tuo telefono. Il valore predefinito è il nome descrittivo dell'entità.",
                 "icon": "Icona personalizzata. Lasciare vuoto per usare l'icona nativa dell'entità (es. mdi:thermometer). Sono supportati anche gli SF Symbols (es. lamp.desk.fill).",
                 "icon_attribute": "Attributo dell'entità per l'icona dinamica. Se impostato, sostituisce l'icona statica e quella dell'entità.",
                 "priority": "Le attività con priorità maggiore vengono conservate più a lungo quando si raggiunge il limite del dispositivo (0 = minima, 10 = massima).",
                 "sound": "Suono riprodotto ad ogni aggiornamento per questa entità. Lasciare vuoto per non forzare alcun suono.",
                 "update_interval": "Secondi minimi tra un aggiornamento e l'altro. I cambi di stato rapidi vengono limitati.",
                 "state_labels": "Testo personalizzato per gli stati. Una riga per stato: il valore dello stato e l'etichetta da mostrare. Esempio: heating e In riscaldamento. Una vecchia stringa stato=Etichetta, stato2=Etichetta 2 è ancora accettata.",
-                "compact_label": "Fino a 4 caratteri mostrati nella parte anteriore della vista compatta della Dynamic Island al posto del contenuto predefinito del modello (l'icona, l'anello dei passaggi o la pila massimo/minimo della cronologia). La presentazione minima li ignora. Lascia vuoto per mantenere il contenuto proprio del modello.",
+                "compact_label": "Fino a 4 caratteri che sostituiscono il contenuto predefinito del modello nella vista compatta. Su iPhone è la parte anteriore della Dynamic Island, al posto dell'icona, dell'anello dei passaggi o della pila massimo/minimo della cronologia (la presentazione minima li ignora); su Android 16 QPR2 e versioni successive è il testo del chip nella barra di stato. Lascia vuoto per mantenere il contenuto proprio del modello.",
                 "compact_trailing_label": "Fino a 4 caratteri mostrati nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, come il contatore dei passaggi o il timer. Ha la precedenza sull'icona posteriore quando sono impostate entrambe. La presentazione minima li ignora. Lascia vuoto per mantenere il contenuto proprio del modello. Richiede PushWard 1.19.1 o successivo.",
                 "compact_trailing_icon": "Icona mostrata nella parte posteriore della vista compatta della Dynamic Island al posto di ciò che il modello vi mostra, colorata con il colore accento. Funzionano sia le icone MDI (es. mdi:airplane-takeoff) sia gli SF Symbols (es. airplane.departure). Ignorata quando è impostata un'etichetta Island posteriore. Lascia vuoto per mantenere il contenuto proprio del modello. Richiede PushWard 1.19.1 o successivo."
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "Nodi del flusso"
           },
           "data_description": {
-            "widget_name": "Nome visualizzato mostrato nel selettore di widget di iOS. Per impostazione predefinita usa il nome descrittivo dell'entità.",
+            "widget_name": "Nome visualizzato nel selettore di widget del tuo telefono. Per impostazione predefinita usa il nome descrittivo dell'entità.",
             "value_attribute": "Attributo dell'entità che contiene il valore. Lascia vuoto per usare lo stato primario dell'entità.",
             "unit": "Unità di visualizzazione mostrata accanto al valore. Max 32 caratteri.",
             "value_scale": "Come interpretare il valore di avanzamento. auto tratta un'unità % o un valore superiore a 1 come percent, e tutto il resto come una frazione 0.0-1.0 (fraction). Scegli percent o fraction per sovrascrivere. Solo per il modello progress.",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "Limite di notifiche {account} raggiunto",
-      "description": "Il tuo account PushWard ha utilizzato {used} delle sue {limit} notifiche per il periodo corrente, quindi le nuove notifiche verranno rifiutate finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per iOS per aumentare il limite."
+      "description": "Il tuo account PushWard ha utilizzato {used} delle sue {limit} notifiche per il periodo corrente, quindi le nuove notifiche verranno rifiutate finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per aumentare il limite."
     },
     "usage_limit_live_activity": {
       "title": "Limite di aggiornamenti Live Activity {account} raggiunto",
-      "description": "Il tuo account PushWard ha utilizzato {used} dei suoi {limit} aggiornamenti Live Activity per il periodo corrente, quindi i nuovi aggiornamenti verranno rifiutati finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per iOS per aumentare il limite."
+      "description": "Il tuo account PushWard ha utilizzato {used} dei suoi {limit} aggiornamenti Live Activity per il periodo corrente, quindi i nuovi aggiornamenti verranno rifiutati finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per aumentare il limite."
     },
     "usage_limit_widgets": {
       "title": "Limite di aggiornamenti widget {account} raggiunto",
-      "description": "Il tuo account PushWard ha utilizzato {used} dei suoi {limit} aggiornamenti widget per il periodo corrente, quindi i nuovi aggiornamenti verranno rifiutati finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per iOS per aumentare il limite."
+      "description": "Il tuo account PushWard ha utilizzato {used} dei suoi {limit} aggiornamenti widget per il periodo corrente, quindi i nuovi aggiornamenti verranno rifiutati finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per aumentare il limite."
     },
     "usage_limit_emails": {
       "title": "Limite di email {account} raggiunto",
-      "description": "Il tuo account PushWard ha utilizzato {used} delle sue {limit} email per il periodo corrente, quindi le nuove email verranno rifiutate finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per iOS per aumentare il limite."
+      "description": "Il tuo account PushWard ha utilizzato {used} delle sue {limit} email per il periodo corrente, quindi le nuove email verranno rifiutate finché la quota non si reimposta ({resets_at}). Aggiorna il tuo abbonamento nell'app PushWard per aumentare il limite."
     },
     "todo_e2e_unavailable": {
       "title": "I promemoria delle cose da fare di {account} non vengono inviati",

@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Notifikasi push"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "Alarm",
-          "description": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya berfungsi di iOS 26+."
+          "description": "Membunyikan alarm di perangkat saat hitung mundur berakhir. Hanya templat countdown. Di iPhone memerlukan iOS 26 atau lebih baru; di Android aplikasi memerlukan izin Alarm & pengingat."
         },
         "snooze_seconds": {
           "name": "Detik Tunda",
-          "description": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Default 300 (5 mnt). Memerlukan alarm (iOS 26+, hanya templat hitung mundur)."
+          "description": "Berapa lama tombol Tunda pada alarm memperpanjang hitung mundur (60-3600). Default 300 (5 mnt). Memerlukan alarm (hanya templat countdown)."
         },
         "step_labels": {
           "name": "Label Langkah",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "URL gambar",
-          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+          "description": "URL https gambar yang ditampilkan di samping ikon. Ponsel mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
         },
         "image_shape": {
           "name": "Bentuk gambar",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "URL gambar",
-          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+          "description": "URL https gambar yang ditampilkan di samping ikon. Ponsel mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
         },
         "image_shape": {
           "name": "Bentuk gambar",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "Alarm",
-          "description": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya berfungsi di iOS 26+."
+          "description": "Membunyikan alarm di perangkat saat hitung mundur berakhir. Hanya templat countdown. Di iPhone memerlukan iOS 26 atau lebih baru; di Android aplikasi memerlukan izin Alarm & pengingat."
         },
         "snooze_seconds": {
           "name": "Detik Tunda",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "Berapa lama tombol Tunda pada alarm memperpanjang hitung mundur (60-3600). Default 300 (5 mnt). Memerlukan alarm (hanya templat countdown)."
         },
         "direction": {
           "name": "Arah",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "URL gambar",
-          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+          "description": "URL https gambar yang ditampilkan di samping ikon. Ponsel mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
         },
         "image_shape": {
           "name": "Bentuk gambar",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "URL gambar",
-          "description": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
+          "description": "URL https gambar yang ditampilkan di samping ikon. Ponsel mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil."
         },
         "image_shape": {
           "name": "Bentuk gambar",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Label Island",
-          "description": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya."
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
         },
         "compact_trailing_label": {
           "name": "Label Island Belakang",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "URL gambar",
-          "description": "URL http atau https gambar. Apa pun yang bisa dijangkau Home Assistant bisa dipakai, termasuk kamera di jaringan lokal yang tidak terlihat oleh iPhone."
+          "description": "URL http atau https gambar. Apa pun yang dapat dijangkau Home Assistant bisa dipakai, termasuk kamera di jaringan lokal yang tidak terlihat oleh ponsel."
         },
         "image_path": {
           "name": "Path gambar",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "Segarkan Widget",
-      "description": "Paksa segarkan widget PushWard yang dilacak. Melewati cache diff dalam memori sehingga widget dirender ulang dan dikirim ke iOS meski nilainya tidak berubah.",
+      "description": "Paksa segarkan widget PushWard yang dilacak. Melewati cache diff dalam memori sehingga widget dirender ulang dan dikirim ke perangkat Anda meski nilainya tidak berubah.",
       "fields": {
         "config_entry_id": {
           "name": "Akun",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "Tingkat",
-          "description": "Tingkat interupsi iOS. Mengontrol cara notifikasi dikirimkan."
+          "description": "Tingkat interupsi. Mengontrol cara notifikasi dikirimkan. Di Android, critical memerlukan akses Jangan Ganggu yang diberikan di aplikasi PushWard."
         },
         "volume": {
           "name": "Volume",
-          "description": "Volume suara untuk alert critical (0.0-1.0). Hanya digunakan saat level adalah critical."
+          "description": "Volume suara untuk peringatan kritis (0.0-1.0). Hanya digunakan saat level adalah critical. Diabaikan di Android."
         },
         "thread_id": {
           "name": "ID Thread",
-          "description": "Mengelompokkan notifikasi bersama di Notification Center."
+          "description": "Mengelompokkan notifikasi di perangkat."
         },
         "collapse_id": {
           "name": "ID Gabungan",
-          "description": "Kunci deduplikasi APNs. Menggantikan notifikasi sebelumnya dengan kunci yang sama."
+          "description": "Kunci deduplikasi. Menggantikan notifikasi sebelumnya dengan kunci yang sama."
         },
         "source": {
           "name": "Sumber",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "Push",
-          "description": "Kirim sebagai push alert APNs ke semua perangkat. Jika false, notifikasi hanya disimpan di kotak masuk."
+          "description": "Kirim sebagai peringatan push ke semua perangkat. Jika false, notifikasi hanya disimpan di kotak masuk."
         },
         "url": {
           "name": "URL",
-          "description": "URL yang dibuka saat mengetuk notifikasi. Memerlukan HTTPS."
+          "description": "URL yang dibuka saat notifikasi diketuk. Jalur seperti /lovelace/kitchen dibuka di URL eksternal Home Assistant."
         },
         "media": {
           "name": "Media",
-          "description": "Lampiran media sebagai objek dengan `url` (HTTPS) dan `type` (image, video, atau audio)."
+          "description": "Lampiran media sebagai objek dengan `url` (HTTPS) dan `type` (image, video, atau audio). Android hanya menampilkan gambar di panel notifikasi."
         },
         "icon_url": {
           "name": "URL Ikon",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "Aksi",
-          "description": "Daftar tombol aksi. Setiap aksi adalah objek dengan id, title, serta url, foreground, destructive, authentication_required, dan icon opsional. Untuk url http(s) Anda juga dapat mengirim webhook senyap dengan method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, dan body. Jika url (dan foreground) dihilangkan, PushWard mencatat ketukan itu sendiri; baca dengan get_notification_answer. Setel text_input: true pada aksi senyap untuk meminta balasan ketikan (text_input_placeholder dan text_input_button_title opsional): tanpa url PushWard mencatat balasannya, dengan url http(s) balasan dikirim ke webhook Anda sebagai JSON dengan field text. Untuk menyisipkannya ke body, gunakan placeholder {{input}} dan bungkus body dalam blok raw Jinja di otomasi Anda, agar Home Assistant tidak merendernya sebelum aksi dikirim."
+          "description": "Daftar tombol aksi. Setiap aksi adalah objek dengan id, title, serta url, foreground, destructive, authentication_required, dan icon opsional. url yang berupa jalur, seperti /lovelace/kitchen, dibuka di URL eksternal Home Assistant. Android menampilkan 3 tombol pertama di panel notifikasi dan semuanya di aplikasi. Untuk url http(s) Anda juga dapat mengirim webhook senyap dengan method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, dan body. Jika url (dan foreground) dihilangkan, PushWard mencatat ketukan itu sendiri; baca dengan get_notification_answer, atau gunakan event pushward_notification_action sebagai pemicu. Setel text_input: true pada aksi senyap untuk meminta balasan ketikan (text_input_placeholder dan text_input_button_title opsional): tanpa url PushWard mencatat balasannya, dengan url http(s) balasan dikirim ke webhook Anda sebagai JSON dengan field text. Untuk menyisipkannya ke body, gunakan placeholder {{input}} dan bungkus body dalam blok raw Jinja di otomasi Anda, agar Home Assistant tidak merendernya sebelum aksi dikirim."
         },
         "send_at": {
           "name": "Waktu kirim",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "URL callback",
           "description": "URL https publik tempat PushWard mengirim tanda terima dengan POST setelah notifikasi dikonfirmasi atau kedaluwarsa, ditandatangani dengan rahasia yang diturunkan dari kunci integrasi. Alamat lokal ditolak, jadi webhook Home Assistant memerlukan URL Home Assistant Cloud atau URL publik lainnya. Memerlukan Konfirmasi."
+        },
+        "snooze": {
+          "name": "Tunda",
+          "description": "Hingga 3 tombol tunda, masing-masing dengan jumlah menit berbeda dari 1 sampai 1440. Mengetuk salah satunya menyembunyikan notifikasi dan menampilkannya lagi di perangkat itu setelah waktu tersebut. Tidak bisa digabung dengan Konfirmasi, dan bersama aksi paling banyak 10 tombol."
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "Tarik Notifikasi",
+      "description": "Tarik kembali notifikasi yang dikirim dengan collapse_id. Setiap perangkat menghapusnya dari tampilan dan menandainya sudah dibaca di aplikasi PushWard, dan notifikasi konfirmasi milik akun atau organisasi dengan collapse_id itu berhenti berulang, kunci integrasi mana pun yang mengirimnya (dengan kunci organisasi yang dibatasi ke grup atau tag, hanya yang dikirim kunci itu). Tanpa jaminan, seperti clear_notification di aplikasi Companion. Respons opsional berisi jumlah perangkat yang dikirimi permintaan ini (devices).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menarik di setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
+        "collapse_id": {
+          "name": "ID Gabungan",
+          "description": "collapse_id yang dipakai saat notifikasi dikirim, hingga 64 karakter."
+        }
+      }
+    },
     "send_email": {
       "name": "Kirim Email",
       "description": "Kirim email transaksional melalui PushWard. Berikan body teks, body HTML, atau keduanya. Kunci integrasi memerlukan kapabilitas \"emails\".",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "Kepada",
-          "description": "Alamat email penerima. Harus merupakan alamat yang sudah Anda tambahkan dan konfirmasi di aplikasi PushWard iOS — alamat yang belum diverifikasi akan ditolak."
+          "description": "Alamat email penerima. Harus merupakan alamat yang sudah Anda tambahkan dan konfirmasi di aplikasi PushWard; alamat yang belum diverifikasi akan ditolak."
         },
         "subject": {
           "name": "Subjek",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "Tidak ada akun PushWard yang dimuat dengan ID entri konfigurasi {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "{path} adalah jalur Home Assistant, dan ponsel hanya dapat membukanya di URL eksternal Home Assistant. Atur URL Internet di Pengaturan > Sistem > Jaringan atau hubungkan Home Assistant Cloud, atau kirim URL lengkap sebagai gantinya."
+    },
+    "ha_path_invalid": {
+      "message": "{url} bukan URL yang valid: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} adalah permintaan senyap, yang hanya dikirim ponsel lewat https, dan URL eksternal Home Assistant adalah http. Atur URL Internet https di Pengaturan > Sistem > Jaringan atau hubungkan Home Assistant Cloud, atau kirim URL https lengkap sebagai gantinya."
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "Hubungkan ke PushWard",
-        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Dapatkan aplikasi PushWard iOS dari App Store: {app_store_url}",
+        "description": "Masukkan kunci integrasi PushWard Anda untuk memulai. Dapatkan aplikasi PushWard dari App Store ({app_store_url}) atau Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Kunci Integrasi"
         },
         "data_description": {
-          "integration_key": "Buka aplikasi PushWard iOS (App Store: {app_store_url}) → Pengaturan → Kunci Integrasi. Anda dapat menempelkan kunci default, atau membuat kunci baru dengan cakupan 'ha-*'."
+          "integration_key": "Buka aplikasi PushWard > Pengaturan > Kunci Integrasi. Anda dapat menempelkan kunci default, atau membuat kunci baru dengan cakupan 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "Kunci Integrasi"
         },
         "data_description": {
-          "integration_key": "Buat di aplikasi PushWard iOS di bawah Pengaturan → Integration Keys dengan cakupan 'ha-*'."
+          "integration_key": "Buat di aplikasi PushWard di bawah Pengaturan > Kunci Integrasi dengan cakupan 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "Kunci Integrasi"
         },
         "data_description": {
-          "integration_key": "Buat di aplikasi PushWard iOS di bawah Pengaturan → Integration Keys dengan cakupan 'ha-*'."
+          "integration_key": "Buat di aplikasi PushWard di bawah Pengaturan > Kunci Integrasi dengan cakupan 'ha-*'."
         }
       }
     },
@@ -2056,7 +2088,7 @@
             "completion_message": "Pesan Penyelesaian",
             "warning_threshold": "Ambang Peringatan",
             "alarm": "Alarm",
-            "snooze_seconds": "Detik Tunda (iOS 26+)",
+            "snooze_seconds": "Detik Tunda",
             "tiles": "Ubin board",
             "log_columns": "Kolom Log"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "Ikat entitas terpisah sebagai garis bernama pada satu chart (misalnya satu sensor PM2.5 per ruangan): setiap baris berisi label, entitas, dan atribut opsional. Label secara default menggunakan nama ramah entitas; kosongkan atribut untuk menampilkan status entitas. Dapat digabung dengan Seri; total maksimal 10 garis. String yang dipisahkan koma masih diterima.",
             "completion_message": "Teks yang ditampilkan saat aktivitas berakhir. Kosongkan untuk 'Selesai'. Contoh: Cucian Selesai",
             "warning_threshold": "Saat nilai mencapai atau melebihi ini, pewarnaan peringatan dipicu. Templat gauge dan timeline.",
-            "alarm": "Memicu alarm AlarmKit saat ambang peringatan terlampaui. Hanya untuk iOS 26+.",
-            "snooze_seconds": "Berapa lama tombol Tunda iOS memperpanjang hitung mundur (60–3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat hitung mundur.",
+            "alarm": "Membunyikan alarm di perangkat saat hitung mundur berakhir. Di iPhone memerlukan iOS 26 atau lebih baru; di Android aplikasi memerlukan izin Alarm & pengingat. Hanya templat countdown.",
+            "snooze_seconds": "Berapa lama tombol Tunda pada alarm memperpanjang hitung mundur (60-3600). Biarkan kosong untuk default 300s (5 mnt). Memerlukan Alarm. Hanya templat countdown.",
             "tiles": "Hingga 4 ubin, masing-masing membaca entitas terpisah: label, entitas, serta atribut, unit, ikon, warna, dan URL ketuk opsional. String yang dipisahkan koma masih diterima. Hanya untuk templat board.",
             "log_columns": "Nilai tambahan yang ditambahkan ke setiap baris log (maks. 6): setiap baris berisi label, entitas, atribut, dan unit. Atribut tanpa entitas membaca entitas ini; entitas tanpa atribut membaca statusnya; keduanya membaca atribut entitas tersebut. String yang dipisahkan koma masih diterima. Hanya templat log."
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "ThumbHash gambar"
               },
               "data_description": {
-                "image_url": "URL https gambar yang ditampilkan di samping ikon. iPhone mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil.",
+                "image_url": "URL https gambar yang ditampilkan di samping ikon. Ponsel mengunduhnya sendiri, jadi URL harus bisa dijangkau dari internet; alamat di jaringan lokal tidak akan termuat, tetapi ThumbHash-nya tetap tampil.",
                 "image_shape": "Cara gambar dipotong: poster mempertahankan potongan vertikal, square adalah bawaan, circle memotong bulat.",
                 "image_thumbhash": "Pratinjau buram tersemat yang digambar saat URL tidak bisa diunduh, dan satu-satunya lapisan yang tampil untuk gambar di jaringan lokal. Biarkan kosong agar dihitung otomatis dari URL, atau gunakan aksi Generate ThumbHash untuk membuatnya dari gambar apa pun yang bisa dibaca Home Assistant."
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "Identifikasi unik untuk aktivitas ini. Kosongkan untuk dibuat otomatis dari ID entitas. Contoh: ha-living-room-lamp",
-                "activity_name": "Nama tampilan yang ditampilkan pada iPhone Live Activity. Default ke nama ramah entitas.",
+                "activity_name": "Nama tampilan yang ditampilkan pada aktivitas di ponsel Anda. Default ke nama ramah entitas.",
                 "icon": "Ganti ikon. Kosongkan untuk menggunakan ikon asli entitas (misalnya mdi:thermometer). SF Symbols juga didukung (misalnya lamp.desk.fill).",
                 "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis dan ikon entitas saat diatur.",
                 "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
                 "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
                 "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
                 "state_labels": "Teks tampilan kustom untuk status. Satu baris per status: nilai status dan label yang ditampilkan. Contoh: heating dan Sedang Memanaskan. String lama state=Label, state2=Label 2 masih diterima.",
-                "compact_label": "Hingga 4 karakter yang ditampilkan di bagian depan tampilan ringkas Dynamic Island sebagai pengganti konten bawaan templat (ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa). Tampilan minimal mengabaikannya. Kosongkan untuk mempertahankan konten templat itu sendiri.",
+                "compact_label": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status. Biarkan kosong untuk mempertahankan konten templat itu sendiri.",
                 "compact_trailing_label": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Kosongkan untuk mempertahankan konten templat itu sendiri. Memerlukan PushWard 1.19.1 atau yang lebih baru.",
                 "compact_trailing_icon": "Ikon yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Ikon MDI (misalnya mdi:airplane-takeoff) dan SF Symbols (misalnya airplane.departure) sama-sama didukung. Diabaikan jika label Island belakang diatur. Kosongkan untuk mempertahankan konten templat itu sendiri. Memerlukan PushWard 1.19.1 atau yang lebih baru."
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "Simpul aliran"
           },
           "data_description": {
-            "widget_name": "Nama tampilan yang ditampilkan di pemilih widget iOS. Default ke nama ramah entitas.",
+            "widget_name": "Nama tampilan di pemilih widget pada ponsel Anda. Default ke nama ramah entitas.",
             "value_attribute": "Atribut entitas yang menyimpan nilai. Biarkan kosong untuk menggunakan status utama entitas.",
             "unit": "Satuan tampilan yang ditampilkan di samping nilai. Maks 32 karakter.",
             "value_scale": "Cara membaca nilai progres. auto memperlakukan satuan % atau nilai di atas 1 sebagai percent, dan selainnya sebagai pecahan 0.0-1.0 (fraction). Pilih percent atau fraction untuk menimpanya. Hanya untuk templat progress.",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "Batas notifikasi {account} tercapai",
-      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} notifikasi untuk periode saat ini, sehingga notifikasi baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} notifikasi untuk periode saat ini, sehingga notifikasi baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard untuk menaikkan batas."
     },
     "usage_limit_live_activity": {
       "title": "Batas pembaruan Live Activity {account} tercapai",
-      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan Live Activity untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan Live Activity untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard untuk menaikkan batas."
     },
     "usage_limit_widgets": {
       "title": "Batas pembaruan widget {account} tercapai",
-      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan widget untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} pembaruan widget untuk periode saat ini, sehingga pembaruan baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard untuk menaikkan batas."
     },
     "usage_limit_emails": {
       "title": "Batas email {account} tercapai",
-      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} email untuk periode saat ini, sehingga email baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard iOS untuk menaikkan batas."
+      "description": "Akun PushWard Anda telah menggunakan {used} dari {limit} email untuk periode saat ini, sehingga email baru akan ditolak hingga kuota disetel ulang ({resets_at}). Tingkatkan langganan Anda di aplikasi PushWard untuk menaikkan batas."
     },
     "todo_e2e_unavailable": {
       "title": "Pengingat tugas {account} tidak terkirim",

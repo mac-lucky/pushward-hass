@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Thông báo đẩy"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "Chuông Báo",
-          "description": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ hoạt động trên iOS 26+."
+          "description": "Đổ chuông báo thức trên thiết bị khi đếm ngược kết thúc. Chỉ mẫu countdown. Trên iPhone cần iOS 26 trở lên; trên Android ứng dụng cần quyền Chuông báo và lời nhắc."
         },
         "snooze_seconds": {
           "name": "Số giây hoãn",
-          "description": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Mặc định là 300 (5 phút). Yêu cầu báo thức (iOS 26+, chỉ mẫu đếm ngược)."
+          "description": "Khoảng thời gian nút Hoãn của báo thức kéo dài đếm ngược (60-3600). Mặc định là 300 (5 phút). Yêu cầu báo thức (chỉ mẫu countdown)."
         },
         "step_labels": {
           "name": "Nhãn Bước",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "URL hình ảnh",
-          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. Điện thoại tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
         },
         "image_shape": {
           "name": "Hình dạng ảnh",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "URL hình ảnh",
-          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. Điện thoại tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
         },
         "image_shape": {
           "name": "Hình dạng ảnh",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "Chuông Báo",
-          "description": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ hoạt động trên iOS 26+."
+          "description": "Đổ chuông báo thức trên thiết bị khi đếm ngược kết thúc. Chỉ mẫu countdown. Trên iPhone cần iOS 26 trở lên; trên Android ứng dụng cần quyền Chuông báo và lời nhắc."
         },
         "snooze_seconds": {
           "name": "Số giây hoãn",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "Khoảng thời gian nút Hoãn của báo thức kéo dài đếm ngược (60-3600). Mặc định là 300 (5 phút). Yêu cầu báo thức (chỉ mẫu countdown)."
         },
         "direction": {
           "name": "Hướng",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "URL hình ảnh",
-          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. Điện thoại tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
         },
         "image_shape": {
           "name": "Hình dạng ảnh",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "URL hình ảnh",
-          "description": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
+          "description": "URL https của hình hiển thị bên cạnh biểu tượng. Điện thoại tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị."
         },
         "image_shape": {
           "name": "Hình dạng ảnh",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Nhãn Island",
-          "description": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này."
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
         },
         "compact_trailing_label": {
           "name": "Nhãn Cuối Island",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "URL hình ảnh",
-          "description": "URL http hoặc https của ảnh. Bất cứ thứ gì Home Assistant truy cập được đều dùng được, kể cả camera trong mạng nội bộ mà iPhone không thấy."
+          "description": "URL http hoặc https của hình ảnh. Mọi thứ Home Assistant truy cập được đều dùng được, kể cả camera trong mạng nội bộ mà điện thoại không thấy."
         },
         "image_path": {
           "name": "Đường dẫn ảnh",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "Làm mới widget",
-      "description": "Buộc làm mới một widget PushWard đang được theo dõi. Bỏ qua bộ nhớ đệm khác biệt trong bộ nhớ để widget được kết xuất lại và đẩy tới iOS ngay cả khi giá trị không thay đổi.",
+      "description": "Buộc làm mới một widget PushWard đang được theo dõi. Bỏ qua bộ nhớ đệm khác biệt trong bộ nhớ để widget được kết xuất lại và đẩy tới các thiết bị của bạn ngay cả khi giá trị không thay đổi.",
       "fields": {
         "config_entry_id": {
           "name": "Tài khoản",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "Mức Độ",
-          "description": "Mức độ gián đoạn iOS. Kiểm soát cách thông báo được gửi."
+          "description": "Mức độ gián đoạn. Kiểm soát cách thông báo được gửi. Trên Android, critical cần quyền truy cập Không làm phiền được cấp trong ứng dụng PushWard."
         },
         "volume": {
           "name": "Âm lượng",
-          "description": "Âm lượng thông báo cho cảnh báo critical (0.0-1.0). Chỉ dùng khi level là critical."
+          "description": "Âm lượng cho cảnh báo khẩn cấp (0.0-1.0). Chỉ dùng khi level là critical. Bị bỏ qua trên Android."
         },
         "thread_id": {
           "name": "ID Luồng",
-          "description": "Nhóm các thông báo lại trong Trung tâm Thông báo."
+          "description": "Nhóm các thông báo lại với nhau trên thiết bị."
         },
         "collapse_id": {
           "name": "ID Thu Gọn",
-          "description": "Khóa loại trùng lặp APNs. Thay thế thông báo trước có cùng khóa."
+          "description": "Khóa chống trùng lặp. Thay thế thông báo trước đó có cùng khóa."
         },
         "source": {
           "name": "Nguồn",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "Đẩy",
-          "description": "Gửi dưới dạng APNs push alert đến tất cả thiết bị. Khi tắt, thông báo chỉ được lưu trong hộp thư."
+          "description": "Gửi dưới dạng cảnh báo đẩy tới mọi thiết bị. Khi là false, thông báo chỉ được lưu trong hộp thư đến."
         },
         "url": {
           "name": "URL",
-          "description": "URL mở khi nhấn vào thông báo. Yêu cầu HTTPS."
+          "description": "URL mở khi chạm vào thông báo. Một đường dẫn như /lovelace/kitchen sẽ mở trên URL bên ngoài của Home Assistant."
         },
         "media": {
           "name": "Phương tiện",
-          "description": "Tệp đính kèm phương tiện dưới dạng đối tượng với `url` (HTTPS) và `type` (image, video hoặc audio)."
+          "description": "Tệp đính kèm phương tiện dưới dạng đối tượng với `url` (HTTPS) và `type` (image, video hoặc audio). Android chỉ hiển thị hình ảnh trong ngăn thông báo."
         },
         "icon_url": {
           "name": "URL Biểu Tượng",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "Hành động",
-          "description": "Danh sách các nút hành động. Mỗi hành động là một đối tượng với id, title, và url, foreground, destructive, authentication_required, icon tùy chọn. Với url http(s) bạn cũng có thể gửi một webhook im lặng với method (GET/POST/PUT/PATCH/DELETE/HEAD), headers và body. Nếu bỏ url (và foreground), PushWard tự ghi nhận lần chạm; đọc kết quả bằng get_notification_answer. Đặt text_input: true trên một hành động im lặng để yêu cầu phản hồi dạng văn bản (text_input_placeholder và text_input_button_title tùy chọn): không có url thì PushWard ghi nhận phản hồi, có url http(s) thì phản hồi được gửi tới webhook của bạn dưới dạng JSON với trường text. Để chèn phản hồi vào body, hãy dùng placeholder {{input}} và bọc body trong khối raw của Jinja trong tự động hóa của bạn, để Home Assistant không xử lý nó trước khi hành động được gửi."
+          "description": "Danh sách các nút hành động. Mỗi hành động là một đối tượng với id, title, và url, foreground, destructive, authentication_required, icon tùy chọn. Một url là đường dẫn, như /lovelace/kitchen, sẽ mở trên URL bên ngoài của Home Assistant. Android hiển thị 3 nút đầu tiên trong ngăn thông báo và tất cả các nút trong ứng dụng. Với url http(s) bạn cũng có thể gửi một webhook im lặng với method (GET/POST/PUT/PATCH/DELETE/HEAD), headers và body. Nếu bỏ url (và foreground), PushWard tự ghi nhận lần chạm; đọc kết quả bằng get_notification_answer, hoặc dùng sự kiện pushward_notification_action làm trình kích hoạt. Đặt text_input: true trên một hành động im lặng để yêu cầu phản hồi dạng văn bản (text_input_placeholder và text_input_button_title tùy chọn): không có url thì PushWard ghi nhận phản hồi, có url http(s) thì phản hồi được gửi tới webhook của bạn dưới dạng JSON với trường text. Để chèn phản hồi vào body, hãy dùng placeholder {{input}} và bọc body trong khối raw của Jinja trong tự động hóa của bạn, để Home Assistant không xử lý nó trước khi hành động được gửi."
         },
         "send_at": {
           "name": "Thời Gian Gửi",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "URL callback",
           "description": "URL https công khai mà PushWard gửi biên nhận tới bằng POST khi thông báo được xác nhận hoặc hết hạn, được ký bằng một khóa bí mật suy ra từ khóa tích hợp. Địa chỉ cục bộ bị từ chối, nên webhook Home Assistant cần URL Home Assistant Cloud hoặc một URL công khai khác. Yêu cầu Xác nhận."
+        },
+        "snooze": {
+          "name": "Hoãn",
+          "description": "Tối đa 3 nút hoãn, mỗi nút một số phút khác nhau từ 1 đến 1440. Chạm vào một nút sẽ ẩn thông báo và hiển thị lại trên thiết bị đó sau khoảng thời gian ấy. Không dùng cùng Xác nhận, và tính cả các hành động thì tối đa 10 nút."
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "Thu hồi thông báo",
+      "description": "Thu hồi các thông báo đã gửi với một collapse_id. Mỗi thiết bị gỡ chúng khỏi màn hình và đánh dấu đã đọc trong ứng dụng PushWard, và các thông báo cần xác nhận của tài khoản hoặc tổ chức có collapse_id đó sẽ ngừng lặp lại, bất kể khóa tích hợp nào đã gửi chúng (với khóa tổ chức giới hạn theo nhóm hoặc thẻ, chỉ những thông báo do khóa đó gửi). Không đảm bảo, giống clear_notification của ứng dụng Companion. Phản hồi tùy chọn cho biết yêu cầu đã được gửi tới bao nhiêu thiết bị (devices).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để thu hồi trên mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
+        "collapse_id": {
+          "name": "ID Thu Gọn",
+          "description": "collapse_id mà các thông báo đã được gửi kèm, tối đa 64 ký tự."
+        }
+      }
+    },
     "send_email": {
       "name": "Gửi email",
       "description": "Gửi một email giao dịch qua PushWard. Cung cấp nội dung văn bản, nội dung HTML, hoặc cả hai. Khóa tích hợp cần có quyền \"emails\".",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "Đến",
-          "description": "Địa chỉ email người nhận. Phải là địa chỉ bạn đã thêm và xác nhận trong ứng dụng PushWard trên iOS — các địa chỉ chưa xác minh sẽ bị từ chối."
+          "description": "Địa chỉ email người nhận. Phải là địa chỉ bạn đã thêm và xác nhận trong ứng dụng PushWard; các địa chỉ chưa xác minh sẽ bị từ chối."
         },
         "subject": {
           "name": "Tiêu đề",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "Không có tài khoản PushWard nào đã tải có ID mục cấu hình {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "{path} là một đường dẫn Home Assistant, và điện thoại chỉ có thể mở nó trên URL bên ngoài của Home Assistant. Đặt URL Internet trong Cài đặt > Hệ thống > Mạng hoặc kết nối Home Assistant Cloud, hoặc gửi một URL đầy đủ thay thế."
+    },
+    "ha_path_invalid": {
+      "message": "{url} không phải là URL hợp lệ: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} là một yêu cầu im lặng, điện thoại chỉ gửi nó qua https, còn URL bên ngoài của Home Assistant là http. Đặt một URL Internet https trong Cài đặt > Hệ thống > Mạng hoặc kết nối Home Assistant Cloud, hoặc gửi một URL https đầy đủ thay thế."
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "Kết Nối với PushWard",
-        "description": "Nhập khóa tích hợp PushWard của bạn để bắt đầu. Tải ứng dụng PushWard cho iOS từ App Store: {app_store_url}",
+        "description": "Nhập khóa tích hợp PushWard của bạn để bắt đầu. Tải ứng dụng PushWard từ App Store ({app_store_url}) hoặc Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Khóa Tích Hợp"
         },
         "data_description": {
-          "integration_key": "Mở ứng dụng PushWard trên iOS (App Store: {app_store_url}) → Cài đặt → Khóa tích hợp. Bạn có thể dán khóa mặc định, hoặc tạo khóa mới với phạm vi 'ha-*'."
+          "integration_key": "Mở ứng dụng PushWard > Cài đặt > Khóa tích hợp. Bạn có thể dán khóa mặc định, hoặc tạo khóa mới với phạm vi 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "Khóa Tích Hợp"
         },
         "data_description": {
-          "integration_key": "Tạo trong ứng dụng PushWard iOS tại Cài đặt → Khóa Tích Hợp với phạm vi 'ha-*'."
+          "integration_key": "Tạo trong ứng dụng PushWard tại Cài đặt > Khóa tích hợp với phạm vi 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "Khóa Tích Hợp"
         },
         "data_description": {
-          "integration_key": "Tạo trong ứng dụng PushWard iOS tại Cài đặt → Khóa Tích Hợp với phạm vi 'ha-*'."
+          "integration_key": "Tạo trong ứng dụng PushWard tại Cài đặt > Khóa tích hợp với phạm vi 'ha-*'."
         }
       }
     },
@@ -2055,8 +2087,8 @@
             "series_entities": "Thực thể chuỗi dữ liệu",
             "completion_message": "Thông Báo Hoàn Thành",
             "warning_threshold": "Ngưỡng Cảnh Báo",
-            "alarm": "Chuông Báo",
-            "snooze_seconds": "Số giây hoãn (iOS 26+)",
+            "alarm": "Báo thức",
+            "snooze_seconds": "Số giây hoãn",
             "tiles": "Ô board",
             "log_columns": "Cột nhật ký"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "Gắn các thực thể riêng biệt thành các đường có tên trên một biểu đồ (ví dụ: một cảm biến PM2.5 cho mỗi phòng): mỗi hàng gồm một nhãn, một thực thể và một thuộc tính tùy chọn. Nhãn mặc định là tên thân thiện của thực thể; để trống thuộc tính để vẽ trạng thái của thực thể. Kết hợp được với Chuỗi dữ liệu; tối đa 10 đường tổng cộng. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy.",
             "completion_message": "Văn bản hiển thị khi hoạt động kết thúc. Để trống cho 'Hoàn thành'. Ví dụ: Giặt Xong",
             "warning_threshold": "Khi đạt hoặc vượt giá trị này, màu cảnh báo được kích hoạt. Mẫu gauge và timeline.",
-            "alarm": "Kích hoạt chuông báo AlarmKit khi vượt ngưỡng cảnh báo. Chỉ dành cho iOS 26+.",
-            "snooze_seconds": "Khoảng thời gian nút Hoãn trên iOS kéo dài đếm ngược (60–3600). Để trống để dùng mặc định 300s (5 phút). Yêu cầu Báo thức. Chỉ mẫu đếm ngược.",
+            "alarm": "Đổ chuông báo thức trên thiết bị khi đếm ngược kết thúc. Trên iPhone cần iOS 26 trở lên; trên Android ứng dụng cần quyền Chuông báo và lời nhắc. Chỉ mẫu countdown.",
+            "snooze_seconds": "Khoảng thời gian nút Hoãn của báo thức kéo dài đếm ngược (60-3600). Để trống để dùng mặc định 300s (5 phút). Yêu cầu Báo thức. Chỉ mẫu countdown.",
             "tiles": "Tối đa 4 ô, mỗi ô đọc một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính, đơn vị, biểu tượng, màu và URL khi chạm. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Chỉ dành cho mẫu board.",
             "log_columns": "Các giá trị bổ sung được thêm vào mỗi dòng nhật ký (tối đa 6): mỗi hàng gồm một nhãn, một thực thể, một thuộc tính và một đơn vị. Thuộc tính không có thực thể sẽ đọc thực thể này; thực thể không có thuộc tính sẽ đọc trạng thái của nó; cả hai sẽ đọc thuộc tính của thực thể đó. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Chỉ dành cho mẫu nhật ký."
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "ThumbHash của ảnh"
               },
               "data_description": {
-                "image_url": "URL https của hình hiển thị bên cạnh biểu tượng. iPhone tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị.",
+                "image_url": "URL https của hình hiển thị bên cạnh biểu tượng. Điện thoại tự tải hình này nên URL phải truy cập được từ internet; địa chỉ trong mạng nội bộ sẽ không tải được, nhưng ThumbHash của nó thì vẫn hiển thị.",
                 "image_shape": "Cách cắt ảnh: poster giữ khung dọc, square là mặc định, circle cắt tròn.",
                 "image_thumbhash": "Bản xem trước mờ nhúng sẵn, được vẽ khi không tải được URL, và là lớp duy nhất hiển thị cho ảnh trong mạng nội bộ. Để trống để tự động tính từ URL, hoặc dùng hành động Generate ThumbHash để tạo từ bất kỳ ảnh nào Home Assistant đọc được."
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "Mã định danh duy nhất cho hoạt động này. Để trống để tự tạo từ ID thực thể. Ví dụ: ha-living-room-lamp",
-                "activity_name": "Tên hiển thị trên iPhone Live Activity. Mặc định là tên thân thiện của thực thể.",
+                "activity_name": "Tên hiển thị trên hoạt động trên điện thoại của bạn. Mặc định là tên thân thiện của thực thể.",
                 "icon": "Ghi đè biểu tượng. Để trống để dùng biểu tượng gốc của thực thể (ví dụ: mdi:thermometer). Cũng hỗ trợ SF Symbols (ví dụ: lamp.desk.fill).",
                 "icon_attribute": "Thuộc tính thực thể cho biểu tượng động. Ghi đè biểu tượng tĩnh và biểu tượng thực thể khi được đặt.",
                 "priority": "Hoạt động có mức ưu tiên cao hơn được giữ lâu hơn khi đạt giới hạn thiết bị (0 = thấp nhất, 10 = cao nhất).",
                 "sound": "Tên âm thanh thông báo cho bản cập nhật này. Để trống để dùng âm thanh hệ thống iOS.",
                 "update_interval": "Số giây tối thiểu giữa các lần cập nhật. Các thay đổi trạng thái nhanh sẽ bị giới hạn tốc độ.",
                 "state_labels": "Văn bản hiển thị tùy chỉnh cho các trạng thái. Mỗi trạng thái một hàng: giá trị trạng thái và nhãn hiển thị. Ví dụ: heating và Đang Sưởi. Chuỗi cũ state=Label, state2=Label 2 vẫn được chấp nhận.",
-                "compact_label": "Tối đa 4 ký tự hiển thị ở phần đầu của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mặc định của mẫu (biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian). Chế độ hiển thị tối giản bỏ qua giá trị này. Để trống để giữ nội dung riêng của mẫu.",
+                "compact_label": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái. Để trống để giữ nội dung riêng của mẫu.",
                 "compact_trailing_label": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Để trống để giữ nội dung riêng của mẫu. Cần PushWard 1.19.1 trở lên.",
                 "compact_trailing_icon": "Biểu tượng hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Cả biểu tượng MDI (ví dụ: mdi:airplane-takeoff) và SF Symbols (ví dụ: airplane.departure) đều dùng được. Bị bỏ qua khi đã đặt nhãn cuối Island. Để trống để giữ nội dung riêng của mẫu. Cần PushWard 1.19.1 trở lên."
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "Nút luồng"
           },
           "data_description": {
-            "widget_name": "Tên hiển thị trong bộ chọn widget trên iOS. Mặc định là tên thân thiện của thực thể.",
+            "widget_name": "Tên hiển thị trong trình chọn widget trên điện thoại của bạn. Mặc định là tên thân thiện của thực thể.",
             "value_attribute": "Thuộc tính của thực thể chứa giá trị. Để trống để dùng trạng thái chính của thực thể.",
             "unit": "Đơn vị hiển thị bên cạnh giá trị. Tối đa 32 ký tự.",
             "value_scale": "Cách đọc giá trị tiến độ. auto coi đơn vị % hoặc bất kỳ giá trị nào trên 1 là percent, và mọi thứ khác là phân số 0.0-1.0 (fraction). Chọn percent hoặc fraction để ghi đè. Chỉ dành cho mẫu progress.",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "Đã đạt giới hạn thông báo của {account}",
-      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} thông báo cho kỳ hiện tại, nên các thông báo mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} thông báo cho kỳ hiện tại, nên các thông báo mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard để tăng giới hạn."
     },
     "usage_limit_live_activity": {
       "title": "Đã đạt giới hạn cập nhật Live Activity của {account}",
-      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật Live Activity cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật Live Activity cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard để tăng giới hạn."
     },
     "usage_limit_widgets": {
       "title": "Đã đạt giới hạn cập nhật widget của {account}",
-      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật widget cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} cập nhật widget cho kỳ hiện tại, nên các cập nhật mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard để tăng giới hạn."
     },
     "usage_limit_emails": {
       "title": "Đã đạt giới hạn email của {account}",
-      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} email cho kỳ hiện tại, nên các email mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard trên iOS để tăng giới hạn."
+      "description": "Tài khoản PushWard của bạn đã dùng {used} trên {limit} email cho kỳ hiện tại, nên các email mới sẽ bị từ chối cho đến khi hạn mức đặt lại ({resets_at}). Nâng cấp gói đăng ký trong ứng dụng PushWard để tăng giới hạn."
     },
     "todo_e2e_unavailable": {
       "title": "Lời nhắc việc cần làm của {account} không được gửi",

@@ -20,6 +20,11 @@
           "premium": "高级"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "推送通知"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "闹钟",
-          "description": "在倒计时到期时触发 AlarmKit 闹钟（iOS 26+，仅适用于 countdown 模板）。"
+          "description": "倒计时到期时在设备上响起闹钟。仅适用于 countdown 模板。iPhone 上需要 iOS 26 或更高版本；Android 上应用需要闹钟和提醒权限。"
         },
         "snooze_seconds": {
           "name": "稍后提醒秒数",
-          "description": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。默认为 300（5 分钟）。需要启用闹钟（仅限 iOS 26+，countdown 模板）。"
+          "description": "闹钟的稍后提醒按钮延长倒计时的时长（60-3600）。默认为 300（5 分钟）。需要启用闹钟（仅限 countdown 模板）。"
         },
         "step_labels": {
           "name": "步骤标签",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "图片 URL",
-          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+          "description": "显示在图标旁边的图片的 https 地址。手机会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
         },
         "image_shape": {
           "name": "图片形状",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "图片 URL",
-          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+          "description": "显示在图标旁边的图片的 https 地址。手机会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
         },
         "image_shape": {
           "name": "图片形状",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "闹钟",
-          "description": "在倒计时到期时触发 AlarmKit 闹钟（iOS 26+，仅适用于 countdown 模板）。"
+          "description": "倒计时到期时在设备上响起闹钟。仅适用于 countdown 模板。iPhone 上需要 iOS 26 或更高版本；Android 上应用需要闹钟和提醒权限。"
         },
         "snooze_seconds": {
           "name": "稍后提醒秒数",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "闹钟的稍后提醒按钮延长倒计时的时长（60-3600）。默认为 300（5 分钟）。需要启用闹钟（仅限 countdown 模板）。"
         },
         "direction": {
           "name": "方向",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "图片 URL",
-          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+          "description": "显示在图标旁边的图片的 https 地址。手机会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
         },
         "image_shape": {
           "name": "图片形状",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "图片 URL",
-          "description": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
+          "description": "显示在图标旁边的图片的 https 地址。手机会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。"
         },
         "image_shape": {
           "name": "图片形状",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "灵动岛标签",
-          "description": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。"
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
         },
         "compact_trailing_label": {
           "name": "灵动岛尾端标签",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "图片 URL",
-          "description": "图片的 http 或 https 地址。只要 Home Assistant 能访问即可，包括 iPhone 看不到的局域网摄像头。"
+          "description": "图片的 http 或 https 地址。只要 Home Assistant 能访问即可，包括手机无法访问的局域网摄像头。"
         },
         "image_path": {
           "name": "图片路径",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "刷新小组件",
-      "description": "强制刷新已追踪的 PushWard 小组件。绕过内存中的差异缓存，即使值未改变也会重新渲染小组件并推送到 iOS。",
+      "description": "强制刷新已追踪的 PushWard 小组件。绕过内存中的差异缓存，即使值未改变也会重新渲染小组件并推送到你的设备。",
       "fields": {
         "config_entry_id": {
           "name": "账户",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "级别",
-          "description": "iOS 打扰级别，控制通知的发送方式。"
+          "description": "打扰级别，控制通知的发送方式。在 Android 上，critical 需要在 PushWard 应用中授予勿扰权限。"
         },
         "volume": {
           "name": "音量",
-          "description": "critical 级别通知的音量（0.0-1.0）。仅在 level 为 critical 时使用。"
+          "description": "严重警报的音量（0.0-1.0）。仅在 level 为 critical 时使用。在 Android 上会被忽略。"
         },
         "thread_id": {
           "name": "线程 ID",
-          "description": "在通知中心将通知分组在一起。"
+          "description": "在设备上将通知分组。"
         },
         "collapse_id": {
           "name": "折叠 ID",
-          "description": "APNs 去重键，用相同键替换之前的通知。"
+          "description": "去重键。替换具有相同键的上一条通知。"
         },
         "source": {
           "name": "来源",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "推送",
-          "description": "作为 APNs 推送 alert 发送到所有设备。为 false 时，通知仅存储在收件箱中。"
+          "description": "作为推送提醒发送到所有设备。为 false 时，通知仅存储在收件箱中。"
         },
         "url": {
           "name": "URL",
-          "description": "点击通知时打开的 URL。"
+          "description": "点按通知时打开的 URL。像 /lovelace/kitchen 这样的路径会通过 Home Assistant 的外部 URL 打开。"
         },
         "media": {
           "name": "媒体",
-          "description": "媒体附件，为一个包含 `url`（HTTPS）和 `type`（image、video 或 audio）的对象。"
+          "description": "媒体附件，为一个包含 `url`（HTTPS）和 `type`（image、video 或 audio）的对象。Android 在通知栏中只显示图片。"
         },
         "icon_url": {
           "name": "图标 URL",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "动作",
-          "description": "动作按钮列表。每个动作是一个对象，包含 id、title、可选的 url、foreground、destructive、authentication_required 和 icon。对于 http(s) URL，还可通过 method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers 和 body 发送静默 webhook。省略 url（及 foreground）时，PushWard 会自行记录点击，可用 get_notification_answer 读取。在静默动作上设置 text_input: true 可请求输入回复（可选 text_input_placeholder 和 text_input_button_title）：没有 url 时由 PushWard 记录回复，有 http(s) URL 时回复会以带 text 字段的 JSON 发送到你的 webhook。若要改为嵌入 body，请使用 {{input}} 占位符，并在自动化中用 Jinja raw 块包裹 body，以免 Home Assistant 在动作发送前就将其渲染掉。"
+          "description": "动作按钮列表。每个动作是一个对象，包含 id、title、可选的 url、foreground、destructive、authentication_required 和 icon。路径形式的 url（如 /lovelace/kitchen）会通过 Home Assistant 的外部 URL 打开。Android 在通知栏中显示前 3 个按钮，在应用中显示全部按钮。对于 http(s) URL，还可通过 method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers 和 body 发送静默 webhook。省略 url（及 foreground）时，PushWard 会自行记录点击，可用 get_notification_answer 读取，或以 pushward_notification_action 事件作为触发器。在静默动作上设置 text_input: true 可请求输入回复（可选 text_input_placeholder 和 text_input_button_title）：没有 url 时由 PushWard 记录回复，有 http(s) URL 时回复会以带 text 字段的 JSON 发送到你的 webhook。若要改为嵌入 body，请使用 {{input}} 占位符，并在自动化中用 Jinja raw 块包裹 body，以免 Home Assistant 在动作发送前就将其渲染掉。"
         },
         "send_at": {
           "name": "发送时间",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "回调 URL",
           "description": "公开的 https URL，通知被确认或过期后，PushWard 会以 POST 将回执发送到该地址，并使用由集成密钥派生的密钥签名。本地地址会被拒绝，因此 Home Assistant webhook 需要使用其 Home Assistant Cloud URL 或其他公开 URL。需要启用确认。"
+        },
+        "snooze": {
+          "name": "稍后提醒",
+          "description": "最多 3 个稍后提醒按钮，每个按钮的分钟数各不相同，取值 1 到 1440。点按其中一个会隐藏通知，并在该时间之后于该设备上再次显示。不能与确认字段同时使用，且与动作合计最多 10 个按钮。"
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "撤回通知",
+      "description": "撤回带有 collapse_id 发送的通知。每台设备都会将其从视图中移除，并在 PushWard 应用中标为已读；该账户或组织中带有此 collapse_id 的需确认通知将停止重复，无论是哪个集成密钥发送的（如果组织密钥仅限于某些分组或标签，则只包括该密钥发送的通知）。尽力而为，类似 Companion 应用的 clear_notification。可选的响应中包含请求发送到的设备数量（devices）。",
+      "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则在添加到 Home Assistant 的每个 PushWard 账户上撤回。"
+        },
+        "collapse_id": {
+          "name": "折叠 ID",
+          "description": "发送通知时使用的 collapse_id，最多 64 个字符。"
+        }
+      }
+    },
     "send_email": {
       "name": "发送邮件",
       "description": "通过 PushWard 发送事务性邮件。可提供纯文本正文、HTML 正文或两者。集成密钥需要具备“emails”权限。",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "收件人",
-          "description": "收件人邮箱地址。必须是你已在 PushWard iOS 应用中添加并确认过的地址——未验证的地址会被拒绝。"
+          "description": "收件人邮箱地址。必须是你已在 PushWard 应用中添加并确认过的地址；未验证的地址会被拒绝。"
         },
         "subject": {
           "name": "主题",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "没有已加载的 PushWard 账户的配置条目 ID 为 {config_entry_id}。"
+    },
+    "external_url_required": {
+      "message": "{path} 是 Home Assistant 路径，手机只能通过 Home Assistant 的外部 URL 打开它。请在设置 > 系统 > 网络中设置互联网 URL，或连接 Home Assistant Cloud，或者改为发送完整的 URL。"
+    },
+    "ha_path_invalid": {
+      "message": "{url} 不是有效的 URL：{error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} 是静默请求，手机只会通过 https 发送，而 Home Assistant 的外部 URL 是 http。请在设置 > 系统 > 网络中设置 https 互联网 URL，或连接 Home Assistant Cloud，或者改为发送完整的 https URL。"
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "连接到 PushWard",
-        "description": "输入你的 PushWard 集成密钥以开始使用。可从 App Store 获取 PushWard iOS 应用：{app_store_url}",
+        "description": "输入你的 PushWard 集成密钥以开始使用。可从 App Store（{app_store_url}）或 Google Play（{play_store_url}）获取 PushWard 应用。",
         "data": {
           "integration_key": "集成密钥"
         },
         "data_description": {
-          "integration_key": "打开 PushWard iOS 应用（App Store：{app_store_url}）→ 设置 → 集成密钥。你可以粘贴默认密钥，或创建一个作用域为 'ha-*' 的新密钥。"
+          "integration_key": "打开 PushWard 应用 > 设置 > 集成密钥。你可以粘贴默认密钥，或创建一个作用域为 'ha-*' 的新密钥。"
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "集成密钥"
         },
         "data_description": {
-          "integration_key": "在 PushWard iOS 应用中，前往设置 → 集成密钥，创建范围为 'ha-*' 的密钥。"
+          "integration_key": "在 PushWard 应用中，前往设置 > 集成密钥，创建作用域为 'ha-*' 的密钥。"
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "集成密钥"
         },
         "data_description": {
-          "integration_key": "在 PushWard iOS 应用中，前往设置 → 集成密钥，创建范围为 'ha-*' 的密钥。"
+          "integration_key": "在 PushWard 应用中，前往设置 > 集成密钥，创建作用域为 'ha-*' 的密钥。"
         }
       }
     },
@@ -2055,8 +2087,8 @@
             "series_entities": "系列实体",
             "completion_message": "完成消息",
             "warning_threshold": "警告阈值（秒）",
-            "alarm": "闹钟（iOS 26+）",
-            "snooze_seconds": "稍后提醒秒数（iOS 26+）",
+            "alarm": "闹钟",
+            "snooze_seconds": "稍后提醒秒数",
             "tiles": "board 磁贴",
             "log_columns": "日志列"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "将独立的实体绑定为同一图表上的命名线条（例如每个房间一个 PM2.5 传感器）：每行包含标签、实体和可选的属性。标签默认使用实体的友好名称；将属性留空则绘制实体的状态。可与系列组合使用；总计最多 10 条线。仍支持以逗号分隔的字符串。",
             "completion_message": "活动结束时显示的文本。留空则显示\"完成\"。示例：洗涤完毕",
             "warning_threshold": "倒计时结束前服务器发送警告推送的秒数。留空则禁用。仅适用于 countdown 模板。",
-            "alarm": "倒计时到期时触发 AlarmKit 闹钟（iOS 26+）。仅适用于 countdown 模板。",
-            "snooze_seconds": "iOS 稍后提醒按钮延长倒计时的时长（60–3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
+            "alarm": "倒计时到期时在设备上响起闹钟。iPhone 上需要 iOS 26 或更高版本；Android 上应用需要闹钟和提醒权限。仅适用于 countdown 模板。",
+            "snooze_seconds": "闹钟的稍后提醒按钮延长倒计时的时长（60-3600）。留空则使用 300 秒（5 分钟）默认值。需要启用闹钟。仅限 countdown 模板。",
             "tiles": "最多 4 个磁贴，每个读取一个单独的实体：标签、实体，以及可选的属性、单位、图标、颜色和点按 URL。仍支持以逗号分隔的字符串。仅用于 board 模板。",
             "log_columns": "追加到每条日志行的额外值（最多 6 个）：每行包含标签、实体、属性和单位。没有实体的属性读取此实体；没有属性的实体读取其状态；两者都设置则读取该实体的属性。仍支持以逗号分隔的字符串。仅限日志模板。"
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "图片 ThumbHash"
               },
               "data_description": {
-                "image_url": "显示在图标旁边的图片的 https 地址。iPhone 会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。",
+                "image_url": "显示在图标旁边的图片的 https 地址。手机会自行下载，因此该地址必须可从公网访问；局域网地址无法加载，但它的 ThumbHash 仍会显示。",
                 "image_shape": "图片的裁剪方式：poster 保留竖版裁剪，square 为默认值，circle 裁剪为圆形。",
                 "image_thumbhash": "无法获取 URL 时绘制的内嵌模糊预览，也是局域网图片唯一能显示的层级。留空可自动根据 URL 计算，或使用 Generate ThumbHash 动作从任意 Home Assistant 能读取的图片生成。"
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "此活动的唯一标识符。留空则自动从实体 ID 生成。示例：ha-living-room-lamp",
-                "activity_name": "在 iPhone Live Activity 上显示的名称。默认使用实体的友好名称。",
+                "activity_name": "在你手机上的活动中显示的名称。默认使用实体的友好名称。",
                 "icon": "覆盖图标。留空则使用实体的原生图标（例如 mdi:thermometer）。也支持 SF Symbols（例如 lamp.desk.fill）。",
                 "icon_attribute": "动态图标的实体属性。设置后将覆盖静态图标和实体图标。",
                 "priority": "当设备达到上限时，优先级较高的活动会保留更长时间（0 = 最低，10 = 最高）。",
                 "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
                 "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
                 "state_labels": "状态的自定义显示文本。每个状态一行：状态值和要显示的标签。示例：heating 和 加热中。仍接受旧的 state=标签, state2=标签2 字符串。",
-                "compact_label": "在灵动岛紧凑视图的前端区域中代替模板默认内容（图标、步骤环或时间线的最高/最低堆叠）显示的最多 4 个字符。最小视图会忽略它。留空则保留模板自身的内容。",
+                "compact_label": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。留空则保留模板自身的内容。",
                 "compact_trailing_label": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。留空则保留模板自身的内容。需要 PushWard 1.19.1 或更高版本。",
                 "compact_trailing_icon": "显示在灵动岛紧凑视图的尾端区域中的图标，代替模板在此处显示的内容，并以强调色着色。MDI 图标（例如 mdi:airplane-takeoff）和 SF Symbols（例如 airplane.departure）均可使用。设置了灵动岛尾端标签时会被忽略。留空则保留模板自身的内容。需要 PushWard 1.19.1 或更高版本。"
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "流向节点"
           },
           "data_description": {
-            "widget_name": "在 iOS 小组件选择器中显示的名称。默认使用实体的友好名称。",
+            "widget_name": "在你手机上的小组件选择器中显示的名称。默认使用实体的友好名称。",
             "value_attribute": "持有数值的实体属性。留空则使用实体的主状态。",
             "unit": "显示在数值旁边的单位。最多 32 个字符。",
             "value_scale": "如何解读进度值。auto 会将 % 单位或大于 1 的值视为 percent，其余视为 0.0-1.0 的 fraction。选择 percent 或 fraction 可覆盖此行为。仅适用于 progress 模板。",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "已达到 {account} 通知上限",
-      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 条通知中的 {used} 条，因此在配额重置（{resets_at}）之前，新通知将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 条通知中的 {used} 条，因此在配额重置（{resets_at}）之前，新通知将被拒绝。请在 PushWard 应用中升级订阅以提高上限。"
     },
     "usage_limit_live_activity": {
       "title": "已达到 {account} Live Activity 更新上限",
-      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次 Live Activity 更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次 Live Activity 更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard 应用中升级订阅以提高上限。"
     },
     "usage_limit_widgets": {
       "title": "已达到 {account} 小组件更新上限",
-      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次小组件更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 次小组件更新中的 {used} 次，因此在配额重置（{resets_at}）之前，新更新将被拒绝。请在 PushWard 应用中升级订阅以提高上限。"
     },
     "usage_limit_emails": {
       "title": "已达到 {account} 邮件上限",
-      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 封邮件中的 {used} 封，因此在配额重置（{resets_at}）之前，新邮件将被拒绝。请在 PushWard iOS 应用中升级订阅以提高上限。"
+      "description": "你的 PushWard 账户在当前周期内已使用 {limit} 封邮件中的 {used} 封，因此在配额重置（{resets_at}）之前，新邮件将被拒绝。请在 PushWard 应用中升级订阅以提高上限。"
     },
     "todo_e2e_unavailable": {
       "title": "{account} 待办事项提醒未能发送",

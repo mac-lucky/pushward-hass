@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Powiadomienie push"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "Alarm",
-          "description": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+, tylko szablon countdown)."
+          "description": "Włącz alarm na urządzeniu po upływie odliczania. Tylko szablon odliczania. Na iPhonie wymaga iOS 26 lub nowszego; na Androidzie aplikacja potrzebuje uprawnienia Alarmy i przypomnienia."
         },
         "snooze_seconds": {
           "name": "Sekundy drzemki",
-          "description": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Domyślnie 300 (5 min). Wymaga alarmu (iOS 26+, tylko szablon odliczania)."
+          "description": "Jak długo przycisk drzemki alarmu wydłuża odliczanie (60-3600). Domyślnie 300 (5 min). Wymaga alarmu (tylko szablon odliczania)."
         },
         "step_labels": {
           "name": "Etykiety kroków",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "URL obrazu",
-          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+          "description": "Adres https obrazu wyświetlanego obok ikony. Telefon pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
         },
         "image_shape": {
           "name": "Kształt obrazu",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "URL obrazu",
-          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+          "description": "Adres https obrazu wyświetlanego obok ikony. Telefon pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
         },
         "image_shape": {
           "name": "Kształt obrazu",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "Alarm",
-          "description": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+, tylko szablon countdown)."
+          "description": "Włącz alarm na urządzeniu po upływie odliczania. Tylko szablon odliczania. Na iPhonie wymaga iOS 26 lub nowszego; na Androidzie aplikacja potrzebuje uprawnienia Alarmy i przypomnienia."
         },
         "snooze_seconds": {
           "name": "Sekundy drzemki",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "Jak długo przycisk drzemki alarmu wydłuża odliczanie (60-3600). Domyślnie 300 (5 min). Wymaga alarmu (tylko szablon odliczania)."
         },
         "direction": {
           "name": "Kierunek",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "URL obrazu",
-          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+          "description": "Adres https obrazu wyświetlanego obok ikony. Telefon pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
         },
         "image_shape": {
           "name": "Kształt obrazu",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "URL obrazu",
-          "description": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
+          "description": "Adres https obrazu wyświetlanego obok ikony. Telefon pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem."
         },
         "image_shape": {
           "name": "Kształt obrazu",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Etykieta Island",
-          "description": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje."
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
         },
         "compact_trailing_label": {
           "name": "Tylna etykieta Island",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "URL obrazu",
-          "description": "Adres http lub https obrazu. Zadziała wszystko, co osiągnie Home Assistant, w tym kamera w sieci lokalnej, której iPhone nie widzi."
+          "description": "Adres http lub https obrazu. Zadziała wszystko, co osiągnie Home Assistant, w tym kamera w sieci lokalnej, której telefon nie widzi."
         },
         "image_path": {
           "name": "Ścieżka do obrazu",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "Odśwież widżet",
-      "description": "Wymuś odświeżenie śledzonego widżetu PushWard. Pomija pamięć podręczną różnic, dzięki czemu widżet jest ponownie renderowany i wysyłany do iOS, nawet gdy wartość się nie zmieniła.",
+      "description": "Wymuś odświeżenie śledzonego widżetu PushWard. Pomija pamięć podręczną różnic, dzięki czemu widżet jest ponownie renderowany i wysyłany na Twoje urządzenia, nawet gdy wartość się nie zmieniła.",
       "fields": {
         "config_entry_id": {
           "name": "Konto",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "Poziom",
-          "description": "Poziom przerywania iOS. Kontroluje sposób dostarczenia powiadomienia."
+          "description": "Poziom przerywania. Kontroluje sposób dostarczenia powiadomienia. Na Androidzie critical wymaga dostępu do trybu Nie przeszkadzać, przyznanego w aplikacji PushWard."
         },
         "volume": {
           "name": "Głośność",
-          "description": "Głośność dźwięku dla alertów krytycznych (0.0-1.0). Używana tylko, gdy level to critical."
+          "description": "Głośność dźwięku dla alertów krytycznych (0.0-1.0). Używana tylko, gdy level to critical. Ignorowana na Androidzie."
         },
         "thread_id": {
           "name": "ID wątku",
-          "description": "Grupuje powiadomienia razem w Centrum powiadomień."
+          "description": "Grupuje powiadomienia razem na urządzeniu."
         },
         "collapse_id": {
           "name": "ID łączenia",
-          "description": "Klucz deduplikacji APNs. Zastępuje poprzednie powiadomienie z tym samym kluczem."
+          "description": "Klucz deduplikacji. Zastępuje poprzednie powiadomienie z tym samym kluczem."
         },
         "source": {
           "name": "Źródło",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "Push",
-          "description": "Wyślij jako alert push APNs na wszystkie urządzenia. Gdy wyłączone, powiadomienie jest zapisywane tylko w skrzynce."
+          "description": "Wyślij jako alert push na wszystkie urządzenia. Gdy wyłączone, powiadomienie jest zapisywane tylko w skrzynce."
         },
         "url": {
           "name": "URL",
-          "description": "Adres URL otwierany po dotknięciu powiadomienia."
+          "description": "Adres URL otwierany po dotknięciu powiadomienia. Ścieżka taka jak /lovelace/kitchen otwiera się pod zewnętrznym adresem URL Home Assistant."
         },
         "media": {
           "name": "Multimedia",
-          "description": "Załącznik multimedialny jako obiekt z `url` (HTTPS) i `type` (image, video lub audio)."
+          "description": "Załącznik multimedialny jako obiekt z `url` (HTTPS) i `type` (image, video lub audio). Android pokazuje w obszarze powiadomień tylko obrazy."
         },
         "icon_url": {
           "name": "URL ikony",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "Akcje",
-          "description": "Lista przycisków akcji. Każda akcja to obiekt z id, title, opcjonalnym url, foreground, destructive, authentication_required oraz icon. Dla adresu http(s) możesz też wysłać cichy webhook z method (GET/POST/PUT/PATCH/DELETE/HEAD), headers i body. Pomiń url (i foreground), a PushWard sam zapisze dotknięcie; odczytasz je przez get_notification_answer. Ustaw text_input: true w cichej akcji, aby poprosić o wpisaną odpowiedź (opcjonalnie text_input_placeholder i text_input_button_title): bez url PushWard zapisuje odpowiedź, a z adresem http(s) trafia ona do Twojego webhooka jako JSON z polem text. Aby zamiast tego wstawić ją do body, użyj symbolu zastępczego {{input}} i otocz body blokiem raw Jinja w swojej automatyzacji, żeby Home Assistant nie przetworzył go przed wysłaniem akcji."
+          "description": "Lista przycisków akcji. Każda akcja to obiekt z id, title, opcjonalnym url, foreground, destructive, authentication_required oraz icon. url będący ścieżką, np. /lovelace/kitchen, otwiera się pod zewnętrznym adresem URL Home Assistant. Android pokazuje pierwsze 3 przyciski w obszarze powiadomień, a wszystkie w aplikacji. Dla adresu http(s) możesz też wysłać cichy webhook z method (GET/POST/PUT/PATCH/DELETE/HEAD), headers i body. Pomiń url (i foreground), a PushWard sam zapisze dotknięcie; odczytasz je przez get_notification_answer albo uruchomisz automatyzację zdarzeniem pushward_notification_action. Ustaw text_input: true w cichej akcji, aby poprosić o wpisaną odpowiedź (opcjonalnie text_input_placeholder i text_input_button_title): bez url PushWard zapisuje odpowiedź, a z adresem http(s) trafia ona do Twojego webhooka jako JSON z polem text. Aby zamiast tego wstawić ją do body, użyj symbolu zastępczego {{input}} i otocz body blokiem raw Jinja w swojej automatyzacji, żeby Home Assistant nie przetworzył go przed wysłaniem akcji."
         },
         "send_at": {
           "name": "Czas wysłania",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "Callback URL",
           "description": "Publiczny adres https, na który PushWard wysyła potwierdzenie odbioru przez POST, gdy powiadomienie zostanie potwierdzone lub wygaśnie, podpisane sekretem wyprowadzonym z klucza integracji. Adresy lokalne są odrzucane, więc webhook Home Assistant wymaga adresu Home Assistant Cloud lub innego publicznego adresu. Wymaga Potwierdź."
+        },
+        "snooze": {
+          "name": "Drzemka",
+          "description": "Do 3 przycisków drzemki, każdy z inną liczbą minut od 1 do 1440. Dotknięcie jednego ukrywa powiadomienie i pokazuje je ponownie na tym urządzeniu po tym czasie. Nie razem z Potwierdź, a razem z akcjami najwyżej 10 przycisków."
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "Wycofaj powiadomienie",
+      "description": "Wycofaj powiadomienia wysłane z collapse_id. Każde urządzenie usuwa je z widoku i oznacza jako przeczytane w aplikacji PushWard, a potwierdzane powiadomienia konta lub organizacji z tym collapse_id przestają się powtarzać, niezależnie od tego, który klucz integracji je wysłał (przy kluczu organizacji ograniczonym do grup lub tagów tylko te wysłane tym kluczem). Bez gwarancji, jak clear_notification w aplikacji Companion. Opcjonalna odpowiedź zawiera, do ilu urządzeń wysłano żądanie (devices).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Konto PushWard do użycia. Zostaw puste, aby wycofać na każdym koncie PushWard dodanym do Home Assistant."
+        },
+        "collapse_id": {
+          "name": "ID łączenia",
+          "description": "collapse_id, z którym wysłano powiadomienia, do 64 znaków."
+        }
+      }
+    },
     "send_email": {
       "name": "Wyślij e-mail",
       "description": "Wyślij e-mail transakcyjny przez PushWard. Podaj treść tekstową, treść HTML lub obie. Klucz integracji wymaga uprawnienia „emails”.",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "Do",
-          "description": "Adres e-mail odbiorcy. Musi to być adres już dodany i potwierdzony w aplikacji PushWard na iOS — niezweryfikowane adresy są odrzucane."
+          "description": "Adres e-mail odbiorcy. Musi to być adres już dodany i potwierdzony w aplikacji PushWard; niezweryfikowane adresy są odrzucane."
         },
         "subject": {
           "name": "Temat",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "Żadne załadowane konto PushWard nie ma identyfikatora wpisu konfiguracji {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "{path} to ścieżka Home Assistant, a telefon może ją otworzyć tylko pod zewnętrznym adresem URL Home Assistant. Ustaw adres URL Internet w Ustawienia > System > Sieć lub połącz Home Assistant Cloud albo zamiast tego wyślij pełny adres URL."
+    },
+    "ha_path_invalid": {
+      "message": "{url} nie jest prawidłowym adresem URL: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} to ciche żądanie, które telefon wysyła tylko przez https, a zewnętrzny adres URL Home Assistant używa http. Ustaw adres URL Internet z https w Ustawienia > System > Sieć lub połącz Home Assistant Cloud albo zamiast tego wyślij pełny adres URL https."
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "Połącz z PushWard",
-        "description": "Wprowadź swój klucz integracji PushWard, aby rozpocząć. Pobierz aplikację PushWard na iOS z App Store: {app_store_url}",
+        "description": "Wprowadź swój klucz integracji PushWard, aby rozpocząć. Pobierz aplikację PushWard z App Store ({app_store_url}) lub Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Klucz integracji"
         },
         "data_description": {
-          "integration_key": "Otwórz aplikację PushWard na iOS (App Store: {app_store_url}) → Ustawienia → Klucze integracji. Możesz wkleić domyślny klucz lub utworzyć nowy z zakresem „ha-*”."
+          "integration_key": "Otwórz aplikację PushWard > Ustawienia > Klucze integracji. Możesz wkleić domyślny klucz lub utworzyć nowy z zakresem 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "Klucz integracji"
         },
         "data_description": {
-          "integration_key": "Utwórz go w aplikacji PushWard na iOS w Ustawienia → Klucze integracji z zakresem 'ha-*'."
+          "integration_key": "Utwórz go w aplikacji PushWard w Ustawienia > Klucze integracji z zakresem 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "Klucz integracji"
         },
         "data_description": {
-          "integration_key": "Utwórz go w aplikacji PushWard na iOS w Ustawienia → Klucze integracji z zakresem 'ha-*'."
+          "integration_key": "Utwórz go w aplikacji PushWard w Ustawienia > Klucze integracji z zakresem 'ha-*'."
         }
       }
     },
@@ -2055,8 +2087,8 @@
             "series_entities": "Encje serii",
             "completion_message": "Komunikat zakończenia",
             "warning_threshold": "Próg ostrzeżenia (sekundy)",
-            "alarm": "Alarm (iOS 26+)",
-            "snooze_seconds": "Sekundy drzemki (iOS 26+)",
+            "alarm": "Alarm",
+            "snooze_seconds": "Sekundy drzemki",
             "tiles": "Kafelki tablicy",
             "log_columns": "Kolumny dziennika"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "Powiąż osobne encje jako nazwane linie na jednym wykresie (np. czujnik PM2.5 dla każdego pokoju): każdy wiersz to etykieta, encja i opcjonalny atrybut. Etykieta domyślnie to przyjazna nazwa encji; pozostaw atrybut pusty, aby pokazać stan encji. Łączy się z Serie; maksymalnie 10 linii łącznie. Nadal akceptowany jest ciąg rozdzielony przecinkami.",
             "completion_message": "Tekst wyświetlany po zakończeniu Live Activity. Pozostaw puste dla 'Zakończono'. Przykład: Pranie zakończone",
             "warning_threshold": "Sekundy przed końcem countdown, w których serwer wysyła ostrzeżenie push. Pozostaw puste, aby wyłączyć. Tylko szablon countdown.",
-            "alarm": "Aktywuj alarm AlarmKit po upływie countdown (iOS 26+). Tylko szablon countdown.",
-            "snooze_seconds": "Jak długo przycisk drzemki w iOS wydłuża odliczanie (60–3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
+            "alarm": "Włącz alarm na urządzeniu po upływie odliczania. Na iPhonie wymaga iOS 26 lub nowszego; na Androidzie aplikacja potrzebuje uprawnienia Alarmy i przypomnienia. Tylko szablon odliczania.",
+            "snooze_seconds": "Jak długo przycisk drzemki alarmu wydłuża odliczanie (60-3600). Pozostaw puste dla domyślnych 300 s (5 min). Wymaga alarmu. Tylko szablon odliczania.",
             "tiles": "Do 4 kafelków, każdy odczytuje osobną encję: etykieta, encja oraz opcjonalnie atrybut, jednostka, ikona, kolor i adres URL po dotknięciu. Nadal akceptowany jest ciąg rozdzielony przecinkami. Tylko dla szablonu board.",
             "log_columns": "Dodatkowe wartości dołączane do każdego wiersza dziennika (maks. 6): każdy wiersz to etykieta, encja, atrybut i jednostka. Atrybut bez encji odczytuje tę encję; encja bez atrybutu odczytuje jej stan; oba odczytują atrybut tej encji. Nadal akceptowany jest ciąg rozdzielony przecinkami. Tylko szablon dziennika."
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "ThumbHash obrazu"
               },
               "data_description": {
-                "image_url": "Adres https obrazu wyświetlanego obok ikony. iPhone pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem.",
+                "image_url": "Adres https obrazu wyświetlanego obok ikony. Telefon pobiera go samodzielnie, więc musi być osiągalny z internetu; adres w sieci lokalnej się nie wczyta, ale jego ThumbHash owszem.",
                 "image_shape": "Sposób kadrowania obrazu: poster zachowuje kadr pionowy, square jest domyślne, circle przycina do koła.",
                 "image_thumbhash": "Rozmyty podgląd osadzony w aktywności, rysowany gdy nie da się pobrać adresu URL, i jedyna warstwa widoczna dla obrazu z sieci lokalnej. Zostaw puste, aby został wyliczony z adresu URL automatycznie, albo użyj akcji Generate ThumbHash, aby utworzyć go z dowolnego obrazu dostępnego dla Home Assistant."
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "Unikalny identyfikator dla tego Live Activity. Pozostaw puste, aby wygenerować automatycznie z ID encji. Przykład: ha-living-room-lamp",
-                "activity_name": "Nazwa wyświetlana w Live Activity na iPhonie. Domyślnie przyjazna nazwa encji.",
+                "activity_name": "Nazwa wyświetlana w aktywności na telefonie. Domyślnie przyjazna nazwa encji.",
                 "icon": "Zastąp ikonę. Pozostaw puste, aby użyć natywnej ikony encji (np. mdi:thermometer). Obsługiwane są także SF Symbols (np. lamp.desk.fill).",
                 "icon_attribute": "Atrybut encji dla dynamicznej ikony. Gdy ustawiony, zastępuje ikonę statyczną i ikonę encji.",
                 "priority": "Live Activity o wyższym priorytecie są utrzymywane dłużej, gdy osiągnięto limit urządzenia (0 = najniższy, 10 = najwyższy).",
                 "sound": "Dźwięk odtwarzany przy każdej aktualizacji dla tej encji. Pozostaw puste, aby nie używać żadnego nadpisania.",
                 "update_interval": "Minimalna liczba sekund między aktualizacjami. Szybkie zmiany stanu są ograniczane.",
                 "state_labels": "Własny tekst wyświetlany dla stanów. Jeden wiersz na stan: wartość stanu i etykieta do wyświetlenia. Przykład: heating i Nagrzewanie. Stary ciąg stan=Etykieta, stan2=Etykieta 2 jest nadal akceptowany.",
-                "compact_label": "Do 4 znaków wyświetlanych w przedniej części kompaktowego widoku Dynamic Island zamiast domyślnej zawartości szablonu (ikony, pierścienia kroków lub stosu maks./min. osi czasu). Widok minimalny je ignoruje. Pozostaw puste, aby zachować własną zawartość szablonu.",
+                "compact_label": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu. Pozostaw puste, aby zachować własną zawartość szablonu.",
                 "compact_trailing_label": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Pozostaw puste, aby zachować własną zawartość szablonu. Wymaga PushWard 1.19.1 lub nowszego.",
                 "compact_trailing_icon": "Ikona wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Działają zarówno ikony MDI (np. mdi:airplane-takeoff), jak i SF Symbols (np. airplane.departure). Ignorowana, gdy ustawiono tylną etykietę Island. Pozostaw puste, aby zachować własną zawartość szablonu. Wymaga PushWard 1.19.1 lub nowszego."
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "Węzły przepływu"
           },
           "data_description": {
-            "widget_name": "Nazwa wyświetlana w selektorze widżetów iOS. Domyślnie przyjazna nazwa encji.",
+            "widget_name": "Nazwa wyświetlana w selektorze widżetów na telefonie. Domyślnie przyjazna nazwa encji.",
             "value_attribute": "Atrybut encji przechowujący wartość. Pozostaw puste, aby użyć podstawowego stanu encji.",
             "unit": "Jednostka wyświetlana obok wartości. Maks. 32 znaki.",
             "value_scale": "Jak odczytywać wartość postępu. auto traktuje jednostkę % lub wartość powyżej 1 jako percent, a wszystko inne jako ułamek 0.0-1.0 (fraction). Wybierz percent lub fraction, aby to nadpisać. Tylko szablon progress.",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "Osiągnięto limit powiadomień {account}",
-      "description": "Twoje konto PushWard wykorzystało {used} z {limit} powiadomień w bieżącym okresie, więc nowe powiadomienia będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} powiadomień w bieżącym okresie, więc nowe powiadomienia będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard."
     },
     "usage_limit_live_activity": {
       "title": "Osiągnięto limit aktualizacji Live Activity {account}",
-      "description": "Twoje konto PushWard wykorzystało {used} z {limit} aktualizacji Live Activity w bieżącym okresie, więc nowe aktualizacje będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} aktualizacji Live Activity w bieżącym okresie, więc nowe aktualizacje będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard."
     },
     "usage_limit_widgets": {
       "title": "Osiągnięto limit aktualizacji widżetów {account}",
-      "description": "Twoje konto PushWard wykorzystało {used} z {limit} aktualizacji widżetów w bieżącym okresie, więc nowe aktualizacje będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} aktualizacji widżetów w bieżącym okresie, więc nowe aktualizacje będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard."
     },
     "usage_limit_emails": {
       "title": "Osiągnięto limit e-maili {account}",
-      "description": "Twoje konto PushWard wykorzystało {used} z {limit} e-maili w bieżącym okresie, więc nowe e-maile będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard na iOS."
+      "description": "Twoje konto PushWard wykorzystało {used} z {limit} e-maili w bieżącym okresie, więc nowe e-maile będą odrzucane do czasu zresetowania limitu ({resets_at}). Zwiększ limit, ulepszając subskrypcję w aplikacji PushWard."
     },
     "todo_e2e_unavailable": {
       "title": "Przypomnienia {account} o zadaniach nie są wysyłane",

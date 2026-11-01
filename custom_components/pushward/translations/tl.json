@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Push notification"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "Alarma",
-          "description": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Gumagana lamang sa iOS 26+."
+          "description": "Nagpapatunog ng alarm sa device kapag natapos ang countdown. Countdown template lamang. Kailangan ng iOS 26 o mas bago sa iPhone; sa Android, kailangan ng app ang pahintulot na Mga alarm at paalala."
         },
         "snooze_seconds": {
           "name": "Snooze na Segundo",
-          "description": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Default ay 300 (5 min). Nangangailangan ng alarm (iOS 26+, countdown template lamang)."
+          "description": "Kung gaano katagal pinahahaba ng Snooze button ng alarm ang countdown (60-3600). Default ay 300 (5 min). Nangangailangan ng alarm (countdown template lamang)."
         },
         "step_labels": {
           "name": "Mga Label ng Hakbang",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "URL ng larawan",
-          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong phone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
         },
         "image_shape": {
           "name": "Hugis ng larawan",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "URL ng larawan",
-          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong phone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
         },
         "image_shape": {
           "name": "Hugis ng larawan",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "Alarma",
-          "description": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Gumagana lamang sa iOS 26+."
+          "description": "Nagpapatunog ng alarm sa device kapag natapos ang countdown. Countdown template lamang. Kailangan ng iOS 26 o mas bago sa iPhone; sa Android, kailangan ng app ang pahintulot na Mga alarm at paalala."
         },
         "snooze_seconds": {
           "name": "Snooze na Segundo",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "Kung gaano katagal pinahahaba ng Snooze button ng alarm ang countdown (60-3600). Default ay 300 (5 min). Nangangailangan ng alarm (countdown template lamang)."
         },
         "direction": {
           "name": "Direksyon",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "URL ng larawan",
-          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong phone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
         },
         "image_shape": {
           "name": "Hugis ng larawan",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "URL ng larawan",
-          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
+          "description": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong phone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito."
         },
         "image_shape": {
           "name": "Hugis ng larawan",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Island Label",
-          "description": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon."
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
         },
         "compact_trailing_label": {
           "name": "Likurang Island Label",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "URL ng larawan",
-          "description": "http o https URL ng larawan. Gumagana ang kahit anong maabot ng Home Assistant, kasama ang camera sa lokal na network na hindi nakikita ng iPhone."
+          "description": "http o https URL ng larawan. Gagana ang anumang naaabot ng Home Assistant, kasama ang camera sa lokal na network na hindi nakikita ng phone."
         },
         "image_path": {
           "name": "Path ng larawan",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "I-refresh ang Widget",
-      "description": "Pwersahang i-refresh ang isang na-track na PushWard widget. Nila-laktawan ang in-memory diff cache upang muling ma-render at maipadala sa iOS ang widget kahit hindi nagbago ang halaga.",
+      "description": "Pwersahang i-refresh ang isang na-track na PushWard widget. Nila-laktawan ang in-memory diff cache upang muling ma-render at maipadala sa iyong mga device ang widget kahit hindi nagbago ang halaga.",
       "fields": {
         "config_entry_id": {
           "name": "Account",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "Antas",
-          "description": "Antas ng iOS interruption. Kinokontrol kung paano idine-deliver ang notification."
+          "description": "Antas ng interruption. Kinokontrol kung paano idine-deliver ang notification. Sa Android, kailangan ng critical ang access sa Huwag Istorbohin na ibinigay sa PushWard app."
         },
         "volume": {
           "name": "Volume",
-          "description": "Volume ng tunog para sa critical na alert (0.0-1.0). Ginagamit lamang kapag critical ang level."
+          "description": "Volume ng tunog para sa mga critical alert (0.0-1.0). Ginagamit lang kapag critical ang level. Hindi pinapansin sa Android."
         },
         "thread_id": {
           "name": "Thread ID",
-          "description": "Nagrugrupo ng mga notification sa Notification Center."
+          "description": "Pinagsasama-sama ang mga notification sa device."
         },
         "collapse_id": {
           "name": "Collapse ID",
-          "description": "APNs deduplication key. Pinapalitan ang nakaraang notification na may parehong key."
+          "description": "Deduplication key. Pinapalitan ang naunang notification na may parehong key."
         },
         "source": {
           "name": "Pinagmulan",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "Push",
-          "description": "Ipadala bilang APNs push alert sa lahat ng device. Kapag false, ang notification ay iniimbak lamang sa inbox."
+          "description": "Ipadala bilang push alert sa lahat ng device. Kapag false, sa inbox lang iniimbak ang notification."
         },
         "url": {
           "name": "URL",
-          "description": "URL na bubukas kapag na-tap ang notification. Nangangailangan ng HTTPS."
+          "description": "URL na bubuksan kapag na-tap ang notification. Ang path tulad ng /lovelace/kitchen ay bubukas sa external URL ng Home Assistant."
         },
         "media": {
           "name": "Media",
-          "description": "Media attachment bilang object na may `url` (HTTPS) at `type` (image, video, o audio)."
+          "description": "Media attachment bilang object na may `url` (HTTPS) at `type` (image, video, o audio). Mga larawan lang ang ipinapakita ng Android sa notification shade."
         },
         "icon_url": {
           "name": "URL ng Icon",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "Mga Aksyon",
-          "description": "Listahan ng action buttons. Ang bawat aksyon ay isang object na may id, title, opsyonal na url, foreground, destructive, authentication_required, at icon. Para sa http(s) url, maaari ka ring magpadala ng silent webhook na may method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, at body. Kapag inalis ang url (at foreground), ang PushWard mismo ang magtatala ng tap; basahin ito gamit ang get_notification_answer. Itakda ang text_input: true sa isang silent na aksyon para humingi ng typed reply (opsyonal ang text_input_placeholder at text_input_button_title): kapag walang url, itinatala ng PushWard ang reply, at kapag may http(s) url, ipinapadala ito sa iyong webhook bilang JSON na may text field. Para ilagay ito sa body sa halip, gamitin ang {{input}} placeholder at balutin ang body sa isang Jinja raw block sa iyong automation, para hindi ito i-render ng Home Assistant bago maipadala ang action."
+          "description": "Listahan ng action buttons. Ang bawat aksyon ay isang object na may id, title, opsyonal na url, foreground, destructive, authentication_required, at icon. Ang url na isang path, tulad ng /lovelace/kitchen, ay bubukas sa external URL ng Home Assistant. Ipinapakita ng Android ang unang 3 button sa notification shade at lahat ng ito sa app. Para sa http(s) url, maaari ka ring magpadala ng silent webhook na may method (GET/POST/PUT/PATCH/DELETE/HEAD), headers, at body. Kapag inalis ang url (at foreground), ang PushWard mismo ang magtatala ng tap; basahin ito gamit ang get_notification_answer, o gamitin ang pushward_notification_action event bilang trigger. Itakda ang text_input: true sa isang silent na aksyon para humingi ng typed reply (opsyonal ang text_input_placeholder at text_input_button_title): kapag walang url, itinatala ng PushWard ang reply, at kapag may http(s) url, ipinapadala ito sa iyong webhook bilang JSON na may text field. Para ilagay ito sa body sa halip, gamitin ang {{input}} placeholder at balutin ang body sa isang Jinja raw block sa iyong automation, para hindi ito i-render ng Home Assistant bago maipadala ang action."
         },
         "send_at": {
           "name": "Oras ng pagpapadala",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "Callback URL",
           "description": "Pampublikong https URL kung saan ipinapadala ng PushWard ang resibo gamit ang POST kapag nakumpirma o nag-expire na ang notification, nilagdaan ng sikretong hango sa integration key. Tinatanggihan ang mga lokal na address, kaya kailangan ng Home Assistant webhook ang Home Assistant Cloud URL nito o ibang pampublikong URL. Nangangailangan ng Kumpirmahin."
+        },
+        "snooze": {
+          "name": "Snooze",
+          "description": "Hanggang 3 snooze button, bawat isa ay may ibang bilang ng minuto mula 1 hanggang 1440. Kapag na-tap ang isa, itinatago nito ang notification at ipinapakita itong muli sa device na iyon pagkalipas ng oras na iyon. Hindi kasama ng Kumpirmahin, at kasama ng mga aksyon ay hanggang 10 button lamang."
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "I-clear ang Notification",
+      "description": "Bawiin ang mga notification na ipinadala na may collapse_id. Inaalis ito ng bawat device sa view at minamarkahang nabasa sa PushWard app, at humihinto sa pag-uulit ang mga kinukumpirmang notification ng account o organisasyon na may ganoong collapse_id, alinmang integration key ang nagpadala (sa organization key na limitado sa mga grupo o tag, iyong mga ipinadala lang ng key na iyon). Best effort, tulad ng clear_notification ng Companion app. Nakasaad sa opsyonal na response kung ilang device ang pinadalhan nito (devices).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para mag-clear sa bawat PushWard account na idinagdag sa Home Assistant."
+        },
+        "collapse_id": {
+          "name": "Collapse ID",
+          "description": "Ang collapse_id na ginamit sa pagpapadala ng mga notification, hanggang 64 na character."
+        }
+      }
+    },
     "send_email": {
       "name": "Magpadala ng Email",
       "description": "Magpadala ng transactional na email sa pamamagitan ng PushWard. Magbigay ng text body, HTML body, o pareho. Kailangan ng integration key ang \"emails\" na kakayahan.",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "Tatanggap",
-          "description": "Email address ng tatanggap. Dapat itong isang address na naidagdag at nakumpirma mo na sa PushWard iOS app — tinatanggihan ang mga hindi na-verify na address."
+          "description": "Email address ng tatanggap. Dapat itong isang address na naidagdag at nakumpirma mo na sa PushWard app; tinatanggihan ang mga hindi na-verify na address."
         },
         "subject": {
           "name": "Paksa",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "Walang naka-load na PushWard account na may config entry id na {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "Ang {path} ay isang Home Assistant path, at mabubuksan lang ito ng phone sa external URL ng Home Assistant. Itakda ang Internet URL sa Settings > System > Network o ikonekta ang Home Assistant Cloud, o magpadala na lang ng buong URL."
+    },
+    "ha_path_invalid": {
+      "message": "Ang {url} ay hindi valid na URL: {error}"
+    },
+    "https_external_url_required": {
+      "message": "Ang {path} ay isang silent request, na ipinapadala lang ng phone sa https, at http ang external URL ng Home Assistant. Magtakda ng https Internet URL sa Settings > System > Network o ikonekta ang Home Assistant Cloud, o magpadala na lang ng buong https URL."
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "Kumonekta sa PushWard",
-        "description": "Ilagay ang iyong PushWard integration key upang magsimula. Kunin ang PushWard iOS app mula sa App Store: {app_store_url}",
+        "description": "Ilagay ang iyong PushWard integration key upang magsimula. Kunin ang PushWard app mula sa App Store ({app_store_url}) o Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Buksan ang PushWard iOS app (App Store: {app_store_url}) → Settings → Integration Keys. Maaari mong i-paste ang default key, o gumawa ng bago na may scope na 'ha-*'."
+          "integration_key": "Buksan ang PushWard app > Settings > Integration Keys. Maaari mong i-paste ang default key, o gumawa ng bago na may scope na 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Lumikha ng isa sa PushWard iOS app sa ilalim ng Settings → Integration Keys na may scope na 'ha-*'."
+          "integration_key": "Lumikha ng isa sa PushWard app sa ilalim ng Settings > Integration Keys na may scope na 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "Integration Key"
         },
         "data_description": {
-          "integration_key": "Lumikha ng isa sa PushWard iOS app sa ilalim ng Settings → Integration Keys na may scope na 'ha-*'."
+          "integration_key": "Lumikha ng isa sa PushWard app sa ilalim ng Settings > Integration Keys na may scope na 'ha-*'."
         }
       }
     },
@@ -2055,8 +2087,8 @@
             "series_entities": "Mga Entity ng Serye",
             "completion_message": "Mensahe ng Pagkumpleto",
             "warning_threshold": "Babala na Threshold",
-            "alarm": "Alarma",
-            "snooze_seconds": "Snooze na Segundo (iOS 26+)",
+            "alarm": "Alarm",
+            "snooze_seconds": "Snooze na Segundo",
             "tiles": "Mga Tile ng Board",
             "log_columns": "Mga Column ng Log"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "I-bind ang hiwalay na entity bilang mga pinangalanang linya sa isang chart (hal. isang PM2.5 sensor kada silid): bawat row ay may label, isang entity, at opsyonal na attribute. Ang label ay nagde-default sa friendly name ng entity; iwanang blangko ang attribute para ipakita ang estado ng entity. Pinagsasama sa Serye; hanggang 10 linya sa kabuuan. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit.",
             "completion_message": "Tekstong ipinapakita kapag natapos ang activity. Iwanan itong blangko para sa 'Kumpleto'. Halimbawa: Tapos na ang Paglalaba",
             "warning_threshold": "Kapag ang halaga ay umabot o lumampas dito, nati-trigger ang kulay ng babala. Mga template na gauge at timeline.",
-            "alarm": "Nagti-trigger ng AlarmKit alarm kapag nalampasan ang babala na threshold. Para sa iOS 26+ lamang.",
-            "snooze_seconds": "Kung gaano katagal pinahahaba ng iOS Snooze button ang countdown (60–3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
+            "alarm": "Nagpapatunog ng alarm sa device kapag natapos ang countdown. Kailangan ng iOS 26 o mas bago sa iPhone; sa Android, kailangan ng app ang pahintulot na Mga alarm at paalala. Countdown template lamang.",
+            "snooze_seconds": "Kung gaano katagal pinahahaba ng Snooze button ng alarm ang countdown (60-3600). Iwanang blanko para sa 300s (5 min) na default. Nangangailangan ng Alarm. Countdown template lamang.",
             "tiles": "Hanggang 4 na tile, bawat isa ay bumabasa ng hiwalay na entity: label, entity, at opsyonal na attribute, unit, icon, kulay, at tap URL. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Para sa board template lamang.",
             "log_columns": "Mga karagdagang halaga na idinaragdag sa bawat linya ng log (max 6): bawat row ay may label, isang entity, isang attribute, at isang unit. Ang attribute na walang entity ay babasa sa entity na ito; ang entity na walang attribute ay babasa sa estado nito; kung parehong nakatakda, babasahin ang attribute ng entity na iyon. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Para lang sa log template."
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "ThumbHash ng larawan"
               },
               "data_description": {
-                "image_url": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong iPhone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito.",
+                "image_url": "https URL ng larawang ipinapakita sa tabi ng icon. Mismong phone ang nagda-download nito, kaya kailangang maabot ito mula sa internet; hindi maglo-load ang address sa lokal na network, pero maipapakita pa rin ang ThumbHash nito.",
                 "image_shape": "Kung paano kina-crop ang larawan: patayong crop ang poster, default ang square, at bilog ang crop ng circle.",
                 "image_thumbhash": "Malabong preview na nakalakip, ipinapakita kapag hindi ma-download ang URL, at ito lang ang lumalabas para sa larawan sa lokal mong network. Iwanang blangko para awtomatikong kalkulahin mula sa URL, o gamitin ang aksyong Generate ThumbHash para gumawa mula sa kahit anong larawang kayang basahin ng Home Assistant."
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "Natatanging identifier para sa activity na ito. Iwanan itong blangko para awtomatikong buuin mula sa entity ID. Halimbawa: ha-living-room-lamp",
-                "activity_name": "Display na pangalan na ipinapakita sa iPhone Live Activity. Nagde-default sa friendly name ng entity.",
+                "activity_name": "Display na pangalan na ipinapakita sa activity sa iyong phone. Nagde-default sa friendly name ng entity.",
                 "icon": "Override na icon. Iwanan itong blangko para gamitin ang native na icon ng entity (hal. mdi:thermometer). Sinusuportahan din ang SF Symbols (hal. lamp.desk.fill).",
                 "icon_attribute": "Attribute ng entity para sa dynamic na icon. Nino-override ang static icon at entity icon kapag nakatakda.",
                 "priority": "Mas mataas na priyoridad na mga activity ang pinananatili nang mas matagal kapag naabot ang limitasyon ng device (0 = pinakamababa, 10 = pinakamataas).",
                 "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
                 "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
                 "state_labels": "Custom na display na teksto para sa mga estado. Isang hilera bawat estado: ang halaga ng estado at ang label na ipapakita. Halimbawa: heating at Nagpapainit. Tinatanggap pa rin ang lumang state=Label, state2=Label 2 na string.",
-                "compact_label": "Hanggang 4 na character na ipinapakita sa harapang bahagi ng compact view ng Dynamic Island sa halip na default na nilalaman ng template (ang icon, ang steps ring, o ang high/low stack ng timeline). Hindi ito pinapansin ng minimal na presentasyon. Iwanang blangko para panatilihin ang sariling nilalaman ng template.",
+                "compact_label": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip. Iwanang blangko para panatilihin ang sariling nilalaman ng template.",
                 "compact_trailing_label": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Iwanang blangko para panatilihin ang sariling nilalaman ng template. Kailangan ang PushWard 1.19.1 o mas bago.",
                 "compact_trailing_icon": "Icon na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Gumagana ang parehong MDI icon (hal. mdi:airplane-takeoff) at SF Symbols (hal. airplane.departure). Binabalewala ito kapag may nakatakdang likurang Island label. Iwanang blangko para panatilihin ang sariling nilalaman ng template. Kailangan ang PushWard 1.19.1 o mas bago."
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "Mga node ng daloy"
           },
           "data_description": {
-            "widget_name": "Display name na ipinapakita sa iOS widget picker. Default sa friendly name ng entity.",
+            "widget_name": "Display na pangalan na ipinapakita sa widget picker ng iyong phone. Nagde-default sa friendly name ng entity.",
             "value_attribute": "Entity attribute na naglalaman ng halaga. Iwanang blanko upang gamitin ang pangunahing state ng entity.",
             "unit": "Display unit na ipinapakita sa tabi ng halaga. Max 32 na character.",
             "value_scale": "Kung paano babasahin ang progress value. Ang auto ay itinuturing na percent ang % unit o anumang mas mataas sa 1, at fraction (0.0-1.0) ang lahat ng iba pa. Piliin ang percent o fraction para i-override ito. Progress template lamang.",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "Naabot na ang limitasyon ng notification sa {account}",
-      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na notification para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong notification hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na notification para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong notification hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard app upang itaas ang limitasyon."
     },
     "usage_limit_live_activity": {
       "title": "Naabot na ang limitasyon ng Live Activity update sa {account}",
-      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na Live Activity update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na Live Activity update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard app upang itaas ang limitasyon."
     },
     "usage_limit_widgets": {
       "title": "Naabot na ang limitasyon ng widget update sa {account}",
-      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na widget update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na widget update para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong update hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard app upang itaas ang limitasyon."
     },
     "usage_limit_emails": {
       "title": "Naabot na ang limitasyon ng email sa {account}",
-      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na email para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong email hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard iOS app upang itaas ang limitasyon."
+      "description": "Nagamit na ng iyong PushWard account ang {used} sa {limit} na email para sa kasalukuyang panahon, kaya tatanggihan ang mga bagong email hanggang ma-reset ang quota ({resets_at}). I-upgrade ang iyong subscription sa PushWard app upang itaas ang limitasyon."
     },
     "todo_e2e_unavailable": {
       "title": "Hindi naipapadala ang mga paalala ng to-do ng {account}",

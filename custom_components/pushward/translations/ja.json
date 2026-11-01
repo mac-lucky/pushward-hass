@@ -20,6 +20,11 @@
           "premium": "プレミアム"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "プッシュ通知"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "アラーム",
-          "description": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+、countdown テンプレートのみ）。"
+          "description": "カウントダウンが終了したときにデバイスでアラームを鳴らします。countdown テンプレートのみ。iPhone では iOS 26 以降が必要です。Android ではアプリにアラームとリマインダーの権限が必要です。"
         },
         "snooze_seconds": {
           "name": "スヌーズ秒数",
-          "description": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。デフォルトは 300（5分）。アラームが必要（iOS 26+、countdown テンプレートのみ）。"
+          "description": "アラームのスヌーズボタンが countdown を延長する時間（60-3600）。デフォルトは 300（5分）。アラームが必要（countdown テンプレートのみ）。"
         },
         "step_labels": {
           "name": "ステップラベル",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "画像 URL",
-          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+          "description": "アイコンの横に表示する画像の https URL です。スマートフォンが直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
         },
         "image_shape": {
           "name": "画像の形",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "画像 URL",
-          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+          "description": "アイコンの横に表示する画像の https URL です。スマートフォンが直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
         },
         "image_shape": {
           "name": "画像の形",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "アラーム",
-          "description": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+、countdown テンプレートのみ）。"
+          "description": "カウントダウンが終了したときにデバイスでアラームを鳴らします。countdown テンプレートのみ。iPhone では iOS 26 以降が必要です。Android ではアプリにアラームとリマインダーの権限が必要です。"
         },
         "snooze_seconds": {
           "name": "スヌーズ秒数",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "アラームのスヌーズボタンが countdown を延長する時間（60-3600）。デフォルトは 300（5分）。アラームが必要（countdown テンプレートのみ）。"
         },
         "direction": {
           "name": "方向",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "画像 URL",
-          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+          "description": "アイコンの横に表示する画像の https URL です。スマートフォンが直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
         },
         "image_shape": {
           "name": "画像の形",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "画像 URL",
-          "description": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
+          "description": "アイコンの横に表示する画像の https URL です。スマートフォンが直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。"
         },
         "image_shape": {
           "name": "画像の形",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Islandラベル",
-          "description": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。"
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
         },
         "compact_trailing_label": {
           "name": "Island末尾ラベル",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "画像 URL",
-          "description": "画像の http または https URL です。iPhone からは見えない LAN 上のカメラを含め、Home Assistant が到達できるものなら何でも使えます。"
+          "description": "画像の http または https URL。Home Assistant が到達できるものなら何でも使えます。スマートフォンからは見えない LAN 上のカメラも含みます。"
         },
         "image_path": {
           "name": "画像のパス",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "ウィジェットを更新",
-      "description": "追跡中の PushWard ウィジェットを強制的に更新します。メモリ内の差分キャッシュをバイパスし、値が変わっていなくてもウィジェットを再描画して iOS にプッシュします。",
+      "description": "追跡中の PushWard ウィジェットを強制的に更新します。メモリ内の差分キャッシュをバイパスし、値が変わっていなくてもウィジェットを再描画してお使いのデバイスにプッシュします。",
       "fields": {
         "config_entry_id": {
           "name": "アカウント",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "レベル",
-          "description": "iOSの割り込みレベル。通知の配信方法を制御します。"
+          "description": "割り込みレベル。通知の配信方法を制御します。Android では、critical には PushWard アプリで許可したサイレント モードへのアクセスが必要です。"
         },
         "volume": {
           "name": "音量",
-          "description": "critical レベルの通知の音量（0.0〜1.0）。level が critical の場合のみ使用されます。"
+          "description": "重大な通知の音量（0.0-1.0）。level が critical のときのみ使用されます。Android では無視されます。"
         },
         "thread_id": {
           "name": "スレッドID",
-          "description": "通知センターで通知をまとめてグループ化します。"
+          "description": "デバイス上で通知をまとめてグループ化します。"
         },
         "collapse_id": {
           "name": "折りたたみID",
-          "description": "APNsの重複排除キー。同じキーを持つ以前の通知を置き換えます。"
+          "description": "重複排除キー。同じキーを持つ前の通知を置き換えます。"
         },
         "source": {
           "name": "ソース",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "プッシュ",
-          "description": "APNs push alert としてすべてのデバイスに送信します。false の場合、通知はインボックスにのみ保存されます。"
+          "description": "すべてのデバイスにプッシュ通知として送信します。false の場合、通知は受信箱にのみ保存されます。"
         },
         "url": {
           "name": "URL",
-          "description": "通知をタップしたときに開く URL。"
+          "description": "通知をタップしたときに開く URL。/lovelace/kitchen のようなパスは Home Assistant の外部 URL で開きます。"
         },
         "media": {
           "name": "メディア",
-          "description": "`url`（HTTPS）と `type`（image、video、または audio）を持つオブジェクトとしてのメディア添付。"
+          "description": "`url`（HTTPS）と `type`（image、video、または audio）を持つオブジェクトとしてのメディア添付。Android では通知シェードに画像のみが表示されます。"
         },
         "icon_url": {
           "name": "アイコン URL",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "アクション",
-          "description": "アクションボタンのリスト。各アクションは id、title、任意の url、foreground、destructive、authentication_required、icon を持つオブジェクトです。http(s) URL の場合は method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers、body を指定してサイレント Webhook を送信することもできます。url（と foreground）を省略すると、PushWard がタップを自身で記録し、get_notification_answer で読み取れます。サイレントアクションに text_input: true を設定すると、入力による返信を求めます（text_input_placeholder と text_input_button_title は任意）。url がない場合は PushWard が返信を記録し、http(s) URL がある場合は text フィールドを含む JSON として Webhook に送信されます。代わりに body に埋め込むには、{{input}} プレースホルダーを使い、オートメーション内で body を Jinja の raw ブロックで囲んでください。そうしないと、アクションの送信前に Home Assistant がプレースホルダーを展開してしまいます。"
+          "description": "アクションボタンのリスト。各アクションは id、title、任意の url、foreground、destructive、authentication_required、icon を持つオブジェクトです。/lovelace/kitchen のようなパスの url は Home Assistant の外部 URL で開きます。Android では通知シェードに最初の 3 個のボタンが表示され、アプリにはすべて表示されます。http(s) URL の場合は method（GET/POST/PUT/PATCH/DELETE/HEAD）、headers、body を指定してサイレント Webhook を送信することもできます。url（と foreground）を省略すると、PushWard がタップを自身で記録し、get_notification_answer で読み取るか、pushward_notification_action イベントをトリガーにできます。サイレントアクションに text_input: true を設定すると、入力による返信を求めます（text_input_placeholder と text_input_button_title は任意）。url がない場合は PushWard が返信を記録し、http(s) URL がある場合は text フィールドを含む JSON として Webhook に送信されます。代わりに body に埋め込むには、{{input}} プレースホルダーを使い、オートメーション内で body を Jinja の raw ブロックで囲んでください。そうしないと、アクションの送信前に Home Assistant がプレースホルダーを展開してしまいます。"
         },
         "send_at": {
           "name": "送信日時",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "コールバック URL",
           "description": "通知が確認されるか期限切れになったときに、PushWard が POST で受信確認を送信する公開 https URL。連携キーから導出したシークレットで署名されます。ローカルアドレスは拒否されるため、Home Assistant の webhook には Home Assistant Cloud の URL かその他の公開 URL が必要です。「確認」が必要です。"
+        },
+        "snooze": {
+          "name": "スヌーズ",
+          "description": "最大 3 個のスヌーズボタンで、それぞれ 1〜1440 の異なる分数を指定します。いずれかをタップすると通知が非表示になり、その時間が経過した後にそのデバイスで再表示されます。確認とは併用できず、アクションと合わせて最大 10 個のボタンです。"
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "通知を取り消す",
+      "description": "collapse_id を付けて送信した通知を取り消します。各デバイスは通知を表示から消し、PushWard アプリで既読にします。また、その collapse_id を持つアカウントまたは組織の確認待ち通知は、どの統合キーで送信されたかにかかわらず繰り返しを停止します（グループまたはタグに限定された組織キーの場合は、そのキーで送信したものだけ）。Companion アプリの clear_notification と同様にベストエフォートです。任意のレスポンスには、送信先のデバイス数（devices）が含まれます。",
+      "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントで取り消します。"
+        },
+        "collapse_id": {
+          "name": "折りたたみID",
+          "description": "通知の送信時に使用した collapse_id（最大 64 文字）。"
+        }
+      }
+    },
     "send_email": {
       "name": "メールを送信",
       "description": "PushWard 経由でトランザクションメールを送信します。テキスト本文、HTML 本文、またはその両方を指定してください。統合キーには「emails」の権限が必要です。",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "宛先",
-          "description": "受信者のメールアドレス。PushWard iOS アプリですでに追加・確認済みのアドレスである必要があります — 未確認のアドレスは拒否されます。"
+          "description": "受信者のメールアドレス。PushWard アプリですでに追加・確認済みのアドレスである必要があります。未確認のアドレスは拒否されます。"
         },
         "subject": {
           "name": "件名",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "構成エントリ ID {config_entry_id} の PushWard アカウントは読み込まれていません。"
+    },
+    "external_url_required": {
+      "message": "{path} は Home Assistant のパスで、スマートフォンは Home Assistant の外部 URL でしか開けません。設定 > システム > ネットワーク でインターネット URL を設定するか、Home Assistant Cloud に接続するか、代わりに完全な URL を送信してください。"
+    },
+    "ha_path_invalid": {
+      "message": "{url} は有効な URL ではありません: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} はサイレントリクエストで、スマートフォンは https でしか送信しませんが、Home Assistant の外部 URL は http です。設定 > システム > ネットワーク で https のインターネット URL を設定するか、Home Assistant Cloud に接続するか、代わりに完全な https URL を送信してください。"
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "PushWardに接続",
-        "description": "始めるには PushWard 統合キーを入力してください。PushWard iOS アプリは App Store から入手できます: {app_store_url}",
+        "description": "始めるには PushWard 統合キーを入力してください。PushWard アプリは App Store（{app_store_url}）または Google Play（{play_store_url}）から入手できます。",
         "data": {
           "integration_key": "統合キー"
         },
         "data_description": {
-          "integration_key": "PushWard iOS アプリ（App Store: {app_store_url}）を開き、設定 → 統合キーへ進みます。デフォルトのキーを貼り付けるか、スコープ 'ha-*' で新しいキーを作成できます。"
+          "integration_key": "PushWard アプリを開き、設定 > インテグレーションキーへ進みます。デフォルトのキーを貼り付けるか、スコープ 'ha-*' で新しいキーを作成できます。"
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "統合キー"
         },
         "data_description": {
-          "integration_key": "PushWard iOSアプリの設定 → 統合キーで、スコープ 'ha-*' のキーを作成してください。"
+          "integration_key": "PushWard アプリの設定 > インテグレーションキーで、スコープ 'ha-*' のキーを作成してください。"
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "統合キー"
         },
         "data_description": {
-          "integration_key": "PushWard iOSアプリの設定 → 統合キーで、スコープ 'ha-*' のキーを作成してください。"
+          "integration_key": "PushWard アプリの設定 > インテグレーションキーで、スコープ 'ha-*' のキーを作成してください。"
         }
       }
     },
@@ -2055,8 +2087,8 @@
             "series_entities": "シリーズエンティティ",
             "completion_message": "完了メッセージ",
             "warning_threshold": "警告しきい値（秒）",
-            "alarm": "アラーム（iOS 26+）",
-            "snooze_seconds": "スヌーズ秒数（iOS 26+）",
+            "alarm": "アラーム",
+            "snooze_seconds": "スヌーズ秒数",
             "tiles": "board タイル",
             "log_columns": "ログ列"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "個別のエンティティを1つのチャート上の名前付きラインとして結び付けます（例: 部屋ごとのPM2.5センサー）。各行はラベル、エンティティ、任意の属性で構成されます。ラベルを省略するとエンティティのフレンドリー名が使用されます。属性を空にするとエンティティの状態を描画します。シリーズと組み合わせて使用でき、合計最大10ラインまでです。カンマ区切りの文字列も引き続き使用できます。",
             "completion_message": "アクティビティ終了時に表示されるテキスト。空白のままにすると「完了」と表示されます。例: 洗濯完了",
             "warning_threshold": "countdown 終了前にサーバーが警告プッシュを送信する秒数。空白のままにすると無効にします。countdown テンプレートのみ。",
-            "alarm": "countdown の期限切れ時に AlarmKit アラームを起動する（iOS 26+）。countdown テンプレートのみ。",
-            "snooze_seconds": "iOS のスヌーズボタンが countdown を延長する時間（60〜3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
+            "alarm": "カウントダウンが終了したときにデバイスでアラームを鳴らします。iPhone では iOS 26 以降が必要です。Android ではアプリにアラームとリマインダーの権限が必要です。countdown テンプレートのみ。",
+            "snooze_seconds": "アラームのスヌーズボタンが countdown を延長する時間（60-3600）。空白のままにすると 300 秒（5分）のデフォルトになります。アラームが必要。countdown テンプレートのみ。",
             "tiles": "最大4個のタイル。各タイルは個別のエンティティを読み取ります: ラベル、エンティティ、任意で属性・単位・アイコン・色・タップURL。カンマ区切りの文字列も引き続き使用できます。board テンプレート専用。",
             "log_columns": "各ログ行に追加される値（最大6個）。各行はラベル、エンティティ、属性、単位で構成されます。エンティティのない属性はこのエンティティを読み取り、属性のないエンティティはその状態を読み取り、両方を指定するとそのエンティティの属性を読み取ります。カンマ区切りの文字列も引き続き使用できます。ログテンプレートのみ。"
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "画像の ThumbHash"
               },
               "data_description": {
-                "image_url": "アイコンの横に表示する画像の https URL です。iPhone が直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。",
+                "image_url": "アイコンの横に表示する画像の https URL です。スマートフォンが直接ダウンロードするため、インターネットから到達できる必要があります。LAN 上のアドレスは読み込まれませんが、その ThumbHash は表示されます。",
                 "image_shape": "画像の切り抜き方です。poster は縦長、square は既定、circle は円形に切り抜きます。",
                 "image_thumbhash": "URL を取得できないときに描画される、ぼかしの埋め込みプレビューです。LAN 上の画像で表示されるのはこれだけです。空欄にすると URL から自動で計算されます。Home Assistant が読める任意の画像から作るには Generate ThumbHash アクションを使ってください。"
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "このアクティビティの一意の識別子。空白のままにするとエンティティIDから自動生成されます。例: ha-living-room-lamp",
-                "activity_name": "iPhone Live Activityに表示される名前。デフォルトはエンティティのフレンドリー名です。",
+                "activity_name": "スマートフォンのアクティビティに表示される名前。デフォルトはエンティティのフレンドリー名です。",
                 "icon": "アイコンの上書き。空白のままにするとエンティティのネイティブアイコンを使用します（例: mdi:thermometer）。SF Symbolsもサポートされています（例: lamp.desk.fill）。",
                 "icon_attribute": "動的アイコン用のエンティティ属性。設定すると静的アイコンおよびエンティティアイコンより優先されます。",
                 "priority": "デバイスの上限に達した場合、優先度の高いアクティビティが長く保持されます（0 = 最低, 10 = 最高）。",
                 "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
                 "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
                 "state_labels": "状態のカスタム表示テキスト。状態ごとに1行: 状態の値と表示するラベル。例: heating と 加熱中。従来の state=Label, state2=Label 2 文字列も引き続き使用できます。",
-                "compact_label": "Dynamic Islandのコンパクト表示の先頭側に、テンプレートの既定の内容（アイコン、ステップリング、タイムラインの高低スタック）の代わりに表示される最大4文字。最小表示では無視されます。空のままにするとテンプレート本来の内容が表示されます。",
+                "compact_label": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。空欄にするとテンプレート自体の内容を保持します。",
                 "compact_trailing_label": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。空のままにするとテンプレート本来の内容が表示されます。PushWard 1.19.1 以降が必要です。",
                 "compact_trailing_icon": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示されるアイコン。MDIアイコン（例: mdi:airplane-takeoff）とSF Symbols（例: airplane.departure）のどちらも使えます。Island末尾ラベルが設定されている場合は無視されます。空のままにするとテンプレート本来の内容が表示されます。PushWard 1.19.1 以降が必要です。"
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "フローのノード"
           },
           "data_description": {
-            "widget_name": "iOS のウィジェット選択画面に表示される表示名。デフォルトはエンティティのフレンドリー名です。",
+            "widget_name": "スマートフォンのウィジェットピッカーに表示される名前。デフォルトはエンティティのフレンドリー名です。",
             "value_attribute": "値を保持するエンティティ属性。空白のままにするとエンティティの主状態を使用します。",
             "unit": "値の横に表示される単位。最大 32 文字。",
             "value_scale": "進捗値の読み取り方法。auto は % 単位または1を超える値を percent として扱い、それ以外は 0.0-1.0 の fraction として扱います。上書きするには percent または fraction を選択してください。progress テンプレートのみ。",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "{account} の通知上限に達しました",
-      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の通知を使用したため、クォータがリセットされる（{resets_at}）まで新しい通知は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の通知を使用したため、クォータがリセットされる（{resets_at}）まで新しい通知は拒否されます。上限を引き上げるには、PushWard アプリでサブスクリプションをアップグレードしてください。"
     },
     "usage_limit_live_activity": {
       "title": "{account} の Live Activity 更新上限に達しました",
-      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の Live Activity 更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件の Live Activity 更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard アプリでサブスクリプションをアップグレードしてください。"
     },
     "usage_limit_widgets": {
       "title": "{account} のウィジェット更新上限に達しました",
-      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のウィジェット更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のウィジェット更新を使用したため、クォータがリセットされる（{resets_at}）まで新しい更新は拒否されます。上限を引き上げるには、PushWard アプリでサブスクリプションをアップグレードしてください。"
     },
     "usage_limit_emails": {
       "title": "{account} のメール上限に達しました",
-      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のメールを使用したため、クォータがリセットされる（{resets_at}）まで新しいメールは拒否されます。上限を引き上げるには、PushWard iOS アプリでサブスクリプションをアップグレードしてください。"
+      "description": "PushWard アカウントは現在の期間の {limit} 件中 {used} 件のメールを使用したため、クォータがリセットされる（{resets_at}）まで新しいメールは拒否されます。上限を引き上げるには、PushWard アプリでサブスクリプションをアップグレードしてください。"
     },
     "todo_e2e_unavailable": {
       "title": "{account} の ToDo リマインダーが送信されていません",

@@ -20,6 +20,11 @@
           "premium": "Premium"
         }
       }
+    },
+    "notify": {
+      "push_notification": {
+        "name": "Notificare push"
+      }
     }
   },
   "services": {
@@ -61,7 +66,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -165,11 +170,11 @@
         },
         "alarm": {
           "name": "Alarmă",
-          "description": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Funcționează doar pe iOS 26+."
+          "description": "Sună o alarmă pe dispozitiv când expiră numărătoarea inversă. Doar șablonul countdown. Pe iPhone necesită iOS 26 sau o versiune ulterioară; pe Android aplicația are nevoie de permisiunea Alarme și mementouri."
         },
         "snooze_seconds": {
           "name": "Secunde amânare",
-          "description": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Implicit 300 (5 min). Necesită alarmă (iOS 26+, doar șablonul countdown)."
+          "description": "Cât prelungește numărătoarea inversă butonul Amânare al alarmei (60-3600). Implicit 300 (5 min). Necesită alarmă (doar șablonul countdown)."
         },
         "step_labels": {
           "name": "Etichete pași",
@@ -237,7 +242,7 @@
         },
         "image_url": {
           "name": "URL imagine",
-          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. Telefonul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
         },
         "image_shape": {
           "name": "Forma imaginii",
@@ -305,7 +310,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -397,7 +402,7 @@
         },
         "image_url": {
           "name": "URL imagine",
-          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. Telefonul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
         },
         "image_shape": {
           "name": "Forma imaginii",
@@ -461,7 +466,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -485,11 +490,11 @@
         },
         "alarm": {
           "name": "Alarmă",
-          "description": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Funcționează doar pe iOS 26+."
+          "description": "Sună o alarmă pe dispozitiv când expiră numărătoarea inversă. Doar șablonul countdown. Pe iPhone necesită iOS 26 sau o versiune ulterioară; pe Android aplicația are nevoie de permisiunea Alarme și mementouri."
         },
         "snooze_seconds": {
           "name": "Secunde amânare",
-          "description": "How long the iOS Snooze button extends the countdown (60–3600). Defaults to 300 (5 min). Only applies with alarm enabled (iOS 26+)."
+          "description": "Cât prelungește numărătoarea inversă butonul Amânare al alarmei (60-3600). Implicit 300 (5 min). Necesită alarmă (doar șablonul countdown)."
         },
         "direction": {
           "name": "Direcție",
@@ -625,7 +630,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -737,7 +742,7 @@
         },
         "image_url": {
           "name": "URL imagine",
-          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. Telefonul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
         },
         "image_shape": {
           "name": "Forma imaginii",
@@ -805,7 +810,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -949,7 +954,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -1077,7 +1082,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -1233,7 +1238,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -1319,7 +1324,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -1401,7 +1406,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -1441,7 +1446,7 @@
         },
         "image_url": {
           "name": "URL imagine",
-          "description": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
+          "description": "Adresa https a unei imagini afișate lângă pictogramă. Telefonul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da."
         },
         "image_shape": {
           "name": "Forma imaginii",
@@ -1547,7 +1552,7 @@
         },
         "compact_label": {
           "name": "Etichetă Island",
-          "description": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră."
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
         },
         "compact_trailing_label": {
           "name": "Etichetă Island din spate",
@@ -1643,7 +1648,7 @@
       "fields": {
         "image_url": {
           "name": "URL imagine",
-          "description": "Adresa http sau https a imaginii. Funcționează orice poate accesa Home Assistant, inclusiv o cameră din rețeaua locală pe care iPhone-ul nu o vede."
+          "description": "Adresa http sau https a imaginii. Funcționează orice poate accesa Home Assistant, inclusiv o cameră din rețeaua locală pe care telefonul nu o vede."
         },
         "image_path": {
           "name": "Cale imagine",
@@ -1703,7 +1708,7 @@
     },
     "widget_refresh": {
       "name": "Reîmprospătați widget-ul",
-      "description": "Forțați reîmprospătarea unui widget PushWard urmărit. Ocolește memoria cache de diferențe, astfel încât widget-ul este redat din nou și trimis către iOS chiar dacă valoarea nu s-a schimbat.",
+      "description": "Forțați reîmprospătarea unui widget PushWard urmărit. Ocolește memoria cache de diferențe, astfel încât widget-ul este redat din nou și trimis către dispozitivele dvs. chiar dacă valoarea nu s-a schimbat.",
       "fields": {
         "config_entry_id": {
           "name": "Cont",
@@ -1741,19 +1746,19 @@
         },
         "level": {
           "name": "Nivel",
-          "description": "Nivelul de întrerupere iOS. Controlează modul de livrare al notificării."
+          "description": "Nivelul de întrerupere. Controlează modul de livrare al notificării. Pe Android, critical necesită accesul la Nu deranja, acordat în aplicația PushWard."
         },
         "volume": {
           "name": "Volum",
-          "description": "Volumul sunetului pentru alertele critice (0.0-1.0). Folosit doar când level este critical."
+          "description": "Volumul sunetului pentru alertele critice (0.0-1.0). Folosit doar când level este critical. Ignorat pe Android."
         },
         "thread_id": {
           "name": "ID fir",
-          "description": "Grupează notificările în Centrul de notificări."
+          "description": "Grupează notificările pe dispozitiv."
         },
         "collapse_id": {
           "name": "ID de comasare",
-          "description": "Cheie de deduplicare APNs. Înlocuiește notificarea anterioară cu aceeași cheie."
+          "description": "Cheie de deduplicare. Înlocuiește notificarea anterioară cu aceeași cheie."
         },
         "source": {
           "name": "Sursă",
@@ -1769,15 +1774,15 @@
         },
         "push": {
           "name": "Push",
-          "description": "Trimiteți ca APNs push alert pe toate dispozitivele. Dacă este fals, notificarea este stocată doar în inbox."
+          "description": "Trimiteți ca alertă push pe toate dispozitivele. Dacă este fals, notificarea este stocată doar în inbox."
         },
         "url": {
           "name": "URL",
-          "description": "URL deschis la atingerea notificării. Necesită HTTPS."
+          "description": "URL deschis la atingerea notificării. O cale precum /lovelace/kitchen se deschide pe URL-ul extern al Home Assistant."
         },
         "media": {
           "name": "Media",
-          "description": "Atașament media sub formă de obiect cu `url` (HTTPS) și `type` (image, video sau audio)."
+          "description": "Atașament media sub formă de obiect cu `url` (HTTPS) și `type` (image, video sau audio). Android afișează în panoul de notificări doar imagini."
         },
         "icon_url": {
           "name": "URL pictogramă",
@@ -1789,7 +1794,7 @@
         },
         "actions": {
           "name": "Acțiuni",
-          "description": "Listă de butoane de acțiune. Fiecare acțiune este un obiect cu id, title și, opțional, url, foreground, destructive, authentication_required și icon. Pentru un url http(s) puteți trimite și un webhook silențios cu method (GET/POST/PUT/PATCH/DELETE/HEAD), headers și body. Omiteți url (și foreground) și PushWard înregistrează singur atingerea; o citiți cu get_notification_answer. Setați text_input: true pe o acțiune silențioasă pentru a cere un răspuns tastat (opțional text_input_placeholder și text_input_button_title): fără url PushWard înregistrează răspunsul, cu un url http(s) acesta este trimis la webhook-ul dvs. ca JSON cu un câmp text. Pentru a-l include în schimb în body, folosiți substituentul {{input}} și încadrați body într-un bloc raw Jinja în automatizarea dvs., astfel încât Home Assistant să nu îl proceseze înainte de trimiterea acțiunii."
+          "description": "Listă de butoane de acțiune. Fiecare acțiune este un obiect cu id, title și, opțional, url, foreground, destructive, authentication_required și icon. Un url care este o cale, precum /lovelace/kitchen, se deschide pe URL-ul extern al Home Assistant. Android afișează primele 3 butoane în panoul de notificări și pe toate în aplicație. Pentru un url http(s) puteți trimite și un webhook silențios cu method (GET/POST/PUT/PATCH/DELETE/HEAD), headers și body. Omiteți url (și foreground) și PushWard înregistrează singur atingerea; o citiți cu get_notification_answer sau folosiți evenimentul pushward_notification_action ca declanșator. Setați text_input: true pe o acțiune silențioasă pentru a cere un răspuns tastat (opțional text_input_placeholder și text_input_button_title): fără url PushWard înregistrează răspunsul, cu un url http(s) acesta este trimis la webhook-ul dvs. ca JSON cu un câmp text. Pentru a-l include în schimb în body, folosiți substituentul {{input}} și încadrați body într-un bloc raw Jinja în automatizarea dvs., astfel încât Home Assistant să nu îl proceseze înainte de trimiterea acțiunii."
         },
         "send_at": {
           "name": "Ora trimiterii",
@@ -1810,6 +1815,10 @@
         "callback_url": {
           "name": "URL de callback",
           "description": "URL https public la care PushWard trimite confirmarea de primire prin POST când notificarea este confirmată sau expiră, semnată cu un secret derivat din cheia de integrare. Adresele locale sunt refuzate, deci un webhook Home Assistant are nevoie de URL-ul Home Assistant Cloud sau de alt URL public. Necesită Confirmare."
+        },
+        "snooze": {
+          "name": "Amânare",
+          "description": "Până la 3 butoane de amânare, fiecare cu alt număr de minute, de la 1 la 1440. Atingerea unuia ascunde notificarea și o afișează din nou pe acel dispozitiv după acel timp. Nu împreună cu Confirmare, iar împreună cu acțiunile cel mult 10 butoane."
         }
       }
     },
@@ -1877,6 +1886,20 @@
         }
       }
     },
+    "clear_notification": {
+      "name": "Retrageți notificarea",
+      "description": "Retrageți notificările trimise cu un collapse_id. Fiecare dispozitiv le scoate din vizualizare și le marchează drept citite în aplicația PushWard, iar notificările cu confirmare ale contului sau organizației cu acel collapse_id nu se mai repetă, indiferent de cheia de integrare care le-a trimis (cu o cheie de organizație limitată la grupuri sau etichete, doar cele trimise de acea cheie). Fără garanție, ca clear_notification din aplicația Companion. Răspunsul opțional arată la câte dispozitive a fost trimisă (devices).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a retrage pe fiecare cont PushWard adăugat în Home Assistant."
+        },
+        "collapse_id": {
+          "name": "ID de comasare",
+          "description": "collapse_id cu care au fost trimise notificările, până la 64 de caractere."
+        }
+      }
+    },
     "send_email": {
       "name": "Trimiteți e-mail",
       "description": "Trimiteți un e-mail tranzacțional prin PushWard. Furnizați un corp text, un corp HTML sau ambele. Cheia de integrare necesită capacitatea „emails”.",
@@ -1887,7 +1910,7 @@
         },
         "to": {
           "name": "Către",
-          "description": "Adresa de e-mail a destinatarului. Trebuie să fie o adresă pe care ați adăugat-o și confirmat-o deja în aplicația PushWard pentru iOS — adresele neverificate sunt respinse."
+          "description": "Adresa de e-mail a destinatarului. Trebuie să fie o adresă pe care ați adăugat-o și confirmat-o deja în aplicația PushWard; adresele neverificate sunt respinse."
         },
         "subject": {
           "name": "Subiect",
@@ -1952,18 +1975,27 @@
     },
     "entry_not_loaded": {
       "message": "Niciun cont PushWard încărcat nu are ID-ul intrării de configurare {config_entry_id}."
+    },
+    "external_url_required": {
+      "message": "{path} este o cale Home Assistant, iar telefonul o poate deschide doar pe URL-ul extern al Home Assistant. Setați URL-ul de Internet în Setări > Sistem > Rețea sau conectați Home Assistant Cloud, ori trimiteți în schimb un URL complet."
+    },
+    "ha_path_invalid": {
+      "message": "{url} nu este un URL valid: {error}"
+    },
+    "https_external_url_required": {
+      "message": "{path} este o cerere silențioasă, pe care telefonul o trimite doar prin https, iar URL-ul extern al Home Assistant este http. Setați un URL de Internet https în Setări > Sistem > Rețea sau conectați Home Assistant Cloud, ori trimiteți în schimb un URL https complet."
     }
   },
   "config": {
     "step": {
       "user": {
         "title": "Conectați-vă la PushWard",
-        "description": "Introduceți cheia de integrare PushWard pentru a începe. Obțineți aplicația PushWard pentru iOS din App Store: {app_store_url}",
+        "description": "Introduceți cheia de integrare PushWard pentru a începe. Obțineți aplicația PushWard din App Store ({app_store_url}) sau Google Play ({play_store_url}).",
         "data": {
           "integration_key": "Cheie de integrare"
         },
         "data_description": {
-          "integration_key": "Deschideți aplicația PushWard pentru iOS (App Store: {app_store_url}) → Setări → Chei de integrare. Puteți lipi cheia implicită sau puteți crea una nouă cu domeniul „ha-*”."
+          "integration_key": "Deschideți aplicația PushWard > Setări > Chei de integrare. Puteți lipi cheia implicită sau puteți crea una nouă cu domeniul 'ha-*'."
         }
       },
       "reconfigure": {
@@ -1973,7 +2005,7 @@
           "integration_key": "Cheie de integrare"
         },
         "data_description": {
-          "integration_key": "Creați una în aplicația PushWard iOS la Setări → Chei de integrare cu domeniul 'ha-*'."
+          "integration_key": "Creați una în aplicația PushWard la Setări > Chei de integrare cu domeniul 'ha-*'."
         }
       },
       "reauth_confirm": {
@@ -1983,7 +2015,7 @@
           "integration_key": "Cheie de integrare"
         },
         "data_description": {
-          "integration_key": "Creați una în aplicația PushWard iOS la Setări → Chei de integrare cu domeniul 'ha-*'."
+          "integration_key": "Creați una în aplicația PushWard la Setări > Chei de integrare cu domeniul 'ha-*'."
         }
       }
     },
@@ -2056,7 +2088,7 @@
             "completion_message": "Mesaj de finalizare",
             "warning_threshold": "Prag de avertizare",
             "alarm": "Alarmă",
-            "snooze_seconds": "Secunde amânare (iOS 26+)",
+            "snooze_seconds": "Secunde amânare",
             "tiles": "Casete panou",
             "log_columns": "Coloane jurnal"
           },
@@ -2076,8 +2108,8 @@
             "series_entities": "Asociați entități separate ca linii denumite pe un singur grafic (ex. un senzor PM2.5 per cameră): fiecare rând are o etichetă, o entitate și un atribut opțional. Eticheta este implicit numele prietenos al entității; lăsați atributul gol pentru a afișa starea entității. Se combină cu Serii; până la 10 linii în total. Un șir separat prin virgule este încă acceptat.",
             "completion_message": "Textul afișat la încheierea activității. Lăsați gol pentru 'Complet'. Exemplu: Spălare terminată",
             "warning_threshold": "Când valoarea atinge sau depășește aceasta, colorarea de avertizare este declanșată. Șabloane gauge și timeline.",
-            "alarm": "Declanșează alarma AlarmKit când pragul de avertizare este depășit. Doar pentru iOS 26+.",
-            "snooze_seconds": "Cât prelungește numărătoarea inversă butonul Snooze din iOS (60–3600). Lăsați gol pentru valoarea implicită de 300s (5 min). Necesită Alarmă. Doar șablonul countdown.",
+            "alarm": "Sună o alarmă pe dispozitiv când expiră numărătoarea inversă. Pe iPhone necesită iOS 26 sau o versiune ulterioară; pe Android aplicația are nevoie de permisiunea Alarme și mementouri. Doar șablonul countdown.",
+            "snooze_seconds": "Cât prelungește numărătoarea inversă butonul Amânare al alarmei (60-3600). Lăsați gol pentru valoarea implicită de 300s (5 min). Necesită Alarmă. Doar șablonul countdown.",
             "tiles": "Până la 4 casete, fiecare citește o entitate separată: etichetă, entitate și, opțional, atribut, unitate, pictogramă, culoare și URL la atingere. Un șir separat prin virgule este încă acceptat. Doar pentru șablonul board.",
             "log_columns": "Valori suplimentare adăugate la fiecare linie de jurnal (max. 6): fiecare rând are o etichetă, o entitate, un atribut și o unitate. Un atribut fără entitate citește această entitate; o entitate fără atribut îi citește starea; ambele citesc atributul acelei entități. Un șir separat prin virgule este încă acceptat. Doar șablon jurnal."
           },
@@ -2144,7 +2176,7 @@
                 "image_thumbhash": "ThumbHash imagine"
               },
               "data_description": {
-                "image_url": "Adresa https a unei imagini afișate lângă pictogramă. iPhone-ul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da.",
+                "image_url": "Adresa https a unei imagini afișate lângă pictogramă. Telefonul o descarcă singur, deci trebuie să fie accesibilă din internet; o adresă din rețeaua locală nu se va încărca, dar ThumbHash-ul ei da.",
                 "image_shape": "Cum este decupată imaginea: poster păstrează un cadru vertical, square este valoarea implicită, circle o decupează rotund.",
                 "image_thumbhash": "Previzualizare neclară încorporată, desenată când adresa URL nu poate fi descărcată, și singurul nivel care apare pentru o imagine din rețeaua locală. Lăsați gol pentru a fi calculat automat din adresa URL sau folosiți acțiunea Generate ThumbHash pentru a-l crea din orice imagine pe care Home Assistant o poate citi."
               }
@@ -2187,14 +2219,14 @@
               },
               "data_description": {
                 "slug": "Identificator unic pentru această activitate. Lăsați gol pentru a genera automat din ID-ul entității. Exemplu: ha-living-room-lamp",
-                "activity_name": "Numele de afișare pe iPhone Live Activity. Implicit este numele prietenos al entității.",
+                "activity_name": "Numele de afișare pe activitatea de pe telefon. Implicit este numele prietenos al entității.",
                 "icon": "Înlocuiți pictograma. Lăsați gol pentru a folosi pictograma nativă a entității (ex. mdi:thermometer). SF Symbols sunt de asemenea acceptate (ex. lamp.desk.fill).",
                 "icon_attribute": "Atributul entității pentru pictogramă dinamică. Suprascrie pictograma statică și cea a entității când este setat.",
                 "priority": "Activitățile cu prioritate mai mare sunt păstrate mai mult timp când se atinge limita dispozitivului (0 = cea mai mică, 10 = cea mai mare).",
                 "sound": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS.",
                 "update_interval": "Numărul minim de secunde între actualizări. Modificările rapide ale stării sunt limitate ca rată.",
                 "state_labels": "Text de afișare personalizat pentru stări. Un rând pe stare: valoarea stării și eticheta de afișat. Exemplu: heating și Se încălzește. Un șir vechi stare=Etichetă, stare2=Etichetă 2 este încă acceptat.",
-                "compact_label": "Până la 4 caractere afișate în partea din față a vizualizării compacte Dynamic Island în locul conținutului implicit al șablonului (pictograma, inelul pașilor sau stiva maxim/minim a cronologiei). Prezentarea minimală le ignoră. Lăsați gol pentru a păstra conținutul propriu al șablonului.",
+                "compact_label": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare. Lăsați gol pentru a păstra conținutul propriu al șablonului.",
                 "compact_trailing_label": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Lăsați gol pentru a păstra conținutul propriu al șablonului. Necesită PushWard 1.19.1 sau mai nou.",
                 "compact_trailing_icon": "Pictogramă afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Funcționează atât pictogramele MDI (ex. mdi:airplane-takeoff), cât și SF Symbols (ex. airplane.departure). Ignorată când este setată o etichetă Island din spate. Lăsați gol pentru a păstra conținutul propriu al șablonului. Necesită PushWard 1.19.1 sau mai nou."
               }
@@ -2351,7 +2383,7 @@
             "flow_nodes": "Noduri de flux"
           },
           "data_description": {
-            "widget_name": "Numele afișat în selectorul de widget-uri din iOS. Implicit, numele prietenos al entității.",
+            "widget_name": "Numele afișat în selectorul de widget-uri de pe telefon. Implicit, numele prietenos al entității.",
             "value_attribute": "Atributul entității care conține valoarea. Lăsați gol pentru a folosi starea principală a entității.",
             "unit": "Unitatea de afișare arătată lângă valoare. Maximum 32 de caractere.",
             "value_scale": "Cum se interpretează valoarea de progres. auto tratează o unitate % sau orice valoare peste 1 ca percent, iar restul ca fracție 0.0-1.0 (fraction). Alegeți percent sau fraction pentru a suprascrie. Numai pentru șablonul progress.",
@@ -2532,19 +2564,19 @@
     },
     "usage_limit_notifications": {
       "title": "Limita de notificări {account} a fost atinsă",
-      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} notificări pentru perioada curentă, așa că noile notificări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} notificări pentru perioada curentă, așa că noile notificări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru a mări limita."
     },
     "usage_limit_live_activity": {
       "title": "Limita de actualizări Live Activity {account} a fost atinsă",
-      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări Live Activity pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări Live Activity pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru a mări limita."
     },
     "usage_limit_widgets": {
       "title": "Limita de actualizări widget {account} a fost atinsă",
-      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări de widget pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} actualizări de widget pentru perioada curentă, așa că noile actualizări vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru a mări limita."
     },
     "usage_limit_emails": {
       "title": "Limita de e-mailuri {account} a fost atinsă",
-      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} e-mailuri pentru perioada curentă, așa că noile e-mailuri vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru iOS pentru a mări limita."
+      "description": "Contul dvs. PushWard a folosit {used} din cele {limit} e-mailuri pentru perioada curentă, așa că noile e-mailuri vor fi respinse până la resetarea cotei ({resets_at}). Faceți upgrade la abonament în aplicația PushWard pentru a mări limita."
     },
     "todo_e2e_unavailable": {
       "title": "Mementourile {account} pentru sarcini nu sunt trimise",
