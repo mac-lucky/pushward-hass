@@ -798,9 +798,14 @@ class _FakeStream:
 
     def __init__(self) -> None:
         self.tracked: set[int] = set()
+        self.released: list[tuple] = []
 
     def delivers_answer(self, schedule_id, notification_id) -> bool:
         return schedule_id in self.tracked
+
+    def release(self, schedule_id=None, notification_id=None) -> None:
+        self.released.append((schedule_id, notification_id))
+        self.tracked.discard(schedule_id)
 
 
 def _done(notification_id: int = 55, action_id: str = "done") -> dict:
@@ -831,6 +836,55 @@ async def test_reminders_the_stream_tracks_get_no_read_of_their_own(hass: HomeAs
     assert rec["watch_until"] is None
     assert rec["notification_id"] == 55
     api.poll_notification_answer.assert_not_awaited()
+    assert (rec["schedule_id"], 55) in stream.released
+
+
+async def test_reminders_ask_the_stream_to_wait_only_as_long_as_the_watch(setup) -> None:
+    _, api, _ = await setup(_CALL)
+
+    assert api.create_notification.call_args.kwargs["answer_window"] == timedelta(hours=24)
+
+
+async def test_a_reminder_whose_item_was_completed_is_released(setup, freezer) -> None:
+    stream = _FakeStream()
+    manager, _, todo = await setup(list(_CALL), answer_stream=stream, **{CONF_TODO_OFFSET_MINUTES: 30})
+    freezer.move_to(NOW + timedelta(minutes=45))
+    await manager._async_reconcile(SUB)  # sent, and watched
+    rec = _records(manager)["a"]
+    stream.tracked.add(rec["schedule_id"])
+    assert stream.released == []
+
+    todo.items.clear()  # ticked off in Home Assistant
+    await manager._async_reconcile(SUB)
+
+    assert rec["watch_until"] is None
+    assert stream.released == [(rec["schedule_id"], None)]
+
+
+async def test_a_reminder_past_its_watch_is_released(setup, freezer) -> None:
+    stream = _FakeStream()
+    manager, _, _ = await setup(_CALL, answer_stream=stream, **{CONF_TODO_OFFSET_MINUTES: 30})
+    freezer.move_to(NOW + timedelta(minutes=45))
+    await manager._async_reconcile(SUB)
+    rec = _records(manager)["a"]
+
+    freezer.move_to(NOW + timedelta(hours=25))
+    await manager._async_reconcile(SUB, full=True)
+
+    assert (rec["schedule_id"], None) in stream.released
+    assert "a" not in _records(manager)  # past the late grace too: forgotten
+
+
+async def test_a_reminder_canceled_before_its_time_is_released(setup) -> None:
+    stream = _FakeStream()
+    manager, api, todo = await setup(list(_CALL), answer_stream=stream)
+    schedule_id = _records(manager)["a"]["schedule_id"]
+
+    todo.items.clear()
+    await manager._async_reconcile(SUB)
+
+    api.cancel_scheduled_notification.assert_awaited_once_with(schedule_id, purge=False)
+    assert stream.released == [(schedule_id, None)]
 
 
 async def test_a_stream_answer_before_the_reminder_is_marked_sent(hass: HomeAssistant, setup, freezer) -> None:

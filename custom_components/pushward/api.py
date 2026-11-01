@@ -8,7 +8,7 @@ import logging
 import random
 import time
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
@@ -232,7 +232,8 @@ class PushWardApiClient:
         self.e2e_key = e2e_key
         # Set by the entry's answer stream; told about every created notification or
         # schedule whose answer the server records, whichever path sent it.
-        self.on_answerable_send: Callable[[dict, bool], None] | None = None
+        # Called as (created, scheduled, window=answer_window).
+        self.on_answerable_send: Callable[..., None] | None = None
         # Set by the same stream; told the id of every schedule this client canceled.
         self.on_schedule_canceled: Callable[[int], None] | None = None
 
@@ -398,6 +399,7 @@ class PushWardApiClient:
         callback_url: str | None = None,
         snooze: list[int] | None = None,
         trim_to_fit: bool = False,
+        answer_window: timedelta | None = None,
     ) -> dict | None:
         """Create a notification via POST /notifications and return it.
 
@@ -425,7 +427,9 @@ class PushWardApiClient:
         notification again after the chosen time. It never goes with acknowledge.
 
         A send the server records the answer to is reported to
-        ``on_answerable_send`` (the created body, and whether it was scheduled).
+        ``on_answerable_send`` (the created body, and whether it was scheduled),
+        with ``answer_window``: how long after the send its answer is still of use
+        (None: the answer stream's default).
         """
         if self.e2e_key is not None:
             if trim_to_fit:
@@ -486,17 +490,19 @@ class PushWardApiClient:
             )
         else:
             answerable = records_answer(actions, acknowledge) if scheduled else None
-            self._report_answerable(created, schedule_answerable=answerable)
+            self._report_answerable(created, schedule_answerable=answerable, window=answer_window)
             return created
         # Asking for repeats must never cost the alert itself.
         plain = {key: val for key, val in payload.items() if key not in _ACK_ONLY_FIELDS}
         created = await self._request_with_retry(
             "POST", path, json=plain, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
         )
-        self._report_answerable(created)
+        self._report_answerable(created, window=answer_window)
         return {**(created or {}), "acknowledge_refused": reason}
 
-    def _report_answerable(self, created: Any, *, schedule_answerable: bool | None = None) -> None:
+    def _report_answerable(
+        self, created: Any, *, schedule_answerable: bool | None = None, window: timedelta | None = None
+    ) -> None:
         """Tell the answer stream about a send it should listen for.
 
         A send now says so itself (``answerable`` in the response). A schedule has
@@ -508,7 +514,7 @@ class PushWardApiClient:
         if not (schedule_answerable if scheduled else created.get("answerable") is True):
             return
         try:
-            self.on_answerable_send(created, scheduled)
+            self.on_answerable_send(created, scheduled, window=window)
         except Exception:
             # Listening for the answer is extra; the notification already went out.
             _LOGGER.exception("PushWard could not start listening for a notification's answer")

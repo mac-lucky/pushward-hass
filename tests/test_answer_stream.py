@@ -587,6 +587,60 @@ async def test_schedules_are_capped_apart_and_never_push_out_a_pending_send(stre
     assert "1005" in stream._schedules
 
 
+async def test_release_stops_waiting_for_a_send_and_its_schedule(streams, feed) -> None:
+    stream = await streams()
+    stream.async_track_send({"id": 42, "answerable": True, "answer_cursor": "57"}, False)
+    stream.async_track_send({"id": 7, "status": "scheduled", "send_at": (NOW + timedelta(hours=1)).isoformat()}, True)
+    stream._pending["99"] = {"sent_at": NOW.isoformat(), "schedule_id": 8}
+    await _until(lambda: feed.calls, "the first read")
+
+    stream.release(notification_id=42)
+    assert set(stream._pending) == {"99"}
+    stream.release(schedule_id=8)  # the notification it became goes with it
+    assert stream._pending == {}
+    stream.release(schedule_id=7, notification_id=None)
+    assert stream._schedules == {}
+    assert not stream.delivers_answer(7, 99)
+
+    feed.reply(cursor="57")
+    await _until(lambda: not stream.running, "the loop to go idle")
+    stream.release(schedule_id=7, notification_id=42)  # nothing left: a no-op
+
+
+async def test_a_send_with_its_own_window_is_waited_for_only_that_long(streams, feed, freezer, hass_storage) -> None:
+    stream = await streams()
+    stream._kick = MagicMock()
+    stream.async_track_send({"id": 42, "answerable": True}, False, window=timedelta(hours=24))
+    stream.async_track_send({"id": 43, "answerable": True}, False, window=timedelta(days=30))  # capped at a week
+    assert stream._pending["42"]["window"] == 86400
+    assert "window" not in stream._pending["43"]
+    await stream.async_stop()
+    assert _stored(hass_storage)["pending"]["42"]["window"] == 86400
+
+    freezer.move_to(NOW + timedelta(hours=24, minutes=1))
+    stream = await streams()
+
+    assert set(stream._pending) == {"43"}
+
+
+async def test_a_schedules_window_carries_into_its_send(hass: HomeAssistant, streams, feed, api, freezer) -> None:
+    stream = await streams()
+    api.get_scheduled_notification.return_value = _sent_row(7, 99, NOW)
+    stream.async_track_send(
+        {"id": 7, "status": "scheduled", "send_at": NOW.isoformat()}, True, window=timedelta(hours=24)
+    )
+    await _until(lambda: len(feed.calls) == 2, "the first read")
+    freezer.move_to(NOW + timedelta(seconds=10))
+    feed.reply(cursor="100")
+    await _until(lambda: "99" in stream._pending, "the send it became")
+
+    assert stream._pending["99"]["window"] == 86400
+    freezer.move_to(NOW + timedelta(hours=24, seconds=1))
+    feed.reply(cursor="100")
+    await _until(lambda: not stream.running, "the loop to go idle")
+    assert stream._pending == {}
+
+
 async def test_bad_ids_are_ignored(streams) -> None:
     stream = await streams()
     for created in ({"answerable": True}, {"id": "42", "answerable": True}, {"id": True, "answerable": True}):

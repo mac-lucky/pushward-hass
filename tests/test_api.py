@@ -1568,9 +1568,27 @@ async def test_an_answerable_schedule_is_reported_from_its_request(kwargs, repor
     await client.create_notification("Bins", "Tonight", send_at=datetime(2026, 11, 2, 8, 0, tzinfo=UTC), **kwargs)
 
     if reported:
-        client.on_answerable_send.assert_called_once_with(created, True)
+        client.on_answerable_send.assert_called_once_with(created, True, window=None)
     else:
         client.on_answerable_send.assert_not_called()
+
+
+async def test_an_answer_window_goes_with_the_report():
+    created = {"id": 7, "status": "scheduled", "send_at": "2026-11-02T08:00:00Z"}
+    session = _make_session(_mock_response(201, json_body=created))
+    client = _make_client(session)
+    client.on_answerable_send = MagicMock()
+
+    await client.create_notification(
+        "Bins",
+        "Tonight",
+        send_at=datetime(2026, 11, 2, 8, 0, tzinfo=UTC),
+        actions=[{"id": "done", "title": "Done"}],
+        answer_window=timedelta(hours=24),
+    )
+
+    client.on_answerable_send.assert_called_once_with(created, True, window=timedelta(hours=24))
+    assert "answer_window" not in session.request.call_args[1]["json"]  # local only, never sent
 
 
 async def test_the_plain_resend_after_an_acknowledge_refusal_is_reported():
@@ -1582,7 +1600,7 @@ async def test_the_plain_resend_after_an_acknowledge_refusal_is_reported():
     result = await client.create_notification("Leak", "Kitchen", acknowledge={}, actions=[{"id": "ok", "title": "OK"}])
 
     assert result["acknowledge_refused"] == "receipt_limit"
-    client.on_answerable_send.assert_called_once_with({"id": 45, "answerable": True}, False)
+    client.on_answerable_send.assert_called_once_with({"id": 45, "answerable": True}, False, window=None)
 
 
 async def test_a_failing_answer_listener_never_fails_the_send(caplog):

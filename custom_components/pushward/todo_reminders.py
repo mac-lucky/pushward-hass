@@ -18,8 +18,9 @@ notes).
   for a reminder that already went out: renaming the item does not send it again.
 - With the Done button on, the reminder carries a url-less "done" action. The
   server records the tap; the manager completes the item when it learns of it.
-  The entry's answer stream reads it for every reminder it tracks; the manager
-  reads the others itself, one reminder at a time.
+  The entry's answer stream reads it for every reminder it tracks, for
+  TODO_WATCH_HOURS after the send, and is told to let a reminder go once its watch
+  ends; the manager reads the others itself, one reminder at a time.
 """
 
 from __future__ import annotations
@@ -478,6 +479,7 @@ class TodoReminderManager:
             self._blocked.discard(sub_id)
             self._dirty.discard(sub_id)
             for rec in (lst.get("items") or {}).values():
+                self._release(rec)
                 if rec.get("status") != _SCHEDULED:
                     continue
                 try:
@@ -568,13 +570,20 @@ class TodoReminderManager:
                 # Either way a pending slot is free again.
                 await self._api.cancel_scheduled_notification(rec["schedule_id"], purge=uid in open_items)
                 del records[uid]
+                self._release(rec)
                 self._blocked.discard(sub_id)
             elif uid in open_items and not _same_occurrence(rec, open_items[uid], versions[uid]):
                 del records[uid]  # moved to a new due time: that one gets a reminder of its own
+                self._release(rec)
             elif self._finished(rec, now):
                 del records[uid]
-            elif uid not in open_items:
-                rec["watch_until"] = None  # completed or removed: no Done tap to wait for
+                self._release(rec)
+            else:
+                if uid not in open_items:
+                    rec["watch_until"] = None  # completed or removed: no Done tap to wait for
+                watch_until = _from_iso(rec.get("watch_until"))
+                if watch_until is None or watch_until <= now:
+                    self._release(rec)  # stopped, unwatched, or past its watch
 
         if sub_id not in self._blocked:
             await self._async_create(sub_id, cfg, records, wanted)
@@ -593,12 +602,14 @@ class TodoReminderManager:
                 self._mark_sent(rec, cfg, row.get("notification_id"))
             elif status == _SERVER_CANCELED:
                 rec["status"] = _STOPPED  # stopped by the owner: leave the item be
+                self._release(rec)
             elif status in _SERVER_PENDING:
                 continue
             else:
                 # Gone (a revoked key, a restored backup) or failed: look at the item
                 # again as if it had never been scheduled.
                 del records[uid]
+                self._release(rec)
         # Schedules tagged with this list that the store does not know: a create
         # that went through although its response was lost, or a lost store.
         known = {rec["schedule_id"] for rec in records.values()}
@@ -680,6 +691,8 @@ class TodoReminderManager:
                     send_at=send_at,
                     # An encrypted reminder is shortened to fit rather than dropped.
                     trim_to_fit=True,
+                    # The answer stream waits for its Done as long as the watch here.
+                    answer_window=timedelta(hours=TODO_WATCH_HOURS),
                 )
             except E2EError as err:
                 # Text that cannot be encrypted at all (invalid Unicode); nothing goes out in the clear.
@@ -803,6 +816,11 @@ class TodoReminderManager:
                     watches.append((sub_id, uid, rec))
         return watches
 
+    def _release(self, rec: dict) -> None:
+        """Tell the answer stream a reminder's answer is of no more use here."""
+        if self._answer_stream is not None:
+            self._answer_stream.release(rec.get("schedule_id"), rec.get("notification_id"))
+
     def _stream_delivers(self, rec: dict) -> bool:
         stream = self._answer_stream
         return stream is not None and stream.delivers_answer(rec.get("schedule_id"), rec.get("notification_id"))
@@ -846,6 +864,7 @@ class TodoReminderManager:
                 pause = max(pause, err.retry_after, TODO_WATCH_ERROR_BACKOFF_SECONDS)
             except PushWardNotFoundError:
                 rec["watch_until"] = None  # nothing to read, e.g. no answer was recorded
+                self._release(rec)
                 self._save()
             except PushWardApiError as err:
                 _LOGGER.debug("Watching a to-do reminder for its answer failed: %s", err)
@@ -875,6 +894,7 @@ class TodoReminderManager:
                     # Not sent (the account was out of quota at its time, say).
                     _LOGGER.warning("A PushWard to-do reminder could not be sent: %s", row.get("failure_reason"))
                 rec["watch_until"] = None  # failed, canceled or gone: no tap will come
+                self._release(rec)
                 self._save()
                 return False
             notification_id = rec["notification_id"] = row["notification_id"]
@@ -882,6 +902,8 @@ class TodoReminderManager:
         answer, held = await self._api.poll_notification_answer(notification_id, hold=hold)
         if answer.get("status") != ANSWER_STATUS_ANSWERED:
             return held
+        # Read here, so any retry of it is read here too.
+        self._release(rec)
         if not await self._async_apply_answer(sub_id, uid, rec, answer):
             return False
         return held
@@ -902,6 +924,7 @@ class TodoReminderManager:
                     self._save()
                     return False
             rec["watch_until"] = None
+            self._release(rec)
             self._save()
             return True
         finally:

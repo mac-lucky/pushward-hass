@@ -152,12 +152,32 @@ def older_cursor(stored: str | None, other: str | None) -> str | None:
     return other if b < a else stored
 
 
+_DEFAULT_WINDOW = timedelta(days=ANSWER_STREAM_PENDING_DAYS)
+
+
+def _window_seconds(window: Any) -> int | None:
+    """A send's own answer window in whole seconds, when it is shorter than the default one."""
+    seconds = window.total_seconds() if isinstance(window, timedelta) else window
+    if isinstance(seconds, bool) or not isinstance(seconds, int | float):
+        return None
+    if not 0 < seconds < _DEFAULT_WINDOW.total_seconds():
+        return None  # the default, or longer: the stream never waits past a week
+    return max(1, int(seconds))
+
+
+def _window(rec: dict) -> timedelta:
+    """How long after its send the answer to a pending send or schedule is waited for."""
+    return timedelta(seconds=rec["window"]) if "window" in rec else _DEFAULT_WINDOW
+
+
 def _load_pending(rec: dict) -> dict:
     loaded = {"sent_at": rec["sent_at"]}
     if (cursor := _cursor(rec.get("cursor"))) is not None:
         loaded["cursor"] = cursor
     if _is_id(rec.get("schedule_id")):
         loaded["schedule_id"] = rec["schedule_id"]
+    if (window := _window_seconds(rec.get("window"))) is not None:
+        loaded["window"] = window
     return loaded
 
 
@@ -168,6 +188,8 @@ def _load_schedule(rec: dict) -> dict:
         loaded["cursor"] = cursor
     if _is_id(rec.get("last_nid")):
         loaded["last_nid"] = rec["last_nid"]
+    if (window := _window_seconds(rec.get("window"))) is not None:
+        loaded["window"] = window
     return loaded
 
 
@@ -223,13 +245,14 @@ class AnswerStream:
         self._store = build_answer_store(hass, entry.entry_id)
         self._cursor: str | None = None
         # notification id -> {"sent_at": iso, "cursor": the create response's answer_cursor
-        # (or its schedule's), "schedule_id": the schedule it came from}
+        # (or its schedule's), "schedule_id": the schedule it came from, "window": seconds
+        # after the send that its answer is waited for, when shorter than the default}
         self._pending: dict[str, dict] = {}
         # schedule id -> {"active_at": its next send (None once it has none), "check_at": when
         # to read it next, "busy_until": the end of the answer window after a send whose
         # notification it could not learn, "recurring": bool, "cursor": the feed's position
         # when it was scheduled, if the stream had none, "last_nid": the latest notification
-        # it became}; isos.
+        # it became, "window": as for a pending send}; isos.
         self._schedules: dict[str, dict] = {}
         # notification id -> action id of the latest answers read, oldest first; persisted.
         self._answered: dict[str, str | None] = {}
@@ -346,8 +369,12 @@ class AnswerStream:
     # --- tracking ---------------------------------------------------------
 
     @callback
-    def async_track_send(self, created: dict, scheduled: bool) -> None:
-        """Listen for the answer to a send the server records it for (PushWardApiClient.on_answerable_send)."""
+    def async_track_send(self, created: dict, scheduled: bool, *, window: timedelta | None = None) -> None:
+        """Listen for the answer to a send the server records it for (PushWardApiClient.on_answerable_send).
+
+        ``window`` waits for it that long after the send instead of
+        ANSWER_STREAM_PENDING_DAYS (never longer).
+        """
         if self._stopped:
             return
         send_id = created.get("id")
@@ -356,24 +383,51 @@ class AnswerStream:
         now = dt_util.utcnow()
         if scheduled:
             send_at = _from_iso(created.get("send_at")) or now
-            self._schedules[str(send_id)] = {
+            rec: dict = {
                 "active_at": _iso(send_at),
                 "check_at": _iso(send_at + timedelta(seconds=ANSWER_STREAM_SCHEDULE_FIRST_READ_SECONDS)),
                 "busy_until": None,
                 "recurring": created.get("recurrence") is not None,
             }
+            self._schedules[str(send_id)] = rec
             if self._cursor is None:
                 self._take_schedule_cursor(str(send_id))
         else:
-            rec: dict = {"sent_at": _iso(now)}
+            rec = {"sent_at": _iso(now)}
             if (answer_cursor := _cursor(created.get("answer_cursor"))) is not None:
                 rec["cursor"] = answer_cursor
                 if self._cursor is None:
                     self._cursor = answer_cursor
             self._pending[str(send_id)] = rec
+        if (seconds := _window_seconds(window)) is not None:
+            rec["window"] = seconds
         self._cap()
         self._save()
         self._kick()
+
+    @callback
+    def release(self, schedule_id: Any = None, notification_id: Any = None) -> None:
+        """Stop waiting for the answer to a send: its reader has no use for it any more.
+
+        Drops the pending notification, and the schedule with the notifications it
+        became. Without anything else to wait for, the long-poll stops; an answer
+        it still reads goes out as usual.
+        """
+        changed = False
+        if _is_id(notification_id):
+            changed = self._pending.pop(str(notification_id), None) is not None
+        if _is_id(schedule_id):
+            key = str(schedule_id)
+            self._awaiting_cursor.discard(key)
+            changed = self._schedules.pop(key, None) is not None or changed
+            for nid in [nid for nid, rec in self._pending.items() if rec.get("schedule_id") == schedule_id]:
+                del self._pending[nid]
+                changed = True
+        if not changed:
+            return
+        self._save()
+        if not self._stopped and not self.running:
+            self._arm_timer(dt_util.utcnow())
 
     @callback
     def async_schedule_canceled(self, schedule_id: int) -> None:
@@ -446,8 +500,7 @@ class AnswerStream:
         return dropped
 
     def _prune(self, now: datetime) -> None:
-        horizon = now - timedelta(days=ANSWER_STREAM_PENDING_DAYS)
-        stale = [nid for nid, rec in self._pending.items() if (_from_iso(rec["sent_at"]) or horizon) <= horizon]
+        stale = [nid for nid, rec in self._pending.items() if (_from_iso(rec["sent_at"]) or now) + _window(rec) <= now]
         for nid in stale:
             del self._pending[nid]
         ended = []
@@ -455,7 +508,7 @@ class AnswerStream:
             active_at, busy_until = _from_iso(rec["active_at"]), _from_iso(rec["busy_until"])
             if active_at is None and (busy_until is None or busy_until <= now):
                 ended.append(sid)  # a series past the window after its last send
-            elif not rec["recurring"] and active_at is not None and active_at <= horizon:
+            elif not rec["recurring"] and active_at is not None and active_at + _window(rec) <= now:
                 ended.append(sid)  # never resolved into a notification
         for sid in ended:
             del self._schedules[sid]
@@ -738,7 +791,7 @@ class AnswerStream:
                 self._track_sent(sid, rec, notification_id, last_sent, now)
             else:
                 # A send the stream cannot name: listen for the window after it.
-                rec["busy_until"] = _iso(last_sent + timedelta(days=ANSWER_STREAM_PENDING_DAYS))
+                rec["busy_until"] = _iso(last_sent + _window(rec))
         if status in _SCHEDULE_LIVE:
             next_at = _from_iso(row.get("send_at")) or now
             rec["active_at"] = _iso(next_at)
@@ -767,7 +820,7 @@ class AnswerStream:
         if rec.get("last_nid") == notification_id:
             return  # a series read again before its next send
         rec["last_nid"] = notification_id
-        if sent_at <= now - timedelta(days=ANSWER_STREAM_PENDING_DAYS):
+        if sent_at + _window(rec) <= now:
             return  # past the answer window
         key = str(notification_id)
         if key in self._answered:
@@ -782,6 +835,8 @@ class AnswerStream:
         pending: dict = {"sent_at": _iso(sent_at), "schedule_id": int(sid)}
         if (cursor := rec.get("cursor")) is not None:
             pending["cursor"] = cursor
+        if "window" in rec:
+            pending["window"] = rec["window"]
         self._pending[key] = pending
 
     # --- storage ----------------------------------------------------------
