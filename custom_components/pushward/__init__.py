@@ -541,10 +541,14 @@ _MEDIA_TEMPLATE_FIELDS = {
 # no foreground key at all: an http(s) url is always a silent webhook (POST when no
 # method is given) and a custom-scheme url opens that app. An option WITHOUT a url
 # gets a server-signed answer URL instead: the first tap is recorded in the
-# server-owned read-only `answer` field, pushed to every device, and the activity
-# ends shortly after. The server replaces options/details wholesale on update and
-# clears the stored answer whenever options are re-sent, so an automation sends
-# `options` only to start a new round.
+# server-owned read-only `answer` field and pushed to every device. The activity
+# then ends shortly after, unless the card carries step/step_count (server
+# v1.64.0, not offered by this action) and sits on a step before its last: that
+# one stays up for the next step, at most 10 minutes. The server replaces
+# options/details wholesale on update; a changed option set (or a changed step)
+# starts a new round and clears the stored answer, while an identical re-send on
+# the same step keeps it, so an automation sends `options` only to start a new
+# round.
 _APPROVAL_OPTION_ID_MSG = (
     "option ids must start with a letter or digit and contain only letters, digits, "
     "hyphens, or underscores (max 64 characters)"
@@ -596,9 +600,10 @@ _APPROVAL_TEMPLATE_FIELDS = {
     vol.Optional("details"): vol.All([_APPROVAL_DETAIL_SCHEMA], vol.Length(max=APPROVAL_DETAILS_MAX)),
     # An option id, or "none" to record no option (same as leaving it out). Neither
     # disarms anything: at end_date an unanswered card gets answer {by: "expired"}
-    # and ends regardless. Only removing end_date cancels that, and end_date here
-    # takes no null. Option membership is checked in _validate_approval_update;
-    # the end_date pairing is the server's call.
+    # and ends regardless (a multi-step card answered on an earlier step and still
+    # waiting for the next one ends there too, keeping that answer). Only removing
+    # end_date cancels that, and end_date here takes no null. Option membership is
+    # checked in _validate_approval_update; the end_date pairing is the server's call.
     vol.Optional("on_expire"): vol.Any(
         "none",
         vol.Match(APPROVAL_OPTION_ID_PATTERN, msg='on_expire must be an option id or "none"'),
