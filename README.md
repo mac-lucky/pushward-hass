@@ -780,7 +780,9 @@ implied by the action name; you no longer pass a `template` field.
 > like a media control (`POST` when no `method` is given, no `foreground`); a custom-scheme
 > `url` opens that app. An option **without** a `url` is server-recorded: the server signs an
 > answer URL into the button, the first tap lands in the read-only `answer` field
-> (`{ option, at, by }`), is pushed to every device, and the activity ends shortly after. The
+> (`{ option, at, by }`), is pushed to every device, and the activity ends shortly after (a card that walks through
+> several questions with `step`/`step_count`, which this action does not send, stays up until
+> its last step). The
 > recorded answer shows on the card, but this integration never reads an activity back, so to
 > react from Home Assistant give each option a `url` pointing at a webhook trigger instead, as
 > in the example below. `end_date` is a hard deadline: if nobody has answered by then, the
@@ -791,8 +793,8 @@ implied by the action name; you no longer pass a `template` field.
 > the sweep does: it never fires the option's webhook, so an automation behind a `url` option
 > runs only on a real tap. This action can move a stored `end_date` but can't remove it; to
 > drop the deadline, `delete_activity` and create the card again without one. Options
-> and details replace wholesale on update, and re-sending `options` starts a new round (the
-> stored answer is cleared) - so a plain update leaves them out.
+> and details replace wholesale on update, and a changed `options` set starts a new round (the
+> stored answer is cleared; an identical set keeps it) - so a plain update leaves them out.
 >
 > ```yaml
 > - action: pushward.update_activity_approval

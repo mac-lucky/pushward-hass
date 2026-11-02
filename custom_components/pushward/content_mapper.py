@@ -757,16 +757,18 @@ def _apply_approval_fields(content: dict, entity_config: dict) -> None:
     """Write the approval template's question-card fields into ``content`` in place.
 
     ``options`` only goes out as a complete valid set: a partial list would 422
-    the whole push, and re-sending options starts a new round (the server clears
-    any answer it already recorded) - so nothing is emitted rather than something
-    wrong. The question itself rides the existing ``state`` text.
+    the whole push, and a changed option set starts a new round (the server clears
+    any answer it already recorded; an identical set on the same step keeps it) -
+    so nothing is emitted rather than something wrong. The question itself rides
+    the existing ``state`` text.
     """
     # Latent answer-wipe hazard, unreachable today: no config flow offers approval,
     # so no tracked entity routes through here. If one ever does, every frame would
-    # re-send `options`, and the server clears the recorded answer on the key's mere
-    # presence (see the completion branch) - each update would wipe the one thing
-    # the card exists to record. Before the flow offers approval, this must emit
-    # options on the first frame only, AND the 404-recreate path in
+    # re-send `options`; an identical set keeps the recorded answer, but any change
+    # (a reordered list, an edited title or url) starts a new round and clears it -
+    # each such update would wipe the one thing the card exists to record. Before the
+    # flow offers approval, this must emit options on the first frame only, AND the
+    # 404-recreate path in
     # activity_manager._send_update must force a re-send: an approval create
     # without options 422s.
     configured = entity_config.get(CONF_APPROVAL_OPTIONS) or []
