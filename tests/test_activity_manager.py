@@ -279,6 +279,37 @@ async def test_stop_ends_all_active(hass: HomeAssistant) -> None:
     assert call_args[0][1] == "ended"
 
 
+async def test_stop_ends_active_activities_concurrently(hass: HomeAssistant) -> None:
+    """A slow ENDED for one activity does not hold back the others during stop."""
+    api = _mock_api()
+    configs = [
+        _entity_config(),
+        _entity_config(**{CONF_ENTITY_ID: "binary_sensor.dryer", CONF_SLUG: "ha-dryer"}),
+    ]
+    manager = ActivityManager(hass, api, configs, _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "on")
+    hass.states.async_set("binary_sensor.dryer", "on")
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    gate = asyncio.Event()
+
+    async def _slow_update(*_args, **_kwargs) -> None:
+        await gate.wait()
+
+    api.update_activity = AsyncMock(side_effect=_slow_update)
+    stop = asyncio.create_task(manager.async_stop())
+    await _pump()
+
+    # Both ENDED sends are in flight while the first is still stuck in its retries.
+    assert sorted(c.args[0] for c in api.update_activity.call_args_list) == ["ha-dryer", "ha-washer"]
+    assert not stop.done()
+
+    gate.set()
+    await stop
+    assert all(c.args[1] == "ended" for c in api.update_activity.call_args_list)
+
+
 async def test_rapid_on_off_cancels_end(hass: HomeAssistant) -> None:
     """off->on during the completion window cancels the end task and restarts.
 

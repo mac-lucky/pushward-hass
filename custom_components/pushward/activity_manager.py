@@ -439,19 +439,23 @@ class ActivityManager:
             self._unsub_quota()
             self._unsub_quota = None
 
-        for tracked in self._tracked.values():
-            if tracked.is_active:
-                slug = tracked.config[CONF_SLUG]
-                try:
-                    content = map_completion_content(tracked.config, tracked.last_content)
-                    await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
-                except PushWardQuotaExceededError:
-                    # Updates are metered, deletes are not: still take the card down.
-                    await self._delete_quietly(slug, "shutdown")
-                except (PushWardApiError, aiohttp.ClientError):
-                    _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
+        # Concurrent, so an outage costs a reload one retry budget rather than one
+        # per activity; the API client's request semaphore bounds the fan-out.
+        await asyncio.gather(*(self._end_on_stop(t) for t in self._tracked.values() if t.is_active))
 
         self._tracked.clear()
+
+    async def _end_on_stop(self, tracked: TrackedEntity) -> None:
+        """Send the shutdown ENDED for one active activity."""
+        slug = tracked.config[CONF_SLUG]
+        try:
+            content = map_completion_content(tracked.config, tracked.last_content)
+            await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
+        except PushWardQuotaExceededError:
+            # Updates are metered, deletes are not: still take the card down.
+            await self._delete_quietly(slug, "shutdown")
+        except (PushWardApiError, aiohttp.ClientError):
+            _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
 
     async def _delete_quietly(self, slug: str, context: str) -> None:
         """DELETE the activity as the un-metered stand-in for a quota-refused end.
