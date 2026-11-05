@@ -439,8 +439,8 @@ class ActivityManager:
             self._unsub_quota()
             self._unsub_quota = None
 
-        # Concurrent, so an outage costs a reload one retry budget rather than one
-        # per activity; the API client's request semaphore bounds the fan-out.
+        # Concurrent, so an outage costs a reload one retry budget per 5 activities (the
+        # API client's request semaphore) rather than one per activity.
         await asyncio.gather(*(self._end_on_stop(t) for t in self._tracked.values() if t.is_active))
 
         self._tracked.clear()
