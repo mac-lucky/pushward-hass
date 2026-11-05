@@ -722,6 +722,11 @@ class TodoReminderManager:
                     _LOGGER.warning("PushWard has no room for more scheduled notifications: %s", err)
                     self._blocked.add(sub_id)
                     return
+                if send_at <= dt_util.utcnow():
+                    # send_at passed while the request was retried: not a refusal of the item,
+                    # so the next pass tries it again with a new send_at.
+                    _LOGGER.debug("Reminder for a to-do item in %s came back late: %s", entity_id, err)
+                    continue
                 _LOGGER.warning("PushWard refused the reminder for a to-do item in %s: %s", entity_id, err)
                 self._refused[(sub_id, reminder.uid)] = reminder.version
                 if err.code == _E2E_UNAVAILABLE_CODE:

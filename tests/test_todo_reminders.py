@@ -525,6 +525,44 @@ async def test_refused_item_is_not_retried_until_edited(setup) -> None:
     assert api.create_notification.await_count == 2
 
 
+async def test_refusal_after_send_at_passed_is_retried(setup, freezer) -> None:
+    items = [{"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T08:10:00+00:00"}]
+    api = _api()
+
+    async def refuse_late(*_args, **_kwargs):
+        freezer.tick(timedelta(seconds=90))  # the retries outlasted the near-due delay
+        raise PushWardApiError("send_at must be in the future", status_code=400)
+
+    api.create_notification = AsyncMock(side_effect=refuse_late)
+    manager, api, _ = await setup(items, api=api, **{CONF_TODO_OFFSET_MINUTES: 30})
+    assert api.create_notification.await_count == 1
+
+    api.create_notification = AsyncMock(return_value={"id": 7})
+    await manager._async_reconcile(SUB, full=True)
+    assert api.create_notification.await_count == 1
+    assert api.create_notification.call_args[1]["send_at"] > NOW + timedelta(seconds=90)
+
+
+async def test_late_refusal_does_not_hold_back_the_next_reminder(setup, freezer) -> None:
+    items = [
+        {"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T08:10:00+00:00"},
+        {"uid": "b", "summary": "Dentist", "status": "needs_action", "due": "2026-10-01T08:40:00+00:00"},
+    ]
+    api = _api()
+    calls = []
+
+    async def first_late(*args, **kwargs):
+        calls.append(args[0])
+        if len(calls) == 1:
+            freezer.tick(timedelta(seconds=90))
+            raise PushWardApiError("send_at must be in the future", status_code=400)
+        return {"id": 8}
+
+    api.create_notification = AsyncMock(side_effect=first_late)
+    await setup(items, api=api, **{CONF_TODO_OFFSET_MINUTES: 30})
+    assert calls == ["Call", "Dentist"]
+
+
 async def test_item_that_cannot_be_encrypted_waits_for_an_edit(setup) -> None:
     items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
     api = _api()
