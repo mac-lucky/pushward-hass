@@ -837,7 +837,8 @@ def usage_limit_issue_id(entry_id: str, used_key: str) -> str:
 
 
 # API retry
-MAX_RETRIES = 5
+# 6 backoff sleeps between 7 attempts add up to 30.5-61s, long enough to ride out a short server outage
+MAX_RETRIES = 7
 RETRY_BASE_DELAY = 1  # seconds
 RETRY_MAX_DELAY = 30  # seconds
 MAX_CONCURRENT_REQUESTS = 5  # max simultaneous API request+retry loops

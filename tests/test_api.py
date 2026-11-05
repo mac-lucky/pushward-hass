@@ -1059,6 +1059,20 @@ async def test_all_5xx_exhaustion_raises_api_error(mock_sleep):
 
 
 @patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_six_503s_then_success_rides_out_the_outage(mock_sleep):
+    """Six 503s in a row (30.5-61s of backoff) still end in the success."""
+    payload = {"id": "u1", "notifications_used": 7}
+    session = _make_session(*[_mock_response(503, text="unavailable")] * 6, _mock_response(200, json_body=payload))
+    client = _make_client(session)
+
+    assert await client.get_me() == payload
+    assert session.request.call_count == 7
+    slept = [call.args[0] for call in mock_sleep.await_args_list]
+    assert len(slept) == 6
+    assert 30.5 <= sum(slept) <= 61
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
 async def test_retry_after_http_date(mock_sleep):
     """Retry-After in HTTP-date form is honored as a relative delay."""
     header = format_datetime(datetime.now(UTC) + timedelta(seconds=5), usegmt=True)
