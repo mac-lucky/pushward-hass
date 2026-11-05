@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import re
 from datetime import UTC, datetime, timedelta
 from email.utils import format_datetime
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -459,6 +460,114 @@ async def test_only_immediate_acknowledged_sends_get_a_collapse_id(kwargs, ackno
     await client.create_notification("t", "b", acknowledge=acknowledge, **kwargs)
 
     assert "collapse_id" not in session.request.call_args[1]["json"]
+
+
+def _idempotency_keys(session: AsyncMock) -> list[str | None]:
+    return [call[1]["headers"].get("Idempotency-Key") for call in session.request.call_args_list]
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_notification_retries_under_one_idempotency_key(mock_sleep):
+    session = _make_session(
+        _mock_response(503, text="unavailable"),
+        _mock_response(502, text="bad gateway"),
+        _mock_response(201, json_body={"id": 7}),
+    )
+    client = _make_client(session)
+
+    await client.create_notification("Garage", "Still open")
+
+    keys = _idempotency_keys(session)
+    assert len(keys) == 3
+    assert re.fullmatch(r"[!-~]{1,128}", keys[0])  # anything else is a 422
+    assert keys == [keys[0]] * 3
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_retry_after_a_lost_response_gets_the_first_notification_back(mock_sleep):
+    # The server stores the first attempt and the reply never arrives. Only the same
+    # key finds that notification again; any other would store a second one.
+    stored: dict[str, int] = {}
+    session = _make_session()
+
+    def server(method, url, *, headers, json, timeout):
+        key = headers["Idempotency-Key"]
+        if key not in stored:
+            stored[key] = len(stored) + 1
+            raise TimeoutError
+        reply = MagicMock()
+        reply.__aenter__ = AsyncMock(return_value=_mock_response(201, json_body={"id": stored[key]}))
+        reply.__aexit__ = AsyncMock(return_value=False)
+        return reply
+
+    session.request.side_effect = server
+    client = _make_client(session)
+
+    created = await client.create_notification("Garage", "Still open")
+
+    assert created == {"id": 1}
+    assert len(stored) == 1
+    assert session.request.call_count == 2
+
+
+async def test_each_notification_gets_its_own_idempotency_key():
+    session = _make_session(_mock_response(201, json_body={"id": 1}), _mock_response(201, json_body={"id": 2}))
+    client = _make_client(session)
+
+    await client.create_notification("t", "b")
+    await client.create_notification("t", "b")
+
+    first, second = _idempotency_keys(session)
+    assert first != second
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [{"send_at": datetime(2030, 1, 1, tzinfo=UTC)}, {"recurrence": {"cron": "0 8 * * *", "timezone": "UTC"}}],
+    ids=["send-at", "recurring"],
+)
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_scheduled_send_retries_under_one_idempotency_key(mock_sleep, kwargs):
+    session = _make_session(_mock_response(503, text="unavailable"), _mock_response(201, json_body={"id": 1}))
+    client = _make_client(session)
+
+    await client.create_notification("t", "b", **kwargs)
+
+    first, second = _idempotency_keys(session)
+    assert first
+    assert first == second
+    assert session.request.call_args[0][1].endswith("/notifications/scheduled")
+
+
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_refused_acknowledge_resend_gets_its_own_idempotency_key(mock_sleep):
+    session = _make_session(
+        _problem(409, "notification_receipt.limit_exceeded"),
+        _mock_response(503, text="unavailable"),
+        _mock_response(201, json_body={"id": 8}),
+    )
+    client = _make_client(session)
+
+    await client.create_notification("t", "b", acknowledge={})
+
+    refused, resend, resend_retry = _idempotency_keys(session)
+    assert refused
+    assert resend
+    assert resend != refused
+    assert resend_retry == resend
+
+
+async def test_idempotency_key_stays_off_other_requests():
+    session = _make_session(_mock_response(201, json_body={"id": 1}), _mock_response(200))
+    client = _make_client(session)
+
+    await client.create_notification("t", "b")
+    await client.create_activity("test-slug", "Test", priority=1)
+
+    send, activity = _idempotency_keys(session)
+    assert send
+    assert activity is None
+    assert client._headers == {"Authorization": "Bearer test-key"}
 
 
 async def test_cancel_notification_receipt_returns_the_receipt():

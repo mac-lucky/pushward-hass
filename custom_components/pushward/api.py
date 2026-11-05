@@ -446,6 +446,10 @@ class PushWardApiClient:
             # own, the retry supersedes the first receipt instead of starting a
             # second alert that repeats until answered.
             collapse_id = uuid4().hex
+        # The same key on every attempt, so a retry after a lost response gets the first
+        # notification back. A key holds for as long as its row exists: a new send that
+        # reused one would get the old notification or schedule and deliver nothing.
+        idempotency_key = uuid4().hex
         for key, val in [
             ("subtitle", subtitle),
             ("level", level),
@@ -477,7 +481,12 @@ class PushWardApiClient:
         scheduled = path != "/notifications"
         try:
             created = await self._request_with_retry(
-                "POST", path, json=payload, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
+                "POST",
+                path,
+                json=payload,
+                quota_kind=QUOTA_KIND_NOTIFICATIONS,
+                return_json=True,
+                idempotency_key=idempotency_key,
             )
         except PushWardApiError as err:
             # Only a send going out now: a schedule refused this way would be stored
@@ -495,7 +504,12 @@ class PushWardApiClient:
         # Asking for repeats must never cost the alert itself.
         plain = {key: val for key, val in payload.items() if key not in _ACK_ONLY_FIELDS}
         created = await self._request_with_retry(
-            "POST", path, json=plain, quota_kind=QUOTA_KIND_NOTIFICATIONS, return_json=True
+            "POST",
+            path,
+            json=plain,
+            quota_kind=QUOTA_KIND_NOTIFICATIONS,
+            return_json=True,
+            idempotency_key=uuid4().hex,  # a different body, so not a retry of the first POST
         )
         self._report_answerable(created, window=answer_window)
         return {**(created or {}), "acknowledge_refused": reason}
@@ -811,6 +825,7 @@ class PushWardApiClient:
         forbidden_is_auth: bool = False,
         return_json: bool = False,
         quota_kind: str | None = None,
+        idempotency_key: str | None = None,
     ) -> Any:
         """Execute an HTTP request with exponential backoff retry.
 
@@ -819,9 +834,12 @@ class PushWardApiClient:
         returns the success body instead of None. ``quota_kind`` names the metered
         quota the request spends (the server's `x-require-subscription-or-quota`
         routes); such requests are refused locally while the quota gate has that
-        kind paused, and a `quota.exceeded` 429 pauses it.
+        kind paused, and a `quota.exceeded` 429 pauses it. ``idempotency_key`` goes
+        out as the Idempotency-Key header on every attempt; only POST /notifications
+        and POST /notifications/scheduled read it.
         """
         gate = self._quota_gate if quota_kind is not None else None
+        headers = self._headers if idempotency_key is None else {**self._headers, "Idempotency-Key": idempotency_key}
         async with self._request_semaphore:
             url = f"{self._base_url}{path}"
             last_error: Exception | None = None
@@ -833,9 +851,7 @@ class PushWardApiClient:
                 if gate is not None:
                     gate.raise_if_blocked(quota_kind)
                 try:
-                    async with self._session.request(
-                        method, url, headers=self._headers, json=json, timeout=_TIMEOUT
-                    ) as resp:
+                    async with self._session.request(method, url, headers=headers, json=json, timeout=_TIMEOUT) as resp:
                         if resp.ok:
                             if not return_json:
                                 return None
