@@ -2529,7 +2529,7 @@
             "all_day_time": "An item with a due date but no time is reminded at this time on that day.",
             "notification_level": "How the reminder interrupts: passive arrives silently, time-sensitive breaks through Focus.",
             "done_button": "Add a Done button to the reminder. Tapping it completes the item in Home Assistant.",
-            "retract_when_done": "When the item is completed or removed in Home Assistant, remove a reminder already delivered from your devices. Apple Watch and app versions before 1.20 keep it.",
+            "retract_when_done": "When the item is completed or removed in Home Assistant, remove a reminder already delivered from your devices. Apple Watch keeps it, and so does PushWard on iPhone, iPad or Mac before 1.20.",
             "max_scheduled": "Only the soonest items are scheduled; the rest follow as those go out. Your account holds at most 25 pending scheduled notifications across everything."
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "An item with a due date but no time is reminded at this time on that day.",
             "notification_level": "How the reminder interrupts: passive arrives silently, time-sensitive breaks through Focus.",
             "done_button": "Add a Done button to the reminder. Tapping it completes the item in Home Assistant.",
-            "retract_when_done": "When the item is completed or removed in Home Assistant, remove a reminder already delivered from your devices. Apple Watch and app versions before 1.20 keep it.",
+            "retract_when_done": "When the item is completed or removed in Home Assistant, remove a reminder already delivered from your devices. Apple Watch keeps it, and so does PushWard on iPhone, iPad or Mac before 1.20.",
             "max_scheduled": "Only the soonest items are scheduled; the rest follow as those go out. Your account holds at most 25 pending scheduled notifications across everything."
           }
         }
