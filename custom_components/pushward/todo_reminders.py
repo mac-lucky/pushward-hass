@@ -683,7 +683,9 @@ class TodoReminderManager:
         row = await self._api.get_scheduled_notification(rec["schedule_id"]) or {}
         status = row.get("status")
         if status in _SERVER_PENDING:
-            # Late: pending again, so _arm_timer brings another look. Each look is one of its tries.
+            # Late, and its item is done: cancel it. The next look (_arm_timer brings it) reads it
+            # canceled, or gone if it went out first, and only then retracts. Each look is one try.
+            await self._api.cancel_scheduled_notification(rec["schedule_id"])
             rec["status"] = _SCHEDULED
             rec["retract_failures"] = rec.get("retract_failures", 0) + 1
             return False

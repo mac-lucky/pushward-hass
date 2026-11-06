@@ -1588,7 +1588,7 @@ async def test_retract_waits_while_the_server_has_not_sent_the_reminder(hass: Ho
     assert _records(manager)["a"]["retracted"] is True
 
 
-async def test_server_late_for_three_looks_leaves_the_reminder(setup, freezer) -> None:
+async def test_a_schedule_that_stays_pending_gets_three_looks_at_most(setup, freezer) -> None:
     manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
     api.get_scheduled_notification = AsyncMock(return_value={"status": "sending"})
     todo.items.clear()
@@ -1597,7 +1597,35 @@ async def test_server_late_for_three_looks_leaves_the_reminder(setup, freezer) -
         await manager._async_reconcile(SUB)
 
     assert api.get_scheduled_notification.await_count == 3
+    assert api.cancel_scheduled_notification.await_count == 3
     api.retract_notifications.assert_not_awaited()
+
+
+@pytest.mark.parametrize("went_out_first", [False, True])
+async def test_a_late_reminder_of_a_finished_item_is_canceled(setup, freezer, went_out_first: bool) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
+    schedule_id = _records(manager)["a"]["schedule_id"]
+    rows = {schedule_id: {"id": schedule_id, "status": "scheduled"}}  # the server is late
+    api.get_scheduled_notification = AsyncMock(side_effect=lambda sid: rows.get(sid))
+
+    async def _cancel(sid: int, **_kw) -> None:
+        if went_out_first:
+            del rows[sid]  # a sent row loses its record on a cancel
+        else:
+            rows[sid]["status"] = "canceled"
+
+    api.cancel_scheduled_notification = AsyncMock(side_effect=_cancel)
+    todo.items.clear()
+
+    await manager._async_reconcile(SUB)
+    api.cancel_scheduled_notification.assert_awaited_once_with(schedule_id)
+    api.retract_notifications.assert_not_awaited()
+
+    await manager._async_reconcile(SUB)  # the next look
+
+    assert api.get_scheduled_notification.await_count == 2
+    assert api.retract_notifications.await_count == (1 if went_out_first else 0)
+    assert _records(manager)["a"]["status"] == ("sent" if went_out_first else "stopped")
 
 
 @pytest.mark.parametrize("status", ["canceled", "failed"])
