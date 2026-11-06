@@ -636,11 +636,11 @@ class TodoReminderManager:
                     self._release(rec)  # stopped, unwatched, or past its watch
 
         # After the cancels above: a reminder about to go out cannot wait for retracts.
-        await self._async_retract(sub_id, lst, owed)
+        await self._async_retract(sub_id, cfg, lst, owed)
         if sub_id not in self._blocked:
             await self._async_create(sub_id, cfg, lst, wanted)
 
-    async def _async_retract(self, sub_id: str, lst: dict, owed: list[str]) -> None:
+    async def _async_retract(self, sub_id: str, cfg: dict, lst: dict, owed: list[str]) -> None:
         """Take back the sent reminders of the items in ``owed``, within the retract budget.
 
         A reminder marked sent by the clock alone gets TODO_SEND_RECHECK_SECONDS
@@ -649,11 +649,13 @@ class TodoReminderManager:
         """
         recent = dt_util.utcnow() - timedelta(seconds=TODO_SEND_RECHECK_SECONDS)
         for uid in owed:
+            if self._stopped or self._configs.get(sub_id) is not cfg:
+                return  # stopping, or the list was changed meanwhile (the switch may be off now)
             rec = lst["items"][uid]
             send_at = _from_iso(rec["send_at"])
             if not isinstance(rec.get("notification_id"), int) and send_at is not None and send_at > recent:
                 continue  # _arm_timer brings the pass for it
-            if self._stopped or not self._take_retract_token():
+            if not self._take_retract_token():
                 return
             collapse_id = rec.get("collapse_id") or _collapse_id(sub_id, uid)
             try:

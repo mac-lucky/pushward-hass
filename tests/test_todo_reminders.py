@@ -1522,3 +1522,25 @@ async def test_a_reminder_found_unsent_after_its_time_is_not_retracted(setup, fr
     await manager._async_reconcile(SUB)
 
     api.retract_notifications.assert_not_awaited()
+
+
+async def test_turning_the_switch_off_during_a_pass_stops_its_retracts(hass: HomeAssistant, setup, freezer) -> None:
+    items = [
+        {"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T09:00:00+00:00"},
+        {"uid": "b", "summary": "Pay", "status": "needs_action", "due": "2026-10-01T10:00:00+00:00"},
+    ]
+    manager, api, todo = await setup(items, **_RETRACT_ON)
+    freezer.move_to(NOW + timedelta(minutes=45))  # a went out, b is still pending
+    await manager._async_reconcile(SUB)
+
+    async def _switch_off(*_args, **_kwargs) -> None:
+        # The reconfigure form is saved while this pass waits on b's cancel.
+        await manager.async_reload([_config(**{**_RETRACT_ON, CONF_TODO_RETRACT: False})])
+
+    api.cancel_scheduled_notification = AsyncMock(side_effect=_switch_off)
+    todo.items.clear()
+    await manager._async_reconcile(SUB)
+    await hass.async_block_till_done()
+
+    api.cancel_scheduled_notification.assert_awaited_once()
+    api.retract_notifications.assert_not_awaited()
