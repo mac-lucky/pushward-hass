@@ -644,22 +644,26 @@ class TodoReminderManager:
         """Take back the sent reminders of the items in ``owed``, within the retract budget.
 
         A reminder marked sent by the clock alone gets TODO_SEND_RECHECK_SECONDS
-        first, so the retract does not overtake the server's send. The first
-        failure ends the round: the others would most likely fail the same way.
+        and then a look at its schedule, so the retract does not overtake the
+        server's send. The first failure ends the round: the others would most
+        likely fail the same way.
         """
         recent = dt_util.utcnow() - timedelta(seconds=TODO_SEND_RECHECK_SECONDS)
         for uid in owed:
             if self._stopped or self._configs.get(sub_id) is not cfg:
                 return  # stopping, or the list was changed meanwhile (the switch may be off now)
             rec = lst["items"][uid]
+            by_clock = not isinstance(rec.get("notification_id"), int)
             send_at = _from_iso(rec["send_at"])
-            if not isinstance(rec.get("notification_id"), int) and send_at is not None and send_at > recent:
+            if by_clock and send_at is not None and send_at > recent:
                 continue  # _arm_timer brings the pass for it
             if not self._take_retract_token():
                 return
             collapse_id = rec.get("collapse_id") or _collapse_id(sub_id, uid)
             try:
                 async with asyncio.timeout(_RETRACT_TIMEOUT_SECONDS):
+                    if by_clock and not await self._async_went_out(rec):
+                        continue
                     await self._api.retract_notifications(collapse_id)
             except PushWardAuthError:
                 raise
@@ -671,6 +675,22 @@ class TodoReminderManager:
                 return
             rec["retracted"] = True
             lst["retracted"][collapse_id] = _iso(dt_util.utcnow())
+
+    async def _async_went_out(self, rec: dict) -> bool:
+        """Whether the server sent a reminder the clock marked sent, so a retract can follow it."""
+        row = await self._api.get_scheduled_notification(rec["schedule_id"]) or {}
+        status = row.get("status")
+        if status in _SERVER_PENDING:
+            # Late: pending again, so _arm_timer brings another look. Each look is one of its tries.
+            rec["status"] = _SCHEDULED
+            rec["retract_failures"] = rec.get("retract_failures", 0) + 1
+            return False
+        if status in (_SERVER_CANCELED, "failed"):
+            rec["status"] = _STOPPED  # never reached a device: nothing to take back
+            return False
+        if isinstance(row.get("notification_id"), int):
+            rec["notification_id"] = row["notification_id"]
+        return True  # sent, or no longer on the server: it may be up
 
     def _take_retract_token(self) -> bool:
         now = dt_util.utcnow()
