@@ -23,7 +23,9 @@ notes).
   ends; the manager reads the others itself, one reminder at a time.
 - With "take back reminders when done" on, a reminder that went out is retracted
   once its item is completed or removed, while its record is still kept (until
-  the item is past the late-grace window and the Done button's watch ended).
+  the item is past the late-grace window and the Done button's watch ended). A
+  later reminder for the item gets a new collapse id while the retract push may
+  still be on its way, so the retract cannot take it down too.
 """
 
 from __future__ import annotations
@@ -116,10 +118,10 @@ _STORAGE_VERSION = 1
 _SAVE_DELAY = 5
 
 # Record states. scheduled: pending on the server. sent: its time came (the Done
-# button may still be watched). stopped: canceled before its time by someone else.
-# sent and stopped records stay until their item is past the late-grace window, so
-# the same item version never gets a second reminder, even if the item briefly
-# leaves the open list (completed, then undone).
+# button may still be watched). stopped: canceled before its time by someone else,
+# or found canceled or failed after it. sent and stopped records stay until their
+# item is past the late-grace window, so the same item version never gets a second
+# reminder, even if the item briefly leaves the open list (completed, then undone).
 _SCHEDULED = "scheduled"
 _SENT = "sent"
 _STOPPED = "stopped"
@@ -134,13 +136,17 @@ _SERVER_PENDING = ("scheduled", "sending")
 _WATCH_SHORT_PAUSE_SECONDS = 10
 # Tries at completing an item for a Done tap before the tap is given up.
 _COMPLETE_ATTEMPTS = 3
-# Taking back the reminders of finished items: tries per reminder, retracts per
-# pass (the server's burst, shared with every other client of the account) and a
-# bound on each call, so a 429 or an outage never holds the list's lock through
-# the client's retries.
+# Taking back the reminders of finished items: tries per reminder, the account's
+# retract budget (burst 5, 10 a minute, shared with every other client of the
+# account) and a bound on each call, so a 429 or an outage never holds the list's
+# lock through the client's retries.
 _RETRACT_ATTEMPTS = 3
-_RETRACT_PER_PASS = 5
+_RETRACT_BURST = 5
+_RETRACT_PER_MINUTE = 10
 _RETRACT_TIMEOUT_SECONDS = 10
+# A retract push can wait that long for a device (FCM keeps it 24 hours) and then
+# removes whatever shows under its collapse id, so no new reminder uses the id before.
+_RETRACT_HOLD = timedelta(hours=24)
 
 # The server refuses encrypted notifications from an organization's key while
 # PushWard has encryption for organizations turned off.
@@ -323,6 +329,9 @@ class TodoReminderManager:
         self._answering: set[tuple[str, str]] = set()
         self._done_label = "Done"
         self._stopped = False
+        # The account's retract budget as this entry spends it, across all its lists.
+        self._retract_tokens = float(_RETRACT_BURST)
+        self._retract_tokens_at = dt_util.utcnow()
 
     async def async_start(self) -> None:
         # The answer stream is already running: listen before the first await, and
@@ -462,7 +471,15 @@ class TodoReminderManager:
         if self._stopped or sub_id not in self._configs:
             return
         records = (self._lists.get(sub_id) or {}).get("items", {})
-        times = [t for rec in records.values() if rec.get("status") == _SCHEDULED and (t := _from_iso(rec["send_at"]))]
+        now = dt_util.utcnow()
+        recent = now - timedelta(seconds=TODO_SEND_RECHECK_SECONDS)
+        # Also one marked sent by the clock before its recheck: a retract waits for that.
+        times = [
+            t
+            for rec in records.values()
+            if (t := _from_iso(rec["send_at"]))
+            and (rec.get("status") == _SCHEDULED or (rec.get("status") == _SENT and t > recent))
+        ]
         if not times:
             return
 
@@ -475,7 +492,7 @@ class TodoReminderManager:
 
         # Never in the past: a reminder whose time passed while the list could not
         # be read would otherwise re-arm an immediate timer on every pass.
-        when = max(min(times), dt_util.utcnow()) + timedelta(seconds=TODO_SEND_RECHECK_SECONDS)
+        when = max(min(times), now) + timedelta(seconds=TODO_SEND_RECHECK_SECONDS)
         self._timers[sub_id] = async_track_point_in_utc_time(self._hass, _due, when)
 
     @callback
@@ -569,6 +586,12 @@ class TodoReminderManager:
             # Unavailable or not loaded yet: never read that as "every item is gone".
             return
         now = dt_util.utcnow()
+        # Collapse ids taken back within _RETRACT_HOLD, by when.
+        lst["retracted"] = {
+            cid: at
+            for cid, at in (lst.get("retracted") or {}).items()
+            if (t := _from_iso(at)) and t > now - _RETRACT_HOLD
+        }
 
         if full:
             await self._async_check_pending(sub_id, cfg, records)
@@ -577,11 +600,11 @@ class TodoReminderManager:
         versions = {uid: _version(item) for uid, item in open_items.items()}
         self._refused = {key: v for key, v in self._refused.items() if key[0] != sub_id or versions.get(key[1]) == v}
         wanted = self._wanted(sub_id, cfg, open_items, versions, records, now)
-        # Before the loop below, which can let a finished item's record go.
-        retracting = (
-            await self._async_retract(sub_id, records, open_items)
+        # Kept through the loop below, which can let a finished item's record go.
+        owed = (
+            [uid for uid, rec in records.items() if uid not in open_items and self._owes_retract(rec)]
             if cfg.get(CONF_TODO_RETRACT, DEFAULT_TODO_RETRACT)
-            else set()
+            else []
         )
 
         for uid, rec in list(records.items()):
@@ -602,7 +625,7 @@ class TodoReminderManager:
             elif uid in open_items and not _same_occurrence(rec, open_items[uid], versions[uid]):
                 del records[uid]  # moved to a new due time: that one gets a reminder of its own
                 self._release(rec)
-            elif self._finished(rec, now) and uid not in retracting:
+            elif self._finished(rec, now) and uid not in owed:
                 del records[uid]
                 self._release(rec)
             else:
@@ -612,30 +635,48 @@ class TodoReminderManager:
                 if watch_until is None or watch_until <= now:
                     self._release(rec)  # stopped, unwatched, or past its watch
 
+        # After the cancels above: a reminder about to go out cannot wait for retracts.
+        await self._async_retract(sub_id, lst, owed)
         if sub_id not in self._blocked:
-            await self._async_create(sub_id, cfg, records, wanted)
+            await self._async_create(sub_id, cfg, lst, wanted)
 
-    async def _async_retract(self, sub_id: str, records: dict[str, dict], open_items: dict[str, dict]) -> set[str]:
-        """Take back the sent reminders whose items were completed or removed.
+    async def _async_retract(self, sub_id: str, lst: dict, owed: list[str]) -> None:
+        """Take back the sent reminders of the items in ``owed``, within the retract budget.
 
-        Returns the items whose retract is still to come (failed, or past this
-        pass's share), so their records are kept for the next pass.
+        A reminder marked sent by the clock alone gets TODO_SEND_RECHECK_SECONDS
+        first, so the retract does not overtake the server's send. The first
+        failure ends the round: the others would most likely fail the same way.
         """
-        due = [uid for uid, rec in records.items() if uid not in open_items and self._owes_retract(rec)]
-        for uid in due[:_RETRACT_PER_PASS]:
-            if self._stopped:
-                break
-            rec = records[uid]
+        recent = dt_util.utcnow() - timedelta(seconds=TODO_SEND_RECHECK_SECONDS)
+        for uid in owed:
+            rec = lst["items"][uid]
+            send_at = _from_iso(rec["send_at"])
+            if not isinstance(rec.get("notification_id"), int) and send_at is not None and send_at > recent:
+                continue  # _arm_timer brings the pass for it
+            if self._stopped or not self._take_retract_token():
+                return
+            collapse_id = rec.get("collapse_id") or _collapse_id(sub_id, uid)
             try:
                 async with asyncio.timeout(_RETRACT_TIMEOUT_SECONDS):
-                    await self._api.retract_notifications(_collapse_id(sub_id, uid))
+                    await self._api.retract_notifications(collapse_id)
+            except PushWardAuthError:
+                raise
             except (PushWardApiError, TimeoutError) as err:
                 rec["retract_failures"] = rec.get("retract_failures", 0) + 1
                 _LOGGER.warning("Could not take back a PushWard reminder for a finished to-do item: %r", err)
-                continue
+                return
             rec["retracted"] = True
-            self._save()
-        return {uid for uid in due if self._owes_retract(records[uid])}
+            lst["retracted"][collapse_id] = _iso(dt_util.utcnow())
+
+    def _take_retract_token(self) -> bool:
+        now = dt_util.utcnow()
+        refill = max(0.0, (now - self._retract_tokens_at).total_seconds()) * _RETRACT_PER_MINUTE / 60
+        self._retract_tokens = min(float(_RETRACT_BURST), self._retract_tokens + refill)
+        self._retract_tokens_at = now
+        if self._retract_tokens < 1:
+            return False
+        self._retract_tokens -= 1
+        return True
 
     @staticmethod
     def _owes_retract(rec: dict) -> bool:
@@ -721,10 +762,9 @@ class TodoReminderManager:
         cap = int(cfg.get(CONF_TODO_MAX_SCHEDULED, DEFAULT_TODO_MAX_SCHEDULED))
         return {r.uid: r for r in candidates[:cap]}
 
-    async def _async_create(
-        self, sub_id: str, cfg: dict, records: dict[str, dict], wanted: dict[str, _Reminder]
-    ) -> None:
+    async def _async_create(self, sub_id: str, cfg: dict, lst: dict, wanted: dict[str, _Reminder]) -> None:
         entity_id = cfg[CONF_ENTITY_ID]
+        records: dict[str, dict] = lst["items"]
         done_button = bool(cfg.get(CONF_TODO_DONE_BUTTON, DEFAULT_TODO_DONE_BUTTON))
         for reminder in sorted(wanted.values(), key=lambda r: r.send_at):
             if self._stopped or self._configs.get(sub_id) is not cfg:
@@ -732,13 +772,17 @@ class TodoReminderManager:
             # A catch-up time computed before earlier creates (and their retries)
             # may have passed by now; the server refuses a send_at in the past.
             send_at = max(reminder.send_at, dt_util.utcnow() + timedelta(seconds=TODO_NEAR_DUE_DELAY_SECONDS))
+            collapse_id, n = _collapse_id(sub_id, reminder.uid), 0
+            while collapse_id in lst["retracted"]:  # a retract under it may still reach a device
+                n += 1
+                collapse_id = _collapse_id(sub_id, f"{reminder.uid}#{n}")
             try:
                 created = await self._api.create_notification(
                     reminder.title,
                     reminder.body,
                     level=cfg.get(CONF_TODO_LEVEL, DEFAULT_TODO_LEVEL),
                     thread_id=f"ha-todo-{entity_id.split('.', 1)[-1]}"[:64],
-                    collapse_id=_collapse_id(sub_id, reminder.uid),
+                    collapse_id=collapse_id,
                     source="home-assistant",
                     source_display_name=self._list_name(entity_id),
                     metadata={TODO_METADATA_LIST: sub_id, TODO_METADATA_UID: reminder.uid},
@@ -795,6 +839,7 @@ class TodoReminderManager:
                 "status": _SCHEDULED,
                 "notification_id": None,
                 "watch_until": None,
+                "collapse_id": collapse_id,
             }
 
     @callback
@@ -981,6 +1026,8 @@ class TodoReminderManager:
                 if status == "failed":
                     # Not sent (the account was out of quota at its time, say).
                     _LOGGER.warning("A PushWard to-do reminder could not be sent: %s", row.get("failure_reason"))
+                if status in (_SERVER_CANCELED, "failed"):
+                    rec["status"] = _STOPPED  # never reached a device: nothing to take back
                 rec["watch_until"] = None  # failed, canceled or gone: no tap will come
                 self._release(rec)
                 self._save()
