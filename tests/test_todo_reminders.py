@@ -1544,3 +1544,19 @@ async def test_turning_the_switch_off_during_a_pass_stops_its_retracts(hass: Hom
 
     api.cancel_scheduled_notification.assert_awaited_once()
     api.retract_notifications.assert_not_awaited()
+
+
+@pytest.mark.parametrize("error", [PushWardApiError("connection reset", status_code=None), TimeoutError()])
+async def test_a_retract_that_may_have_gone_through_holds_its_collapse_id(setup, freezer, error) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    first = api.create_notification.call_args.kwargs["collapse_id"]
+    api.retract_notifications = AsyncMock(side_effect=error)
+    todo.items[0]["status"] = "completed"
+    await manager._async_reconcile(SUB)
+    assert first in manager._lists[SUB]["retracted"]
+
+    todo.items[0] = {**todo.items[0], "status": "needs_action", "due": "2026-10-01T09:20:00+00:00"}
+    await manager._async_reconcile(SUB)
+
+    assert api.create_notification.await_count == 2
+    assert api.create_notification.call_args.kwargs["collapse_id"] != first

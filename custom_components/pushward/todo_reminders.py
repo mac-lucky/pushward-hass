@@ -665,6 +665,8 @@ class TodoReminderManager:
                 raise
             except (PushWardApiError, TimeoutError) as err:
                 rec["retract_failures"] = rec.get("retract_failures", 0) + 1
+                # The server may have taken it all the same: no later reminder gets this id.
+                lst["retracted"][collapse_id] = _iso(dt_util.utcnow())
                 _LOGGER.warning("Could not take back a PushWard reminder for a finished to-do item: %r", err)
                 return
             rec["retracted"] = True
