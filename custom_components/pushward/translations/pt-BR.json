@@ -2520,6 +2520,7 @@
             "all_day_time": "Horário para itens só com data",
             "notification_level": "Nível de notificação",
             "done_button": "Botão Concluído",
+            "retract_when_done": "Retirar lembretes ao concluir",
             "max_scheduled": "Máximo de lembretes agendados ao mesmo tempo"
           },
           "data_description": {
@@ -2528,6 +2529,7 @@
             "all_day_time": "Um item com data de vencimento, mas sem horário, é lembrado neste horário naquele dia.",
             "notification_level": "Como o lembrete interrompe: Passivo chega em silêncio, Urgente atravessa o Foco.",
             "done_button": "Adiciona um botão Concluído ao lembrete. Tocar nele conclui o item no Home Assistant.",
+            "retract_when_done": "Quando o item é concluído ou removido no Home Assistant, um lembrete já entregue some dos seus dispositivos. O Apple Watch e versões do app anteriores à 1.20 o mantêm.",
             "max_scheduled": "Apenas os itens mais próximos são agendados; os demais entram à medida que esses são enviados. Sua conta comporta no máximo 25 notificações agendadas pendentes no total."
           }
         },
@@ -2539,6 +2541,7 @@
             "all_day_time": "Horário para itens só com data",
             "notification_level": "Nível de notificação",
             "done_button": "Botão Concluído",
+            "retract_when_done": "Retirar lembretes ao concluir",
             "max_scheduled": "Máximo de lembretes agendados ao mesmo tempo"
           },
           "data_description": {
@@ -2547,6 +2550,7 @@
             "all_day_time": "Um item com data de vencimento, mas sem horário, é lembrado neste horário naquele dia.",
             "notification_level": "Como o lembrete interrompe: Passivo chega em silêncio, Urgente atravessa o Foco.",
             "done_button": "Adiciona um botão Concluído ao lembrete. Tocar nele conclui o item no Home Assistant.",
+            "retract_when_done": "Quando o item é concluído ou removido no Home Assistant, um lembrete já entregue some dos seus dispositivos. O Apple Watch e versões do app anteriores à 1.20 o mantêm.",
             "max_scheduled": "Apenas os itens mais próximos são agendados; os demais entram à medida que esses são enviados. Sua conta comporta no máximo 25 notificações agendadas pendentes no total."
           }
         }

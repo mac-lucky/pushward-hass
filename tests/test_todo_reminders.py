@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
@@ -22,6 +23,7 @@ from custom_components.pushward.const import (
     CONF_TODO_LEVEL,
     CONF_TODO_MAX_SCHEDULED,
     CONF_TODO_OFFSET_MINUTES,
+    CONF_TODO_RETRACT,
     DOMAIN,
     TODO_METADATA_LIST,
     TODO_METADATA_UID,
@@ -64,6 +66,7 @@ def _api() -> AsyncMock:
     api.list_scheduled_notifications = AsyncMock(return_value=[])
     api.get_scheduled_notification = AsyncMock(return_value=None)
     api.poll_notification_answer = AsyncMock(return_value=({"status": "pending"}, True))
+    api.retract_notifications = AsyncMock(return_value=1)
     return api
 
 
@@ -78,7 +81,9 @@ class _TodoList:
         async def get_items(call: ServiceCall) -> dict:
             entity_ids = call.data["entity_id"]
             entity_ids = [entity_ids] if isinstance(entity_ids, str) else entity_ids
-            return {eid: {"items": list(self.items)} for eid in entity_ids}
+            status = call.data.get("status")
+            items = [item for item in self.items if not status or item.get("status") in status]
+            return {eid: {"items": items} for eid in entity_ids}
 
         async def update_item(call: ServiceCall) -> None:
             self.updates.append(dict(call.data))
@@ -1183,3 +1188,198 @@ async def test_a_reminder_canceled_before_its_time_leaves_the_stream(hass: HomeA
     assert stream._schedules == {}
     assert stream._unsub_timer is None
     assert not stream.running
+
+
+# --- taking back sent reminders -------------------------------------------
+
+_RETRACT_ON = {CONF_TODO_OFFSET_MINUTES: 30, CONF_TODO_RETRACT: True}
+
+
+async def _sent(setup, freezer, items: list[dict] | None = None, **cfg) -> tuple:
+    """A list whose reminders (due 09:00 UTC, sent 08:30) went out."""
+    items = items or [{"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T09:00:00+00:00"}]
+    manager, api, todo = await setup(items, **{**_RETRACT_ON, **cfg})
+    freezer.move_to(NOW + timedelta(minutes=45))
+    await manager._async_reconcile(SUB)
+    assert all(rec["status"] == "sent" for rec in _records(manager).values())
+    return manager, api, todo
+
+
+async def test_completed_item_keeps_its_sent_reminder_with_the_switch_off(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_RETRACT: False})
+
+    todo.items[0]["status"] = "completed"
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_not_awaited()
+
+
+async def test_old_list_config_without_the_switch_retracts_nothing(setup, freezer) -> None:
+    items = [{"uid": "a", "summary": "Call", "status": "needs_action", "due": "2026-10-01T09:00:00+00:00"}]
+    manager, api, todo = await setup(items, **{CONF_TODO_OFFSET_MINUTES: 30})
+    assert CONF_TODO_RETRACT not in manager._configs[SUB]
+    freezer.move_to(NOW + timedelta(minutes=45))
+    await manager._async_reconcile(SUB)
+
+    todo.items.clear()
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_not_awaited()
+
+
+@pytest.mark.parametrize("finish", ["completed", "removed"])
+async def test_finished_item_takes_back_its_sent_reminder_once(setup, freezer, finish: str) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    collapse_id = api.create_notification.call_args.kwargs["collapse_id"]
+
+    if finish == "completed":
+        todo.items[0]["status"] = "completed"
+    else:
+        todo.items.clear()
+    await manager._async_reconcile(SUB)
+    await manager._async_reconcile(SUB, full=True)
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_awaited_once_with(collapse_id)
+    assert _records(manager)["a"]["retracted"] is True  # kept until 90 minutes past due
+
+
+async def test_retracted_flag_survives_a_restart(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    todo.items[0]["status"] = "completed"
+    await manager._async_reconcile(SUB)
+    api.retract_notifications.assert_awaited_once()
+    await manager.async_stop()
+
+    done = [{"uid": "a", "summary": "Call", "status": "completed", "due": "2026-10-01T09:00:00+00:00"}]
+    restarted, api2, _ = await setup(done, **_RETRACT_ON)
+
+    assert _records(restarted)["a"]["retracted"] is True
+    api2.retract_notifications.assert_not_awaited()
+
+
+async def test_done_tap_takes_the_reminder_back_before_its_record_goes(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    rec = _records(manager)["a"]
+    api.get_scheduled_notification = AsyncMock(
+        return_value={"id": rec["schedule_id"], "status": "sent", "notification_id": 55}
+    )
+    api.poll_notification_answer = AsyncMock(
+        return_value=({"notification_id": 55, "status": "answered", "action_id": "done"}, True)
+    )
+    freezer.move_to(NOW + timedelta(minutes=60 + 91))  # past due and its grace: nothing else keeps the record
+    await manager._async_watch_once(SUB, "a", rec, hold=0)
+    assert todo.updates == [{"item": "a", "status": "completed", "entity_id": ENTITY}]
+    assert rec["watch_until"] is None
+
+    todo.items[0]["status"] = "completed"
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_awaited_once_with(api.create_notification.call_args.kwargs["collapse_id"])
+    assert "a" not in _records(manager)
+
+
+async def test_pending_reminder_of_a_finished_item_is_canceled_not_retracted(setup) -> None:
+    items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
+    manager, api, todo = await setup(items, **_RETRACT_ON)
+
+    todo.items.clear()
+    await manager._async_reconcile(SUB)
+
+    api.cancel_scheduled_notification.assert_awaited_once()
+    api.retract_notifications.assert_not_awaited()
+
+
+async def test_stopped_reminder_is_not_retracted(setup) -> None:
+    items = [{"uid": "a", "summary": "Dentist", "status": "needs_action", "due": "2026-10-02T15:00:00+02:00"}]
+    manager, api, todo = await setup(items, **_RETRACT_ON)
+    api.get_scheduled_notification = AsyncMock(
+        return_value={"id": _records(manager)["a"]["schedule_id"], "status": "canceled"}
+    )
+    await manager._async_reconcile(SUB, full=True)
+    assert _records(manager)["a"]["status"] == "stopped"
+
+    todo.items.clear()
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_not_awaited()
+
+
+async def test_item_moved_to_a_new_due_time_is_not_retracted(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+
+    todo.items[0] = {**todo.items[0], "due": "2026-10-02T09:00:00+00:00"}
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_not_awaited()
+    assert api.create_notification.await_count == 2
+    assert _records(manager)["a"]["status"] == "scheduled"
+
+
+async def test_failed_retract_is_tried_on_three_passes_then_dropped(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
+    api.retract_notifications = AsyncMock(side_effect=PushWardApiError("down", status_code=503))
+    todo.items.clear()
+    freezer.move_to(NOW + timedelta(minutes=60 + 91))  # the record would finish on this pass
+
+    for attempt in (1, 2):
+        await manager._async_reconcile(SUB)
+        assert api.retract_notifications.await_count == attempt
+        assert _records(manager)["a"]["retract_failures"] == attempt  # kept for the next try
+    await manager._async_reconcile(SUB)
+    await manager._async_reconcile(SUB)
+
+    assert api.retract_notifications.await_count == 3
+    assert "a" not in _records(manager)
+
+
+async def test_retract_after_a_failure_succeeds_on_the_next_pass(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    api.retract_notifications = AsyncMock(side_effect=[PushWardApiError("busy", status_code=429), 1])
+    todo.items.clear()
+
+    await manager._async_reconcile(SUB)
+    assert "retracted" not in _records(manager)["a"]
+    await manager._async_reconcile(SUB)
+    await manager._async_reconcile(SUB)
+
+    assert api.retract_notifications.await_count == 2
+    assert _records(manager)["a"]["retracted"] is True
+
+
+async def test_slow_retract_is_cut_off_and_tried_again(hass: HomeAssistant, setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    called = asyncio.Event()
+
+    async def _hang(_collapse_id: str) -> int:
+        called.set()
+        await asyncio.Event().wait()  # a 429 ladder or an outage
+        return 1
+
+    api.retract_notifications = AsyncMock(side_effect=_hang)
+    todo.items.clear()
+    task = hass.async_create_task(manager._async_reconcile(SUB))
+    await called.wait()
+    async_fire_time_changed(hass, NOW + timedelta(minutes=45, seconds=11))
+    await task
+
+    assert _records(manager)["a"]["retract_failures"] == 1
+    assert "retracted" not in _records(manager)["a"]
+
+
+async def test_at_most_five_retracts_per_pass(setup, freezer) -> None:
+    due = "2026-10-01T09:00:00+00:00"
+    items = [{"uid": f"i{n}", "summary": f"Item {n}", "status": "needs_action", "due": due} for n in range(7)]
+    manager, api, todo = await _sent(setup, freezer, items, **{CONF_TODO_DONE_BUTTON: False})
+    todo.items.clear()
+    freezer.move_to(NOW + timedelta(minutes=60 + 91))  # every record would finish on this pass
+
+    await manager._async_reconcile(SUB)
+    assert api.retract_notifications.await_count == 5
+    assert len(_records(manager)) == 2  # the two still to take back
+    await manager._async_reconcile(SUB)
+    await manager._async_reconcile(SUB)
+
+    assert api.retract_notifications.await_count == 7
+    assert len({call.args[0] for call in api.retract_notifications.call_args_list}) == 7
+    assert _records(manager) == {}

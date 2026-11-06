@@ -2520,6 +2520,7 @@
             "all_day_time": "Godzina dla zadań z samą datą",
             "notification_level": "Poziom powiadomienia",
             "done_button": "Przycisk Zrobione",
+            "retract_when_done": "Wycofuj przypomnienia po wykonaniu",
             "max_scheduled": "Maksymalnie zaplanowanych przypomnień naraz"
           },
           "data_description": {
@@ -2528,6 +2529,7 @@
             "all_day_time": "Zadanie z terminem, ale bez godziny, jest przypominane tego dnia o tej godzinie.",
             "notification_level": "Jak przypomnienie przerywa: Pasywny przychodzi po cichu, Pilny przebija się przez Skupienie.",
             "done_button": "Dodaj do przypomnienia przycisk Zrobione. Dotknięcie go oznacza zadanie jako wykonane w Home Assistant.",
+            "retract_when_done": "Gdy zadanie zostanie ukończone lub usunięte w Home Assistant, dostarczone już przypomnienie znika z Twoich urządzeń. Apple Watch i wersje aplikacji starsze niż 1.20 je zachowują.",
             "max_scheduled": "Planowane są tylko najbliższe zadania; pozostałe dołączają, gdy te zostaną wysłane. Twoje konto może mieć łącznie maksymalnie 25 oczekujących zaplanowanych powiadomień."
           }
         },
@@ -2539,6 +2541,7 @@
             "all_day_time": "Godzina dla zadań z samą datą",
             "notification_level": "Poziom powiadomienia",
             "done_button": "Przycisk Zrobione",
+            "retract_when_done": "Wycofuj przypomnienia po wykonaniu",
             "max_scheduled": "Maksymalnie zaplanowanych przypomnień naraz"
           },
           "data_description": {
@@ -2547,6 +2550,7 @@
             "all_day_time": "Zadanie z terminem, ale bez godziny, jest przypominane tego dnia o tej godzinie.",
             "notification_level": "Jak przypomnienie przerywa: Pasywny przychodzi po cichu, Pilny przebija się przez Skupienie.",
             "done_button": "Dodaj do przypomnienia przycisk Zrobione. Dotknięcie go oznacza zadanie jako wykonane w Home Assistant.",
+            "retract_when_done": "Gdy zadanie zostanie ukończone lub usunięte w Home Assistant, dostarczone już przypomnienie znika z Twoich urządzeń. Apple Watch i wersje aplikacji starsze niż 1.20 je zachowują.",
             "max_scheduled": "Planowane są tylko najbliższe zadania; pozostałe dołączają, gdy te zostaną wysłane. Twoje konto może mieć łącznie maksymalnie 25 oczekujących zaplanowanych powiadomień."
           }
         }

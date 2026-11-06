@@ -2520,6 +2520,7 @@
             "all_day_time": "Heure pour les éléments sans heure",
             "notification_level": "Niveau de notification",
             "done_button": "Bouton Terminé",
+            "retract_when_done": "Retirer les rappels une fois terminés",
             "max_scheduled": "Nombre maximal de rappels planifiés à la fois"
           },
           "data_description": {
@@ -2528,6 +2529,7 @@
             "all_day_time": "Un élément avec une date d'échéance mais sans heure est rappelé à cette heure ce jour-là.",
             "notification_level": "Comment le rappel interrompt : Passif arrive en silence, Urgent passe outre le mode Concentration.",
             "done_button": "Ajouter un bouton Terminé au rappel. Le toucher termine l'élément dans Home Assistant.",
+            "retract_when_done": "Quand l'élément est terminé ou supprimé dans Home Assistant, un rappel déjà reçu est retiré de vos appareils. L'Apple Watch et les versions de l'app antérieures à 1.20 le conservent.",
             "max_scheduled": "Seuls les éléments les plus proches sont planifiés ; les autres suivent à mesure que ceux-ci partent. Votre compte peut contenir au maximum 25 notifications planifiées en attente, tout confondu."
           }
         },
@@ -2539,6 +2541,7 @@
             "all_day_time": "Heure pour les éléments sans heure",
             "notification_level": "Niveau de notification",
             "done_button": "Bouton Terminé",
+            "retract_when_done": "Retirer les rappels une fois terminés",
             "max_scheduled": "Nombre maximal de rappels planifiés à la fois"
           },
           "data_description": {
@@ -2547,6 +2550,7 @@
             "all_day_time": "Un élément avec une date d'échéance mais sans heure est rappelé à cette heure ce jour-là.",
             "notification_level": "Comment le rappel interrompt : Passif arrive en silence, Urgent passe outre le mode Concentration.",
             "done_button": "Ajouter un bouton Terminé au rappel. Le toucher termine l'élément dans Home Assistant.",
+            "retract_when_done": "Quand l'élément est terminé ou supprimé dans Home Assistant, un rappel déjà reçu est retiré de vos appareils. L'Apple Watch et les versions de l'app antérieures à 1.20 le conservent.",
             "max_scheduled": "Seuls les éléments les plus proches sont planifiés ; les autres suivent à mesure que ceux-ci partent. Votre compte peut contenir au maximum 25 notifications planifiées en attente, tout confondu."
           }
         }

@@ -21,6 +21,9 @@ notes).
   The entry's answer stream reads it for every reminder it tracks, for
   TODO_WATCH_HOURS after the send, and is told to let a reminder go once its watch
   ends; the manager reads the others itself, one reminder at a time.
+- With "take back reminders when done" on, a reminder that went out is retracted
+  once its item is completed or removed, while its record is still kept (until
+  the item is past the late-grace window and the Done button's watch ended).
 """
 
 from __future__ import annotations
@@ -75,11 +78,13 @@ from .const import (
     CONF_TODO_LEVEL,
     CONF_TODO_MAX_SCHEDULED,
     CONF_TODO_OFFSET_MINUTES,
+    CONF_TODO_RETRACT,
     DEFAULT_TODO_ALL_DAY_TIME,
     DEFAULT_TODO_DONE_BUTTON,
     DEFAULT_TODO_LEVEL,
     DEFAULT_TODO_MAX_SCHEDULED,
     DEFAULT_TODO_OFFSET_MINUTES,
+    DEFAULT_TODO_RETRACT,
     DOMAIN,
     SUBENTRY_TYPE_TODO,
     TODO_BODY_MAX,
@@ -129,6 +134,13 @@ _SERVER_PENDING = ("scheduled", "sending")
 _WATCH_SHORT_PAUSE_SECONDS = 10
 # Tries at completing an item for a Done tap before the tap is given up.
 _COMPLETE_ATTEMPTS = 3
+# Taking back the reminders of finished items: tries per reminder, retracts per
+# pass (the server's burst, shared with every other client of the account) and a
+# bound on each call, so a 429 or an outage never holds the list's lock through
+# the client's retries.
+_RETRACT_ATTEMPTS = 3
+_RETRACT_PER_PASS = 5
+_RETRACT_TIMEOUT_SECONDS = 10
 
 # The server refuses encrypted notifications from an organization's key while
 # PushWard has encryption for organizations turned off.
@@ -565,6 +577,12 @@ class TodoReminderManager:
         versions = {uid: _version(item) for uid, item in open_items.items()}
         self._refused = {key: v for key, v in self._refused.items() if key[0] != sub_id or versions.get(key[1]) == v}
         wanted = self._wanted(sub_id, cfg, open_items, versions, records, now)
+        # Before the loop below, which can let a finished item's record go.
+        retracting = (
+            await self._async_retract(sub_id, records, open_items)
+            if cfg.get(CONF_TODO_RETRACT, DEFAULT_TODO_RETRACT)
+            else set()
+        )
 
         for uid, rec in list(records.items()):
             if rec["status"] == _SCHEDULED:
@@ -584,7 +602,7 @@ class TodoReminderManager:
             elif uid in open_items and not _same_occurrence(rec, open_items[uid], versions[uid]):
                 del records[uid]  # moved to a new due time: that one gets a reminder of its own
                 self._release(rec)
-            elif self._finished(rec, now):
+            elif self._finished(rec, now) and uid not in retracting:
                 del records[uid]
                 self._release(rec)
             else:
@@ -596,6 +614,34 @@ class TodoReminderManager:
 
         if sub_id not in self._blocked:
             await self._async_create(sub_id, cfg, records, wanted)
+
+    async def _async_retract(self, sub_id: str, records: dict[str, dict], open_items: dict[str, dict]) -> set[str]:
+        """Take back the sent reminders whose items were completed or removed.
+
+        Returns the items whose retract is still to come (failed, or past this
+        pass's share), so their records are kept for the next pass.
+        """
+        due = [uid for uid, rec in records.items() if uid not in open_items and self._owes_retract(rec)]
+        for uid in due[:_RETRACT_PER_PASS]:
+            if self._stopped:
+                break
+            rec = records[uid]
+            try:
+                async with asyncio.timeout(_RETRACT_TIMEOUT_SECONDS):
+                    await self._api.retract_notifications(_collapse_id(sub_id, uid))
+            except (PushWardApiError, TimeoutError) as err:
+                rec["retract_failures"] = rec.get("retract_failures", 0) + 1
+                _LOGGER.warning("Could not take back a PushWard reminder for a finished to-do item: %r", err)
+                continue
+            rec["retracted"] = True
+            self._save()
+        return {uid for uid in due if self._owes_retract(records[uid])}
+
+    @staticmethod
+    def _owes_retract(rec: dict) -> bool:
+        return (
+            rec["status"] == _SENT and not rec.get("retracted") and rec.get("retract_failures", 0) < _RETRACT_ATTEMPTS
+        )
 
     async def _async_check_pending(self, sub_id: str, cfg: dict, records: dict[str, dict]) -> None:
         """Find out what became of pending reminders, and purge this list's unknown schedules."""

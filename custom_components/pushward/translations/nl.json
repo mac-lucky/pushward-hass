@@ -2520,6 +2520,7 @@
             "all_day_time": "Tijd voor items met alleen een datum",
             "notification_level": "Meldingsniveau",
             "done_button": "Klaar-knop",
+            "retract_when_done": "Herinneringen intrekken na voltooien",
             "max_scheduled": "Maximaal tegelijk geplande herinneringen"
           },
           "data_description": {
@@ -2528,6 +2529,7 @@
             "all_day_time": "Een item met een vervaldatum maar zonder tijd wordt op die dag op dit tijdstip herinnerd.",
             "notification_level": "Hoe de herinnering onderbreekt: Passief komt stil binnen, Tijdgevoelig doorbreekt Focus.",
             "done_button": "Voeg een Klaar-knop toe aan de herinnering. Erop tikken voltooit het item in Home Assistant.",
+            "retract_when_done": "Wanneer het item in Home Assistant wordt voltooid of verwijderd, verdwijnt een al bezorgde herinnering van je apparaten. Apple Watch en appversies ouder dan 1.20 houden hem.",
             "max_scheduled": "Alleen de eerstvolgende items worden gepland; de rest volgt zodra die verstuurd zijn. Je account kan in totaal maximaal 25 openstaande geplande meldingen bevatten."
           }
         },
@@ -2539,6 +2541,7 @@
             "all_day_time": "Tijd voor items met alleen een datum",
             "notification_level": "Meldingsniveau",
             "done_button": "Klaar-knop",
+            "retract_when_done": "Herinneringen intrekken na voltooien",
             "max_scheduled": "Maximaal tegelijk geplande herinneringen"
           },
           "data_description": {
@@ -2547,6 +2550,7 @@
             "all_day_time": "Een item met een vervaldatum maar zonder tijd wordt op die dag op dit tijdstip herinnerd.",
             "notification_level": "Hoe de herinnering onderbreekt: Passief komt stil binnen, Tijdgevoelig doorbreekt Focus.",
             "done_button": "Voeg een Klaar-knop toe aan de herinnering. Erop tikken voltooit het item in Home Assistant.",
+            "retract_when_done": "Wanneer het item in Home Assistant wordt voltooid of verwijderd, verdwijnt een al bezorgde herinnering van je apparaten. Apple Watch en appversies ouder dan 1.20 houden hem.",
             "max_scheduled": "Alleen de eerstvolgende items worden gepland; de rest volgt zodra die verstuurd zijn. Je account kan in totaal maximaal 25 openstaande geplande meldingen bevatten."
           }
         }

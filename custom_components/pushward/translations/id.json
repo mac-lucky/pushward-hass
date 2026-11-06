@@ -2520,6 +2520,7 @@
             "all_day_time": "Waktu untuk item yang hanya bertanggal",
             "notification_level": "Tingkat notifikasi",
             "done_button": "Tombol Selesai",
+            "retract_when_done": "Tarik kembali pengingat setelah selesai",
             "max_scheduled": "Maksimum pengingat terjadwal sekaligus"
           },
           "data_description": {
@@ -2528,6 +2529,7 @@
             "all_day_time": "Item dengan tanggal tenggat tetapi tanpa jam diingatkan pada jam ini di hari tersebut.",
             "notification_level": "Cara pengingat menyela: Pasif datang tanpa suara, Peka waktu menembus Fokus.",
             "done_button": "Tambahkan tombol Selesai ke pengingat. Mengetuknya menyelesaikan item di Home Assistant.",
+            "retract_when_done": "Saat item diselesaikan atau dihapus di Home Assistant, pengingat yang sudah terkirim dihapus dari perangkat Anda. Apple Watch dan versi aplikasi sebelum 1.20 tetap menyimpannya.",
             "max_scheduled": "Hanya item terdekat yang dijadwalkan; sisanya menyusul saat item tersebut terkirim. Akun Anda dapat menampung paling banyak 25 notifikasi terjadwal yang tertunda secara keseluruhan."
           }
         },
@@ -2539,6 +2541,7 @@
             "all_day_time": "Waktu untuk item yang hanya bertanggal",
             "notification_level": "Tingkat notifikasi",
             "done_button": "Tombol Selesai",
+            "retract_when_done": "Tarik kembali pengingat setelah selesai",
             "max_scheduled": "Maksimum pengingat terjadwal sekaligus"
           },
           "data_description": {
@@ -2547,6 +2550,7 @@
             "all_day_time": "Item dengan tanggal tenggat tetapi tanpa jam diingatkan pada jam ini di hari tersebut.",
             "notification_level": "Cara pengingat menyela: Pasif datang tanpa suara, Peka waktu menembus Fokus.",
             "done_button": "Tambahkan tombol Selesai ke pengingat. Mengetuknya menyelesaikan item di Home Assistant.",
+            "retract_when_done": "Saat item diselesaikan atau dihapus di Home Assistant, pengingat yang sudah terkirim dihapus dari perangkat Anda. Apple Watch dan versi aplikasi sebelum 1.20 tetap menyimpannya.",
             "max_scheduled": "Hanya item terdekat yang dijadwalkan; sisanya menyusul saat item tersebut terkirim. Akun Anda dapat menampung paling banyak 25 notifikasi terjadwal yang tertunda secara keseluruhan."
           }
         }

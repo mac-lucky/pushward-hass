@@ -465,11 +465,13 @@ CONF_TODO_OFFSET_MINUTES = "offset_minutes"
 CONF_TODO_ALL_DAY_TIME = "all_day_time"
 CONF_TODO_LEVEL = "notification_level"
 CONF_TODO_DONE_BUTTON = "done_button"
+CONF_TODO_RETRACT = "retract_when_done"
 CONF_TODO_MAX_SCHEDULED = "max_scheduled"
 DEFAULT_TODO_OFFSET_MINUTES = 0
 DEFAULT_TODO_ALL_DAY_TIME = "09:00:00"
 DEFAULT_TODO_LEVEL = "active"
 DEFAULT_TODO_DONE_BUTTON = True
+DEFAULT_TODO_RETRACT = False
 DEFAULT_TODO_MAX_SCHEDULED = 10
 # Levels the to-do list form offers (critical needs a volume and the entitlement).
 TODO_LEVELS = ["passive", "active", "time-sensitive"]

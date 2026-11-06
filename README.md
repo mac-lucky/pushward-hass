@@ -479,6 +479,7 @@ How many `stat_list` rows are visible depends on the widget size. By default a m
 | Time for date-only items | 09:00 | An item with a due date but no time is reminded at this time on that day |
 | Notification level | active | passive, active or time-sensitive |
 | Done button | on | Adds a Done button to the reminder; tapping it completes the item in Home Assistant |
+| Take back reminders when done | off | Removes a reminder that already went out from your devices once its item is completed or removed |
 | Most reminders scheduled at once | 10 | Only the soonest items are scheduled; the rest follow as those go out (the account holds at most 25 pending scheduled notifications across everything) |
 
 How it stays in step:
@@ -487,6 +488,7 @@ How it stays in step:
 - An item due more than 365 days out is scheduled once it comes within range. An item whose reminder time has already passed gets its reminder within a minute, unless it is more than 90 minutes past due; then it gets none.
 - If you stop a reminder in the PushWard app, the item stays open and gets no new reminder until you change its due date or time. Renaming an item whose reminder already went out does not send it again either.
 - After a reminder goes out, the item stays open for you to tick off. With the Done button, a tap within 24 hours completes it. The tap reaches Home Assistant through the same long-poll as the [`pushward_notification_action` event](#the-pushward_notification_action-event); a reminder it does not track (one made by an older version, or any while that long-poll has stopped on an error) is watched on its own, a long-lived request at a time for the first hour, then a quick check every 5 minutes.
+- With **Take back reminders when done** on, a reminder that already went out is taken back once its item is completed (in Home Assistant or with the Done button) or deleted, the way [`pushward.clear_notification`](#pushwardclear_notification) does it. That is best effort: the Apple Watch and PushWard versions before 1.20 keep the reminder. Home Assistant forgets a sent reminder 90 minutes after the item's due time, or 24 hours after the send with the Done button on if that is later, so an item completed after that keeps its reminder. A list takes back at most 5 reminders per sync and tries each one up to 3 times; the rest wait for the next sync, at the latest an hour later.
 - The pairing between items and reminders is kept in Home Assistant's storage, not in the item, so notes synced to other apps stay clean. Removing the list (or the integration) cancels its pending reminders.
 
 ### End-to-end encryption

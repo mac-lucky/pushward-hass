@@ -2520,6 +2520,7 @@
             "all_day_time": "Giờ cho mục chỉ có ngày",
             "notification_level": "Mức thông báo",
             "done_button": "Nút Xong",
+            "retract_when_done": "Thu hồi lời nhắc khi hoàn thành",
             "max_scheduled": "Số lời nhắc tối đa được lên lịch cùng lúc"
           },
           "data_description": {
@@ -2528,6 +2529,7 @@
             "all_day_time": "Mục có ngày đến hạn nhưng không có giờ sẽ được nhắc vào giờ này trong ngày đó.",
             "notification_level": "Cách lời nhắc làm gián đoạn: Thụ động đến lặng lẽ, Nhạy cảm thời gian vượt qua Tập trung.",
             "done_button": "Thêm nút Xong vào lời nhắc. Chạm vào nút sẽ hoàn thành mục đó trong Home Assistant.",
+            "retract_when_done": "Khi mục được hoàn thành hoặc xóa trong Home Assistant, lời nhắc đã gửi đến sẽ bị gỡ khỏi thiết bị của bạn. Apple Watch và các phiên bản ứng dụng trước 1.20 vẫn giữ lại.",
             "max_scheduled": "Chỉ những mục gần nhất được lên lịch; các mục còn lại sẽ theo sau khi những mục đó được gửi. Tài khoản của bạn chỉ có tối đa 25 thông báo đã lên lịch đang chờ cho tất cả mọi thứ."
           }
         },
@@ -2539,6 +2541,7 @@
             "all_day_time": "Giờ cho mục chỉ có ngày",
             "notification_level": "Mức thông báo",
             "done_button": "Nút Xong",
+            "retract_when_done": "Thu hồi lời nhắc khi hoàn thành",
             "max_scheduled": "Số lời nhắc tối đa được lên lịch cùng lúc"
           },
           "data_description": {
@@ -2547,6 +2550,7 @@
             "all_day_time": "Mục có ngày đến hạn nhưng không có giờ sẽ được nhắc vào giờ này trong ngày đó.",
             "notification_level": "Cách lời nhắc làm gián đoạn: Thụ động đến lặng lẽ, Nhạy cảm thời gian vượt qua Tập trung.",
             "done_button": "Thêm nút Xong vào lời nhắc. Chạm vào nút sẽ hoàn thành mục đó trong Home Assistant.",
+            "retract_when_done": "Khi mục được hoàn thành hoặc xóa trong Home Assistant, lời nhắc đã gửi đến sẽ bị gỡ khỏi thiết bị của bạn. Apple Watch và các phiên bản ứng dụng trước 1.20 vẫn giữ lại.",
             "max_scheduled": "Chỉ những mục gần nhất được lên lịch; các mục còn lại sẽ theo sau khi những mục đó được gửi. Tài khoản của bạn chỉ có tối đa 25 thông báo đã lên lịch đang chờ cho tất cả mọi thứ."
           }
         }

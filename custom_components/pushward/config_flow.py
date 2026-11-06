@@ -147,6 +147,7 @@ from .const import (
     CONF_TODO_LEVEL,
     CONF_TODO_MAX_SCHEDULED,
     CONF_TODO_OFFSET_MINUTES,
+    CONF_TODO_RETRACT,
     CONF_TOTAL_ENTITY,
     CONF_TOTAL_STEPS,
     CONF_UNIT,
@@ -185,6 +186,7 @@ from .const import (
     DEFAULT_TODO_LEVEL,
     DEFAULT_TODO_MAX_SCHEDULED,
     DEFAULT_TODO_OFFSET_MINUTES,
+    DEFAULT_TODO_RETRACT,
     DEFAULT_TOTAL_STEPS,
     DEFAULT_UPDATE_INTERVAL,
     DEFAULT_VALUE_SCALE,
@@ -3649,6 +3651,7 @@ def _todo_schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
             vol.Required(
                 CONF_TODO_DONE_BUTTON, default=d.get(CONF_TODO_DONE_BUTTON, DEFAULT_TODO_DONE_BUTTON)
             ): BooleanSelector(),
+            vol.Required(CONF_TODO_RETRACT, default=d.get(CONF_TODO_RETRACT, DEFAULT_TODO_RETRACT)): BooleanSelector(),
             vol.Required(
                 CONF_TODO_MAX_SCHEDULED, default=d.get(CONF_TODO_MAX_SCHEDULED, DEFAULT_TODO_MAX_SCHEDULED)
             ): NumberSelector(
@@ -3666,6 +3669,7 @@ def _todo_data(user_input: Mapping[str, Any]) -> dict[str, Any]:
         CONF_TODO_ALL_DAY_TIME: str(user_input.get(CONF_TODO_ALL_DAY_TIME, DEFAULT_TODO_ALL_DAY_TIME)),
         CONF_TODO_LEVEL: user_input.get(CONF_TODO_LEVEL, DEFAULT_TODO_LEVEL),
         CONF_TODO_DONE_BUTTON: bool(user_input.get(CONF_TODO_DONE_BUTTON, DEFAULT_TODO_DONE_BUTTON)),
+        CONF_TODO_RETRACT: bool(user_input.get(CONF_TODO_RETRACT, DEFAULT_TODO_RETRACT)),
         CONF_TODO_MAX_SCHEDULED: int(user_input.get(CONF_TODO_MAX_SCHEDULED, DEFAULT_TODO_MAX_SCHEDULED)),
     }
 

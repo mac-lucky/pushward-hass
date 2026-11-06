@@ -17,6 +17,7 @@ from custom_components.pushward.const import (
     CONF_TODO_LEVEL,
     CONF_TODO_MAX_SCHEDULED,
     CONF_TODO_OFFSET_MINUTES,
+    CONF_TODO_RETRACT,
     DOMAIN,
     SUBENTRY_TYPE_TODO,
 )
@@ -29,7 +30,8 @@ FORM = {
     CONF_TODO_DONE_BUTTON: True,
     CONF_TODO_MAX_SCHEDULED: 5.0,
 }
-STORED = {**FORM, CONF_TODO_OFFSET_MINUTES: 15, CONF_TODO_MAX_SCHEDULED: 5}
+# The form left at its defaults: "take back reminders when done" is stored off.
+STORED = {**FORM, CONF_TODO_OFFSET_MINUTES: 15, CONF_TODO_MAX_SCHEDULED: 5, CONF_TODO_RETRACT: False}
 
 
 def _entry(*subentries: ConfigSubentryData) -> MockConfigEntry:
@@ -93,7 +95,8 @@ async def test_reconfigure_tracked_todo_list(hass: HomeAssistant) -> None:
     assert result["step_id"] == "reconfigure"
 
     result = await hass.config_entries.subentries.async_configure(
-        result["flow_id"], user_input={**FORM, CONF_TODO_OFFSET_MINUTES: 60.0, CONF_TODO_DONE_BUTTON: False}
+        result["flow_id"],
+        user_input={**FORM, CONF_TODO_OFFSET_MINUTES: 60.0, CONF_TODO_DONE_BUTTON: False, CONF_TODO_RETRACT: True},
     )
 
     assert result["type"] is FlowResultType.ABORT
@@ -101,6 +104,28 @@ async def test_reconfigure_tracked_todo_list(hass: HomeAssistant) -> None:
     data = entry.subentries[subentry_id].data
     assert data[CONF_TODO_OFFSET_MINUTES] == 60
     assert data[CONF_TODO_DONE_BUTTON] is False
+    assert data[CONF_TODO_RETRACT] is True
+
+
+def _default(result, key: str):
+    return next(field.default() for field in result["data_schema"].schema if field == key)
+
+
+async def test_retract_switch_defaults_off_for_new_and_older_lists(hass: HomeAssistant) -> None:
+    older = {key: value for key, value in STORED.items() if key != CONF_TODO_RETRACT}
+    existing = ConfigSubentryData(
+        data=older, subentry_type=SUBENTRY_TYPE_TODO, title="Reminders", unique_id="todo:todo.reminders"
+    )
+    entry = _entry(existing)
+    entry.add_to_hass(hass)
+
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_TODO), context={"source": config_entries.SOURCE_USER}
+    )
+    assert _default(result, CONF_TODO_RETRACT) is False
+
+    result = await entry.start_subentry_reconfigure_flow(hass, next(iter(entry.subentries)))
+    assert _default(result, CONF_TODO_RETRACT) is False
 
 
 async def test_list_already_tracked_as_an_activity_can_be_added(hass: HomeAssistant) -> None:
