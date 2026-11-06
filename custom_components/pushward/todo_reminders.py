@@ -24,8 +24,9 @@ notes).
 - With "take back reminders when done" on, a reminder that went out is retracted
   once its item is completed or removed, while its record is still kept (until
   the item is past the late-grace window and the Done button's watch ended). A
-  later reminder for the item gets a new collapse id while the retract push may
-  still be on its way, so the retract cannot take it down too.
+  later reminder for the item (moved to a new due time, or undone and so reminded
+  again) gets a new collapse id while the retract push may still be on its way,
+  so the retract cannot take it down too.
 """
 
 from __future__ import annotations
@@ -121,7 +122,8 @@ _SAVE_DELAY = 5
 # button may still be watched). stopped: canceled before its time by someone else,
 # or found canceled or failed after it. sent and stopped records stay until their
 # item is past the late-grace window, so the same item version never gets a second
-# reminder, even if the item briefly leaves the open list (completed, then undone).
+# reminder, even if the item briefly leaves the open list (completed, then undone);
+# unless its reminder was taken back meanwhile, then the item is reminded again.
 _SCHEDULED = "scheduled"
 _SENT = "sent"
 _STOPPED = "stopped"
@@ -759,7 +761,12 @@ class TodoReminderManager:
             if due_at is None:
                 continue
             rec = records.get(uid)
-            if rec is not None and rec["status"] != _SCHEDULED and _same_occurrence(rec, item, versions[uid]):
+            if (
+                rec is not None
+                and rec["status"] != _SCHEDULED
+                and not rec.get("retracted")
+                and _same_occurrence(rec, item, versions[uid])
+            ):
                 continue  # this due time was already reminded, or its reminder stopped
             if self._refused.get((sub_id, uid)) == versions[uid]:
                 continue

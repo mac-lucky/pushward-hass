@@ -1623,3 +1623,32 @@ async def test_known_notification_needs_no_look_before_the_retract(setup, freeze
 
     api.get_scheduled_notification.assert_not_awaited()
     api.retract_notifications.assert_awaited_once()
+
+
+async def test_an_item_undone_after_its_reminder_was_taken_back_is_reminded_again(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    first = api.create_notification.call_args.kwargs["collapse_id"]
+    todo.items[0]["status"] = "completed"  # ticked by mistake
+    await manager._async_reconcile(SUB)
+    api.retract_notifications.assert_awaited_once_with(first)
+
+    todo.items[0]["status"] = "needs_action"  # and unticked, same due time
+    await manager._async_reconcile(SUB)
+
+    assert api.create_notification.await_count == 2
+    kwargs = api.create_notification.call_args.kwargs
+    assert kwargs["collapse_id"] != first  # the retract may still be on its way
+    assert kwargs["send_at"] == NOW + timedelta(minutes=45, seconds=60)
+    assert _records(manager)["a"]["status"] == "scheduled"
+
+
+async def test_an_item_undone_after_a_failed_take_back_is_not_reminded_again(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer)
+    api.retract_notifications = AsyncMock(side_effect=PushWardApiError("down", status_code=503))
+    todo.items[0]["status"] = "completed"
+    await manager._async_reconcile(SUB)
+
+    todo.items[0]["status"] = "needs_action"  # the reminder most likely still shows
+    await manager._async_reconcile(SUB)
+
+    api.create_notification.assert_awaited_once()
