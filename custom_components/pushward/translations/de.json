@@ -2529,7 +2529,7 @@
             "all_day_time": "Ein Eintrag mit Fälligkeitsdatum, aber ohne Uhrzeit wird an diesem Tag zu dieser Uhrzeit erinnert.",
             "notification_level": "Wie die Erinnerung unterbricht: Passiv kommt lautlos an, Dringlich durchbricht den Fokus.",
             "done_button": "Der Erinnerung eine Erledigt-Schaltfläche hinzufügen. Antippen erledigt den Eintrag in Home Assistant.",
-            "retract_when_done": "Wird der Eintrag in Home Assistant erledigt oder entfernt, verschwindet eine bereits zugestellte Erinnerung von den Geräten. Apple Watch und App-Versionen vor 1.20 behalten sie.",
+            "retract_when_done": "Wird der Eintrag in Home Assistant erledigt oder entfernt, verschwindet eine bereits zugestellte Erinnerung von den Geräten. Die Apple Watch behält sie, ebenso PushWard auf iPhone, iPad oder Mac vor Version 1.20.",
             "max_scheduled": "Nur die nächstfälligen Einträge werden geplant; der Rest folgt, sobald diese gesendet sind. Das Konto hält über alles hinweg höchstens 25 ausstehende geplante Benachrichtigungen."
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "Ein Eintrag mit Fälligkeitsdatum, aber ohne Uhrzeit wird an diesem Tag zu dieser Uhrzeit erinnert.",
             "notification_level": "Wie die Erinnerung unterbricht: Passiv kommt lautlos an, Dringlich durchbricht den Fokus.",
             "done_button": "Der Erinnerung eine Erledigt-Schaltfläche hinzufügen. Antippen erledigt den Eintrag in Home Assistant.",
-            "retract_when_done": "Wird der Eintrag in Home Assistant erledigt oder entfernt, verschwindet eine bereits zugestellte Erinnerung von den Geräten. Apple Watch und App-Versionen vor 1.20 behalten sie.",
+            "retract_when_done": "Wird der Eintrag in Home Assistant erledigt oder entfernt, verschwindet eine bereits zugestellte Erinnerung von den Geräten. Die Apple Watch behält sie, ebenso PushWard auf iPhone, iPad oder Mac vor Version 1.20.",
             "max_scheduled": "Nur die nächstfälligen Einträge werden geplant; der Rest folgt, sobald diese gesendet sind. Das Konto hält über alles hinweg höchstens 25 ausstehende geplante Benachrichtigungen."
           }
         }

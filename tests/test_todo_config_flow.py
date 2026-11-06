@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant
@@ -21,6 +24,8 @@ from custom_components.pushward.const import (
     DOMAIN,
     SUBENTRY_TYPE_TODO,
 )
+
+TRANSLATIONS = Path(__file__).parent.parent / "custom_components" / "pushward" / "translations"
 
 FORM = {
     CONF_ENTITY_ID: "todo.reminders",
@@ -126,6 +131,17 @@ async def test_retract_switch_defaults_off_for_new_and_older_lists(hass: HomeAss
 
     result = await entry.start_subentry_reconfigure_flow(hass, next(iter(entry.subentries)))
     assert _default(result, CONF_TODO_RETRACT) is False
+
+
+def test_retract_description_excepts_only_the_apple_apps_before_1_20() -> None:
+    # Android removes a taken-back reminder in every released version, so no
+    # locale may say "app versions before 1.20" without naming the Apple apps.
+    for path in sorted(TRANSLATIONS.glob("*.json")):
+        steps = json.loads(path.read_text(encoding="utf-8"))["config_subentries"]["tracked_todo"]["step"]
+        for step in ("user", "reconfigure"):
+            text = steps[step]["data_description"]["retract_when_done"]
+            for name in ("Apple Watch", "PushWard", "iPhone", "iPad", "Mac", "1.20"):
+                assert name in text, (path.name, step, name)
 
 
 async def test_list_already_tracked_as_an_activity_can_be_added(hass: HomeAssistant) -> None:

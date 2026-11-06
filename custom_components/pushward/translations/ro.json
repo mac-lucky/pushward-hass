@@ -2529,7 +2529,7 @@
             "all_day_time": "Un element cu dată de termen, dar fără oră, este amintit la această oră în ziua respectivă.",
             "notification_level": "Cum întrerupe mementoul: Pasiv sosește silențios, Urgent trece prin modul Concentrare.",
             "done_button": "Adaugă un buton Gata la memento. Atingerea lui finalizează elementul în Home Assistant.",
-            "retract_when_done": "Când elementul este finalizat sau eliminat în Home Assistant, un memento deja livrat dispare de pe dispozitivele dvs. Apple Watch și versiunile aplicației mai vechi de 1.20 îl păstrează.",
+            "retract_when_done": "Când elementul este finalizat sau eliminat în Home Assistant, un memento deja livrat dispare de pe dispozitivele dvs. Apple Watch îl păstrează, la fel și PushWard pe iPhone, iPad sau Mac în versiunile mai vechi de 1.20.",
             "max_scheduled": "Sunt programate doar elementele cele mai apropiate; restul urmează pe măsură ce acestea sunt trimise. Contul dvs. poate avea în total cel mult 25 de notificări programate în așteptare."
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "Un element cu dată de termen, dar fără oră, este amintit la această oră în ziua respectivă.",
             "notification_level": "Cum întrerupe mementoul: Pasiv sosește silențios, Urgent trece prin modul Concentrare.",
             "done_button": "Adaugă un buton Gata la memento. Atingerea lui finalizează elementul în Home Assistant.",
-            "retract_when_done": "Când elementul este finalizat sau eliminat în Home Assistant, un memento deja livrat dispare de pe dispozitivele dvs. Apple Watch și versiunile aplicației mai vechi de 1.20 îl păstrează.",
+            "retract_when_done": "Când elementul este finalizat sau eliminat în Home Assistant, un memento deja livrat dispare de pe dispozitivele dvs. Apple Watch îl păstrează, la fel și PushWard pe iPhone, iPad sau Mac în versiunile mai vechi de 1.20.",
             "max_scheduled": "Sunt programate doar elementele cele mai apropiate; restul urmează pe măsură ce acestea sunt trimise. Contul dvs. poate avea în total cel mult 25 de notificări programate în așteptare."
           }
         }

@@ -2529,7 +2529,7 @@
             "all_day_time": "Son tarihi olan ancak saati olmayan bir öğe o gün bu saatte hatırlatılır.",
             "notification_level": "Hatırlatıcının nasıl böldüğü: Pasif sessizce gelir, Zamana duyarlı Odak modunu aşar.",
             "done_button": "Hatırlatıcıya bir Tamamlandı düğmesi ekler. Düğmeye dokunmak öğeyi Home Assistant'ta tamamlar.",
-            "retract_when_done": "Öğe Home Assistant'ta tamamlandığında veya kaldırıldığında, zaten ulaşmış bir hatırlatıcı cihazlarınızdan kaldırılır. Apple Watch ve 1.20 öncesi uygulama sürümleri onu tutar.",
+            "retract_when_done": "Öğe Home Assistant'ta tamamlandığında veya kaldırıldığında, zaten ulaşmış bir hatırlatıcı cihazlarınızdan kaldırılır. Apple Watch onu tutar; iPhone, iPad veya Mac'te 1.20 öncesi PushWard da tutar.",
             "max_scheduled": "Yalnızca en yakın öğeler planlanır; diğerleri bunlar gönderildikçe sıraya girer. Hesabınız toplamda en fazla 25 bekleyen zamanlanmış bildirim tutabilir."
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "Son tarihi olan ancak saati olmayan bir öğe o gün bu saatte hatırlatılır.",
             "notification_level": "Hatırlatıcının nasıl böldüğü: Pasif sessizce gelir, Zamana duyarlı Odak modunu aşar.",
             "done_button": "Hatırlatıcıya bir Tamamlandı düğmesi ekler. Düğmeye dokunmak öğeyi Home Assistant'ta tamamlar.",
-            "retract_when_done": "Öğe Home Assistant'ta tamamlandığında veya kaldırıldığında, zaten ulaşmış bir hatırlatıcı cihazlarınızdan kaldırılır. Apple Watch ve 1.20 öncesi uygulama sürümleri onu tutar.",
+            "retract_when_done": "Öğe Home Assistant'ta tamamlandığında veya kaldırıldığında, zaten ulaşmış bir hatırlatıcı cihazlarınızdan kaldırılır. Apple Watch onu tutar; iPhone, iPad veya Mac'te 1.20 öncesi PushWard da tutar.",
             "max_scheduled": "Yalnızca en yakın öğeler planlanır; diğerleri bunlar gönderildikçe sıraya girer. Hesabınız toplamda en fazla 25 bekleyen zamanlanmış bildirim tutabilir."
           }
         }

@@ -2529,7 +2529,7 @@
             "all_day_time": "Un elemento con fecha de vencimiento pero sin hora se recuerda a esta hora ese día.",
             "notification_level": "Cómo interrumpe el recordatorio: Pasivo llega en silencio, Urgente atraviesa el modo Concentración.",
             "done_button": "Añadir un botón Hecho al recordatorio. Al tocarlo, el elemento se completa en Home Assistant.",
-            "retract_when_done": "Cuando el elemento se completa o se elimina en Home Assistant, el recordatorio ya entregado desaparece de tus dispositivos. El Apple Watch y las versiones de la app anteriores a la 1.20 lo conservan.",
+            "retract_when_done": "Cuando el elemento se completa o se elimina en Home Assistant, el recordatorio ya entregado desaparece de tus dispositivos. El Apple Watch lo conserva, y también PushWard en iPhone, iPad o Mac en versiones anteriores a la 1.20.",
             "max_scheduled": "Solo se programan los elementos más próximos; el resto se programa a medida que esos se envían. Tu cuenta admite como máximo 25 notificaciones programadas pendientes en total."
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "Un elemento con fecha de vencimiento pero sin hora se recuerda a esta hora ese día.",
             "notification_level": "Cómo interrumpe el recordatorio: Pasivo llega en silencio, Urgente atraviesa el modo Concentración.",
             "done_button": "Añadir un botón Hecho al recordatorio. Al tocarlo, el elemento se completa en Home Assistant.",
-            "retract_when_done": "Cuando el elemento se completa o se elimina en Home Assistant, el recordatorio ya entregado desaparece de tus dispositivos. El Apple Watch y las versiones de la app anteriores a la 1.20 lo conservan.",
+            "retract_when_done": "Cuando el elemento se completa o se elimina en Home Assistant, el recordatorio ya entregado desaparece de tus dispositivos. El Apple Watch lo conserva, y también PushWard en iPhone, iPad o Mac en versiones anteriores a la 1.20.",
             "max_scheduled": "Solo se programan los elementos más próximos; el resto se programa a medida que esos se envían. Tu cuenta admite como máximo 25 notificaciones programadas pendientes en total."
           }
         }

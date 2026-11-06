@@ -2529,7 +2529,7 @@
             "all_day_time": "有截止日期但没有时间的事项，会在当天的这个时间提醒。",
             "notification_level": "提醒的打扰方式：被动会静默送达，时效性可突破专注模式。",
             "done_button": "为提醒添加完成按钮。点按后会在 Home Assistant 中完成该事项。",
-            "retract_when_done": "在 Home Assistant 中完成或删除该事项后，已送达的提醒会从你的设备上移除。Apple Watch 和 1.20 之前的应用版本会保留它。",
+            "retract_when_done": "在 Home Assistant 中完成或删除该事项后，已送达的提醒会从你的设备上移除。Apple Watch 会保留它，iPhone、iPad 或 Mac 上 1.20 之前版本的 PushWard 也会保留。",
             "max_scheduled": "只安排最近的事项；其余事项会随着这些提醒发出而依次安排。你的账户总共最多保留 25 条待发送的定时通知。"
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "有截止日期但没有时间的事项，会在当天的这个时间提醒。",
             "notification_level": "提醒的打扰方式：被动会静默送达，时效性可突破专注模式。",
             "done_button": "为提醒添加完成按钮。点按后会在 Home Assistant 中完成该事项。",
-            "retract_when_done": "在 Home Assistant 中完成或删除该事项后，已送达的提醒会从你的设备上移除。Apple Watch 和 1.20 之前的应用版本会保留它。",
+            "retract_when_done": "在 Home Assistant 中完成或删除该事项后，已送达的提醒会从你的设备上移除。Apple Watch 会保留它，iPhone、iPad 或 Mac 上 1.20 之前版本的 PushWard 也会保留。",
             "max_scheduled": "只安排最近的事项；其余事项会随着这些提醒发出而依次安排。你的账户总共最多保留 25 条待发送的定时通知。"
           }
         }

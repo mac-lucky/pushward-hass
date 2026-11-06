@@ -2529,7 +2529,7 @@
             "all_day_time": "Un elemento con data di scadenza ma senza orario viene ricordato a quest'ora in quel giorno.",
             "notification_level": "Come il promemoria interrompe: Passivo arriva in silenzio, Urgente supera la modalità Full immersion.",
             "done_button": "Aggiunge un pulsante Fatto al promemoria. Toccarlo completa l'elemento in Home Assistant.",
-            "retract_when_done": "Quando l'elemento viene completato o rimosso in Home Assistant, il promemoria già consegnato viene tolto dai tuoi dispositivi. Apple Watch e le versioni dell'app precedenti alla 1.20 lo mantengono.",
+            "retract_when_done": "Quando l'elemento viene completato o rimosso in Home Assistant, il promemoria già consegnato viene tolto dai tuoi dispositivi. Apple Watch lo mantiene, e così anche PushWard su iPhone, iPad o Mac nelle versioni precedenti alla 1.20.",
             "max_scheduled": "Vengono programmati solo gli elementi più vicini; gli altri seguono man mano che questi vengono inviati. Il tuo account può avere al massimo 25 notifiche programmate in attesa in tutto."
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "Un elemento con data di scadenza ma senza orario viene ricordato a quest'ora in quel giorno.",
             "notification_level": "Come il promemoria interrompe: Passivo arriva in silenzio, Urgente supera la modalità Full immersion.",
             "done_button": "Aggiunge un pulsante Fatto al promemoria. Toccarlo completa l'elemento in Home Assistant.",
-            "retract_when_done": "Quando l'elemento viene completato o rimosso in Home Assistant, il promemoria già consegnato viene tolto dai tuoi dispositivi. Apple Watch e le versioni dell'app precedenti alla 1.20 lo mantengono.",
+            "retract_when_done": "Quando l'elemento viene completato o rimosso in Home Assistant, il promemoria già consegnato viene tolto dai tuoi dispositivi. Apple Watch lo mantiene, e così anche PushWard su iPhone, iPad o Mac nelle versioni precedenti alla 1.20.",
             "max_scheduled": "Vengono programmati solo gli elementi più vicini; gli altri seguono man mano che questi vengono inviati. Il tuo account può avere al massimo 25 notifiche programmate in attesa in tutto."
           }
         }

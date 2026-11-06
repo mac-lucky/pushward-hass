@@ -2529,7 +2529,7 @@
             "all_day_time": "Ang item na may due date pero walang oras ay ipapaalala sa oras na ito sa araw na iyon.",
             "notification_level": "Paano umaabala ang paalala: ang Pasibo ay dumarating nang tahimik, ang Sensitibo sa oras ay lumulusot sa Focus.",
             "done_button": "Magdagdag ng Tapos na button sa paalala. Kapag na-tap ito, matatapos ang item sa Home Assistant.",
-            "retract_when_done": "Kapag natapos o inalis ang item sa Home Assistant, aalisin sa iyong mga device ang paalalang naihatid na. Nananatili ito sa Apple Watch at sa mga bersyon ng app bago ang 1.20.",
+            "retract_when_done": "Kapag natapos o inalis ang item sa Home Assistant, aalisin sa iyong mga device ang paalalang naihatid na. Nananatili ito sa Apple Watch, pati na sa PushWard sa iPhone, iPad o Mac na mas luma sa 1.20.",
             "max_scheduled": "Ang pinakamalapit na mga item lang ang naka-iskedyul; susunod ang iba habang naipapadala ang mga iyon. Hanggang 25 nakabinbing naka-iskedyul na notification lang ang kaya ng iyong account sa kabuuan."
           }
         },
@@ -2550,7 +2550,7 @@
             "all_day_time": "Ang item na may due date pero walang oras ay ipapaalala sa oras na ito sa araw na iyon.",
             "notification_level": "Paano umaabala ang paalala: ang Pasibo ay dumarating nang tahimik, ang Sensitibo sa oras ay lumulusot sa Focus.",
             "done_button": "Magdagdag ng Tapos na button sa paalala. Kapag na-tap ito, matatapos ang item sa Home Assistant.",
-            "retract_when_done": "Kapag natapos o inalis ang item sa Home Assistant, aalisin sa iyong mga device ang paalalang naihatid na. Nananatili ito sa Apple Watch at sa mga bersyon ng app bago ang 1.20.",
+            "retract_when_done": "Kapag natapos o inalis ang item sa Home Assistant, aalisin sa iyong mga device ang paalalang naihatid na. Nananatili ito sa Apple Watch, pati na sa PushWard sa iPhone, iPad o Mac na mas luma sa 1.20.",
             "max_scheduled": "Ang pinakamalapit na mga item lang ang naka-iskedyul; susunod ang iba habang naipapadala ang mga iyon. Hanggang 25 nakabinbing naka-iskedyul na notification lang ang kaya ng iyong account sa kabuuan."
           }
         }
