@@ -687,11 +687,14 @@ class TodoReminderManager:
             # Late, and its item is done: cancel it. The next look (_arm_timer brings it) reads it
             # canceled, or gone if it went out first, and only then retracts. Each look is one try.
             # Set first, as a cancel that went through can still raise: an item undone from here on is
-            # reminded again, unless a later look finds the reminder sent after all. Scheduled first
-            # too, so a cancel that raised still gets that look within seconds, not at the hourly pass.
+            # reminded again, unless a later look finds the reminder sent after all. The first cancel
+            # is scheduled first too, so if it raises the look still comes within seconds; one that
+            # raises again waits for the hourly pass, so an outage does not use up every try at once.
+            if not rec.get("canceled"):
+                rec["status"] = _SCHEDULED
             rec["canceled"] = True
-            rec["status"] = _SCHEDULED
             await self._api.cancel_scheduled_notification(rec["schedule_id"])
+            rec["status"] = _SCHEDULED
             rec["retract_failures"] = rec.get("retract_failures", 0) + 1
             return False
         if status in (_SERVER_CANCELED, "failed"):

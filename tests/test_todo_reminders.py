@@ -1737,6 +1737,40 @@ async def test_an_item_undone_after_a_cancel_that_never_got_there_is_not_reminde
     api.create_notification.assert_awaited_once()  # no second reminder next to the one that most likely shows
 
 
+@pytest.mark.parametrize("error", [TimeoutError(), PushWardApiError("bad gateway", status_code=502)])
+async def test_a_cancel_that_keeps_raising_gets_one_quick_look_and_leaves_a_try_for_later(
+    hass: HomeAssistant, setup, freezer, error: Exception
+) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
+    first = api.create_notification.call_args.kwargs["collapse_id"]
+    schedule_id = _records(manager)["a"]["schedule_id"]
+    rows = {schedule_id: {"id": schedule_id, "status": "scheduled"}}  # the server is late
+    api.get_scheduled_notification = AsyncMock(side_effect=lambda sid: rows.get(sid))
+    api.cancel_scheduled_notification = AsyncMock(side_effect=error)  # an outage longer than the quick look
+    item = todo.items[0]
+    item["status"] = "completed"
+    await manager._async_reconcile(SUB)
+
+    for seconds in (11, 22, 33):
+        later = NOW + timedelta(minutes=45, seconds=seconds)
+        freezer.move_to(later)
+        async_fire_time_changed(hass, later)
+        await hass.async_block_till_done()
+
+    assert api.cancel_scheduled_notification.await_count == 2  # the rest waits for the hourly pass
+    assert _records(manager)["a"]["status"] == "sent"
+    assert SUB not in manager._timers
+
+    rows[schedule_id] = {"id": schedule_id, "status": "sent", "notification_id": 77}  # the outage ends, it goes out
+    await manager._async_reconcile(SUB, full=True)
+    api.retract_notifications.assert_awaited_once_with(first)
+
+    item["status"] = "needs_action"
+    await manager._async_reconcile(SUB)
+
+    assert api.create_notification.await_count == 2  # the late one was taken back first
+
+
 @pytest.mark.parametrize("status", ["canceled", "failed"])
 async def test_reminder_the_server_never_sent_is_not_retracted(setup, freezer, status: str) -> None:
     manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
