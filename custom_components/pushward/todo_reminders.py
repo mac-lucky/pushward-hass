@@ -123,7 +123,8 @@ _SAVE_DELAY = 5
 # or found canceled or failed after it. sent and stopped records stay until their
 # item is past the late-grace window, so the same item version never gets a second
 # reminder, even if the item briefly leaves the open list (completed, then undone);
-# unless its reminder was taken back meanwhile, then the item is reminded again.
+# unless its reminder was taken back or canceled late meanwhile, then the item is
+# reminded again.
 _SCHEDULED = "scheduled"
 _SENT = "sent"
 _STOPPED = "stopped"
@@ -687,6 +688,7 @@ class TodoReminderManager:
             # canceled, or gone if it went out first, and only then retracts. Each look is one try.
             await self._api.cancel_scheduled_notification(rec["schedule_id"])
             rec["status"] = _SCHEDULED
+            rec["canceled"] = True  # an item undone now is reminded again: no retract used the id
             rec["retract_failures"] = rec.get("retract_failures", 0) + 1
             return False
         if status in (_SERVER_CANCELED, "failed"):
@@ -767,6 +769,7 @@ class TodoReminderManager:
                 rec is not None
                 and rec["status"] != _SCHEDULED
                 and not rec.get("retracted")
+                and not rec.get("canceled")
                 and _same_occurrence(rec, item, versions[uid])
             ):
                 continue  # this due time was already reminded, or its reminder stopped

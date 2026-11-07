@@ -1628,6 +1628,37 @@ async def test_a_late_reminder_of_a_finished_item_is_canceled(setup, freezer, we
     assert _records(manager)["a"]["status"] == ("sent" if went_out_first else "stopped")
 
 
+@pytest.mark.parametrize("undone", ["after the next look", "before the next look", "during the look"])
+async def test_an_item_undone_after_its_late_reminder_was_canceled_is_reminded_again(
+    setup, freezer, undone: str
+) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
+    schedule_id = _records(manager)["a"]["schedule_id"]
+    rows = {schedule_id: {"id": schedule_id, "status": "scheduled"}}  # the server is late
+    api.get_scheduled_notification = AsyncMock(side_effect=lambda sid: rows.get(sid))
+    item = todo.items[0]
+
+    async def _cancel(sid: int, **_kw) -> None:
+        rows[sid]["status"] = "canceled"
+        if undone == "during the look":
+            item["status"] = "needs_action"
+
+    api.cancel_scheduled_notification = AsyncMock(side_effect=_cancel)
+    item["status"] = "completed"
+    await manager._async_reconcile(SUB)
+    api.cancel_scheduled_notification.assert_awaited_once_with(schedule_id)
+    if undone == "after the next look":
+        await manager._async_reconcile(SUB)
+        assert _records(manager)["a"]["status"] == "stopped"
+
+    item["status"] = "needs_action"
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_not_awaited()
+    assert api.create_notification.await_count == 2
+    assert _records(manager)["a"]["status"] == "scheduled"
+
+
 @pytest.mark.parametrize("status", ["canceled", "failed"])
 async def test_reminder_the_server_never_sent_is_not_retracted(setup, freezer, status: str) -> None:
     manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
