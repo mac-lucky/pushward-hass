@@ -1659,6 +1659,56 @@ async def test_an_item_undone_after_its_late_reminder_was_canceled_is_reminded_a
     assert _records(manager)["a"]["status"] == "scheduled"
 
 
+async def test_a_canceled_reminder_that_went_out_is_not_reminded_again_while_its_retract_failed(setup, freezer) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
+    schedule_id = _records(manager)["a"]["schedule_id"]
+    rows = {schedule_id: {"id": schedule_id, "status": "scheduled"}}  # the server is late
+    api.get_scheduled_notification = AsyncMock(side_effect=lambda sid: rows.get(sid))
+
+    async def _cancel(sid: int, **_kw) -> None:
+        del rows[sid]  # the send got there first, and a sent row loses its record on a cancel
+
+    api.cancel_scheduled_notification = AsyncMock(side_effect=_cancel)
+    api.retract_notifications = AsyncMock(side_effect=PushWardApiError("down", status_code=503))
+    item = todo.items[0]
+    item["status"] = "completed"
+    await manager._async_reconcile(SUB)
+    await manager._async_reconcile(SUB)  # the next look finds it gone, and the retract fails
+    api.retract_notifications.assert_awaited_once()
+
+    item["status"] = "needs_action"
+    await manager._async_reconcile(SUB)
+
+    assert api.create_notification.await_count == 1  # the reminder most likely still shows
+
+
+@pytest.mark.parametrize("error", [TimeoutError(), PushWardApiError("bad gateway", status_code=502)])
+async def test_an_item_undone_after_a_cancel_that_raised_is_reminded_again(setup, freezer, error: Exception) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
+    first = api.create_notification.call_args.kwargs["collapse_id"]
+    schedule_id = _records(manager)["a"]["schedule_id"]
+    rows = {schedule_id: {"id": schedule_id, "status": "scheduled"}}  # the server is late
+    api.get_scheduled_notification = AsyncMock(side_effect=lambda sid: rows.get(sid))
+
+    async def _cancel(sid: int, **_kw) -> None:
+        rows[sid]["status"] = "canceled"
+        raise error  # canceled, but the answer was lost
+
+    api.cancel_scheduled_notification = AsyncMock(side_effect=_cancel)
+    item = todo.items[0]
+    item["status"] = "completed"
+    await manager._async_reconcile(SUB)
+    await manager._async_reconcile(SUB)  # the next look reads it canceled
+    assert _records(manager)["a"]["status"] == "stopped"
+
+    item["status"] = "needs_action"
+    await manager._async_reconcile(SUB)
+
+    api.retract_notifications.assert_not_awaited()
+    assert api.create_notification.await_count == 2
+    assert api.create_notification.call_args.kwargs["collapse_id"] != first
+
+
 @pytest.mark.parametrize("status", ["canceled", "failed"])
 async def test_reminder_the_server_never_sent_is_not_retracted(setup, freezer, status: str) -> None:
     manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})

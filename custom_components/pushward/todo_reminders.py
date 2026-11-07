@@ -686,9 +686,11 @@ class TodoReminderManager:
         if status in _SERVER_PENDING:
             # Late, and its item is done: cancel it. The next look (_arm_timer brings it) reads it
             # canceled, or gone if it went out first, and only then retracts. Each look is one try.
+            # Set first, as a cancel that went through can still raise: an item undone from here on is
+            # reminded again, unless a later look finds the reminder sent after all.
+            rec["canceled"] = True
             await self._api.cancel_scheduled_notification(rec["schedule_id"])
             rec["status"] = _SCHEDULED
-            rec["canceled"] = True  # an item undone now is reminded again: no retract used the id
             rec["retract_failures"] = rec.get("retract_failures", 0) + 1
             return False
         if status in (_SERVER_CANCELED, "failed"):
@@ -696,6 +698,7 @@ class TodoReminderManager:
             return False
         if isinstance(row.get("notification_id"), int):
             rec["notification_id"] = row["notification_id"]
+        rec.pop("canceled", None)  # it went out after all: reminded again only once a retract lands
         return True  # sent, or no longer on the server: it may be up
 
     def _take_retract_token(self) -> bool:
