@@ -1709,6 +1709,34 @@ async def test_an_item_undone_after_a_cancel_that_raised_is_reminded_again(setup
     assert api.create_notification.call_args.kwargs["collapse_id"] != first
 
 
+@pytest.mark.parametrize("error", [TimeoutError(), PushWardApiError("bad gateway", status_code=502)])
+async def test_an_item_undone_after_a_cancel_that_never_got_there_is_not_reminded_twice(
+    hass: HomeAssistant, setup, freezer, error: Exception
+) -> None:
+    manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
+    schedule_id = _records(manager)["a"]["schedule_id"]
+    rows = {schedule_id: {"id": schedule_id, "status": "scheduled"}}  # the server is late
+    api.get_scheduled_notification = AsyncMock(side_effect=lambda sid: rows.get(sid))
+    api.cancel_scheduled_notification = AsyncMock(side_effect=error)  # the row stays as it was
+    api.retract_notifications = AsyncMock(side_effect=error)
+    item = todo.items[0]
+    item["status"] = "completed"
+    await manager._async_reconcile(SUB)
+    assert _records(manager)["a"]["status"] == "scheduled"  # so the next look is seconds away, not an hour
+
+    rows[schedule_id] = {"id": schedule_id, "status": "sent", "notification_id": 77}  # it went out late
+    later = NOW + timedelta(minutes=45, seconds=11)
+    freezer.move_to(later)
+    async_fire_time_changed(hass, later)
+    await hass.async_block_till_done()
+    assert api.get_scheduled_notification.await_count == 2
+
+    item["status"] = "needs_action"
+    await manager._async_reconcile(SUB)
+
+    api.create_notification.assert_awaited_once()  # no second reminder next to the one that most likely shows
+
+
 @pytest.mark.parametrize("status", ["canceled", "failed"])
 async def test_reminder_the_server_never_sent_is_not_retracted(setup, freezer, status: str) -> None:
     manager, api, todo = await _sent(setup, freezer, **{CONF_TODO_DONE_BUTTON: False})
