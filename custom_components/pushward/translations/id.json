@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Perbarui Aktivitas (Checklist)",
+      "description": "Memperbarui Live Activity daftar periksa PushWard: hingga 8 item yang dicentang dari layar kunci, jam tangan, atau notifikasi. Home Assistant tidak mengetahui centang tersebut; aksi ini hanya mengirim daftarnya.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Identifikasi slug aktivitas."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Status aktivitas yang diinginkan."
+        },
+        "items": {
+          "name": "Item",
+          "description": "Daftar 1-8 item. Masing-masing: id (wajib, 1-16 huruf, angka, - atau _, unik), label (wajib, maks. 40), dan checked opsional (true/false). Daftar ini menggantikan yang tersimpan. Tanpa checked, server mempertahankan centang yang sudah dimilikinya untuk id itu; centang dari ponsel tidak dilaporkan kembali ke Home Assistant."
+        },
+        "subtitle": {
+          "name": "Subjudul",
+          "description": "Teks subjudul yang ditampilkan pada aktivitas."
+        },
+        "compact_label": {
+          "name": "Label Island",
+          "description": "Hingga 4 karakter yang menggantikan konten bawaan templat di tampilan ringkas. Di iPhone, ini adalah bagian depan Dynamic Island, sebagai pengganti ikon, cincin langkah, atau tumpukan tinggi/rendah linimasa (tampilan minimal mengabaikannya); di Android 16 QPR2 dan yang lebih baru, ini adalah teks chip bilah status."
+        },
+        "compact_trailing_label": {
+          "name": "Label Island Belakang",
+          "description": "Hingga 4 karakter yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, seperti penghitung langkah atau timer. Lebih diutamakan daripada ikon belakang jika keduanya diatur. Tampilan minimal mengabaikannya. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "compact_trailing_icon": {
+          "name": "Ikon Island Belakang",
+          "description": "Ikon SF Symbol atau MDI (misalnya airplane.departure, mdi:airplane-takeoff) yang ditampilkan di bagian belakang tampilan ringkas Dynamic Island sebagai pengganti apa yang ditampilkan templat di sana, diwarnai dengan warna aksen. Diabaikan jika label Island belakang diatur. Memerlukan PushWard 1.19.1 atau yang lebih baru."
+        },
+        "icon": {
+          "name": "Ikon",
+          "description": "Nama ikon SF Symbol atau MDI (misalnya checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Pesan Penyelesaian",
+          "description": "Pesan yang ditampilkan saat aktivitas berakhir."
+        },
+        "accent_color": {
+          "name": "Warna Aksen",
+          "description": "Warna aksen untuk aktivitas. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "background_color": {
+          "name": "Warna Latar",
+          "description": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "text_color": {
+          "name": "Warna Teks",
+          "description": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem."
+        },
+        "tap_action": {
+          "name": "Aksi Ketuk",
+          "description": "Target ketuk seluruh aktivitas sebagai objek: url (wajib), foreground opsional, dan untuk url http(s) webhook senyap melalui method/headers/body."
+        },
+        "sound": {
+          "name": "Suara",
+          "description": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS."
+        },
+        "priority": {
+          "name": "Override Prioritas",
+          "description": "Prioritas per pembaruan (0-10). Hanya menimpa prioritas yang dikonfigurasi pada aktivitas untuk push ini."
+        },
+        "ended_ttl": {
+          "name": "TTL Berakhir",
+          "description": "Detik untuk menyimpan aktivitas setelah berakhir."
+        },
+        "stale_ttl": {
+          "name": "TTL Kedaluwarsa",
+          "description": "Detik sebelum aktivitas dianggap kedaluwarsa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL penghapusan",
+          "description": "Jumlah detik aktivitas yang telah berakhir tetap tampil di Layar Terkunci sebelum dihapus. 0 menghapusnya segera saat berakhir."
+        }
+      }
+    },
     "create_activity": {
       "name": "Buat Aktivitas",
       "description": "Buat PushWard Live Activity baru.",
@@ -2343,7 +2425,7 @@
             "slug": "Slug Widget"
           },
           "data_description": {
-            "widget_template": "Tata letak widget: `value` untuk satu angka, `progress` untuk bilah, `gauge` untuk nilai dalam rentang, `status` untuk lencana tingkat keparahan, `stat_list` untuk maksimal 6 baris, `trend` untuk grafik mini, `countdown` untuk tanggal, `battery` untuk cincin perangkat, `schedule` untuk lini masa per jam, `flow` untuk yang masuk dan keluar.",
+            "widget_template": "Tata letak widget: `value` untuk satu angka, `progress` untuk bilah, `gauge` untuk nilai dalam rentang, `status` untuk lencana tingkat keparahan, `stat_list` untuk maksimal 6 baris, `trend` untuk grafik mini, `countdown` untuk tanggal, `battery` untuk cincin perangkat, `schedule` untuk lini masa per jam, `flow` untuk yang masuk dan keluar. `heatmap` menampilkan nilai harian pada kisi kalender.",
             "slug": "Pengidentifikasi unik untuk widget ini. Biarkan kosong untuk membuat otomatis dari ID entitas."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Kunci nilai periode",
             "schedule_low_max": "Maksimum pita rendah",
             "schedule_high_min": "Minimum pita tinggi",
-            "flow_nodes": "Simpul aliran"
+            "flow_nodes": "Simpul aliran",
+            "heatmap_weeks": "Minggu",
+            "heatmap_aggregate": "Nilai harian"
           },
           "data_description": {
             "widget_name": "Nama tampilan di pemilih widget pada ponsel Anda. Default ke nama ramah entitas.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Kunci berisi nilai setiap periode di dalam daftar tersebut.",
             "schedule_low_max": "Nilai pada atau di bawah ini masuk pita rendah. Kosongkan kedua ambang agar aplikasi menurunkan pita dari rentang yang dikirim.",
             "schedule_high_min": "Nilai pada atau di atas ini masuk pita tinggi. Harus di atas maksimum pita rendah.",
-            "flow_nodes": "Satu baris per simpul. Slot menentukan tempat tampilnya: hingga 3 masukan, plus masing-masing satu keluaran, penyimpanan, dan pertukaran. Laju berasal dari entitas, dengan tanda sesuai konvensi Anda."
+            "flow_nodes": "Satu baris per simpul. Slot menentukan tempat tampilnya: hingga 3 masukan, plus masing-masing satu keluaran, penyimpanan, dan pertukaran. Laju berasal dari entitas, dengan tanda sesuai konvensi Anda.",
+            "heatmap_weeks": "Berapa minggu yang dicakup kisi, 1-22. Setiap sel adalah satu hari, hari ini paling akhir.",
+            "heatmap_aggregate": "Statistik recorder yang mengisi setiap hari: perubahan per hari untuk total yang terus bertambah (energi, langkah), atau rata-rata, maksimum, atau minimum harian sebuah pengukuran. Bawaannya perubahan bila entitas punya statistik jumlah."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Widget aliran mendukung paling banyak 3 masukan.",
         "duplicate_flow_slot": "Hanya satu keluaran, penyimpanan, dan pertukaran masing-masing. Gunakan input untuk sisanya.",
         "flow_nodes_required": "Templat flow memerlukan setidaknya satu simpul.",
-        "invalid_schedule_thresholds": "Maksimum pita rendah harus di bawah minimum pita tinggi."
+        "invalid_schedule_thresholds": "Maksimum pita rendah harus di bawah minimum pita tinggi.",
+        "heatmap_no_statistics": "Entitas ini tidak punya statistik recorder, jadi peta panas tidak punya apa pun untuk mengisi hari-harinya. Gunakan sensor dengan state_class.",
+        "heatmap_aggregate_unsupported": "Statistik entitas ini tidak memuat nilai harian tersebut. Perubahan per hari butuh total (statistik jumlah); rata-rata, maksimum, dan minimum butuh pengukuran."
       },
       "abort": {
         "already_configured": "Widget dengan slug ini sudah ada.",
@@ -2665,7 +2753,8 @@
         "countdown": "Hitung mundur",
         "battery": "Baterai",
         "schedule": "Jadwal",
-        "flow": "Aliran"
+        "flow": "Aliran",
+        "heatmap": "Peta panas"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Baterai terendah dulu",
         "level_desc": "Baterai tertinggi dulu"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Perubahan per hari",
+        "mean": "Rata-rata harian",
+        "max": "Maksimum harian",
+        "min": "Minimum harian"
       }
     },
     "todo_notification_level": {

@@ -50,6 +50,7 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_COUNTDOWN,
     WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -1278,3 +1279,79 @@ def test_look_values_the_server_does_not_take_are_dropped():
         **{CONF_WIDGET_STYLE: "fancy", "widget_style_medium": "huge", "widget_density_small": "tight"},
     )
     assert not set(_LOOK_FIELDS) & set(content)
+
+
+# ----- heatmap -----
+
+
+def _heatmap(state_value: str = "4200", attributes: dict | None = None, **overrides):
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP,
+            CONF_ENTITY_ID: "sensor.steps",
+            CONF_MIN_VALUE: None,
+            CONF_MAX_VALUE: None,
+            **overrides,
+        }
+    )
+    attrs = {"friendly_name": "Daily steps", "unit_of_measurement": "steps"} if attributes is None else attributes
+    state = make_mock_state(state_value, attrs, entity_id="sensor.steps")
+    return _make_hass({"sensor.steps": state}), config
+
+
+_STEP_DAYS = [None, 8000.0, 0.0, 12000.5, None, 6000.0, 4200.0]
+
+
+def test_heatmap_sends_the_cells_with_today_as_the_headline():
+    hass, config = _heatmap()
+
+    content = map_widget_content(hass, config, cells=list(_STEP_DAYS))
+
+    assert content["cells"] == _STEP_DAYS
+    assert content["value"] == 4200.0
+    # Label and unit fall back to the entity's own.
+    assert (content["label"], content["unit"]) == ("Daily steps", "steps")
+    assert "min_value" not in content and "max_value" not in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+
+
+def test_heatmap_configured_label_unit_and_bounds_win():
+    hass, config = _heatmap(**{CONF_LABEL: "Steps", CONF_UNIT: "k", CONF_MIN_VALUE: 0.0, CONF_MAX_VALUE: 10000.0})
+
+    content = map_widget_content(hass, config, cells=list(_STEP_DAYS))
+
+    assert (content["label"], content["unit"]) == ("Steps", "k")
+    assert (content["min_value"], content["max_value"]) == (0.0, 10000.0)
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+
+
+def test_heatmap_drops_inverted_bounds_and_missing_entity_names():
+    hass, config = _heatmap(attributes={}, **{CONF_MIN_VALUE: 10.0, CONF_MAX_VALUE: 5.0})
+
+    content = map_widget_content(hass, config, cells=list(_STEP_DAYS))
+
+    assert "min_value" not in content and "max_value" not in content
+    assert "label" not in content and "unit" not in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+
+
+def test_heatmap_today_without_statistics_sends_a_null_headline():
+    """The explicit null clears yesterday's headline on the merge patch."""
+    hass, config = _heatmap()
+
+    content = map_widget_content(hass, config, cells=[*_STEP_DAYS[1:], None])
+
+    assert content["value"] is None
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+
+
+@pytest.mark.parametrize("cells", [None, [], [None] * 7], ids=["not_read", "empty", "only_nulls"])
+def test_heatmap_sends_nothing_without_a_number(cells):
+    """The server refuses an all-null grid, so nothing goes out rather than a 422."""
+    hass, config = _heatmap()
+    assert map_widget_content(hass, config, cells=cells) is None
+
+
+def test_heatmap_unavailable_entity_sends_nothing():
+    hass, config = _heatmap("unavailable")
+    assert map_widget_content(hass, config, cells=list(_STEP_DAYS)) is None

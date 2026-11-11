@@ -190,6 +190,20 @@ def valid_approval() -> dict:
     }
 
 
+def valid_checklist() -> dict:
+    # No progress or state: the server fills both from the ticks.
+    return {
+        "template": "checklist",
+        "subtitle": "Before 9:00",
+        "icon": "checklist",
+        "items": [
+            {"id": "meds", "label": "Take vitamins", "checked": True},
+            {"id": "plants", "label": "Water the plants", "checked": False},
+            {"id": "bins_out-2", "label": "Bins out"},
+        ],
+    }
+
+
 def _approval_options(n: int, *, icons: bool = True) -> list:
     """n answer buttons, carrying the icon three-plus options require unless icons=False."""
     icon = {"icon": "checkmark"} if icons else {}
@@ -230,8 +244,21 @@ def _rm(factory, *keys) -> dict:
         valid_log,
         valid_media,
         valid_approval,
+        valid_checklist,
     ],
-    ids=["generic", "countdown", "steps", "alert", "gauge", "timeline", "board", "log", "media", "approval"],
+    ids=[
+        "generic",
+        "countdown",
+        "steps",
+        "alert",
+        "gauge",
+        "timeline",
+        "board",
+        "log",
+        "media",
+        "approval",
+        "checklist",
+    ],
 )
 def test_valid_activity_payloads_pass(factory) -> None:
     assert_valid_activity_content(factory())
@@ -553,6 +580,27 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_approval, url_action={"url": IMAGE_OK}), id="url_action_on_approval"),
     pytest.param(lambda: _mut(valid_approval, alarm=True), id="alarm_on_approval"),
     pytest.param(lambda: _mut(valid_approval, snooze_seconds=300), id="snooze_on_approval"),
+    pytest.param(lambda: _mut(valid_checklist, items=[]), id="checklist_no_items"),
+    pytest.param(
+        lambda: _mut(valid_checklist, items=[{"id": f"i{n}", "label": "L"} for n in range(9)]),
+        id="checklist_nine_items",
+    ),
+    pytest.param(
+        lambda: _mut(valid_checklist, items=[{"id": "a", "label": "A"}, {"id": "a", "label": "B"}]),
+        id="checklist_duplicate_id",
+    ),
+    pytest.param(lambda: _mut(valid_checklist, items=[{"id": "a" * 17, "label": "A"}]), id="checklist_id_too_long"),
+    pytest.param(lambda: _mut(valid_checklist, items=[{"id": "a.b", "label": "A"}]), id="checklist_id_bad_char"),
+    pytest.param(lambda: _mut(valid_checklist, items=[{"id": "a", "label": ""}]), id="checklist_label_empty"),
+    pytest.param(lambda: _mut(valid_checklist, items=[{"id": "a", "label": "x" * 41}]), id="checklist_label_long"),
+    pytest.param(
+        lambda: _mut(valid_checklist, items=[{"id": "a", "label": "A", "checked": "yes"}]), id="checklist_checked_str"
+    ),
+    pytest.param(lambda: _mut(valid_checklist, tick_url="https://api.example.com/t"), id="checklist_sends_tick_url"),
+    pytest.param(lambda: _mut(valid_checklist, tiles=[{"label": "L", "value": "V"}]), id="tiles_on_checklist"),
+    pytest.param(lambda: _mut(valid_checklist, options=_approval_options(2)), id="approval_options_on_checklist"),
+    pytest.param(lambda: _mut(valid_checklist, image_url=IMAGE_OK), id="image_on_checklist"),
+    pytest.param(lambda: _mut(valid_generic, items=[{"id": "a", "label": "A"}]), id="items_off_checklist"),
 ]
 
 
@@ -659,6 +707,8 @@ def test_valid_live_progress_payloads_pass() -> None:
         ),
         ({"flow": {"inputs": [{"rate": 3200.0}], "storage": {"rate": -450.0, "level": 72.0}}}, "flow"),
         ({"value": 1.0, "subtitle_timer": {"date": _iso(minutes=30), "style": "relative"}}, "value"),
+        ({"cells": [None] * 6 + [3.5], "value": 3.5, "label": "Steps", "unit": "steps"}, "heatmap"),
+        ({"cells": [1.0] * 153 + [None], "value": None, "min_value": 0.0, "max_value": 5.0}, "heatmap"),
         (
             {"stat_rows": [{"label": "Next", "value": "18:00", "timer": {"date": _iso(hours=3)}}]},
             "stat_list",
@@ -680,6 +730,8 @@ def test_valid_live_progress_payloads_pass() -> None:
         "schedule",
         "flow",
         "subtitle_timer",
+        "heatmap_one_week",
+        "heatmap_22_weeks_today_empty",
         "stat_row_timer",
     ],
 )
@@ -779,6 +831,15 @@ _WIDGET_INVALID = [
     # Collection rules run for EVERY template, not just the one that renders them:
     # a PATCH replaces arrays wholesale, so a half-built element still gets stored.
     pytest.param({"value": 1.0, "devices": [{"level": 1.0}]}, "value", id="collections_checked_off_template"),
+    pytest.param({}, "heatmap", id="heatmap_missing_cells"),
+    pytest.param({"cells": [None] * 7}, "heatmap", id="heatmap_only_nulls"),
+    pytest.param({"cells": [1.0] * 6}, "heatmap", id="heatmap_six_cells"),
+    pytest.param({"cells": [1.0] * 155}, "heatmap", id="heatmap_155_cells"),
+    pytest.param({"cells": [1.0] * 6 + [float("nan")]}, "heatmap", id="heatmap_cell_not_finite"),
+    pytest.param({"cells": [1.0] * 6 + ["2"]}, "heatmap", id="heatmap_cell_string"),
+    pytest.param({"cells": [1.0] * 7, "min_value": 5.0, "max_value": 5.0}, "heatmap", id="heatmap_min_eq_max"),
+    pytest.param({"cells": [1.0] * 7, "value": float("inf")}, "heatmap", id="heatmap_value_not_finite"),
+    pytest.param({"value": 1.0, "cells": [1.0] * 3}, "value", id="cells_checked_off_template"),
 ]
 
 

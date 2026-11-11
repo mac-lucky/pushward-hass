@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Aktualizuj Live Activity (Checklist)",
+      "description": "Aktualizuje Live Activity PushWard typu lista kontrolna: do 8 pozycji odhaczanych z ekranu blokady, zegarka lub powiadomienia. Home Assistant nie dowiaduje się o tych odhaczeniach; ta akcja tylko wysyła listę.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Konto PushWard do użycia. Zostaw puste, aby użyć każdego konta PushWard dodanego do Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Identyfikator slug Live Activity."
+        },
+        "state": {
+          "name": "Stan",
+          "description": "Żądany stan Live Activity."
+        },
+        "items": {
+          "name": "Pozycje",
+          "description": "Lista 1-8 pozycji. Każda: id (wymagane, 1-16 liter, cyfr, - lub _, unikalne), label (wymagana, maks. 40) i opcjonalnie checked (true/false). Lista zastępuje zapisaną. Bez checked serwer zachowuje odhaczenie, które już ma dla tego id; odhaczenia z telefonu nie wracają do Home Assistant."
+        },
+        "subtitle": {
+          "name": "Podtytuł",
+          "description": "Tekst podtytułu wyświetlany w Live Activity."
+        },
+        "compact_label": {
+          "name": "Etykieta Island",
+          "description": "Do 4 znaków, które zastępują domyślną zawartość szablonu w widoku kompaktowym. Na iPhonie to przednia część Dynamic Island, zamiast ikony, pierścienia kroków lub stosu maks./min. osi czasu (widok minimalny je ignoruje); na Androidzie 16 QPR2 i nowszym to tekst chipa na pasku stanu."
+        },
+        "compact_trailing_label": {
+          "name": "Tylna etykieta Island",
+          "description": "Do 4 znaków wyświetlanych w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, np. licznika kroków lub timera. Ma pierwszeństwo przed tylną ikoną, gdy ustawiono obie. Widok minimalny je ignoruje. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "compact_trailing_icon": {
+          "name": "Tylna ikona Island",
+          "description": "Ikona SF Symbol lub MDI (np. airplane.departure, mdi:airplane-takeoff) wyświetlana w tylnej części kompaktowego widoku Dynamic Island zamiast tego, co szablon tam pokazuje, w kolorze akcentu. Ignorowana, gdy ustawiono tylną etykietę Island. Wymaga PushWard 1.19.1 lub nowszego."
+        },
+        "icon": {
+          "name": "Ikona",
+          "description": "Nazwa ikony SF Symbol lub MDI (np. checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Komunikat zakończenia",
+          "description": "Komunikat wyświetlany po zakończeniu Live Activity."
+        },
+        "accent_color": {
+          "name": "Kolor akcentu",
+          "description": "Kolor akcentu dla Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "background_color": {
+          "name": "Kolor tła",
+          "description": "Kolor tła Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "text_color": {
+          "name": "Kolor tekstu",
+          "description": "Kolor tekstu Live Activity. Szesnastkowy (#RRGGBB) lub nazwa koloru."
+        },
+        "tap_action": {
+          "name": "Akcja dotknięcia",
+          "description": "Cel dotknięcia całej aktywności jako obiekt: url (wymagane), opcjonalne foreground oraz, dla adresu http(s), cichy webhook przez method/headers/body."
+        },
+        "sound": {
+          "name": "Dźwięk",
+          "description": "Dźwięk powiadomienia odtwarzany na urządzeniu przy tej aktualizacji."
+        },
+        "priority": {
+          "name": "Nadpisanie priorytetu",
+          "description": "Priorytet dla pojedynczej aktualizacji (0-10). Nadpisuje skonfigurowany priorytet Live Activity tylko dla tego push."
+        },
+        "ended_ttl": {
+          "name": "TTL po zakończeniu",
+          "description": "Liczba sekund, przez które Live Activity jest przechowywany po zakończeniu."
+        },
+        "stale_ttl": {
+          "name": "TTL nieaktywności",
+          "description": "Liczba sekund, po których Live Activity jest uznawany za nieaktualny."
+        },
+        "dismissal_ttl": {
+          "name": "TTL usunięcia",
+          "description": "Liczba sekund, przez które zakończona aktywność pozostaje na ekranie blokady, zanim zostanie usunięta. 0 usuwa ją natychmiast po zakończeniu."
+        }
+      }
+    },
     "create_activity": {
       "name": "Utwórz Live Activity",
       "description": "Utwórz nowy PushWard Live Activity.",
@@ -2343,7 +2425,7 @@
             "slug": "Slug widżetu"
           },
           "data_description": {
-            "widget_template": "Układ widżetu: `value` dla jednej liczby, `progress` dla paska, `gauge` dla wartości w zakresie, `status` dla odznaki ważności, `stat_list` dla maksymalnie 6 wierszy, `trend` dla wykresu iskrowego, `countdown` dla daty, `battery` dla pierścieni urządzeń, `schedule` dla osi godzinowej, `flow` dla tego, co wpływa i wypływa.",
+            "widget_template": "Układ widżetu: `value` dla jednej liczby, `progress` dla paska, `gauge` dla wartości w zakresie, `status` dla odznaki ważności, `stat_list` dla maksymalnie 6 wierszy, `trend` dla wykresu iskrowego, `countdown` dla daty, `battery` dla pierścieni urządzeń, `schedule` dla osi godzinowej, `flow` dla tego, co wpływa i wypływa. `heatmap` pokazuje wartości dzienne na siatce kalendarza.",
             "slug": "Unikalny identyfikator tego widżetu. Pozostaw puste, aby wygenerować automatycznie z identyfikatora encji."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Klucz wartości okresu",
             "schedule_low_max": "Maksimum niskiego pasma",
             "schedule_high_min": "Minimum wysokiego pasma",
-            "flow_nodes": "Węzły przepływu"
+            "flow_nodes": "Węzły przepływu",
+            "heatmap_weeks": "Tygodnie",
+            "heatmap_aggregate": "Wartość dzienna"
           },
           "data_description": {
             "widget_name": "Nazwa wyświetlana w selektorze widżetów na telefonie. Domyślnie przyjazna nazwa encji.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Klucz z wartością każdego okresu w tych listach.",
             "schedule_low_max": "Wartości mniejsze lub równe trafiają do niskiego pasma. Zostaw oba progi puste, aby aplikacja wyliczyła pasma z wysłanego zakresu.",
             "schedule_high_min": "Wartości większe lub równe trafiają do wysokiego pasma. Musi być powyżej maksimum niskiego pasma.",
-            "flow_nodes": "Jeden wiersz na węzeł. Slot decyduje o miejscu: do 3 wejść oraz po jednym wyjściu, magazynie i wymianie. Tempo pochodzi z encji, ze znakiem według własnej konwencji."
+            "flow_nodes": "Jeden wiersz na węzeł. Slot decyduje o miejscu: do 3 wejść oraz po jednym wyjściu, magazynie i wymianie. Tempo pochodzi z encji, ze znakiem według własnej konwencji.",
+            "heatmap_weeks": "Ile tygodni obejmuje siatka, 1-22. Każda komórka to jeden dzień, dzisiejszy na końcu.",
+            "heatmap_aggregate": "Która statystyka rejestratora wypełnia dzień: zmiana na dzień dla stale rosnącej sumy (energia, kroki) albo dzienna średnia, maksimum lub minimum pomiaru. Domyślnie zmiana, gdy encja ma statystykę sumy."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Widżet przepływu obsługuje najwyżej 3 wejścia.",
         "duplicate_flow_slot": "Tylko po jednym wyjściu, magazynie i wymianie. Dla reszty użyj input.",
         "flow_nodes_required": "Szablon flow wymaga co najmniej jednego węzła.",
-        "invalid_schedule_thresholds": "Maksimum niskiego pasma musi być poniżej minimum wysokiego pasma."
+        "invalid_schedule_thresholds": "Maksimum niskiego pasma musi być poniżej minimum wysokiego pasma.",
+        "heatmap_no_statistics": "Ta encja nie ma statystyk rejestratora, więc mapa cieplna nie ma czym wypełnić dni. Potrzebny jest czujnik z state_class.",
+        "heatmap_aggregate_unsupported": "Statystyki tej encji nie zawierają tej wartości dziennej. Zmiana na dzień wymaga sumy (statystyki sumy); średnia, maksimum i minimum wymagają pomiaru."
       },
       "abort": {
         "already_configured": "Widżet z tym slugiem już istnieje.",
@@ -2665,7 +2753,8 @@
         "countdown": "Odliczanie",
         "battery": "Bateria",
         "schedule": "Harmonogram",
-        "flow": "Przepływ"
+        "flow": "Przepływ",
+        "heatmap": "Mapa cieplna"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Najniższy poziom baterii najpierw",
         "level_desc": "Najwyższy poziom baterii najpierw"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Zmiana na dzień",
+        "mean": "Średnia dzienna",
+        "max": "Maksimum dzienne",
+        "min": "Minimum dzienne"
       }
     },
     "todo_notification_level": {

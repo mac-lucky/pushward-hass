@@ -38,6 +38,9 @@ from .const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    CHECKLIST_ITEM_ID_PATTERN,
+    CHECKLIST_ITEM_LABEL_MAX,
+    CHECKLIST_ITEMS_MAX,
     COMPACT_TRAILING_ICON_PATTERN,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
@@ -47,6 +50,7 @@ from .const import (
     CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
+    CONF_CHECKLIST_ITEMS,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
     CONF_COMPACT_TRAILING_LABEL,
@@ -535,6 +539,34 @@ def _build_board_tiles(entity_config: dict, hass: HomeAssistant | None) -> list[
         if len(tiles_out) >= BOARD_MAX_TILES:
             break
     return tiles_out
+
+
+_CHECKLIST_ITEM_ID_RE = re.compile(CHECKLIST_ITEM_ID_PATTERN)
+
+
+def _build_checklist_items(entity_config: dict) -> list[dict]:
+    """Build the checklist ``items`` list from the configured rows, the way board tiles are built.
+
+    Lenient like the other row parsers: a row without a valid id or a label is
+    skipped, a repeated id keeps its first row, and the list stops at the cap.
+    ``checked`` goes out only when the row sets it, so the server keeps a tick
+    made on a phone.
+    """
+    items: list[dict] = []
+    for raw in entity_config.get(CONF_CHECKLIST_ITEMS) or []:
+        if not isinstance(raw, dict):
+            continue
+        item_id = str(raw.get("id") or "").strip()
+        label = str(raw.get("label") or "").strip()
+        if not _CHECKLIST_ITEM_ID_RE.match(item_id) or not label or any(i["id"] == item_id for i in items):
+            continue
+        item = {"id": item_id, "label": label[:CHECKLIST_ITEM_LABEL_MAX]}
+        if isinstance(raw.get("checked"), bool):
+            item["checked"] = raw["checked"]
+        items.append(item)
+        if len(items) >= CHECKLIST_ITEMS_MAX:
+            break
+    return items
 
 
 def _clean_step_weights(weights: list) -> list[float]:
@@ -1083,6 +1115,11 @@ def map_content(
         _apply_media_fields(content, entity_config, state, hass, now=now)
     elif template == "approval":
         _apply_approval_fields(content, entity_config)
+    elif template == "checklist":
+        if items := _build_checklist_items(entity_config):
+            content["items"] = items
+        # The server fills both from the ticks.
+        del content["progress"], content["state"]
     elif template == "generic" and entity_config.get(CONF_LIVE_PROGRESS):
         # Opt-in: hand the end time to iOS so it interpolates the progress bar to
         # 1.0 by end_date and shows a counting-down ETA. False first, for the same
@@ -1165,6 +1202,10 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         # completion screen is there to show. So nothing template-specific goes
         # out beyond the flat progress the server requires.
         content["progress"] = 0.0
+    elif template == "checklist":
+        # The stored items survive the merge patch, and progress and the state
+        # text are the server's to fill.
+        del content["progress"], content["state"]
 
     # The activity is done, so stop the opt-in ETA interpolation. Without this the
     # completion card keeps filling toward a deadline that no longer means anything.

@@ -20,6 +20,7 @@ from custom_components.pushward.const import (
     CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
+    CONF_CHECKLIST_ITEMS,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
     CONF_COMPACT_TRAILING_LABEL,
@@ -3907,3 +3908,44 @@ def test_approval_completion_does_not_restate_the_options():
     assert "options" not in content
     assert content["progress"] == 0.0
     assert_valid_activity_content(content, where="approval completion")
+
+
+# --- checklist template ------------------------------------------------------
+
+
+def test_checklist_maps_the_configured_rows():
+    """Rows map like board tiles: a bad or repeated id or an empty label is skipped,
+    the label is cut at the cap, checked rides only when the row sets it, and the
+    list stops at 8. Progress and the state text are left to the server."""
+    rows = [
+        {"id": "meds", "label": " Take vitamins ", "checked": True},
+        {"id": "plants", "label": "Water the plants"},
+        {"id": "meds", "label": "Repeated id"},
+        {"id": "bad id", "label": "Space in the id"},
+        {"id": "nolabel", "label": "  "},
+        "not a row",
+        {"id": "long", "label": "x" * 50, "checked": False},
+        *({"id": f"r{n}", "label": f"Row {n}"} for n in range(10)),
+    ]
+    content = map_content(_make_state("on", {}), {CONF_TEMPLATE: "checklist", CONF_CHECKLIST_ITEMS: rows})
+
+    assert content["template"] == "checklist"
+    assert content["items"][:3] == [
+        {"id": "meds", "label": "Take vitamins", "checked": True},
+        {"id": "plants", "label": "Water the plants"},
+        {"id": "long", "label": "x" * 40, "checked": False},
+    ]
+    assert len(content["items"]) == 8
+    assert "progress" not in content and "state" not in content
+    assert_valid_activity_content(content, where="checklist")
+
+
+def test_checklist_without_rows_and_its_completion_still_validate():
+    """A frame with no rows is legal: the stored items survive the merge, on the end frame too."""
+    content = map_content(_make_state("on", {}), {CONF_TEMPLATE: "checklist"})
+    assert "items" not in content
+    assert_valid_activity_content(content, where="checklist bare")
+
+    done = map_completion_content({CONF_TEMPLATE: "checklist"}, {"subtitle": "Morning"})
+    assert "items" not in done and "progress" not in done and "state" not in done
+    assert_valid_activity_content(done, where="checklist completion")

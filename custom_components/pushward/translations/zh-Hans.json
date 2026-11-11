@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "更新活动 (Checklist)",
+      "description": "更新 PushWard 清单 Live Activity：最多 8 个项目，可在锁屏、手表或通知中勾选。Home Assistant 不会得知这些勾选；此操作只发送清单。",
+      "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
+        "slug": {
+          "name": "标识符",
+          "description": "活动的 slug 标识符。"
+        },
+        "state": {
+          "name": "状态",
+          "description": "所需的活动状态。"
+        },
+        "items": {
+          "name": "项目",
+          "description": "1-8 个项目的列表。每项：id（必填，1-16 个字母、数字、- 或 _，不可重复）、label（必填，最多 40）以及可选的 checked（true/false）。该列表会替换已保存的列表。省略 checked 时，服务器保留它已为该 id 记录的勾选状态；在手机上做的勾选不会回报给 Home Assistant。"
+        },
+        "subtitle": {
+          "name": "副标题",
+          "description": "活动上显示的副标题文本。"
+        },
+        "compact_label": {
+          "name": "灵动岛标签",
+          "description": "最多 4 个字符，在紧凑视图中代替模板的默认内容。在 iPhone 上是灵动岛的前端区域，代替图标、步骤环或时间线的最高/最低堆叠（最小视图会忽略它）；在 Android 16 QPR2 及更高版本上是状态栏胶囊中的文字。"
+        },
+        "compact_trailing_label": {
+          "name": "灵动岛尾端标签",
+          "description": "在灵动岛紧凑视图的尾端区域中代替模板在此处显示的内容（例如步骤计数器或计时器）显示的最多 4 个字符。两者都设置时优先于尾端图标。最小视图会忽略它。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "compact_trailing_icon": {
+          "name": "灵动岛尾端图标",
+          "description": "SF Symbol 或 MDI 图标（例如 airplane.departure、mdi:airplane-takeoff），显示在灵动岛紧凑视图的尾端区域中，代替模板在此处显示的内容，并以强调色着色。设置了灵动岛尾端标签时会被忽略。需要 PushWard 1.19.1 或更高版本。"
+        },
+        "icon": {
+          "name": "图标",
+          "description": "SF Symbol 或 MDI 图标名称（例如 checklist、mdi:format-list-checks）。"
+        },
+        "completion_message": {
+          "name": "完成消息",
+          "description": "活动结束时显示的消息。"
+        },
+        "accent_color": {
+          "name": "强调色",
+          "description": "活动的强调色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "background_color": {
+          "name": "背景颜色",
+          "description": "Live Activity 的背景颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "text_color": {
+          "name": "文字颜色",
+          "description": "Live Activity 的文字颜色。十六进制（#RRGGBB）或颜色名称。"
+        },
+        "tap_action": {
+          "name": "点击动作",
+          "description": "整个活动的点击目标，为一个对象：url（必填）、可选的 foreground，以及对于 http(s) URL 可通过 method/headers/body 设置静默 webhook。"
+        },
+        "sound": {
+          "name": "声音",
+          "description": "本次更新在设备上播放的通知声音。"
+        },
+        "priority": {
+          "name": "优先级覆盖",
+          "description": "单次更新优先级（0-10）。仅在此次推送中覆盖活动配置的优先级。"
+        },
+        "ended_ttl": {
+          "name": "结束后保留时长",
+          "description": "活动结束后保留的秒数。"
+        },
+        "stale_ttl": {
+          "name": "过期时长",
+          "description": "活动被视为过期前的秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "移除 TTL",
+          "description": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。"
+        }
+      }
+    },
     "create_activity": {
       "name": "创建活动",
       "description": "创建新的 PushWard Live Activity。",
@@ -2343,7 +2425,7 @@
             "slug": "小组件 Slug"
           },
           "data_description": {
-            "widget_template": "小组件布局：`value` 显示单个数字，`progress` 显示进度条，`gauge` 显示区间内的数值，`status` 显示严重程度徽章，`stat_list` 最多 6 行，`trend` 显示迷你折线图，`countdown` 显示日期，`battery` 显示设备圆环，`schedule` 显示按小时的时间轴，`flow` 显示进出流向。",
+            "widget_template": "小组件布局：`value` 显示单个数字，`progress` 显示进度条，`gauge` 显示区间内的数值，`status` 显示严重程度徽章，`stat_list` 最多 6 行，`trend` 显示迷你折线图，`countdown` 显示日期，`battery` 显示设备圆环，`schedule` 显示按小时的时间轴，`flow` 显示进出流向。`heatmap` 在日历网格中显示每日数值。",
             "slug": "此小组件的唯一标识符。留空则根据实体 ID 自动生成。"
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "时段数值键",
             "schedule_low_max": "低档上限",
             "schedule_high_min": "高档下限",
-            "flow_nodes": "流向节点"
+            "flow_nodes": "流向节点",
+            "heatmap_weeks": "周数",
+            "heatmap_aggregate": "每日数值"
           },
           "data_description": {
             "widget_name": "在你手机上的小组件选择器中显示的名称。默认使用实体的友好名称。",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "这些列表中存放每个时段数值的键。",
             "schedule_low_max": "小于或等于此值的落入低档。两个阈值都留空，则由 App 依据所发送的范围自行划分档位。",
             "schedule_high_min": "大于或等于此值的落入高档。必须高于低档上限。",
-            "flow_nodes": "每个节点一行。插槽决定绘制位置：最多 3 个输入，外加各一个输出、存储和交换。速率取自实体，正负号由你自行约定。"
+            "flow_nodes": "每个节点一行。插槽决定绘制位置：最多 3 个输入，外加各一个输出、存储和交换。速率取自实体，正负号由你自行约定。",
+            "heatmap_weeks": "网格覆盖的周数（1-22）。每个格子是一天，今天在最后。",
+            "heatmap_aggregate": "用哪种 recorder 统计填充每一天：持续增长的总量（能耗、步数）用每日变化量，测量值用每日平均值、最大值或最小值。实体有总和统计时默认为变化量。"
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "流向小组件最多支持 3 个输入。",
         "duplicate_flow_slot": "输出、存储和交换各只能有一个。其余请使用 input。",
         "flow_nodes_required": "flow 模板至少需要一个节点。",
-        "invalid_schedule_thresholds": "低档上限必须小于高档下限。"
+        "invalid_schedule_thresholds": "低档上限必须小于高档下限。",
+        "heatmap_no_statistics": "该实体没有 recorder 统计，热力图无法填充各天。请选择带 state_class 的传感器。",
+        "heatmap_aggregate_unsupported": "该实体的统计中没有这种每日数值。每日变化量需要总量（总和统计）；平均值、最大值和最小值需要测量值。"
       },
       "abort": {
         "already_configured": "已存在使用此 slug 的小组件。",
@@ -2665,7 +2753,8 @@
         "countdown": "倒计时",
         "battery": "电池",
         "schedule": "时段表",
-        "flow": "流向"
+        "flow": "流向",
+        "heatmap": "热力图"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "电量最低优先",
         "level_desc": "电量最高优先"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "每日变化量",
+        "mean": "每日平均值",
+        "max": "每日最大值",
+        "min": "每日最小值"
       }
     },
     "todo_notification_level": {

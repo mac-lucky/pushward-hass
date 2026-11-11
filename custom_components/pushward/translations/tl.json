@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "I-update ang Activity (Checklist)",
+      "description": "I-update ang isang checklist na Live Activity ng PushWard: hanggang 8 item na tsinetsekan mula sa Lock Screen, sa relo o sa notification. Hindi nalalaman ng Home Assistant ang mga tsek na iyon; ipinapadala lang ng action na ito ang listahan.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug identifier ng activity."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Nais na estado ng activity."
+        },
+        "items": {
+          "name": "Mga item",
+          "description": "Listahan ng 1-8 item. Bawat isa: id (kailangan, 1-16 titik, numero, - o _, natatangi), label (kailangan, hanggang 40) at opsyonal na checked (true/false). Pinapalitan ng listahan ang nakaimbak. Kapag walang checked, pinapanatili ng server ang tsek na hawak na nito para sa id na iyon; hindi ibinabalik sa Home Assistant ang mga tsek na ginawa sa telepono."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle na teksto na ipinapakita sa activity."
+        },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Hanggang 4 na character na pumapalit sa default ng template sa compact view. Sa iPhone, ito ang harapang bahagi ng Dynamic Island, sa halip na ang icon, ang steps ring, o ang high/low stack ng timeline (hindi ito pinapansin ng minimal na presentasyon); sa Android 16 QPR2 at mas bago, ito ang text ng status-bar chip."
+        },
+        "compact_trailing_label": {
+          "name": "Likurang Island Label",
+          "description": "Hanggang 4 na character na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, gaya ng step counter o timer. Nangingibabaw ito sa likurang icon kapag pareho silang nakatakda. Hindi ito pinapansin ng minimal na presentasyon. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "compact_trailing_icon": {
+          "name": "Likurang Island Icon",
+          "description": "SF Symbol o MDI icon (hal. airplane.departure, mdi:airplane-takeoff) na ipinapakita sa likurang bahagi ng compact view ng Dynamic Island sa halip na ang ipinapakita roon ng template, na kinukulayan ng accent color. Binabalewala ito kapag may nakatakdang likurang Island label. Kailangan ang PushWard 1.19.1 o mas bago."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "Pangalan ng SF Symbol o MDI icon (hal. checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Mensahe ng Pagkumpleto",
+          "description": "Mensaheng ipinapakita kapag natapos ang activity."
+        },
+        "accent_color": {
+          "name": "Accent na Kulay",
+          "description": "Accent color para sa activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "background_color": {
+          "name": "Kulay ng Background",
+          "description": "Background color para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "text_color": {
+          "name": "Kulay ng Teksto",
+          "description": "Kulay ng teksto para sa Live Activity. Hex (#RRGGBB) o pangalan ng kulay."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Tap target ng buong activity bilang object: url (kinakailangan), opsyonal na foreground, at para sa http(s) url, isang silent webhook sa pamamagitan ng method/headers/body."
+        },
+        "sound": {
+          "name": "Tunog",
+          "description": "Tunog ng notification na tinutugtog sa device para sa update na ito."
+        },
+        "priority": {
+          "name": "Override ng Priyoridad",
+          "description": "Priyoridad kada update (0-10). Nino-override ang naka-configure na priyoridad ng activity para sa push na ito lamang."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Mga segundo na panatilihin ang activity pagkatapos itong matapos."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Mga segundo bago ituring na luma ang activity."
+        },
+        "dismissal_ttl": {
+          "name": "TTL ng pag-alis",
+          "description": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos."
+        }
+      }
+    },
     "create_activity": {
       "name": "Lumikha ng Activity",
       "description": "Lumikha ng bagong PushWard Live Activity.",
@@ -2343,7 +2425,7 @@
             "slug": "Widget Slug"
           },
           "data_description": {
-            "widget_template": "Layout ng widget: `value` para sa iisang numero, `progress` para sa bar, `gauge` para sa halaga sa loob ng saklaw, `status` para sa badge ng antas, `stat_list` para sa hanggang 6 na hilera, `trend` para sa sparkline, `countdown` para sa petsa, `battery` para sa mga singsing ng device, `schedule` para sa timeline kada oras, `flow` para sa pumapasok at lumalabas.",
+            "widget_template": "Layout ng widget: `value` para sa iisang numero, `progress` para sa bar, `gauge` para sa halaga sa loob ng saklaw, `status` para sa badge ng antas, `stat_list` para sa hanggang 6 na hilera, `trend` para sa sparkline, `countdown` para sa petsa, `battery` para sa mga singsing ng device, `schedule` para sa timeline kada oras, `flow` para sa pumapasok at lumalabas. Ang `heatmap` ay nagpapakita ng mga halaga bawat araw sa isang grid na kalendaryo.",
             "slug": "Natatanging identifier para sa widget na ito. Iwanang blanko upang awtomatikong ma-generate mula sa entity ID."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Key ng halaga ng panahon",
             "schedule_low_max": "Pinakamataas ng mababang banda",
             "schedule_high_min": "Pinakamababa ng mataas na banda",
-            "flow_nodes": "Mga node ng daloy"
+            "flow_nodes": "Mga node ng daloy",
+            "heatmap_weeks": "Mga linggo",
+            "heatmap_aggregate": "Halaga bawat araw"
           },
           "data_description": {
             "widget_name": "Display na pangalan na ipinapakita sa widget picker ng iyong phone. Nagde-default sa friendly name ng entity.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Key na naglalaman ng halaga ng bawat panahon sa mga listahang iyon.",
             "schedule_low_max": "Ang mga halagang katumbas o mas mababa dito ay mapupunta sa mababang banda. Iwanang blanko ang dalawang threshold para ang app na ang kumuha ng mga banda mula sa ipinadalang saklaw.",
             "schedule_high_min": "Ang mga halagang katumbas o mas mataas dito ay mapupunta sa mataas na banda. Dapat mas mataas ito kaysa sa pinakamataas ng mababang banda.",
-            "flow_nodes": "Isang hilera bawat node. Ang slot ang nagtatakda kung saan iginuguhit: hanggang 3 input, kasama ang tig-isang output, storage at exchange. Ang rate ay galing sa entity, at sa iyo ang tanda."
+            "flow_nodes": "Isang hilera bawat node. Ang slot ang nagtatakda kung saan iginuguhit: hanggang 3 input, kasama ang tig-isang output, storage at exchange. Ang rate ay galing sa entity, at sa iyo ang tanda.",
+            "heatmap_weeks": "Ilang linggo ang sakop ng grid, 1-22. Bawat cell ay isang araw, huli ang ngayon.",
+            "heatmap_aggregate": "Aling statistic ng recorder ang pumupuno sa isang araw: ang pagbabago bawat araw para sa total na patuloy na lumalaki (enerhiya, hakbang), o ang average, pinakamataas o pinakamababa sa araw ng isang sukat. Default ang pagbabago kapag may sum statistic ang entity."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Hanggang 3 input lang ang kayang suportahan ng flow widget.",
         "duplicate_flow_slot": "Tig-isang output, storage at exchange lamang. Gamitin ang input para sa iba.",
         "flow_nodes_required": "Kailangan ng kahit isang node para sa template na flow.",
-        "invalid_schedule_thresholds": "Dapat mas mababa ang pinakamataas ng mababang banda kaysa sa pinakamababa ng mataas na banda."
+        "invalid_schedule_thresholds": "Dapat mas mababa ang pinakamataas ng mababang banda kaysa sa pinakamababa ng mataas na banda.",
+        "heatmap_no_statistics": "Walang recorder statistics ang entity na ito, kaya walang maipupuno ang heatmap sa mga araw nito. Gumamit ng sensor na may state_class.",
+        "heatmap_aggregate_unsupported": "Wala sa statistics ng entity na ito ang halagang iyon bawat araw. Kailangan ng total (sum statistic) ang pagbabago bawat araw; kailangan ng sukat ang average, pinakamataas at pinakamababa."
       },
       "abort": {
         "already_configured": "May widget na umiiral na sa slug na ito.",
@@ -2665,7 +2753,8 @@
         "countdown": "Countdown",
         "battery": "Baterya",
         "schedule": "Iskedyul",
-        "flow": "Daloy"
+        "flow": "Daloy",
+        "heatmap": "Heatmap"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Pinakamababang baterya muna",
         "level_desc": "Pinakamataas na baterya muna"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Pagbabago bawat araw",
+        "mean": "Average bawat araw",
+        "max": "Pinakamataas sa araw",
+        "min": "Pinakamababa sa araw"
       }
     },
     "todo_notification_level": {

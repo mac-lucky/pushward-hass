@@ -156,6 +156,9 @@ CONF_MEDIA_TOKEN = "media_token"
 CONF_APPROVAL_OPTIONS = "approval_options"
 CONF_APPROVAL_DETAILS = "approval_details"
 CONF_APPROVAL_SOURCE = "approval_source"
+# Checklist template: the rows of the list, read the same way as the approval
+# fields above (no config-flow editor, update_activity_checklist drives the card).
+CONF_CHECKLIST_ITEMS = "checklist_items"
 # Not stored: the manager's entity configs get the owning subentry's id injected at
 # load time so a control URL can name the subentry the callback has to look up.
 CONF_SUBENTRY_ID = "subentry_id"
@@ -245,6 +248,11 @@ CONF_FLOW_SLOT = "slot"
 # Per-row companion entities for a flow node's cumulative total and fill level.
 CONF_TOTAL_ENTITY = "total_entity"
 CONF_LEVEL_ENTITY = "level_entity"
+
+# heatmap template: how many weeks of daily cells to send, and which daily
+# statistic fills a cell (see HEATMAP_AGGREGATES).
+CONF_HEATMAP_WEEKS = "heatmap_weeks"
+CONF_HEATMAP_AGGREGATE = "heatmap_aggregate"
 
 # Defaults
 DEFAULT_SERVER_URL = "https://api.pushward.app"
@@ -523,10 +531,10 @@ TODO_WATCH_FINAL_READ_MINUTES = 30
 # Templates offered by the tracked-entity config flow (each has a mapper).
 TEMPLATES = ["generic", "countdown", "alert", "steps", "gauge", "timeline", "board", "log", "media"]
 # Templates with an update_activity_<template> action: every template the flow
-# offers, plus approval, which is service-only (like media once was) until the
-# flow grows an options editor - a flow-created approval config could not name
-# its answer buttons, so every create would 422.
-SERVICE_TEMPLATES = (*TEMPLATES, "approval")
+# offers, plus approval and checklist, which are service-only (like media once
+# was) until the flow grows an editor for them - a flow-created approval config
+# could not name its answer buttons, so every create would 422.
+SERVICE_TEMPLATES = (*TEMPLATES, "approval", "checklist")
 # Template names the server accepts as input for another one. The docs call the
 # countdown template "Timer"; stored rows and pushes keep saying "countdown".
 TEMPLATE_ALIASES = {"timer": "countdown"}
@@ -581,6 +589,17 @@ APPROVAL_DETAILS_MAX = 2
 APPROVAL_DETAIL_LABEL_MAX = 24
 APPROVAL_DETAIL_VALUE_MAX = 64
 
+# Checklist template caps (mirror pushward-server/internal/model/activity.go).
+# `items` replace wholesale on update, like board tiles. An item whose `checked`
+# is left out keeps the value the server stored (a tick made on a phone); an
+# explicit true/false sets it. The server fills `progress` and the `state` text
+# ("3 of 8") itself for older app builds, and `tick_url` is server-owned.
+CHECKLIST_ITEMS_MIN = 1
+CHECKLIST_ITEMS_MAX = 8
+CHECKLIST_ITEM_LABEL_MAX = 40
+# \Z, not $, for the same reason as APPROVAL_OPTION_ID_PATTERN.
+CHECKLIST_ITEM_ID_PATTERN = r"^[A-Za-z0-9_-]{1,16}\Z"
+
 # Widget templates (server: pushward-server/internal/model/widget.go)
 WIDGET_TEMPLATE_VALUE = "value"
 WIDGET_TEMPLATE_PROGRESS = "progress"
@@ -594,6 +613,7 @@ WIDGET_TEMPLATE_COUNTDOWN = "countdown"
 WIDGET_TEMPLATE_BATTERY = "battery"
 WIDGET_TEMPLATE_SCHEDULE = "schedule"
 WIDGET_TEMPLATE_FLOW = "flow"
+WIDGET_TEMPLATE_HEATMAP = "heatmap"
 WIDGET_TEMPLATES = [
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TEMPLATE_PROGRESS,
@@ -605,6 +625,7 @@ WIDGET_TEMPLATES = [
     WIDGET_TEMPLATE_BATTERY,
     WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_FLOW,
+    WIDGET_TEMPLATE_HEATMAP,
 ]
 
 # Widget looks (server widgetStyles), offered on every template, and the stat_list
@@ -732,6 +753,24 @@ FLOW_SLOTS = [FLOW_SLOT_INPUT, FLOW_SLOT_OUTPUT, FLOW_SLOT_STORAGE, FLOW_SLOT_EX
 WIDGET_TREND_BUFFER_MAX = 300
 # Default recorder seed window for a new trend widget (minutes).
 DEFAULT_WIDGET_TREND_PERIOD = 1440
+
+# heatmap cells: one per local day, oldest first (server minHeatmapCells /
+# maxHeatmapCells), so the flow offers whole weeks from 1 to 22.
+WIDGET_MIN_HEATMAP_CELLS = 7
+WIDGET_MAX_HEATMAP_CELLS = 154
+WIDGET_HEATMAP_WEEKS_MAX = WIDGET_MAX_HEATMAP_CELLS // 7
+DEFAULT_HEATMAP_WEEKS = WIDGET_HEATMAP_WEEKS_MAX
+# The daily recorder statistic a cell holds: `change` for a total such as energy
+# or steps (needs a sum statistic), `mean`/`max`/`min` for a measurement.
+HEATMAP_AGGREGATE_CHANGE = "change"
+HEATMAP_AGGREGATE_MEAN = "mean"
+HEATMAP_AGGREGATES = [HEATMAP_AGGREGATE_CHANGE, HEATMAP_AGGREGATE_MEAN, "max", "min"]
+# Long-term statistics move once an hour, so a state change reads them again
+# only after this many seconds; inside the window the last read is reused.
+WIDGET_HEATMAP_READ_INTERVAL = 300
+# Local time of the daily refresh that starts the new day's cell: a few minutes
+# past midnight, so the statistics of yesterday's last hour are compiled.
+WIDGET_HEATMAP_REFRESH_MINUTE = 5
 
 # Widget severities (mirrors server validWidgetSeverities)
 WIDGET_SEVERITIES = ["", "info", "warning", "critical", "success"]

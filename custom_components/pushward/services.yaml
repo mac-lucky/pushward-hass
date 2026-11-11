@@ -41,6 +41,7 @@ update_activity:
             - "log"
             - "media"
             - "approval"
+            - "checklist"
     progress:
       name: Progress
       description: Progress value between 0.0 and 1.0.
@@ -1982,6 +1983,111 @@ update_activity_approval:
         text:
     accent_color:
       example: "orange"
+      selector:
+        text:
+    background_color:
+      example: "#1a2b3c"
+      selector:
+        text:
+    text_color:
+      example: "#ffffff"
+      selector:
+        text:
+    tap_action:
+      example: '{"url": "homeassistant://navigate/lovelace/0"}'
+      selector:
+        object:
+    sound:
+      example: "chime"
+      selector:
+        select:
+          options:
+            - "default"
+            - "chime"
+            - "alert"
+            - "success"
+            - "warning"
+            - "bell"
+            - "ding"
+            - "buzz"
+            - "notification"
+    priority:
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 10
+          mode: slider
+    ended_ttl:
+      example: 300
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    stale_ttl:
+      example: 1800
+      selector:
+        number:
+          min: 1
+          max: 2592000
+          mode: box
+    dismissal_ttl:
+      example: 60
+      selector:
+        number:
+          min: 0
+          max: 14400
+          mode: box
+
+update_activity_checklist:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: pushward
+    slug:
+      required: true
+      example: "ha-morning-routine"
+      selector:
+        text:
+    state:
+      required: true
+      selector:
+        select:
+          options:
+            - "ongoing"
+            - "ended"
+    items:
+      example: '[{"id": "meds", "label": "Take vitamins"}, {"id": "plants", "label": "Water the plants"}, {"id": "bins", "label": "Bins out", "checked": true}]'
+      selector:
+        object:
+    subtitle:
+      example: "Before 9:00"
+      selector:
+        text:
+    compact_label:
+      example: "TODO"
+      selector:
+        text:
+    compact_trailing_label:
+      example: "AM"
+      selector:
+        text:
+    compact_trailing_icon:
+      example: "mdi:sun-clock"
+      selector:
+        text:
+    icon:
+      example: "checklist"
+      selector:
+        text:
+    completion_message:
+      example: "All done"
+      selector:
+        text:
+    accent_color:
+      example: "green"
       selector:
         text:
     background_color:

@@ -35,6 +35,7 @@ from custom_components.pushward.config_flow import (
 )
 from custom_components.pushward.const import (
     FLOW_SLOTS,
+    HEATMAP_AGGREGATES,
     IMAGE_SHAPES,
     NAMED_COLORS,
     SCALES,
@@ -73,6 +74,7 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "widget_severity": tuple(s for s in WIDGET_SEVERITIES if s),
     "widget_trigger_mode": tuple(WIDGET_TRIGGER_MODES),
     "battery_sort": tuple(s for s in WIDGET_BATTERY_SORTS if s),
+    "heatmap_aggregate": tuple(HEATMAP_AGGREGATES),
     "named_color": tuple(NAMED_COLORS),
     "timer_style": tuple(TIMER_STYLES),
     "flow_slot": tuple(FLOW_SLOTS),
@@ -374,6 +376,7 @@ WIDGET_FROZEN_FIELDS: dict[str, set[str]] = {
         "schedule_high_min",
     },
     "flow": _WIDGET_COMMON | {"unit", "flow_nodes"},
+    "heatmap": _WIDGET_SINGLE | {"unit", "min_value", "max_value", "heatmap_weeks", "heatmap_aggregate"},
 }
 
 

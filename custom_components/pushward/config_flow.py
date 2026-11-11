@@ -74,6 +74,8 @@ from .const import (
     CONF_FIRED_AT_ENTITY,
     CONF_FLOW_NODES,
     CONF_FLOW_SLOT,
+    CONF_HEATMAP_AGGREGATE,
+    CONF_HEATMAP_WEEKS,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -170,6 +172,7 @@ from .const import (
     CONF_WIDGET_TRIGGER_MODE,
     DANGEROUS_URL_SCHEMES,
     DEFAULT_DECIMALS,
+    DEFAULT_HEATMAP_WEEKS,
     DEFAULT_HISTORY_PERIOD,
     DEFAULT_IMAGE_SHAPE,
     DEFAULT_MAX_VALUE,
@@ -199,6 +202,9 @@ from .const import (
     DOMAIN,
     FLOW_SLOT_INPUT,
     FLOW_SLOTS,
+    HEATMAP_AGGREGATE_CHANGE,
+    HEATMAP_AGGREGATE_MEAN,
+    HEATMAP_AGGREGATES,
     HISTORY_PERIOD_MAX,
     IMAGE_SHAPES,
     IMAGE_TEMPLATES,
@@ -246,6 +252,7 @@ from .const import (
     WIDGET_BATTERY_SORTS,
     WIDGET_EXPIRED_TEXT_MAX,
     WIDGET_GROUP_TEMPLATES,
+    WIDGET_HEATMAP_WEEKS_MAX,
     WIDGET_LABEL_MAX,
     WIDGET_LOOK_UNSET,
     WIDGET_LOOKS,
@@ -266,6 +273,7 @@ from .const import (
     WIDGET_TEMPLATE_COUNTDOWN,
     WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -285,6 +293,7 @@ from .const import (
 from .content_mapper import get_domain_defaults, is_valid_color, sanitize_slug
 from .e2e import E2EError, key_id, parse_key
 from .media_control import new_control_token
+from .recorder_history import async_statistics_info, statistics_has_mean
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -722,6 +731,8 @@ _WIDGET_TOPLEVEL: frozenset[str] = frozenset(
         CONF_SCHEDULE_LOW_MAX,
         CONF_SCHEDULE_HIGH_MIN,
         CONF_FLOW_NODES,
+        CONF_HEATMAP_WEEKS,
+        CONF_HEATMAP_AGGREGATE,
     }
 )
 
@@ -2499,8 +2510,9 @@ def _widget_details_schema(
         WIDGET_TEMPLATE_TREND,
         WIDGET_TEMPLATE_SCHEDULE,
         WIDGET_TEMPLATE_FLOW,
+        WIDGET_TEMPLATE_HEATMAP,
     ):
-        if template not in (WIDGET_TEMPLATE_SCHEDULE, WIDGET_TEMPLATE_FLOW):
+        if template not in (WIDGET_TEMPLATE_SCHEDULE, WIDGET_TEMPLATE_FLOW, WIDGET_TEMPLATE_HEATMAP):
             fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
         fields[
             vol.Optional(
@@ -2521,6 +2533,37 @@ def _widget_details_schema(
                 max=HISTORY_PERIOD_MAX,
                 mode=NumberSelectorMode.BOX,
                 unit_of_measurement="minutes",
+            )
+        )
+        fields[_opt_number_key(CONF_MIN_VALUE, d)] = _NUMBER_BOX_ANY
+        fields[_opt_number_key(CONF_MAX_VALUE, d)] = _NUMBER_BOX_ANY
+
+    if template == WIDGET_TEMPLATE_HEATMAP:
+        fields[
+            vol.Optional(
+                CONF_HEATMAP_WEEKS,
+                default=d.get(CONF_HEATMAP_WEEKS, DEFAULT_HEATMAP_WEEKS),
+            )
+        ] = NumberSelector(
+            NumberSelectorConfig(
+                min=1,
+                max=WIDGET_HEATMAP_WEEKS_MAX,
+                step=1,
+                mode=NumberSelectorMode.BOX,
+                unit_of_measurement="weeks",
+            )
+        )
+        # The flow steps put the entity's own default here (change for a total).
+        fields[
+            vol.Optional(
+                CONF_HEATMAP_AGGREGATE,
+                default=d.get(CONF_HEATMAP_AGGREGATE, HEATMAP_AGGREGATE_MEAN),
+            )
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=HEATMAP_AGGREGATES,
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key="heatmap_aggregate",
             )
         )
         fields[_opt_number_key(CONF_MIN_VALUE, d)] = _NUMBER_BOX_ANY
@@ -2998,7 +3041,7 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     raw_slug = (step1.get(CONF_SLUG) or "").strip()
     slug = (normalize_slug(raw_slug) if raw_slug else "") or sanitize_slug(entity_id)
 
-    if template == WIDGET_TEMPLATE_TREND:
+    if template in (WIDGET_TEMPLATE_TREND, WIDGET_TEMPLATE_HEATMAP):
         min_v, max_v = _coerce_trend_bounds(user_input)
     else:
         min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == WIDGET_TEMPLATE_GAUGE)
@@ -3094,7 +3137,35 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
         CONF_BACKGROUND_COLOR: _rgb_to_hex(user_input.get(CONF_BACKGROUND_COLOR)),
         CONF_TEXT_COLOR: _rgb_to_hex(user_input.get(CONF_TEXT_COLOR)),
         **action_slots,
+        # Heatmap keys only on a heatmap, so the other templates store what they always have.
+        **(_parse_heatmap_fields(user_input) if template == WIDGET_TEMPLATE_HEATMAP else {}),
     }
+
+
+def _parse_heatmap_fields(user_input: dict) -> dict:
+    """Weeks clamped to 1-22, and an aggregate from the allowlist (mean when unknown)."""
+    raw = user_input.get(CONF_HEATMAP_WEEKS)
+    try:
+        weeks = DEFAULT_HEATMAP_WEEKS if raw in (None, "") else int(float(raw))
+    except (TypeError, ValueError):
+        weeks = DEFAULT_HEATMAP_WEEKS
+    aggregate = user_input.get(CONF_HEATMAP_AGGREGATE)
+    return {
+        CONF_HEATMAP_WEEKS: max(1, min(WIDGET_HEATMAP_WEEKS_MAX, weeks)),
+        CONF_HEATMAP_AGGREGATE: aggregate if aggregate in HEATMAP_AGGREGATES else HEATMAP_AGGREGATE_MEAN,
+    }
+
+
+def _default_heatmap_aggregate(info: dict) -> str:
+    """change for an entity with a sum statistic (energy, steps), mean for the rest."""
+    return HEATMAP_AGGREGATE_CHANGE if info.get("has_sum") else HEATMAP_AGGREGATE_MEAN
+
+
+def _check_heatmap_aggregate(aggregate: str, info: dict) -> None:
+    """Refuse a daily statistic the entity's recorder statistics do not carry."""
+    supported = info.get("has_sum") if aggregate == HEATMAP_AGGREGATE_CHANGE else statistics_has_mean(info)
+    if not supported:
+        raise vol.Invalid("heatmap_aggregate_unsupported", path=[CONF_HEATMAP_AGGREGATE])
 
 
 class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
@@ -3106,6 +3177,15 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
         self._is_reconfigure: bool = False
         self._details_defaults: dict[str, Any] = {}
         self._suggestion_offered: bool = False
+        # Recorder statistics metadata of a heatmap's entity, read in step 1.
+        self._statistics_info: dict[str, Any] = {}
+
+    async def _heatmap_statistics_errors(self, user_input: dict[str, Any]) -> dict[str, str]:
+        """A heatmap fills its cells from recorder statistics, so its entity must have some."""
+        if user_input.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_HEATMAP:
+            return {}
+        self._statistics_info = await async_statistics_info(self.hass, user_input[CONF_ENTITY_ID]) or {}
+        return {} if self._statistics_info else {CONF_ENTITY_ID: "heatmap_no_statistics"}
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
         """Step 1: entity + template + slug."""
@@ -3129,6 +3209,13 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                         ),
                     )
 
+            if errors := await self._heatmap_statistics_errors(user_input):
+                return self.async_show_form(
+                    step_id="user",
+                    data_schema=_widget_step1_schema(defaults=user_input),
+                    errors=errors,
+                )
+
             self._step1_input = user_input
             self._is_reconfigure = False
             return await self.async_step_details()
@@ -3142,6 +3229,12 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
     ) -> config_entries.SubentryFlowResult:
         subentry = self._get_reconfigure_subentry()
         if user_input is not None:
+            if errors := await self._heatmap_statistics_errors(user_input):
+                return self.async_show_form(
+                    step_id="reconfigure",
+                    data_schema=_widget_step1_schema(defaults=user_input),
+                    errors=errors,
+                )
             self._step1_input = user_input
             self._is_reconfigure = True
             current = dict(subentry.data)
@@ -3173,6 +3266,8 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
         if user_input is not None:
             try:
                 widget_cfg = _parse_widget_input(user_input, self._step1_input)
+                if template == WIDGET_TEMPLATE_HEATMAP:
+                    _check_heatmap_aggregate(widget_cfg[CONF_HEATMAP_AGGREGATE], self._statistics_info)
             except vol.Invalid as exc:
                 for field in exc.path:
                     errors[field] = str(exc.msg)
@@ -3193,7 +3288,9 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                     unique_id=widget_cfg[CONF_SLUG],
                 )
 
-        defaults = self._details_defaults if self._is_reconfigure else None
+        defaults = dict(self._details_defaults) if self._is_reconfigure else {}
+        if template == WIDGET_TEMPLATE_HEATMAP:
+            defaults.setdefault(CONF_HEATMAP_AGGREGATE, _default_heatmap_aggregate(self._statistics_info))
         expand = _sections_to_expand(WIDGET_SECTIONS, _WIDGET_TOPLEVEL, errors)
         schema = _widget_details_schema(entity_id, template, defaults=defaults, expand=expand)
         if errors and user_input is not None:

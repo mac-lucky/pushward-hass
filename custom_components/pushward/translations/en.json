@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Update Activity (Checklist)",
+      "description": "Update a PushWard checklist Live Activity: up to 8 items people tick from the Lock Screen, the watch or the notification. Home Assistant does not learn about those ticks; this action only sends the list.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Activity slug identifier."
+        },
+        "state": {
+          "name": "State",
+          "description": "Desired activity state."
+        },
+        "items": {
+          "name": "Items",
+          "description": "List of 1-8 items. Each: id (required, 1-16 letters, digits, - or _, unique), label (required, max 40) and optional checked (true/false). The list replaces the stored one. Leave checked out to keep the tick the server already has for that id; ticks made on a phone are not reported back to Home Assistant."
+        },
+        "subtitle": {
+          "name": "Subtitle",
+          "description": "Subtitle text shown on the activity."
+        },
+        "compact_label": {
+          "name": "Island Label",
+          "description": "Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text."
+        },
+        "compact_trailing_label": {
+          "name": "Island Trailing Label",
+          "description": "Up to 4 characters shown in the Dynamic Island compact trailing ear in place of what that template shows there, such as the step counter or the timer. Wins over the trailing icon when both are set. The minimal presentation ignores it. Needs PushWard 1.19.1 or later."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Trailing Icon",
+          "description": "SF Symbol or MDI icon (e.g. airplane.departure, mdi:airplane-takeoff) shown in the Dynamic Island compact trailing ear in place of what that template shows there, tinted with the accent color. Ignored when an island trailing label is set. Needs PushWard 1.19.1 or later."
+        },
+        "icon": {
+          "name": "Icon",
+          "description": "SF Symbol or MDI icon name (e.g. checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Completion Message",
+          "description": "Message shown when the activity ends."
+        },
+        "accent_color": {
+          "name": "Accent Color",
+          "description": "Accent color for the activity. Hex (#RRGGBB) or named color."
+        },
+        "background_color": {
+          "name": "Background Color",
+          "description": "Background color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "text_color": {
+          "name": "Text Color",
+          "description": "Text color for the Live Activity. Hex (#RRGGBB) or named color."
+        },
+        "tap_action": {
+          "name": "Tap Action",
+          "description": "Whole-activity tap target as an object: url (required), optional foreground, and for an http(s) url a silent webhook via method/headers/body."
+        },
+        "sound": {
+          "name": "Sound",
+          "description": "Notification sound played on the device for this update."
+        },
+        "priority": {
+          "name": "Priority Override",
+          "description": "Per-update priority (0-10). Overrides the activity's configured priority for this push only."
+        },
+        "ended_ttl": {
+          "name": "Ended TTL",
+          "description": "Seconds to keep the activity after it ends."
+        },
+        "stale_ttl": {
+          "name": "Stale TTL",
+          "description": "Seconds before the activity is considered stale."
+        },
+        "dismissal_ttl": {
+          "name": "Dismissal TTL",
+          "description": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end."
+        }
+      }
+    },
     "create_activity": {
       "name": "Create Activity",
       "description": "Create a new PushWard Live Activity.",
@@ -2343,7 +2425,7 @@
             "slug": "Widget Slug"
           },
           "data_description": {
-            "widget_template": "Widget layout: `value` for a single number, `progress` for a bar, `gauge` for a value in range, `status` for a severity badge, `stat_list` for up to 6 rows, `trend` for a sparkline, `countdown` for a date, `battery` for device rings, `schedule` for an hourly timeline, `flow` for what comes in and goes out.",
+            "widget_template": "Widget layout: `value` for a single number, `progress` for a bar, `gauge` for a value in range, `status` for a severity badge, `stat_list` for up to 6 rows, `trend` for a sparkline, `countdown` for a date, `battery` for device rings, `schedule` for an hourly timeline, `flow` for what comes in and goes out, `heatmap` for a calendar grid of daily values.",
             "slug": "Unique identifier for this widget. Leave empty to auto-generate from entity ID."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Period Value Key",
             "schedule_low_max": "Low Band Maximum",
             "schedule_high_min": "High Band Minimum",
-            "flow_nodes": "Flow Nodes"
+            "flow_nodes": "Flow Nodes",
+            "heatmap_weeks": "Weeks",
+            "heatmap_aggregate": "Daily Value"
           },
           "data_description": {
             "widget_name": "Display name shown in the widget picker on your phone. Defaults to the entity's friendly name.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Key holding each period's value inside those lists.",
             "schedule_low_max": "Values at or below this land in the low band. Leave both thresholds empty to let the app derive the bands from the posted range.",
             "schedule_high_min": "Values at or above this land in the high band. Must be above the low band maximum.",
-            "flow_nodes": "One row per node. Slot decides where it renders: up to 3 inputs, plus one output, storage and exchange. The rate comes from the entity, signed by your own convention."
+            "flow_nodes": "One row per node. Slot decides where it renders: up to 3 inputs, plus one output, storage and exchange. The rate comes from the entity, signed by your own convention.",
+            "heatmap_weeks": "How many weeks the grid covers, 1-22. Each cell is one day, today last.",
+            "heatmap_aggregate": "Which recorder statistic fills a day: the change per day for a total that keeps growing (energy, steps), or the daily average, maximum or minimum of a measurement. Defaults to the change when the entity has a sum statistic."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "A flow widget supports at most 3 inputs.",
         "duplicate_flow_slot": "Only one output, storage and exchange node each. Use input for the rest.",
         "flow_nodes_required": "At least one node is required for the flow template.",
-        "invalid_schedule_thresholds": "Low band maximum must be below high band minimum."
+        "invalid_schedule_thresholds": "Low band maximum must be below high band minimum.",
+        "heatmap_no_statistics": "This entity has no recorder statistics, so a heatmap has nothing to fill its days from. Pick a sensor with a state class.",
+        "heatmap_aggregate_unsupported": "This entity's statistics do not carry that daily value. Change per day needs a total (a sum statistic); average, maximum and minimum need a measurement."
       },
       "abort": {
         "already_configured": "A widget with this slug already exists.",
@@ -2665,7 +2753,8 @@
         "countdown": "Countdown",
         "battery": "Battery",
         "schedule": "Schedule",
-        "flow": "Flow"
+        "flow": "Flow",
+        "heatmap": "Heatmap"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Lowest battery first",
         "level_desc": "Highest battery first"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Change per day",
+        "mean": "Daily average",
+        "max": "Daily maximum",
+        "min": "Daily minimum"
       }
     },
     "todo_notification_level": {

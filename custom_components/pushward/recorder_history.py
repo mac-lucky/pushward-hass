@@ -2,14 +2,16 @@
 
 Both surfaces seed a chart from HA's recorder on start: the timeline activity
 seeds its sparkline series, the trend widget seeds its points buffer. The query
-strategy is identical, so it lives here rather than in either manager.
+strategy is identical, so it lives here rather than in either manager. The
+heatmap widget reads daily long-term statistics from here too.
 """
 
 from __future__ import annotations
 
 import contextlib
 import logging
-from datetime import timedelta
+import math
+from datetime import UTC, datetime, timedelta
 from functools import partial
 
 from homeassistant.components.sensor import ATTR_STATE_CLASS
@@ -182,3 +184,69 @@ async def _raw_recorder_points(
         if points:
             result[entity_id] = points
     return result
+
+
+async def async_statistics_info(hass: HomeAssistant, entity_id: str) -> dict | None:
+    """The recorder's statistics metadata for one entity, or None when it has none.
+
+    An entity the sensor platform will compile statistics for in the next period
+    counts too, so a sensor with a state_class added a minute ago is accepted.
+    None as well when the recorder is not loaded.
+    """
+    try:
+        from homeassistant.components.recorder.statistics import async_list_statistic_ids
+
+        found = await async_list_statistic_ids(hass, {entity_id})
+    except Exception:
+        _LOGGER.debug("Failed to read statistics metadata for %s", entity_id, exc_info=True)
+        return None
+    return found[0] if found else None
+
+
+def statistics_has_mean(info: dict) -> bool:
+    """True when the statistics carry mean/min/max (a measurement rather than a total)."""
+    # mean_type replaced has_mean; older Home Assistant releases only send has_mean.
+    return bool(info.get("mean_type") or info.get("has_mean"))
+
+
+async def async_daily_values(
+    hass: HomeAssistant, entity_id: str, days: int, stat_type: str
+) -> list[float | None] | None:
+    """One value per local day from long-term statistics, oldest first, ending today.
+
+    ``stat_type`` is a statistics_during_period type (change, mean, max, min). The
+    recorder's "day" period starts at local midnight, DST days included, so each
+    row lands on its own local date. A day without statistics is None. Returns
+    None when the recorder cannot be read.
+    """
+    try:
+        from homeassistant.components.recorder.statistics import statistics_during_period
+    except ImportError:
+        return None
+
+    from homeassistant.helpers.recorder import get_instance
+
+    first = dt_util.now().date() - timedelta(days=days - 1)
+    try:
+        stats = await get_instance(hass).async_add_executor_job(
+            partial(
+                statistics_during_period,
+                hass,
+                dt_util.start_of_local_day(first),
+                None,
+                {entity_id},
+                "day",
+                None,
+                {stat_type},
+            )
+        )
+    except Exception:
+        _LOGGER.debug("Failed to query daily statistics for %s", entity_id, exc_info=True)
+        return None
+
+    by_day: dict = {}
+    for row in stats.get(entity_id, []):
+        value, start = row.get(stat_type), row.get("start")
+        if isinstance(value, (int, float)) and math.isfinite(value) and start is not None:
+            by_day[dt_util.as_local(datetime.fromtimestamp(start, UTC)).date()] = float(value)
+    return [by_day.get(first + timedelta(days=i)) for i in range(days)]

@@ -54,6 +54,9 @@ from custom_components.pushward.const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    CHECKLIST_ITEM_LABEL_MAX,
+    CHECKLIST_ITEMS_MAX,
+    CHECKLIST_ITEMS_MIN,
     COUNTDOWN_DIRECTION_UP,
     COUNTDOWN_DIRECTIONS,
     COUNTDOWN_DOWN_ONLY_FIELDS,
@@ -110,9 +113,11 @@ from custom_components.pushward.const import (
     WIDGET_MAX_BATTERY_DEVICES,
     WIDGET_MAX_DEVICE_SORT_KEYS,
     WIDGET_MAX_FLOW_INPUTS,
+    WIDGET_MAX_HEATMAP_CELLS,
     WIDGET_MAX_SCHEDULE_PERIODS,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_MAX_TREND_POINTS,
+    WIDGET_MIN_HEATMAP_CELLS,
     WIDGET_MIN_TREND_POINTS,
     WIDGET_NODE_ICON_MAX,
     WIDGET_NODE_NAME_MAX,
@@ -181,6 +186,11 @@ CLOCK_SERVER_OWNED = ("paused_at", "paused_seconds")
 # leading-alphanumeric / [a-zA-Z0-9_-] / 64-char rule as an activity slug.
 # \Z, not $: Python's $ also matches before a trailing newline; the server's does not.
 _APPROVAL_OPTION_ID_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}\Z")
+# The checklist-only content fields. `tick_url` is server-owned, so it is a
+# violation even on checklist itself.
+CHECKLIST_FIELDS = ("items", "tick_url")
+# Restated like the approval option id: 1-16 of [A-Za-z0-9_-], no leading rule.
+_CHECKLIST_ITEM_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,16}\Z")
 
 # Padded standard-alphabet base64 - the only form Swift's Data(base64Encoded:) reads.
 _THUMBHASH_B64_RE = re.compile(r"[A-Za-z0-9+/]+={0,2}")
@@ -320,6 +330,8 @@ def assert_valid_activity_content(content: dict, *, where: str = "activity") -> 
     _assert_media(content, where, template)
     # And the approval fields, for the same reason.
     _assert_approval(content, where, template)
+    # And the checklist fields.
+    _assert_checklist(content, where, template)
     # And the countdown clock fields.
     if template != "countdown" and (present := [f for f in CLOCK_FIELDS if f in content]):
         _fail(where, f"{present} are only supported by the 'countdown' template, got {template!r}")
@@ -586,6 +598,45 @@ def _assert_approval(content: dict, where: str, template: str) -> None:
         # membership is the one locally checkable rule ("none" skips it).
         if on_expire != "none" and options and on_expire not in [option.get("id") for option in options]:
             _fail(where, f"on_expire {on_expire!r} must name one of the sent options")
+
+
+def _assert_checklist(content: dict, where: str, template: str) -> None:
+    """The checklist template's items: checklist only, 1-8 rows, ids unique, tick_url server-owned."""
+    present = [f for f in CHECKLIST_FIELDS if content.get(f) not in (None, "", [])]
+    if template != "checklist":
+        if present:
+            _fail(where, f"{present} are only supported by the 'checklist' template, got {template!r}")
+        return
+
+    if "tick_url" in content:
+        _fail(where, "checklist must not send tick_url (server-owned field)")
+    # Board tiles and log lines are refused on a checklist, not ignored.
+    for field in ("tiles", "lines"):
+        if content.get(field) not in (None, []):
+            _fail(where, f"{field} is not supported by the 'checklist' template")
+
+    items = content.get("items")
+    if items is None:
+        return
+    if not isinstance(items, list):
+        _fail(where, f"items must be a list, got {type(items).__name__}")
+    if not (CHECKLIST_ITEMS_MIN <= len(items) <= CHECKLIST_ITEMS_MAX):
+        _fail(where, f"checklist requires {CHECKLIST_ITEMS_MIN}-{CHECKLIST_ITEMS_MAX} items, got {len(items)}")
+    for i, item in enumerate(items):
+        if not isinstance(item, dict):
+            _fail(where, f"items[{i}] must be an object, got {type(item).__name__}")
+        item_id = item.get("id")
+        if not isinstance(item_id, str) or not _CHECKLIST_ITEM_ID_RE.match(item_id):
+            _fail(where, f"items[{i}].id must match {_CHECKLIST_ITEM_ID_RE.pattern}, got {item_id!r}")
+        label = item.get("label")
+        if not isinstance(label, str) or not label:
+            _fail(where, f"items[{i}].label is required")
+        _check_len(label, CHECKLIST_ITEM_LABEL_MAX, f"items[{i}].label", where)
+        if "checked" in item and not isinstance(item["checked"], bool):
+            _fail(where, f"items[{i}].checked must be a bool, got {item['checked']!r}")
+    ids = [item.get("id") for item in items]
+    if len(set(ids)) != len(ids):
+        _fail(where, f"item ids must be unique, got {ids}")
 
 
 def _assert_live_progress(content: dict, where: str, template: str) -> None:
@@ -940,6 +991,21 @@ def _assert_widget_collections(content: dict, where: str) -> None:
             if not _is_finite_number(point):
                 _fail(where, f"points[{i}] must be a finite number, got {point!r}")
 
+    cells = content.get("cells")
+    if cells is not None:
+        if not isinstance(cells, list):
+            _fail(where, f"cells must be a list, got {type(cells).__name__}")
+        if cells and not (WIDGET_MIN_HEATMAP_CELLS <= len(cells) <= WIDGET_MAX_HEATMAP_CELLS):
+            _fail(
+                where,
+                f"heatmap requires between {WIDGET_MIN_HEATMAP_CELLS} and {WIDGET_MAX_HEATMAP_CELLS} cells, "
+                f"got {len(cells)}",
+            )
+        for i, cell in enumerate(cells):
+            # null is a day without data; every other cell is a finite number.
+            if cell is not None and not _is_finite_number(cell):
+                _fail(where, f"cells[{i}] must be a finite number or null, got {cell!r}")
+
     devices = content.get("devices")
     if devices is not None:
         if not isinstance(devices, list):
@@ -1115,6 +1181,18 @@ def assert_valid_widget_content(content: dict, template: str | None = None, *, w
         min_v, max_v = content.get("min_value"), content.get("max_value")
         if min_v is not None and max_v is not None and float(min_v) >= float(max_v):
             _fail(where, f"trend widget min_value ({min_v}) must be less than max_value ({max_v})")
+    elif template == "heatmap":
+        cells = content.get("cells")
+        if not cells:
+            _fail(where, "heatmap widget requires cells")
+        if all(cell is None for cell in cells):
+            _fail(where, "heatmap widget cells must hold at least one number, not only nulls")
+        value = content.get("value")
+        if value is not None and not _is_finite_number(value):
+            _fail(where, f"heatmap widget value must be a finite number, got {value!r}")
+        min_v, max_v = content.get("min_value"), content.get("max_value")
+        if min_v is not None and max_v is not None and float(min_v) >= float(max_v):
+            _fail(where, f"heatmap widget min_value ({min_v}) must be less than max_value ({max_v})")
     elif template == "countdown":
         if content.get("end_date") is None:
             _fail(where, "countdown widget requires end_date")

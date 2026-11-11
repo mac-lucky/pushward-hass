@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Atualizar Atividade (Checklist)",
+      "description": "Atualiza uma Live Activity de checklist do PushWard: até 8 itens marcados pela tela de bloqueio, pelo relógio ou pela notificação. O Home Assistant não fica sabendo dessas marcações; esta ação só envia a lista.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Conta",
+          "description": "Conta PushWard a usar. Deixe vazio para usar todas as contas PushWard adicionadas ao Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Identificador slug da atividade."
+        },
+        "state": {
+          "name": "Estado",
+          "description": "Estado de atividade desejado."
+        },
+        "items": {
+          "name": "Itens",
+          "description": "Lista de 1-8 itens. Cada um: id (obrigatório, 1-16 letras, dígitos, - ou _, único), label (obrigatório, máx. 40) e checked opcional (true/false). A lista substitui a salva. Sem checked, o servidor mantém a marcação que já tem para esse id; marcações feitas no telefone não voltam para o Home Assistant."
+        },
+        "subtitle": {
+          "name": "Subtítulo",
+          "description": "Texto de subtítulo exibido na atividade."
+        },
+        "compact_label": {
+          "name": "Rótulo da Island",
+          "description": "Até 4 caracteres que substituem o conteúdo padrão do modelo na visualização compacta. No iPhone é a parte frontal da Dynamic Island, no lugar do ícone, do anel de etapas ou da pilha máximo/mínimo da linha do tempo (a apresentação mínima os ignora); no Android 16 QPR2 e posterior é o texto do chip da barra de status."
+        },
+        "compact_trailing_label": {
+          "name": "Rótulo traseiro da Island",
+          "description": "Até 4 caracteres exibidos na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, como o contador de etapas ou o timer. Tem prioridade sobre o ícone traseiro quando ambos estão definidos. A apresentação mínima os ignora. Requer PushWard 1.19.1 ou posterior."
+        },
+        "compact_trailing_icon": {
+          "name": "Ícone traseiro da Island",
+          "description": "Ícone SF Symbol ou MDI (ex.: airplane.departure, mdi:airplane-takeoff) exibido na parte traseira da visualização compacta da Dynamic Island no lugar do que o modelo mostra ali, tingido com a cor de destaque. Ignorado quando um rótulo traseiro da Island está definido. Requer PushWard 1.19.1 ou posterior."
+        },
+        "icon": {
+          "name": "Ícone",
+          "description": "Nome do ícone SF Symbol ou MDI (ex.: checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Mensagem de Conclusão",
+          "description": "Mensagem exibida quando a atividade é encerrada."
+        },
+        "accent_color": {
+          "name": "Cor de Destaque",
+          "description": "Cor de destaque para a atividade. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "background_color": {
+          "name": "Cor de Fundo",
+          "description": "Cor de fundo da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "text_color": {
+          "name": "Cor do Texto",
+          "description": "Cor do texto da Live Activity. Hexadecimal (#RRGGBB) ou nome de cor."
+        },
+        "tap_action": {
+          "name": "Ação de toque",
+          "description": "Alvo de toque da atividade inteira como um objeto: url (obrigatório), foreground opcional e, para uma url http(s), um webhook silencioso via method/headers/body."
+        },
+        "sound": {
+          "name": "Som",
+          "description": "Som de notificação reproduzido no dispositivo para esta atualização."
+        },
+        "priority": {
+          "name": "Substituição de Prioridade",
+          "description": "Prioridade por atualização (0-10). Substitui a prioridade configurada da atividade apenas para este push."
+        },
+        "ended_ttl": {
+          "name": "TTL de Encerramento",
+          "description": "Segundos para manter a atividade após o encerramento."
+        },
+        "stale_ttl": {
+          "name": "TTL de Inatividade",
+          "description": "Segundos antes de a atividade ser considerada inativa."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de remoção",
+          "description": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar."
+        }
+      }
+    },
     "create_activity": {
       "name": "Criar Atividade",
       "description": "Criar uma nova PushWard Live Activity.",
@@ -2343,7 +2425,7 @@
             "slug": "Slug do widget"
           },
           "data_description": {
-            "widget_template": "Layout do widget: `value` para um único número, `progress` para uma barra, `gauge` para um valor em um intervalo, `status` para um selo de gravidade, `stat_list` para até 6 linhas, `trend` para um minigráfico, `countdown` para uma data, `battery` para anéis de dispositivos, `schedule` para uma linha do tempo por hora, `flow` para o que entra e o que sai.",
+            "widget_template": "Layout do widget: `value` para um único número, `progress` para uma barra, `gauge` para um valor em um intervalo, `status` para um selo de gravidade, `stat_list` para até 6 linhas, `trend` para um minigráfico, `countdown` para uma data, `battery` para anéis de dispositivos, `schedule` para uma linha do tempo por hora, `flow` para o que entra e o que sai. `heatmap` mostra valores diários em uma grade de calendário.",
             "slug": "Identificador único deste widget. Deixe vazio para gerar automaticamente a partir do ID da entidade."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Chave do valor do período",
             "schedule_low_max": "Máximo da faixa baixa",
             "schedule_high_min": "Mínimo da faixa alta",
-            "flow_nodes": "Nós do fluxo"
+            "flow_nodes": "Nós do fluxo",
+            "heatmap_weeks": "Semanas",
+            "heatmap_aggregate": "Valor diário"
           },
           "data_description": {
             "widget_name": "Nome de exibição mostrado no seletor de widgets do seu celular. Padrão é o nome amigável da entidade.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Chave com o valor de cada período dentro dessas listas.",
             "schedule_low_max": "Valores iguais ou abaixo caem na faixa baixa. Deixe os dois limiares vazios para o app derivar as faixas do intervalo enviado.",
             "schedule_high_min": "Valores iguais ou acima caem na faixa alta. Precisa ficar acima do máximo da faixa baixa.",
-            "flow_nodes": "Uma linha por nó. O slot decide onde ele aparece: até 3 entradas, mais uma saída, um armazenamento e uma troca. A taxa vem da entidade, com o sinal que você escolher."
+            "flow_nodes": "Uma linha por nó. O slot decide onde ele aparece: até 3 entradas, mais uma saída, um armazenamento e uma troca. A taxa vem da entidade, com o sinal que você escolher.",
+            "heatmap_weeks": "Quantas semanas a grade cobre, de 1 a 22. Cada célula é um dia, com hoje por último.",
+            "heatmap_aggregate": "Qual estatística do gravador preenche cada dia: a variação por dia para um total que só cresce (energia, passos), ou a média, o máximo ou o mínimo diário de uma medição. Padrão: a variação quando a entidade tem estatística de soma."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Um widget de fluxo aceita no máximo 3 entradas.",
         "duplicate_flow_slot": "Apenas uma saída, um armazenamento e uma troca. Use input para o restante.",
         "flow_nodes_required": "O modelo flow exige pelo menos um nó.",
-        "invalid_schedule_thresholds": "O máximo da faixa baixa precisa ficar abaixo do mínimo da faixa alta."
+        "invalid_schedule_thresholds": "O máximo da faixa baixa precisa ficar abaixo do mínimo da faixa alta.",
+        "heatmap_no_statistics": "Esta entidade não tem estatísticas do gravador, então um mapa de calor não tem com o que preencher os dias. Serve um sensor com state_class.",
+        "heatmap_aggregate_unsupported": "As estatísticas desta entidade não trazem esse valor diário. Variação por dia precisa de um total (estatística de soma); média, máximo e mínimo precisam de uma medição."
       },
       "abort": {
         "already_configured": "Já existe um widget com este slug.",
@@ -2665,7 +2753,8 @@
         "countdown": "Contagem regressiva",
         "battery": "Bateria",
         "schedule": "Programação",
-        "flow": "Fluxo"
+        "flow": "Fluxo",
+        "heatmap": "Mapa de calor"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Menor bateria primeiro",
         "level_desc": "Maior bateria primeiro"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Variação por dia",
+        "mean": "Média diária",
+        "max": "Máximo diário",
+        "min": "Mínimo diário"
       }
     },
     "todo_notification_level": {

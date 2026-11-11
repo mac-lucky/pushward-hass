@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "アクティビティを更新 (Checklist)",
+      "description": "PushWard のチェックリスト Live Activity を更新します。ロック画面、ウォッチ、通知からチェックできる最大 8 項目です。Home Assistant はそのチェックを受け取りません。このアクションはリストを送るだけです。",
+      "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
+        "slug": {
+          "name": "スラッグ",
+          "description": "アクティビティのスラッグ識別子。"
+        },
+        "state": {
+          "name": "状態",
+          "description": "アクティビティの目標状態。"
+        },
+        "items": {
+          "name": "項目",
+          "description": "1-8 項目のリスト。各項目: id（必須、1-16 文字の英数字・-・_、重複不可）、label（必須、最大 40）、任意の checked（true/false）。保存済みのリストを置き換えます。checked を省くと、サーバーはその id で既に持っているチェック状態を保ちます。スマートフォンで付けたチェックは Home Assistant に返されません。"
+        },
+        "subtitle": {
+          "name": "サブタイトル",
+          "description": "アクティビティに表示されるサブタイトルテキスト。"
+        },
+        "compact_label": {
+          "name": "Islandラベル",
+          "description": "コンパクト表示でテンプレートの既定の内容の代わりに表示される最大4文字。iPhone では Dynamic Island の先頭側で、アイコン、ステップリング、タイムラインの高低スタックの代わりになります（最小表示では無視されます）。Android 16 QPR2 以降ではステータスバーのチップのテキストになります。"
+        },
+        "compact_trailing_label": {
+          "name": "Island末尾ラベル",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容（ステップカウンターやタイマーなど）の代わりに表示される最大4文字。両方を設定した場合は末尾アイコンより優先されます。最小表示では無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "compact_trailing_icon": {
+          "name": "Island末尾アイコン",
+          "description": "Dynamic Islandのコンパクト表示の末尾側に、テンプレートがそこに表示する内容の代わりにアクセントカラーで表示される SF Symbol またはMDIアイコン（例: airplane.departure, mdi:airplane-takeoff）。Island末尾ラベルが設定されている場合は無視されます。PushWard 1.19.1 以降が必要です。"
+        },
+        "icon": {
+          "name": "アイコン",
+          "description": "SF Symbol またはMDIアイコン名（例: checklist, mdi:format-list-checks）。"
+        },
+        "completion_message": {
+          "name": "完了メッセージ",
+          "description": "アクティビティ終了時に表示されるメッセージ。"
+        },
+        "accent_color": {
+          "name": "アクセントカラー",
+          "description": "アクティビティのアクセントカラー。16進数（#RRGGBB）または色名。"
+        },
+        "background_color": {
+          "name": "背景色",
+          "description": "Live Activity の背景色。16進数（#RRGGBB）または色名。"
+        },
+        "text_color": {
+          "name": "テキスト色",
+          "description": "Live Activity のテキスト色。16進数（#RRGGBB）または色名。"
+        },
+        "tap_action": {
+          "name": "タップアクション",
+          "description": "アクティビティ全体のタップ先をオブジェクトで指定: url（必須）、任意の foreground、http(s) URL の場合は method/headers/body によるサイレント Webhook。"
+        },
+        "sound": {
+          "name": "サウンド",
+          "description": "この更新でデバイスで再生される通知サウンド。"
+        },
+        "priority": {
+          "name": "優先度の上書き",
+          "description": "更新ごとの優先度（0〜10）。このプッシュにのみ、アクティビティに設定された優先度を上書きします。"
+        },
+        "ended_ttl": {
+          "name": "終了後TTL",
+          "description": "アクティビティ終了後に保持する秒数。"
+        },
+        "stale_ttl": {
+          "name": "古いTTL",
+          "description": "アクティビティが古いと見なされるまでの秒数。"
+        },
+        "dismissal_ttl": {
+          "name": "削除TTL",
+          "description": "終了したアクティビティが削除されるまでロック画面に残る秒数です。0 を指定すると終了と同時にすぐ削除されます。"
+        }
+      }
+    },
     "create_activity": {
       "name": "アクティビティを作成",
       "description": "新しいPushWard Live Activityを作成します。",
@@ -2343,7 +2425,7 @@
             "slug": "ウィジェットスラッグ"
           },
           "data_description": {
-            "widget_template": "ウィジェットのレイアウト: 数値ひとつなら `value`、バーなら `progress`、範囲内の値なら `gauge`、重要度バッジなら `status`、最大 6 行なら `stat_list`、スパークラインなら `trend`、日時なら `countdown`、デバイスのリングなら `battery`、1 時間ごとのタイムラインなら `schedule`、出入りを見るなら `flow`。",
+            "widget_template": "ウィジェットのレイアウト: 数値ひとつなら `value`、バーなら `progress`、範囲内の値なら `gauge`、重要度バッジなら `status`、最大 6 行なら `stat_list`、スパークラインなら `trend`、日時なら `countdown`、デバイスのリングなら `battery`、1 時間ごとのタイムラインなら `schedule`、出入りを見るなら `flow`。`heatmap` は日ごとの値をカレンダーのグリッドで表示します。",
             "slug": "このウィジェットの一意の識別子。空白のままにするとエンティティ ID から自動生成されます。"
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "期間の値キー",
             "schedule_low_max": "低帯域の上限",
             "schedule_high_min": "高帯域の下限",
-            "flow_nodes": "フローのノード"
+            "flow_nodes": "フローのノード",
+            "heatmap_weeks": "週数",
+            "heatmap_aggregate": "日ごとの値"
           },
           "data_description": {
             "widget_name": "スマートフォンのウィジェットピッカーに表示される名前。デフォルトはエンティティのフレンドリー名です。",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "それらのリスト内で各期間の値を保持するキー。",
             "schedule_low_max": "この値以下は低帯域になります。両方のしきい値を空欄にすると、送信した範囲からアプリが帯域を導き出します。",
             "schedule_high_min": "この値以上は高帯域になります。低帯域の上限より大きくしてください。",
-            "flow_nodes": "ノードごとに 1 行。スロットが描画位置を決めます: 入力は最大 3 つ、加えて出力・蓄積・やり取りが各 1 つ。レートはエンティティから読み、符号の意味は自分で決めます。"
+            "flow_nodes": "ノードごとに 1 行。スロットが描画位置を決めます: 入力は最大 3 つ、加えて出力・蓄積・やり取りが各 1 つ。レートはエンティティから読み、符号の意味は自分で決めます。",
+            "heatmap_weeks": "グリッドに含める週数（1-22）。各セルが 1 日で、最後が今日です。",
+            "heatmap_aggregate": "各日を埋めるレコーダー統計: 増え続ける合計（エネルギー、歩数）なら 1 日の変化量、計測値なら 1 日の平均・最大・最小。エンティティに合計の統計があれば既定は変化量です。"
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "フローウィジェットの入力は最大 3 つです。",
         "duplicate_flow_slot": "出力・蓄積・やり取りは各 1 つだけです。残りは input を使ってください。",
         "flow_nodes_required": "flow テンプレートには最低 1 つのノードが必要です。",
-        "invalid_schedule_thresholds": "低帯域の上限は高帯域の下限より小さくしてください。"
+        "invalid_schedule_thresholds": "低帯域の上限は高帯域の下限より小さくしてください。",
+        "heatmap_no_statistics": "このエンティティにはレコーダー統計がないため、ヒートマップの日を埋められません。state_class を持つセンサーを選んでください。",
+        "heatmap_aggregate_unsupported": "このエンティティの統計にはその日ごとの値がありません。1 日の変化量には合計（sum の統計）が、平均・最大・最小には計測値が必要です。"
       },
       "abort": {
         "already_configured": "このスラッグのウィジェットはすでに存在します。",
@@ -2665,7 +2753,8 @@
         "countdown": "カウントダウン",
         "battery": "バッテリー",
         "schedule": "スケジュール",
-        "flow": "フロー"
+        "flow": "フロー",
+        "heatmap": "ヒートマップ"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "残量の少ない順",
         "level_desc": "残量の多い順"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "1 日の変化量",
+        "mean": "1 日の平均",
+        "max": "1 日の最大",
+        "min": "1 日の最小"
       }
     },
     "todo_notification_level": {

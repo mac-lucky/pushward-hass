@@ -5,8 +5,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from datetime import timedelta
-from unittest.mock import AsyncMock, patch
+from datetime import date, datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.const import STATE_UNAVAILABLE
@@ -25,6 +25,8 @@ from custom_components.pushward.const import (
     CONF_BATTERY_DEVICES,
     CONF_ENTITY_ID,
     CONF_FLOW_NODES,
+    CONF_HEATMAP_AGGREGATE,
+    CONF_HEATMAP_WEEKS,
     CONF_HISTORY_PERIOD,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
@@ -38,10 +40,12 @@ from custom_components.pushward.const import (
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     WIDGET_GROUP_TEMPLATES,
+    WIDGET_HEATMAP_READ_INTERVAL,
     WIDGET_STALE_AFTER_MIN,
     WIDGET_TEMPLATE_BATTERY,
     WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
@@ -49,6 +53,7 @@ from custom_components.pushward.const import (
     widget_look_keys,
 )
 from custom_components.pushward.quota import quota_released_signal
+from custom_components.pushward.recorder_history import async_daily_values
 from custom_components.pushward.widget_manager import (
     _GROUP_ROW_SOURCES,
     WidgetManager,
@@ -57,6 +62,7 @@ from custom_components.pushward.widget_manager import (
 )
 
 from .conftest import make_mock_entry, make_quota_error, make_widget_config
+from .server_contract import assert_valid_widget_content
 
 
 def _mock_api() -> AsyncMock:
@@ -1143,3 +1149,252 @@ async def test_quota_release_subscription_dropped_on_stop(hass: HomeAssistant) -
     async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "widget_updates")
     await hass.async_block_till_done()
     assert api.patch_widget.await_count == 1
+
+
+# ----- heatmap -----
+
+
+def _midnight(day: date) -> float:
+    """The epoch the recorder's "day" period gives a local day's row as its start."""
+    return dt_util.start_of_local_day(day).timestamp()
+
+
+async def _daily(hass: HomeAssistant, rows: list[dict], days: int, stat_type: str = "mean"):
+    """Run async_daily_values against mocked statistics rows; return (cells, the recorder call)."""
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(return_value={"sensor.energy": rows})
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        cells = await async_daily_values(hass, "sensor.energy", days, stat_type)
+    return cells, instance.async_add_executor_job.await_args.args[0]
+
+
+@pytest.mark.parametrize("stat_type", ["change", "mean", "max", "min"])
+async def test_daily_values_read_the_chosen_statistic_per_local_day(hass: HomeAssistant, freezer, stat_type) -> None:
+    """One cell per local day ending today, from the day's row of the chosen type; a day
+    with no row is null. Warsaw is UTC+1 here, so each row starts at 23:00 UTC the day
+    before and must still land on its own local date."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-11T14:00:00+00:00")
+    today = date(2026, 11, 11)
+    rows = [
+        {"start": _midnight(today - timedelta(days=n)), "change": 10.0 + n, "mean": 20.0 + n, "max": 30.0 + n, "min": n}
+        for n in range(7)
+        if n != 3  # no statistics for 2026-11-08
+    ]
+    cells, call = await _daily(hass, rows, 7, stat_type)
+
+    base = {"change": 10.0, "mean": 20.0, "max": 30.0, "min": 0.0}[stat_type]
+    assert cells == [base + 6, base + 5, base + 4, None, base + 2, base + 1, base]
+    _hass, start, end, ids, period, units, types = call.args
+    assert start == dt_util.start_of_local_day(date(2026, 11, 5))
+    assert start.isoformat() == "2026-11-05T00:00:00+01:00"
+    assert (end, ids, period, units, types) == (None, {"sensor.energy"}, "day", None, {stat_type})
+
+
+async def test_daily_values_skip_null_and_non_finite_statistics(hass: HomeAssistant, freezer) -> None:
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-11T14:00:00+00:00")
+    today = date(2026, 11, 11)
+    rows = [
+        {"start": _midnight(today), "mean": None},
+        {"start": _midnight(today - timedelta(days=1)), "mean": float("nan")},
+        {"start": _midnight(today - timedelta(days=2)), "mean": 4.5},
+    ]
+    cells, _ = await _daily(hass, rows, 7)
+    assert cells == [None, None, None, None, 4.5, None, None]
+
+
+@pytest.mark.parametrize(
+    ("now", "first_day"),
+    [
+        # Clocks went back on 2026-10-25 (a 25-hour day).
+        pytest.param("2026-10-27T10:00:00+00:00", date(2026, 10, 21), id="autumn"),
+        # Clocks go forward on 2027-03-28 (a 23-hour day).
+        pytest.param("2027-03-30T10:00:00+00:00", date(2027, 3, 24), id="spring"),
+    ],
+)
+async def test_daily_values_keep_one_cell_per_day_across_dst(hass: HomeAssistant, freezer, now, first_day) -> None:
+    """The DST day is shorter or longer than 24 h; every row still lands on its own date."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to(now)
+    rows = [{"start": _midnight(first_day + timedelta(days=n)), "mean": float(n)} for n in range(7)]
+    cells, call = await _daily(hass, rows, 7)
+
+    assert cells == [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    assert call.args[1] == dt_util.start_of_local_day(first_day)
+
+
+async def test_daily_values_cover_22_weeks(hass: HomeAssistant, freezer) -> None:
+    await hass.config.async_set_time_zone("America/New_York")
+    freezer.move_to("2026-11-11T03:00:00+00:00")  # still 2026-11-10 in New York
+    today = date(2026, 11, 10)
+    rows = [{"start": _midnight(today), "mean": 1.0}, {"start": _midnight(today - timedelta(days=153)), "mean": 2.0}]
+    cells, call = await _daily(hass, rows, 154)
+
+    assert len(cells) == 154
+    assert cells[0] == 2.0 and cells[-1] == 1.0
+    assert sum(cell is not None for cell in cells) == 2
+    assert call.args[1] == dt_util.start_of_local_day(today - timedelta(days=153))
+
+
+async def test_daily_values_none_when_the_recorder_fails(hass: HomeAssistant) -> None:
+    instance = MagicMock()
+    instance.async_add_executor_job = AsyncMock(side_effect=RuntimeError("database is locked"))
+    with patch("homeassistant.helpers.recorder.get_instance", return_value=instance):
+        assert await async_daily_values(hass, "sensor.energy", 7, "change") is None
+
+
+def _heatmap_config(**overrides) -> dict:
+    base = {
+        CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP,
+        CONF_SLUG: "ha-energy",
+        CONF_ENTITY_ID: "sensor.energy",
+        CONF_MIN_VALUE: None,
+        CONF_MAX_VALUE: None,
+        CONF_HEATMAP_WEEKS: 1,
+        CONF_HEATMAP_AGGREGATE: "change",
+    }
+    base.update(overrides)
+    return make_widget_config(**base)
+
+
+_WEEK = [1.0, None, 3.0, 4.0, 5.0, 6.0, 7.5]
+
+
+async def test_heatmap_creates_from_daily_statistics(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "120.5", {"friendly_name": "Energy", "unit_of_measurement": "kWh"})
+    with patch("custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=_WEEK)) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+
+    read.assert_awaited_once_with(hass, "sensor.energy", 7, "change")
+    content = api.create_widget.call_args.kwargs["content"]
+    assert content["cells"] == _WEEK
+    assert content["value"] == 7.5
+    assert (content["label"], content["unit"]) == ("Energy", "kWh")
+    assert "end_date" not in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+    await manager.async_stop()
+
+
+async def test_heatmap_state_changes_reuse_the_last_read(hass: HomeAssistant) -> None:
+    """A busy sensor reads the statistics at most once per interval and sends one update per
+    change of the daily values, however many state changes arrive."""
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "1")
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=list(_WEEK))
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+        for n in range(30):
+            hass.states.async_set("sensor.energy", str(2 + n))
+            await hass.async_block_till_done()
+        assert read.await_count == 1
+        api.patch_widget.assert_not_awaited()
+
+        # The next hour's statistics land; the first change after the interval reads them.
+        read.return_value = [*_WEEK[:-1], 9.0]
+        manager._tracked["ha-energy"].cells_read_at -= WIDGET_HEATMAP_READ_INTERVAL + 1
+        for n in range(30):
+            hass.states.async_set("sensor.energy", str(100 + n))
+            await hass.async_block_till_done()
+
+    assert read.await_count == 2
+    api.patch_widget.assert_awaited_once()
+    assert api.patch_widget.call_args.args[1]["content"]["cells"][-1] == 9.0
+    await manager.async_stop()
+
+
+async def test_heatmap_reads_again_after_local_midnight(hass: HomeAssistant, freezer) -> None:
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-11T22:00:00+00:00")  # 23:00 in Warsaw
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "1")
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=list(_WEEK))
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+
+        # Midnight itself does nothing: yesterday's last hour is not compiled yet.
+        midnight = datetime.fromisoformat("2026-11-12T00:00:30+01:00")
+        freezer.move_to(midnight)
+        async_fire_time_changed(hass, midnight)
+        await hass.async_block_till_done()
+        assert read.await_count == 1
+
+        read.return_value = [*_WEEK[1:], None]
+        refresh = datetime.fromisoformat("2026-11-12T00:05:00+01:00")
+        freezer.move_to(refresh)
+        async_fire_time_changed(hass, refresh)
+        await hass.async_block_till_done()
+
+    assert read.await_count == 2
+    content = api.patch_widget.call_args.args[1]["content"]
+    assert content["cells"] == [*_WEEK[1:], None]
+    assert content["value"] is None  # today has no statistics yet
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+    await manager.async_stop()
+
+
+async def test_heatmap_without_history_sends_nothing_and_warns_once(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "4242.5")
+
+    def warnings() -> list[str]:
+        return [
+            r.getMessage() for r in caplog.records if r.levelno == logging.WARNING and "ha-energy" in r.getMessage()
+        ]
+
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=[None] * 7)
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+        tracked = manager._tracked["ha-energy"]
+        for n in range(3):
+            tracked.cells_read_at = None
+            hass.states.async_set("sensor.energy", f"{4243 + n}.5")
+            await hass.async_block_till_done()
+        assert read.await_count == 4
+        api.create_widget.assert_not_awaited()
+        assert len(warnings()) == 1
+        # The entity's state values stay out of the log.
+        assert not any(f"{4242 + n}.5" in caplog.text for n in range(4))
+
+        # History comes back: the widget is created and the warning re-arms.
+        read.return_value = list(_WEEK)
+        tracked.cells_read_at = None
+        hass.states.async_set("sensor.energy", "4246.5")
+        await hass.async_block_till_done()
+        api.create_widget.assert_awaited_once()
+
+        # It goes away again later: nothing is sent, and it is reported once more.
+        read.return_value = None
+        tracked.cells_read_at = None
+        hass.states.async_set("sensor.energy", "4247.5")
+        await hass.async_block_till_done()
+
+    api.patch_widget.assert_not_awaited()
+    assert len(warnings()) == 2
+    await manager.async_stop()
+
+
+async def test_heatmap_manual_refresh_reads_again(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "1")
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=list(_WEEK))
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config(**{CONF_HEATMAP_WEEKS: 22})], make_mock_entry())
+        await manager.async_start()
+        await manager.async_refresh(slug="ha-energy")
+
+    assert read.await_count == 2
+    assert read.await_args.args[2] == 154
+    api.patch_widget.assert_awaited_once()
+    await manager.async_stop()

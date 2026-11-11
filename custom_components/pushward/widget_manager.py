@@ -30,6 +30,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import (
     async_track_state_change_event,
+    async_track_time_change,
     async_track_time_interval,
 )
 from homeassistant.helpers.storage import Store
@@ -48,6 +49,8 @@ from .const import (
     CONF_CHARGING_ENTITY,
     CONF_ENTITY_ID,
     CONF_FLOW_NODES,
+    CONF_HEATMAP_AGGREGATE,
+    CONF_HEATMAP_WEEKS,
     CONF_HISTORY_PERIOD,
     CONF_LEVEL_ENTITY,
     CONF_SLUG,
@@ -58,10 +61,16 @@ from .const import (
     CONF_WIDGET_STALE_AFTER,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    DEFAULT_HEATMAP_WEEKS,
     DEFAULT_WIDGET_POLL_INTERVAL,
     DEFAULT_WIDGET_TREND_PERIOD,
+    HEATMAP_AGGREGATE_MEAN,
+    HEATMAP_AGGREGATES,
     QUOTA_KIND_WIDGET_UPDATES,
     WIDGET_GROUP_TEMPLATES,
+    WIDGET_HEATMAP_READ_INTERVAL,
+    WIDGET_HEATMAP_REFRESH_MINUTE,
+    WIDGET_HEATMAP_WEEKS_MAX,
     WIDGET_LOOKS,
     WIDGET_MAX_TREND_POINTS,
     WIDGET_MIN_TREND_POINTS,
@@ -69,6 +78,7 @@ from .const import (
     WIDGET_STALE_AFTER_MIN,
     WIDGET_TEMPLATE_BATTERY,
     WIDGET_TEMPLATE_FLOW,
+    WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_TREND,
     WIDGET_TREND_BUFFER_MAX,
@@ -77,7 +87,7 @@ from .const import (
 )
 from .content_mapper import lookup_registry_icon
 from .quota import quota_released_signal
-from .recorder_history import async_recorder_states, downsample_evenly
+from .recorder_history import async_daily_values, async_recorder_states, downsample_evenly
 from .widget_mapper import map_widget_content, read_numeric_value, widget_name_from_config
 
 _LOGGER = logging.getLogger(__name__)
@@ -119,6 +129,7 @@ class TrackedWidget:
     unsub_state: Callable[[], None] | None = None
     unsub_poll: Callable[[], None] | None = None
     unsub_heartbeat: Callable[[], None] | None = None
+    unsub_new_day: Callable[[], None] | None = None
     registry_icon: str | None = None
     pending_task: asyncio.Task | None = field(default=None, repr=False)
     # A change landing while a send is in flight re-sends the newest state after.
@@ -134,6 +145,11 @@ class TrackedWidget:
     last_synced: float = 0.0
     # (epoch_seconds, value) samples backing the trend sparkline.
     points_buffer: deque = field(default_factory=lambda: deque(maxlen=WIDGET_TREND_BUFFER_MAX))
+    # Heatmap: the last daily read, its monotonic() time (None = read on the next
+    # send), and whether the warning for an empty read has been logged.
+    cells: list | None = None
+    cells_read_at: float | None = None
+    cells_missing_warned: bool = False
 
 
 # Where each group template keeps its rows, and which per-row keys carry a
@@ -348,6 +364,7 @@ class WidgetManager:
         # any other update.
         while (prev := target.pending_task) is not None and not prev.done():
             await asyncio.wait([prev])
+        target.cells_read_at = None  # a manual refresh reads the recorder again
         task = self._spawn_send(target, force=True)
         await asyncio.wait([task])
         if not task.cancelled() and (exc := task.exception()) is not None:
@@ -358,6 +375,15 @@ class WidgetManager:
     def _subscribe(self, tracked: TrackedWidget) -> None:
         """Attach event-track or polling timer based on trigger mode."""
         self._arm_heartbeat(tracked)
+        if tracked.config.get(CONF_WIDGET_TEMPLATE) == WIDGET_TEMPLATE_HEATMAP:
+            # Local time: the grid's last cell is today, so a new day needs a new read.
+            tracked.unsub_new_day = async_track_time_change(
+                self._hass,
+                partial(self._on_new_day, tracked.config[CONF_SLUG]),
+                hour=0,
+                minute=WIDGET_HEATMAP_REFRESH_MINUTE,
+                second=0,
+            )
         mode = tracked.config.get(CONF_WIDGET_TRIGGER_MODE) or WIDGET_TRIGGER_EVENT
         if mode == WIDGET_TRIGGER_POLL:
             interval = max(
@@ -395,6 +421,9 @@ class WidgetManager:
         if tracked.unsub_heartbeat:
             tracked.unsub_heartbeat()
             tracked.unsub_heartbeat = None
+        if tracked.unsub_new_day:
+            tracked.unsub_new_day()
+            tracked.unsub_new_day = None
 
     def _arm_heartbeat(self, tracked: TrackedWidget) -> None:
         """Keep a stale_after widget alive when its entity sits still.
@@ -431,6 +460,14 @@ class WidgetManager:
         tracked = self._tracked.get(slug)
         if tracked is None:
             return
+        self._schedule_update(tracked)
+
+    @callback
+    def _on_new_day(self, slug: str, _now: Any) -> None:
+        tracked = self._tracked.get(slug)
+        if tracked is None:
+            return
+        tracked.cells_read_at = None
         self._schedule_update(tracked)
 
     @callback
@@ -519,6 +556,7 @@ class WidgetManager:
             prev_value=_extract_numeric(tracked.last_content),
             registry_icon=tracked.registry_icon,
             points=self._sample_points(tracked),
+            cells=await self._heatmap_cells(tracked),
         )
 
         if content is None:
@@ -551,6 +589,7 @@ class WidgetManager:
             prev_value=_extract_numeric(tracked.last_content),
             registry_icon=tracked.registry_icon,
             points=self._sample_points(tracked),
+            cells=await self._heatmap_cells(tracked),
         )
         if content is None:
             return
@@ -659,6 +698,44 @@ class WidgetManager:
         if len(tracked.points_buffer) < WIDGET_MIN_TREND_POINTS:
             return None
         return downsample_evenly([value for _ts, value in tracked.points_buffer], WIDGET_MAX_TREND_POINTS)
+
+    async def _heatmap_cells(self, tracked: TrackedWidget) -> list | None:
+        """The heatmap's daily cells, read from the recorder at most once per read interval.
+
+        A state change inside the interval reuses the last read, so the content
+        comes out unchanged and the diff check skips the PATCH: a busy sensor
+        costs at most one statistics query per interval and one request per
+        change of the daily values.
+        """
+        cfg = tracked.config
+        if cfg.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_HEATMAP:
+            return None
+        now = time.monotonic()
+        if tracked.cells_read_at is not None and now - tracked.cells_read_at < WIDGET_HEATMAP_READ_INTERVAL:
+            return tracked.cells
+        # Stamped before the read: a new-day reset landing during it must win.
+        tracked.cells_read_at = now
+        try:
+            weeks = int(cfg.get(CONF_HEATMAP_WEEKS) or DEFAULT_HEATMAP_WEEKS)
+        except (TypeError, ValueError):
+            weeks = DEFAULT_HEATMAP_WEEKS
+        aggregate = cfg.get(CONF_HEATMAP_AGGREGATE)
+        if aggregate not in HEATMAP_AGGREGATES:
+            aggregate = HEATMAP_AGGREGATE_MEAN
+        entity_id = cfg.get(CONF_ENTITY_ID) or ""
+        days = max(1, min(WIDGET_HEATMAP_WEEKS_MAX, weeks)) * 7
+        tracked.cells = await async_daily_values(self._hass, entity_id, days, aggregate)
+        if tracked.cells and any(cell is not None for cell in tracked.cells):
+            tracked.cells_missing_warned = False
+        elif not tracked.cells_missing_warned:
+            tracked.cells_missing_warned = True
+            _LOGGER.warning(
+                "Heatmap widget %s has no daily %s statistics for %s; not sending it until there are some",
+                cfg[CONF_SLUG],
+                aggregate,
+                entity_id,
+            )
+        return tracked.cells
 
     @staticmethod
     def _append_point(tracked: TrackedWidget, ts: float, value: float) -> None:

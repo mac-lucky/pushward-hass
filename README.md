@@ -65,8 +65,8 @@ The surfaces are independent (separate config, managers, and caches) and share o
 ## Features
 
 - **Track any HA entity** as a PushWard Live Activity (Dynamic Island + Lock Screen)
-- **10 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log, media, approval
-- **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow,
+- **11 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log, media, approval, checklist
+- **11 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow, heatmap,
   each with an optional [style](#style) that overrides the one picked in the app
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
@@ -100,6 +100,7 @@ The PushWard app is on [Google Play](https://play.google.com/store/apps/details?
 - On activities, `background_color` and `text_color` don't apply, because Android does not colorize promoted notifications. Widgets do use them.
 - The notification shade shows at most 3 action buttons. The notification's detail screen in the app lists all of them.
 - An approval activity shows at most 3 of its up to 4 options as buttons.
+- A checklist activity gets a button for each of the next 3 unticked items at most; the body lists them all.
 - A notification `media` of type video or audio is not shown in the shade. Images are.
 - `level: critical` needs Do Not Disturb access, granted in the app, and `volume` is ignored.
 - The PushWard widget is a home-screen widget on Android; there is no lock-screen widget.
@@ -359,14 +360,16 @@ A two-step flow mirroring entities. **Step 1** picks the entity, a widget templa
 | `battery` | Up to 8 device rings, each bound to a **separate** entity |
 | `schedule` | Up to 48 periods on a timeline (hourly tariffs, delivery windows, shifts) |
 | `flow` | What comes in, what buffers it, what is traded, what consumes it |
+| `heatmap` | One cell per day for up to 22 weeks, filled from the recorder's daily statistics |
 
 `countdown` here is the widget template, unrelated to the activity template of the same name.
 
-**The last five templates need the PushWard iOS app 1.6.0 or newer.** Older builds cannot decode
+**`trend`, `countdown`, `battery`, `schedule` and `flow` need the PushWard iOS app 1.6.0 or newer.** Older builds cannot decode
 them, and a single entry they cannot decode makes the entire widget list unavailable in the app
 until that widget is deleted -- not just the one new widget. Update every device on the account
 before adding one, especially if the account is shared with a device you have not opened in a while.
-The original five templates are unaffected.
+The original five templates are unaffected. `heatmap` needs the next PushWard app release or later;
+builds before it show an "update the app" placeholder in its place.
 
 **Step 2** configures the widget (publishing widgets requires the `widgets` key permission).
 
@@ -377,8 +380,8 @@ The original five templates are unaffected.
 |-------|-------------|
 | Widget Name | Display name |
 | Value Attribute | Source attribute (value/progress/gauge); blank = entity state |
-| Unit | Display unit (value/progress/gauge) |
-| Min / Max Value | Gauge range bounds (default: 0-100) |
+| Unit | Display unit (value/progress/gauge/heatmap; heatmap defaults to the entity's unit) |
+| Min / Max Value | Gauge range bounds (default: 0-100); optional on trend and heatmap |
 | Severity | "", info, warning, critical, success (status template) |
 | Stat Rows | Rows binding a separate entity to a stat (label, entity, attribute, unit, timer), max 6 (stat_list) |
 | Trend History | Minutes of recorder history to seed the sparkline on start; 0 skips the seed (trend) |
@@ -388,6 +391,8 @@ The original five templates are unaffected.
 | Period Attributes / Start Key / Value Key | Where to read the period arrays and their keys (schedule) |
 | Low Band Maximum / High Band Minimum | Optional band thresholds; leave both empty to let the app derive them (schedule) |
 | Flow Nodes | Rows binding a separate entity to a slot, max 3 inputs (flow) |
+| Weeks | How many weeks of days the grid holds, 1-22, default 22 (heatmap) |
+| Daily Value | Which daily statistic fills a cell: change, mean, max or min (heatmap) |
 | Style | Not set (default), Standard, Bold or Classic, for every size and per size; plus Row Density on stat_list. See [Style](#style) |
 | Label / Label Attribute | Static label or an entity attribute |
 | Subtitle Attribute | Subtitle text from an attribute |
@@ -459,6 +464,26 @@ A trend widget needs at least two points before it can render, so a brand-new on
 a second sample arrives. Set **Trend History** to seed it from the recorder instead: entities with a
 `state_class` read pre-aggregated statistics, the rest read raw states. The buffer keeps up to 300 samples,
 downsampled to the 48 the wire allows, and persists across restarts so a reload doesn't flatten the chart.
+
+#### Heatmap days
+
+A `heatmap` widget reads its cells from the recorder's long-term statistics (the daily period), so the
+entity needs statistics: a sensor with a `state_class`. The flow refuses one without. Each cell is one
+local day, oldest first, ending today; a day the recorder has nothing for is sent as `null`, which the
+app draws as an empty cell rather than a zero.
+
+**Daily Value** picks the statistic. `change` is how much a total grew that day, for `total_increasing`
+sensors such as energy, water or steps; `mean`, `max` and `min` are for measurements such as temperature.
+The flow preselects `change` when the entity has a sum statistic and `mean` otherwise, and refuses a value
+the entity's statistics don't carry. The headline number is today's cell, the label and unit default to
+the entity's own, and Min / Max Value pin the color scale (leave them empty to scale from 0 to the
+largest day).
+
+Statistics are compiled once an hour, so today's cell trails the live state by up to an hour. The widget
+recomputes when it starts, at 00:05 local time (a new day, after yesterday's last hour is compiled) and
+on a state change, but a state change reads the recorder at most once every 5 minutes and only sends an
+update when a daily value actually moved. If the entity's history goes away, the widget stops sending
+and logs one warning instead of pushing an empty grid.
 
 #### Self-advancing progress
 
@@ -632,7 +657,7 @@ Push a content update to an existing activity. There is **one action per templat
 `update_activity_generic`, `update_activity_countdown`, `update_activity_steps`,
 `update_activity_alert`, `update_activity_gauge`, `update_activity_timeline`,
 `update_activity_board`, `update_activity_log`, `update_activity_media`,
-`update_activity_approval`, so the UI shows only
+`update_activity_approval`, `update_activity_checklist`, so the UI shows only
 the fields that template supports (Home Assistant cannot hide service fields based on another field's value, so a single
 action with collapsed sections would always surface every template's fields). The template is
 implied by the action name; you no longer pass a `template` field.
@@ -700,6 +725,7 @@ implied by the action name; you no longer pass a `template` field.
 | `update_activity_log` | `lines` |
 | `update_activity_media` | `media_title` (max 128), `playback_state`, `position_seconds`, `duration_seconds`, `position_at`, `volume`, `favorite`, `controls`, `image_url`, `image_shape`, `image_thumbhash` |
 | `update_activity_approval` | `options` (2-4 answer buttons), `source` (max 24), `details` (up to 2 label/value rows), `on_expire`, `end_date` |
+| `update_activity_checklist` | `items` (1-8 rows, each `{ id, label, checked? }`) |
 
 > **`board` / `log` / `media` / `approval` use a lean schema.** They render no progress bar and no
 > whole-activity button slots, so `update_activity_board`, `update_activity_log`,
@@ -713,7 +739,8 @@ implied by the action name; you no longer pass a `template` field.
 > buttons live in `options`). `tiles` is a list of 1-4 objects
 > `{ label, value, unit?, icon?, color?, trend?, url_action? }` (`value` is a string max 16
 > chars). `lines` is a list of 1-20 newest-first objects `{ text, at?, level? }` where `level`
-> is `info`/`warn`/`error`.
+> is `info`/`warn`/`error`. `update_activity_checklist` is lean too and also leaves out
+> `state_text`: the server writes the state text itself from the ticks.
 
 > `duration` (integer seconds or a string like `"30m"` / `"1h30m"`) is the set-and-forget
 > alternative to `end_date`: the server re-anchors `start_date = now` and
@@ -852,6 +879,39 @@ implied by the action name; you no longer pass a `template` field.
 >     - action: cover.open_cover
 >       target:
 >         entity_id: cover.front_gate
+> ```
+
+> **`checklist`** is a short list people tick off from the Lock Screen, the Dynamic Island, the
+> watch, the Mac or the Android notification, driven entirely by this action (the config flow does
+> not offer the template). `items` is a list of 1-8 rows `{ id, label, checked? }`: `id` is 1-16
+> letters, digits, `-` or `_` and unique in the list, `label` is at most 40 characters. The list
+> replaces the stored one on every call, like board tiles. Leave `checked` out of a row to keep
+> whatever tick the server already has for that id, so re-sending the list doesn't undo a tick made
+> on the phone; `true`/`false` sets it. Once every row is ticked the server ends the activity a few
+> seconds later.
+>
+> Home Assistant does not learn about ticks. This integration never reads an activity back, so a
+> tick on the phone changes the card and nothing in Home Assistant, and there is no event or entity
+> for it. If an automation needs to know, keep the list in Home Assistant instead (a to-do list, or a
+> few `input_boolean` helpers) and send the rows' state from there; reading ticks back may come later
+> by syncing a to-do entity. The phone needs the next PushWard app release to draw the list; older
+> builds show a generic card with the count ("2 of 3").
+>
+> ```yaml
+> - action: pushward.update_activity_checklist
+>   data:
+>     slug: morning-routine
+>     state: ongoing
+>     subtitle: Before 9:00
+>     icon: checklist
+>     items:
+>       - id: meds
+>         label: Take vitamins
+>       - id: plants
+>         label: Water the plants
+>       - id: bins
+>         label: Bins out
+>         checked: true
 > ```
 
 #### Activity images

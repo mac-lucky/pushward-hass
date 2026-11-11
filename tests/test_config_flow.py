@@ -72,6 +72,8 @@ from custom_components.pushward.const import (
     CONF_FIRED_AT_ATTRIBUTE,
     CONF_FIRED_AT_ENTITY,
     CONF_FLOW_NODES,
+    CONF_HEATMAP_AGGREGATE,
+    CONF_HEATMAP_WEEKS,
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
@@ -186,6 +188,7 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_COUNTDOWN,
     WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -5132,3 +5135,184 @@ def test_parse_entity_input_defaults_media_controls_on() -> None:
     result = _parse_entity_input(_base_user_input(**{CONF_TEMPLATE: "media"}))
     assert result[CONF_MEDIA_CONTROLS] is True
     assert result[CONF_MEDIA_FAVORITE_SCRIPT] == ""
+
+
+# --- heatmap widget ------------------------------------------------------------
+
+# What the recorder's list_statistic_ids reports for a total and for a measurement.
+_TOTAL_STATS = {"statistic_id": "sensor.energy", "has_sum": True, "has_mean": False, "mean_type": 0}
+_MEASUREMENT_STATS = {"statistic_id": "sensor.temperature", "has_sum": False, "has_mean": True, "mean_type": 1}
+_STATS_LOOKUP = "custom_components.pushward.config_flow.async_statistics_info"
+
+
+async def _heatmap_step1(hass: HomeAssistant, entry: MockConfigEntry, info: dict | None, entity_id: str) -> dict:
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET),
+        context={"source": config_entries.SOURCE_USER},
+    )
+    with patch(_STATS_LOOKUP, AsyncMock(return_value=info)) as lookup:
+        result = await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input={CONF_ENTITY_ID: entity_id, CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP, CONF_SLUG: ""},
+        )
+    lookup.assert_awaited_once_with(hass, entity_id)
+    return result
+
+
+@pytest.mark.parametrize(
+    ("entity_id", "info", "default"),
+    [
+        pytest.param("sensor.energy", _TOTAL_STATS, "change", id="total"),
+        pytest.param("sensor.temperature", _MEASUREMENT_STATS, "mean", id="measurement"),
+    ],
+)
+async def test_heatmap_widget_create_defaults_the_daily_value_from_the_statistics(
+    hass: HomeAssistant, entity_id: str, info: dict, default: str
+) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _heatmap_step1(hass, entry, info, entity_id)
+    assert result["step_id"] == "details"
+    defaults = _all_field_defaults(result["data_schema"])
+    assert defaults[CONF_HEATMAP_AGGREGATE] == default
+    assert defaults[CONF_HEATMAP_WEEKS] == 22
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        user_input=_nest_widget(
+            WIDGET_TEMPLATE_HEATMAP,
+            {CONF_WIDGET_NAME: "Daily", CONF_HEATMAP_WEEKS: 4.0, CONF_HEATMAP_AGGREGATE: default},
+        ),
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    assert data[CONF_WIDGET_TEMPLATE] == WIDGET_TEMPLATE_HEATMAP
+    assert (data[CONF_HEATMAP_WEEKS], data[CONF_HEATMAP_AGGREGATE]) == (4, default)
+    assert (data[CONF_MIN_VALUE], data[CONF_MAX_VALUE]) == (None, None)
+
+
+async def test_heatmap_widget_refuses_an_entity_without_statistics(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _heatmap_step1(hass, entry, None, "sensor.plain")
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "user"
+    assert result["errors"] == {CONF_ENTITY_ID: "heatmap_no_statistics"}
+
+
+@pytest.mark.parametrize(
+    ("entity_id", "info", "refused", "accepted"),
+    [
+        pytest.param("sensor.temperature", _MEASUREMENT_STATS, "change", "max", id="change_needs_a_sum"),
+        pytest.param("sensor.energy", _TOTAL_STATS, "mean", "change", id="mean_needs_a_measurement"),
+    ],
+)
+async def test_heatmap_widget_refuses_a_daily_value_the_statistics_lack(
+    hass: HomeAssistant, entity_id: str, info: dict, refused: str, accepted: str
+) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _heatmap_step1(hass, entry, info, entity_id)
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_nest_widget(WIDGET_TEMPLATE_HEATMAP, {CONF_HEATMAP_AGGREGATE: refused})
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_HEATMAP_AGGREGATE: "heatmap_aggregate_unsupported"}
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_nest_widget(WIDGET_TEMPLATE_HEATMAP, {CONF_HEATMAP_AGGREGATE: accepted})
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert next(iter(entry.subentries.values())).data[CONF_HEATMAP_AGGREGATE] == accepted
+
+
+async def test_heatmap_widget_reconfigure_keeps_its_settings(hass: HomeAssistant) -> None:
+    widget = make_widget_config(
+        widget_template=WIDGET_TEMPLATE_HEATMAP,
+        entity_id="sensor.temperature",
+        slug="ha-temperature",
+        min_value=None,
+        max_value=None,
+        heatmap_weeks=8,
+        heatmap_aggregate="max",
+    )
+    entry = _mock_entry(
+        subentries_data=[
+            ConfigSubentryData(
+                data=widget,
+                subentry_type=SUBENTRY_TYPE_WIDGET,
+                title=widget[CONF_WIDGET_NAME],
+                unique_id=widget[CONF_SLUG],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    with patch(_STATS_LOOKUP, AsyncMock(return_value=_MEASUREMENT_STATS)):
+        result = await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP},
+        )
+    assert result["step_id"] == "details"
+    defaults = _all_field_defaults(result["data_schema"])
+    assert (defaults[CONF_HEATMAP_WEEKS], defaults[CONF_HEATMAP_AGGREGATE]) == (8, "max")
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    data = entry.subentries[subentry_id].data
+    assert (data[CONF_HEATMAP_WEEKS], data[CONF_HEATMAP_AGGREGATE]) == (8, "max")
+
+
+async def test_reconfigure_to_heatmap_checks_the_entity_statistics(hass: HomeAssistant) -> None:
+    widget = make_widget_config()
+    entry = _mock_entry(
+        subentries_data=[
+            ConfigSubentryData(
+                data=widget,
+                subentry_type=SUBENTRY_TYPE_WIDGET,
+                title=widget[CONF_WIDGET_NAME],
+                unique_id=widget[CONF_SLUG],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    with patch(_STATS_LOOKUP, AsyncMock(return_value=None)):
+        result = await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP},
+        )
+    assert result["step_id"] == "reconfigure"
+    assert result["errors"] == {CONF_ENTITY_ID: "heatmap_no_statistics"}
+    assert entry.subentries[subentry_id].data == widget
+
+
+@pytest.mark.parametrize(
+    ("weeks", "aggregate", "stored"),
+    [
+        pytest.param(None, None, (22, "mean"), id="defaults"),
+        pytest.param(0, "sum", (1, "mean"), id="clamped_up_unknown_aggregate"),
+        pytest.param(40.0, "min", (22, "min"), id="clamped_down"),
+    ],
+)
+def test_parse_widget_input_heatmap_fields(weeks, aggregate, stored) -> None:
+    details = _widget_details(**{CONF_HEATMAP_WEEKS: weeks, CONF_HEATMAP_AGGREGATE: aggregate})
+    result = _parse_widget_input(details, _widget_step1(**{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP}))
+    assert (result[CONF_HEATMAP_WEEKS], result[CONF_HEATMAP_AGGREGATE]) == stored
+
+
+def test_parse_widget_input_stores_no_heatmap_keys_on_other_templates() -> None:
+    """Adding the template leaves every other template's stored data as it was."""
+    result = _parse_widget_input(_widget_details(), _widget_step1())
+    assert CONF_HEATMAP_WEEKS not in result and CONF_HEATMAP_AGGREGATE not in result

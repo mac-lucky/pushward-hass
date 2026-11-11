@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Aktiviteyi Güncelle (Checklist)",
+      "description": "Bir PushWard kontrol listesi Live Activity'sini günceller: kilit ekranından, saatten veya bildirimden işaretlenen en fazla 8 öğe. Home Assistant bu işaretlerden haberdar olmaz; bu eylem yalnızca listeyi gönderir.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Aktivite slug tanımlayıcısı."
+        },
+        "state": {
+          "name": "Durum",
+          "description": "İstenen aktivite durumu."
+        },
+        "items": {
+          "name": "Öğeler",
+          "description": "1-8 öğelik liste. Her biri: id (zorunlu, 1-16 harf, rakam, - veya _, benzersiz), label (zorunlu, en fazla 40) ve isteğe bağlı checked (true/false). Liste kayıtlı olanın yerine geçer. checked verilmezse sunucu o id için zaten tuttuğu işareti korur; telefonda yapılan işaretler Home Assistant'a geri bildirilmez."
+        },
+        "subtitle": {
+          "name": "Alt Başlık",
+          "description": "Aktivitede gösterilen alt başlık metni."
+        },
+        "compact_label": {
+          "name": "Island Etiketi",
+          "description": "Kompakt görünümde şablonun varsayılan içeriğinin yerini alan en fazla 4 karakter. iPhone'da bu, simge, adım halkası veya zaman çizelgesinin yüksek/düşük yığını yerine Dynamic Island'ın ön kısmıdır (minimal görünüm bunu yok sayar); Android 16 QPR2 ve sonrasında durum çubuğu çipinin metnidir."
+        },
+        "compact_trailing_label": {
+          "name": "Island Arka Etiketi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik (adım sayacı veya zamanlayıcı gibi) yerine gösterilen en fazla 4 karakter. İkisi de ayarlandığında arka simgeye göre önceliklidir. Minimal görünüm bunu yok sayar. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "compact_trailing_icon": {
+          "name": "Island Arka Simgesi",
+          "description": "Dynamic Island kompakt görünümünün arka kısmında şablonun orada gösterdiği içerik yerine vurgu rengiyle gösterilen SF Symbol veya MDI simgesi (örn. airplane.departure, mdi:airplane-takeoff). Bir Island arka etiketi ayarlandığında yok sayılır. PushWard 1.19.1 veya sonrası gerekir."
+        },
+        "icon": {
+          "name": "Simge",
+          "description": "SF Symbol veya MDI simge adı (örn. checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Tamamlanma Mesajı",
+          "description": "Aktivite sona erdiğinde gösterilen mesaj."
+        },
+        "accent_color": {
+          "name": "Vurgu Rengi",
+          "description": "Aktivite için vurgu rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "background_color": {
+          "name": "Arka Plan Rengi",
+          "description": "Live Activity arka plan rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "text_color": {
+          "name": "Metin Rengi",
+          "description": "Live Activity metin rengi. Hex (#RRGGBB) veya adlandırılmış renk."
+        },
+        "tap_action": {
+          "name": "Dokunma Eylemi",
+          "description": "Nesne olarak tüm etkinliğin dokunma hedefi: url (gerekli), isteğe bağlı foreground ve http(s) url için method/headers/body üzerinden sessiz bir webhook."
+        },
+        "sound": {
+          "name": "Ses",
+          "description": "Bu güncelleme için cihazda çalınan bildirim sesi."
+        },
+        "priority": {
+          "name": "Öncelik Geçersiz Kılma",
+          "description": "Güncelleme başına öncelik (0-10). Yalnızca bu push için aktivitenin yapılandırılmış önceliğini geçersiz kılar."
+        },
+        "ended_ttl": {
+          "name": "Bitiş TTL",
+          "description": "Aktivite sona erdikten sonra tutulacağı saniye sayısı."
+        },
+        "stale_ttl": {
+          "name": "Bayatlama TTL",
+          "description": "Aktivitenin bayatlamış sayılmasından önceki saniye sayısı."
+        },
+        "dismissal_ttl": {
+          "name": "Kaldırma TTL'si",
+          "description": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır."
+        }
+      }
+    },
     "create_activity": {
       "name": "Aktivite Oluştur",
       "description": "Yeni bir PushWard Live Activity oluştur.",
@@ -2343,7 +2425,7 @@
             "slug": "Widget Slug'ı"
           },
           "data_description": {
-            "widget_template": "Widget düzeni: tek bir sayı için `value`, çubuk için `progress`, aralıktaki bir değer için `gauge`, önem rozeti için `status`, en fazla 6 satır için `stat_list`, mini grafik için `trend`, tarih için `countdown`, cihaz halkaları için `battery`, saatlik zaman çizelgesi için `schedule`, giren ve çıkan için `flow`.",
+            "widget_template": "Widget düzeni: tek bir sayı için `value`, çubuk için `progress`, aralıktaki bir değer için `gauge`, önem rozeti için `status`, en fazla 6 satır için `stat_list`, mini grafik için `trend`, tarih için `countdown`, cihaz halkaları için `battery`, saatlik zaman çizelgesi için `schedule`, giren ve çıkan için `flow`. `heatmap` günlük değerleri takvim ızgarasında gösterir.",
             "slug": "Bu widget için benzersiz tanımlayıcı. Varlık kimliğinden otomatik oluşturmak için boş bırakın."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Dönem değer anahtarı",
             "schedule_low_max": "Düşük bandın üst sınırı",
             "schedule_high_min": "Yüksek bandın alt sınırı",
-            "flow_nodes": "Akış düğümleri"
+            "flow_nodes": "Akış düğümleri",
+            "heatmap_weeks": "Haftalar",
+            "heatmap_aggregate": "Günlük değer"
           },
           "data_description": {
             "widget_name": "Telefonunuzdaki widget seçicide gösterilen görüntü adı. Varsayılan olarak varlığın kolay adını kullanır.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Bu listelerde her dönemin değerini taşıyan anahtar.",
             "schedule_low_max": "Bu değere eşit veya altındaki değerler düşük banda düşer. Uygulamanın bantları gönderilen aralıktan türetmesi için her iki eşiği de boş bırakın.",
             "schedule_high_min": "Bu değere eşit veya üstündeki değerler yüksek banda düşer. Düşük bandın üst sınırından büyük olmalıdır.",
-            "flow_nodes": "Her düğüm için bir satır. Yuva nerede çizileceğini belirler: en fazla 3 giriş, ayrıca birer çıkış, depolama ve takas. Hız varlıktan gelir, işaret kuralını siz belirlersiniz."
+            "flow_nodes": "Her düğüm için bir satır. Yuva nerede çizileceğini belirler: en fazla 3 giriş, ayrıca birer çıkış, depolama ve takas. Hız varlıktan gelir, işaret kuralını siz belirlersiniz.",
+            "heatmap_weeks": "Izgaranın kaç haftayı kapsadığı, 1-22. Her hücre bir gündür, bugün en sondadır.",
+            "heatmap_aggregate": "Bir günü hangi kayıt cihazı istatistiğinin dolduracağı: sürekli artan bir toplam (enerji, adım) için günlük değişim ya da bir ölçümün günlük ortalaması, en yükseği veya en düşüğü. Varlığın toplam istatistiği varsa varsayılan günlük değişimdir."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Bir akış widget'ı en fazla 3 giriş destekler.",
         "duplicate_flow_slot": "Çıkış, depolama ve takastan yalnızca birer tane. Geri kalanlar için input kullanın.",
         "flow_nodes_required": "flow şablonu için en az bir düğüm gerekir.",
-        "invalid_schedule_thresholds": "Düşük bandın üst sınırı, yüksek bandın alt sınırından küçük olmalıdır."
+        "invalid_schedule_thresholds": "Düşük bandın üst sınırı, yüksek bandın alt sınırından küçük olmalıdır.",
+        "heatmap_no_statistics": "Bu varlığın kayıt cihazı istatistiği yok, bu yüzden ısı haritasının günlerini dolduracak bir şeyi yok. state_class'lı bir sensör uygun olur.",
+        "heatmap_aggregate_unsupported": "Bu varlığın istatistikleri bu günlük değeri içermiyor. Günlük değişim bir toplam (toplam istatistiği) gerektirir; ortalama, en yüksek ve en düşük bir ölçüm gerektirir."
       },
       "abort": {
         "already_configured": "Bu slug'a sahip bir widget zaten var.",
@@ -2665,7 +2753,8 @@
         "countdown": "Geri sayım",
         "battery": "Pil",
         "schedule": "Program",
-        "flow": "Akış"
+        "flow": "Akış",
+        "heatmap": "Isı haritası"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Önce en düşük pil",
         "level_desc": "Önce en yüksek pil"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Günlük değişim",
+        "mean": "Günlük ortalama",
+        "max": "Günlük en yüksek",
+        "min": "Günlük en düşük"
       }
     },
     "todo_notification_level": {

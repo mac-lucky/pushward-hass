@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Cập Nhật Hoạt Động (Checklist)",
+      "description": "Cập nhật Live Activity danh sách kiểm tra của PushWard: tối đa 8 mục được đánh dấu từ màn hình khóa, đồng hồ hoặc thông báo. Home Assistant không biết về các dấu tích đó; hành động này chỉ gửi danh sách.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Mã định danh slug của hoạt động."
+        },
+        "state": {
+          "name": "Trạng Thái",
+          "description": "Trạng thái hoạt động mong muốn."
+        },
+        "items": {
+          "name": "Mục",
+          "description": "Danh sách 1-8 mục. Mỗi mục: id (bắt buộc, 1-16 chữ cái, chữ số, - hoặc _, không trùng), label (bắt buộc, tối đa 40) và checked tùy chọn (true/false). Danh sách thay thế danh sách đã lưu. Không có checked thì máy chủ giữ dấu tích đã có cho id đó; dấu tích trên điện thoại không được báo lại cho Home Assistant."
+        },
+        "subtitle": {
+          "name": "Phụ Đề",
+          "description": "Văn bản phụ đề hiển thị trên hoạt động."
+        },
+        "compact_label": {
+          "name": "Nhãn Island",
+          "description": "Tối đa 4 ký tự thay cho nội dung mặc định của mẫu trong chế độ xem thu gọn. Trên iPhone, đó là phần đầu của Dynamic Island, thay cho biểu tượng, vòng các bước hoặc chồng cao/thấp của dòng thời gian (chế độ hiển thị tối giản bỏ qua giá trị này); trên Android 16 QPR2 trở lên, đó là văn bản của chip trên thanh trạng thái."
+        },
+        "compact_trailing_label": {
+          "name": "Nhãn Cuối Island",
+          "description": "Tối đa 4 ký tự hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, chẳng hạn bộ đếm bước hoặc bộ hẹn giờ. Được ưu tiên hơn biểu tượng cuối khi cả hai đều được đặt. Chế độ hiển thị tối giản bỏ qua giá trị này. Cần PushWard 1.19.1 trở lên."
+        },
+        "compact_trailing_icon": {
+          "name": "Biểu Tượng Cuối Island",
+          "description": "Biểu tượng SF Symbol hoặc MDI (ví dụ: airplane.departure, mdi:airplane-takeoff) hiển thị ở phần cuối của chế độ xem thu gọn trên Dynamic Island thay cho nội dung mẫu hiển thị ở đó, được tô bằng màu nhấn. Bị bỏ qua khi đã đặt nhãn cuối Island. Cần PushWard 1.19.1 trở lên."
+        },
+        "icon": {
+          "name": "Biểu Tượng",
+          "description": "Tên biểu tượng SF Symbol hoặc MDI (ví dụ: checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Thông Báo Hoàn Thành",
+          "description": "Thông báo hiển thị khi hoạt động kết thúc."
+        },
+        "accent_color": {
+          "name": "Màu Nhấn",
+          "description": "Màu nhấn cho hoạt động. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "background_color": {
+          "name": "Màu Nền",
+          "description": "Màu nền Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "text_color": {
+          "name": "Màu Chữ",
+          "description": "Màu chữ Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống."
+        },
+        "tap_action": {
+          "name": "Hành động khi chạm",
+          "description": "Mục tiêu chạm cho toàn bộ activity dưới dạng đối tượng: url (bắt buộc), foreground tùy chọn, và với url http(s) là một webhook im lặng qua method/headers/body."
+        },
+        "sound": {
+          "name": "Âm Thanh",
+          "description": "Tên âm thanh thông báo cho bản cập nhật. Để trống để dùng âm thanh hệ thống iOS."
+        },
+        "priority": {
+          "name": "Ưu tiên ghi đè",
+          "description": "Mức ưu tiên cho từng lần cập nhật (0-10). Chỉ ghi đè mức ưu tiên đã cấu hình của hoạt động cho lần đẩy này."
+        },
+        "ended_ttl": {
+          "name": "TTL Kết Thúc",
+          "description": "Số giây giữ hoạt động sau khi kết thúc."
+        },
+        "stale_ttl": {
+          "name": "TTL Hết Hạn",
+          "description": "Số giây trước khi hoạt động được coi là hết hạn."
+        },
+        "dismissal_ttl": {
+          "name": "TTL gỡ bỏ",
+          "description": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc."
+        }
+      }
+    },
     "create_activity": {
       "name": "Tạo Hoạt Động",
       "description": "Tạo PushWard Live Activity mới.",
@@ -2343,7 +2425,7 @@
             "slug": "Slug của widget"
           },
           "data_description": {
-            "widget_template": "Bố cục widget: `value` cho một số, `progress` cho thanh tiến trình, `gauge` cho giá trị trong khoảng, `status` cho huy hiệu mức độ, `stat_list` cho tối đa 6 dòng, `trend` cho biểu đồ nhỏ, `countdown` cho một ngày, `battery` cho vòng thiết bị, `schedule` cho dòng thời gian theo giờ, `flow` cho những gì vào và ra.",
+            "widget_template": "Bố cục widget: `value` cho một số, `progress` cho thanh tiến trình, `gauge` cho giá trị trong khoảng, `status` cho huy hiệu mức độ, `stat_list` cho tối đa 6 dòng, `trend` cho biểu đồ nhỏ, `countdown` cho một ngày, `battery` cho vòng thiết bị, `schedule` cho dòng thời gian theo giờ, `flow` cho những gì vào và ra. `heatmap` hiển thị giá trị theo ngày trên lưới lịch.",
             "slug": "Định danh duy nhất cho widget này. Để trống để tự động tạo từ ID thực thể."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Khóa giá trị khoảng",
             "schedule_low_max": "Ngưỡng trên của dải thấp",
             "schedule_high_min": "Ngưỡng dưới của dải cao",
-            "flow_nodes": "Nút luồng"
+            "flow_nodes": "Nút luồng",
+            "heatmap_weeks": "Số tuần",
+            "heatmap_aggregate": "Giá trị theo ngày"
           },
           "data_description": {
             "widget_name": "Tên hiển thị trong trình chọn widget trên điện thoại của bạn. Mặc định là tên thân thiện của thực thể.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Khóa chứa giá trị của mỗi khoảng trong các danh sách đó.",
             "schedule_low_max": "Giá trị bằng hoặc thấp hơn rơi vào dải thấp. Để trống cả hai ngưỡng để ứng dụng tự suy ra dải từ khoảng dữ liệu đã gửi.",
             "schedule_high_min": "Giá trị bằng hoặc cao hơn rơi vào dải cao. Phải lớn hơn ngưỡng trên của dải thấp.",
-            "flow_nodes": "Mỗi nút một dòng. Khe quyết định vị trí hiển thị: tối đa 3 đầu vào, cộng thêm một đầu ra, một kho và một trao đổi. Tốc độ lấy từ thực thể, dấu do bạn quy ước."
+            "flow_nodes": "Mỗi nút một dòng. Khe quyết định vị trí hiển thị: tối đa 3 đầu vào, cộng thêm một đầu ra, một kho và một trao đổi. Tốc độ lấy từ thực thể, dấu do bạn quy ước.",
+            "heatmap_weeks": "Lưới bao gồm bao nhiêu tuần, 1-22. Mỗi ô là một ngày, hôm nay ở cuối.",
+            "heatmap_aggregate": "Thống kê recorder nào điền mỗi ngày: thay đổi mỗi ngày cho tổng tăng dần (năng lượng, số bước), hoặc trung bình, tối đa hay tối thiểu trong ngày của một phép đo. Mặc định là thay đổi khi thực thể có thống kê tổng."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Widget luồng hỗ trợ tối đa 3 đầu vào.",
         "duplicate_flow_slot": "Chỉ một đầu ra, một kho và một trao đổi. Dùng input cho phần còn lại.",
         "flow_nodes_required": "Mẫu flow cần ít nhất một nút.",
-        "invalid_schedule_thresholds": "Ngưỡng trên của dải thấp phải nhỏ hơn ngưỡng dưới của dải cao."
+        "invalid_schedule_thresholds": "Ngưỡng trên của dải thấp phải nhỏ hơn ngưỡng dưới của dải cao.",
+        "heatmap_no_statistics": "Thực thể này không có thống kê recorder, nên bản đồ nhiệt không có gì để điền các ngày. Hãy dùng cảm biến có state_class.",
+        "heatmap_aggregate_unsupported": "Thống kê của thực thể này không có giá trị theo ngày đó. Thay đổi mỗi ngày cần một tổng (thống kê tổng); trung bình, tối đa và tối thiểu cần một phép đo."
       },
       "abort": {
         "already_configured": "Đã tồn tại một widget với slug này.",
@@ -2665,7 +2753,8 @@
         "countdown": "Đếm ngược",
         "battery": "Pin",
         "schedule": "Lịch trình",
-        "flow": "Luồng"
+        "flow": "Luồng",
+        "heatmap": "Bản đồ nhiệt"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Pin thấp nhất trước",
         "level_desc": "Pin cao nhất trước"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Thay đổi mỗi ngày",
+        "mean": "Trung bình ngày",
+        "max": "Tối đa trong ngày",
+        "min": "Tối thiểu trong ngày"
       }
     },
     "todo_notification_level": {

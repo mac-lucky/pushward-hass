@@ -84,6 +84,7 @@ from .const import (
     WIDGET_TEMPLATE_COUNTDOWN,
     WIDGET_TEMPLATE_FLOW,
     WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATE_PROGRESS,
     WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_STAT_LIST,
@@ -334,14 +335,16 @@ def map_widget_content(
     prev_value: float | None = None,
     registry_icon: str | None = None,
     points: list[float] | None = None,
+    cells: list[float | None] | None = None,
 ) -> dict | None:
     """Render a WidgetContent dict from HA state + widget config.
 
     Returns None when the configuration cannot produce a valid payload yet
     (e.g. progress/gauge with no usable numeric state). Caller decides
-    whether to skip the request entirely or send a placeholder.
+    whether to skip the request entirely or send a placeholder. ``points``
+    (trend) and ``cells`` (heatmap) are read from the recorder by the manager.
     """
-    content = _render_content(hass, config, prev_value, registry_icon, points)
+    content = _render_content(hass, config, prev_value, registry_icon, points, cells)
     if content is None:
         return None
     # Only set values ride along. A value the server does not take (a hand-edited
@@ -362,6 +365,7 @@ def _render_content(
     prev_value: float | None,
     registry_icon: str | None,
     points: list[float] | None,
+    cells: list[float | None] | None,
 ) -> dict | None:
     template = config.get(CONF_WIDGET_TEMPLATE)
     if not template:
@@ -424,6 +428,9 @@ def _render_content(
 
     if template == WIDGET_TEMPLATE_TREND:
         return _map_trend(state, config, content, points)
+
+    if template == WIDGET_TEMPLATE_HEATMAP:
+        return _map_heatmap(state, config, content, cells)
 
     if template == WIDGET_TEMPLATE_COUNTDOWN:
         return _map_countdown(hass, state, config, content)
@@ -562,12 +569,18 @@ def _map_trend(state: State, config: dict, content: dict, points: list[float] | 
 
     content["value"] = value
     content["points"] = [float(p) for p in series[-WIDGET_MAX_TREND_POINTS:]]
+    _apply_optional_bounds(state, config, content)
+    return content
 
+
+def _apply_optional_bounds(state: State, config: dict, content: dict) -> None:
+    """Optional min/max chart bounds (trend, heatmap): each may be unset, but never min >= max."""
     min_val = _finite(_coerce_float(config.get(CONF_MIN_VALUE)))
     max_val = _finite(_coerce_float(config.get(CONF_MAX_VALUE)))
     if min_val is not None and max_val is not None and min_val >= max_val:
         _LOGGER.warning(
-            "Trend widget for %s has min_value >= max_value (%s >= %s); ignoring both bounds",
+            "%s widget for %s has min_value >= max_value (%s >= %s); ignoring both bounds",
+            config.get(CONF_WIDGET_TEMPLATE),
             state.entity_id,
             min_val,
             max_val,
@@ -577,6 +590,24 @@ def _map_trend(state: State, config: dict, content: dict, points: list[float] | 
         content["min_value"] = min_val
     if max_val is not None:
         content["max_value"] = max_val
+
+
+def _map_heatmap(state: State, config: dict, content: dict, cells: list[float | None] | None) -> dict | None:
+    """heatmap template: one recorder value per local day, oldest first, ending today.
+
+    Nothing is sent while every cell is empty (the server refuses an all-null
+    grid). The label and unit fall back to the entity's own, and the headline
+    value is today's cell, null until today has statistics.
+    """
+    if not cells or all(cell is None for cell in cells):
+        return None
+    content["cells"] = cells
+    content["value"] = cells[-1]
+    if "label" not in content and (name := state.attributes.get("friendly_name")):
+        content["label"] = _truncate(str(name), WIDGET_LABEL_MAX)
+    if "unit" not in content and (unit := state.attributes.get("unit_of_measurement")):
+        content["unit"] = _truncate(str(unit), WIDGET_UNIT_MAX)
+    _apply_optional_bounds(state, config, content)
     return content
 
 

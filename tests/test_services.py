@@ -1507,7 +1507,8 @@ async def test_per_template_services_registered_and_persist(hass: HomeAssistant)
         assert hass.services.has_service(DOMAIN, f"update_activity_{template}")
 
 
-@pytest.mark.parametrize("template", SERVICE_TEMPLATES)
+# checklist takes no state_text: the server writes that text from the ticks.
+@pytest.mark.parametrize("template", [t for t in SERVICE_TEMPLATES if t != "checklist"])
 async def test_update_activity_template_injects_template(hass: HomeAssistant, template: str) -> None:
     """The service name implies the template; the handler injects it and remaps state_text -> state."""
     api = _mock_api()
@@ -2458,11 +2459,12 @@ async def test_pause_timer_rejects_a_bad_slug(hass: HomeAssistant) -> None:
 
 # --- universal action fields (all templates that render button slots) ---
 
-# board/log/media/approval use a lean schema: only the whole-activity tap_action, no
-# url / secondary_url / url_action / secondary_url_action slots (board uses per-tile
-# url_action; log has no buttons; media has its transport row; approval has its
-# answer buttons).
-_UNIVERSAL_ACTION_TEMPLATES = [t for t in SERVICE_TEMPLATES if t not in ("board", "log", "media", "approval")]
+# board/log/media/approval/checklist use a lean schema: only the whole-activity
+# tap_action, no url / secondary_url / url_action / secondary_url_action slots (board
+# uses per-tile url_action; log has no buttons; media has its transport row; approval
+# has its answer buttons; checklist rows are the tap targets).
+_LEAN_TEMPLATES = ("board", "log", "media", "approval", "checklist")
+_UNIVERSAL_ACTION_TEMPLATES = [t for t in SERVICE_TEMPLATES if t not in _LEAN_TEMPLATES]
 
 
 @pytest.mark.parametrize("template", _UNIVERSAL_ACTION_TEMPLATES)
@@ -3568,6 +3570,139 @@ async def test_approval_fields_are_not_accepted_on_other_templates(hass: HomeAss
             blocking=True,
         )
     api.update_activity.assert_not_awaited()
+
+
+# --- checklist ---------------------------------------------------------------
+
+_CHECKLIST_ITEMS = [
+    {"id": "meds", "label": "Take vitamins", "checked": True},
+    {"id": "plants", "label": "Water the plants", "checked": False},
+    # No checked: the server keeps whatever tick it stored for this id.
+    {"id": "bins_out-2", "label": "Bins out"},
+]
+
+
+async def test_update_activity_checklist_sends_items(hass: HomeAssistant) -> None:
+    """The items reach the PATCH content as sent, an item without checked stays without it,
+    and nothing fills progress or the state text (the server does both from the ticks)."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_checklist",
+        {
+            "slug": "morning",
+            "state": "ongoing",
+            "items": _CHECKLIST_ITEMS,
+            "subtitle": "Before 9:00",
+            "icon": "checklist",
+            "tap_action": {"url": "homeassistant://navigate/lovelace/0"},
+        },
+        blocking=True,
+    )
+
+    api.update_activity.assert_awaited_once()
+    slug, state, content = api.update_activity.call_args[0]
+    assert (slug, state) == ("morning", "ongoing")
+    assert content == {
+        "template": "checklist",
+        "items": _CHECKLIST_ITEMS,
+        "subtitle": "Before 9:00",
+        "icon": "checklist",
+        "tap_action": {"url": "homeassistant://navigate/lovelace/0"},
+    }
+    assert "checked" not in content["items"][2]
+    assert_valid_activity_content(content, where="update_activity_checklist")
+
+
+async def test_update_activity_checklist_coerces_yaml_scalars(hass: HomeAssistant) -> None:
+    """YAML hands a numeric id over as an int and a tick as yes/no; both reach the wire typed."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity_checklist",
+        {"slug": "x", "state": "ongoing", "items": [{"id": 1, "label": 2024, "checked": "yes"}]},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["items"] == [{"id": "1", "label": "2024", "checked": True}]
+    assert_valid_activity_content(content, where="update_activity_checklist")
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        pytest.param({"items": []}, id="no_items"),
+        pytest.param({"items": [{"id": f"i{n}", "label": "L"} for n in range(9)]}, id="nine_items"),
+        pytest.param({"items": [{"id": "a", "label": "A"}, {"id": "a", "label": "B"}]}, id="duplicate_id"),
+        pytest.param({"items": [{"id": "", "label": "A"}]}, id="empty_id"),
+        pytest.param({"items": [{"id": "a" * 17, "label": "A"}]}, id="id_too_long"),
+        pytest.param({"items": [{"id": "a b", "label": "A"}]}, id="id_with_space"),
+        pytest.param({"items": [{"id": "a.b", "label": "A"}]}, id="id_with_dot"),
+        # \Z, not $: Python's $ would let a trailing newline through.
+        pytest.param({"items": [{"id": "a\n", "label": "A"}]}, id="id_trailing_newline"),
+        pytest.param({"items": [{"label": "A"}]}, id="id_missing"),
+        pytest.param({"items": [{"id": None, "label": "A"}]}, id="id_null"),
+        pytest.param({"items": [{"id": "a"}]}, id="label_missing"),
+        pytest.param({"items": [{"id": "a", "label": ""}]}, id="label_empty"),
+        pytest.param({"items": [{"id": "a", "label": "x" * 41}]}, id="label_too_long"),
+        pytest.param({"items": [{"id": "a", "label": "A", "checked": "maybe"}]}, id="checked_not_bool"),
+        pytest.param({"items": [{"id": "a", "label": "A", "url": "https://example.com"}]}, id="unknown_item_key"),
+        pytest.param({"items": {"id": "a", "label": "A"}}, id="items_not_a_list"),
+        # Server-owned or server-filled, or not drawn on a checklist.
+        pytest.param({"tick_url": "https://api.example.com/tick?token=x"}, id="tick_url"),
+        pytest.param({"state_text": "1 of 3"}, id="state_text"),
+        pytest.param({"progress": 0.5}, id="progress"),
+        pytest.param({"url_action": {"url": "https://example.com"}}, id="url_action"),
+        pytest.param({"tiles": [{"label": "L", "value": "V"}]}, id="board_tiles"),
+    ],
+)
+async def test_update_activity_checklist_rejects_out_of_contract_values(hass: HomeAssistant, data: dict) -> None:
+    """The service schema mirrors the server's checklist bounds, so a bad value fails locally."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, "update_activity_checklist", {"slug": "x", "state": "ongoing", **data}, blocking=True
+        )
+    api.update_activity.assert_not_awaited()
+
+
+@pytest.mark.parametrize("template", [t for t in SERVICE_TEMPLATES if t != "checklist"])
+async def test_checklist_items_are_not_accepted_on_other_templates(hass: HomeAssistant, template: str) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN,
+            f"update_activity_{template}",
+            {"slug": "x", "state": "ongoing", "items": [{"id": "a", "label": "A"}]},
+            blocking=True,
+        )
+    api.update_activity.assert_not_awaited()
+
+
+async def test_deprecated_update_activity_takes_checklist_items(hass: HomeAssistant) -> None:
+    """The deprecated alias accepts every template's fields, the checklist rows included."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "update_activity",
+        {"slug": "x", "state": "ongoing", "template": "checklist", "items": [{"id": "a", "label": "A"}]},
+        blocking=True,
+    )
+
+    content = api.update_activity.call_args[0][2]
+    assert content["template"] == "checklist"
+    assert content["items"] == [{"id": "a", "label": "A"}]
 
 
 # --- image trio + generate_thumbhash ----------------------------------------

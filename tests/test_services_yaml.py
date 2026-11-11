@@ -96,6 +96,22 @@ def test_deprecated_update_activity_still_registered() -> None:
     assert "update_activity" in _services()
 
 
+def test_checklist_action_lists_its_schema_fields_named_in_every_locale() -> None:
+    """update_activity_checklist shows exactly the fields its schema takes, each with a name in every locale."""
+    from custom_components.pushward import _UPDATE_TEMPLATE_SCHEMAS
+
+    leaves = _leaf_fields(_services()["update_activity_checklist"])
+    assert set(leaves) == {str(key) for key in _UPDATE_TEMPLATE_SCHEMAS["checklist"].schema}
+    assert "items" in leaves
+    assert "state_text" not in leaves
+
+    for locale_file in sorted(_TRANSLATIONS.glob("*.json")):
+        service = json.loads(locale_file.read_text())["services"]["update_activity_checklist"]
+        assert service["name"].strip() and service["description"].strip(), locale_file.name
+        for field in leaves:
+            assert service["fields"][field]["name"].strip(), f"{locale_file.name}: {field} has no name"
+
+
 # Matches the stale dict-keyed wording ("1=Label", "1 = Label") the bug fix removed.
 _DICT_STEP_LABEL_RE = re.compile(r"\b1\s*=")
 

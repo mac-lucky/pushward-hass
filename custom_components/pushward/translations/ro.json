@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Actualizați activitatea (Checklist)",
+      "description": "Actualizează o Live Activity PushWard de tip listă de verificare: până la 8 elemente bifate de pe ecranul de blocare, de pe ceas sau din notificare. Home Assistant nu află de aceste bife; această acțiune trimite doar lista.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Identificatorul slug al activității."
+        },
+        "state": {
+          "name": "Stare",
+          "description": "Starea dorită a activității."
+        },
+        "items": {
+          "name": "Elemente",
+          "description": "Listă de 1-8 elemente. Fiecare: id (obligatoriu, 1-16 litere, cifre, - sau _, unic), label (obligatoriu, max. 40) și checked opțional (true/false). Lista o înlocuiește pe cea salvată. Fără checked, serverul păstrează bifa pe care o are deja pentru acel id; bifele făcute pe telefon nu ajung înapoi în Home Assistant."
+        },
+        "subtitle": {
+          "name": "Subtitrare",
+          "description": "Textul de subtitrare afișat în activitate."
+        },
+        "compact_label": {
+          "name": "Etichetă Island",
+          "description": "Până la 4 caractere care înlocuiesc conținutul implicit al șablonului în vizualizarea compactă. Pe iPhone este partea din față a Dynamic Island, în locul pictogramei, al inelului pașilor sau al stivei maxim/minim a cronologiei (prezentarea minimală le ignoră); pe Android 16 QPR2 și versiunile ulterioare este textul cipului din bara de stare."
+        },
+        "compact_trailing_label": {
+          "name": "Etichetă Island din spate",
+          "description": "Până la 4 caractere afișate în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, cum ar fi contorul de pași sau cronometrul. Are prioritate față de pictograma din spate când sunt setate ambele. Prezentarea minimală le ignoră. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "compact_trailing_icon": {
+          "name": "Pictogramă Island din spate",
+          "description": "Pictogramă SF Symbol sau MDI (ex. airplane.departure, mdi:airplane-takeoff) afișată în partea din spate a vizualizării compacte Dynamic Island în locul a ceea ce afișează șablonul acolo, colorată cu culoarea de accent. Ignorată când este setată o etichetă Island din spate. Necesită PushWard 1.19.1 sau mai nou."
+        },
+        "icon": {
+          "name": "Pictogramă",
+          "description": "Numele unui SF Symbol sau pictogramă MDI (ex. checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Mesaj de finalizare",
+          "description": "Mesajul afișat la încheierea activității."
+        },
+        "accent_color": {
+          "name": "Culoare accent",
+          "description": "Culoarea de accent pentru activitate. Hex (#RRGGBB) sau culoare numită."
+        },
+        "background_color": {
+          "name": "Culoare fundal",
+          "description": "Culoarea de fundal a Live Activity. Hex (#RRGGBB) sau culoare numită."
+        },
+        "text_color": {
+          "name": "Culoare text",
+          "description": "Culoarea textului Live Activity. Hex (#RRGGBB) sau culoare numită."
+        },
+        "tap_action": {
+          "name": "Acțiune la atingere",
+          "description": "Țintă de atingere pentru întreaga activitate, sub formă de obiect: url (obligatoriu), foreground opțional și, pentru un url http(s), un webhook silențios prin method/headers/body."
+        },
+        "sound": {
+          "name": "Sunet",
+          "description": "Sunetul de notificare redat pe dispozitiv pentru această actualizare."
+        },
+        "priority": {
+          "name": "Suprascriere prioritate",
+          "description": "Prioritate per actualizare (0-10). Suprascrie prioritatea configurată a activității doar pentru acest push."
+        },
+        "ended_ttl": {
+          "name": "TTL după încheiere",
+          "description": "Secunde pentru a păstra activitatea după ce se încheie."
+        },
+        "stale_ttl": {
+          "name": "TTL inactivitate",
+          "description": "Secunde înainte ca activitatea să fie considerată inactivă."
+        },
+        "dismissal_ttl": {
+          "name": "TTL de eliminare",
+          "description": "Numărul de secunde în care activitatea încheiată rămâne pe ecranul de blocare înainte de a fi eliminată. 0 o elimină imediat la încheiere."
+        }
+      }
+    },
     "create_activity": {
       "name": "Creați activitatea",
       "description": "Creați un nou PushWard Live Activity.",
@@ -2343,7 +2425,7 @@
             "slug": "Slug widget"
           },
           "data_description": {
-            "widget_template": "Aspectul widgetului: `value` pentru un singur număr, `progress` pentru o bară, `gauge` pentru o valoare într-un interval, `status` pentru o insignă de gravitate, `stat_list` pentru până la 6 rânduri, `trend` pentru un grafic mic, `countdown` pentru o dată, `battery` pentru inele de dispozitive, `schedule` pentru o cronologie pe ore, `flow` pentru ce intră și ce iese.",
+            "widget_template": "Aspectul widgetului: `value` pentru un singur număr, `progress` pentru o bară, `gauge` pentru o valoare într-un interval, `status` pentru o insignă de gravitate, `stat_list` pentru până la 6 rânduri, `trend` pentru un grafic mic, `countdown` pentru o dată, `battery` pentru inele de dispozitive, `schedule` pentru o cronologie pe ore, `flow` pentru ce intră și ce iese. `heatmap` arată valori zilnice pe o grilă de calendar.",
             "slug": "Identificator unic pentru acest widget. Lăsați gol pentru a-l genera automat din ID-ul entității."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Cheia valorii perioadei",
             "schedule_low_max": "Maximul benzii joase",
             "schedule_high_min": "Minimul benzii înalte",
-            "flow_nodes": "Noduri de flux"
+            "flow_nodes": "Noduri de flux",
+            "heatmap_weeks": "Săptămâni",
+            "heatmap_aggregate": "Valoare zilnică"
           },
           "data_description": {
             "widget_name": "Numele afișat în selectorul de widget-uri de pe telefon. Implicit, numele prietenos al entității.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Cheia care conține valoarea fiecărei perioade din acele liste.",
             "schedule_low_max": "Valorile mai mici sau egale intră în banda joasă. Lasă ambele praguri goale pentru ca aplicația să deducă benzile din intervalul trimis.",
             "schedule_high_min": "Valorile mai mari sau egale intră în banda înaltă. Trebuie să fie peste maximul benzii joase.",
-            "flow_nodes": "Un rând pentru fiecare nod. Slotul decide unde apare: până la 3 intrări, plus câte o ieșire, un stocaj și un schimb. Rata vine din entitate, cu semnul ales de tine."
+            "flow_nodes": "Un rând pentru fiecare nod. Slotul decide unde apare: până la 3 intrări, plus câte o ieșire, un stocaj și un schimb. Rata vine din entitate, cu semnul ales de tine.",
+            "heatmap_weeks": "Câte săptămâni acoperă grila, 1-22. Fiecare celulă este o zi, azi la final.",
+            "heatmap_aggregate": "Ce statistică din recorder umple fiecare zi: variația pe zi pentru un total care tot crește (energie, pași) sau media, maximul ori minimul zilnic al unei măsurători. Implicit variația, când entitatea are o statistică de sumă."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Un widget de flux acceptă cel mult 3 intrări.",
         "duplicate_flow_slot": "Doar câte o ieșire, un stocaj și un schimb. Folosește input pentru restul.",
         "flow_nodes_required": "Șablonul flow necesită cel puțin un nod.",
-        "invalid_schedule_thresholds": "Maximul benzii joase trebuie să fie sub minimul benzii înalte."
+        "invalid_schedule_thresholds": "Maximul benzii joase trebuie să fie sub minimul benzii înalte.",
+        "heatmap_no_statistics": "Această entitate nu are statistici în recorder, deci o hartă termică nu are cu ce să-și umple zilele. Merge un senzor cu state_class.",
+        "heatmap_aggregate_unsupported": "Statisticile acestei entități nu conțin această valoare zilnică. Variația pe zi cere un total (statistică de sumă); media, maximul și minimul cer o măsurătoare."
       },
       "abort": {
         "already_configured": "Există deja un widget cu acest slug.",
@@ -2665,7 +2753,8 @@
         "countdown": "Numărătoare inversă",
         "battery": "Baterie",
         "schedule": "Program",
-        "flow": "Flux"
+        "flow": "Flux",
+        "heatmap": "Hartă termică"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Bateria cea mai mică prima",
         "level_desc": "Bateria cea mai mare prima"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Variație pe zi",
+        "mean": "Medie zilnică",
+        "max": "Maxim zilnic",
+        "min": "Minim zilnic"
       }
     },
     "todo_notification_level": {

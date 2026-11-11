@@ -63,6 +63,10 @@ from .const import (
     BOARD_TILE_UNIT_MAX,
     BOARD_TILE_VALUE_MAX,
     BOARD_TRENDS,
+    CHECKLIST_ITEM_ID_PATTERN,
+    CHECKLIST_ITEM_LABEL_MAX,
+    CHECKLIST_ITEMS_MAX,
+    CHECKLIST_ITEMS_MIN,
     COMPACT_TRAILING_ICON_PATTERN,
     CONF_E2E_KEY,
     CONF_INTEGRATION_KEY,
@@ -630,6 +634,43 @@ def _validate_approval_update(data: dict) -> dict:
     return data
 
 
+# checklist: 1-8 rows replaced wholesale per update, like board tiles. `checked`
+# left out is passed on left out, so the server keeps the tick it already has for
+# that id; tick_url is server-owned and not a key the schema knows. Home Assistant
+# does not learn about ticks made on a phone: nothing here reads the activity back.
+_CHECKLIST_ITEM_SCHEMA = vol.Schema(
+    {
+        # YAML reads `id: 1` as an int; take it as the string it is meant to be.
+        vol.Required("id"): vol.All(
+            vol.Any(str, int),
+            vol.Coerce(str),
+            vol.Match(
+                CHECKLIST_ITEM_ID_PATTERN,
+                msg="item ids must be 1-16 letters, digits, hyphens, or underscores",
+            ),
+        ),
+        vol.Required("label"): vol.All(vol.Coerce(str), vol.Length(min=1, max=CHECKLIST_ITEM_LABEL_MAX)),
+        vol.Optional("checked"): cv.boolean,
+    }
+)
+
+
+def _validate_checklist_items(items: list) -> list:
+    ids = [item["id"] for item in items]
+    if len(set(ids)) != len(ids):
+        raise vol.Invalid("item ids must be unique")
+    return items
+
+
+_CHECKLIST_TEMPLATE_FIELDS = {
+    vol.Optional("items"): vol.All(
+        [_CHECKLIST_ITEM_SCHEMA],
+        vol.Length(min=CHECKLIST_ITEMS_MIN, max=CHECKLIST_ITEMS_MAX),
+        _validate_checklist_items,
+    ),
+}
+
+
 # Lean field groups for board/log/media: only the fields those templates actually render.
 # Board/log have no progress bar, no remaining_time, and no whole-activity button slots
 # (board uses per-tile url_action; log has no buttons; media has its own transport row and
@@ -702,6 +743,15 @@ _UPDATE_TEMPLATE_SCHEMAS = {
     # server rejects url_action/secondary_url_action and alarm/snooze on it, and
     # it has no image slot.
     "approval": vol.All(_lean_update_schema(_APPROVAL_TEMPLATE_FIELDS), _validate_approval_update),
+    # checklist is lean as well, minus state_text: the server writes the state
+    # text ("3 of 8") itself from the ticks.
+    "checklist": vol.Schema(
+        {
+            key: validator
+            for key, validator in _lean_update_schema(_CHECKLIST_TEMPLATE_FIELDS).schema.items()
+            if str(key) != "state_text"
+        }
+    ),
 }
 
 # The deprecated update_activity accepts every template's fields (plus an explicit
@@ -721,6 +771,7 @@ SCHEMA_UPDATE_ACTIVITY = _update_template_schema(
     _LOG_TEMPLATE_FIELDS,
     _MEDIA_TEMPLATE_FIELDS,
     _APPROVAL_TEMPLATE_FIELDS,
+    _CHECKLIST_TEMPLATE_FIELDS,
 )
 
 SCHEMA_CREATE_ACTIVITY = vol.Schema(

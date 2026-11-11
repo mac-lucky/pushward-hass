@@ -1608,6 +1608,88 @@
         }
       }
     },
+    "update_activity_checklist": {
+      "name": "Activiteit bijwerken (Checklist)",
+      "description": "Werkt een PushWard-checklist-Live Activity bij: tot 8 items die worden afgevinkt op het vergrendelscherm, het horloge of in de melding. Home Assistant hoort niets van die vinkjes; deze actie verstuurt alleen de lijst.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
+        "slug": {
+          "name": "Slug",
+          "description": "Slug-identificator van de activiteit."
+        },
+        "state": {
+          "name": "Status",
+          "description": "Gewenste activiteitsstatus."
+        },
+        "items": {
+          "name": "Items",
+          "description": "Lijst van 1-8 items. Elk: id (verplicht, 1-16 letters, cijfers, - of _, uniek), label (verplicht, max. 40) en optioneel checked (true/false). De lijst vervangt de opgeslagen lijst. Zonder checked houdt de server het vinkje dat hij al voor die id heeft; vinkjes op een telefoon worden niet aan Home Assistant teruggemeld."
+        },
+        "subtitle": {
+          "name": "Ondertitel",
+          "description": "Ondertiteltekst op de activiteit."
+        },
+        "compact_label": {
+          "name": "Island-label",
+          "description": "Maximaal 4 tekens die in de compacte weergave de standaardinhoud van de sjabloon vervangen. Op de iPhone is dat de voorkant van de Dynamic Island, in plaats van het pictogram, de stappenring of de hoog/laag-stapel van de tijdlijn (de minimale weergave negeert ze); op Android 16 QPR2 en later is het de tekst van de chip in de statusbalk."
+        },
+        "compact_trailing_label": {
+          "name": "Achterste Island-label",
+          "description": "Maximaal 4 tekens die aan de achterkant van de compacte Dynamic Island-weergave worden getoond in plaats van wat de sjabloon daar toont, zoals de stappenteller of de timer. Gaat voor op het achterste pictogram als beide zijn ingesteld. De minimale weergave negeert ze. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "compact_trailing_icon": {
+          "name": "Achterste Island-pictogram",
+          "description": "SF Symbol- of MDI-pictogram (bijv. airplane.departure, mdi:airplane-takeoff) dat aan de achterkant van de compacte Dynamic Island-weergave wordt getoond in plaats van wat de sjabloon daar toont, gekleurd in de accentkleur. Wordt genegeerd als een achterste Island-label is ingesteld. Vereist PushWard 1.19.1 of nieuwer."
+        },
+        "icon": {
+          "name": "Pictogram",
+          "description": "SF Symbol- of MDI-pictogramnaam (bijv. checklist, mdi:format-list-checks)."
+        },
+        "completion_message": {
+          "name": "Voltooiingsbericht",
+          "description": "Bericht dat wordt weergegeven wanneer de activiteit eindigt."
+        },
+        "accent_color": {
+          "name": "Accentkleur",
+          "description": "Accentkleur voor de activiteit. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "Achtergrondkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "text_color": {
+          "name": "Tekstkleur",
+          "description": "Tekstkleur van de Live Activity. Hexadecimaal (#RRGGBB) of kleurnaam."
+        },
+        "tap_action": {
+          "name": "Tikactie",
+          "description": "Tikdoel voor de hele activiteit als object: url (verplicht), optionele foreground, en voor een http(s)-url een stille webhook via method/headers/body."
+        },
+        "sound": {
+          "name": "Geluid",
+          "description": "Meldingsgeluid dat op het apparaat wordt afgespeeld bij deze update."
+        },
+        "priority": {
+          "name": "Prioriteit overschrijven",
+          "description": "Prioriteit per update (0-10). Overschrijft de geconfigureerde prioriteit van de activiteit alleen voor deze push."
+        },
+        "ended_ttl": {
+          "name": "TTL na beëindigen",
+          "description": "Seconden om de activiteit te bewaren nadat deze is beëindigd."
+        },
+        "stale_ttl": {
+          "name": "TTL bij inactiviteit",
+          "description": "Seconden voordat de activiteit als verouderd wordt beschouwd."
+        },
+        "dismissal_ttl": {
+          "name": "TTL voor verwijderen",
+          "description": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging."
+        }
+      }
+    },
     "create_activity": {
       "name": "Activiteit aanmaken",
       "description": "Maak een nieuwe PushWard Live Activity aan.",
@@ -2343,7 +2425,7 @@
             "slug": "Widget-slug"
           },
           "data_description": {
-            "widget_template": "Widgetindeling: `value` voor een enkel getal, `progress` voor een balk, `gauge` voor een waarde in een bereik, `status` voor een ernstbadge, `stat_list` voor maximaal 6 rijen, `trend` voor een sparkline, `countdown` voor een datum, `battery` voor apparaatringen, `schedule` voor een uurtijdlijn, `flow` voor wat binnenkomt en weggaat.",
+            "widget_template": "Widgetindeling: `value` voor een enkel getal, `progress` voor een balk, `gauge` voor een waarde in een bereik, `status` voor een ernstbadge, `stat_list` voor maximaal 6 rijen, `trend` voor een sparkline, `countdown` voor een datum, `battery` voor apparaatringen, `schedule` voor een uurtijdlijn, `flow` voor wat binnenkomt en weggaat. `heatmap` toont dagwaarden in een kalenderraster.",
             "slug": "Unieke identificatie voor deze widget. Laat leeg om automatisch te genereren op basis van de entiteits-ID."
           }
         },
@@ -2380,7 +2462,9 @@
             "schedule_value_key": "Sleutel periodewaarde",
             "schedule_low_max": "Maximum lage band",
             "schedule_high_min": "Minimum hoge band",
-            "flow_nodes": "Stroomknooppunten"
+            "flow_nodes": "Stroomknooppunten",
+            "heatmap_weeks": "Weken",
+            "heatmap_aggregate": "Dagwaarde"
           },
           "data_description": {
             "widget_name": "Weergavenaam in de widgetkiezer op je telefoon. Standaard de vriendelijke naam van de entiteit.",
@@ -2401,7 +2485,9 @@
             "schedule_value_key": "Sleutel met de waarde van elke periode in die lijsten.",
             "schedule_low_max": "Waarden tot en met dit getal vallen in de lage band. Laat beide drempels leeg om de app de banden uit het verzonden bereik te laten afleiden.",
             "schedule_high_min": "Waarden vanaf dit getal vallen in de hoge band. Moet boven het maximum van de lage band liggen.",
-            "flow_nodes": "Een rij per knooppunt. De slot bepaalt waar het verschijnt: tot 3 ingangen plus een uitgang, opslag en uitwisseling. De snelheid komt uit de entiteit, met je eigen tekenafspraak."
+            "flow_nodes": "Een rij per knooppunt. De slot bepaalt waar het verschijnt: tot 3 ingangen plus een uitgang, opslag en uitwisseling. De snelheid komt uit de entiteit, met je eigen tekenafspraak.",
+            "heatmap_weeks": "Hoeveel weken het raster beslaat, 1-22. Elke cel is een dag, vandaag als laatste.",
+            "heatmap_aggregate": "Welke recorderstatistiek een dag vult: de verandering per dag voor een totaal dat blijft groeien (energie, stappen), of het gemiddelde, maximum of minimum per dag van een meting. Standaard de verandering als de entiteit een somstatistiek heeft."
           },
           "sections": {
             "look": {
@@ -2525,7 +2611,9 @@
         "too_many_flow_inputs": "Een stroomwidget ondersteunt maximaal 3 ingangen.",
         "duplicate_flow_slot": "Slechts één uitgang, opslag en uitwisseling elk. Gebruik input voor de rest.",
         "flow_nodes_required": "Voor de sjabloon flow is minstens één knooppunt vereist.",
-        "invalid_schedule_thresholds": "Het maximum van de lage band moet onder het minimum van de hoge band liggen."
+        "invalid_schedule_thresholds": "Het maximum van de lage band moet onder het minimum van de hoge band liggen.",
+        "heatmap_no_statistics": "Deze entiteit heeft geen recorderstatistieken, dus een heatmap heeft niets om zijn dagen mee te vullen. Een sensor met state_class werkt wel.",
+        "heatmap_aggregate_unsupported": "De statistieken van deze entiteit bevatten die dagwaarde niet. Verandering per dag vraagt een totaal (somstatistiek); gemiddelde, maximum en minimum vragen een meting."
       },
       "abort": {
         "already_configured": "Er bestaat al een widget met deze slug.",
@@ -2665,7 +2753,8 @@
         "countdown": "Aftellen",
         "battery": "Batterij",
         "schedule": "Schema",
-        "flow": "Stroom"
+        "flow": "Stroom",
+        "heatmap": "Heatmap"
       }
     },
     "value_scale": {
@@ -2730,6 +2819,14 @@
       "options": {
         "level_asc": "Laagste batterij eerst",
         "level_desc": "Hoogste batterij eerst"
+      }
+    },
+    "heatmap_aggregate": {
+      "options": {
+        "change": "Verandering per dag",
+        "mean": "Daggemiddelde",
+        "max": "Dagmaximum",
+        "min": "Dagminimum"
       }
     },
     "todo_notification_level": {
