@@ -1628,6 +1628,10 @@
           "name": "Öğeler",
           "description": "1-8 öğelik liste. Her biri: id (zorunlu, 1-16 harf, rakam, - veya _, benzersiz), label (zorunlu, en fazla 40) ve isteğe bağlı checked (true/false). Liste kayıtlı olanın yerine geçer. checked verilmezse sunucu o id için zaten tuttuğu işareti korur. Liste bittiyse (tüm öğeler işaretli), state ongoing ile göndermek listeyi baştan başlatır ve checked içermeyen her öğe işaretsiz başlar. Telefonda yapılan işaretler Home Assistant'a geri bildirilmez."
         },
+        "auto_end": {
+          "name": "Otomatik sonlandır",
+          "description": "Açık, tüm öğeler işaretlendikten birkaç saniye sonra aktiviteyi sonlandırır; kapalı, tamamen işaretlenmiş listeyi Aktiviteyi Sonlandır ile bitirilene kadar açık tutar. Varsayılan olarak açık; verilmezse mevcut değer korunur."
+        },
         "subtitle": {
           "name": "Alt Başlık",
           "description": "Aktivitede gösterilen alt başlık metni."

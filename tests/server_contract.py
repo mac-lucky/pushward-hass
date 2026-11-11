@@ -187,8 +187,8 @@ CLOCK_SERVER_OWNED = ("paused_at", "paused_seconds")
 # \Z, not $: Python's $ also matches before a trailing newline; the server's does not.
 _APPROVAL_OPTION_ID_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}\Z")
 # The checklist-only content fields. `tick_url` is server-owned, so it is a
-# violation even on checklist itself.
-CHECKLIST_FIELDS = ("items", "tick_url")
+# violation even on checklist itself. auto_end false counts as sent.
+CHECKLIST_FIELDS = ("items", "tick_url", "auto_end")
 # Restated like the approval option id: 1-16 of [A-Za-z0-9_-], no leading rule.
 _CHECKLIST_ITEM_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,16}\Z")
 
@@ -622,6 +622,8 @@ def _assert_checklist(content: dict, where: str, template: str) -> None:
     for field in ("url_action", "secondary_url_action", "alarm"):
         if content.get(field) is not None:
             _fail(where, f"{field} is not supported by the 'checklist' template")
+    if content.get("auto_end") is not None and not isinstance(content["auto_end"], bool):
+        _fail(where, f"auto_end must be a bool, got {content['auto_end']!r}")
 
     items = content.get("items")
     if items is None:

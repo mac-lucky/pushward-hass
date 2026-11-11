@@ -3616,6 +3616,25 @@ async def test_update_activity_checklist_sends_items(hass: HomeAssistant) -> Non
     assert_valid_activity_content(content, where="update_activity_checklist")
 
 
+async def test_update_activity_checklist_sends_auto_end_only_when_given(hass: HomeAssistant) -> None:
+    """auto_end false reaches the PATCH; left out, the key stays off so the server keeps its value."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+    items = [{"id": "a", "label": "A"}]
+
+    for data in ({"auto_end": False}, {}):
+        await hass.services.async_call(
+            DOMAIN,
+            "update_activity_checklist",
+            {"slug": "x", "state": "ongoing", "items": items, **data},
+            blocking=True,
+        )
+    sent_off, left_out = (call.args[2] for call in api.update_activity.call_args_list)
+    assert sent_off == {"template": "checklist", "items": items, "auto_end": False}
+    assert left_out == {"template": "checklist", "items": items}
+    assert_valid_activity_content(sent_off, where="update_activity_checklist")
+
+
 async def test_update_activity_checklist_coerces_yaml_scalars(hass: HomeAssistant) -> None:
     """YAML hands a numeric id over as an int and a tick as yes/no; both reach the wire typed."""
     api = _mock_api()
@@ -3654,6 +3673,7 @@ async def test_update_activity_checklist_coerces_yaml_scalars(hass: HomeAssistan
         pytest.param({"items": [{"id": "a", "label": "A", "checked": "maybe"}]}, id="checked_not_bool"),
         pytest.param({"items": [{"id": "a", "label": "A", "url": "https://example.com"}]}, id="unknown_item_key"),
         pytest.param({"items": {"id": "a", "label": "A"}}, id="items_not_a_list"),
+        pytest.param({"auto_end": "maybe"}, id="auto_end_not_bool"),
         # Server-owned or server-filled, or not drawn on a checklist.
         pytest.param({"tick_url": "https://api.example.com/tick?token=x"}, id="tick_url"),
         pytest.param({"state_text": "1 of 3"}, id="state_text"),
@@ -3674,8 +3694,13 @@ async def test_update_activity_checklist_rejects_out_of_contract_values(hass: Ho
     api.update_activity.assert_not_awaited()
 
 
+@pytest.mark.parametrize(
+    "field", [{"items": [{"id": "a", "label": "A"}]}, {"auto_end": False}], ids=["items", "auto_end"]
+)
 @pytest.mark.parametrize("template", [t for t in SERVICE_TEMPLATES if t != "checklist"])
-async def test_checklist_items_are_not_accepted_on_other_templates(hass: HomeAssistant, template: str) -> None:
+async def test_checklist_items_are_not_accepted_on_other_templates(
+    hass: HomeAssistant, template: str, field: dict
+) -> None:
     api = _mock_api()
     await _setup_entry(hass, api)
 
@@ -3683,7 +3708,7 @@ async def test_checklist_items_are_not_accepted_on_other_templates(hass: HomeAss
         await hass.services.async_call(
             DOMAIN,
             f"update_activity_{template}",
-            {"slug": "x", "state": "ongoing", "items": [{"id": "a", "label": "A"}]},
+            {"slug": "x", "state": "ongoing", **field},
             blocking=True,
         )
     api.update_activity.assert_not_awaited()

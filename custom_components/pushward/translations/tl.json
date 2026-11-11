@@ -1628,6 +1628,10 @@
           "name": "Mga item",
           "description": "Listahan ng 1-8 item. Bawat isa: id (kailangan, 1-16 titik, numero, - o _, natatangi), label (kailangan, hanggang 40) at opsyonal na checked (true/false). Pinapalitan ng listahan ang nakaimbak. Kapag walang checked, pinapanatili ng server ang tsek na hawak na nito para sa id na iyon. Kapag tapos na ang listahan (may tsek na lahat ng item), ang pagpapadala nito na may state ongoing ay nagsisimula ulit dito at bawat item na walang checked ay nagsisimulang walang tsek. Hindi ibinabalik sa Home Assistant ang mga tsek na ginawa sa telepono."
         },
+        "auto_end": {
+          "name": "Awtomatikong tapusin",
+          "description": "Kapag naka-on, tinatapos ang activity ilang segundo matapos ma-tsek ang lahat ng item; kapag naka-off, nananatiling bukas ang listahang na-tsek na lahat hanggang tapusin mo ito gamit ang Tapusin ang Activity. Naka-on bilang default; kapag hindi ibinigay, nananatili ang kasalukuyang value."
+        },
         "subtitle": {
           "name": "Subtitle",
           "description": "Subtitle na teksto na ipinapakita sa activity."

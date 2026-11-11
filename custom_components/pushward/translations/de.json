@@ -1628,6 +1628,10 @@
           "name": "Einträge",
           "description": "Liste mit 1-8 Einträgen. Jeder: id (Pflicht, 1-16 Buchstaben, Ziffern, - oder _, eindeutig), label (Pflicht, max. 40) und optional checked (true/false). Die Liste ersetzt die gespeicherte. Ohne checked behält der Server das Häkchen, das er für diese id schon hat. Ist die Liste beendet (alle Einträge abgehakt), startet ein erneutes Senden mit state ongoing sie neu, und jeder Eintrag ohne checked beginnt unabgehakt. Auf dem Telefon gesetzte Häkchen werden nicht an Home Assistant gemeldet."
         },
+        "auto_end": {
+          "name": "Automatisch beenden",
+          "description": "An beendet die Live Activity wenige Sekunden, nachdem alle Einträge abgehakt sind; aus lässt eine komplett abgehakte Liste offen, bis sie mit Live Activity beenden geschlossen wird. Standardmäßig an; weggelassen bleibt der bisherige Wert."
+        },
         "subtitle": {
           "name": "Untertitel",
           "description": "Auf der Live Activity angezeigter Untertitel."

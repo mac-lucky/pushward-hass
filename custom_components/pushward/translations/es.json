@@ -1628,6 +1628,10 @@
           "name": "Elementos",
           "description": "Lista de 1-8 elementos. Cada uno: id (obligatorio, 1-16 letras, dígitos, - o _, único), label (obligatorio, máx. 40) y checked opcional (true/false). La lista sustituye a la guardada. Sin checked, el servidor conserva la marca que ya tiene para ese id. Si la lista ya terminó (todos los elementos marcados), enviarla con state ongoing la empieza de nuevo y cada elemento sin checked empieza sin marcar. Las marcas hechas en un teléfono no se comunican a Home Assistant."
         },
+        "auto_end": {
+          "name": "Finalizar automáticamente",
+          "description": "Activado finaliza la actividad unos segundos después de marcar todos los elementos; desactivado deja abierta la lista completa hasta que se finalice con Finalizar actividad. Activado por defecto; si se omite, se conserva el valor actual."
+        },
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo mostrado en la actividad."

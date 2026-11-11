@@ -1628,6 +1628,10 @@
           "name": "Mục",
           "description": "Danh sách 1-8 mục. Mỗi mục: id (bắt buộc, 1-16 chữ cái, chữ số, - hoặc _, không trùng), label (bắt buộc, tối đa 40) và checked tùy chọn (true/false). Danh sách thay thế danh sách đã lưu. Không có checked thì máy chủ giữ dấu tích đã có cho id đó. Khi danh sách đã kết thúc (mọi mục đều đã tích), gửi lại với state ongoing sẽ bắt đầu lại danh sách và mọi mục không có checked đều bắt đầu ở trạng thái chưa tích. Dấu tích trên điện thoại không được báo lại cho Home Assistant."
         },
+        "auto_end": {
+          "name": "Tự động kết thúc",
+          "description": "Bật sẽ kết thúc hoạt động vài giây sau khi mọi mục được đánh dấu; tắt sẽ giữ danh sách đã đánh dấu hết ở trạng thái mở cho đến khi bạn kết thúc bằng Kết Thúc Hoạt Động. Bật theo mặc định; nếu bỏ trống, giá trị hiện có được giữ nguyên."
+        },
         "subtitle": {
           "name": "Phụ Đề",
           "description": "Văn bản phụ đề hiển thị trên hoạt động."

@@ -1628,6 +1628,10 @@
           "name": "Items",
           "description": "List of 1-8 items. Each: id (required, 1-16 letters, digits, - or _, unique), label (required, max 40) and optional checked (true/false). The list replaces the stored one. Leave checked out to keep the tick the server already has for that id. Once the list has ended (every item ticked), sending it with state ongoing starts it over and every item without checked starts unticked. Ticks made on a phone are not reported back to Home Assistant."
         },
+        "auto_end": {
+          "name": "Auto End",
+          "description": "On ends the activity a few seconds after every item is ticked; off keeps a fully ticked list open until you end it with End Activity. On by default; leave it out to keep the value already set."
+        },
         "subtitle": {
           "name": "Subtitle",
           "description": "Subtitle text shown on the activity."

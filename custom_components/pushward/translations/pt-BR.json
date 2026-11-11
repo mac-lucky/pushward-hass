@@ -1628,6 +1628,10 @@
           "name": "Itens",
           "description": "Lista de 1-8 itens. Cada um: id (obrigatório, 1-16 letras, dígitos, - ou _, único), label (obrigatório, máx. 40) e checked opcional (true/false). A lista substitui a salva. Sem checked, o servidor mantém a marcação que já tem para esse id. Depois que a lista terminou (todos os itens marcados), enviá-la com state ongoing a recomeça e cada item sem checked começa desmarcado. Marcações feitas no telefone não voltam para o Home Assistant."
         },
+        "auto_end": {
+          "name": "Encerrar automaticamente",
+          "description": "Ativado encerra a atividade alguns segundos depois que todos os itens são marcados; desativado mantém aberta uma lista toda marcada até você encerrá-la com Encerrar Atividade. Ativado por padrão; se omitido, o valor atual é mantido."
+        },
         "subtitle": {
           "name": "Subtítulo",
           "description": "Texto de subtítulo exibido na atividade."

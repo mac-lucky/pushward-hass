@@ -2062,6 +2062,9 @@ update_activity_checklist:
       example: '[{"id": "meds", "label": "Take vitamins"}, {"id": "plants", "label": "Water the plants"}, {"id": "bins", "label": "Bins out", "checked": true}]'
       selector:
         object:
+    auto_end:
+      selector:
+        boolean:
     subtitle:
       example: "Before 9:00"
       selector:

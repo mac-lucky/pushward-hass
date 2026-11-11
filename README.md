@@ -734,7 +734,7 @@ implied by the action name; you no longer pass a `template` field.
 | `update_activity_log` | `lines` |
 | `update_activity_media` | `media_title` (max 128), `playback_state`, `position_seconds`, `duration_seconds`, `position_at`, `volume`, `favorite`, `controls`, `image_url`, `image_shape`, `image_thumbhash` |
 | `update_activity_approval` | `options` (2-4 answer buttons), `source` (max 24), `details` (up to 2 label/value rows), `on_expire`, `end_date` |
-| `update_activity_checklist` | `items` (1-8 rows, each `{ id, label, checked? }`) |
+| `update_activity_checklist` | `items` (1-8 rows, each `{ id, label, checked? }`), `auto_end` |
 
 > **`board` / `log` / `media` / `approval` use a lean schema.** They render no progress bar and no
 > whole-activity button slots, so `update_activity_board`, `update_activity_log`,
@@ -898,6 +898,11 @@ implied by the action name; you no longer pass a `template` field.
 > out of a row to keep whatever tick the server already has for that id, so re-sending the list
 > doesn't undo a tick made on the phone; `true`/`false` sets it. Once every row is ticked the server
 > ends the activity a few seconds later.
+>
+> `auto_end: false` turns that off: a fully ticked list stays up and reads "All done" until you call
+> `pushward.end_activity` (or its `stale_ttl` runs out). Leave `auto_end` out of a later call and the
+> server keeps what it has; `true` puts the default back, and on a list that is already all ticked it
+> ends a few seconds later.
 >
 > An ended list works differently: a call with `state: ongoing` starts a new run, and every row sent
 > without `checked` starts unticked. An automation that re-sends the list on a repeating schedule

@@ -201,6 +201,7 @@ def valid_checklist() -> dict:
             {"id": "plants", "label": "Water the plants", "checked": False},
             {"id": "bins_out-2", "label": "Bins out"},
         ],
+        "auto_end": False,
     }
 
 
@@ -608,6 +609,8 @@ _ACTIVITY_INVALID = [
     ),
     pytest.param(lambda: _mut(valid_checklist, alarm=True), id="alarm_on_checklist"),
     pytest.param(lambda: _mut(valid_generic, items=[{"id": "a", "label": "A"}]), id="items_off_checklist"),
+    pytest.param(lambda: _mut(valid_checklist, auto_end="no"), id="checklist_auto_end_str"),
+    pytest.param(lambda: _mut(valid_generic, auto_end=False), id="auto_end_off_checklist"),
 ]
 
 

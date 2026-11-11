@@ -1628,6 +1628,10 @@
           "name": "Voci",
           "description": "Elenco di 1-8 voci. Ognuna: id (obbligatorio, 1-16 lettere, cifre, - o _, univoco), label (obbligatoria, max 40) e checked facoltativo (true/false). L'elenco sostituisce quello salvato. Senza checked il server mantiene la spunta che ha già per quell'id. Quando l'elenco è terminato (tutte le voci spuntate), inviarlo con state ongoing lo fa ripartire e ogni voce senza checked riparte non spuntata. Le spunte fatte su un telefono non vengono riportate a Home Assistant."
         },
+        "auto_end": {
+          "name": "Termina automaticamente",
+          "description": "Attivo termina l'attività pochi secondi dopo che tutte le voci sono spuntate; disattivo lascia aperto un elenco tutto spuntato finché non viene chiuso con Termina attività. Attivo per impostazione predefinita; se omesso, resta il valore già impostato."
+        },
         "subtitle": {
           "name": "Sottotitolo",
           "description": "Testo del sottotitolo visualizzato nell'attività."

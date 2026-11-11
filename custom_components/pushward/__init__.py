@@ -671,6 +671,9 @@ _CHECKLIST_TEMPLATE_FIELDS = {
         vol.Length(min=CHECKLIST_ITEMS_MIN, max=CHECKLIST_ITEMS_MAX),
         _validate_checklist_items,
     ),
+    # Left out means the server keeps what it stored (true by default); false
+    # keeps a fully ticked list ongoing until an end_activity call.
+    vol.Optional("auto_end"): cv.boolean,
 }
 
 

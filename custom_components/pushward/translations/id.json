@@ -1628,6 +1628,10 @@
           "name": "Item",
           "description": "Daftar 1-8 item. Masing-masing: id (wajib, 1-16 huruf, angka, - atau _, unik), label (wajib, maks. 40), dan checked opsional (true/false). Daftar ini menggantikan yang tersimpan. Tanpa checked, server mempertahankan centang yang sudah dimilikinya untuk id itu. Setelah daftar berakhir (semua item dicentang), mengirimnya dengan state ongoing memulainya lagi dan setiap item tanpa checked dimulai tanpa centang. Centang dari ponsel tidak dilaporkan kembali ke Home Assistant."
         },
+        "auto_end": {
+          "name": "Akhiri Otomatis",
+          "description": "Aktif mengakhiri aktivitas beberapa detik setelah semua item dicentang; nonaktif membiarkan daftar yang sudah tercentang semua tetap terbuka sampai Anda mengakhirinya dengan Akhiri Aktivitas. Aktif secara bawaan; jika tidak diisi, nilai yang sudah ada dipertahankan."
+        },
         "subtitle": {
           "name": "Subjudul",
           "description": "Teks subjudul yang ditampilkan pada aktivitas."

@@ -1628,6 +1628,10 @@
           "name": "Items",
           "description": "Lijst van 1-8 items. Elk: id (verplicht, 1-16 letters, cijfers, - of _, uniek), label (verplicht, max. 40) en optioneel checked (true/false). De lijst vervangt de opgeslagen lijst. Zonder checked houdt de server het vinkje dat hij al voor die id heeft. Is de lijst afgelopen (alle items afgevinkt), dan start opnieuw versturen met state ongoing haar opnieuw en begint elk item zonder checked onafgevinkt. Vinkjes op een telefoon worden niet aan Home Assistant teruggemeld."
         },
+        "auto_end": {
+          "name": "Automatisch beëindigen",
+          "description": "Aan beëindigt de activiteit een paar seconden nadat alle items zijn afgevinkt; uit houdt een volledig afgevinkte lijst open tot je hem beëindigt met Activiteit beëindigen. Standaard aan; weggelaten blijft de huidige waarde staan."
+        },
         "subtitle": {
           "name": "Ondertitel",
           "description": "Ondertiteltekst op de activiteit."

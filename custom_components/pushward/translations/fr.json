@@ -1628,6 +1628,10 @@
           "name": "Éléments",
           "description": "Liste de 1-8 éléments. Chacun : id (obligatoire, 1-16 lettres, chiffres, - ou _, unique), label (obligatoire, 40 max.) et checked facultatif (true/false). La liste remplace celle enregistrée. Sans checked, le serveur garde la coche qu'il a déjà pour cet id. Une fois la liste terminée (tous les éléments cochés), l'envoyer avec state ongoing la relance et chaque élément sans checked repart décoché. Les coches faites sur un téléphone ne remontent pas à Home Assistant."
         },
+        "auto_end": {
+          "name": "Fin automatique",
+          "description": "Activé termine la Live Activity quelques secondes après que tous les éléments sont cochés ; désactivé garde ouverte une liste entièrement cochée jusqu'à ce que vous la terminiez avec Terminer la Live Activity. Activé par défaut ; omis, la valeur déjà enregistrée est conservée."
+        },
         "subtitle": {
           "name": "Sous-titre",
           "description": "Texte du sous-titre affiché sur la Live Activity."
