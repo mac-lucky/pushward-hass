@@ -649,7 +649,8 @@ _CHECKLIST_ITEM_SCHEMA = vol.Schema(
                 msg="item ids must be 1-16 letters, digits, hyphens, or underscores",
             ),
         ),
-        vol.Required("label"): vol.All(vol.Coerce(str), vol.Length(min=1, max=CHECKLIST_ITEM_LABEL_MAX)),
+        # cv.string, not Coerce(str): an empty YAML `label:` is None and must fail, not become "None".
+        vol.Required("label"): vol.All(cv.string, vol.Length(min=1, max=CHECKLIST_ITEM_LABEL_MAX)),
         vol.Optional("checked"): cv.boolean,
     }
 )

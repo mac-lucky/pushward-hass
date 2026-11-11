@@ -600,6 +600,13 @@ _ACTIVITY_INVALID = [
     pytest.param(lambda: _mut(valid_checklist, tiles=[{"label": "L", "value": "V"}]), id="tiles_on_checklist"),
     pytest.param(lambda: _mut(valid_checklist, options=_approval_options(2)), id="approval_options_on_checklist"),
     pytest.param(lambda: _mut(valid_checklist, image_url=IMAGE_OK), id="image_on_checklist"),
+    pytest.param(lambda: _mut(valid_checklist, url=IMAGE_OK), id="url_on_checklist"),
+    pytest.param(lambda: _mut(valid_checklist, secondary_url=IMAGE_OK), id="secondary_url_on_checklist"),
+    pytest.param(lambda: _mut(valid_checklist, url_action={"url": IMAGE_OK}), id="url_action_on_checklist"),
+    pytest.param(
+        lambda: _mut(valid_checklist, secondary_url_action={"url": IMAGE_OK}), id="secondary_url_action_on_checklist"
+    ),
+    pytest.param(lambda: _mut(valid_checklist, alarm=True), id="alarm_on_checklist"),
     pytest.param(lambda: _mut(valid_generic, items=[{"id": "a", "label": "A"}]), id="items_off_checklist"),
 ]
 

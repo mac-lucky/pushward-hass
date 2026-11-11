@@ -614,6 +614,14 @@ def _assert_checklist(content: dict, where: str, template: str) -> None:
     for field in ("tiles", "lines"):
         if content.get(field) not in (None, []):
             _fail(where, f"{field} is not supported by the 'checklist' template")
+    # Every item is a tap target, so the button slots, their legacy url strings and
+    # the alarm are refused too ("" counts as an absent url string, as on the server).
+    for field in ("url", "secondary_url"):
+        if content.get(field) not in (None, ""):
+            _fail(where, f"{field} is not supported by the 'checklist' template")
+    for field in ("url_action", "secondary_url_action", "alarm"):
+        if content.get(field) is not None:
+            _fail(where, f"{field} is not supported by the 'checklist' template")
 
     items = content.get("items")
     if items is None:

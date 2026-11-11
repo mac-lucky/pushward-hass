@@ -3649,6 +3649,7 @@ async def test_update_activity_checklist_coerces_yaml_scalars(hass: HomeAssistan
         pytest.param({"items": [{"id": None, "label": "A"}]}, id="id_null"),
         pytest.param({"items": [{"id": "a"}]}, id="label_missing"),
         pytest.param({"items": [{"id": "a", "label": ""}]}, id="label_empty"),
+        pytest.param({"items": [{"id": "a", "label": None}]}, id="label_null"),
         pytest.param({"items": [{"id": "a", "label": "x" * 41}]}, id="label_too_long"),
         pytest.param({"items": [{"id": "a", "label": "A", "checked": "maybe"}]}, id="checked_not_bool"),
         pytest.param({"items": [{"id": "a", "label": "A", "url": "https://example.com"}]}, id="unknown_item_key"),
