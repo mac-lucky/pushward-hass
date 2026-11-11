@@ -69,7 +69,6 @@ from .const import (
     HEATMAP_AGGREGATES,
     QUOTA_KIND_WIDGET_UPDATES,
     WIDGET_GROUP_TEMPLATES,
-    WIDGET_HEATMAP_READ_INTERVAL,
     WIDGET_HEATMAP_REFRESH_MINUTE,
     WIDGET_HEATMAP_WEEKS_MAX,
     WIDGET_LOOKS,
@@ -146,11 +145,10 @@ class TrackedWidget:
     last_synced: float = 0.0
     # (epoch_seconds, value) samples backing the trend sparkline.
     points_buffer: deque = field(default_factory=lambda: deque(maxlen=WIDGET_TREND_BUFFER_MAX))
-    # Heatmap: the last daily read, its monotonic() time (None = read on the next
-    # send), and whether the warning for an empty read has been logged.
+    # Heatmap: the last daily read, the local date it was taken on (None = read on
+    # the next send), and whether the warning for an empty read has been logged.
     cells: list | None = None
-    cells_read_at: float | None = None
-    cells_read_day: Any = None  # local date of the last read
+    cells_read_day: Any = None
     cells_missing_warned: bool = False
 
 
@@ -366,7 +364,7 @@ class WidgetManager:
         # any other update.
         while (prev := target.pending_task) is not None and not prev.done():
             await asyncio.wait([prev])
-        target.cells_read_at = None  # a manual refresh reads the recorder again
+        target.cells_read_day = None  # a manual refresh reads the recorder again
         task = self._spawn_send(target, force=True)
         await asyncio.wait([task])
         if not task.cancelled() and (exc := task.exception()) is not None:
@@ -470,7 +468,7 @@ class WidgetManager:
         tracked = self._tracked.get(slug)
         if tracked is None:
             return
-        tracked.cells_read_at = None
+        tracked.cells_read_day = None
         self._schedule_update(tracked)
 
     @callback
@@ -703,27 +701,22 @@ class WidgetManager:
         return downsample_evenly([value for _ts, value in tracked.points_buffer], WIDGET_MAX_TREND_POINTS)
 
     async def _heatmap_cells(self, tracked: TrackedWidget) -> list | None:
-        """The heatmap's daily cells, read from the recorder at most once per read interval.
+        """The heatmap's daily cells, read from the recorder only when a read is due.
 
-        A state change inside the interval reuses the last read, so the content
-        comes out unchanged and the diff check skips the PATCH: a busy sensor
-        costs at most one statistics query per interval and one request per
-        change of the daily values.
+        A read is due at setup, after the hourly read or a manual refresh cleared
+        the last one, and on the first send after local midnight. A state change
+        reuses the last read: long-term statistics only move at the hourly
+        compile, which the hourly read picks up, so re-reading on a change could
+        not return anything new.
         """
         cfg = tracked.config
         if cfg.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_HEATMAP:
             return None
-        now = time.monotonic()
         today = dt_util.now().date()
         # A read from yesterday is never reused: its last cell is the wrong day.
-        if (
-            tracked.cells_read_at is not None
-            and tracked.cells_read_day == today
-            and now - tracked.cells_read_at < WIDGET_HEATMAP_READ_INTERVAL
-        ):
+        if tracked.cells_read_day == today:
             return tracked.cells
-        # Stamped before the read: a new-day reset landing during it must win.
-        tracked.cells_read_at = now
+        # Stamped before the read: an hourly reset landing during it must win.
         tracked.cells_read_day = today
         try:
             weeks = int(cfg.get(CONF_HEATMAP_WEEKS) or DEFAULT_HEATMAP_WEEKS)

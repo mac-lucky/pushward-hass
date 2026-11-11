@@ -40,7 +40,6 @@ from custom_components.pushward.const import (
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     WIDGET_GROUP_TEMPLATES,
-    WIDGET_HEATMAP_READ_INTERVAL,
     WIDGET_STALE_AFTER_MIN,
     WIDGET_TEMPLATE_BATTERY,
     WIDGET_TEMPLATE_FLOW,
@@ -1278,9 +1277,11 @@ async def test_heatmap_creates_from_daily_statistics(hass: HomeAssistant) -> Non
     await manager.async_stop()
 
 
-async def test_heatmap_state_changes_reuse_the_last_read(hass: HomeAssistant) -> None:
-    """A busy sensor reads the statistics at most once per interval and sends one update per
-    change of the daily values, however many state changes arrive."""
+async def test_heatmap_state_changes_never_read_the_recorder(hass: HomeAssistant, freezer) -> None:
+    """Statistics only move at the hourly compile, so however many state changes arrive, and
+    however far apart, they reuse the last read; the hourly read is what picks up the next hour."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-12T07:10:00+01:00")
     api = _mock_api()
     hass.states.async_set("sensor.energy", "1")
     with patch(
@@ -1288,18 +1289,19 @@ async def test_heatmap_state_changes_reuse_the_last_read(hass: HomeAssistant) ->
     ) as read:
         manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
         await manager.async_start()
-        for n in range(30):
+        read.return_value = [*_WEEK[:-1], 9.0]
+        for n in range(9):
+            # Six minutes apart, up to 08:04: never two in the same five minutes.
+            freezer.move_to(datetime.fromisoformat("2026-11-12T07:16:00+01:00") + timedelta(minutes=6 * n))
             hass.states.async_set("sensor.energy", str(2 + n))
             await hass.async_block_till_done()
         assert read.await_count == 1
         api.patch_widget.assert_not_awaited()
 
-        # The next hour's statistics land; the first change after the interval reads them.
-        read.return_value = [*_WEEK[:-1], 9.0]
-        manager._tracked["ha-energy"].cells_read_at -= WIDGET_HEATMAP_READ_INTERVAL + 1
-        for n in range(30):
-            hass.states.async_set("sensor.energy", str(100 + n))
-            await hass.async_block_till_done()
+        refresh = datetime.fromisoformat("2026-11-12T08:05:00+01:00")
+        freezer.move_to(refresh)
+        async_fire_time_changed(hass, refresh)
+        await hass.async_block_till_done()
 
     assert read.await_count == 2
     api.patch_widget.assert_awaited_once()
@@ -1340,8 +1342,8 @@ async def test_heatmap_reads_again_after_local_midnight(hass: HomeAssistant, fre
 
 
 async def test_heatmap_never_reuses_a_read_from_yesterday(hass: HomeAssistant, freezer) -> None:
-    """A read taken before midnight ends on yesterday, so a send just after midnight reads again
-    even inside the read interval."""
+    """A read taken before midnight ends on yesterday, so the first state change after midnight
+    reads again, before the 00:05 read."""
     await hass.config.async_set_time_zone("Europe/Warsaw")
     freezer.move_to("2026-11-11T22:58:00+00:00")  # 23:58 in Warsaw
     api = _mock_api()
@@ -1420,7 +1422,7 @@ async def test_heatmap_without_history_sends_nothing_and_warns_once(
         await manager.async_start()
         tracked = manager._tracked["ha-energy"]
         for n in range(3):
-            tracked.cells_read_at = None
+            tracked.cells_read_day = None
             hass.states.async_set("sensor.energy", f"{4243 + n}.5")
             await hass.async_block_till_done()
         assert read.await_count == 4
@@ -1431,14 +1433,14 @@ async def test_heatmap_without_history_sends_nothing_and_warns_once(
 
         # History comes back: the widget is created and the warning re-arms.
         read.return_value = list(_WEEK)
-        tracked.cells_read_at = None
+        tracked.cells_read_day = None
         hass.states.async_set("sensor.energy", "4246.5")
         await hass.async_block_till_done()
         api.create_widget.assert_awaited_once()
 
         # It goes away again later: nothing is sent, and it is reported once more.
         read.return_value = None
-        tracked.cells_read_at = None
+        tracked.cells_read_day = None
         hass.states.async_set("sensor.energy", "4247.5")
         await hass.async_block_till_done()
 

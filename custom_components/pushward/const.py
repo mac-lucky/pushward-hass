@@ -766,11 +766,10 @@ DEFAULT_HEATMAP_WEEKS = WIDGET_HEATMAP_WEEKS_MAX
 HEATMAP_AGGREGATE_CHANGE = "change"
 HEATMAP_AGGREGATE_MEAN = "mean"
 HEATMAP_AGGREGATES = [HEATMAP_AGGREGATE_CHANGE, HEATMAP_AGGREGATE_MEAN, "max", "min"]
-# Long-term statistics move once an hour, so a state change reads them again
-# only after this many seconds; inside the window the last read is reused.
-WIDGET_HEATMAP_READ_INTERVAL = 300
 # Minute of every hour the statistics are read again: a few minutes past the hour,
 # so the hour that just ended is compiled. The 00:05 read starts the new day's cell.
+# Long-term statistics only move at that compile, so a state change never reads
+# them; only setup, a manual refresh and the first send after local midnight do.
 WIDGET_HEATMAP_REFRESH_MINUTE = 5
 
 # Widget severities (mirrors server validWidgetSeverities)
