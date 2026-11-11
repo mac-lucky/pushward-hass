@@ -589,7 +589,7 @@ APPROVAL_DETAILS_MAX = 2
 APPROVAL_DETAIL_LABEL_MAX = 24
 APPROVAL_DETAIL_VALUE_MAX = 64
 
-# Checklist template caps (mirror pushward-server/internal/model/activity.go).
+# Checklist template caps (mirror the server's limits).
 # `items` replace wholesale on update, like board tiles. An item whose `checked`
 # is left out keeps the value the server stored (a tick made on a phone) while the
 # activity is ongoing; an update that brings an ended one back to ongoing starts it
@@ -755,8 +755,8 @@ WIDGET_TREND_BUFFER_MAX = 300
 # Default recorder seed window for a new trend widget (minutes).
 DEFAULT_WIDGET_TREND_PERIOD = 1440
 
-# heatmap cells: one per local day, oldest first (server minHeatmapCells /
-# maxHeatmapCells), so the flow offers whole weeks from 1 to 22.
+# heatmap cells: one per local day, oldest first, within the server's limits of
+# 7 to 154 cells, so the flow offers whole weeks from 1 to 22.
 WIDGET_MIN_HEATMAP_CELLS = 7
 WIDGET_MAX_HEATMAP_CELLS = 154
 WIDGET_HEATMAP_WEEKS_MAX = WIDGET_MAX_HEATMAP_CELLS // 7
