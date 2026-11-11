@@ -636,7 +636,9 @@ def _validate_approval_update(data: dict) -> dict:
 
 # checklist: 1-8 rows replaced wholesale per update, like board tiles. `checked`
 # left out is passed on left out, so the server keeps the tick it already has for
-# that id; tick_url is server-owned and not a key the schema knows. Home Assistant
+# that id - but only while the activity is ongoing: an update that brings an ended
+# checklist back to ongoing is a new run, and every row without `checked` starts
+# unticked. tick_url is server-owned and not a key the schema knows. Home Assistant
 # does not learn about ticks made on a phone: nothing here reads the activity back.
 _CHECKLIST_ITEM_SCHEMA = vol.Schema(
     {

@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Elemente",
-          "description": "Listă de 1-8 elemente. Fiecare: id (obligatoriu, 1-16 litere, cifre, - sau _, unic), label (obligatoriu, max. 40) și checked opțional (true/false). Lista o înlocuiește pe cea salvată. Fără checked, serverul păstrează bifa pe care o are deja pentru acel id; bifele făcute pe telefon nu ajung înapoi în Home Assistant."
+          "description": "Listă de 1-8 elemente. Fiecare: id (obligatoriu, 1-16 litere, cifre, - sau _, unic), label (obligatoriu, max. 40) și checked opțional (true/false). Lista o înlocuiește pe cea salvată. Fără checked, serverul păstrează bifa pe care o are deja pentru acel id. După ce lista s-a încheiat (toate elementele bifate), trimiterea ei cu state ongoing o reia de la capăt și fiecare element fără checked pornește nebifat. Bifele făcute pe telefon nu ajung înapoi în Home Assistant."
         },
         "subtitle": {
           "name": "Subtitrare",

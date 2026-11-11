@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Öğeler",
-          "description": "1-8 öğelik liste. Her biri: id (zorunlu, 1-16 harf, rakam, - veya _, benzersiz), label (zorunlu, en fazla 40) ve isteğe bağlı checked (true/false). Liste kayıtlı olanın yerine geçer. checked verilmezse sunucu o id için zaten tuttuğu işareti korur; telefonda yapılan işaretler Home Assistant'a geri bildirilmez."
+          "description": "1-8 öğelik liste. Her biri: id (zorunlu, 1-16 harf, rakam, - veya _, benzersiz), label (zorunlu, en fazla 40) ve isteğe bağlı checked (true/false). Liste kayıtlı olanın yerine geçer. checked verilmezse sunucu o id için zaten tuttuğu işareti korur. Liste bittiyse (tüm öğeler işaretli), state ongoing ile göndermek listeyi baştan başlatır ve checked içermeyen her öğe işaretsiz başlar. Telefonda yapılan işaretler Home Assistant'a geri bildirilmez."
         },
         "subtitle": {
           "name": "Alt Başlık",

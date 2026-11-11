@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Itens",
-          "description": "Lista de 1-8 itens. Cada um: id (obrigatório, 1-16 letras, dígitos, - ou _, único), label (obrigatório, máx. 40) e checked opcional (true/false). A lista substitui a salva. Sem checked, o servidor mantém a marcação que já tem para esse id; marcações feitas no telefone não voltam para o Home Assistant."
+          "description": "Lista de 1-8 itens. Cada um: id (obrigatório, 1-16 letras, dígitos, - ou _, único), label (obrigatório, máx. 40) e checked opcional (true/false). A lista substitui a salva. Sem checked, o servidor mantém a marcação que já tem para esse id. Depois que a lista terminou (todos os itens marcados), enviá-la com state ongoing a recomeça e cada item sem checked começa desmarcado. Marcações feitas no telefone não voltam para o Home Assistant."
         },
         "subtitle": {
           "name": "Subtítulo",

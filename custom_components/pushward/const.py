@@ -591,8 +591,9 @@ APPROVAL_DETAIL_VALUE_MAX = 64
 
 # Checklist template caps (mirror pushward-server/internal/model/activity.go).
 # `items` replace wholesale on update, like board tiles. An item whose `checked`
-# is left out keeps the value the server stored (a tick made on a phone); an
-# explicit true/false sets it. The server fills `progress` and the `state` text
+# is left out keeps the value the server stored (a tick made on a phone) while the
+# activity is ongoing; an update that brings an ended one back to ongoing starts it
+# unticked. An explicit true/false sets it. The server fills `progress` and the `state` text
 # ("3 of 8") itself for older app builds, and `tick_url` is server-owned.
 CHECKLIST_ITEMS_MIN = 1
 CHECKLIST_ITEMS_MAX = 8

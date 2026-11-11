@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Voci",
-          "description": "Elenco di 1-8 voci. Ognuna: id (obbligatorio, 1-16 lettere, cifre, - o _, univoco), label (obbligatoria, max 40) e checked facoltativo (true/false). L'elenco sostituisce quello salvato. Senza checked il server mantiene la spunta che ha già per quell'id; le spunte fatte su un telefono non vengono riportate a Home Assistant."
+          "description": "Elenco di 1-8 voci. Ognuna: id (obbligatorio, 1-16 lettere, cifre, - o _, univoco), label (obbligatoria, max 40) e checked facoltativo (true/false). L'elenco sostituisce quello salvato. Senza checked il server mantiene la spunta che ha già per quell'id. Quando l'elenco è terminato (tutte le voci spuntate), inviarlo con state ongoing lo fa ripartire e ogni voce senza checked riparte non spuntata. Le spunte fatte su un telefono non vengono riportate a Home Assistant."
         },
         "subtitle": {
           "name": "Sottotitolo",

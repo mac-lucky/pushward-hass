@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Einträge",
-          "description": "Liste mit 1-8 Einträgen. Jeder: id (Pflicht, 1-16 Buchstaben, Ziffern, - oder _, eindeutig), label (Pflicht, max. 40) und optional checked (true/false). Die Liste ersetzt die gespeicherte. Ohne checked behält der Server das Häkchen, das er für diese id schon hat; auf dem Telefon gesetzte Häkchen werden nicht an Home Assistant gemeldet."
+          "description": "Liste mit 1-8 Einträgen. Jeder: id (Pflicht, 1-16 Buchstaben, Ziffern, - oder _, eindeutig), label (Pflicht, max. 40) und optional checked (true/false). Die Liste ersetzt die gespeicherte. Ohne checked behält der Server das Häkchen, das er für diese id schon hat. Ist die Liste beendet (alle Einträge abgehakt), startet ein erneutes Senden mit state ongoing sie neu, und jeder Eintrag ohne checked beginnt unabgehakt. Auf dem Telefon gesetzte Häkchen werden nicht an Home Assistant gemeldet."
         },
         "subtitle": {
           "name": "Untertitel",

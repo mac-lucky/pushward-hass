@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Item",
-          "description": "Daftar 1-8 item. Masing-masing: id (wajib, 1-16 huruf, angka, - atau _, unik), label (wajib, maks. 40), dan checked opsional (true/false). Daftar ini menggantikan yang tersimpan. Tanpa checked, server mempertahankan centang yang sudah dimilikinya untuk id itu; centang dari ponsel tidak dilaporkan kembali ke Home Assistant."
+          "description": "Daftar 1-8 item. Masing-masing: id (wajib, 1-16 huruf, angka, - atau _, unik), label (wajib, maks. 40), dan checked opsional (true/false). Daftar ini menggantikan yang tersimpan. Tanpa checked, server mempertahankan centang yang sudah dimilikinya untuk id itu. Setelah daftar berakhir (semua item dicentang), mengirimnya dengan state ongoing memulainya lagi dan setiap item tanpa checked dimulai tanpa centang. Centang dari ponsel tidak dilaporkan kembali ke Home Assistant."
         },
         "subtitle": {
           "name": "Subjudul",

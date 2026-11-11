@@ -886,10 +886,16 @@ implied by the action name; you no longer pass a `template` field.
 > watch, the Mac or the Android notification, driven entirely by this action (the config flow does
 > not offer the template). `items` is a list of 1-8 rows `{ id, label, checked? }`: `id` is 1-16
 > letters, digits, `-` or `_` and unique in the list, `label` is at most 40 characters. The list
-> replaces the stored one on every call, like board tiles. Leave `checked` out of a row to keep
-> whatever tick the server already has for that id, so re-sending the list doesn't undo a tick made
-> on the phone; `true`/`false` sets it. Once every row is ticked the server ends the activity a few
-> seconds later.
+> replaces the stored one on every call, like board tiles. While the list is ongoing, leave `checked`
+> out of a row to keep whatever tick the server already has for that id, so re-sending the list
+> doesn't undo a tick made on the phone; `true`/`false` sets it. Once every row is ticked the server
+> ends the activity a few seconds later.
+>
+> An ended list works differently: a call with `state: ongoing` starts a new run, and every row sent
+> without `checked` starts unticked. An automation that re-sends the list on a repeating schedule
+> therefore brings it back, all unticked, on every device once someone ticks the last row. Send the
+> list once per run instead (a morning trigger, say), or keep the ticks in Home Assistant as described
+> below and send `checked` for every row, `true` for the ones that are done.
 >
 > Home Assistant does not learn about ticks. This integration never reads an activity back, so a
 > tick on the phone changes the card and nothing in Home Assistant, and there is no event or entity

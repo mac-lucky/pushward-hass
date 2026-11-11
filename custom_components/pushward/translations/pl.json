@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Pozycje",
-          "description": "Lista 1-8 pozycji. Każda: id (wymagane, 1-16 liter, cyfr, - lub _, unikalne), label (wymagana, maks. 40) i opcjonalnie checked (true/false). Lista zastępuje zapisaną. Bez checked serwer zachowuje odhaczenie, które już ma dla tego id; odhaczenia z telefonu nie wracają do Home Assistant."
+          "description": "Lista 1-8 pozycji. Każda: id (wymagane, 1-16 liter, cyfr, - lub _, unikalne), label (wymagana, maks. 40) i opcjonalnie checked (true/false). Lista zastępuje zapisaną. Bez checked serwer zachowuje odhaczenie, które już ma dla tego id. Gdy lista się zakończyła (wszystkie pozycje odhaczone), wysłanie jej ze state ongoing zaczyna ją od nowa i każda pozycja bez checked startuje nieodhaczona. Odhaczenia z telefonu nie wracają do Home Assistant."
         },
         "subtitle": {
           "name": "Podtytuł",

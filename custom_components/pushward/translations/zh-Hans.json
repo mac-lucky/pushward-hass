@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "项目",
-          "description": "1-8 个项目的列表。每项：id（必填，1-16 个字母、数字、- 或 _，不可重复）、label（必填，最多 40）以及可选的 checked（true/false）。该列表会替换已保存的列表。省略 checked 时，服务器保留它已为该 id 记录的勾选状态；在手机上做的勾选不会回报给 Home Assistant。"
+          "description": "1-8 个项目的列表。每项：id（必填，1-16 个字母、数字、- 或 _，不可重复）、label（必填，最多 40）以及可选的 checked（true/false）。该列表会替换已保存的列表。省略 checked 时，服务器保留它已为该 id 记录的勾选状态。清单结束后（所有项目均已勾选），以 state ongoing 再次发送会让清单重新开始，未带 checked 的项目都从未勾选开始。在手机上做的勾选不会回报给 Home Assistant。"
         },
         "subtitle": {
           "name": "副标题",

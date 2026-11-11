@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Mga item",
-          "description": "Listahan ng 1-8 item. Bawat isa: id (kailangan, 1-16 titik, numero, - o _, natatangi), label (kailangan, hanggang 40) at opsyonal na checked (true/false). Pinapalitan ng listahan ang nakaimbak. Kapag walang checked, pinapanatili ng server ang tsek na hawak na nito para sa id na iyon; hindi ibinabalik sa Home Assistant ang mga tsek na ginawa sa telepono."
+          "description": "Listahan ng 1-8 item. Bawat isa: id (kailangan, 1-16 titik, numero, - o _, natatangi), label (kailangan, hanggang 40) at opsyonal na checked (true/false). Pinapalitan ng listahan ang nakaimbak. Kapag walang checked, pinapanatili ng server ang tsek na hawak na nito para sa id na iyon. Kapag tapos na ang listahan (may tsek na lahat ng item), ang pagpapadala nito na may state ongoing ay nagsisimula ulit dito at bawat item na walang checked ay nagsisimulang walang tsek. Hindi ibinabalik sa Home Assistant ang mga tsek na ginawa sa telepono."
         },
         "subtitle": {
           "name": "Subtitle",

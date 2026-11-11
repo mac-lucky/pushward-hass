@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Mục",
-          "description": "Danh sách 1-8 mục. Mỗi mục: id (bắt buộc, 1-16 chữ cái, chữ số, - hoặc _, không trùng), label (bắt buộc, tối đa 40) và checked tùy chọn (true/false). Danh sách thay thế danh sách đã lưu. Không có checked thì máy chủ giữ dấu tích đã có cho id đó; dấu tích trên điện thoại không được báo lại cho Home Assistant."
+          "description": "Danh sách 1-8 mục. Mỗi mục: id (bắt buộc, 1-16 chữ cái, chữ số, - hoặc _, không trùng), label (bắt buộc, tối đa 40) và checked tùy chọn (true/false). Danh sách thay thế danh sách đã lưu. Không có checked thì máy chủ giữ dấu tích đã có cho id đó. Khi danh sách đã kết thúc (mọi mục đều đã tích), gửi lại với state ongoing sẽ bắt đầu lại danh sách và mọi mục không có checked đều bắt đầu ở trạng thái chưa tích. Dấu tích trên điện thoại không được báo lại cho Home Assistant."
         },
         "subtitle": {
           "name": "Phụ Đề",

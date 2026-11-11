@@ -1626,7 +1626,7 @@
         },
         "items": {
           "name": "Items",
-          "description": "List of 1-8 items. Each: id (required, 1-16 letters, digits, - or _, unique), label (required, max 40) and optional checked (true/false). The list replaces the stored one. Leave checked out to keep the tick the server already has for that id; ticks made on a phone are not reported back to Home Assistant."
+          "description": "List of 1-8 items. Each: id (required, 1-16 letters, digits, - or _, unique), label (required, max 40) and optional checked (true/false). The list replaces the stored one. Leave checked out to keep the tick the server already has for that id. Once the list has ended (every item ticked), sending it with state ongoing starts it over and every item without checked starts unticked. Ticks made on a phone are not reported back to Home Assistant."
         },
         "subtitle": {
           "name": "Subtitle",
