@@ -1352,6 +1352,58 @@ def test_heatmap_sends_nothing_without_a_number(cells):
     assert map_widget_content(hass, config, cells=cells) is None
 
 
-def test_heatmap_unavailable_entity_sends_nothing():
-    hass, config = _heatmap("unavailable")
-    assert map_widget_content(hass, config, cells=list(_STEP_DAYS)) is None
+@pytest.mark.parametrize("state_value", ["unavailable", "unknown"])
+def test_heatmap_sends_while_the_entity_is_unavailable(state_value):
+    """An inverter's energy sensor is unavailable all night; its statistics still fill the
+    days. Home Assistant keeps the entity's name and unit on an unavailable state, so the
+    content matches what the available entity renders."""
+    hass, config = _heatmap(state_value)
+
+    content = map_widget_content(hass, config, cells=list(_STEP_DAYS))
+
+    available_hass, _ = _heatmap()
+    assert content == map_widget_content(available_hass, config, cells=list(_STEP_DAYS))
+    assert content["cells"] == _STEP_DAYS
+    assert content["value"] == 4200.0
+    assert (content["label"], content["unit"]) == ("Daily steps", "steps")
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+
+
+def test_heatmap_without_any_state_sends_the_cells_with_the_configured_chrome():
+    """A removed entity has no state at all; its statistics stay, and only the stored config
+    supplies the label, unit and icon."""
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP,
+            CONF_ENTITY_ID: "sensor.retired",
+            CONF_MIN_VALUE: 0.0,
+            CONF_MAX_VALUE: 10000.0,
+            CONF_LABEL: "Steps",
+            CONF_UNIT: "k",
+            CONF_ICON: "mdi:walk",
+        }
+    )
+
+    content = map_widget_content(_make_hass({}), config, cells=list(_STEP_DAYS))
+
+    assert content["cells"] == _STEP_DAYS
+    assert content["value"] == 4200.0
+    assert (content["label"], content["unit"], content["icon"]) == ("Steps", "k", "mdi:walk")
+    assert (content["min_value"], content["max_value"]) == (0.0, 10000.0)
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+
+    # Nothing configured: nothing made up, and the merge patch keeps what the server has.
+    bare = make_widget_config(
+        **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP, CONF_ENTITY_ID: "sensor.retired", CONF_MIN_VALUE: None}
+    )
+    content = map_widget_content(_make_hass({}), bare, cells=list(_STEP_DAYS))
+    assert "label" not in content and "unit" not in content
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+
+
+@pytest.mark.parametrize("state_value", ["unavailable", None], ids=["unavailable", "no_state"])
+def test_heatmap_unavailable_entity_without_a_number_sends_nothing(state_value):
+    hass, config = _heatmap(state_value or "4200")
+    if state_value is None:
+        hass = _make_hass({})
+    assert map_widget_content(hass, config, cells=[None] * 7) is None

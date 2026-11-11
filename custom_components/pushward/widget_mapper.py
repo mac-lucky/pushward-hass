@@ -313,7 +313,8 @@ def _group_chrome(config: dict) -> dict:
     """Static icon/label/colors/tap-action for a multi-entity template.
 
     No single state anchors an attribute override, so only the static config
-    applies - the same rule stat_list has always followed.
+    applies - the same rule stat_list has always followed. A heatmap whose
+    entity has no state at all uses it too.
     """
     content: dict = {}
     icon = config.get(CONF_ICON) or ""
@@ -377,12 +378,21 @@ def _render_content(
     entity_id = config.get(CONF_ENTITY_ID)
     state = hass.states.get(entity_id) if entity_id else None
 
-    # For single-entity templates, unavailable entity means skip the update.
+    # For single-entity templates, unavailable entity means skip the update,
+    # except status and heatmap.
     if _is_unavailable(state):
         if template == WIDGET_TEMPLATE_STATUS:
             # status template can render without a numeric value — emit minimal content.
             return _map_status_static(config)
-        return None
+        if template != WIDGET_TEMPLATE_HEATMAP:
+            return None
+        # heatmap cells are statistics, not the live state, so an inverter that is
+        # unavailable all night, or a retired device, still has days to send.
+        if state is None:
+            content = _group_chrome(config)
+            if unit := str(config.get(CONF_UNIT, "") or ""):
+                content["unit"] = _truncate(unit, WIDGET_UNIT_MAX)
+            return _map_heatmap(None, config, content, cells)
 
     assert state is not None  # narrowing for type-checkers
 
@@ -569,11 +579,11 @@ def _map_trend(state: State, config: dict, content: dict, points: list[float] | 
 
     content["value"] = value
     content["points"] = [float(p) for p in series[-WIDGET_MAX_TREND_POINTS:]]
-    _apply_optional_bounds(state, config, content)
+    _apply_optional_bounds(config, content)
     return content
 
 
-def _apply_optional_bounds(state: State, config: dict, content: dict) -> None:
+def _apply_optional_bounds(config: dict, content: dict) -> None:
     """Optional min/max chart bounds (trend, heatmap): each may be unset, but never min >= max."""
     min_val = _finite(_coerce_float(config.get(CONF_MIN_VALUE)))
     max_val = _finite(_coerce_float(config.get(CONF_MAX_VALUE)))
@@ -581,7 +591,7 @@ def _apply_optional_bounds(state: State, config: dict, content: dict) -> None:
         _LOGGER.warning(
             "%s widget for %s has min_value >= max_value (%s >= %s); ignoring both bounds",
             config.get(CONF_WIDGET_TEMPLATE),
-            state.entity_id,
+            config.get(CONF_ENTITY_ID),
             min_val,
             max_val,
         )
@@ -592,22 +602,25 @@ def _apply_optional_bounds(state: State, config: dict, content: dict) -> None:
         content["max_value"] = max_val
 
 
-def _map_heatmap(state: State, config: dict, content: dict, cells: list[float | None] | None) -> dict | None:
+def _map_heatmap(state: State | None, config: dict, content: dict, cells: list[float | None] | None) -> dict | None:
     """heatmap template: one recorder value per local day, oldest first, ending today.
 
     Nothing is sent while every cell is empty (the server refuses an all-null
-    grid). The label and unit fall back to the entity's own, and the headline
-    value is today's cell, null until today has statistics.
+    grid); the live state's availability does not matter. The headline value is
+    today's cell, null until today has statistics. The label and unit fall back
+    to the entity's name and unit, which Home Assistant keeps on an unavailable
+    state too; with no state at all only the configured ones are sent.
     """
     if not cells or all(cell is None for cell in cells):
         return None
     content["cells"] = cells
     content["value"] = cells[-1]
-    if "label" not in content and (name := state.attributes.get("friendly_name")):
+    attrs = state.attributes if state is not None else {}
+    if "label" not in content and (name := attrs.get("friendly_name")):
         content["label"] = _truncate(str(name), WIDGET_LABEL_MAX)
-    if "unit" not in content and (unit := state.attributes.get("unit_of_measurement")):
+    if "unit" not in content and (unit := attrs.get("unit_of_measurement")):
         content["unit"] = _truncate(str(unit), WIDGET_UNIT_MAX)
-    _apply_optional_bounds(state, config, content)
+    _apply_optional_bounds(config, content)
     return content
 
 

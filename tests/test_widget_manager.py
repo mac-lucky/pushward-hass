@@ -1277,6 +1277,34 @@ async def test_heatmap_creates_from_daily_statistics(hass: HomeAssistant) -> Non
     await manager.async_stop()
 
 
+async def test_heatmap_sends_while_the_entity_is_unavailable(hass: HomeAssistant, freezer) -> None:
+    """A solar inverter goes unavailable at sunset: the widget is still created on a restart at
+    night, and the next hourly read still sends the evening's statistics."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-12T20:30:00+01:00")
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "unavailable", {"friendly_name": "Solar", "unit_of_measurement": "kWh"})
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=list(_WEEK))
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+        api.create_widget.assert_awaited_once()
+        assert api.create_widget.call_args.kwargs["content"]["cells"] == _WEEK
+
+        read.return_value = [*_WEEK[:-1], 9.0]
+        refresh = datetime.fromisoformat("2026-11-12T21:05:00+01:00")
+        freezer.move_to(refresh)
+        async_fire_time_changed(hass, refresh)
+        await hass.async_block_till_done()
+
+    content = api.patch_widget.call_args.args[1]["content"]
+    assert (content["cells"][-1], content["value"]) == (9.0, 9.0)
+    assert (content["label"], content["unit"]) == ("Solar", "kWh")
+    assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+    await manager.async_stop()
+
+
 async def test_heatmap_state_changes_never_read_the_recorder(hass: HomeAssistant, freezer) -> None:
     """Statistics only move at the hourly compile, so however many state changes arrive, and
     however far apart, they reuse the last read; the hourly read is what picks up the next hour."""

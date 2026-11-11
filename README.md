@@ -487,6 +487,11 @@ exception is the first change after local midnight, which starts the new day's c
 sent when a daily value actually moved. If the entity's history goes away, the widget stops sending
 and logs one warning instead of pushing an empty grid.
 
+The live state does not matter: the widget keeps sending while the entity is unavailable (an
+inverter's energy sensor at night) and after it is removed, as long as its statistics have a number.
+Home Assistant keeps the entity's name and unit on an unavailable state, so the label and unit stay
+the same; once the entity has no state at all, only the configured Label and Unit are sent.
+
 #### Self-advancing progress
 
 Give a `progress` widget a **Start Date Attribute** and an **End Date Attribute** and the bar advances on the
