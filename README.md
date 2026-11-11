@@ -364,12 +364,14 @@ A two-step flow mirroring entities. **Step 1** picks the entity, a widget templa
 
 `countdown` here is the widget template, unrelated to the activity template of the same name.
 
-**`trend`, `countdown`, `battery`, `schedule` and `flow` need the PushWard iOS app 1.6.0 or newer.** Older builds cannot decode
-them, and a single entry they cannot decode makes the entire widget list unavailable in the app
-until that widget is deleted -- not just the one new widget. Update every device on the account
-before adding one, especially if the account is shared with a device you have not opened in a while.
-The original five templates are unaffected. `heatmap` needs the next PushWard app release or later;
-builds before it show an "update the app" placeholder in its place.
+**`trend`, `countdown`, `battery`, `schedule` and `flow` need the PushWard iOS app 1.6.0 or newer,
+and `heatmap` the next PushWard app release.** The original five (`value`, `progress`, `status`,
+`gauge`, `stat_list`) work on every build. iPhone, iPad, watch and Mac builds older than 1.6.0
+simply don't see a widget of any other template: PushWard leaves it out of their widget list, and
+the rest of the list works as before. Builds from 1.6.0 up to the release that draws a template show
+an "update the app" placeholder in its place, and the Android app shows the same placeholder for any
+template it doesn't know yet. Update every device on the account to see the new widget, especially
+if the account is shared with a device you have not opened in a while.
 
 **Step 2** configures the widget (publishing widgets requires the `widgets` key permission).
 
