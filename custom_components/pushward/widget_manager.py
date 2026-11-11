@@ -34,6 +34,7 @@ from homeassistant.helpers.event import (
     async_track_time_interval,
 )
 from homeassistant.helpers.storage import Store
+from homeassistant.util import dt as dt_util
 
 from .api import (
     PushWardApiClient,
@@ -149,6 +150,7 @@ class TrackedWidget:
     # send), and whether the warning for an empty read has been logged.
     cells: list | None = None
     cells_read_at: float | None = None
+    cells_read_day: Any = None  # local date of the last read
     cells_missing_warned: bool = False
 
 
@@ -712,10 +714,17 @@ class WidgetManager:
         if cfg.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_HEATMAP:
             return None
         now = time.monotonic()
-        if tracked.cells_read_at is not None and now - tracked.cells_read_at < WIDGET_HEATMAP_READ_INTERVAL:
+        today = dt_util.now().date()
+        # A read from yesterday is never reused: its last cell is the wrong day.
+        if (
+            tracked.cells_read_at is not None
+            and tracked.cells_read_day == today
+            and now - tracked.cells_read_at < WIDGET_HEATMAP_READ_INTERVAL
+        ):
             return tracked.cells
         # Stamped before the read: a new-day reset landing during it must win.
         tracked.cells_read_at = now
+        tracked.cells_read_day = today
         try:
             weeks = int(cfg.get(CONF_HEATMAP_WEEKS) or DEFAULT_HEATMAP_WEEKS)
         except (TypeError, ValueError):

@@ -1339,6 +1339,30 @@ async def test_heatmap_reads_again_after_local_midnight(hass: HomeAssistant, fre
     await manager.async_stop()
 
 
+async def test_heatmap_never_reuses_a_read_from_yesterday(hass: HomeAssistant, freezer) -> None:
+    """A read taken before midnight ends on yesterday, so a send just after midnight reads again
+    even inside the read interval."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-11T22:58:00+00:00")  # 23:58 in Warsaw
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "1")
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=list(_WEEK))
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+        assert read.await_count == 1
+
+        read.return_value = [*_WEEK[1:], None]
+        freezer.move_to("2026-11-11T23:02:00+00:00")  # 00:02, four minutes after the read
+        hass.states.async_set("sensor.energy", "2")
+        await hass.async_block_till_done()
+
+    assert read.await_count == 2
+    assert api.patch_widget.call_args.args[1]["content"]["cells"] == [*_WEEK[1:], None]
+    await manager.async_stop()
+
+
 async def test_heatmap_reads_each_hour_once_compiled_without_a_state_change(hass: HomeAssistant, freezer) -> None:
     """A meter that changed at 07:10 and then sits still: the 07:00-08:00 hour is compiled
     after 08:00, and the 08:05 read sends it without waiting for another state change."""
