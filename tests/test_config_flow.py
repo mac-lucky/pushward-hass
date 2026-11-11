@@ -5142,6 +5142,8 @@ def test_parse_entity_input_defaults_media_controls_on() -> None:
 # What the recorder's list_statistic_ids reports for a total and for a measurement.
 _TOTAL_STATS = {"statistic_id": "sensor.energy", "has_sum": True, "has_mean": False, "mean_type": 0}
 _MEASUREMENT_STATS = {"statistic_id": "sensor.temperature", "has_sum": False, "has_mean": True, "mean_type": 1}
+# A measurement_angle sensor: a circular mean, compiled without min or max.
+_ANGLE_STATS = {"statistic_id": "sensor.wind_direction", "has_sum": False, "has_mean": False, "mean_type": 2}
 _STATS_LOOKUP = "custom_components.pushward.config_flow.async_statistics_info"
 
 
@@ -5208,6 +5210,8 @@ async def test_heatmap_widget_refuses_an_entity_without_statistics(hass: HomeAss
     [
         pytest.param("sensor.temperature", _MEASUREMENT_STATS, "change", "max", id="change_needs_a_sum"),
         pytest.param("sensor.energy", _TOTAL_STATS, "mean", "change", id="mean_needs_a_measurement"),
+        pytest.param("sensor.wind_direction", _ANGLE_STATS, "max", "mean", id="max_needs_an_arithmetic_mean"),
+        pytest.param("sensor.wind_direction", _ANGLE_STATS, "min", "mean", id="min_needs_an_arithmetic_mean"),
     ],
 )
 async def test_heatmap_widget_refuses_a_daily_value_the_statistics_lack(
@@ -5270,6 +5274,47 @@ async def test_heatmap_widget_reconfigure_keeps_its_settings(hass: HomeAssistant
     assert result["reason"] == "reconfigure_successful"
     data = entry.subentries[subentry_id].data
     assert (data[CONF_HEATMAP_WEEKS], data[CONF_HEATMAP_AGGREGATE]) == (8, "max")
+
+
+async def test_heatmap_widget_reconfigure_to_another_entity_redefaults_the_daily_value(hass: HomeAssistant) -> None:
+    """A stored daily value the new entity's statistics lack is replaced by that entity's default."""
+    widget = make_widget_config(
+        widget_template=WIDGET_TEMPLATE_HEATMAP,
+        entity_id="sensor.energy",
+        slug="ha-energy",
+        min_value=None,
+        max_value=None,
+        heatmap_weeks=8,
+        heatmap_aggregate="change",
+    )
+    entry = _mock_entry(
+        subentries_data=[
+            ConfigSubentryData(
+                data=widget,
+                subentry_type=SUBENTRY_TYPE_WIDGET,
+                title=widget[CONF_WIDGET_NAME],
+                unique_id=widget[CONF_SLUG],
+            )
+        ]
+    )
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    with patch(_STATS_LOOKUP, AsyncMock(return_value=_MEASUREMENT_STATS)):
+        result = await hass.config_entries.subentries.async_configure(
+            result["flow_id"],
+            user_input={CONF_ENTITY_ID: "sensor.temperature", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP},
+        )
+    defaults = _all_field_defaults(result["data_schema"])
+    assert (defaults[CONF_HEATMAP_WEEKS], defaults[CONF_HEATMAP_AGGREGATE]) == (8, "mean")
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+    assert result["type"] is FlowResultType.ABORT
+    data = entry.subentries[subentry_id].data
+    assert (data[CONF_ENTITY_ID], data[CONF_HEATMAP_AGGREGATE]) == ("sensor.temperature", "mean")
 
 
 async def test_reconfigure_to_heatmap_checks_the_entity_statistics(hass: HomeAssistant) -> None:

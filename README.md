@@ -479,10 +479,11 @@ the entity's statistics don't carry. The headline number is today's cell, the la
 the entity's own, and Min / Max Value pin the color scale (leave them empty to scale from 0 to the
 largest day).
 
-Statistics are compiled once an hour, so today's cell trails the live state by up to an hour. The widget
-recomputes when it starts, at 00:05 local time (a new day, after yesterday's last hour is compiled) and
-on a state change, but a state change reads the recorder at most once every 5 minutes and only sends an
-update when a daily value actually moved. If the entity's history goes away, the widget stops sending
+Statistics are compiled once an hour, so today's cell holds the hours compiled so far and trails the live
+state by about an hour at most. The widget
+reads them when it starts, five minutes past every hour (after that hour is compiled; the 00:05 read
+starts the new local day) and on a state change, but a state change reads the recorder at most once
+every 5 minutes, and an update is only sent when a daily value actually moved. If the entity's history goes away, the widget stops sending
 and logs one warning instead of pushing an empty grid.
 
 #### Self-advancing progress

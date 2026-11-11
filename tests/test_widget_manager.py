@@ -1309,7 +1309,7 @@ async def test_heatmap_state_changes_reuse_the_last_read(hass: HomeAssistant) ->
 
 async def test_heatmap_reads_again_after_local_midnight(hass: HomeAssistant, freezer) -> None:
     await hass.config.async_set_time_zone("Europe/Warsaw")
-    freezer.move_to("2026-11-11T22:00:00+00:00")  # 23:00 in Warsaw
+    freezer.move_to("2026-11-11T22:30:00+00:00")  # 23:30 in Warsaw, past the 23:05 read
     api = _mock_api()
     hass.states.async_set("sensor.energy", "1")
     with patch(
@@ -1336,6 +1336,45 @@ async def test_heatmap_reads_again_after_local_midnight(hass: HomeAssistant, fre
     assert content["cells"] == [*_WEEK[1:], None]
     assert content["value"] is None  # today has no statistics yet
     assert_valid_widget_content(content, WIDGET_TEMPLATE_HEATMAP)
+    await manager.async_stop()
+
+
+async def test_heatmap_reads_each_hour_once_compiled_without_a_state_change(hass: HomeAssistant, freezer) -> None:
+    """A meter that changed at 07:10 and then sits still: the 07:00-08:00 hour is compiled
+    after 08:00, and the 08:05 read sends it without waiting for another state change."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-12T07:10:00+01:00")
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "1")
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=list(_WEEK))
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+
+        # Before the read minute nothing happens.
+        early = datetime.fromisoformat("2026-11-12T08:00:30+01:00")
+        freezer.move_to(early)
+        async_fire_time_changed(hass, early)
+        await hass.async_block_till_done()
+        assert read.await_count == 1
+
+        read.return_value = [*_WEEK[:-1], 9.0]
+        refresh = datetime.fromisoformat("2026-11-12T08:05:00+01:00")
+        freezer.move_to(refresh)
+        async_fire_time_changed(hass, refresh)
+        await hass.async_block_till_done()
+
+        # The next hour reads again; unchanged values send nothing.
+        later = datetime.fromisoformat("2026-11-12T09:05:00+01:00")
+        freezer.move_to(later)
+        async_fire_time_changed(hass, later)
+        await hass.async_block_till_done()
+
+    assert read.await_count == 3
+    api.patch_widget.assert_awaited_once()
+    content = api.patch_widget.call_args.args[1]["content"]
+    assert (content["cells"][-1], content["value"]) == (9.0, 9.0)
     await manager.async_stop()
 
 

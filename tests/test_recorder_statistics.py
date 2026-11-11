@@ -12,13 +12,18 @@ from datetime import date, datetime, timedelta
 import pytest
 from homeassistant.components.recorder.models import StatisticMeanType
 from homeassistant.components.recorder.statistics import async_import_statistics
-from homeassistant.const import UnitOfEnergy, UnitOfTemperature
+from homeassistant.const import DEGREE, UnitOfEnergy, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.components.recorder.common import async_wait_recording_done
 
-from custom_components.pushward.recorder_history import async_daily_values, async_statistics_info, statistics_has_mean
+from custom_components.pushward.recorder_history import (
+    async_daily_values,
+    async_statistics_info,
+    statistics_has_mean,
+    statistics_has_min_max,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -90,6 +95,24 @@ async def test_daily_values_from_real_statistics_across_dst(hass: HomeAssistant,
     measurement = await async_statistics_info(hass, "sensor.temperature")
     assert total["has_sum"] and not statistics_has_mean(total)
     assert statistics_has_mean(measurement) and not measurement["has_sum"]
+    assert statistics_has_min_max(measurement) and not statistics_has_min_max(total)
+
+
+async def test_circular_statistics_carry_a_mean_but_no_min_or_max(hass: HomeAssistant, freezer) -> None:
+    """A measurement_angle sensor (wind direction) is compiled as a circular mean alone."""
+    freezer.move_to("2026-10-27T10:00:00+00:00")
+    meta = {
+        **_meta("sensor.wind_direction", total=False),
+        "has_mean": False,
+        "mean_type": StatisticMeanType.CIRCULAR,
+        "unit_of_measurement": DEGREE,
+        "unit_class": None,
+    }
+    async_import_statistics(hass, meta, [{"start": dt_util.utcnow() - timedelta(hours=2), "mean": 180.0}])
+    await async_wait_recording_done(hass)
+
+    info = await async_statistics_info(hass, "sensor.wind_direction")
+    assert statistics_has_mean(info) and not statistics_has_min_max(info)
 
 
 async def test_no_statistics(hass: HomeAssistant) -> None:

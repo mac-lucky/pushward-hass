@@ -129,7 +129,7 @@ class TrackedWidget:
     unsub_state: Callable[[], None] | None = None
     unsub_poll: Callable[[], None] | None = None
     unsub_heartbeat: Callable[[], None] | None = None
-    unsub_new_day: Callable[[], None] | None = None
+    unsub_hourly: Callable[[], None] | None = None
     registry_icon: str | None = None
     pending_task: asyncio.Task | None = field(default=None, repr=False)
     # A change landing while a send is in flight re-sends the newest state after.
@@ -376,11 +376,12 @@ class WidgetManager:
         """Attach event-track or polling timer based on trigger mode."""
         self._arm_heartbeat(tracked)
         if tracked.config.get(CONF_WIDGET_TEMPLATE) == WIDGET_TEMPLATE_HEATMAP:
-            # Local time: the grid's last cell is today, so a new day needs a new read.
-            tracked.unsub_new_day = async_track_time_change(
+            # Statistics land once an hour, after any state change that went into
+            # them, so each hour is read again once compiled. The 00:05 read starts
+            # the new day's cell (local time: the grid's last cell is today).
+            tracked.unsub_hourly = async_track_time_change(
                 self._hass,
-                partial(self._on_new_day, tracked.config[CONF_SLUG]),
-                hour=0,
+                partial(self._on_hourly_read, tracked.config[CONF_SLUG]),
                 minute=WIDGET_HEATMAP_REFRESH_MINUTE,
                 second=0,
             )
@@ -421,9 +422,9 @@ class WidgetManager:
         if tracked.unsub_heartbeat:
             tracked.unsub_heartbeat()
             tracked.unsub_heartbeat = None
-        if tracked.unsub_new_day:
-            tracked.unsub_new_day()
-            tracked.unsub_new_day = None
+        if tracked.unsub_hourly:
+            tracked.unsub_hourly()
+            tracked.unsub_hourly = None
 
     def _arm_heartbeat(self, tracked: TrackedWidget) -> None:
         """Keep a stale_after widget alive when its entity sits still.
@@ -463,7 +464,7 @@ class WidgetManager:
         self._schedule_update(tracked)
 
     @callback
-    def _on_new_day(self, slug: str, _now: Any) -> None:
+    def _on_hourly_read(self, slug: str, _now: Any) -> None:
         tracked = self._tracked.get(slug)
         if tracked is None:
             return

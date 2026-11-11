@@ -27,6 +27,9 @@ _LOGGER = logging.getLogger(__name__)
 # window stays fully covered regardless of retention.
 STATS_SHORT_TERM_MAX_MINUTES = 1440  # 24 h
 
+# StatisticMeanType.ARITHMETIC; the recorder is imported lazily here, so the enum is not.
+_MEAN_TYPE_ARITHMETIC = 1
+
 
 def downsample_evenly(points: list, max_points: int) -> list:
     """Reduce a time-sorted point list to at most max_points.
@@ -204,9 +207,20 @@ async def async_statistics_info(hass: HomeAssistant, entity_id: str) -> dict | N
 
 
 def statistics_has_mean(info: dict) -> bool:
-    """True when the statistics carry mean/min/max (a measurement rather than a total)."""
+    """True when the statistics carry a mean (a measurement rather than a total)."""
     # mean_type replaced has_mean; older Home Assistant releases only send has_mean.
     return bool(info.get("mean_type") or info.get("has_mean"))
+
+
+def statistics_has_min_max(info: dict) -> bool:
+    """True when the statistics carry min and max: an arithmetic mean only.
+
+    A circular mean (state_class measurement_angle, such as wind direction) is
+    compiled as the mean alone.
+    """
+    if (mean_type := info.get("mean_type")) is None:
+        return bool(info.get("has_mean"))
+    return mean_type == _MEAN_TYPE_ARITHMETIC
 
 
 async def async_daily_values(

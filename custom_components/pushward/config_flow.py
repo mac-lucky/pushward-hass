@@ -293,7 +293,7 @@ from .const import (
 from .content_mapper import get_domain_defaults, is_valid_color, sanitize_slug
 from .e2e import E2EError, key_id, parse_key
 from .media_control import new_control_token
-from .recorder_history import async_statistics_info, statistics_has_mean
+from .recorder_history import async_statistics_info, statistics_has_mean, statistics_has_min_max
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -3161,10 +3161,18 @@ def _default_heatmap_aggregate(info: dict) -> str:
     return HEATMAP_AGGREGATE_CHANGE if info.get("has_sum") else HEATMAP_AGGREGATE_MEAN
 
 
+def _heatmap_aggregate_supported(aggregate: str | None, info: dict) -> bool:
+    """Whether the entity's recorder statistics carry this daily statistic."""
+    if aggregate == HEATMAP_AGGREGATE_CHANGE:
+        return bool(info.get("has_sum"))
+    if aggregate == HEATMAP_AGGREGATE_MEAN:
+        return statistics_has_mean(info)
+    return aggregate in HEATMAP_AGGREGATES and statistics_has_min_max(info)
+
+
 def _check_heatmap_aggregate(aggregate: str, info: dict) -> None:
     """Refuse a daily statistic the entity's recorder statistics do not carry."""
-    supported = info.get("has_sum") if aggregate == HEATMAP_AGGREGATE_CHANGE else statistics_has_mean(info)
-    if not supported:
+    if not _heatmap_aggregate_supported(aggregate, info):
         raise vol.Invalid("heatmap_aggregate_unsupported", path=[CONF_HEATMAP_AGGREGATE])
 
 
@@ -3289,8 +3297,11 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                 )
 
         defaults = dict(self._details_defaults) if self._is_reconfigure else {}
-        if template == WIDGET_TEMPLATE_HEATMAP:
-            defaults.setdefault(CONF_HEATMAP_AGGREGATE, _default_heatmap_aggregate(self._statistics_info))
+        # A stored choice the (possibly new) entity cannot serve falls back to its default.
+        if template == WIDGET_TEMPLATE_HEATMAP and not _heatmap_aggregate_supported(
+            defaults.get(CONF_HEATMAP_AGGREGATE), self._statistics_info
+        ):
+            defaults[CONF_HEATMAP_AGGREGATE] = _default_heatmap_aggregate(self._statistics_info)
         expand = _sections_to_expand(WIDGET_SECTIONS, _WIDGET_TOPLEVEL, errors)
         schema = _widget_details_schema(entity_id, template, defaults=defaults, expand=expand)
         if errors and user_input is not None:
