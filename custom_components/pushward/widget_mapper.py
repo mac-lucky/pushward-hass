@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, State
+from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 
 from .const import (
@@ -838,6 +839,34 @@ def _map_status_static(config: dict) -> dict:
     return content
 
 
+def _state_at_display_precision(hass: HomeAssistant, entity_id: str, raw: str) -> str:
+    """Round a numeric sensor state the way HA's own UI shows it.
+
+    The state string carries the device's full precision ("23.06"); HA displays it
+    at the user's display_precision, else the integration's suggested one. A
+    non-numeric state, or an entity with neither set, is returned unchanged.
+    """
+    try:
+        entry = er.async_get(hass).async_get(entity_id)
+    except (AttributeError, KeyError):
+        return raw
+    if entry is None:
+        return raw
+    opts = entry.options.get("sensor") or {}
+    precision = opts.get("display_precision")
+    if precision is None:
+        precision = opts.get("suggested_display_precision")
+    if not isinstance(precision, int) or isinstance(precision, bool):
+        return raw
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return raw
+    if not math.isfinite(value):
+        return raw
+    return f"{value:.{precision}f}"
+
+
 def _map_stat_list(hass: HomeAssistant, config: dict) -> dict | None:
     """stat_list: 1-WIDGET_MAX_STAT_ROWS rows, each binding to a separate HA entity.
 
@@ -861,6 +890,8 @@ def _map_stat_list(hass: HomeAssistant, config: dict) -> dict | None:
         raw = state.attributes.get(attr) if attr else state.state
         if raw in (None, ""):
             continue
+        if not attr:
+            raw = _state_at_display_precision(hass, entity_id, raw)
         out: dict = {"label": label, "value": _truncate(str(raw), WIDGET_STAT_VALUE_MAX)}
         unit = row.get(CONF_UNIT)
         if unit:

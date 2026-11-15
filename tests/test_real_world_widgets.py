@@ -14,6 +14,7 @@ from unittest.mock import AsyncMock, patch
 
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 
 from custom_components.pushward.const import (
     CONF_BATTERY_DEVICES,
@@ -34,6 +35,7 @@ from custom_components.pushward.const import (
     CONF_UNIT,
     CONF_URL,
     CONF_URL_TITLE,
+    CONF_VALUE_ATTRIBUTE,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_STALE_AFTER,
@@ -704,3 +706,33 @@ async def test_temperature_trend_over_the_day(hass: HomeAssistant) -> None:
     assert_valid_widget_content(patched, WIDGET_TEMPLATE_TREND)
 
     await manager.async_stop()
+
+
+async def test_stat_list_rounds_states_to_display_precision(hass: HomeAssistant) -> None:
+    """A row reading the state shows it at HA's display precision; the rest stay raw."""
+    registry = er.async_get(hass)
+    suggested = registry.async_get_or_create("sensor", "test", "suggested", suggested_object_id="suggested")
+    registry.async_update_entity_options(suggested.entity_id, "sensor", {"suggested_display_precision": 1})
+    override = registry.async_get_or_create("sensor", "test", "override", suggested_object_id="override")
+    registry.async_update_entity_options(
+        override.entity_id, "sensor", {"suggested_display_precision": 2, "display_precision": 0}
+    )
+    hass.states.async_set(suggested.entity_id, "23.06", {"reading": "23.06"})
+    hass.states.async_set(override.entity_id, "21.5")
+    hass.states.async_set("sensor.unregistered", "3.31")
+    config = make_widget_config(
+        **{
+            CONF_SLUG: "ha-precision",
+            CONF_WIDGET_NAME: "Rooms",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+            CONF_STAT_ROWS: [
+                {CONF_ENTITY_ID: suggested.entity_id, CONF_LABEL: "Suggested"},
+                {CONF_ENTITY_ID: override.entity_id, CONF_LABEL: "Override"},
+                {CONF_ENTITY_ID: "sensor.unregistered", CONF_LABEL: "Raw"},
+                {CONF_ENTITY_ID: suggested.entity_id, CONF_LABEL: "Attribute", CONF_VALUE_ATTRIBUTE: "reading"},
+            ],
+        }
+    )
+    content = map_widget_content(hass, config)
+    assert content is not None
+    assert [r["value"] for r in content["stat_rows"]] == ["23.1", "22", "3.31", "23.06"]
