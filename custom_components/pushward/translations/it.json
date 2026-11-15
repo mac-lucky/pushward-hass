@@ -2424,7 +2424,7 @@
                 "widget_style_medium": "Stile del widget medio della schermata Home. Non impostato usa lo Stile qui sopra.",
                 "widget_style_large": "Stile del widget grande della schermata Home. Non impostato usa lo Stile qui sopra.",
                 "widget_style_lock_screen": "Stile dei widget della schermata di blocco di iPhone. Non impostato usa lo Stile qui sopra. Android non ha widget nella schermata di blocco.",
-                "widget_density": "La spaziatura delle righe in tutte le dimensioni: Compatta le dispone su due colonne per farne stare fino a 6, Ampio mantiene una colonna con righe più grandi, Automatico le adatta alla dimensione. Lascia Non impostato per usare la Densità righe scelta nell'app PushWard.",
+                "widget_density": "La spaziatura delle righe in tutte le dimensioni: Compatta le dispone su due colonne per farne stare fino a 6, Ampia mantiene una colonna con righe più grandi, Automatica le adatta alla dimensione. Lascia Non impostato per usare la Densità righe scelta nell'app PushWard.",
                 "widget_density_small": "Densità righe del widget piccolo della schermata Home. Non impostato usa la Densità righe qui sopra.",
                 "widget_density_medium": "Densità righe del widget medio della schermata Home. Non impostato usa la Densità righe qui sopra.",
                 "widget_density_large": "Densità righe del widget grande della schermata Home. Non impostato usa la Densità righe qui sopra.",
@@ -2755,9 +2755,9 @@
     "widget_density": {
       "options": {
         "app": "Non impostato",
-        "auto": "Automatico",
+        "auto": "Automatica",
         "compact": "Compatta",
-        "comfortable": "Ampio"
+        "comfortable": "Ampia"
       }
     }
   }

@@ -2424,7 +2424,7 @@
                 "widget_style_medium": "Estilo del widget mediano de la pantalla de inicio. Sin definir usa el Estilo de arriba.",
                 "widget_style_large": "Estilo del widget grande de la pantalla de inicio. Sin definir usa el Estilo de arriba.",
                 "widget_style_lock_screen": "Estilo de los widgets de la pantalla de bloqueo del iPhone. Sin definir usa el Estilo de arriba. Android no tiene widgets en la pantalla de bloqueo.",
-                "widget_density": "Cómo se espacian las filas en todos los tamaños: Compacta las reparte en dos columnas para que quepan hasta 6 filas, Amplio mantiene una columna con filas más grandes y Automático las ajusta al tamaño. Déjalo en Sin definir para usar la Densidad de filas elegida en la app PushWard.",
+                "widget_density": "Cómo se espacian las filas en todos los tamaños: Compacta las reparte en dos columnas para que quepan hasta 6 filas, Amplia mantiene una columna con filas más grandes y Automática las ajusta al tamaño. Déjalo en Sin definir para usar la Densidad de filas elegida en la app PushWard.",
                 "widget_density_small": "Densidad de filas del widget pequeño de la pantalla de inicio. Sin definir usa la Densidad de filas de arriba.",
                 "widget_density_medium": "Densidad de filas del widget mediano de la pantalla de inicio. Sin definir usa la Densidad de filas de arriba.",
                 "widget_density_large": "Densidad de filas del widget grande de la pantalla de inicio. Sin definir usa la Densidad de filas de arriba.",
@@ -2755,9 +2755,9 @@
     "widget_density": {
       "options": {
         "app": "Sin definir",
-        "auto": "Automático",
+        "auto": "Automática",
         "compact": "Compacta",
-        "comfortable": "Amplio"
+        "comfortable": "Amplia"
       }
     }
   }
