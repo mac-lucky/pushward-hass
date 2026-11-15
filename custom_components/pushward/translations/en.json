@@ -2390,7 +2390,7 @@
             "min_value": "Minimum value for the gauge range.",
             "max_value": "Maximum value for the gauge range.",
             "severity": "Status severity (info, warning, critical, success).",
-            "stat_rows": "Up to 6 rows, each binding a separate entity: label, entity, plus optional attribute and unit. A comma-separated string is still accepted. Configure row density per widget in the PushWard app.",
+            "stat_rows": "Up to 6 rows, each binding a separate entity: label, entity, plus optional attribute and unit. A comma-separated string is still accepted. Set Row Density under Style, or per widget in the PushWard app.",
             "history_period": "How far back to seed the sparkline from the recorder when the widget starts. 0 skips the seed and the chart fills in as the entity changes.",
             "start_date_attribute": "Entity attribute holding the start of the window. Optional; on progress it makes the bar advance on device between pushes.",
             "end_date_attribute": "Entity attribute holding the end of the window. Leave empty to use the entity's own state, a timer's finishes_at, or a calendar's end_time.",
