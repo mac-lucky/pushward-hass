@@ -414,7 +414,8 @@ Compact or Comfortable), again for every size and per size.
 Leave a field on Not set and nothing is sent for it, so whatever is picked for that widget in the PushWard
 app applies (Standard and Auto if nothing is). Anything set here overrides the in-app choice for that size,
 and the app shows it as locked. Setting a field back to Not set clears it on the server at the next push.
-Moving a widget off `stat_list` drops its Row Density.
+Moving a widget off `stat_list` drops its Row Density. Home Assistant sends the whole widget again on every start
+and reload, so a style or density another client set on the same widget is replaced by what is set here.
 
 #### Battery rings
 
