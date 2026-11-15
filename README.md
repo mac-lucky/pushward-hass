@@ -66,7 +66,8 @@ The surfaces are independent (separate config, managers, and caches) and share o
 
 - **Track any HA entity** as a PushWard Live Activity (Dynamic Island + Lock Screen)
 - **10 activity templates**: generic, countdown, alert, steps, gauge, timeline, board, log, media, approval
-- **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow
+- **10 widget templates**: value, progress, gauge, status, stat_list, trend, countdown, battery, schedule, flow,
+  each with an optional [style](#style) that overrides the one picked in the app
 - **Two widget trigger modes**: `event` (state-change) or `poll` (10-3600 s interval), plus an optional
   staleness heartbeat that keeps a rarely-changing widget from greying out
 - **To-do reminders**: a push for every dated item on a to-do list, with a Done button that completes the item
@@ -387,6 +388,7 @@ The original five templates are unaffected.
 | Period Attributes / Start Key / Value Key | Where to read the period arrays and their keys (schedule) |
 | Low Band Maximum / High Band Minimum | Optional band thresholds; leave both empty to let the app derive them (schedule) |
 | Flow Nodes | Rows binding a separate entity to a slot, max 3 inputs (flow) |
+| Style | Not set (default), Standard, Bold or Classic, for every size and per size; plus Row Density on stat_list. See [Style](#style) |
 | Label / Label Attribute | Static label or an entity attribute |
 | Subtitle Attribute | Subtitle text from an attribute |
 | Timer Entity / Attribute / Style | Render the subtitle as a live countdown or count-up |
@@ -398,6 +400,21 @@ The original five templates are unaffected.
 | Stale After | Seconds before the widget greys out; blank = never (60-604800) |
 
 </details>
+
+#### Style
+
+Every template can be drawn in three styles: **Standard** (the default), **Bold**, a different take on the
+same data, and **Classic**, the layout from before the redesign.
+
+The collapsed **Style** section sets the style for every size, and below it one per size: Small, Medium and
+Large for the Home Screen, and Lock Screen for every Lock Screen widget (iPhone only; Android has none). A
+size left on **Not set** uses the style above it. On `stat_list` the same section has **Row Density** (Auto,
+Compact or Comfortable), again for every size and per size.
+
+Leave a field on Not set and nothing is sent for it, so whatever is picked for that widget in the PushWard
+app applies (Standard and Auto if nothing is). Anything set here overrides the in-app choice for that size,
+and the app shows it as locked. Setting a field back to Not set clears it on the server at the next push.
+Moving a widget off `stat_list` drops its Row Density.
 
 #### Battery rings
 
@@ -466,7 +483,7 @@ that re-stamps `updated_at` without pushing to the device.
 you genuinely need a tighter freshness window - 3600 costs about 1,440 widget updates a month per widget.
 Leave the field blank and the widget is never marked stale and no heartbeat runs.
 
-How many `stat_list` rows are visible depends on the widget size. By default a medium or large Home Screen widget shows all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3, packing in up to 6 when every value is very short (for example a single status glyph). You can change Row Density per widget in the PushWard iOS app: Compact packs two columns to show up to 6 rows on any size (labels may truncate on the small placements), and Comfortable keeps a single column with larger rows. To see all 6 rows with full labels, use a medium or large widget, or set Compact.
+How many `stat_list` rows are visible depends on the widget size. By default a medium or large Home Screen widget shows all 6 rows; the small widget shows 4 and the Lock Screen rectangular shows 3, packing in up to 6 when every value is very short (for example a single status glyph). You can change Row Density per widget in the PushWard app, or here under [Style](#style): Compact packs two columns to show up to 6 rows on any size (labels may truncate on the small placements), and Comfortable keeps a single column with larger rows. To see all 6 rows with full labels, use a medium or large widget, or set Compact.
 
 ### Add a tracked to-do list
 

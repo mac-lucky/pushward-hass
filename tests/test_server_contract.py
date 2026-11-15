@@ -8,6 +8,7 @@ documented rule rejects a concrete violating payload.
 
 from __future__ import annotations
 
+import re
 import time
 from datetime import UTC, datetime, timedelta
 
@@ -20,10 +21,18 @@ from custom_components.pushward.const import (
     MAX_COMPACT_TRAILING_ICON_LEN,
     MAX_URL_LEN,
     MEDIA_POSITION_MAX_AGE,
+    WIDGET_DENSITIES,
+    WIDGET_SIZES,
+    WIDGET_STYLES,
+    WIDGET_TEMPLATES,
 )
 
 from .server_contract import (
+    _WIDGET_DENSITIES,
+    _WIDGET_SIZES,
+    _WIDGET_STYLES,
     PushWardContractError,
+    _check_widget_looks,
     assert_valid_activity_content,
     assert_valid_answer_feed,
     assert_valid_notification_receipt,
@@ -777,6 +786,63 @@ _WIDGET_INVALID = [
 def test_invalid_widget_payloads_rejected(content, template) -> None:
     with pytest.raises(PushWardContractError):
         assert_valid_widget_content(content, template)
+
+
+def test_widget_look_constants_match_the_contract() -> None:
+    assert (WIDGET_STYLES, WIDGET_DENSITIES, WIDGET_SIZES) == (_WIDGET_STYLES, _WIDGET_DENSITIES, _WIDGET_SIZES)
+
+
+@pytest.mark.parametrize("template", WIDGET_TEMPLATES)
+def test_every_template_takes_every_style(template) -> None:
+    for style in WIDGET_STYLES:
+        _check_widget_looks({"style": style, "style_by_size": dict.fromkeys(WIDGET_SIZES, style)}, template, "widget")
+
+
+def test_widget_looks_clear_and_case() -> None:
+    # null, "" and {} are the clear on PATCH and nothing on POST, on any template; case is folded.
+    for template in ("value", "stat_list"):
+        _check_widget_looks(
+            {"style": None, "style_by_size": None, "density": None, "density_by_size": None}, template, "widget"
+        )
+        _check_widget_looks({"style": "", "style_by_size": {}, "density": "", "density_by_size": {}}, template, "w")
+    folded = {
+        "style": "Bold",
+        "style_by_size": {"Large": "CLASSIC"},
+        "density": "Compact",
+        "density_by_size": {"SMALL": "auto"},
+    }
+    _check_widget_looks(folded, "stat_list", "widget")
+
+
+def test_density_is_stat_list_only() -> None:
+    _check_widget_looks({"density": "compact", "density_by_size": {"lock_screen": "comfortable"}}, "stat_list", "w")
+    with pytest.raises(PushWardContractError, match='density is only available for template "stat_list", not "value"'):
+        _check_widget_looks({"density": "auto"}, "value", "widget")
+    with pytest.raises(PushWardContractError, match='density_by_size is only available for template "stat_list"'):
+        _check_widget_looks({"density_by_size": {"small": "auto"}}, "gauge", "widget")
+
+
+@pytest.mark.parametrize(
+    ("content", "message"),
+    [
+        ({"style": "fancy"}, 'style must be one of standard, bold, classic, got "fancy"'),
+        ({"style": 7}, "style must be a string, got int"),
+        ({"style_by_size": ["bold"]}, "style_by_size must be an object, got list"),
+        (
+            {"style_by_size": {"Watch": "bold"}},
+            'style_by_size key must be one of small, medium, large, lock_screen, got "watch"',
+        ),
+        ({"style_by_size": {"small": "huge"}}, "style_by_size.small must be one of standard, bold, classic"),
+        ({"style_by_size": {"small": "bold", "SMALL": "bold"}}, "style_by_size names small twice"),
+        ({"density": "tight"}, 'density must be one of auto, compact, comfortable, got "tight"'),
+        ({"density_by_size": {"medium": "dense"}}, "density_by_size.medium must be one of auto, compact, comfortable"),
+    ],
+)
+def test_widget_looks_rejected(content, message) -> None:
+    with pytest.raises(PushWardContractError, match=re.escape(message)):
+        assert_valid_widget_content(
+            {"stat_rows": [{"label": "Users", "value": "42"}], **content}, "stat_list", where="widget"
+        )
 
 
 # --- sound & priority ------------------------------------------------------

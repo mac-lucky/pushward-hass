@@ -140,9 +140,11 @@ from custom_components.pushward.const import (
     CONF_VALUE_ENTITY,
     CONF_VALUE_SCALE,
     CONF_WARNING_THRESHOLD,
+    CONF_WIDGET_DENSITY,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_STALE_AFTER,
+    CONF_WIDGET_STYLE,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     DEFAULT_IMAGE_SHAPE,
@@ -172,11 +174,14 @@ from custom_components.pushward.const import (
     TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
     VALUE_SCALE_PERCENT,
+    WIDGET_DENSITIES,
+    WIDGET_LOOK_UNSET,
     WIDGET_MAX_STAT_ROWS,
     WIDGET_STALE_AFTER_MAX,
     WIDGET_STALE_AFTER_MIN,
     WIDGET_STAT_LABEL_MAX,
     WIDGET_STAT_UNIT_MAX,
+    WIDGET_STYLES,
     WIDGET_TEMPLATE_BATTERY,
     WIDGET_TEMPLATE_COUNTDOWN,
     WIDGET_TEMPLATE_FLOW,
@@ -191,6 +196,7 @@ from custom_components.pushward.const import (
     WIDGET_TRIGGER_EVENT,
     WIDGET_TRIGGER_POLL,
     validate_url,
+    widget_look_keys,
 )
 from custom_components.pushward.content_mapper import map_content
 
@@ -4565,6 +4571,121 @@ async def test_reconfigure_round_trip_preserves_widget_stat_rows(hass: HomeAssis
     )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
+
+
+# ----- widget style and row density -----
+
+_STAT_ROW = {CONF_LABEL: "Users", CONF_ENTITY_ID: "sensor.users"}
+
+
+def _look_section(schema: vol.Schema) -> dict:
+    """{field: (vol key, selector)} of the collapsed look section."""
+    inner = schema.schema[next(k for k in schema.schema if k == "look")].schema
+    return {key.schema: (key, value) for key, value in inner.schema.items()}
+
+
+@pytest.mark.parametrize("template", WIDGET_TEMPLATES)
+def test_look_selectors_per_template(template: str) -> None:
+    """Every template offers all three styles for every size; Row Density is stat_list only. All default to not set."""
+    fields = _look_section(_widget_details_schema("sensor.users", template, {}))
+    expected = {key: [WIDGET_LOOK_UNSET, *WIDGET_STYLES] for key in widget_look_keys(CONF_WIDGET_STYLE)}
+    if template == WIDGET_TEMPLATE_STAT_LIST:
+        expected |= {key: [WIDGET_LOOK_UNSET, *WIDGET_DENSITIES] for key in widget_look_keys(CONF_WIDGET_DENSITY)}
+    assert {name: selector.config["options"] for name, (_, selector) in fields.items()} == expected
+    assert {key.default() for key, _ in fields.values()} == {WIDGET_LOOK_UNSET}
+
+
+async def test_widget_looks_not_set_store_nothing_to_send(hass: HomeAssistant) -> None:
+    """Leaving every dropdown on "not set" stores empty values, which the mapper never sends."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_widget_subentry(
+        hass, entry, template=WIDGET_TEMPLATE_STAT_LIST, details={CONF_STAT_ROWS: [_STAT_ROW]}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    data = next(iter(entry.subentries.values())).data
+    for key in (*widget_look_keys(CONF_WIDGET_STYLE), *widget_look_keys(CONF_WIDGET_DENSITY)):
+        assert data[key] == ""
+
+
+async def test_widget_looks_set_are_stored_and_prefilled(hass: HomeAssistant) -> None:
+    """Picked values are stored and come back as the reconfigure defaults for the same template."""
+    picks = {
+        CONF_WIDGET_STYLE: "bold",
+        "widget_style_lock_screen": "classic",
+        CONF_WIDGET_DENSITY: "compact",
+        "widget_density_small": "comfortable",
+    }
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_widget_subentry(
+        hass, entry, template=WIDGET_TEMPLATE_STAT_LIST, details={CONF_STAT_ROWS: [_STAT_ROW], **picks}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentry_id = next(iter(entry.subentries))
+    data = entry.subentries[subentry_id].data
+    assert {key: data[key] for key in picks} == picks
+    assert data["widget_style_small"] == data["widget_density_large"] == ""
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST}
+    )
+    defaults = _all_field_defaults(result["data_schema"])
+    assert {key: defaults[key] for key in picks} == picks
+    assert defaults["widget_style_small"] == defaults["widget_density_large"] == WIDGET_LOOK_UNSET
+
+
+async def test_reconfigure_off_stat_list_drops_the_density(hass: HomeAssistant) -> None:
+    """stat_list moved to value: the density fields go away and are stored empty; the style stays."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    await _add_widget_subentry(
+        hass,
+        entry,
+        template=WIDGET_TEMPLATE_STAT_LIST,
+        details={
+            CONF_STAT_ROWS: [_STAT_ROW],
+            CONF_WIDGET_STYLE: "bold",
+            CONF_WIDGET_DENSITY: "compact",
+            "widget_density_lock_screen": "auto",
+        },
+    )
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE}
+    )
+    assert set(_look_section(result["data_schema"])) == set(widget_look_keys(CONF_WIDGET_STYLE))
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+    assert result["reason"] == "reconfigure_successful"
+    stored = entry.subentries[subentry_id].data
+    assert stored[CONF_WIDGET_TEMPLATE] == WIDGET_TEMPLATE_VALUE
+    assert stored[CONF_WIDGET_STYLE] == "bold"
+    assert all(stored[key] == "" for key in widget_look_keys(CONF_WIDGET_DENSITY))
+
+
+def test_parse_widget_input_drops_looks_the_template_does_not_take() -> None:
+    """The parse is the backstop for a submission the selectors would not have offered."""
+    step1 = {CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_GAUGE}
+    parsed = _parse_widget_input(
+        {
+            CONF_WIDGET_STYLE: "fancy",
+            "widget_style_small": "classic",
+            "widget_style_large": WIDGET_LOOK_UNSET,
+            CONF_WIDGET_DENSITY: "compact",
+            "widget_density_medium": "auto",
+        },
+        step1,
+    )
+    assert parsed[CONF_WIDGET_STYLE] == ""
+    assert parsed["widget_style_small"] == "classic"
+    assert parsed["widget_style_large"] == ""
+    assert parsed[CONF_WIDGET_DENSITY] == parsed["widget_density_medium"] == ""
 
 
 # ----- 1.6 widget templates: parse + schema round trips -----

@@ -161,9 +161,11 @@ from .const import (
     CONF_VALUE_SCALE,
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_BATTERY_SORT,
+    CONF_WIDGET_DENSITY,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_STALE_AFTER,
+    CONF_WIDGET_STYLE,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     DANGEROUS_URL_SCHEMES,
@@ -245,6 +247,8 @@ from .const import (
     WIDGET_EXPIRED_TEXT_MAX,
     WIDGET_GROUP_TEMPLATES,
     WIDGET_LABEL_MAX,
+    WIDGET_LOOK_UNSET,
+    WIDGET_LOOKS,
     WIDGET_MAX_BATTERY_DEVICES,
     WIDGET_MAX_FLOW_INPUTS,
     WIDGET_MAX_STAT_ROWS,
@@ -275,6 +279,8 @@ from .const import (
     normalize_slug,
     validate_image_url,
     validate_thumbhash,
+    widget_look_keys,
+    widget_looks,
 )
 from .content_mapper import get_domain_defaults, is_valid_color, sanitize_slug
 from .e2e import E2EError, key_id, parse_key
@@ -667,6 +673,7 @@ _ENTITY_TOPLEVEL_EXTRA: dict[str, tuple[str, ...]] = {
 }
 
 WIDGET_SECTIONS: dict[str, tuple[str, ...]] = {
+    "look": (*widget_look_keys(CONF_WIDGET_STYLE), *widget_look_keys(CONF_WIDGET_DENSITY)),
     "display_options": (
         CONF_LABEL,
         CONF_LABEL_ATTRIBUTE,
@@ -2621,6 +2628,20 @@ def _widget_details_schema(
         # entity (label, entity, attribute, unit). Capped by WIDGET_MAX_STAT_ROWS.
         fields[_object_rows_key(CONF_STAT_ROWS, d, required=True)] = _WIDGET_STAT_ROWS_SELECTOR
 
+    # Style for every size and per size, plus Row Density on stat_list only. A
+    # stored value the template no longer takes falls back to "not set".
+    for conf, allowed in widget_looks(template).values():
+        look_selector = SelectSelector(
+            SelectSelectorConfig(
+                options=[WIDGET_LOOK_UNSET, *allowed],
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key=conf,
+            )
+        )
+        for key in widget_look_keys(conf):
+            stored = d.get(key)
+            fields[vol.Optional(key, default=stored if stored in allowed else WIDGET_LOOK_UNSET)] = look_selector
+
     # Cosmetic fields (all templates)
     fields[
         vol.Optional(
@@ -3023,11 +3044,21 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
 
     action_slots = _parse_action_slots(user_input)
 
+    # "" for not set and for anything the template does not take (density off
+    # stat_list), so a template move cannot store a value the server would refuse.
+    offered = widget_looks(template)
+    looks: dict[str, str] = {}
+    for field, (conf, allowed) in WIDGET_LOOKS.items():
+        for key in widget_look_keys(conf):
+            value = user_input.get(key)
+            looks[key] = value if field in offered and value in allowed else ""
+
     return {
         CONF_ENTITY_ID: entity_id,
         CONF_SLUG: slug,
         CONF_WIDGET_NAME: user_input.get(CONF_WIDGET_NAME, "") or "",
         CONF_WIDGET_TEMPLATE: template,
+        **looks,
         CONF_WIDGET_TRIGGER_MODE: trigger,
         CONF_WIDGET_POLL_INTERVAL: poll_interval,
         CONF_VALUE_ATTRIBUTE: user_input.get(CONF_VALUE_ATTRIBUTE, "") or "",

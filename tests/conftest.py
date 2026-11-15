@@ -112,9 +112,11 @@ from custom_components.pushward.const import (
     CONF_VALUE_SCALE,
     CONF_WARNING_THRESHOLD,
     CONF_WIDGET_BATTERY_SORT,
+    CONF_WIDGET_DENSITY,
     CONF_WIDGET_NAME,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_STALE_AFTER,
+    CONF_WIDGET_STYLE,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     DEFAULT_MEDIA_CONTROLS,
@@ -126,6 +128,7 @@ from custom_components.pushward.const import (
     DEFAULT_WIDGET_POLL_INTERVAL,
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_EVENT,
+    widget_look_keys,
 )
 
 # Seconds to backdate last_sent_at by so any configured cooldown reads as elapsed.
@@ -232,6 +235,7 @@ def make_widget_config(**overrides) -> dict:
         CONF_SLUG: "ha-users",
         CONF_WIDGET_NAME: "Users",
         CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE,
+        **dict.fromkeys((*widget_look_keys(CONF_WIDGET_STYLE), *widget_look_keys(CONF_WIDGET_DENSITY)), ""),
         CONF_WIDGET_TRIGGER_MODE: WIDGET_TRIGGER_EVENT,
         CONF_WIDGET_POLL_INTERVAL: DEFAULT_WIDGET_POLL_INTERVAL,
         CONF_VALUE_ATTRIBUTE: "",

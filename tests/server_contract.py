@@ -195,6 +195,13 @@ _URL_HOST_RE = re.compile(rf"^{_URL_HOST_LABEL}(?:\.{_URL_HOST_LABEL})*\.?$")
 
 _HTTP_SCHEMES = ("http", "https")
 _TRENDS = ("", WIDGET_TREND_UP, WIDGET_TREND_DOWN, WIDGET_TREND_FLAT)
+# Widget looks and stat_list row densities, restated like the template allowlists
+# above. Every template takes every style; density is stat_list only. The server
+# also maps the looks' pre-rename names silently, but they are undocumented, so
+# the contract refuses them.
+_WIDGET_STYLES = ("standard", "bold", "classic")
+_WIDGET_DENSITIES = ("auto", "compact", "comfortable")
+_WIDGET_SIZES = ("small", "medium", "large", "lock_screen")
 
 
 class PushWardContractError(AssertionError):
@@ -1020,6 +1027,41 @@ def _assert_widget_collections(content: dict, where: str) -> None:
         _fail(where, f"start_date ({start_date}) must be before end_date ({end_date})")
 
 
+def _check_one_of(value: object, allowed: tuple[str, ...], field: str, where: str) -> None:
+    if not isinstance(value, str):
+        _fail(where, f"{field} must be a string, got {type(value).__name__}")
+    if value.lower() not in allowed:
+        _fail(where, f'{field} must be one of {", ".join(allowed)}, got "{value.lower()}"')
+
+
+def _check_widget_looks(content: dict, template: str, where: str) -> None:
+    """style / style_by_size on any template, density / density_by_size on stat_list.
+
+    null or "" (a map: null or {}) clears on PATCH and sets nothing on POST; case is
+    folded. Anything else outside the allowlist is a 422 widget.content_invalid
+    with the server's message.
+    """
+    for field, allowed in (("style", _WIDGET_STYLES), ("density", _WIDGET_DENSITIES)):
+        value, by_size = content.get(field), content.get(f"{field}_by_size")
+        if value not in (None, ""):
+            _check_one_of(value, allowed, field, where)
+        if by_size is not None:
+            if not isinstance(by_size, dict):
+                _fail(where, f"{field}_by_size must be an object, got {type(by_size).__name__}")
+            seen: set[str] = set()
+            for size, v in by_size.items():
+                _check_one_of(size, _WIDGET_SIZES, f"{field}_by_size key", where)
+                if size.lower() in seen:
+                    _fail(where, f"{field}_by_size names {size.lower()} twice")
+                seen.add(size.lower())
+                _check_one_of(v, allowed, f"{field}_by_size.{size.lower()}", where)
+        if field == "density" and template != "stat_list":
+            if value not in (None, ""):
+                _fail(where, f'density is only available for template "stat_list", not "{template}"')
+            if by_size:
+                _fail(where, f'density_by_size is only available for template "stat_list", not "{template}"')
+
+
 def assert_valid_widget_content(content: dict, template: str | None = None, *, where: str = "widget") -> None:
     """Assert ``content`` satisfies the public widget content contract.
 
@@ -1050,6 +1092,7 @@ def assert_valid_widget_content(content: dict, template: str | None = None, *, w
         _check_color(content.get(field), field, where)
     for field in ("tap_action", "url_action", "secondary_url_action"):
         _check_tap_action(content.get(field), field, where)
+    _check_widget_looks(content, template, where)
 
     _assert_widget_collections(content, where)
 

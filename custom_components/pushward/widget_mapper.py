@@ -74,6 +74,7 @@ from .const import (
     WIDGET_NAME_MAX,
     WIDGET_NODE_ICON_MAX,
     WIDGET_NODE_NAME_MAX,
+    WIDGET_SIZES,
     WIDGET_STAT_LABEL_MAX,
     WIDGET_STAT_UNIT_MAX,
     WIDGET_STAT_VALUE_MAX,
@@ -92,6 +93,7 @@ from .const import (
     WIDGET_TREND_FLAT,
     WIDGET_TREND_UP,
     WIDGET_UNIT_MAX,
+    widget_looks,
 )
 from .content_mapper import (
     add_all_tap_actions,
@@ -338,6 +340,28 @@ def map_widget_content(
     (e.g. progress/gauge with no usable numeric state). Caller decides
     whether to skip the request entirely or send a placeholder.
     """
+    content = _render_content(hass, config, prev_value, registry_icon, points)
+    if content is None:
+        return None
+    # Only set values ride along. A value the server does not take (a hand-edited
+    # config, or density left over from a move off stat_list) is dropped rather
+    # than sent, since the server would refuse the whole widget.
+    for field, (conf, allowed) in widget_looks(config.get(CONF_WIDGET_TEMPLATE)).items():
+        if (value := config.get(conf)) in allowed:
+            content[field] = value
+        by_size = {size: v for size in WIDGET_SIZES if (v := config.get(f"{conf}_{size}")) in allowed}
+        if by_size:
+            content[f"{field}_by_size"] = by_size
+    return content
+
+
+def _render_content(
+    hass: HomeAssistant,
+    config: dict,
+    prev_value: float | None,
+    registry_icon: str | None,
+    points: list[float] | None,
+) -> dict | None:
     template = config.get(CONF_WIDGET_TEMPLATE)
     if not template:
         return None

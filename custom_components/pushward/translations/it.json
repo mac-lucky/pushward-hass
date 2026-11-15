@@ -2404,6 +2404,33 @@
             "flow_nodes": "Una riga per nodo. Lo slot decide dove viene disegnato: fino a 3 ingressi, più un'uscita, un accumulo e uno scambio. La portata arriva dall'entità, con il segno che scegli tu."
           },
           "sections": {
+            "look": {
+              "name": "Style",
+              "data": {
+                "widget_style": "Style",
+                "widget_style_small": "Small Style",
+                "widget_style_medium": "Medium Style",
+                "widget_style_large": "Large Style",
+                "widget_style_lock_screen": "Lock Screen Style",
+                "widget_density": "Row Density",
+                "widget_density_small": "Small Row Density",
+                "widget_density_medium": "Medium Row Density",
+                "widget_density_large": "Large Row Density",
+                "widget_density_lock_screen": "Lock Screen Row Density"
+              },
+              "data_description": {
+                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
+                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
+                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
+                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
+                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
+                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
+                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
+                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
+                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
+                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+              }
+            },
             "display_options": {
               "name": "Appearance",
               "data": {
@@ -2715,6 +2742,22 @@
     "todo_reminder_action": {
       "options": {
         "done": "Fatto"
+      }
+    },
+    "widget_style": {
+      "options": {
+        "app": "Not set",
+        "standard": "Standard",
+        "bold": "Bold",
+        "classic": "Classic"
+      }
+    },
+    "widget_density": {
+      "options": {
+        "app": "Not set",
+        "auto": "Auto",
+        "compact": "Compact",
+        "comfortable": "Comfortable"
       }
     }
   }

@@ -45,7 +45,10 @@ from custom_components.pushward.const import (
     TODO_LEVELS,
     VALUE_SCALES,
     WIDGET_BATTERY_SORTS,
+    WIDGET_DENSITIES,
+    WIDGET_LOOK_UNSET,
     WIDGET_SEVERITIES,
+    WIDGET_STYLES,
     WIDGET_TEMPLATES,
     WIDGET_TRIGGER_MODES,
 )
@@ -74,6 +77,8 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "timer_style": tuple(TIMER_STYLES),
     "flow_slot": tuple(FLOW_SLOTS),
     "todo_notification_level": tuple(TODO_LEVELS),
+    "widget_style": (WIDGET_LOOK_UNSET, *WIDGET_STYLES),
+    "widget_density": (WIDGET_LOOK_UNSET, *WIDGET_DENSITIES),
 }
 
 
@@ -306,6 +311,11 @@ ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
 
 _WIDGET_COMMON: set[str] = {
     "widget_name",
+    "widget_style",
+    "widget_style_small",
+    "widget_style_medium",
+    "widget_style_large",
+    "widget_style_lock_screen",
     "label",
     "label_attribute",
     "subtitle_attribute",
@@ -342,7 +352,15 @@ WIDGET_FROZEN_FIELDS: dict[str, set[str]] = {
     | {"value_attribute", "unit", "value_scale", "start_date_attribute", "end_date_attribute"},
     "gauge": _WIDGET_SINGLE | {"value_attribute", "unit", "min_value", "max_value"},
     "status": _WIDGET_SINGLE | {"severity"},
-    "stat_list": _WIDGET_COMMON | {"stat_rows"},
+    "stat_list": _WIDGET_COMMON
+    | {
+        "stat_rows",
+        "widget_density",
+        "widget_density_small",
+        "widget_density_medium",
+        "widget_density_large",
+        "widget_density_lock_screen",
+    },
     "trend": _WIDGET_SINGLE | {"value_attribute", "unit", "history_period", "min_value", "max_value"},
     "countdown": _WIDGET_SINGLE | {"start_date_attribute", "end_date_attribute", "expired_text"},
     "battery": _WIDGET_COMMON | {"battery_devices", "battery_sort"},

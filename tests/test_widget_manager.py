@@ -31,8 +31,10 @@ from custom_components.pushward.const import (
     CONF_SLUG,
     CONF_STAT_ROWS,
     CONF_SUBTITLE_TIMER_ENTITY,
+    CONF_WIDGET_DENSITY,
     CONF_WIDGET_POLL_INTERVAL,
     CONF_WIDGET_STALE_AFTER,
+    CONF_WIDGET_STYLE,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     WIDGET_GROUP_TEMPLATES,
@@ -44,6 +46,7 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
     WIDGET_TRIGGER_POLL,
+    widget_look_keys,
 )
 from custom_components.pushward.quota import quota_released_signal
 from custom_components.pushward.widget_manager import (
@@ -430,6 +433,123 @@ async def test_cache_survives_restart(hass: HomeAssistant) -> None:
     api2.patch_widget.assert_not_called()
 
     await manager2.async_stop()
+
+
+_STAT_LIST = {
+    CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+    CONF_STAT_ROWS: [{"label": "Users", "entity_id": "sensor.users"}],
+}
+_LOOKS = {
+    CONF_WIDGET_STYLE: "bold",
+    "widget_style_large": "classic",
+    CONF_WIDGET_DENSITY: "compact",
+    "widget_density_lock_screen": "comfortable",
+}
+_SENT_LOOKS = {
+    "style": "bold",
+    "style_by_size": {"large": "classic"},
+    "density": "compact",
+    "density_by_size": {"lock_screen": "comfortable"},
+}
+
+
+def _looks_of(content: dict) -> dict:
+    return {k: content[k] for k in _SENT_LOOKS if k in content}
+
+
+@pytest.mark.parametrize(("looks", "sent"), [({}, {}), (_LOOKS, _SENT_LOOKS)], ids=["not_set", "set"])
+async def test_looks_on_create_and_restart_repost(hass: HomeAssistant, looks: dict, sent: dict) -> None:
+    """POST replaces the content, so set looks ride every POST and unset ones never appear."""
+    config = make_widget_config(**_STAT_LIST, **looks)
+    hass.states.async_set("sensor.users", "42")
+
+    for _ in range(2):  # first start, then the re-POST after an HA restart
+        api = _mock_api()
+        manager = WidgetManager(hass, api, [config], make_mock_entry())
+        await manager.async_start()
+        assert _looks_of(api.create_widget.call_args.kwargs["content"]) == sent
+        await manager.async_stop()
+
+
+async def test_looks_switched_to_not_set_repost_without_them(hass: HomeAssistant) -> None:
+    """The reconfigure reload re-POSTs without the keys, which is what clears them server-side."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config(**_STAT_LIST, **_LOOKS)], make_mock_entry())
+    await manager.async_start()
+    assert _looks_of(api.create_widget.call_args.kwargs["content"]) == _SENT_LOOKS
+
+    api.reset_mock()
+    await manager.async_reload([make_widget_config(**_STAT_LIST)])
+    assert _looks_of(api.create_widget.call_args.kwargs["content"]) == {}
+    api.patch_widget.assert_not_called()
+
+    await manager.async_stop()
+
+
+async def test_looks_dropped_on_the_patch_path_send_null(hass: HomeAssistant) -> None:
+    """When the restart POST is deferred, the next PATCH clears each dropped look once and then leaves it out."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config(**_STAT_LIST, **_LOOKS)], make_mock_entry())
+    await manager.async_start()
+    await manager.async_stop()
+
+    # Restart with all but the style removed while the row entity is unavailable: no POST yet.
+    hass.states.async_set("sensor.users", STATE_UNAVAILABLE)
+    api2 = _mock_api()
+    config = make_widget_config(**_STAT_LIST, **{CONF_WIDGET_STYLE: "bold"})
+    manager2 = WidgetManager(hass, api2, [config], make_mock_entry())
+    await manager2.async_start()
+    api2.create_widget.assert_not_called()
+
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+    assert _looks_of(api2.patch_widget.call_args.args[1]["content"]) == {
+        "style": "bold",
+        "style_by_size": None,
+        "density": None,
+        "density_by_size": None,
+    }
+
+    hass.states.async_set("sensor.users", "44")
+    await hass.async_block_till_done()
+    assert api2.patch_widget.await_count == 2
+    assert _looks_of(api2.patch_widget.call_args.args[1]["content"]) == {"style": "bold"}
+
+    await manager2.async_stop()
+
+
+async def test_set_looks_ride_every_patch(hass: HomeAssistant) -> None:
+    """A PATCH replaces a whole per-size map, so the full map rides every PATCH."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config(**_STAT_LIST, **_LOOKS)], make_mock_entry())
+    await manager.async_start()
+
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+    assert _looks_of(api.patch_widget.call_args.args[1]["content"]) == _SENT_LOOKS
+
+    await manager.async_stop()
+
+
+async def test_subentry_saved_without_look_keys_sends_none(hass: HomeAssistant) -> None:
+    """A widget saved before these settings existed has none of the keys: nothing sent and no null clear."""
+    config = make_widget_config(**_STAT_LIST)
+    for key in (*widget_look_keys(CONF_WIDGET_STYLE), *widget_look_keys(CONF_WIDGET_DENSITY)):
+        del config[key]
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
+    await manager.async_start()
+    assert _looks_of(api.create_widget.call_args.kwargs["content"]) == {}
+
+    hass.states.async_set("sensor.users", "43")
+    await hass.async_block_till_done()
+    assert _looks_of(api.patch_widget.call_args.args[1]["content"]) == {}
+
+    await manager.async_stop()
 
 
 async def test_patch_404_recreate_rearms_on_redeletion(hass: HomeAssistant) -> None:

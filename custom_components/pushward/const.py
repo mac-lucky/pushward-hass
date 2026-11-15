@@ -190,6 +190,12 @@ CONF_VALUE_SCALE = "value_scale"
 # Seconds after the last successful push before iOS renders the widget as stale.
 # Setting it also arms the heartbeat in widget_manager (see WIDGET_STALE_AFTER_*).
 CONF_WIDGET_STALE_AFTER = "widget_stale_after"
+# The look the widget is drawn in (WIDGET_STYLES) and the stat_list row density
+# (WIDGET_DENSITIES), each with per-size overrides stored flat as <key>_<size>
+# (widget_look_keys). Empty means none is sent, so the pick in the PushWard app
+# applies.
+CONF_WIDGET_STYLE = "widget_style"
+CONF_WIDGET_DENSITY = "widget_density"
 
 # countdown / self-advancing progress: attributes holding the RFC 3339 (or epoch)
 # window ends. An empty end-date attribute falls back to the entity's own state,
@@ -600,6 +606,33 @@ WIDGET_TEMPLATES = [
     WIDGET_TEMPLATE_SCHEDULE,
     WIDGET_TEMPLATE_FLOW,
 ]
+
+# Widget looks (server widgetStyles), offered on every template, and the stat_list
+# row densities (server statListDensities). A value sent here wins over the one
+# picked in the app; sending none leaves the choice to the app.
+WIDGET_STYLES = ("standard", "bold", "classic")
+WIDGET_DENSITIES = ("auto", "compact", "comfortable")
+# Keys of style_by_size / density_by_size; lock_screen covers every accessory size.
+WIDGET_SIZES = ("small", "medium", "large", "lock_screen")
+# Wire field -> (config key, allowed values).
+WIDGET_LOOKS: dict[str, tuple[str, tuple[str, ...]]] = {
+    "style": (CONF_WIDGET_STYLE, WIDGET_STYLES),
+    "density": (CONF_WIDGET_DENSITY, WIDGET_DENSITIES),
+}
+# The config flow's "not set" choice. Never stored and never sent: an empty
+# option key breaks hassfest, so the dropdown needs a real value for it.
+WIDGET_LOOK_UNSET = "app"
+
+
+def widget_looks(template: str | None) -> dict[str, tuple[str, tuple[str, ...]]]:
+    """The WIDGET_LOOKS the template takes: density is stat_list only (422 elsewhere)."""
+    return {f: v for f, v in WIDGET_LOOKS.items() if f != "density" or template == WIDGET_TEMPLATE_STAT_LIST}
+
+
+def widget_look_keys(conf: str) -> tuple[str, ...]:
+    """conf itself (every size) followed by its per-size config keys."""
+    return (conf, *(f"{conf}_{size}" for size in WIDGET_SIZES))
+
 
 # Templates built from per-row entities instead of one anchoring entity. They
 # have no state to read attribute overrides or a subtitle-timer date from, no

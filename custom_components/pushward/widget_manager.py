@@ -62,6 +62,7 @@ from .const import (
     DEFAULT_WIDGET_TREND_PERIOD,
     QUOTA_KIND_WIDGET_UPDATES,
     WIDGET_GROUP_TEMPLATES,
+    WIDGET_LOOKS,
     WIDGET_MAX_TREND_POINTS,
     WIDGET_MIN_TREND_POINTS,
     WIDGET_STALE_AFTER_MAX,
@@ -85,6 +86,9 @@ _WIDGET_STORAGE_VERSION = 1
 # Floor on the heartbeat tick. A stale_after at the 60 s minimum would otherwise
 # ask for a push every 30 s, which is already more than the quota is worth.
 _HEARTBEAT_MIN_INTERVAL = 30
+# style, style_by_size, density, density_by_size: the content keys the PATCH path
+# null-clears when the config drops them.
+_LOOK_FIELDS = tuple(k for field in WIDGET_LOOKS for k in (field, f"{field}_by_size"))
 
 
 def _widget_storage_key(entry_id: str) -> str:
@@ -560,11 +564,17 @@ class WidgetManager:
                 # First successful render after a deferred initial POST.
                 await self._create_widget(tracked, content)
             else:
+                # The subentry dropped a look (or moved off stat_list, taking the
+                # density with it) since the last push. A merge patch keeps a
+                # left-out key, so clear it with null once; after that the key
+                # stays out and the app's pick applies.
+                last = tracked.last_content or {}
+                patch_content = {**content, **{k: None for k in _LOOK_FIELDS if k not in content and last.get(k)}}
                 # stale_after rides every PATCH, null included: the merge patch
                 # null-clears, so a widget created before the field existed (or
                 # one whose config lost it) converges instead of keeping a value
                 # HA no longer knows about.
-                patch_body: dict = {"content": content, "stale_after": _stale_after(cfg)}
+                patch_body: dict = {"content": patch_content, "stale_after": _stale_after(cfg)}
                 push_throttle = self._compute_push_throttle(cfg)
                 if push_throttle is not None:
                     patch_body["push_throttle"] = push_throttle

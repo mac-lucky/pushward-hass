@@ -35,6 +35,8 @@ from custom_components.pushward.const import (
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_SCALE,
     CONF_WIDGET_BATTERY_SORT,
+    CONF_WIDGET_DENSITY,
+    CONF_WIDGET_STYLE,
     CONF_WIDGET_TEMPLATE,
     VALUE_SCALE_FRACTION,
     VALUE_SCALE_PERCENT,
@@ -54,6 +56,7 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_STATUS,
     WIDGET_TEMPLATE_TREND,
     WIDGET_TEMPLATE_VALUE,
+    widget_look_keys,
 )
 from custom_components.pushward.widget_mapper import (
     _GROUP_MAPPERS,
@@ -1203,3 +1206,75 @@ def test_stat_row_timer_skipped_for_non_date_value():
 
     assert "timer" not in content["stat_rows"][0]
     assert_valid_widget_content(content, WIDGET_TEMPLATE_STAT_LIST)
+
+
+def _map_looks(template: str, config_edit=None, **looks) -> dict:
+    """Map a widget whose rows (stat_list, battery) read sensor.users, with the given look keys."""
+    config = make_widget_config(
+        **{
+            CONF_WIDGET_TEMPLATE: template,
+            CONF_STAT_ROWS: [{"label": "Users", "entity_id": "sensor.users"}],
+            CONF_BATTERY_DEVICES: [{"name": "Phone", "entity_id": "sensor.users"}],
+            **looks,
+        }
+    )
+    if config_edit:
+        config_edit(config)
+    content = map_widget_content(_make_hass({"sensor.users": make_mock_state("42", entity_id="sensor.users")}), config)
+    assert_valid_widget_content(content, template)
+    return content
+
+
+_LOOK_FIELDS = ("style", "style_by_size", "density", "density_by_size")
+
+
+def _drop_look_keys(config: dict) -> None:
+    for key in (*widget_look_keys(CONF_WIDGET_STYLE), *widget_look_keys(CONF_WIDGET_DENSITY)):
+        config.pop(key, None)
+
+
+@pytest.mark.parametrize("config_edit", [None, _drop_look_keys], ids=["not_set", "saved_without_the_keys"])
+def test_looks_not_set_send_no_keys(config_edit):
+    """Nothing configured, or a config from before these settings: no key at all, so the app's own pick applies."""
+    content = _map_looks(WIDGET_TEMPLATE_STAT_LIST, config_edit)
+    assert not set(_LOOK_FIELDS) & set(content)
+
+
+@pytest.mark.parametrize(
+    "template", [WIDGET_TEMPLATE_VALUE, WIDGET_TEMPLATE_STATUS, WIDGET_TEMPLATE_BATTERY, WIDGET_TEMPLATE_STAT_LIST]
+)
+def test_style_and_per_size_style_ride_the_content(template):
+    """Every template takes every style, group templates included; only the sizes set go in the map."""
+    content = _map_looks(
+        template,
+        **{CONF_WIDGET_STYLE: "bold", "widget_style_small": "classic", "widget_style_lock_screen": "standard"},
+    )
+    assert content["style"] == "bold"
+    assert content["style_by_size"] == {"small": "classic", "lock_screen": "standard"}
+
+
+def test_per_size_style_without_a_style_for_every_size():
+    content = _map_looks(WIDGET_TEMPLATE_VALUE, **{"widget_style_large": "classic"})
+    assert "style" not in content
+    assert content["style_by_size"] == {"large": "classic"}
+
+
+def test_density_rides_stat_list_only():
+    looks = {CONF_WIDGET_DENSITY: "compact", "widget_density_large": "comfortable", "widget_density_small": "auto"}
+    content = _map_looks(WIDGET_TEMPLATE_STAT_LIST, **looks)
+    assert content["density"] == "compact"
+    assert content["density_by_size"] == {"small": "auto", "large": "comfortable"}
+
+    # Left over from a move off stat_list: the server would refuse it, so it is not sent.
+    content = _map_looks(WIDGET_TEMPLATE_VALUE, **looks)
+    assert "density" not in content
+    assert "density_by_size" not in content
+
+
+def test_look_values_the_server_does_not_take_are_dropped():
+    """A hand-edited value would be a 422 for the whole widget, so it is not sent."""
+    content = _map_looks(
+        WIDGET_TEMPLATE_STAT_LIST,
+        **{CONF_WIDGET_STYLE: "fancy", "widget_style_medium": "huge", "widget_density_small": "tight"},
+    )
+    assert not set(_LOOK_FIELDS) & set(content)
