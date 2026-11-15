@@ -2390,7 +2390,7 @@
             "min_value": "Giá trị tối thiểu cho khoảng đồng hồ đo.",
             "max_value": "Giá trị tối đa cho khoảng đồng hồ đo.",
             "severity": "Mức độ nghiêm trọng của trạng thái (info, warning, critical, success).",
-            "stat_rows": "Tối đa 6 hàng, mỗi hàng liên kết một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính và đơn vị. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Điều chỉnh mật độ hàng cho từng widget trong ứng dụng PushWard.",
+            "stat_rows": "Tối đa 6 hàng, mỗi hàng liên kết một thực thể riêng: nhãn, thực thể và tùy chọn thuộc tính và đơn vị. Vẫn chấp nhận chuỗi phân tách bằng dấu phẩy. Điều chỉnh Mật độ hàng trong mục Kiểu, hoặc cho từng widget trong ứng dụng PushWard.",
             "history_period": "Nạp bao nhiêu lịch sử từ recorder khi biểu đồ nhỏ khởi động. 0 bỏ qua việc nạp và biểu đồ tự đầy dần khi thực thể thay đổi.",
             "start_date_attribute": "Thuộc tính thực thể chứa điểm bắt đầu của khoảng. Tùy chọn; với progress nó giúp thanh tiến trình tự chạy trên thiết bị giữa các lần gửi.",
             "end_date_attribute": "Thuộc tính thực thể chứa điểm kết thúc của khoảng. Để trống để dùng trạng thái của thực thể, finishes_at của timer hoặc end_time của lịch.",

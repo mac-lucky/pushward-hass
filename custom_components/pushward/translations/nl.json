@@ -2390,7 +2390,7 @@
             "min_value": "Minimumwaarde voor het meterbereik.",
             "max_value": "Maximumwaarde voor het meterbereik.",
             "severity": "Ernst van de status (info, warning, critical, success).",
-            "stat_rows": "Tot 6 rijen, elk gekoppeld aan een aparte entiteit: label, entiteit en optioneel attribuut en eenheid. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Stel de rijdichtheid per widget in de PushWard-app in.",
+            "stat_rows": "Tot 6 rijen, elk gekoppeld aan een aparte entiteit: label, entiteit en optioneel attribuut en eenheid. Een door komma's gescheiden tekst wordt nog steeds geaccepteerd. Stel de Rijdichtheid in onder Stijl, of per widget in de PushWard-app.",
             "history_period": "Hoe ver terug de sparkline bij de start uit de recorder wordt gevuld. 0 slaat het vullen over en de grafiek loopt vol naarmate de entiteit verandert.",
             "start_date_attribute": "Entiteitsattribuut met het begin van het venster. Optioneel; bij progress loopt de balk hiermee op het apparaat door tussen pushes.",
             "end_date_attribute": "Entiteitsattribuut met het einde van het venster. Laat leeg om de status van de entiteit, finishes_at van een timer of end_time van een agenda te gebruiken.",

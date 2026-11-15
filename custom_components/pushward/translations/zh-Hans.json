@@ -2390,7 +2390,7 @@
             "min_value": "gauge 范围的最小值。",
             "max_value": "gauge 范围的最大值。",
             "severity": "状态严重程度（info、warning、critical、success）。",
-            "stat_rows": "最多 6 行，每行绑定一个单独的实体：标签、实体，以及可选的属性和单位。仍支持以逗号分隔的字符串。可在 PushWard 应用中按小组件设置行密度。",
+            "stat_rows": "最多 6 行，每行绑定一个单独的实体：标签、实体，以及可选的属性和单位。仍支持以逗号分隔的字符串。可在“样式”下设置行密度，或在 PushWard 应用中按小组件设置。",
             "history_period": "小组件启动时从 recorder 回填迷你图的时间跨度。填 0 则跳过回填，图表随实体变化逐渐填满。",
             "start_date_attribute": "存放时间窗起点的实体属性。可选；在 progress 模板下，进度条可据此在设备上自行推进，无需再次推送。",
             "end_date_attribute": "存放时间窗终点的实体属性。留空则使用实体自身状态、计时器的 finishes_at 或日历的 end_time。",

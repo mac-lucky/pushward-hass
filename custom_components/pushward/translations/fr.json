@@ -2390,7 +2390,7 @@
             "min_value": "Valeur minimale de la plage du gauge.",
             "max_value": "Valeur maximale de la plage du gauge.",
             "severity": "Gravité du statut (info, warning, critical, success).",
-            "stat_rows": "Jusqu'à 6 lignes, chacune liée à une entité distincte : libellé, entité, puis attribut et unité en option. Une chaîne séparée par des virgules reste acceptée. Réglez la densité des lignes par widget dans l'app PushWard.",
+            "stat_rows": "Jusqu'à 6 lignes, chacune liée à une entité distincte : libellé, entité, puis attribut et unité en option. Une chaîne séparée par des virgules reste acceptée. Réglez la Densité des lignes sous Style, ou par widget dans l'app PushWard.",
             "history_period": "Profondeur d'historique chargée depuis l'enregistreur au démarrage de la courbe. 0 saute le préchargement et le graphique se remplit au fil des changements.",
             "start_date_attribute": "Attribut d'entité portant le début de la fenêtre. Facultatif ; sur progress, la barre avance alors sur l'appareil entre deux envois.",
             "end_date_attribute": "Attribut d'entité portant la fin de la fenêtre. Laissez vide pour utiliser l'état de l'entité, finishes_at d'un minuteur ou end_time d'un calendrier.",

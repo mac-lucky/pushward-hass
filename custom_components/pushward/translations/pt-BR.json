@@ -2390,7 +2390,7 @@
             "min_value": "Valor mínimo do intervalo do medidor.",
             "max_value": "Valor máximo do intervalo do medidor.",
             "severity": "Severidade do status (info, warning, critical, success).",
-            "stat_rows": "Até 6 linhas, cada uma vinculada a uma entidade distinta: rótulo, entidade e, opcionalmente, atributo e unidade. Uma string separada por vírgulas ainda é aceita. Ajuste a densidade das linhas por widget no app PushWard.",
+            "stat_rows": "Até 6 linhas, cada uma vinculada a uma entidade distinta: rótulo, entidade e, opcionalmente, atributo e unidade. Uma string separada por vírgulas ainda é aceita. Ajuste a Densidade de linhas em Estilo, ou por widget no app PushWard.",
             "history_period": "Quanto histórico carregar do gravador quando o minigráfico inicia. 0 pula o carregamento e o gráfico se preenche conforme a entidade muda.",
             "start_date_attribute": "Atributo da entidade com o início da janela. Opcional; em progress faz a barra avançar no dispositivo entre os envios.",
             "end_date_attribute": "Atributo da entidade com o fim da janela. Deixe vazio para usar o estado da entidade, finishes_at de um timer ou end_time de um calendário.",

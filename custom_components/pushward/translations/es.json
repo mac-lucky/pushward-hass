@@ -2390,7 +2390,7 @@
             "min_value": "Valor mínimo del rango del indicador.",
             "max_value": "Valor máximo del rango del indicador.",
             "severity": "Gravedad del estado (info, warning, critical, success).",
-            "stat_rows": "Hasta 6 filas, cada una vincula una entidad distinta: etiqueta, entidad y, de forma opcional, atributo y unidad. También se admite una cadena separada por comas. Ajusta la densidad de filas por widget en la app de PushWard.",
+            "stat_rows": "Hasta 6 filas, cada una vincula una entidad distinta: etiqueta, entidad y, de forma opcional, atributo y unidad. También se admite una cadena separada por comas. Ajusta la Densidad de filas en Estilo, o por widget en la app de PushWard.",
             "history_period": "Cuánto historial se carga desde el registrador al iniciar el minigráfico. 0 omite la carga y el gráfico se llena a medida que la entidad cambia.",
             "start_date_attribute": "Atributo de la entidad con el inicio de la ventana. Opcional; en progress hace que la barra avance en el dispositivo entre envíos.",
             "end_date_attribute": "Atributo de la entidad con el fin de la ventana. Déjalo vacío para usar el estado de la entidad, finishes_at de un temporizador o end_time de un calendario.",

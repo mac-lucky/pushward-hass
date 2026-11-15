@@ -2390,7 +2390,7 @@
             "min_value": "Pinakamababang halaga para sa gauge range.",
             "max_value": "Pinakamataas na halaga para sa gauge range.",
             "severity": "Severity ng status (info, warning, critical, success).",
-            "stat_rows": "Hanggang 6 na hanay, bawat isa ay naka-ugnay sa hiwalay na entity: label, entity, at opsyonal na attribute at unit. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Itakda ang density ng hanay kada widget sa PushWard app.",
+            "stat_rows": "Hanggang 6 na hanay, bawat isa ay naka-ugnay sa hiwalay na entity: label, entity, at opsyonal na attribute at unit. Tinatanggap pa rin ang string na pinaghihiwalay ng kuwit. Itakda ang Density ng Hanay sa ilalim ng Istilo, o kada widget sa PushWard app.",
             "history_period": "Gaano kalayo pabalik kinukuha ang sparkline mula sa recorder kapag nagsimula ang widget. Ang 0 ay laktawan ang pagkuha at napupuno ang tsart habang nagbabago ang entity.",
             "start_date_attribute": "Attribute ng entity na naglalaman ng simula ng window. Opsyonal; sa progress, dahil dito umuusad ang bar sa device sa pagitan ng mga push.",
             "end_date_attribute": "Attribute ng entity na naglalaman ng dulo ng window. Iwanang blanko para gamitin ang state ng entity, ang finishes_at ng timer, o ang end_time ng kalendaryo.",

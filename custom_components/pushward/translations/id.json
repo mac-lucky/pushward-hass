@@ -2390,7 +2390,7 @@
             "min_value": "Nilai minimum untuk rentang gauge.",
             "max_value": "Nilai maksimum untuk rentang gauge.",
             "severity": "Tingkat keparahan status (info, warning, critical, success).",
-            "stat_rows": "Hingga 6 baris, masing-masing terikat ke entitas terpisah: label, entitas, serta atribut dan unit opsional. String yang dipisahkan koma masih diterima. Atur kepadatan baris per widget di aplikasi PushWard.",
+            "stat_rows": "Hingga 6 baris, masing-masing terikat ke entitas terpisah: label, entitas, serta atribut dan unit opsional. String yang dipisahkan koma masih diterima. Atur Kepadatan Baris di bagian Gaya, atau per widget di aplikasi PushWard.",
             "history_period": "Seberapa jauh ke belakang grafik mini diisi dari recorder saat widget dimulai. 0 melewati pengisian dan grafik terisi seiring perubahan entitas.",
             "start_date_attribute": "Atribut entitas berisi awal jendela waktu. Opsional; pada progress membuat bilah tetap maju di perangkat di antara pengiriman.",
             "end_date_attribute": "Atribut entitas berisi akhir jendela waktu. Kosongkan untuk memakai status entitas, finishes_at sebuah timer, atau end_time sebuah kalender.",

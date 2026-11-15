@@ -2390,7 +2390,7 @@
             "min_value": "Valoarea minimă pentru intervalul gauge.",
             "max_value": "Valoarea maximă pentru intervalul gauge.",
             "severity": "Severitatea stării (info, warning, critical, success).",
-            "stat_rows": "Până la 6 rânduri, fiecare legat de o entitate separată: etichetă, entitate și, opțional, atribut și unitate. Un șir separat prin virgule este încă acceptat. Densitatea rândurilor se reglează per widget în aplicația PushWard.",
+            "stat_rows": "Până la 6 rânduri, fiecare legat de o entitate separată: etichetă, entitate și, opțional, atribut și unitate. Un șir separat prin virgule este încă acceptat. Densitatea rândurilor se reglează la Stil sau per widget în aplicația PushWard.",
             "history_period": "Cât istoric se încarcă din recorder la pornirea graficului. 0 sare peste încărcare, iar graficul se umple pe măsură ce entitatea se schimbă.",
             "start_date_attribute": "Atributul entității cu începutul ferestrei. Opțional; la progress face bara să avanseze pe dispozitiv între trimiteri.",
             "end_date_attribute": "Atributul entității cu sfârșitul ferestrei. Lasă gol pentru a folosi starea entității, finishes_at al unui timer sau end_time al unui calendar.",

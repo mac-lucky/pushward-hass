@@ -2390,7 +2390,7 @@
             "min_value": "Wartość minimalna zakresu wskaźnika.",
             "max_value": "Wartość maksymalna zakresu wskaźnika.",
             "severity": "Istotność statusu (info, warning, critical, success).",
-            "stat_rows": "Do 6 wierszy, każdy powiązany z osobną encją: etykieta, encja oraz opcjonalnie atrybut i jednostka. Nadal akceptowany jest ciąg rozdzielony przecinkami. Gęstość wierszy ustawisz dla każdego widżetu w aplikacji PushWard.",
+            "stat_rows": "Do 6 wierszy, każdy powiązany z osobną encją: etykieta, encja oraz opcjonalnie atrybut i jednostka. Nadal akceptowany jest ciąg rozdzielony przecinkami. Gęstość wierszy ustawisz w sekcji Styl albo dla każdego widżetu w aplikacji PushWard.",
             "history_period": "Jak daleko wstecz wykres jest wypełniany z rejestratora przy starcie. 0 pomija wstępne wypełnienie, a wykres zapełnia się wraz ze zmianami encji.",
             "start_date_attribute": "Atrybut encji z początkiem okna. Opcjonalny; przy progress pasek dzięki niemu przesuwa się na urządzeniu między wysyłkami.",
             "end_date_attribute": "Atrybut encji z końcem okna. Zostaw puste, aby użyć stanu encji, finishes_at minutnika lub end_time kalendarza.",

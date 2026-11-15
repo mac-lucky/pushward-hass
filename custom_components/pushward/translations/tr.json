@@ -2390,7 +2390,7 @@
             "min_value": "Gösterge aralığı için minimum değer.",
             "max_value": "Gösterge aralığı için maksimum değer.",
             "severity": "Durum önem derecesi (info, warning, critical, success).",
-            "stat_rows": "En fazla 6 satır; her biri ayrı bir varlığa bağlanır: etiket, varlık ve isteğe bağlı olarak öznitelik ve birim. Virgülle ayrılmış metin de kabul edilir. Satır yoğunluğunu her widget için PushWard uygulamasından ayarlayın.",
+            "stat_rows": "En fazla 6 satır; her biri ayrı bir varlığa bağlanır: etiket, varlık ve isteğe bağlı olarak öznitelik ve birim. Virgülle ayrılmış metin de kabul edilir. Satır yoğunluğunu Stil altında ya da her widget için PushWard uygulamasından ayarlayın.",
             "history_period": "Widget başlarken mini grafiğin kayıt cihazından ne kadar geriye doldurulacağı. 0 doldurmayı atlar ve grafik varlık değiştikçe dolar.",
             "start_date_attribute": "Pencerenin başlangıcını taşıyan varlık özniteliği. İsteğe bağlı; progress şablonunda çubuğun gönderiler arasında cihazda ilerlemesini sağlar.",
             "end_date_attribute": "Pencerenin bitişini taşıyan varlık özniteliği. Varlığın kendi durumunu, bir zamanlayıcının finishes_at değerini veya bir takvimin end_time değerini kullanmak için boş bırakın.",

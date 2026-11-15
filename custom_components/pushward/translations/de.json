@@ -2390,7 +2390,7 @@
             "min_value": "Minimalwert für den Gauge-Bereich.",
             "max_value": "Maximalwert für den Gauge-Bereich.",
             "severity": "Schweregrad des Status (info, warning, critical, success).",
-            "stat_rows": "Bis zu 6 Zeilen, jede bindet eine eigene Entität: Bezeichnung, Entität sowie optional Attribut und Einheit. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Die Zeilendichte lässt sich je Widget in der PushWard-App einstellen.",
+            "stat_rows": "Bis zu 6 Zeilen, jede bindet eine eigene Entität: Bezeichnung, Entität sowie optional Attribut und Einheit. Eine kommagetrennte Zeichenfolge wird weiterhin akzeptiert. Die Zeilendichte lässt sich unter Stil einstellen oder je Widget in der PushWard-App.",
             "history_period": "Wie weit zurück die Sparkline beim Start aus dem Recorder befüllt wird. 0 überspringt das Vorbefüllen, das Diagramm füllt sich dann mit jeder Änderung.",
             "start_date_attribute": "Entitätsattribut mit dem Anfang des Zeitfensters. Optional; bei progress läuft der Balken damit auf dem Gerät weiter, ohne neue Pushes.",
             "end_date_attribute": "Entitätsattribut mit dem Ende des Zeitfensters. Leer lassen, um den Zustand der Entität, finishes_at eines Timers oder end_time eines Kalenders zu verwenden.",
