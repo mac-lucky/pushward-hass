@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Stil",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Stil",
+                "widget_style_small": "Stil (klein)",
+                "widget_style_medium": "Stil (mittel)",
+                "widget_style_large": "Stil (groß)",
+                "widget_style_lock_screen": "Stil (Sperrbildschirm)",
+                "widget_density": "Zeilendichte",
+                "widget_density_small": "Zeilendichte (klein)",
+                "widget_density_medium": "Zeilendichte (mittel)",
+                "widget_density_large": "Zeilendichte (groß)",
+                "widget_density_lock_screen": "Zeilendichte (Sperrbildschirm)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "So sieht das Widget in jeder Größe aus: Standard, Kräftig oder Klassisch. „Nicht festgelegt“ beibehalten, um den in der PushWard-App gewählten Look zu verwenden. Ein hier festgelegter Stil hat Vorrang vor der Wahl in der App, die ihn dann als gesperrt anzeigt.",
+                "widget_style_small": "Stil des kleinen Widgets auf dem Home-Bildschirm. „Nicht festgelegt“ nutzt den Stil oben.",
+                "widget_style_medium": "Stil des mittleren Widgets auf dem Home-Bildschirm. „Nicht festgelegt“ nutzt den Stil oben.",
+                "widget_style_large": "Stil des großen Widgets auf dem Home-Bildschirm. „Nicht festgelegt“ nutzt den Stil oben.",
+                "widget_style_lock_screen": "Stil der Widgets auf dem Sperrbildschirm des iPhone. „Nicht festgelegt“ nutzt den Stil oben. Android hat keine Widgets auf dem Sperrbildschirm.",
+                "widget_density": "So sind die Zeilen in jeder Größe verteilt: Kompakt ordnet sie in zwei Spalten an, damit bis zu 6 Zeilen passen, Geräumig behält eine Spalte mit größeren Zeilen, Automatisch passt sie an die Größe an. „Nicht festgelegt“ beibehalten, um die in der PushWard-App gewählte Zeilendichte zu verwenden.",
+                "widget_density_small": "Zeilendichte des kleinen Widgets auf dem Home-Bildschirm. „Nicht festgelegt“ nutzt die Zeilendichte oben.",
+                "widget_density_medium": "Zeilendichte des mittleren Widgets auf dem Home-Bildschirm. „Nicht festgelegt“ nutzt die Zeilendichte oben.",
+                "widget_density_large": "Zeilendichte des großen Widgets auf dem Home-Bildschirm. „Nicht festgelegt“ nutzt die Zeilendichte oben.",
+                "widget_density_lock_screen": "Zeilendichte der Widgets auf dem Sperrbildschirm des iPhone. „Nicht festgelegt“ nutzt die Zeilendichte oben."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
+        "app": "Nicht festgelegt",
         "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "bold": "Kräftig",
+        "classic": "Klassisch"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Nicht festgelegt",
+        "auto": "Automatisch",
+        "compact": "Kompakt",
+        "comfortable": "Geräumig"
       }
     }
   }

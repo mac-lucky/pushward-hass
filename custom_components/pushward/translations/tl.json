@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Istilo",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Istilo",
+                "widget_style_small": "Istilo (maliit)",
+                "widget_style_medium": "Istilo (katamtaman)",
+                "widget_style_large": "Istilo (malaki)",
+                "widget_style_lock_screen": "Istilo (Lock Screen)",
+                "widget_density": "Density ng Hanay",
+                "widget_density_small": "Density ng Hanay (maliit)",
+                "widget_density_medium": "Density ng Hanay (katamtaman)",
+                "widget_density_large": "Density ng Hanay (malaki)",
+                "widget_density_lock_screen": "Density ng Hanay (Lock Screen)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Ang hitsura ng widget sa bawat laki: Istandard, Matapang o Klasiko. Iwan ito sa Hindi nakatakda para gamitin ang hitsurang pinili sa PushWard app. Nangingibabaw ang istilong itinakda rito sa pinili sa app, at ipinapakita ito ng app bilang naka-lock.",
+                "widget_style_small": "Istilo ng maliit na widget sa Home Screen. Kapag Hindi nakatakda, ginagamit ang Istilo sa itaas.",
+                "widget_style_medium": "Istilo ng katamtamang widget sa Home Screen. Kapag Hindi nakatakda, ginagamit ang Istilo sa itaas.",
+                "widget_style_large": "Istilo ng malaking widget sa Home Screen. Kapag Hindi nakatakda, ginagamit ang Istilo sa itaas.",
+                "widget_style_lock_screen": "Istilo ng mga widget sa Lock Screen ng iPhone. Kapag Hindi nakatakda, ginagamit ang Istilo sa itaas. Walang widget sa Lock Screen ang Android.",
+                "widget_density": "Ang pagitan ng mga hanay sa bawat laki: inilalagay ng Siksik ang mga ito sa dalawang column para magkasya ang hanggang 6 na hanay, isang column na may mas malalaking hanay ang Maluwag, at iniaangkop ng Awto ang mga ito sa laki. Iwan ito sa Hindi nakatakda para gamitin ang Density ng Hanay na pinili sa PushWard app.",
+                "widget_density_small": "Density ng hanay ng maliit na widget sa Home Screen. Kapag Hindi nakatakda, ginagamit ang Density ng Hanay sa itaas.",
+                "widget_density_medium": "Density ng hanay ng katamtamang widget sa Home Screen. Kapag Hindi nakatakda, ginagamit ang Density ng Hanay sa itaas.",
+                "widget_density_large": "Density ng hanay ng malaking widget sa Home Screen. Kapag Hindi nakatakda, ginagamit ang Density ng Hanay sa itaas.",
+                "widget_density_lock_screen": "Density ng hanay ng mga widget sa Lock Screen ng iPhone. Kapag Hindi nakatakda, ginagamit ang Density ng Hanay sa itaas."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Hindi nakatakda",
+        "standard": "Istandard",
+        "bold": "Matapang",
+        "classic": "Klasiko"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Hindi nakatakda",
+        "auto": "Awto",
+        "compact": "Siksik",
+        "comfortable": "Maluwag"
       }
     }
   }

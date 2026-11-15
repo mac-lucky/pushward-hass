@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Kiểu",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Kiểu",
+                "widget_style_small": "Kiểu cỡ nhỏ",
+                "widget_style_medium": "Kiểu cỡ vừa",
+                "widget_style_large": "Kiểu cỡ lớn",
+                "widget_style_lock_screen": "Kiểu Màn hình khóa",
+                "widget_density": "Mật độ hàng",
+                "widget_density_small": "Mật độ hàng cỡ nhỏ",
+                "widget_density_medium": "Mật độ hàng cỡ vừa",
+                "widget_density_large": "Mật độ hàng cỡ lớn",
+                "widget_density_lock_screen": "Mật độ hàng Màn hình khóa"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Giao diện của widget ở mọi kích cỡ: Tiêu chuẩn, Nổi bật hoặc Cổ điển. Để Chưa đặt để dùng giao diện đã chọn trong ứng dụng PushWard. Kiểu đặt ở đây được ưu tiên hơn lựa chọn trong ứng dụng, và ứng dụng sẽ hiển thị nó là đã khóa.",
+                "widget_style_small": "Kiểu của widget cỡ nhỏ trên Màn hình chính. Chưa đặt sẽ dùng Kiểu ở trên.",
+                "widget_style_medium": "Kiểu của widget cỡ vừa trên Màn hình chính. Chưa đặt sẽ dùng Kiểu ở trên.",
+                "widget_style_large": "Kiểu của widget cỡ lớn trên Màn hình chính. Chưa đặt sẽ dùng Kiểu ở trên.",
+                "widget_style_lock_screen": "Kiểu của các widget trên Màn hình khóa của iPhone. Chưa đặt sẽ dùng Kiểu ở trên. Android không có widget trên Màn hình khóa.",
+                "widget_density": "Khoảng cách giữa các hàng ở mọi kích cỡ: Thu gọn xếp thành hai cột để chứa tối đa 6 hàng, Thoải mái giữ một cột với các hàng lớn hơn, Tự động điều chỉnh theo kích cỡ. Để Chưa đặt để dùng Mật độ hàng đã chọn trong ứng dụng PushWard.",
+                "widget_density_small": "Mật độ hàng của widget cỡ nhỏ trên Màn hình chính. Chưa đặt sẽ dùng Mật độ hàng ở trên.",
+                "widget_density_medium": "Mật độ hàng của widget cỡ vừa trên Màn hình chính. Chưa đặt sẽ dùng Mật độ hàng ở trên.",
+                "widget_density_large": "Mật độ hàng của widget cỡ lớn trên Màn hình chính. Chưa đặt sẽ dùng Mật độ hàng ở trên.",
+                "widget_density_lock_screen": "Mật độ hàng của các widget trên Màn hình khóa của iPhone. Chưa đặt sẽ dùng Mật độ hàng ở trên."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Chưa đặt",
+        "standard": "Tiêu chuẩn",
+        "bold": "Nổi bật",
+        "classic": "Cổ điển"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Chưa đặt",
+        "auto": "Tự động",
+        "compact": "Thu gọn",
+        "comfortable": "Thoải mái"
       }
     }
   }

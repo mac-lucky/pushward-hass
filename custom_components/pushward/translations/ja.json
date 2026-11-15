@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "スタイル",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "スタイル",
+                "widget_style_small": "スモールのスタイル",
+                "widget_style_medium": "ミディアムのスタイル",
+                "widget_style_large": "ラージのスタイル",
+                "widget_style_lock_screen": "ロック画面のスタイル",
+                "widget_density": "行の密度",
+                "widget_density_small": "スモールの行の密度",
+                "widget_density_medium": "ミディアムの行の密度",
+                "widget_density_large": "ラージの行の密度",
+                "widget_density_lock_screen": "ロック画面の行の密度"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "すべてのサイズでのウィジェットの見た目です: スタンダード、ボールド、クラシック。PushWard アプリで選んだデザインを使うには「未設定」のままにします。ここで設定したスタイルはアプリでの選択より優先され、アプリではロック中として表示されます。",
+                "widget_style_small": "ホーム画面のスモールウィジェットのスタイルです。未設定の場合は上の「スタイル」が使われます。",
+                "widget_style_medium": "ホーム画面のミディアムウィジェットのスタイルです。未設定の場合は上の「スタイル」が使われます。",
+                "widget_style_large": "ホーム画面のラージウィジェットのスタイルです。未設定の場合は上の「スタイル」が使われます。",
+                "widget_style_lock_screen": "iPhone のロック画面ウィジェットのスタイルです。未設定の場合は上の「スタイル」が使われます。Android にはロック画面ウィジェットがありません。",
+                "widget_density": "すべてのサイズでの行の配置です: コンパクトは2列に並べて最大6行まで収め、ゆったりは1列のまま行を大きく表示し、自動はサイズに合わせて調整します。PushWard アプリで選んだ行の密度を使うには「未設定」のままにします。",
+                "widget_density_small": "ホーム画面のスモールウィジェットの行の密度です。未設定の場合は上の「行の密度」が使われます。",
+                "widget_density_medium": "ホーム画面のミディアムウィジェットの行の密度です。未設定の場合は上の「行の密度」が使われます。",
+                "widget_density_large": "ホーム画面のラージウィジェットの行の密度です。未設定の場合は上の「行の密度」が使われます。",
+                "widget_density_lock_screen": "iPhone のロック画面ウィジェットの行の密度です。未設定の場合は上の「行の密度」が使われます。"
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "未設定",
+        "standard": "スタンダード",
+        "bold": "ボールド",
+        "classic": "クラシック"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "未設定",
+        "auto": "自動",
+        "compact": "コンパクト",
+        "comfortable": "ゆったり"
       }
     }
   }

@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Stil",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Stil",
+                "widget_style_small": "Stil (mic)",
+                "widget_style_medium": "Stil (mediu)",
+                "widget_style_large": "Stil (mare)",
+                "widget_style_lock_screen": "Stil (ecran de blocare)",
+                "widget_density": "Densitate rânduri",
+                "widget_density_small": "Densitate rânduri (mic)",
+                "widget_density_medium": "Densitate rânduri (mediu)",
+                "widget_density_large": "Densitate rânduri (mare)",
+                "widget_density_lock_screen": "Densitate rânduri (ecran de blocare)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Cum arată widgetul în toate dimensiunile: Standard, Îndrăzneț sau Clasic. Lăsați Nesetat pentru a folosi aspectul ales în aplicația PushWard. Un stil setat aici are prioritate față de alegerea din aplicație, care îl afișează atunci ca blocat.",
+                "widget_style_small": "Stilul widgetului mic de pe ecranul principal. Nesetat folosește Stilul de mai sus.",
+                "widget_style_medium": "Stilul widgetului mediu de pe ecranul principal. Nesetat folosește Stilul de mai sus.",
+                "widget_style_large": "Stilul widgetului mare de pe ecranul principal. Nesetat folosește Stilul de mai sus.",
+                "widget_style_lock_screen": "Stilul widgeturilor de pe ecranul de blocare al iPhone-ului. Nesetat folosește Stilul de mai sus. Android nu are widgeturi pe ecranul de blocare.",
+                "widget_density": "Cum sunt spațiate rândurile în toate dimensiunile: Compact le așază pe două coloane ca să încapă până la 6 rânduri, Spațios păstrează o coloană cu rânduri mai mari, Automat le potrivește la dimensiune. Lăsați Nesetat pentru a folosi Densitatea rândurilor aleasă în aplicația PushWard.",
+                "widget_density_small": "Densitatea rândurilor widgetului mic de pe ecranul principal. Nesetat folosește Densitatea rândurilor de mai sus.",
+                "widget_density_medium": "Densitatea rândurilor widgetului mediu de pe ecranul principal. Nesetat folosește Densitatea rândurilor de mai sus.",
+                "widget_density_large": "Densitatea rândurilor widgetului mare de pe ecranul principal. Nesetat folosește Densitatea rândurilor de mai sus.",
+                "widget_density_lock_screen": "Densitatea rândurilor widgeturilor de pe ecranul de blocare al iPhone-ului. Nesetat folosește Densitatea rândurilor de mai sus."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
+        "app": "Nesetat",
         "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "bold": "Îndrăzneț",
+        "classic": "Clasic"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
+        "app": "Nesetat",
+        "auto": "Automat",
         "compact": "Compact",
-        "comfortable": "Comfortable"
+        "comfortable": "Spațios"
       }
     }
   }

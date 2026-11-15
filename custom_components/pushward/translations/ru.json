@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Стиль",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Стиль",
+                "widget_style_small": "Стиль (малый)",
+                "widget_style_medium": "Стиль (средний)",
+                "widget_style_large": "Стиль (большой)",
+                "widget_style_lock_screen": "Стиль (экран блокировки)",
+                "widget_density": "Плотность строк",
+                "widget_density_small": "Плотность строк (малый)",
+                "widget_density_medium": "Плотность строк (средний)",
+                "widget_density_large": "Плотность строк (большой)",
+                "widget_density_lock_screen": "Плотность строк (экран блокировки)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Как виджет выглядит во всех размерах: «Стандартный», «Выразительный» или «Классический». Оставьте «Не задано», чтобы использовать вид, выбранный в приложении PushWard. Стиль, заданный здесь, важнее выбора в приложении, и приложение показывает его как заблокированный.",
+                "widget_style_small": "Стиль малого виджета на экране «Домой». «Не задано» использует стиль выше.",
+                "widget_style_medium": "Стиль среднего виджета на экране «Домой». «Не задано» использует стиль выше.",
+                "widget_style_large": "Стиль большого виджета на экране «Домой». «Не задано» использует стиль выше.",
+                "widget_style_lock_screen": "Стиль виджетов на экране блокировки iPhone. «Не задано» использует стиль выше. В Android нет виджетов на экране блокировки.",
+                "widget_density": "Как расположены строки во всех размерах: «Компактный» раскладывает их в два столбца, чтобы уместить до 6 строк, «Просторный» оставляет один столбец с более крупными строками, «Авто» подгоняет их под размер. Оставьте «Не задано», чтобы использовать плотность строк, выбранную в приложении PushWard.",
+                "widget_density_small": "Плотность строк малого виджета на экране «Домой». «Не задано» использует плотность строк выше.",
+                "widget_density_medium": "Плотность строк среднего виджета на экране «Домой». «Не задано» использует плотность строк выше.",
+                "widget_density_large": "Плотность строк большого виджета на экране «Домой». «Не задано» использует плотность строк выше.",
+                "widget_density_lock_screen": "Плотность строк виджетов на экране блокировки iPhone. «Не задано» использует плотность строк выше."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Не задано",
+        "standard": "Стандартный",
+        "bold": "Выразительный",
+        "classic": "Классический"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Не задано",
+        "auto": "Авто",
+        "compact": "Компактный",
+        "comfortable": "Просторный"
       }
     }
   }

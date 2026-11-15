@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "స్టైల్",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "స్టైల్",
+                "widget_style_small": "చిన్న సైజు స్టైల్",
+                "widget_style_medium": "మధ్యస్థ సైజు స్టైల్",
+                "widget_style_large": "పెద్ద సైజు స్టైల్",
+                "widget_style_lock_screen": "లాక్ స్క్రీన్ స్టైల్",
+                "widget_density": "వరుస సాంద్రత",
+                "widget_density_small": "చిన్న సైజు వరుస సాంద్రత",
+                "widget_density_medium": "మధ్యస్థ సైజు వరుస సాంద్రత",
+                "widget_density_large": "పెద్ద సైజు వరుస సాంద్రత",
+                "widget_density_lock_screen": "లాక్ స్క్రీన్ వరుస సాంద్రత"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "ప్రతి సైజులో విడ్జెట్ ఎలా కనిపిస్తుంది: ప్రామాణిక, బోల్డ్ లేదా క్లాసిక్. PushWard యాప్‌లో ఎంచుకున్న రూపాన్ని వాడాలంటే దీన్ని సెట్ చేయలేదు వద్దే ఉంచండి. ఇక్కడ సెట్ చేసిన స్టైల్ యాప్‌లోని ఎంపిక కంటే ప్రాధాన్యత పొందుతుంది, అప్పుడు యాప్ దాన్ని లాక్ అయినట్లు చూపిస్తుంది.",
+                "widget_style_small": "హోమ్ స్క్రీన్‌పై ఉన్న చిన్న విడ్జెట్ స్టైల్. సెట్ చేయలేదు అయితే పైన ఉన్న స్టైల్ వాడబడుతుంది.",
+                "widget_style_medium": "హోమ్ స్క్రీన్‌పై ఉన్న మధ్యస్థ విడ్జెట్ స్టైల్. సెట్ చేయలేదు అయితే పైన ఉన్న స్టైల్ వాడబడుతుంది.",
+                "widget_style_large": "హోమ్ స్క్రీన్‌పై ఉన్న పెద్ద విడ్జెట్ స్టైల్. సెట్ చేయలేదు అయితే పైన ఉన్న స్టైల్ వాడబడుతుంది.",
+                "widget_style_lock_screen": "iPhone లోని లాక్ స్క్రీన్ విడ్జెట్‌ల స్టైల్. సెట్ చేయలేదు అయితే పైన ఉన్న స్టైల్ వాడబడుతుంది. Android లో లాక్ స్క్రీన్ విడ్జెట్‌లు లేవు.",
+                "widget_density": "ప్రతి సైజులో వరుసల మధ్య దూరం: కాంపాక్ట్ రెండు నిలువు వరుసల్లో అమర్చి 6 వరుసల వరకు పడుతుంది, విశాలమైన పెద్ద వరుసలతో ఒకే నిలువు వరుస ఉంచుతుంది, స్వయంచాలక వాటిని సైజుకు తగ్గట్టు సర్దుతుంది. PushWard యాప్‌లో ఎంచుకున్న వరుస సాంద్రతను వాడాలంటే దీన్ని సెట్ చేయలేదు వద్దే ఉంచండి.",
+                "widget_density_small": "హోమ్ స్క్రీన్‌పై ఉన్న చిన్న విడ్జెట్ వరుస సాంద్రత. సెట్ చేయలేదు అయితే పైన ఉన్న వరుస సాంద్రత వాడబడుతుంది.",
+                "widget_density_medium": "హోమ్ స్క్రీన్‌పై ఉన్న మధ్యస్థ విడ్జెట్ వరుస సాంద్రత. సెట్ చేయలేదు అయితే పైన ఉన్న వరుస సాంద్రత వాడబడుతుంది.",
+                "widget_density_large": "హోమ్ స్క్రీన్‌పై ఉన్న పెద్ద విడ్జెట్ వరుస సాంద్రత. సెట్ చేయలేదు అయితే పైన ఉన్న వరుస సాంద్రత వాడబడుతుంది.",
+                "widget_density_lock_screen": "iPhone లోని లాక్ స్క్రీన్ విడ్జెట్‌ల వరుస సాంద్రత. సెట్ చేయలేదు అయితే పైన ఉన్న వరుస సాంద్రత వాడబడుతుంది."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "సెట్ చేయలేదు",
+        "standard": "ప్రామాణిక",
+        "bold": "బోల్డ్",
+        "classic": "క్లాసిక్"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "సెట్ చేయలేదు",
+        "auto": "స్వయంచాలక",
+        "compact": "కాంపాక్ట్",
+        "comfortable": "విశాలమైన"
       }
     }
   }

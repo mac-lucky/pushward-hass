@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "வடிவம்",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "வடிவம்",
+                "widget_style_small": "சிறிய அளவு வடிவம்",
+                "widget_style_medium": "நடுத்தர அளவு வடிவம்",
+                "widget_style_large": "பெரிய அளவு வடிவம்",
+                "widget_style_lock_screen": "பூட்டுத் திரை வடிவம்",
+                "widget_density": "வரிசை அடர்த்தி",
+                "widget_density_small": "சிறிய அளவு வரிசை அடர்த்தி",
+                "widget_density_medium": "நடுத்தர அளவு வரிசை அடர்த்தி",
+                "widget_density_large": "பெரிய அளவு வரிசை அடர்த்தி",
+                "widget_density_lock_screen": "பூட்டுத் திரை வரிசை அடர்த்தி"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "எல்லா அளவுகளிலும் விட்ஜெட் எப்படித் தெரியும்: நிலையான, எடுப்பான அல்லது கிளாசிக். PushWard ஆப்பில் தேர்ந்தெடுத்த தோற்றத்தைப் பயன்படுத்த, இதை அமைக்கப்படவில்லை என்றே விடுங்கள். இங்கே அமைக்கும் வடிவம் ஆப்பில் உள்ள தேர்வை விட முன்னுரிமை பெறும்; அப்போது ஆப் அதைப் பூட்டியதாகக் காட்டும்.",
+                "widget_style_small": "முகப்புத் திரையில் உள்ள சிறிய விட்ஜெட்டின் வடிவம். அமைக்கப்படவில்லை என்றால் மேலே உள்ள வடிவம் பயன்படும்.",
+                "widget_style_medium": "முகப்புத் திரையில் உள்ள நடுத்தர விட்ஜெட்டின் வடிவம். அமைக்கப்படவில்லை என்றால் மேலே உள்ள வடிவம் பயன்படும்.",
+                "widget_style_large": "முகப்புத் திரையில் உள்ள பெரிய விட்ஜெட்டின் வடிவம். அமைக்கப்படவில்லை என்றால் மேலே உள்ள வடிவம் பயன்படும்.",
+                "widget_style_lock_screen": "iPhone இன் பூட்டுத் திரை விட்ஜெட்டுகளின் வடிவம். அமைக்கப்படவில்லை என்றால் மேலே உள்ள வடிவம் பயன்படும். Android இல் பூட்டுத் திரை விட்ஜெட்டுகள் இல்லை.",
+                "widget_density": "எல்லா அளவுகளிலும் வரிசைகளுக்கு இடையிலான இடைவெளி: சுருக்கம் 6 வரிசைகள் வரை பொருந்த இரண்டு நெடுவரிசைகளில் அடுக்கும், வசதியான பெரிய வரிசைகளுடன் ஒரே நெடுவரிசையை வைக்கும், தானியங்கு அளவுக்கு ஏற்ப அவற்றைப் பொருத்தும். PushWard ஆப்பில் தேர்ந்தெடுத்த வரிசை அடர்த்தியைப் பயன்படுத்த, இதை அமைக்கப்படவில்லை என்றே விடுங்கள்.",
+                "widget_density_small": "முகப்புத் திரையில் உள்ள சிறிய விட்ஜெட்டின் வரிசை அடர்த்தி. அமைக்கப்படவில்லை என்றால் மேலே உள்ள வரிசை அடர்த்தி பயன்படும்.",
+                "widget_density_medium": "முகப்புத் திரையில் உள்ள நடுத்தர விட்ஜெட்டின் வரிசை அடர்த்தி. அமைக்கப்படவில்லை என்றால் மேலே உள்ள வரிசை அடர்த்தி பயன்படும்.",
+                "widget_density_large": "முகப்புத் திரையில் உள்ள பெரிய விட்ஜெட்டின் வரிசை அடர்த்தி. அமைக்கப்படவில்லை என்றால் மேலே உள்ள வரிசை அடர்த்தி பயன்படும்.",
+                "widget_density_lock_screen": "iPhone இன் பூட்டுத் திரை விட்ஜெட்டுகளின் வரிசை அடர்த்தி. அமைக்கப்படவில்லை என்றால் மேலே உள்ள வரிசை அடர்த்தி பயன்படும்."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "அமைக்கப்படவில்லை",
+        "standard": "நிலையான",
+        "bold": "எடுப்பான",
+        "classic": "கிளாசிக்"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "அமைக்கப்படவில்லை",
+        "auto": "தானியங்கு",
+        "compact": "சுருக்கம்",
+        "comfortable": "வசதியான"
       }
     }
   }

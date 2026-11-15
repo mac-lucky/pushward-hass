@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "शैली",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "शैली",
+                "widget_style_small": "लहान आकाराची शैली",
+                "widget_style_medium": "मध्यम आकाराची शैली",
+                "widget_style_large": "मोठ्या आकाराची शैली",
+                "widget_style_lock_screen": "लॉक स्क्रीनची शैली",
+                "widget_density": "रांगेची घनता",
+                "widget_density_small": "लहान आकाराची रांगेची घनता",
+                "widget_density_medium": "मध्यम आकाराची रांगेची घनता",
+                "widget_density_large": "मोठ्या आकाराची रांगेची घनता",
+                "widget_density_lock_screen": "लॉक स्क्रीनची रांगेची घनता"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "प्रत्येक आकारात विजेट कसे दिसते: मानक, बोल्ड किंवा क्लासिक. PushWard अ‍ॅपमध्ये निवडलेला लूक वापरण्यासाठी हे सेट नाही वर ठेवा. येथे सेट केलेली शैली अ‍ॅपमधील निवडीपेक्षा वरचढ ठरते, आणि अ‍ॅप ती लॉक केलेली म्हणून दाखवते.",
+                "widget_style_small": "होम स्क्रीनवरील लहान विजेटची शैली. सेट नाही निवडल्यास वरची शैली वापरली जाते.",
+                "widget_style_medium": "होम स्क्रीनवरील मध्यम विजेटची शैली. सेट नाही निवडल्यास वरची शैली वापरली जाते.",
+                "widget_style_large": "होम स्क्रीनवरील मोठ्या विजेटची शैली. सेट नाही निवडल्यास वरची शैली वापरली जाते.",
+                "widget_style_lock_screen": "iPhone वरील लॉक स्क्रीन विजेट्सची शैली. सेट नाही निवडल्यास वरची शैली वापरली जाते. Android मध्ये लॉक स्क्रीन विजेट्स नसतात.",
+                "widget_density": "प्रत्येक आकारात रांगांमधील अंतर: कॉम्पॅक्ट दोन स्तंभ करून 6 रांगांपर्यंत बसवते, विस्तृत मोठ्या रांगांसह एकच स्तंभ ठेवते, स्वयंचलित त्यांना आकारानुसार जुळवते. PushWard अ‍ॅपमध्ये निवडलेली रांगेची घनता वापरण्यासाठी हे सेट नाही वर ठेवा.",
+                "widget_density_small": "होम स्क्रीनवरील लहान विजेटची रांगेची घनता. सेट नाही निवडल्यास वरची रांगेची घनता वापरली जाते.",
+                "widget_density_medium": "होम स्क्रीनवरील मध्यम विजेटची रांगेची घनता. सेट नाही निवडल्यास वरची रांगेची घनता वापरली जाते.",
+                "widget_density_large": "होम स्क्रीनवरील मोठ्या विजेटची रांगेची घनता. सेट नाही निवडल्यास वरची रांगेची घनता वापरली जाते.",
+                "widget_density_lock_screen": "iPhone वरील लॉक स्क्रीन विजेट्सची रांगेची घनता. सेट नाही निवडल्यास वरची रांगेची घनता वापरली जाते."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "सेट नाही",
+        "standard": "मानक",
+        "bold": "बोल्ड",
+        "classic": "क्लासिक"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "सेट नाही",
+        "auto": "स्वयंचलित",
+        "compact": "कॉम्पॅक्ट",
+        "comfortable": "विस्तृत"
       }
     }
   }

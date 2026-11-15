@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Stil",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Stil",
+                "widget_style_small": "Stil (küçük)",
+                "widget_style_medium": "Stil (orta)",
+                "widget_style_large": "Stil (büyük)",
+                "widget_style_lock_screen": "Stil (Kilit Ekranı)",
+                "widget_density": "Satır yoğunluğu",
+                "widget_density_small": "Satır yoğunluğu (küçük)",
+                "widget_density_medium": "Satır yoğunluğu (orta)",
+                "widget_density_large": "Satır yoğunluğu (büyük)",
+                "widget_density_lock_screen": "Satır yoğunluğu (Kilit Ekranı)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Widget'ın her boyuttaki görünümü: Standart, Cesur veya Klasik. PushWard uygulamasında seçilen görünümü kullanmak için Ayarlanmadı olarak bırakın. Burada ayarlanan stil uygulamadaki seçimin önüne geçer ve uygulama onu kilitli olarak gösterir.",
+                "widget_style_small": "Ana ekrandaki küçük widget'ın stili. Ayarlanmadı seçilirse yukarıdaki Stil kullanılır.",
+                "widget_style_medium": "Ana ekrandaki orta widget'ın stili. Ayarlanmadı seçilirse yukarıdaki Stil kullanılır.",
+                "widget_style_large": "Ana ekrandaki büyük widget'ın stili. Ayarlanmadı seçilirse yukarıdaki Stil kullanılır.",
+                "widget_style_lock_screen": "iPhone'daki Kilit Ekranı widget'larının stili. Ayarlanmadı seçilirse yukarıdaki Stil kullanılır. Android'de Kilit Ekranı widget'ı yoktur.",
+                "widget_density": "Satırların her boyuttaki yerleşimi: Kompakt, 6 satıra kadar sığdırmak için iki sütun kullanır; Geniş, daha büyük satırlarla tek sütun tutar; Otomatik, onları boyuta göre ayarlar. PushWard uygulamasında seçilen Satır yoğunluğunu kullanmak için Ayarlanmadı olarak bırakın.",
+                "widget_density_small": "Ana ekrandaki küçük widget'ın satır yoğunluğu. Ayarlanmadı seçilirse yukarıdaki Satır yoğunluğu kullanılır.",
+                "widget_density_medium": "Ana ekrandaki orta widget'ın satır yoğunluğu. Ayarlanmadı seçilirse yukarıdaki Satır yoğunluğu kullanılır.",
+                "widget_density_large": "Ana ekrandaki büyük widget'ın satır yoğunluğu. Ayarlanmadı seçilirse yukarıdaki Satır yoğunluğu kullanılır.",
+                "widget_density_lock_screen": "iPhone'daki Kilit Ekranı widget'larının satır yoğunluğu. Ayarlanmadı seçilirse yukarıdaki Satır yoğunluğu kullanılır."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Ayarlanmadı",
+        "standard": "Standart",
+        "bold": "Cesur",
+        "classic": "Klasik"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Ayarlanmadı",
+        "auto": "Otomatik",
+        "compact": "Kompakt",
+        "comfortable": "Geniş"
       }
     }
   }

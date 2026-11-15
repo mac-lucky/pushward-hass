@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Стиль",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Стиль",
+                "widget_style_small": "Стиль (малий)",
+                "widget_style_medium": "Стиль (середній)",
+                "widget_style_large": "Стиль (великий)",
+                "widget_style_lock_screen": "Стиль (екран блокування)",
+                "widget_density": "Щільність рядків",
+                "widget_density_small": "Щільність рядків (малий)",
+                "widget_density_medium": "Щільність рядків (середній)",
+                "widget_density_large": "Щільність рядків (великий)",
+                "widget_density_lock_screen": "Щільність рядків (екран блокування)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Як віджет виглядає в усіх розмірах: «Стандартний», «Виразний» або «Класичний». Залиште «Не задано», щоб використовувати вигляд, вибраний у застосунку PushWard. Стиль, заданий тут, важливіший за вибір у застосунку, і застосунок показує його як заблокований.",
+                "widget_style_small": "Стиль малого віджета на початковому екрані. «Не задано» використовує стиль вище.",
+                "widget_style_medium": "Стиль середнього віджета на початковому екрані. «Не задано» використовує стиль вище.",
+                "widget_style_large": "Стиль великого віджета на початковому екрані. «Не задано» використовує стиль вище.",
+                "widget_style_lock_screen": "Стиль віджетів на екрані блокування iPhone. «Не задано» використовує стиль вище. В Android немає віджетів на екрані блокування.",
+                "widget_density": "Як розташовані рядки в усіх розмірах: «Компактний» розкладає їх у два стовпці, щоб умістити до 6 рядків, «Просторий» залишає один стовпець із більшими рядками, «Автоматично» припасовує їх до розміру. Залиште «Не задано», щоб використовувати щільність рядків, вибрану в застосунку PushWard.",
+                "widget_density_small": "Щільність рядків малого віджета на початковому екрані. «Не задано» використовує щільність рядків вище.",
+                "widget_density_medium": "Щільність рядків середнього віджета на початковому екрані. «Не задано» використовує щільність рядків вище.",
+                "widget_density_large": "Щільність рядків великого віджета на початковому екрані. «Не задано» використовує щільність рядків вище.",
+                "widget_density_lock_screen": "Щільність рядків віджетів на екрані блокування iPhone. «Не задано» використовує щільність рядків вище."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Не задано",
+        "standard": "Стандартний",
+        "bold": "Виразний",
+        "classic": "Класичний"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Не задано",
+        "auto": "Автоматично",
+        "compact": "Компактний",
+        "comfortable": "Просторий"
       }
     }
   }

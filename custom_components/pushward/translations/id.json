@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Gaya",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Gaya",
+                "widget_style_small": "Gaya ukuran kecil",
+                "widget_style_medium": "Gaya ukuran sedang",
+                "widget_style_large": "Gaya ukuran besar",
+                "widget_style_lock_screen": "Gaya Layar Terkunci",
+                "widget_density": "Kepadatan Baris",
+                "widget_density_small": "Kepadatan baris ukuran kecil",
+                "widget_density_medium": "Kepadatan baris ukuran sedang",
+                "widget_density_large": "Kepadatan baris ukuran besar",
+                "widget_density_lock_screen": "Kepadatan baris Layar Terkunci"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Tampilan widget di semua ukuran: Standar, Tegas, atau Klasik. Biarkan di Tidak diatur untuk memakai tampilan yang dipilih di aplikasi PushWard. Gaya yang diatur di sini mengesampingkan pilihan di aplikasi, yang lalu menampilkannya sebagai terkunci.",
+                "widget_style_small": "Gaya widget Layar Utama ukuran kecil. Tidak diatur memakai Gaya di atas.",
+                "widget_style_medium": "Gaya widget Layar Utama ukuran sedang. Tidak diatur memakai Gaya di atas.",
+                "widget_style_large": "Gaya widget Layar Utama ukuran besar. Tidak diatur memakai Gaya di atas.",
+                "widget_style_lock_screen": "Gaya widget Layar Terkunci di iPhone. Tidak diatur memakai Gaya di atas. Android tidak punya widget Layar Terkunci.",
+                "widget_density": "Jarak antarbaris di semua ukuran: Kompak menyusunnya dalam dua kolom agar muat hingga 6 baris, Luas mempertahankan satu kolom dengan baris yang lebih besar, Otomatis menyesuaikannya dengan ukuran. Biarkan di Tidak diatur untuk memakai Kepadatan Baris yang dipilih di aplikasi PushWard.",
+                "widget_density_small": "Kepadatan baris widget Layar Utama ukuran kecil. Tidak diatur memakai Kepadatan Baris di atas.",
+                "widget_density_medium": "Kepadatan baris widget Layar Utama ukuran sedang. Tidak diatur memakai Kepadatan Baris di atas.",
+                "widget_density_large": "Kepadatan baris widget Layar Utama ukuran besar. Tidak diatur memakai Kepadatan Baris di atas.",
+                "widget_density_lock_screen": "Kepadatan baris widget Layar Terkunci di iPhone. Tidak diatur memakai Kepadatan Baris di atas."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Tidak diatur",
+        "standard": "Standar",
+        "bold": "Tegas",
+        "classic": "Klasik"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Tidak diatur",
+        "auto": "Otomatis",
+        "compact": "Kompak",
+        "comfortable": "Luas"
       }
     }
   }

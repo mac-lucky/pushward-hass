@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "النمط",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "النمط",
+                "widget_style_small": "نمط الحجم الصغير",
+                "widget_style_medium": "نمط الحجم المتوسط",
+                "widget_style_large": "نمط الحجم الكبير",
+                "widget_style_lock_screen": "نمط شاشة القفل",
+                "widget_density": "كثافة الصفوف",
+                "widget_density_small": "كثافة الصفوف للحجم الصغير",
+                "widget_density_medium": "كثافة الصفوف للحجم المتوسط",
+                "widget_density_large": "كثافة الصفوف للحجم الكبير",
+                "widget_density_lock_screen": "كثافة الصفوف لشاشة القفل"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "مظهر الأداة بكل الأحجام: قياسي أو جريء أو كلاسيكي. اتركه على «غير محدد» لاستخدام المظهر المختار في تطبيق PushWard. النمط المحدد هنا يتقدّم على الاختيار في التطبيق، فيعرضه التطبيق عندها مقفلًا.",
+                "widget_style_small": "نمط الأداة الصغيرة على الشاشة الرئيسية. عند اختيار «غير محدد» يُستخدم النمط أعلاه.",
+                "widget_style_medium": "نمط الأداة المتوسطة على الشاشة الرئيسية. عند اختيار «غير محدد» يُستخدم النمط أعلاه.",
+                "widget_style_large": "نمط الأداة الكبيرة على الشاشة الرئيسية. عند اختيار «غير محدد» يُستخدم النمط أعلاه.",
+                "widget_style_lock_screen": "نمط أدوات شاشة القفل على iPhone. عند اختيار «غير محدد» يُستخدم النمط أعلاه. لا توجد أدوات لشاشة القفل في Android.",
+                "widget_density": "تباعد الصفوف بكل الأحجام: «مضغوط» يرتّبها في عمودين ليتسع حتى 6 صفوف، و«مريح» يُبقي عمودًا واحدًا بصفوف أكبر، و«تلقائي» يلائمها مع الحجم. اتركه على «غير محدد» لاستخدام كثافة الصفوف المختارة في تطبيق PushWard.",
+                "widget_density_small": "كثافة الصفوف في الأداة الصغيرة على الشاشة الرئيسية. عند اختيار «غير محدد» تُستخدم كثافة الصفوف أعلاه.",
+                "widget_density_medium": "كثافة الصفوف في الأداة المتوسطة على الشاشة الرئيسية. عند اختيار «غير محدد» تُستخدم كثافة الصفوف أعلاه.",
+                "widget_density_large": "كثافة الصفوف في الأداة الكبيرة على الشاشة الرئيسية. عند اختيار «غير محدد» تُستخدم كثافة الصفوف أعلاه.",
+                "widget_density_lock_screen": "كثافة الصفوف في أدوات شاشة القفل على iPhone. عند اختيار «غير محدد» تُستخدم كثافة الصفوف أعلاه."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "غير محدد",
+        "standard": "قياسي",
+        "bold": "جريء",
+        "classic": "كلاسيكي"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "غير محدد",
+        "auto": "تلقائي",
+        "compact": "مضغوط",
+        "comfortable": "مريح"
       }
     }
   }

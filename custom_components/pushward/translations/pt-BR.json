@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Estilo",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Estilo",
+                "widget_style_small": "Estilo (pequeno)",
+                "widget_style_medium": "Estilo (médio)",
+                "widget_style_large": "Estilo (grande)",
+                "widget_style_lock_screen": "Estilo (Tela Bloqueada)",
+                "widget_density": "Densidade de linhas",
+                "widget_density_small": "Densidade de linhas (pequeno)",
+                "widget_density_medium": "Densidade de linhas (médio)",
+                "widget_density_large": "Densidade de linhas (grande)",
+                "widget_density_lock_screen": "Densidade de linhas (Tela Bloqueada)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Como o widget aparece em todos os tamanhos: Padrão, Ousado ou Clássico. Deixe em Não definido para usar o visual escolhido no app PushWard. Um estilo definido aqui prevalece sobre a escolha no app, que passa a mostrá-lo como bloqueado.",
+                "widget_style_small": "Estilo do widget pequeno da Tela de Início. Não definido usa o Estilo acima.",
+                "widget_style_medium": "Estilo do widget médio da Tela de Início. Não definido usa o Estilo acima.",
+                "widget_style_large": "Estilo do widget grande da Tela de Início. Não definido usa o Estilo acima.",
+                "widget_style_lock_screen": "Estilo dos widgets da Tela Bloqueada do iPhone. Não definido usa o Estilo acima. O Android não tem widgets na Tela Bloqueada.",
+                "widget_density": "Como as linhas se espaçam em todos os tamanhos: Compacto as distribui em duas colunas para caber até 6 linhas, Espaçado mantém uma coluna com linhas maiores, Automático as ajusta ao tamanho. Deixe em Não definido para usar a Densidade de linhas escolhida no app PushWard.",
+                "widget_density_small": "Densidade de linhas do widget pequeno da Tela de Início. Não definido usa a Densidade de linhas acima.",
+                "widget_density_medium": "Densidade de linhas do widget médio da Tela de Início. Não definido usa a Densidade de linhas acima.",
+                "widget_density_large": "Densidade de linhas do widget grande da Tela de Início. Não definido usa a Densidade de linhas acima.",
+                "widget_density_lock_screen": "Densidade de linhas dos widgets da Tela Bloqueada do iPhone. Não definido usa a Densidade de linhas acima."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Não definido",
+        "standard": "Padrão",
+        "bold": "Ousado",
+        "classic": "Clássico"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Não definido",
+        "auto": "Automático",
+        "compact": "Compacto",
+        "comfortable": "Espaçado"
       }
     }
   }

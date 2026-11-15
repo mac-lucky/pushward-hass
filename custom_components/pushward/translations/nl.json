@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Stijl",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Stijl",
+                "widget_style_small": "Stijl (klein)",
+                "widget_style_medium": "Stijl (middel)",
+                "widget_style_large": "Stijl (groot)",
+                "widget_style_lock_screen": "Stijl (toegangsscherm)",
+                "widget_density": "Rijdichtheid",
+                "widget_density_small": "Rijdichtheid (klein)",
+                "widget_density_medium": "Rijdichtheid (middel)",
+                "widget_density_large": "Rijdichtheid (groot)",
+                "widget_density_lock_screen": "Rijdichtheid (toegangsscherm)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Hoe de widget er in elk formaat uitziet: Standaard, Krachtig of Klassiek. Laat Niet ingesteld staan om de look te gebruiken die in de PushWard-app is gekozen. Een stijl die hier is ingesteld gaat voor de keuze in de app, die hem dan als vergrendeld toont.",
+                "widget_style_small": "Stijl van de kleine widget op het beginscherm. Niet ingesteld gebruikt de Stijl hierboven.",
+                "widget_style_medium": "Stijl van de middelgrote widget op het beginscherm. Niet ingesteld gebruikt de Stijl hierboven.",
+                "widget_style_large": "Stijl van de grote widget op het beginscherm. Niet ingesteld gebruikt de Stijl hierboven.",
+                "widget_style_lock_screen": "Stijl van de widgets op het toegangsscherm van de iPhone. Niet ingesteld gebruikt de Stijl hierboven. Android heeft geen widgets op het toegangsscherm.",
+                "widget_density": "Hoe de rijen in elk formaat verdeeld zijn: Compact zet ze in twee kolommen zodat er tot 6 rijen passen, Ruim houdt één kolom met grotere rijen, Automatisch past ze aan het formaat aan. Laat Niet ingesteld staan om de Rijdichtheid te gebruiken die in de PushWard-app is gekozen.",
+                "widget_density_small": "Rijdichtheid van de kleine widget op het beginscherm. Niet ingesteld gebruikt de Rijdichtheid hierboven.",
+                "widget_density_medium": "Rijdichtheid van de middelgrote widget op het beginscherm. Niet ingesteld gebruikt de Rijdichtheid hierboven.",
+                "widget_density_large": "Rijdichtheid van de grote widget op het beginscherm. Niet ingesteld gebruikt de Rijdichtheid hierboven.",
+                "widget_density_lock_screen": "Rijdichtheid van de widgets op het toegangsscherm van de iPhone. Niet ingesteld gebruikt de Rijdichtheid hierboven."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Niet ingesteld",
+        "standard": "Standaard",
+        "bold": "Krachtig",
+        "classic": "Klassiek"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
+        "app": "Niet ingesteld",
+        "auto": "Automatisch",
         "compact": "Compact",
-        "comfortable": "Comfortable"
+        "comfortable": "Ruim"
       }
     }
   }

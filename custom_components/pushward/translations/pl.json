@@ -2405,30 +2405,30 @@
           },
           "sections": {
             "look": {
-              "name": "Style",
+              "name": "Styl",
               "data": {
-                "widget_style": "Style",
-                "widget_style_small": "Small Style",
-                "widget_style_medium": "Medium Style",
-                "widget_style_large": "Large Style",
-                "widget_style_lock_screen": "Lock Screen Style",
-                "widget_density": "Row Density",
-                "widget_density_small": "Small Row Density",
-                "widget_density_medium": "Medium Row Density",
-                "widget_density_large": "Large Row Density",
-                "widget_density_lock_screen": "Lock Screen Row Density"
+                "widget_style": "Styl",
+                "widget_style_small": "Styl (mały)",
+                "widget_style_medium": "Styl (średni)",
+                "widget_style_large": "Styl (duży)",
+                "widget_style_lock_screen": "Styl (ekran blokady)",
+                "widget_density": "Gęstość wierszy",
+                "widget_density_small": "Gęstość wierszy (mały)",
+                "widget_density_medium": "Gęstość wierszy (średni)",
+                "widget_density_large": "Gęstość wierszy (duży)",
+                "widget_density_lock_screen": "Gęstość wierszy (ekran blokady)"
               },
               "data_description": {
-                "widget_style": "How the widget looks on every size: Standard, Bold or Classic. Leave it on Not set to use the look picked in the PushWard app. A style set here overrides the in-app pick, which the app then shows as locked.",
-                "widget_style_small": "Style of the small Home Screen widget. Not set uses Style above.",
-                "widget_style_medium": "Style of the medium Home Screen widget. Not set uses Style above.",
-                "widget_style_large": "Style of the large Home Screen widget. Not set uses Style above.",
-                "widget_style_lock_screen": "Style of the Lock Screen widgets on iPhone. Not set uses Style above. Android has no Lock Screen widgets.",
-                "widget_density": "How the rows are spaced on every size: Compact packs two columns to fit up to 6 rows, Comfortable keeps one column with larger rows, Auto fits them to the size. Leave it on Not set to use the Row Density picked in the PushWard app.",
-                "widget_density_small": "Row Density of the small Home Screen widget. Not set uses Row Density above.",
-                "widget_density_medium": "Row Density of the medium Home Screen widget. Not set uses Row Density above.",
-                "widget_density_large": "Row Density of the large Home Screen widget. Not set uses Row Density above.",
-                "widget_density_lock_screen": "Row Density of the Lock Screen widgets on iPhone. Not set uses Row Density above."
+                "widget_style": "Wygląd widżetu we wszystkich rozmiarach: Standardowy, Wyrazisty lub Klasyczny. Pozostaw Nie ustawiono, aby użyć wyglądu wybranego w aplikacji PushWard. Styl ustawiony tutaj ma pierwszeństwo przed wyborem w aplikacji, która pokazuje go wtedy jako zablokowany.",
+                "widget_style_small": "Styl małego widżetu na ekranie początkowym. Opcja Nie ustawiono korzysta ze Stylu powyżej.",
+                "widget_style_medium": "Styl średniego widżetu na ekranie początkowym. Opcja Nie ustawiono korzysta ze Stylu powyżej.",
+                "widget_style_large": "Styl dużego widżetu na ekranie początkowym. Opcja Nie ustawiono korzysta ze Stylu powyżej.",
+                "widget_style_lock_screen": "Styl widżetów na ekranie blokady iPhone'a. Opcja Nie ustawiono korzysta ze Stylu powyżej. Android nie ma widżetów na ekranie blokady.",
+                "widget_density": "Odstępy między wierszami we wszystkich rozmiarach: Kompaktowy układa je w dwóch kolumnach, mieszcząc do 6 wierszy, Wygodny zostawia jedną kolumnę z większymi wierszami, Automatyczny dopasowuje je do rozmiaru. Pozostaw Nie ustawiono, aby użyć Gęstości wierszy wybranej w aplikacji PushWard.",
+                "widget_density_small": "Gęstość wierszy małego widżetu na ekranie początkowym. Opcja Nie ustawiono korzysta z Gęstości wierszy powyżej.",
+                "widget_density_medium": "Gęstość wierszy średniego widżetu na ekranie początkowym. Opcja Nie ustawiono korzysta z Gęstości wierszy powyżej.",
+                "widget_density_large": "Gęstość wierszy dużego widżetu na ekranie początkowym. Opcja Nie ustawiono korzysta z Gęstości wierszy powyżej.",
+                "widget_density_lock_screen": "Gęstość wierszy widżetów na ekranie blokady iPhone'a. Opcja Nie ustawiono korzysta z Gęstości wierszy powyżej."
               }
             },
             "display_options": {
@@ -2746,18 +2746,18 @@
     },
     "widget_style": {
       "options": {
-        "app": "Not set",
-        "standard": "Standard",
-        "bold": "Bold",
-        "classic": "Classic"
+        "app": "Nie ustawiono",
+        "standard": "Standardowy",
+        "bold": "Wyrazisty",
+        "classic": "Klasyczny"
       }
     },
     "widget_density": {
       "options": {
-        "app": "Not set",
-        "auto": "Auto",
-        "compact": "Compact",
-        "comfortable": "Comfortable"
+        "app": "Nie ustawiono",
+        "auto": "Automatyczny",
+        "compact": "Kompaktowy",
+        "comfortable": "Wygodny"
       }
     }
   }
