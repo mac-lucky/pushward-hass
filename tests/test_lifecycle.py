@@ -738,6 +738,11 @@ async def test_calendar_content_follows_the_phase(hass: HomeAssistant, freezer) 
     assert (content["start_date"], content["end_date"]) == (_ts(9, 30), _ts(10))
     assert calendar_next_boundary(state, config, _local(9, 45).timestamp()) == _ts(10)
 
+    # The held countdown window gives way to the event's own dates at the phase switch.
+    freezer.move_to(_local(10, 5))
+    during = map_content(state, config, last_content=content)
+    assert (during["start_date"], during["end_date"]) == (_ts(10), _ts(11))
+
     long_title = make_mock_state("on", _event(message="x" * (MAX_TEXT_LEN + 20)), CAL)
     assert map_content(long_title, config)["state"] == "x" * MAX_TEXT_LEN
 

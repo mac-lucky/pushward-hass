@@ -1017,6 +1017,48 @@ def _resolve_live_end(now: int, remaining: int | None, absolute_end: int | None)
     return end if end > now else None
 
 
+def _carry_window(
+    last_content: dict | None,
+    *,
+    same_run: bool,
+    now: int,
+    end: int,
+    remaining: int | None,
+    absolute_end: int | None,
+) -> tuple[int, int]:
+    """(start_date, end_date) for a bar that fills across the window, held from the previous frame.
+
+    HA only knows how much time is left, so the window's start has to be remembered:
+    carry the previous frame's start_date forward while ``same_run`` holds, and
+    restamp it to now when it does not. Without the carry-forward a fresh
+    start_date=now would ship on every update and the bar would snap back to empty
+    on each push.
+    """
+    prev = last_content or {}
+
+    # A relative source re-derives end_date against the wall clock on every frame,
+    # so an unmoved deadline still emits a moving end_date. The server treats that
+    # as a structural change: a high-priority push that skips update coalescing.
+    # Keep the deadline already shipped until the source genuinely re-estimates.
+    prev_end = prev.get("end_date")
+    if (
+        absolute_end is None
+        and same_run
+        and type(prev_end) is int
+        and prev_end > now
+        and remaining == prev.get("remaining_time")
+    ):
+        end = prev_end
+
+    prev_start = prev.get("start_date")
+    start = prev_start if same_run and type(prev_start) is int else now
+    # time.time() is not monotonic: an NTP correction or a restored snapshot can
+    # move the clock behind the carried anchor and invert the window.
+    if start >= end:
+        start = now
+    return start, end
+
+
 def _apply_steps_live_progress(
     content: dict,
     last_content: dict | None,
@@ -1028,13 +1070,8 @@ def _apply_steps_live_progress(
     """Anchor the steps live_progress animation to the current step's window.
 
     On steps, end_date is the end of the *current* step and the bar fills across
-    start_date..end_date. HA only knows how much time is left, so the step's
-    start has to be remembered: it is the moment current_step last changed. Carry
-    the previous frame's start_date forward while the step number holds, and
-    restamp it to now when the step advances.
-
-    Without the carry-forward a fresh start_date=now would ship on every update
-    and the bar would snap back to empty on each push.
+    start_date..end_date. The step's start is the moment current_step last
+    changed, so the window carries while the step number holds (``_carry_window``).
 
     The caller sets live_progress False first, so an early return here clears a
     previously-armed animation rather than leaving it running under merge-patch.
@@ -1042,34 +1079,11 @@ def _apply_steps_live_progress(
     end = _resolve_live_end(now, remaining, absolute_end)
     if end is None:
         return
-
-    prev = last_content or {}
-    same_step = prev.get("current_step") == content.get("current_step")
-
-    # A relative source re-derives end_date against the wall clock on every frame,
-    # so an unmoved deadline still emits a moving end_date. The server treats that
-    # as a structural change: a high-priority push that skips update coalescing.
-    # Keep the deadline already shipped until the source genuinely re-estimates.
-    prev_end = prev.get("end_date")
-    if (
-        absolute_end is None
-        and same_step
-        and type(prev_end) is int
-        and prev_end > now
-        and remaining == prev.get("remaining_time")
-    ):
-        end = prev_end
-
-    prev_start = prev.get("start_date")
-    start = prev_start if same_step and type(prev_start) is int else now
-    # time.time() is not monotonic: an NTP correction or a restored snapshot can
-    # move the clock behind the carried anchor and invert the window.
-    if start >= end:
-        start = now
-
+    same_step = (last_content or {}).get("current_step") == content.get("current_step")
     content["live_progress"] = True
-    content["start_date"] = start
-    content["end_date"] = end
+    content["start_date"], content["end_date"] = _carry_window(
+        last_content, same_run=same_step, now=now, end=end, remaining=remaining, absolute_end=absolute_end
+    )
 
 
 # Dynamic Island compact ear overrides: (option key, wire key, cap).
@@ -1163,8 +1177,9 @@ def map_content(
 
     ``last_content`` is the previously sent frame. It is read by the steps
     template's live_progress anchor, which has to know when the current step
-    began (see ``_apply_steps_live_progress``), and by remaining-mode progress,
-    which holds its bar while the source is missing.
+    began (see ``_apply_steps_live_progress``), by the countdown window, held the
+    same way (``_carry_window``), and by remaining-mode progress, which holds its
+    bar while the source is missing.
 
     ``progress_max`` is the largest progress-source value seen since the activity
     started; only progress_mode "remaining" reads it (see ``_get_progress``).
@@ -1236,16 +1251,28 @@ def map_content(
     if template == "countdown":
         # A timestamp (finish-time) source anchors end_date to the absolute finish
         # time, so it doesn't drift as the clock ticks. Otherwise derive it from
-        # remaining seconds against the shared ``now`` read above.
-        if absolute_end is not None:
-            content["end_date"] = absolute_end
+        # remaining seconds against the shared ``now`` read above. The bar fills
+        # across start_date..end_date, held between frames like the steps window.
+        prev = last_content or {}
+        if remaining is not None:
+            content["start_date"], content["end_date"] = _carry_window(
+                last_content,
+                same_run=True,
+                now=now,
+                end=absolute_end if absolute_end is not None else now + remaining,
+                remaining=remaining,
+                absolute_end=absolute_end,
+            )
+        elif type(prev.get("end_date")) is int:
+            # The remaining time went missing: keep the window already shipped.
+            content["end_date"] = prev["end_date"]
+            if type(prev.get("start_date")) is int:
+                content["start_date"] = prev["start_date"]
         else:
-            content["end_date"] = now + (remaining if remaining is not None else 0)
+            content["end_date"] = now
         completion_msg = entity_config.get(CONF_COMPLETION_MESSAGE)
         if completion_msg:
             content["completion_message"] = completion_msg
-        if remaining is not None:
-            content["start_date"] = now
         if calendar is not None:
             # Both ends pinned to the event, so the bar fills across the phase.
             content["start_date"], content["end_date"] = calendar

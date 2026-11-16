@@ -2259,6 +2259,51 @@ def test_countdown_omits_start_date_when_no_remaining_time_attr(mock_time):
     assert "start_date" not in content
 
 
+def _countdown_config() -> dict:
+    return make_entity_config(**{CONF_TEMPLATE: "countdown", CONF_REMAINING_TIME_ATTR: "remaining"})
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_holds_its_window_while_remaining_unchanged(mock_time):
+    """A fresh start_date per frame restarted the bar on every push and no two frames compared equal."""
+    config = _countdown_config()
+    state = _make_state("active", {"remaining": 120})
+    mock_time.time.return_value = 5000.0
+    first = map_content(state, config)
+
+    mock_time.time.return_value = 5010.0
+    second = map_content(state, config, last_content=first)
+
+    assert second == first
+    assert (second["start_date"], second["end_date"]) == (5000, 5120)
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_moves_end_but_keeps_start_when_remaining_changes(mock_time):
+    config = _countdown_config()
+    mock_time.time.return_value = 5000.0
+    first = map_content(_make_state("active", {"remaining": 120}), config)
+
+    mock_time.time.return_value = 5010.0
+    second = map_content(_make_state("active", {"remaining": 60}), config, last_content=first)
+
+    assert (second["start_date"], second["end_date"]) == (5000, 5070)
+    assert_valid_activity_content(second)
+
+
+@patch("custom_components.pushward.content_mapper.time")
+def test_countdown_keeps_its_window_while_remaining_is_missing(mock_time):
+    config = _countdown_config()
+    mock_time.time.return_value = 5000.0
+    first = map_content(_make_state("active", {"remaining": 120}), config)
+
+    mock_time.time.return_value = 5010.0
+    second = map_content(_make_state("active", {}), config, last_content=first)
+
+    assert (second["start_date"], second["end_date"]) == (5000, 5120)
+    assert "remaining_time" not in second
+
+
 # Steps: step_labels
 
 
