@@ -2118,6 +2118,19 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     }
 
 
+def _entity_details_to_config(
+    step1: dict[str, Any], user_input: dict[str, Any], hass: HomeAssistant | None
+) -> tuple[dict | None, dict[str, str]]:
+    """The details step's parse: the config to store, or the {field: error} the form shows.
+
+    Shared with the panel preview, so a draft that previews cleanly also saves.
+    """
+    try:
+        return _parse_entity_input({**step1, **user_input}, hass=hass), {}
+    except vol.Invalid as exc:
+        return None, dict.fromkeys(exc.path, str(exc.msg))
+
+
 class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle initial PushWard configuration."""
 
@@ -2402,13 +2415,8 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            merged = {**self._step1_input, **user_input}
-            try:
-                entity_cfg = _parse_entity_input(merged, hass=self.hass)
-            except vol.Invalid as exc:
-                for field in exc.path:
-                    errors[field] = str(exc.msg)
-            else:
+            entity_cfg, errors = _entity_details_to_config(self._step1_input, user_input, self.hass)
+            if entity_cfg is not None:
                 if self._is_reconfigure:
                     entry = self._get_entry()
                     subentry = self._get_reconfigure_subentry()
@@ -3172,6 +3180,33 @@ def _check_heatmap_aggregate(aggregate: str, info: dict) -> None:
         raise vol.Invalid("heatmap_aggregate_unsupported", path=[CONF_HEATMAP_AGGREGATE])
 
 
+async def _heatmap_statistics(hass: HomeAssistant, step1: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
+    """A heatmap fills its cells from recorder statistics, so its entity must have some.
+
+    Returns the statistics metadata and the step-1 errors.
+    """
+    if step1.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_HEATMAP:
+        return {}, {}
+    info = await async_statistics_info(hass, step1[CONF_ENTITY_ID]) or {}
+    return info, {} if info else {CONF_ENTITY_ID: "heatmap_no_statistics"}
+
+
+def _widget_details_to_config(
+    step1: dict[str, Any], user_input: dict[str, Any], statistics_info: dict[str, Any]
+) -> tuple[dict | None, dict[str, str]]:
+    """The details step's parse: the config to store, or the {field: error} the form shows.
+
+    Shared with the panel preview, so a draft that previews cleanly also saves.
+    """
+    try:
+        widget_cfg = _parse_widget_input(user_input, step1)
+        if widget_cfg[CONF_WIDGET_TEMPLATE] == WIDGET_TEMPLATE_HEATMAP:
+            _check_heatmap_aggregate(widget_cfg[CONF_HEATMAP_AGGREGATE], statistics_info)
+    except vol.Invalid as exc:
+        return None, dict.fromkeys(exc.path, str(exc.msg))
+    return widget_cfg, {}
+
+
 class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
     """Two-step flow for adding / reconfiguring a tracked widget."""
 
@@ -3185,11 +3220,8 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
         self._statistics_info: dict[str, Any] = {}
 
     async def _heatmap_statistics_errors(self, user_input: dict[str, Any]) -> dict[str, str]:
-        """A heatmap fills its cells from recorder statistics, so its entity must have some."""
-        if user_input.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_HEATMAP:
-            return {}
-        self._statistics_info = await async_statistics_info(self.hass, user_input[CONF_ENTITY_ID]) or {}
-        return {} if self._statistics_info else {CONF_ENTITY_ID: "heatmap_no_statistics"}
+        self._statistics_info, errors = await _heatmap_statistics(self.hass, user_input)
+        return errors
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
         """Step 1: entity + template + slug."""
@@ -3268,14 +3300,8 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            try:
-                widget_cfg = _parse_widget_input(user_input, self._step1_input)
-                if template == WIDGET_TEMPLATE_HEATMAP:
-                    _check_heatmap_aggregate(widget_cfg[CONF_HEATMAP_AGGREGATE], self._statistics_info)
-            except vol.Invalid as exc:
-                for field in exc.path:
-                    errors[field] = str(exc.msg)
-            else:
+            widget_cfg, errors = _widget_details_to_config(self._step1_input, user_input, self._statistics_info)
+            if widget_cfg is not None:
                 title = widget_cfg.get(CONF_WIDGET_NAME) or widget_cfg[CONF_SLUG]
                 if self._is_reconfigure:
                     entry = self._get_entry()
