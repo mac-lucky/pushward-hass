@@ -67,6 +67,8 @@ _ACK_REFUSALS = {
     (HTTPStatus.UNPROCESSABLE_ENTITY, "notification.encrypted_too_large"): "encrypted_too_large",
 }
 _ACK_ONLY_FIELDS = ("acknowledge", "tags", "callback_url")
+# A raw request still raises for these: a bad key, and the quota gate / rate-limit retry.
+_RAW_KEEPS_ERROR = (HTTPStatus.UNAUTHORIZED, HTTPStatus.TOO_MANY_REQUESTS)
 
 
 def parse_http_date(header: str | None) -> datetime | None:
@@ -807,6 +809,14 @@ class PushWardApiClient:
         return str(data.get("code") or ""), str(data.get("detail") or ""), raw, data
 
     @staticmethod
+    async def _body_or_none(resp: aiohttp.ClientResponse) -> Any:
+        """The response's JSON, None when it is empty or not JSON."""
+        try:
+            return json.loads(await resp.text() or "null")
+        except ValueError:
+            return None
+
+    @staticmethod
     def _quota_error_from(kind: str, data: dict) -> PushWardQuotaExceededError:
         """Build the typed error from a `quota.exceeded` Problem body."""
         reset_at = dt_util.parse_datetime(str(data.get("reset_at") or ""))
@@ -826,6 +836,8 @@ class PushWardApiClient:
         return_json: bool = False,
         quota_kind: str | None = None,
         idempotency_key: str | None = None,
+        content_type: str | None = None,
+        raw: bool = False,
     ) -> Any:
         """Execute an HTTP request with exponential backoff retry.
 
@@ -836,10 +848,14 @@ class PushWardApiClient:
         routes); such requests are refused locally while the quota gate has that
         kind paused, and a `quota.exceeded` 429 pauses it. ``idempotency_key`` goes
         out as the Idempotency-Key header on every attempt; only POST /notifications
-        and POST /notifications/scheduled read it.
+        and POST /notifications/scheduled read it. ``content_type`` replaces the
+        JSON body's Content-Type. ``raw`` returns (status, parsed body or None) for
+        every answer below 500 except 401 and 429, which keep their errors.
         """
         gate = self._quota_gate if quota_kind is not None else None
         headers = self._headers if idempotency_key is None else {**self._headers, "Idempotency-Key": idempotency_key}
+        if content_type is not None:
+            headers = {**headers, "Content-Type": content_type}
         async with self._request_semaphore:
             url = f"{self._base_url}{path}"
             last_error: Exception | None = None
@@ -852,6 +868,8 @@ class PushWardApiClient:
                     gate.raise_if_blocked(quota_kind)
                 try:
                     async with self._session.request(method, url, headers=headers, json=json, timeout=_TIMEOUT) as resp:
+                        if raw and resp.status < 500 and resp.status not in _RAW_KEEPS_ERROR:
+                            return resp.status, await self._body_or_none(resp)
                         if resp.ok:
                             if not return_json:
                                 return None

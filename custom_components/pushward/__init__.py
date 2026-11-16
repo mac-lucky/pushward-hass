@@ -143,8 +143,10 @@ from .image_hash import (
     clear_thumbhash_cache,
 )
 from .media_control import async_register_media_control_view
+from .panel import async_register_panel, async_register_static_path, async_remove_panel
 from .quota import QuotaGate
 from .todo_reminders import TodoReminderManager, async_cancel_stored_schedules, todo_configs
+from .websocket import async_register_commands
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -1702,6 +1704,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """
     _register_services(hass)
     async_register_media_control_view(hass)
+    await async_register_static_path(hass)
+    async_register_commands(hass)
     return True
 
 
@@ -1788,6 +1792,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "answer_stream": answer_stream,
         "e2e_key": entry.options.get(CONF_E2E_KEY),
     }
+    if len(hass.data[DOMAIN]) == 1:  # the first loaded account brings the sidebar panel
+        await async_register_panel(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -1848,6 +1854,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if todo_manager is not None:
             stops.append(todo_manager.async_stop())
         await asyncio.gather(*stops)
+    if not hass.data[DOMAIN]:
+        async_remove_panel(hass)
 
     # Non-persistent usage-limit repair issues clear on restart but not on a plain
     # unload/reload — drop any outstanding ones so they don't linger after teardown.

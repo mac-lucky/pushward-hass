@@ -2,7 +2,9 @@
   "domain": "pushward",
   "name": "PushWard",
   "after_dependencies": [
+    "frontend",
     "media_player",
+    "panel_custom",
     "recorder",
     "todo"
   ],

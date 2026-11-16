@@ -1735,3 +1735,44 @@ async def test_a_failing_answer_listener_never_fails_the_send(caplog):
         "answerable": True,
     }
     assert "could not start listening" in caplog.text
+
+
+# --- raw requests (the panel playground) ---
+
+
+async def test_raw_request_returns_a_refusal_as_status_and_body():
+    problem = {"code": "activity.invalid", "detail": "bad content"}
+    client = _make_client(_make_session(_mock_response(422, text=json.dumps(problem))))
+
+    assert await client._request_with_retry("PATCH", "/activities/ha-x", json={}, raw=True) == (422, problem)
+
+
+async def test_raw_request_body_is_none_when_empty_or_not_json():
+    client = _make_client(_make_session(_mock_response(204), _mock_response(200, text="ok")))
+
+    assert await client._request_with_retry("GET", "/app/status", raw=True) == (204, None)
+    assert await client._request_with_retry("GET", "/app/status", raw=True) == (200, None)
+
+
+async def test_raw_request_keeps_the_auth_and_quota_errors():
+    quota = {"code": "quota.exceeded", "kind": "notifications", "used": 5, "limit": 5}
+    client = _make_client(_make_session(_mock_response(401), _mock_response(429, text=json.dumps(quota))))
+
+    with pytest.raises(PushWardAuthError):
+        await client._request_with_retry("POST", "/activities", json={}, raw=True)
+    with pytest.raises(PushWardQuotaExceededError):
+        await client._request_with_retry("POST", "/notifications", json={}, quota_kind="notifications", raw=True)
+
+
+async def test_content_type_replaces_the_json_content_type():
+    session = _make_session(_mock_response(200, text="{}"))
+    client = _make_client(session)
+
+    await client._request_with_retry(
+        "PATCH", "/widgets/ha-x", json={"content": {}}, content_type="application/merge-patch+json", raw=True
+    )
+
+    kwargs = session.request.call_args.kwargs
+    assert kwargs["headers"]["Content-Type"] == "application/merge-patch+json"
+    assert kwargs["headers"]["Authorization"] == "Bearer test-key"
+    assert kwargs["json"] == {"content": {}}
