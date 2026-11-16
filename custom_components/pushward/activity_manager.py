@@ -383,11 +383,13 @@ class ActivityManager:
                 self._record_history_sample(tracked, current)
                 self._record_log_sample(tracked, current)
 
+            # Arm the boundary first: a start still on the wire when the event begins
+            # would otherwise leave the countdown aimed at the start time.
+            if is_calendar_config(entity_cfg):
+                self._arm_calendar_timer(entity_id, tracked)
             # Resume if entity is currently in a start state (HA restart)
             if self._should_run(tracked, current):
                 await self._start_activity(entity_id)
-            if is_calendar_config(entity_cfg):
-                self._arm_calendar_timer(entity_id, tracked)
 
         # Prune buffers persisted for entities whose subentry was removed;
         # otherwise they linger in .storage until an unrelated debounced save.
