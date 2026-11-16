@@ -14,6 +14,7 @@ from homeassistant import config_entries
 from homeassistant.components import frontend
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
+from homeassistant.data_entry_flow import InvalidData
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward import panel
@@ -24,11 +25,15 @@ from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
+    CONF_PRIORITY,
     CONF_SERVER_URL,
     CONF_SLUG,
+    CONF_SOUND,
     CONF_STAT_ROWS,
     CONF_TEMPLATE,
     CONF_TODO_LEVEL,
+    CONF_TODO_MAX_SCHEDULED,
+    CONF_UPDATE_INTERVAL,
     CONF_WIDGET_NAME,
     CONF_WIDGET_TEMPLATE,
     DEFAULT_SERVER_URL,
@@ -272,6 +277,40 @@ async def test_preview_draft_activity_errors_match_the_details_step(hass: HomeAs
     )
 
     assert reply["result"] == {"kind": "activity", "payload": None, "errors": flow["errors"], "available": False}
+
+
+@pytest.mark.parametrize(("field", "value"), [(CONF_UPDATE_INTERVAL, 0), (CONF_PRIORITY, 11), (CONF_SOUND, "bogus")])
+async def test_preview_draft_activity_refuses_what_the_form_selectors_refuse(
+    hass: HomeAssistant, loaded, ws, field: str, value: Any
+) -> None:
+    entry, _ = loaded
+    core = _mock_core_input(**{CONF_ENTITY_ID: "sensor.temp"})
+    details = _mock_details_input("generic", **{field: value})
+
+    flow = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY), context={"source": config_entries.SOURCE_USER}
+    )
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=core)
+    with pytest.raises(InvalidData) as refused:
+        await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=details)
+    assert refused.value.path[-1] == field
+
+    reply = await ws(
+        "pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_ENTITY, data={**core, **details}
+    )
+
+    assert reply["result"]["errors"] == {field: refused.value.error_message}
+    assert reply["result"]["payload"] is None
+
+
+async def test_preview_draft_todo_refuses_what_the_form_selectors_refuse(loaded, ws) -> None:
+    entry, _ = loaded
+    draft = {CONF_ENTITY_ID: TODO_LIST, CONF_TODO_MAX_SCHEDULED: 0}
+
+    reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_TODO, data=draft)
+
+    assert set(reply["result"]["errors"]) == {CONF_TODO_MAX_SCHEDULED}
+    assert reply["result"]["payload"] is None
 
 
 async def test_preview_unavailable_entity(hass: HomeAssistant, loaded, ws) -> None:

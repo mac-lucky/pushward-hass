@@ -17,9 +17,20 @@ from uuid import uuid4
 import voluptuous as vol
 from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import section
 
 from .api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
-from .config_flow import _entity_details_to_config, _heatmap_statistics, _todo_data, _widget_details_to_config
+from .config_flow import (
+    _details_schema,
+    _entity_details_to_config,
+    _entity_template_schema,
+    _heatmap_statistics,
+    _todo_data,
+    _todo_schema,
+    _widget_details_schema,
+    _widget_details_to_config,
+    _widget_step1_schema,
+)
 from .const import (
     _SLUG_RE,
     ACTIVITY_STATE_ENDED,
@@ -30,6 +41,7 @@ from .const import (
     CONF_HEATMAP_WEEKS,
     CONF_SLUG,
     CONF_SUBENTRY_ID,
+    CONF_TEMPLATE,
     CONF_WIDGET_TEMPLATE,
     DEFAULT_HEATMAP_WEEKS,
     DEFAULT_PRIORITY,
@@ -44,6 +56,7 @@ from .const import (
     SUBENTRY_TYPE_TODO,
     SUBENTRY_TYPE_WIDGET,
     WIDGET_TEMPLATE_HEATMAP,
+    WIDGET_TEMPLATE_VALUE,
     WIDGET_TEMPLATES,
 )
 from .content_mapper import lookup_registry_icon, map_content
@@ -148,16 +161,50 @@ def _api_errors(func: Callable[..., Coroutine[Any, Any, None]]) -> Callable[...,
 # --- pushward/preview ---
 
 
+def _form_errors(schema: vol.Schema, values: dict) -> dict[str, str]:
+    """{field: message} for the given values the form's selectors refuse.
+
+    HA runs a submit through the form schema before the step handler sees it.
+    Fields the draft leaves out are not checked; the form fills their defaults.
+    """
+    errors: dict[str, str] = {}
+    for key, validator in schema.schema.items():
+        if (name := str(key)) not in values:
+            continue
+        if isinstance(validator, section):
+            if isinstance(values[name], dict):
+                errors.update(_form_errors(validator.schema, values[name]))
+            else:
+                errors[name] = "expected a dictionary"
+            continue
+        try:
+            vol.Schema(validator)(values[name])
+        except vol.Invalid as err:
+            errors[name] = err.error_message
+    return errors
+
+
 async def _parse_draft(hass: HomeAssistant, subentry_type: str, draft: dict) -> tuple[dict | None, dict[str, str]]:
-    """A draft through the same parse its flow's form submit goes through."""
+    """A draft through what its flow's form submit goes through: the selectors, then the parse."""
+    if subentry_type == SUBENTRY_TYPE_TODO:
+        errors = _form_errors(_todo_schema(), draft)
+        return (None, errors) if errors else (_todo_data(draft), {})
+    entity_id = draft[CONF_ENTITY_ID]
     if subentry_type == SUBENTRY_TYPE_ENTITY:
-        return _entity_details_to_config(draft, {}, hass)
-    if subentry_type == SUBENTRY_TYPE_WIDGET:
-        info, errors = await _heatmap_statistics(hass, draft)
-        if errors:
+        if errors := _form_errors(_entity_template_schema(), draft):
             return None, errors
-        return _widget_details_to_config(draft, draft, info)
-    return _todo_data(draft), {}
+        if errors := _form_errors(_details_schema(entity_id, draft.get(CONF_TEMPLATE, "generic"), hass=hass), draft):
+            return None, errors
+        return _entity_details_to_config(draft, {}, hass)
+    if errors := _form_errors(_widget_step1_schema(), draft):
+        return None, errors
+    info, errors = await _heatmap_statistics(hass, draft)
+    if errors:
+        return None, errors
+    template = draft.get(CONF_WIDGET_TEMPLATE, WIDGET_TEMPLATE_VALUE)
+    if errors := _form_errors(_widget_details_schema(entity_id, template), draft):
+        return None, errors
+    return _widget_details_to_config(draft, draft, info)
 
 
 async def _activity_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: bool) -> dict | None:
