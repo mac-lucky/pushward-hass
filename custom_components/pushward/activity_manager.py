@@ -745,6 +745,9 @@ class ActivityManager:
         # At the event start the countdown target moves to the end. The server ends a
         # countdown whose end_date has passed, so that frame skips the update interval.
         tracked.last_sent_at = float("-inf")
+        # Nothing re-evaluates a calendar between boundaries, so a pause left by a
+        # failed start must not swallow this one.
+        tracked.start_retry_at = 0.0
         self._calendar_evaluate(entity_id)
 
     @callback
@@ -893,6 +896,9 @@ class ActivityManager:
 
         tracked.generation += 1
 
+        # True from the create request until the start lands; still True after the guard
+        # means the start was refused or failed.
+        requested = False
         async with self._api_error_guard(slug, "starting"):
             current_state = self._hass.states.get(entity_id)
             if current_state is None:
@@ -930,9 +936,7 @@ class ActivityManager:
                 content.get("icon"),
             )
 
-            # Armed until the start lands, so a refused or failed one pauses the next attempts.
-            interval = config.get(CONF_UPDATE_INTERVAL, 5)
-            tracked.start_retry_at = time.monotonic() + max(interval, _START_RETRY_MIN_S)
+            requested = True
             await self._create_activity(entity_id, config)
 
             # Seed timeline back-history from HA recorder if configured
@@ -958,6 +962,7 @@ class ActivityManager:
             tracked.last_sent_at = time.monotonic()
             tracked.recreate_attempted = False
             tracked.start_retry_at = 0.0
+            requested = False
 
             # A run_while row, calendar window or end state reached while this start was
             # on the wire found nothing active to end. State-driven entities keep ending
@@ -973,7 +978,16 @@ class ActivityManager:
             elif tracked.update_pending:
                 # Changes that landed while this start was on the wire.
                 tracked.update_pending = False
+                if is_calendar_config(config):
+                    # A calendar re-evaluated during the start, maybe at the event start:
+                    # like _on_calendar_boundary, that frame cannot wait out the interval.
+                    tracked.last_sent_at = float("-inf")
                 self._schedule_throttled_update(entity_id)
+
+        if requested:
+            # Paused from the failure, not the request: the client may have retried it for a while.
+            interval = config.get(CONF_UPDATE_INTERVAL, 5)
+            tracked.start_retry_at = time.monotonic() + max(interval, _START_RETRY_MIN_S)
 
     def _activity_name(self, entity_id: str, config: dict) -> str:
         """Resolve activity name: configured name > friendly name > entity_id."""

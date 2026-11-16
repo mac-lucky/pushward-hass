@@ -18,6 +18,7 @@ from custom_components.pushward.activity_manager import (
     _is_start,
     run_while_rows,
 )
+from custom_components.pushward.api import PushWardApiError
 from custom_components.pushward.const import (
     CONF_CALENDAR_LEAD_MINUTES,
     CONF_CALENDAR_SUBTITLE_BEFORE,
@@ -629,6 +630,49 @@ async def test_calendar_switches_the_target_at_the_start_despite_the_throttle(
     assert activity_updates(api, "ongoing")[-1]["state"] == "Dentist, room 4"
 
     await _at(hass, freezer, _local(10))
+    assert activity_updates(api, "ongoing")[-1]["end_date"] == _ts(11)
+
+
+async def test_calendar_start_on_the_wire_at_the_event_start_switches_the_target(
+    hass: HomeAssistant, calendar, freezer
+) -> None:
+    """A start still in flight when the event begins lands the old target; the switch still cannot wait."""
+    start, api = calendar
+    await start(_event("12:00", "13:00", "Lunch"), **{CONF_UPDATE_INTERVAL: 60})
+    gate = asyncio.Event()
+
+    async def _on_the_wire(*_args, **_kwargs) -> None:
+        await gate.wait()
+
+    api.create_activity.side_effect = _on_the_wire
+    freezer.move_to(_local(9, 59) + timedelta(seconds=59))
+    hass.states.async_set(CAL, "off", _event())
+    await _pump()
+
+    freezer.move_to(_local(10))
+    async_fire_time_changed(hass, _local(10))
+    await _pump()
+    gate.set()
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_awaited_once()
+    frames = activity_updates(api, "ongoing")
+    assert frames[0]["end_date"] == _ts(10)
+    assert frames[-1]["end_date"] == _ts(11)
+
+
+async def test_calendar_boundary_retries_a_start_that_just_failed(hass: HomeAssistant, calendar, freezer) -> None:
+    """Calendars re-evaluate only at boundaries, so the pause after a failed start must not skip one."""
+    start, api = calendar
+    manager = await start(_event("12:00", "13:00", "Lunch"))
+    api.create_activity.side_effect = [PushWardApiError("unavailable", status_code=503), None]
+    freezer.move_to(_local(9, 59) + timedelta(seconds=45))
+    await _set(hass, CAL, "off", _event())
+    assert not manager._tracked[CAL].is_active
+
+    await _at(hass, freezer, _local(10))
+    assert api.create_activity.await_count == 2
+    assert manager._tracked[CAL].is_active
     assert activity_updates(api, "ongoing")[-1]["end_date"] == _ts(11)
 
 

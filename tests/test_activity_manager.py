@@ -587,6 +587,38 @@ async def test_refused_start_waits_out_the_retry_pause(hass: HomeAssistant) -> N
     await manager.async_stop()
 
 
+async def test_failed_start_pauses_from_the_failure(hass: HomeAssistant, freezer) -> None:
+    """The client retries a failing request for a while, so the pause counts from when it gave up."""
+    api = _mock_api()
+    gate = asyncio.Event()
+
+    async def _fails_after_retrying(*_args, **_kwargs) -> None:
+        await gate.wait()
+        raise PushWardApiError("unavailable", status_code=503)
+
+    api.create_activity.side_effect = _fails_after_retrying
+    manager = ActivityManager(hass, api, [_entity_config(**{CONF_PROGRESS_ATTRIBUTE: "progress"})], _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 1})
+    await _pump()
+
+    freezer.tick(timedelta(seconds=40))  # longer than the pause, spent retrying
+    gate.set()
+    await hass.async_block_till_done()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 2})
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
+
+    api.create_activity.side_effect = None
+    freezer.tick(timedelta(seconds=31))
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 3})
+    await hass.async_block_till_done()
+    assert api.create_activity.await_count == 2
+    assert manager._tracked["binary_sensor.washer"].is_active
+    await manager.async_stop()
+
+
 async def test_update_404_recreates_activity(hass: HomeAssistant) -> None:
     """A PATCH that 404s (activity gone server-side) self-heals via a recreate POST."""
     api = _mock_api()
