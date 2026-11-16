@@ -24,8 +24,12 @@ async def async_register_static_path(hass: HomeAssistant) -> None:
 
 
 async def async_register_panel(hass: HomeAssistant) -> None:
-    """Add the sidebar panel; the module URL carries the version so an update is not served from cache."""
+    """Add the sidebar panel unless it is there; the module URL carries the version against stale caches."""
     integration = await async_get_integration(hass, DOMAIN)
+    # Checked after the await: registering a panel that exists raises, and
+    # panel_custom adds it without yielding, so nothing can slip in between.
+    if PANEL_URL_PATH in hass.data.get(frontend.DATA_PANELS, {}):
+        return
     await panel_custom.async_register_panel(
         hass,
         frontend_url_path=PANEL_URL_PATH,

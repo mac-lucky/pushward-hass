@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from pathlib import Path
 from typing import Any
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiohttp import web
@@ -174,6 +175,34 @@ async def test_panel_lives_while_any_account_is_loaded(hass: HomeAssistant) -> N
         if isinstance(r, web.StaticResource) and r.canonical == STATIC_URL_PATH
     ]
     assert static.get_info()["directory"] == Path(panel.__file__).parent / "frontend"
+
+
+async def test_panel_survives_an_account_set_up_while_the_last_one_stops(hass: HomeAssistant) -> None:
+    panels = hass.data.setdefault(frontend.DATA_PANELS, {})
+    first, second = _entry("user-1"), _entry("user-2")
+    await async_setup_with_api(hass, first, _api())
+    manager = hass.data[DOMAIN][first.entry_id]["manager"]
+    stopping, release = asyncio.Event(), asyncio.Event()
+    real_stop = manager.async_stop
+
+    async def slow_stop() -> None:
+        stopping.set()
+        await release.wait()
+        await real_stop()
+
+    manager.async_stop = slow_stop
+    unload = hass.async_create_task(hass.config_entries.async_unload(first.entry_id))
+    await stopping.wait()
+
+    second.add_to_hass(hass)
+    with patch("custom_components.pushward.PushWardApiClient", return_value=_api()):
+        assert await hass.config_entries.async_setup(second.entry_id)
+    release.set()
+    await unload
+
+    assert second.state is config_entries.ConfigEntryState.LOADED
+    assert PANEL_URL_PATH in panels
+    await panel.async_register_panel(hass)  # registering a present panel again is a no-op
 
 
 # --- pushward/preview ---

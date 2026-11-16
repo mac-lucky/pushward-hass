@@ -1792,8 +1792,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "answer_stream": answer_stream,
         "e2e_key": entry.options.get(CONF_E2E_KEY),
     }
-    if len(hass.data[DOMAIN]) == 1:  # the first loaded account brings the sidebar panel
-        await async_register_panel(hass)
+    await async_register_panel(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -1845,6 +1844,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         return False
 
     data = hass.data[DOMAIN].pop(entry.entry_id, None)
+    # Decided before the stops yield: an entry set up meanwhile keeps its panel.
+    if not hass.data[DOMAIN]:
+        async_remove_panel(hass)
     if data:
         widget_manager: WidgetManager | None = data.get("widget_manager")
         todo_manager: TodoReminderManager | None = data.get("todo_manager")
@@ -1854,8 +1856,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if todo_manager is not None:
             stops.append(todo_manager.async_stop())
         await asyncio.gather(*stops)
-    if not hass.data[DOMAIN]:
-        async_remove_panel(hass)
 
     # Non-persistent usage-limit repair issues clear on restart but not on a plain
     # unload/reload — drop any outstanding ones so they don't linger after teardown.
