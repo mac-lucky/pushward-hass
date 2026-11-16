@@ -1,7 +1,9 @@
 """Tests for the PushWard content mapper."""
 
+import re
 import time
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -817,6 +819,36 @@ def test_with_cleared_keys_nulls_what_the_server_may_still_hold():
     first = with_cleared_keys(content, None)
     assert {key for key, value in first.items() if value is None} == OPTIONAL_CONTENT_KEYS - content.keys()
     assert content == {"template": "generic", "subtitle": "Washer", "unit": "W"}
+
+
+def test_every_key_the_mapper_writes_is_classified():
+    """A key the mapper sets only sometimes belongs in OPTIONAL_CONTENT_KEYS, or it is never nulled.
+
+    The rest are keys every frame of their template carries or the server requires.
+    """
+    source = (Path(__file__).parent.parent / "custom_components" / "pushward" / "content_mapper.py").read_text()
+    written = set(re.findall(r'\bcontent\["([a-z_]+)"\] = ', source))
+    always = {
+        "accent_color",
+        "controls",
+        "current_step",
+        "items",
+        "lines",
+        "max_value",
+        "min_value",
+        "options",
+        "playback_state",
+        "progress",
+        "severity",
+        "state",
+        "subtitle",
+        "tiles",
+        "total_steps",
+        "value",
+    }
+    assert always <= written  # the scan still finds the writes
+    assert written - always - OPTIONAL_CONTENT_KEYS == set()
+    assert always & OPTIONAL_CONTENT_KEYS == set()
 
 
 @patch("custom_components.pushward.content_mapper.time")
