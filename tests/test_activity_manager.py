@@ -46,6 +46,7 @@ from custom_components.pushward.const import (
     CONF_MEDIA_FAVORITE_SCRIPT,
     CONF_MEDIA_TOKEN,
     CONF_PROGRESS_ATTRIBUTE,
+    CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SERIES_ENTITIES,
     CONF_SLUG,
@@ -63,6 +64,7 @@ from custom_components.pushward.const import (
     HISTORY_SEED_MAX,
     LOG_MAX_LINES,
 )
+from custom_components.pushward.content_mapper import OPTIONAL_CONTENT_KEYS
 from custom_components.pushward.media_control import EMITTED_CONTROL_SLOTS
 from custom_components.pushward.quota import quota_released_signal
 
@@ -264,6 +266,60 @@ async def test_refused_updates_still_honor_the_interval(hass: HomeAssistant) -> 
     await hass.async_block_till_done()
     assert api.update_activity.await_count == 2
     assert api.update_activity.call_args.args[2]["progress"] == 0.1
+    await manager.async_stop()
+
+
+async def test_a_key_the_frame_stops_carrying_is_nulled(hass: HomeAssistant) -> None:
+    """Content is merge-patched: a key a frame leaves out stays on the server unless it is nulled.
+
+    A remaining time whose source went away must not keep counting on the phone.
+    """
+    api = _mock_api()
+    config = _entity_config(**{CONF_REMAINING_TIME_ATTR: "remaining", CONF_UPDATE_INTERVAL: 0})
+    manager, tracked = await _start_active(hass, api, config, on_attrs={"remaining": 120})
+
+    await bump_state(manager, hass, "binary_sensor.washer", "binary_sensor.washer", "on", {})
+
+    sent = api.update_activity.call_args.args[2]
+    assert sent["remaining_time"] is None
+    assert "remaining_time" not in tracked.last_content
+    assert None not in tracked.last_content.values()
+    # The dedup compares the frame without its nulls, so an unchanged state still sends nothing.
+    await manager._send_update("binary_sensor.washer")
+    assert api.update_activity.await_count == 1
+    await manager.async_stop()
+
+
+async def test_a_new_run_clears_what_the_previous_run_left(hass: HomeAssistant) -> None:
+    """The create upsert keeps stored content, so a run's first frame nulls every optional key it omits."""
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [_entity_config()], _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+
+    sent = activity_updates(api, "ongoing")[0]
+    mapped = manager._tracked["binary_sensor.washer"].last_content
+    assert {key for key, value in sent.items() if value is None} == OPTIONAL_CONTENT_KEYS - mapped.keys()
+    assert {key: value for key, value in sent.items() if value is not None} == mapped
+    assert "log_backlog" not in sent
+    assert_valid_activity_content(sent)
+    await manager.async_stop()
+
+
+async def test_completion_clears_the_remaining_time(hass: HomeAssistant) -> None:
+    """A finished card must not show the last frame's time left; the rest stays as the final values."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_REMAINING_TIME_ATTR: "remaining"})
+    manager, _tracked = await _start_active(hass, api, config, on_attrs={"remaining": 120})
+
+    with patch(SLEEP_TARGET, new_callable=AsyncMock):
+        await manager._async_end_activity("binary_sensor.washer")
+
+    frames = [call.args[2] for call in api.update_activity.call_args_list]
+    assert [call.args[1] for call in api.update_activity.call_args_list] == ["ongoing", "ended"]
+    assert all(frame["remaining_time"] is None for frame in frames)
     await manager.async_stop()
 
 
@@ -2491,7 +2547,8 @@ async def test_unreachable_image_does_not_block_the_activity(hass: HomeAssistant
     api.update_activity.assert_awaited()
     content = api.update_activity.call_args[0][2]
     assert content["image_url"] == IMAGE_URL
-    assert "image_thumbhash" not in content
+    # Nulled, as on every new run's first frame: no hash from an earlier run stays.
+    assert content["image_thumbhash"] is None
     assert_valid_activity_content(content, where="unreachable image")
 
     await manager.async_stop()
@@ -2620,7 +2677,7 @@ async def test_media_cover_art_ships_as_an_inline_thumbhash(hass: HomeAssistant)
     content = activity_updates(api, "ongoing")[-1]
     assert content["image_thumbhash"] == expected_thumbhash(body)
     assert content["image_shape"] == "square"
-    assert "image_url" not in content
+    assert content["image_url"] is None
     assert_valid_activity_content(content, where="media artwork")
 
     await manager.async_stop()
@@ -2649,7 +2706,7 @@ async def test_media_unreadable_cover_art_does_not_block_the_push(hass: HomeAssi
         manager = await _start_player(hass, api, _media_config(), entity_picture=_MEDIA_PICTURE)
 
     content = activity_updates(api, "ongoing")[-1]
-    assert "image_thumbhash" not in content
+    assert content["image_thumbhash"] is None
     assert content["media_title"] == "Snooze"
     assert_valid_activity_content(content, where="media without artwork")
 

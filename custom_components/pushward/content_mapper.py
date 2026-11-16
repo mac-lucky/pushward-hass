@@ -1160,6 +1160,75 @@ def calendar_next_boundary(state: State, entity_config: dict, now: float) -> int
     return next((ts for ts in window if ts > now), None) if window else None
 
 
+# Keys a frame may leave out where leaving one out means "no value": the optional
+# fields of map_content and of the artwork helpers. Updates are RFC 7396 merge
+# patches, so the server keeps whatever a frame omits; with_cleared_keys nulls these
+# instead. Not listed: keys every frame of their template carries, keys the server
+# requires (timeline value, approval options, checklist items, board tiles, log
+# lines), the write-only timeline history, and the server-owned log_backlog.
+OPTIONAL_CONTENT_KEYS = frozenset(
+    {
+        # every template
+        "remaining_time",
+        "background_color",
+        "text_color",
+        "compact_label",
+        "compact_trailing_label",
+        "compact_trailing_icon",
+        "tap_action",
+        "url_action",
+        "secondary_url_action",
+        "image_url",
+        "image_shape",
+        "image_thumbhash",
+        # countdown, steps, generic
+        "live_progress",
+        "start_date",
+        "end_date",
+        "completion_message",
+        "warning_threshold",
+        "alarm",
+        "snooze_seconds",
+        "step_labels",
+        "step_rows",
+        "step_weights",
+        "step_colors",
+        # alert
+        "severity_label",
+        "fired_at",
+        # gauge, timeline
+        "unit",
+        "scale",
+        "decimals",
+        "smoothing",
+        "thresholds",
+        "units",
+        "primary_series",
+        # media
+        "media_title",
+        "duration_seconds",
+        "position_seconds",
+        "position_at",
+        "volume",
+        # approval
+        "source",
+        "details",
+    }
+)
+
+
+def with_cleared_keys(content: dict, last_content: dict | None) -> dict:
+    """``content`` plus a null for each optional key the server may still hold that this frame omits.
+
+    A null deletes the key under the merge patch. The keys the server may hold are
+    the ones the previous frame carried, or every optional key on a run's first
+    frame (``last_content`` None): the create upsert never resets content, so the
+    previous run's keys are still stored.
+    """
+    held = OPTIONAL_CONTENT_KEYS if last_content is None else OPTIONAL_CONTENT_KEYS & last_content.keys()
+    return content | dict.fromkeys(held - content.keys())
+
+
 def map_content(
     state: State,
     entity_config: dict,
@@ -1474,6 +1543,11 @@ def map_completion_content(entity_config: dict, last_content: dict | None = None
         for key in _COMMON_CARRY_FIELDS:
             if key in last_content:
                 content[key] = last_content[key]
+        # The run is over, so the last live frame's remaining time would read as time
+        # still left. The other keys this frame omits stay on purpose: they are the
+        # final values the completion card keeps showing.
+        if "remaining_time" in last_content:
+            content["remaining_time"] = None
 
     return content
 

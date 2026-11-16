@@ -90,6 +90,7 @@ from custom_components.pushward.const import (
     validate_slug,
 )
 from custom_components.pushward.content_mapper import (
+    OPTIONAL_CONTENT_KEYS,
     _build_log_line,
     _get_timeline_units,
     _get_timeline_values,
@@ -99,6 +100,7 @@ from custom_components.pushward.content_mapper import (
     map_completion_content,
     map_content,
     sanitize_slug,
+    with_cleared_keys,
 )
 from custom_components.pushward.media_control import EMITTED_CONTROL_SLOTS
 
@@ -791,6 +793,30 @@ def test_map_content_countdown_no_remaining(mock_time):
 
     # No remaining_time_attribute → falls back to now (end_date = now + 0)
     assert content["end_date"] == 1000
+
+
+def test_map_completion_content_clears_only_the_remaining_time():
+    """The finished card drops the time left; keys it leaves to the merge patch are not nulled."""
+    config = {CONF_TEMPLATE: "generic"}
+    last = {"remaining_time": 120, "image_url": _IMAGE_URL, "subtitle": "Washer"}
+
+    completion = map_completion_content(config, last)
+
+    assert completion["remaining_time"] is None
+    assert "image_url" not in completion
+    assert "remaining_time" not in map_completion_content(config, {"subtitle": "Washer"})
+
+
+def test_with_cleared_keys_nulls_what_the_server_may_still_hold():
+    content = {"template": "generic", "subtitle": "Washer", "unit": "W"}
+
+    assert with_cleared_keys(content, {"unit": "kW", "remaining_time": 60, "value": {"a": 1.0}}) == {
+        **content,
+        "remaining_time": None,
+    }
+    first = with_cleared_keys(content, None)
+    assert {key for key, value in first.items() if value is None} == OPTIONAL_CONTENT_KEYS - content.keys()
+    assert content == {"template": "generic", "subtitle": "Washer", "unit": "W"}
 
 
 @patch("custom_components.pushward.content_mapper.time")

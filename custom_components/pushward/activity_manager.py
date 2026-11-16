@@ -85,6 +85,7 @@ from .content_mapper import (
     map_completion_content,
     map_content,
     progress_remaining_value,
+    with_cleared_keys,
 )
 from .image_hash import async_ensure_thumbhash
 from .media_control import async_ensure_media_artwork
@@ -948,7 +949,8 @@ class ActivityManager:
             await async_ensure_thumbhash(self._hass, content)
 
             sound = config.get(CONF_SOUND) or None
-            await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
+            # A new run's first frame clears what the previous run left stored.
+            await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, with_cleared_keys(content, None), sound=sound)
             self._clear_forbidden_notification(slug)
 
             tracked.is_active = True
@@ -1142,13 +1144,15 @@ class ActivityManager:
             return
 
         slug = tracked.config[CONF_SLUG]
+        # last_content (and the dedup above) stay null-free; only the wire clears keys.
+        wire = with_cleared_keys(content, tracked.last_content)
         # Stamped before the send: a refused push still spaces the next one, and the
         # throttle's trailing flush delivers the newest state once the interval passes.
         tracked.last_sent_at = time.monotonic()
         async with self._api_error_guard(slug, "updating"):
             sound = tracked.config.get(CONF_SOUND) or None
             try:
-                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
+                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, wire, sound=sound)
             except PushWardNotFoundError:
                 # The server has no row for this slug (dismissed on the phone,
                 # TTL-expired, or deleted out-of-band). Recreate so updates
@@ -1163,7 +1167,7 @@ class ActivityManager:
                 # Counts only once the create reached the server: a create refused
                 # locally (quota gate) or lost on the wire says nothing about the row.
                 tracked.recreate_attempted = True
-                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, content, sound=sound)
+                await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, wire, sound=sound)
                 # The retry push landed, so the 404 streak is over: re-arm the guard
                 # (reset on the next successful push) so a later re-deletion self-heals
                 # again instead of 404ing forever. If the retry push had 404'd, it would
