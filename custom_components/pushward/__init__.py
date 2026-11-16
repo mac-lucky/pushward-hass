@@ -146,7 +146,7 @@ from .media_control import async_register_media_control_view
 from .panel import async_register_panel, async_register_static_path, async_remove_panel
 from .quota import QuotaGate
 from .todo_reminders import TodoReminderManager, async_cancel_stored_schedules, todo_configs
-from .websocket import async_register_commands
+from .websocket import PREVIEW_WIDGET_SLUG, async_register_commands
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
@@ -1878,19 +1878,22 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     managers' async_reload, but no manager is live here (async_unload_entry already ran
     and popped hass.data), so build a throwaway client from entry.data.
     """
+    # The panel's test widget too: it outlives the subentries that previewed it.
     widget_slugs = [
-        slug
-        for sub in entry.subentries.values()
-        if sub.subentry_type == SUBENTRY_TYPE_WIDGET and (slug := sub.data.get(CONF_SLUG))
+        PREVIEW_WIDGET_SLUG,
+        *(
+            slug
+            for sub in entry.subentries.values()
+            if sub.subentry_type == SUBENTRY_TYPE_WIDGET and (slug := sub.data.get(CONF_SLUG))
+        ),
     ]
     api = PushWardApiClient(
         async_get_clientsession(hass),
         entry.data[CONF_SERVER_URL],
         entry.data[CONF_INTEGRATION_KEY],
     )
-    if widget_slugs:
-        # delete_widget is 404-safe; isolate failures so one bad slug can't strand the rest.
-        await asyncio.gather(*(api.delete_widget(slug) for slug in widget_slugs), return_exceptions=True)
+    # delete_widget is 404-safe; isolate failures so one bad slug can't strand the rest.
+    await asyncio.gather(*(api.delete_widget(slug) for slug in widget_slugs), return_exceptions=True)
     await async_cancel_stored_schedules(hass, api, entry.entry_id)
     await build_history_store(hass, entry.entry_id).async_remove()
     await build_widget_store(hass, entry.entry_id).async_remove()

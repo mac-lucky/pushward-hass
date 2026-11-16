@@ -2872,7 +2872,7 @@ async def test_async_remove_entry_deletes_server_widgets(hass: HomeAssistant) ->
     with patch("custom_components.pushward.PushWardApiClient", return_value=api):
         await async_remove_entry(hass, entry)
 
-    assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-one", "ha-two"}
+    assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-one", "ha-two", "ha-preview-widget"}
 
 
 async def test_action_objects_satisfy_server_contract(hass: HomeAssistant) -> None:
