@@ -1251,6 +1251,78 @@ async def test_reconfigure_entity_left_on_another_unique_id_still_aborts(hass: H
     assert entry.subentries[washer_id].data[CONF_ENTITY_ID] == "binary_sensor.washer"
 
 
+def _moved_entity(entity_id: str, stale_unique_id: str) -> ConfigSubentryData:
+    """A subentry an older version moved to entity_id without moving its unique_id."""
+    moved = _entity_subentry_data(**{CONF_ENTITY_ID: entity_id})
+    moved["unique_id"] = stale_unique_id
+    return moved
+
+
+def _uids(entry: MockConfigEntry) -> dict[str, str | None]:
+    """Each subentry's unique_id by the entity it tracks."""
+    return {sub.data[CONF_ENTITY_ID]: sub.unique_id for sub in entry.subentries.values()}
+
+
+async def test_reconfigure_entity_onto_an_entity_held_only_as_a_stale_unique_id(hass: HomeAssistant) -> None:
+    entry = _mock_entry(
+        subentries_data=[
+            _moved_entity("binary_sensor.dryer", "binary_sensor.washer"),
+            _entity_subentry_data(**{CONF_ENTITY_ID: "binary_sensor.dishwasher"}),
+        ]
+    )
+    entry.add_to_hass(hass)
+    dishwasher_id = next(sid for sid, sub in entry.subentries.items() if sub.unique_id == "binary_sensor.dishwasher")
+
+    result = await _reconfigure_entity_onto(hass, entry, dishwasher_id, "binary_sensor.washer")
+
+    assert result["reason"] == "reconfigure_successful"
+    assert _uids(entry) == {
+        "binary_sensor.dryer": "binary_sensor.dryer",
+        "binary_sensor.washer": "binary_sensor.washer",
+    }
+
+
+async def test_reconfigure_entity_in_place_frees_its_id_from_a_stale_holder(hass: HomeAssistant) -> None:
+    """X tracks dryer under the washer id, Y holds the dryer id but tracks dishwasher: X still saves."""
+    entry = _mock_entry(
+        subentries_data=[
+            _moved_entity("binary_sensor.dryer", "binary_sensor.washer"),
+            _moved_entity("binary_sensor.dishwasher", "binary_sensor.dryer"),
+        ]
+    )
+    entry.add_to_hass(hass)
+    dryer_id = next(sid for sid, sub in entry.subentries.items() if sub.data[CONF_ENTITY_ID] == "binary_sensor.dryer")
+
+    result = await _reconfigure_entity_onto(hass, entry, dryer_id, "binary_sensor.dryer")
+
+    assert result["reason"] == "reconfigure_successful"
+    assert _uids(entry) == {
+        "binary_sensor.dryer": "binary_sensor.dryer",
+        "binary_sensor.dishwasher": "binary_sensor.dishwasher",
+    }
+
+
+async def test_add_entity_frees_a_stale_id_and_leaves_a_holder_whose_own_id_is_held_without_one(
+    hass: HomeAssistant,
+) -> None:
+    entry = _mock_entry(
+        subentries_data=[
+            _moved_entity("binary_sensor.dishwasher", "binary_sensor.washer"),
+            _moved_entity("binary_sensor.oven", "binary_sensor.dishwasher"),
+        ]
+    )
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(hass, entry)
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert _uids(entry) == {
+        "binary_sensor.dishwasher": None,
+        "binary_sensor.oven": "binary_sensor.dishwasher",
+        "binary_sensor.washer": "binary_sensor.washer",
+    }
+
+
 def _widget_subentry_data(**overrides) -> ConfigSubentryData:
     data = make_widget_config(**overrides)
     return ConfigSubentryData(
@@ -1292,6 +1364,22 @@ async def test_reconfigure_widget_onto_a_free_slug_moves_the_unique_id(hass: Hom
     subentry = entry.subentries[subentry_id]
     assert subentry.data[CONF_SLUG] == "ha-members"
     assert subentry.unique_id == "ha-members"
+
+
+async def test_reconfigure_widget_onto_a_slug_held_only_as_a_stale_unique_id(hass: HomeAssistant) -> None:
+    moved = _widget_subentry_data(**{CONF_SLUG: "ha-old"})
+    moved["unique_id"] = "ha-members"
+    entry = _mock_entry(subentries_data=[moved, _widget_subentry_data()])
+    entry.add_to_hass(hass)
+    users_id = next(sid for sid, sub in entry.subentries.items() if sub.unique_id == "ha-users")
+
+    result = await _reconfigure_widget_onto(hass, entry, users_id, "ha-members")
+
+    assert result["reason"] == "reconfigure_successful"
+    assert {sub.data[CONF_SLUG]: sub.unique_id for sub in entry.subentries.values()} == {
+        "ha-old": "ha-old",
+        "ha-members": "ha-members",
+    }
 
 
 # --- Template auto-suggestion tests ---

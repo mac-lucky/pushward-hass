@@ -2496,6 +2496,31 @@ def _tracked_elsewhere(
     )
 
 
+def _free_stale_unique_id(
+    hass: HomeAssistant,
+    entry: config_entries.ConfigEntry,
+    subentry_type: str,
+    key: str,
+    unique_id: str,
+    own_subentry_id: str | None = None,
+) -> None:
+    """Re-key another subentry that holds unique_id without storing it under key.
+
+    HA refuses a unique_id any subentry still holds, and a subentry an older version
+    moved kept the unique_id of what it left. The holder takes the unique_id of what
+    it stores now, or none while another subentry holds that one too.
+    """
+    holder = next(
+        (sub for sub in entry.subentries.values() if sub.unique_id == unique_id and sub.subentry_id != own_subentry_id),
+        None,
+    )
+    if holder is None or holder.subentry_type != subentry_type or holder.data.get(key) == unique_id:
+        return
+    current = holder.data.get(key)
+    taken = any(sub.unique_id == current for sub in entry.subentries.values())
+    hass.config_entries.async_update_subentry(entry, holder, unique_id=None if taken else current)
+
+
 class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
     """Handle adding and reconfiguring tracked entities (two-step flow)."""
 
@@ -2563,14 +2588,11 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             if entity_cfg is not None:
                 entry = self._get_entry()
                 subentry = self._get_reconfigure_subentry() if self._is_reconfigure else None
-                if _tracked_elsewhere(
-                    entry,
-                    SUBENTRY_TYPE_ENTITY,
-                    CONF_ENTITY_ID,
-                    entity_cfg[CONF_ENTITY_ID],
-                    subentry.subentry_id if subentry else None,
-                ):
+                claim = (entry, SUBENTRY_TYPE_ENTITY, CONF_ENTITY_ID, entity_cfg[CONF_ENTITY_ID])
+                own_id = subentry.subentry_id if subentry else None
+                if _tracked_elsewhere(*claim, own_id):
                     return self.async_abort(reason="already_configured")
+                _free_stale_unique_id(self.hass, *claim, own_id)
                 if subentry is not None:
                     entity_cfg[CONF_MEDIA_TOKEN] = _media_control_token(entity_cfg, subentry.data.get(CONF_MEDIA_TOKEN))
                     return self.async_update_and_abort(
@@ -3420,14 +3442,11 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                 title = widget_cfg.get(CONF_WIDGET_NAME) or widget_cfg[CONF_SLUG]
                 entry = self._get_entry()
                 subentry = self._get_reconfigure_subentry() if self._is_reconfigure else None
-                if _tracked_elsewhere(
-                    entry,
-                    SUBENTRY_TYPE_WIDGET,
-                    CONF_SLUG,
-                    widget_cfg[CONF_SLUG],
-                    subentry.subentry_id if subentry else None,
-                ):
+                claim = (entry, SUBENTRY_TYPE_WIDGET, CONF_SLUG, widget_cfg[CONF_SLUG])
+                own_id = subentry.subentry_id if subentry else None
+                if _tracked_elsewhere(*claim, own_id):
                     return self.async_abort(reason="already_configured")
+                _free_stale_unique_id(self.hass, *claim, own_id)
                 if subentry is not None:
                     return self.async_update_and_abort(
                         entry,
