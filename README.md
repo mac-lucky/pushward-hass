@@ -365,7 +365,7 @@ A two-step flow mirroring entities. **Step 1** picks the entity, a widget templa
 `countdown` here is the widget template, unrelated to the activity template of the same name.
 
 **`trend`, `countdown`, `battery`, `schedule` and `flow` need the PushWard iOS app 1.6.0 or newer,
-and `heatmap` the next PushWard app release.** The original five (`value`, `progress`, `status`,
+and `heatmap` 1.30.0 (Android 1.4.0).** The original five (`value`, `progress`, `status`,
 `gauge`, `stat_list`) work on every build. iPhone, iPad, watch and Mac builds older than 1.6.0
 simply don't see a widget of any other template: PushWard leaves it out of their widget list, and
 the rest of the list works as before. Builds from 1.6.0 up to the release that draws a template show
@@ -914,8 +914,8 @@ implied by the action name; you no longer pass a `template` field.
 > tick on the phone changes the card and nothing in Home Assistant, and there is no event or entity
 > for it. If an automation needs to know, keep the list in Home Assistant instead (a to-do list, or a
 > few `input_boolean` helpers) and send the rows' state from there; reading ticks back may come later
-> by syncing a to-do entity. The phone needs the next PushWard app release to draw the list; older
-> builds show a generic card with the count ("2 of 3").
+> by syncing a to-do entity. The list needs PushWard 1.30.0 on iPhone, iPad, watch and Mac, or 1.4.0
+> on Android; older builds show a generic card with the count ("2 of 3").
 >
 > ```yaml
 > - action: pushward.update_activity_checklist
