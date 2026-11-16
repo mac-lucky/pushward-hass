@@ -155,6 +155,13 @@ _RETRACT_HOLD = timedelta(hours=24)
 # PushWard has encryption for organizations turned off.
 _E2E_UNAVAILABLE_CODE = "notification.encryption_unavailable"
 
+# What the panel previews for a list with no upcoming due item.
+_SAMPLE_ITEM = {
+    "uid": "sample",
+    "summary": "Sample reminder",
+    "description": "No item on this list has an upcoming due date yet",
+}
+
 
 def build_todo_store(hass: HomeAssistant, entry_id: str) -> Store:
     return Store(hass, _STORAGE_VERSION, f"{DOMAIN}.todo.{entry_id}", atomic_writes=True)
@@ -197,8 +204,7 @@ class _Reminder:
     fingerprint: str
     due_at: datetime
     send_at: datetime
-    title: str
-    body: str
+    item: dict
 
 
 def _is_date_only(due: Any) -> bool:
@@ -283,6 +289,28 @@ def e2e_unavailable_issue_id(entry_id: str) -> str:
 def _collapse_id(sub_id: str, uid: str) -> str:
     """One collapse id per item, so a duplicate send replaces the banner instead of stacking."""
     return "ha-todo-" + hashlib.sha256(f"{sub_id}/{uid}".encode()).hexdigest()[:32]
+
+
+def build_reminder_notification(
+    item: dict, cfg: dict, *, sub_id: str, collapse_id: str, list_name: str, done_label: str
+) -> dict[str, Any]:
+    """The notification fields of one item's reminder (create_notification's arguments).
+
+    Pure, so the panel preview shows exactly what the manager sends.
+    """
+    entity_id = cfg[CONF_ENTITY_ID]
+    done_button = bool(cfg.get(CONF_TODO_DONE_BUTTON, DEFAULT_TODO_DONE_BUTTON))
+    return {
+        "title": str(item.get("summary") or list_name)[:TODO_TITLE_MAX],
+        "body": str(item.get("description") or list_name)[:TODO_BODY_MAX],
+        "level": cfg.get(CONF_TODO_LEVEL, DEFAULT_TODO_LEVEL),
+        "thread_id": f"ha-todo-{entity_id.split('.', 1)[-1]}"[:64],
+        "collapse_id": collapse_id,
+        "source": "home-assistant",
+        "source_display_name": list_name,
+        "metadata": {TODO_METADATA_LIST: sub_id, TODO_METADATA_UID: item["uid"]},
+        "actions": [{"id": TODO_DONE_ACTION_ID, "title": done_label}] if done_button else None,
+    }
 
 
 class TodoReminderManager:
@@ -764,7 +792,6 @@ class TodoReminderManager:
         offset = timedelta(minutes=int(cfg.get(CONF_TODO_OFFSET_MINUTES, DEFAULT_TODO_OFFSET_MINUTES)))
         late_limit = now - timedelta(minutes=TODO_LATE_GRACE_MINUTES)
         horizon = now + timedelta(days=TODO_SCHEDULE_HORIZON_DAYS, minutes=-TODO_SCHEDULE_HORIZON_MARGIN_MINUTES)
-        list_name = self._list_name(cfg[CONF_ENTITY_ID])
         candidates: list[_Reminder] = []
         for uid, item in open_items.items():
             due = item.get("due")
@@ -797,8 +824,7 @@ class TodoReminderManager:
                     fingerprint=_fingerprint(versions[uid], cfg, _is_date_only(due)),
                     due_at=due_at,
                     send_at=send_at,
-                    title=str(item.get("summary") or list_name)[:TODO_TITLE_MAX],
-                    body=str(item.get("description") or list_name)[:TODO_BODY_MAX],
+                    item=item,
                 )
             )
         candidates.sort(key=lambda r: r.send_at)
@@ -808,7 +834,6 @@ class TodoReminderManager:
     async def _async_create(self, sub_id: str, cfg: dict, lst: dict, wanted: dict[str, _Reminder]) -> None:
         entity_id = cfg[CONF_ENTITY_ID]
         records: dict[str, dict] = lst["items"]
-        done_button = bool(cfg.get(CONF_TODO_DONE_BUTTON, DEFAULT_TODO_DONE_BUTTON))
         for reminder in sorted(wanted.values(), key=lambda r: r.send_at):
             if self._stopped or self._configs.get(sub_id) is not cfg:
                 return  # stopping, or the list was removed or changed meanwhile
@@ -819,17 +844,19 @@ class TodoReminderManager:
             while collapse_id in lst["retracted"]:  # a retract under it may still reach a device
                 n += 1
                 collapse_id = _collapse_id(sub_id, f"{reminder.uid}#{n}")
+            fields = build_reminder_notification(
+                reminder.item,
+                cfg,
+                sub_id=sub_id,
+                collapse_id=collapse_id,
+                list_name=self._list_name(entity_id),
+                done_label=self._done_label,
+            )
             try:
                 created = await self._api.create_notification(
-                    reminder.title,
-                    reminder.body,
-                    level=cfg.get(CONF_TODO_LEVEL, DEFAULT_TODO_LEVEL),
-                    thread_id=f"ha-todo-{entity_id.split('.', 1)[-1]}"[:64],
-                    collapse_id=collapse_id,
-                    source="home-assistant",
-                    source_display_name=self._list_name(entity_id),
-                    metadata={TODO_METADATA_LIST: sub_id, TODO_METADATA_UID: reminder.uid},
-                    actions=[{"id": TODO_DONE_ACTION_ID, "title": self._done_label}] if done_button else None,
+                    fields.pop("title"),
+                    fields.pop("body"),
+                    **fields,
                     send_at=send_at,
                     # An encrypted reminder is shortened to fit rather than dropped.
                     trim_to_fit=True,
@@ -884,6 +911,33 @@ class TodoReminderManager:
                 "watch_until": None,
                 "collapse_id": collapse_id,
             }
+
+    async def async_preview(self, cfg: dict, sub_id: str) -> dict | None:
+        """The reminder of the list's next due item, or of a sample item when none is due.
+
+        For the panel preview: nothing is scheduled. None while the list cannot be read.
+        """
+        entity_id = cfg[CONF_ENTITY_ID]
+        items = await self._async_open_items(entity_id)
+        if items is None:
+            return None
+        all_day_time = _parse_time(cfg.get(CONF_TODO_ALL_DAY_TIME, DEFAULT_TODO_ALL_DAY_TIME))
+        now = dt_util.utcnow()
+        upcoming = [
+            (due_at, item)
+            for item in items
+            if item.get("uid") and (due_at := _parse_due(item.get("due"), all_day_time)) and due_at >= now
+        ]
+        item = min(upcoming, key=lambda pair: pair[0])[1] if upcoming else _SAMPLE_ITEM
+        fields = build_reminder_notification(
+            item,
+            cfg,
+            sub_id=sub_id,
+            collapse_id=_collapse_id(sub_id, item["uid"]),
+            list_name=self._list_name(entity_id),
+            done_label=self._done_label,
+        )
+        return {key: value for key, value in fields.items() if value is not None}
 
     @callback
     def _raise_e2e_issue(self) -> None:
