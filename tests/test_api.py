@@ -1747,6 +1747,16 @@ async def test_raw_request_returns_a_refusal_as_status_and_body():
     assert await client._request_with_retry("PATCH", "/activities/ha-x", json={}, raw=True) == (422, problem)
 
 
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_raw_request_answers_a_server_error_once_the_retries_are_spent(_sleep):
+    problem = {"code": "internal", "detail": "down"}
+    session = _make_session(*[_mock_response(503, text=json.dumps(problem)) for _ in range(MAX_RETRIES)])
+    client = _make_client(session)
+
+    assert await client._request_with_retry("PATCH", "/activities/ha-x", json={}, raw=True) == (503, problem)
+    assert session.request.call_count == MAX_RETRIES
+
+
 async def test_raw_request_body_is_none_when_empty_or_not_json():
     client = _make_client(_make_session(_mock_response(204), _mock_response(200, text="ok")))
 

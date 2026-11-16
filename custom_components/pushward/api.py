@@ -850,7 +850,8 @@ class PushWardApiClient:
         out as the Idempotency-Key header on every attempt; only POST /notifications
         and POST /notifications/scheduled read it. ``content_type`` replaces the
         JSON body's Content-Type. ``raw`` returns (status, parsed body or None) for
-        every answer below 500 except 401 and 429, which keep their errors.
+        every answer except 401 and 429, which keep their errors; a 5xx only once
+        the retries are spent.
         """
         gate = self._quota_gate if quota_kind is not None else None
         headers = self._headers if idempotency_key is None else {**self._headers, "Idempotency-Key": idempotency_key}
@@ -868,7 +869,12 @@ class PushWardApiClient:
                     gate.raise_if_blocked(quota_kind)
                 try:
                     async with self._session.request(method, url, headers=headers, json=json, timeout=_TIMEOUT) as resp:
-                        if raw and resp.status < 500 and resp.status not in _RAW_KEEPS_ERROR:
+                        # A raw 5xx is still retried; only the last attempt's answer comes back.
+                        if (
+                            raw
+                            and resp.status not in _RAW_KEEPS_ERROR
+                            and (resp.status < 500 or attempt == MAX_RETRIES - 1)
+                        ):
                             return resp.status, await self._body_or_none(resp)
                         if resp.ok:
                             if not return_json:
