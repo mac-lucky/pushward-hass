@@ -1692,21 +1692,16 @@ def _strict_board_tile(item: object) -> dict:
     return tile
 
 
-def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
+def _parse_board_tiles(raw: object) -> list[dict]:
     """Parse board tiles from a row-editor list (or the legacy comma string).
 
     From the form each row is already a dict with the storage keys: ``{label,
     entity_id, value_attribute?, unit?, icon?, color?, url_action?}``. The legacy
-    string form ('label=entity_id[:attr[:unit[:icon]]], ...') stays accepted for
-    stored-string edge cases and non-form callers. Capped at BOARD_MAX_TILES.
-    Lenient (default) skips malformed rows/entries and truncates past the cap;
-    strict (form paths) raises invalid_tile / too_many_tiles (and applies the
-    per-field length, color, and URL rules) instead.
+    string form ('label=entity_id[:attr[:unit[:icon]]], ...') stays accepted.
+    Raises invalid_tile / too_many_tiles (past BOARD_MAX_TILES), and applies the
+    per-field length, color, and URL rules to the rows.
     """
     if isinstance(raw, list):
-        if not strict:
-            kept = [t for t in raw if isinstance(t, dict) and t.get(CONF_ENTITY_ID) and t.get(CONF_LABEL)]
-            return kept[:BOARD_MAX_TILES]
         tiles = [_strict_board_tile(item) for item in raw]
         if len(tiles) > BOARD_MAX_TILES:
             raise vol.Invalid("too_many_tiles", path=[CONF_TILES])
@@ -1719,18 +1714,14 @@ def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
         if not entry:
             continue
         if "=" not in entry:
-            if strict:
-                raise vol.Invalid("invalid_tile", path=[CONF_TILES])
-            continue
+            raise vol.Invalid("invalid_tile", path=[CONF_TILES])
         label, rest = entry.split("=", 1)
         label = label.strip()
         # maxsplit=3 keeps the icon (4th field) intact even when it contains a
         # colon, e.g. an "mdi:cpu" MDI icon - otherwise the prefix would be lost.
         parts = [p.strip() for p in rest.split(":", 3)]
         if not label or not parts or not parts[0]:
-            if strict:
-                raise vol.Invalid("invalid_tile", path=[CONF_TILES])
-            continue
+            raise vol.Invalid("invalid_tile", path=[CONF_TILES])
         tile: dict = {CONF_LABEL: label, CONF_ENTITY_ID: parts[0]}
         if len(parts) > 1 and parts[1]:
             tile[CONF_VALUE_ATTRIBUTE] = parts[1]
@@ -1739,11 +1730,9 @@ def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
         if len(parts) > 3 and parts[3]:
             tile[CONF_ICON] = parts[3]
         tiles.append(tile)
-        if not strict and len(tiles) >= BOARD_MAX_TILES:
-            break
-    if strict and len(tiles) > BOARD_MAX_TILES:
+    if len(tiles) > BOARD_MAX_TILES:
         raise vol.Invalid("too_many_tiles", path=[CONF_TILES])
-    return tiles[:BOARD_MAX_TILES]
+    return tiles
 
 
 def _strict_log_column(item: object, path_key: str = CONF_LOG_COLUMNS) -> dict:
@@ -1777,24 +1766,19 @@ def _strict_log_column(item: object, path_key: str = CONF_LOG_COLUMNS) -> dict:
     return column
 
 
-def _parse_log_columns(raw: object, *, strict: bool = False, path_key: str = CONF_LOG_COLUMNS) -> list[dict]:
+def _parse_log_columns(raw: object, *, path_key: str = CONF_LOG_COLUMNS) -> list[dict]:
     """Parse log or subtitle columns from a row-editor list (or the legacy comma string).
 
     From the form each row is a dict with the storage keys: ``{label?, entity_id?,
     attribute?, unit?}``. The legacy string form ('[Label=]source[|unit], ...') stays
-    accepted for stored-string edge cases and non-form callers. Capped at
-    LOG_MAX_COLUMNS. ``source`` disambiguates in the string form:
+    accepted. ``source`` disambiguates in the string form:
       - ``brightness`` (no dot)            an attribute of the tracked entity
       - ``binary_sensor.door`` (has a dot) another entity's state
       - ``sensor.temp:temperature``        another entity's attribute
-    Lenient (default) skips malformed rows/entries and truncates past the cap; strict
-    (form paths) raises invalid_log_column / too_many_log_columns (and applies the
-    label length cap) instead.
+    Raises invalid_log_column / too_many_log_columns (past LOG_MAX_COLUMNS), and
+    applies the label length cap to the rows.
     """
     if isinstance(raw, list):
-        if not strict:
-            kept = [c for c in raw if isinstance(c, dict) and (c.get(CONF_ENTITY_ID) or c.get("attribute"))]
-            return kept[:LOG_MAX_COLUMNS]
         columns = [_strict_log_column(item, path_key) for item in raw]
         if len(columns) > LOG_MAX_COLUMNS:
             raise vol.Invalid("too_many_log_columns", path=[path_key])
@@ -1814,18 +1798,14 @@ def _parse_log_columns(raw: object, *, strict: bool = False, path_key: str = CON
             entry, unit = (part.strip() for part in entry.split("|", 1))
         source = entry
         if not source:
-            if strict:
-                raise vol.Invalid("invalid_log_column", path=[path_key])
-            continue
+            raise vol.Invalid("invalid_log_column", path=[path_key])
         column: dict = {}
         if label:
             column[CONF_LABEL] = label
         if ":" in source:
             entity_id, attr = (part.strip() for part in source.split(":", 1))
             if not entity_id:
-                if strict:
-                    raise vol.Invalid("invalid_log_column", path=[path_key])
-                continue
+                raise vol.Invalid("invalid_log_column", path=[path_key])
             column[CONF_ENTITY_ID] = entity_id
             if attr:
                 column["attribute"] = attr
@@ -1836,11 +1816,9 @@ def _parse_log_columns(raw: object, *, strict: bool = False, path_key: str = CON
         if unit:
             column[CONF_UNIT] = unit
         columns.append(column)
-        if not strict and len(columns) >= LOG_MAX_COLUMNS:
-            break
-    if strict and len(columns) > LOG_MAX_COLUMNS:
+    if len(columns) > LOG_MAX_COLUMNS:
         raise vol.Invalid("too_many_log_columns", path=[path_key])
-    return columns[:LOG_MAX_COLUMNS]
+    return columns
 
 
 def _strict_series_entity(item: object) -> dict:
@@ -1868,23 +1846,18 @@ def _strict_series_entity(item: object) -> dict:
     return series
 
 
-def _parse_series_entities(raw: object, *, strict: bool = False) -> list[dict]:
+def _parse_series_entities(raw: object) -> list[dict]:
     """Parse timeline series entities from a row-editor list (or the legacy comma string).
 
     From the form each row is a dict with the storage keys: ``{label?, entity_id,
     attribute?}``. The legacy string form ('[Label=]entity_id[:attribute], ...') stays
-    accepted for stored-string edge cases and non-form callers; in that form ``source``
-    must be an entity_id (contains a dot) and a bare word is not a series. The optional
-    label is left raw here and frozen later by ``_resolve_series_entity_labels``. The
-    lenient (default) list/string path skips malformed rows and truncates past
-    TIMELINE_MAX_SERIES; strict (form paths) raises invalid_series_entity per row and
-    leaves the over-cap check to the combined series + series_entities guard in
+    accepted; in that form ``source`` must be an entity_id (contains a dot) and a bare
+    word is not a series. The optional label is left raw here and frozen later by
+    ``_resolve_series_entity_labels``. Raises invalid_series_entity per row and leaves
+    the over-cap check to the combined series + series_entities guard in
     ``_parse_entity_input`` (so a lone over-cap list still trips too_many_series).
     """
     if isinstance(raw, list):
-        if not strict:
-            series = [s for s in raw if isinstance(s, dict) and s.get(CONF_ENTITY_ID)]
-            return series[:TIMELINE_MAX_SERIES]
         return [_strict_series_entity(item) for item in raw]
     if not isinstance(raw, str) or not raw.strip():
         return []
@@ -1898,30 +1871,22 @@ def _parse_series_entities(raw: object, *, strict: bool = False) -> list[dict]:
             label, entry = (part.strip() for part in entry.split("=", 1))
         source = entry
         if not source:
-            if strict:
-                raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
-            continue
+            raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
         series: dict = {}
         if ":" in source:
             entity_id, attr = (part.strip() for part in source.split(":", 1))
             if not entity_id or "." not in entity_id:
-                if strict:
-                    raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
-                continue
+                raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
             series[CONF_ENTITY_ID] = entity_id
             if attr:
                 series["attribute"] = attr
         elif "." in source:
             series[CONF_ENTITY_ID] = source
         else:
-            if strict:
-                raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
-            continue
+            raise vol.Invalid("invalid_series_entity", path=[CONF_SERIES_ENTITIES])
         if label:
             series[CONF_LABEL] = label
         result.append(series)
-        if len(result) >= TIMELINE_MAX_SERIES:
-            break
     return result
 
 
@@ -2085,9 +2050,9 @@ def _parse_calendar_fields(user_input: dict) -> dict:
 def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> dict:
     """Normalize user input into an entity config dict.
 
-    Called only from the two subentry form paths, so the DSL parsers run in
-    strict mode: malformed tokens raise vol.Invalid instead of being silently
-    dropped, and the details step maps each exc.path field to its error code.
+    Called only from the two subentry form paths: a malformed row or token raises
+    vol.Invalid instead of being silently dropped, and the details step maps each
+    exc.path field to its error code.
     """
     user_input = _flatten_section_input(user_input, ENTITY_SECTIONS)
     entity_id = user_input[CONF_ENTITY_ID]
@@ -2138,7 +2103,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         for attr, label in _kv_rows_to_map(user_input.get(CONF_SERIES, ""), "attribute", CONF_LABEL).items()
     }
     series_entities = _resolve_series_entity_labels(
-        _parse_series_entities(user_input.get(CONF_SERIES_ENTITIES, ""), strict=True), hass
+        _parse_series_entities(user_input.get(CONF_SERIES_ENTITIES, "")), hass
     )
     if len(series) + len(series_entities) > TIMELINE_MAX_SERIES:
         raise vol.Invalid("too_many_series", path=[CONF_SERIES_ENTITIES])
@@ -2147,23 +2112,21 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         known_labels = _timeline_series_labels(series, series_entities, entity_id, hass)
         if primary_series not in known_labels:
             raise vol.Invalid("unknown_primary_series", path=[CONF_PRIMARY_SERIES])
-    thresholds = _parse_thresholds(user_input.get(CONF_THRESHOLDS, ""), strict=True)
+    thresholds = _parse_thresholds(user_input.get(CONF_THRESHOLDS, ""))
     history_period_raw = user_input.get(CONF_HISTORY_PERIOD, DEFAULT_HISTORY_PERIOD)
 
     # Board tiles: a board needs at least one tile to render.
-    tiles = _parse_board_tiles(user_input.get(CONF_TILES, ""), strict=True)
+    tiles = _parse_board_tiles(user_input.get(CONF_TILES, ""))
     if template == "board" and not tiles:
         raise vol.Invalid("tiles_required", path=[CONF_TILES])
 
-    # Steps: the unified editor submits one row per step, decomposed here into the
-    # four stored keys. The row count must be 0 or exactly total_steps (the server
-    # drops a wrong-length list, so surface it here rather than silently).
+    # Steps: the unified editor (only the steps form has it) submits one row per step,
+    # decomposed here into the four stored keys. The row count must be 0 or exactly
+    # total_steps (the server drops a wrong-length list, so surface it here rather than silently).
     total_steps = int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS))
-    step_fields = _steps_fields_from_input(user_input, total_steps, strict=template == "steps")
-    log_columns = _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, ""), strict=True)
-    subtitle_columns = _parse_log_columns(
-        user_input.get(CONF_SUBTITLE_COLUMNS, ""), strict=True, path_key=CONF_SUBTITLE_COLUMNS
-    )
+    step_fields = _decompose_steps_rows(user_input.get(CONF_STEPS_EDITOR), total_steps)
+    log_columns = _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, ""))
+    subtitle_columns = _parse_log_columns(user_input.get(CONF_SUBTITLE_COLUMNS, ""), path_key=CONF_SUBTITLE_COLUMNS)
     icon_map = _kv_rows_to_map(user_input.get(CONF_ICON_MAP, ""), "state", CONF_ICON)
     if any(len(icon) > MAX_ICON_LEN for icon in icon_map.values()):
         raise vol.Invalid("invalid_icon_map", path=[CONF_ICON_MAP])
@@ -3018,18 +2981,14 @@ def _strict_battery_row(item: object) -> dict:
     return row
 
 
-def _parse_battery_devices(raw: object, *, strict: bool = False) -> list[dict]:
-    """Parse battery devices from the row editor.
+def _parse_battery_devices(raw: object) -> list[dict]:
+    """Parse battery devices from the row editor, raising the translated errors.
 
-    Lenient (load/reconfigure) skips malformed rows and truncates past the cap;
-    strict (form paths) raises the translated errors instead. Unlike stat_rows
-    there is no legacy comma-string form to keep working - the template is new.
+    Unlike stat_rows there is no legacy comma-string form to keep working - the
+    template is new.
     """
     if not isinstance(raw, list):
         return []
-    if not strict:
-        kept = [r for r in raw if isinstance(r, dict) and r.get(CONF_ENTITY_ID)]
-        return kept[:WIDGET_MAX_BATTERY_DEVICES]
     rows = [_strict_battery_row(item) for item in raw]
     if len(rows) > WIDGET_MAX_BATTERY_DEVICES:
         raise vol.Invalid("too_many_battery_devices", path=[CONF_BATTERY_DEVICES])
@@ -3062,7 +3021,7 @@ def _strict_flow_node(item: object) -> dict:
     return row
 
 
-def _parse_flow_nodes(raw: object, *, strict: bool = False) -> list[dict]:
+def _parse_flow_nodes(raw: object) -> list[dict]:
     """Parse flow nodes from the row editor, enforcing the per-slot arity.
 
     Three inputs is the server cap; output, storage and exchange are single
@@ -3071,9 +3030,6 @@ def _parse_flow_nodes(raw: object, *, strict: bool = False) -> list[dict]:
     """
     if not isinstance(raw, list):
         return []
-    if not strict:
-        kept = [r for r in raw if isinstance(r, dict) and r.get(CONF_ENTITY_ID) and r.get(CONF_FLOW_SLOT)]
-        return kept
     rows = [_strict_flow_node(item) for item in raw]
     inputs = sum(1 for r in rows if r[CONF_FLOW_SLOT] == FLOW_SLOT_INPUT)
     if inputs > WIDGET_MAX_FLOW_INPUTS:
@@ -3084,28 +3040,16 @@ def _parse_flow_nodes(raw: object, *, strict: bool = False) -> list[dict]:
     return rows
 
 
-def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
+def _parse_widget_stat_rows(raw: object) -> list[dict]:
     """Parse stat_rows from a row-editor list (or the legacy comma string).
 
     From the form each row is a dict with the storage keys: ``{label, entity_id,
     value_attribute?, unit?}``. The legacy string form
-    ('label=entity_id[:attr[:unit]], ...') stays accepted for stored-string edge
-    cases and non-form callers. Lenient (default) skips malformed rows/entries and
-    truncates past the cap; strict (form paths) raises invalid_stat_row /
-    too_many_stat_rows (and applies the per-field length caps) instead.
+    ('label=entity_id[:attr[:unit]], ...') stays accepted. Raises invalid_stat_row /
+    too_many_stat_rows (past WIDGET_MAX_STAT_ROWS), and applies the per-field length
+    caps to the rows.
     """
     if isinstance(raw, list):
-        if not strict:
-            kept = []
-            for row in raw:
-                if not (isinstance(row, dict) and row.get(CONF_ENTITY_ID) and row.get(CONF_LABEL)):
-                    continue
-                if row.get("timer_style") and str(row["timer_style"]).strip().lower() not in TIMER_STYLES:
-                    # Drop the bad key, not the row: the row still renders fine
-                    # as plain text without a timer.
-                    row = {k: v for k, v in row.items() if k != "timer_style"}
-                kept.append(row)
-            return kept[:WIDGET_MAX_STAT_ROWS]
         rows = [_strict_stat_row(item) for item in raw]
         if len(rows) > WIDGET_MAX_STAT_ROWS:
             raise vol.Invalid("too_many_stat_rows", path=[CONF_STAT_ROWS])
@@ -3118,27 +3062,21 @@ def _parse_widget_stat_rows(raw: object, *, strict: bool = False) -> list[dict]:
         if not entry:
             continue
         if "=" not in entry:
-            if strict:
-                raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
-            continue
+            raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
         label, rest = entry.split("=", 1)
         label = label.strip()
         parts = [p.strip() for p in rest.split(":")]
         if not label or not parts or not parts[0]:
-            if strict:
-                raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
-            continue
+            raise vol.Invalid("invalid_stat_row", path=[CONF_STAT_ROWS])
         row: dict = {CONF_LABEL: label, CONF_ENTITY_ID: parts[0]}
         if len(parts) > 1 and parts[1]:
             row[CONF_VALUE_ATTRIBUTE] = parts[1]
         if len(parts) > 2 and parts[2]:
             row[CONF_UNIT] = parts[2]
         rows.append(row)
-        if not strict and len(rows) >= WIDGET_MAX_STAT_ROWS:
-            break
-    if strict and len(rows) > WIDGET_MAX_STAT_ROWS:
+    if len(rows) > WIDGET_MAX_STAT_ROWS:
         raise vol.Invalid("too_many_stat_rows", path=[CONF_STAT_ROWS])
-    return rows[:WIDGET_MAX_STAT_ROWS]
+    return rows
 
 
 def _optional_number(user_input: dict, key: str) -> float | None:
@@ -3206,15 +3144,15 @@ def _parse_widget_input(user_input: dict, step1: dict) -> dict:
     else:
         min_v, max_v = _coerce_gauge_range(user_input, is_gauge=template == WIDGET_TEMPLATE_GAUGE)
 
-    stat_rows = _parse_widget_stat_rows(user_input.get(CONF_STAT_ROWS, ""), strict=True)
+    stat_rows = _parse_widget_stat_rows(user_input.get(CONF_STAT_ROWS, ""))
     if template == WIDGET_TEMPLATE_STAT_LIST and not stat_rows:
         raise vol.Invalid("stat_rows_required", path=[CONF_STAT_ROWS])
 
-    battery_devices = _parse_battery_devices(user_input.get(CONF_BATTERY_DEVICES), strict=True)
+    battery_devices = _parse_battery_devices(user_input.get(CONF_BATTERY_DEVICES))
     if template == WIDGET_TEMPLATE_BATTERY and not battery_devices:
         raise vol.Invalid("battery_devices_required", path=[CONF_BATTERY_DEVICES])
 
-    flow_nodes = _parse_flow_nodes(user_input.get(CONF_FLOW_NODES), strict=True)
+    flow_nodes = _parse_flow_nodes(user_input.get(CONF_FLOW_NODES))
     if template == WIDGET_TEMPLATE_FLOW and not flow_nodes:
         raise vol.Invalid("flow_nodes_required", path=[CONF_FLOW_NODES])
 
@@ -3586,45 +3524,6 @@ def _parse_csv(value: str) -> list[str]:
     return [s.strip() for s in value.split(",") if s.strip()]
 
 
-def _parse_int_list(value: str) -> list[int]:
-    """Parse '1,2,3' into [1, 2, 3], silently skipping non-integer tokens."""
-    result: list[int] = []
-    for token in _parse_csv(value):
-        try:
-            result.append(int(token))
-        except ValueError:
-            continue
-    return result
-
-
-def _parse_float_list(value: str) -> list[float]:
-    """Parse '1, 2.5, 3' into [1.0, 2.5, 3.0], skipping tokens float() rejects.
-
-    "nan" and "inf" are not among them - float() takes both, so they are kept;
-    _clean_step_weights drops them before they reach the server.
-    """
-    result: list[float] = []
-    for token in _parse_csv(value):
-        try:
-            result.append(float(token))
-        except ValueError:
-            continue
-    return result
-
-
-def _parse_color_list(value: str) -> list[str]:
-    """Parse 'red,,blue' into ['red', '', 'blue'], keeping empty entries.
-
-    Positional, unlike _parse_csv: the server matches step_colors to steps by
-    index and requires exactly total_steps entries, so dropping the empty token
-    that leaves a step on the accent color would shift every later color by one
-    and fail the length check.
-    """
-    if not value:
-        return []
-    return [s.strip() for s in value.split(",")]
-
-
 def _parse_state_labels(value: str) -> dict[str, str]:
     """Parse 'key=value, key2=value2' into a dict."""
     if not value:
@@ -3703,13 +3602,13 @@ def _blank(value: object) -> bool:
     return value is None or (isinstance(value, str) and not value.strip())
 
 
-def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False) -> dict:
+def _decompose_steps_rows(raw: object, total_steps: int) -> dict:
     """Split the unified steps-editor rows into the four stored step keys.
 
     Each row is one step in order: {label?, row?, weight?, color?}. Returns
     {step_labels: {str(i): label}, step_rows: [...], step_weights: [...],
-    step_colors: [...]}. In strict (form) mode the row count must be 0 or exactly
-    total_steps (step_length_mismatch otherwise). row/weight are all-or-none across
+    step_colors: [...]}. The row count must be 0 or exactly total_steps
+    (step_length_mismatch otherwise). row/weight are all-or-none across
     rows - a partial column is dropped, since the server needs exactly total_steps
     entries; color keeps a positional blank for each uncolored row.
     """
@@ -3719,7 +3618,7 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
     rows = [r for r in raw if isinstance(r, dict)]
     if not rows:
         return empty
-    if strict and len(rows) != total_steps:
+    if len(rows) != total_steps:
         raise vol.Invalid("step_length_mismatch", path=[CONF_STEPS_EDITOR])
 
     labels: dict[str, str] = {}
@@ -3733,7 +3632,7 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
     for index, row in enumerate(rows, start=1):
         label = str(row.get(CONF_LABEL, "") or "").strip()
         if label:
-            if strict and len(label) > STEP_LABEL_MAX:
+            if len(label) > STEP_LABEL_MAX:
                 raise vol.Invalid("invalid_step_labels", path=[CONF_STEPS_EDITOR])
             labels[str(index)] = label
 
@@ -3744,13 +3643,10 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
             try:
                 height = int(float(row_val))
             except (TypeError, ValueError):
-                if strict:
-                    raise vol.Invalid("invalid_step_rows", path=[CONF_STEPS_EDITOR]) from None
-                have_rows = False
-            else:
-                if strict and not (STEP_ROW_MIN <= height <= STEP_ROW_MAX):
-                    raise vol.Invalid("invalid_step_rows", path=[CONF_STEPS_EDITOR])
-                row_heights.append(height)
+                raise vol.Invalid("invalid_step_rows", path=[CONF_STEPS_EDITOR]) from None
+            if not (STEP_ROW_MIN <= height <= STEP_ROW_MAX):
+                raise vol.Invalid("invalid_step_rows", path=[CONF_STEPS_EDITOR])
+            row_heights.append(height)
 
         weight_val = row.get("weight")
         if _blank(weight_val):
@@ -3759,17 +3655,14 @@ def _decompose_steps_rows(raw: object, total_steps: int, *, strict: bool = False
             try:
                 weight = float(weight_val)
             except (TypeError, ValueError):
-                if strict:
-                    raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR]) from None
-                have_weights = False
-            else:
-                if strict and not _is_valid_step_weight(weight):
-                    raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR])
-                weights.append(weight)
+                raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR]) from None
+            if not _is_valid_step_weight(weight):
+                raise vol.Invalid("invalid_step_weights", path=[CONF_STEPS_EDITOR])
+            weights.append(weight)
 
         color = str(row.get("color", "") or "").strip()
         if color:
-            if strict and not is_valid_color(color):
+            if not is_valid_color(color):
                 raise vol.Invalid("invalid_step_colors", path=[CONF_STEPS_EDITOR])
             have_color = True
         colors.append(color)
@@ -3847,33 +3740,6 @@ def _compose_steps_rows(config: dict) -> list[dict]:
     return out
 
 
-def _steps_fields_from_input(user_input: dict, total_steps: int, *, strict: bool) -> dict:
-    """Resolve the four stored step keys from the form editor or legacy input.
-
-    The steps form submits one row per step under CONF_STEPS_EDITOR, decomposed here.
-    When that key is absent (non-form callers, stored-string edge cases) the four
-    legacy keys are read leniently instead, so older callers keep working.
-    """
-    if CONF_STEPS_EDITOR in user_input:
-        return _decompose_steps_rows(user_input[CONF_STEPS_EDITOR], total_steps, strict=strict)
-    labels_raw = user_input.get(CONF_STEP_LABELS, "")
-    return {
-        CONF_STEP_LABELS: labels_raw if isinstance(labels_raw, dict) else _parse_state_labels(labels_raw),
-        CONF_STEP_ROWS: _legacy_step_list(user_input.get(CONF_STEP_ROWS, ""), _parse_int_list),
-        CONF_STEP_WEIGHTS: _legacy_step_list(user_input.get(CONF_STEP_WEIGHTS, ""), _parse_float_list),
-        CONF_STEP_COLORS: _legacy_step_list(user_input.get(CONF_STEP_COLORS, ""), _parse_color_list),
-    }
-
-
-def _legacy_step_list(raw: object, parser) -> list:
-    """Parse one legacy step list leniently, passing an already-stored list through."""
-    if isinstance(raw, list):
-        return raw
-    if isinstance(raw, str):
-        return parser(raw)
-    return []
-
-
 def _is_number(value: object) -> bool:
     """True for a real int/float (a JSON bool is not a number here)."""
     return isinstance(value, (int, float)) and not isinstance(value, bool)
@@ -3916,20 +3782,15 @@ def _strict_threshold(item: object) -> dict:
     return threshold
 
 
-def _parse_thresholds(raw: object, *, strict: bool = False) -> list[dict]:
+def _parse_thresholds(raw: object) -> list[dict]:
     """Parse timeline thresholds from a row-editor list (or the legacy comma string).
 
     From the form each row is a dict with the storage keys: ``{value, color?, label?}``.
     The legacy string form ('value[:color[:label]], ...', e.g. '25:red:Hot, 20') stays
-    accepted for stored-string edge cases and non-form callers. Capped at THRESHOLDS_MAX.
-    Lenient (default) skips a non-numeric value and truncates past the cap; strict
-    (form paths) raises invalid_threshold / too_many_thresholds (and applies the colour
-    rule and label length cap) instead.
+    accepted. Raises invalid_threshold / too_many_thresholds (past THRESHOLDS_MAX), and
+    applies the colour rule and label length cap to the rows.
     """
     if isinstance(raw, list):
-        if not strict:
-            kept = [t for t in raw if isinstance(t, dict) and _is_number(t.get("value"))]
-            return kept[:THRESHOLDS_MAX]
         thresholds = [_strict_threshold(item) for item in raw]
         if len(thresholds) > THRESHOLDS_MAX:
             raise vol.Invalid("too_many_thresholds", path=[CONF_THRESHOLDS])
@@ -3940,23 +3801,21 @@ def _parse_thresholds(raw: object, *, strict: bool = False) -> list[dict]:
     for entry in raw.split(","):
         parts = [p.strip() for p in entry.strip().split(":")]
         if not parts or not parts[0]:
-            if strict and entry.strip():
+            if entry.strip():
                 raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS])
             continue
         try:
             threshold: dict = {"value": float(parts[0])}
         except ValueError:
-            if strict:
-                raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS]) from None
-            continue
+            raise vol.Invalid("invalid_threshold", path=[CONF_THRESHOLDS]) from None
         if len(parts) > 1 and parts[1]:
             threshold["color"] = parts[1]
         if len(parts) > 2 and parts[2]:
             threshold["label"] = parts[2]
         result.append(threshold)
-    if strict and len(result) > THRESHOLDS_MAX:
+    if len(result) > THRESHOLDS_MAX:
         raise vol.Invalid("too_many_thresholds", path=[CONF_THRESHOLDS])
-    return result[:THRESHOLDS_MAX]
+    return result
 
 
 def _todo_schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:

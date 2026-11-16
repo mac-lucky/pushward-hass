@@ -28,11 +28,8 @@ from custom_components.pushward.config_flow import (
     _kv_rows_to_map,
     _map_to_kv_rows,
     _parse_board_tiles,
-    _parse_color_list,
     _parse_csv,
     _parse_entity_input,
-    _parse_float_list,
-    _parse_int_list,
     _parse_log_columns,
     _parse_run_while,
     _parse_series_entities,
@@ -190,7 +187,6 @@ from custom_components.pushward.const import (
     TEMPLATES,
     THRESHOLD_LABEL_MAX,
     THRESHOLDS_MAX,
-    TIMELINE_MAX_SERIES,
     TIMELINE_SERIES_LABEL_MAX,
     VALUE_SCALE_PERCENT,
     WIDGET_DENSITIES,
@@ -2247,18 +2243,6 @@ def test_parse_thresholds_empty():
     assert _parse_thresholds("") == []
 
 
-def test_parse_thresholds_invalid_value():
-    """Non-numeric value is skipped."""
-    result = _parse_thresholds("abc:red:Hot, 18:blue:Cold")
-    assert result == [{"value": 18.0, "color": "blue", "label": "Cold"}]
-
-
-def test_parse_thresholds_max_five():
-    """More than 5 thresholds are truncated."""
-    result = _parse_thresholds("1, 2, 3, 4, 5, 6, 7")
-    assert len(result) == 5
-
-
 def test_parse_thresholds_list_round_trip():
     """A row list (what the editor submits) strict-parses to itself unchanged."""
     rows = [
@@ -2266,15 +2250,15 @@ def test_parse_thresholds_list_round_trip():
         {"value": 18.0, "color": "blue"},
         {"value": 20.0},
     ]
-    parsed = _parse_thresholds(rows, strict=True)
+    parsed = _parse_thresholds(rows)
     assert parsed == rows
-    assert _parse_thresholds(parsed, strict=True) == rows
+    assert _parse_thresholds(parsed) == rows
 
 
 def test_parse_thresholds_strict_list_rejects_missing_value():
     """A row with no value bounces with invalid_threshold under strict parsing."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_thresholds([{"color": "red", "label": "Hot"}], strict=True)
+        _parse_thresholds([{"color": "red", "label": "Hot"}])
     assert exc.value.path == [CONF_THRESHOLDS]
     assert "invalid_threshold" in str(exc.value)
 
@@ -2282,24 +2266,24 @@ def test_parse_thresholds_strict_list_rejects_missing_value():
 def test_parse_thresholds_strict_list_label_cap():
     """A label past THRESHOLD_LABEL_MAX bounces with invalid_threshold."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_thresholds([{"value": 25.0, "label": "x" * (THRESHOLD_LABEL_MAX + 1)}], strict=True)
+        _parse_thresholds([{"value": 25.0, "label": "x" * (THRESHOLD_LABEL_MAX + 1)}])
     assert "invalid_threshold" in str(exc.value)
 
 
 def test_parse_thresholds_strict_list_rejects_bad_color():
     """An unknown color name bounces; a named colour and 8-digit hex both survive."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_thresholds([{"value": 25.0, "color": "chartreuse"}], strict=True)
+        _parse_thresholds([{"value": 25.0, "color": "chartreuse"}])
     assert "invalid_threshold" in str(exc.value)
     ok = [{"value": 25.0, "color": "teal"}, {"value": 18.0, "color": "#00ff0080"}]
-    assert _parse_thresholds(ok, strict=True) == ok
+    assert _parse_thresholds(ok) == ok
 
 
 def test_parse_thresholds_strict_list_too_many():
     """More than THRESHOLDS_MAX rows bounces instead of silently truncating."""
     rows = [{"value": float(i)} for i in range(THRESHOLDS_MAX + 1)]
     with pytest.raises(vol.Invalid) as exc:
-        _parse_thresholds(rows, strict=True)
+        _parse_thresholds(rows)
     assert "too_many_thresholds" in str(exc.value)
 
 
@@ -2478,60 +2462,6 @@ def test_details_schema_log_has_log_level_attribute() -> None:
     assert CONF_LOG_LEVEL_ATTRIBUTE in keys
 
 
-# --- _parse_int_list tests ---
-
-
-def test_parse_int_list_basic() -> None:
-    """Basic CSV of integers returns list of ints."""
-    assert _parse_int_list("1, 2, 3") == [1, 2, 3]
-
-
-def test_parse_int_list_skips_non_integers() -> None:
-    """Non-integer tokens are silently skipped."""
-    assert _parse_int_list("1, abc, 3") == [1, 3]
-
-
-def test_parse_int_list_empty_string_returns_empty() -> None:
-    """Empty string returns empty list."""
-    assert _parse_int_list("") == []
-
-
-# --- _parse_float_list / _parse_color_list tests ---
-
-
-def test_parse_float_list_basic() -> None:
-    assert _parse_float_list("1, 2.5, 3") == [1.0, 2.5, 3.0]
-
-
-def test_parse_float_list_skips_non_numbers() -> None:
-    assert _parse_float_list("1, abc, 3") == [1.0, 3.0]
-
-
-def test_parse_float_list_empty_string_returns_empty() -> None:
-    assert _parse_float_list("") == []
-
-
-def test_parse_color_list_keeps_empty_entries() -> None:
-    """Colors are positional, so an omitted one must hold its slot, not collapse the list."""
-    assert _parse_color_list("red,,blue") == ["red", "", "blue"]
-    assert _parse_color_list("red, , blue") == ["red", "", "blue"]
-
-
-def test_parse_color_list_trailing_comma_adds_a_slot() -> None:
-    """Unlike the float parser, empties are significant here, so a stray comma is a step.
-
-    content_mapper drops step_colors wholesale on a length mismatch, so this typo
-    silently costs the user every per-step color.
-    """
-    assert _parse_color_list("red, blue, green,") == ["red", "blue", "green", ""]
-    assert _parse_color_list(",") == ["", ""]
-    assert _parse_float_list("1, 2, 3,") == [1.0, 2.0, 3.0]
-
-
-def test_parse_color_list_empty_string_returns_empty() -> None:
-    assert _parse_color_list("") == []
-
-
 # --- _parse_entity_input new field tests ---
 
 
@@ -2549,30 +2479,6 @@ def _base_user_input(**overrides) -> dict:
     }
     data.update(overrides)
     return data
-
-
-def test_parse_entity_input_step_labels_parsed_to_dict() -> None:
-    """step_labels CSV is parsed into a dict."""
-    result = _parse_entity_input(_base_user_input(**{CONF_STEP_LABELS: "1=Init, 2=Build"}))
-    assert result[CONF_STEP_LABELS] == {"1": "Init", "2": "Build"}
-
-
-def test_parse_entity_input_step_rows_parsed_to_int_list() -> None:
-    """step_rows CSV is parsed into a list of ints."""
-    result = _parse_entity_input(_base_user_input(**{CONF_STEP_ROWS: "1, 2, 3"}))
-    assert result[CONF_STEP_ROWS] == [1, 2, 3]
-
-
-def test_parse_entity_input_step_weights_parsed_to_float_list() -> None:
-    """step_weights CSV is parsed into a list of floats."""
-    result = _parse_entity_input(_base_user_input(**{CONF_STEP_WEIGHTS: "1, 2.5, 1"}))
-    assert result[CONF_STEP_WEIGHTS] == [1.0, 2.5, 1.0]
-
-
-def test_parse_entity_input_step_colors_keeps_blank_slot() -> None:
-    """'red,,blue' is 3 steps, the middle one on the accent color. Not 2 steps."""
-    result = _parse_entity_input(_base_user_input(**{CONF_STEP_COLORS: "red,,blue"}))
-    assert result[CONF_STEP_COLORS] == ["red", "", "blue"]
 
 
 def test_parse_entity_input_units_parsed_to_dict() -> None:
@@ -2717,7 +2623,7 @@ def _widget_details(**overrides) -> dict:
 
 
 def test_parse_widget_stat_rows_legacy_string() -> None:
-    """The legacy comma string still parses into row dicts (non-form callers)."""
+    """The legacy comma string still parses into row dicts."""
     raw = "Users=sensor.users, Active=sensor.active:count:online, Idle=sensor.idle::widgets"
     parsed = _parse_widget_stat_rows(raw)
     assert parsed == [
@@ -2733,25 +2639,9 @@ def test_parse_widget_stat_rows_list_round_trip() -> None:
         {"label": "Users", "entity_id": "sensor.users"},
         {"label": "Active", "entity_id": "sensor.active", "value_attribute": "count", "unit": "online"},
     ]
-    parsed = _parse_widget_stat_rows(rows, strict=True)
-    assert parsed == rows
-    assert _parse_widget_stat_rows(parsed, strict=True) == rows
-
-
-def test_parse_widget_stat_rows_caps_at_max() -> None:
-    raw = ",".join(f"Row{i}=sensor.s{i}" for i in range(10))
-    parsed = _parse_widget_stat_rows(raw)
-    assert len(parsed) == WIDGET_MAX_STAT_ROWS
-
-
-def test_parse_widget_stat_rows_accepts_list_passthrough() -> None:
-    rows = [
-        {"label": "A", "entity_id": "sensor.a"},
-        {"label": "", "entity_id": "sensor.b"},  # dropped: empty label
-        {"label": "C", "entity_id": ""},  # dropped: empty entity
-    ]
     parsed = _parse_widget_stat_rows(rows)
-    assert parsed == [{"label": "A", "entity_id": "sensor.a"}]
+    assert parsed == rows
+    assert _parse_widget_stat_rows(parsed) == rows
 
 
 def test_parse_widget_input_invalid_gauge_range_raises() -> None:
@@ -3006,13 +2896,6 @@ def test_parse_board_tiles_icon_with_colon() -> None:
     assert parsed[0][CONF_ICON] == "mdi:cpu-64"
 
 
-def test_parse_board_tiles_caps_at_max() -> None:
-    """More than BOARD_MAX_TILES tiles are truncated to the cap."""
-    raw = ", ".join(f"Row{i}=sensor.s{i}" for i in range(6))
-    parsed = _parse_board_tiles(raw)
-    assert len(parsed) == BOARD_MAX_TILES
-
-
 def test_parse_board_tiles_empty() -> None:
     """Empty string and non-string inputs return an empty list."""
     assert _parse_board_tiles("") == []
@@ -3031,15 +2914,15 @@ def test_parse_board_tiles_list_round_trip() -> None:
         },
         {"label": "Door", "entity_id": "binary_sensor.door", "color": "red", "url_action": "https://ha.local"},
     ]
-    parsed = _parse_board_tiles(tiles, strict=True)
+    parsed = _parse_board_tiles(tiles)
     assert parsed == tiles
-    assert _parse_board_tiles(parsed, strict=True) == tiles
+    assert _parse_board_tiles(parsed) == tiles
 
 
 def test_parse_board_tiles_strict_list_rejects_incomplete_row() -> None:
     """A row missing its entity_id bounces with invalid_tile under strict parsing."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_board_tiles([{"label": "CPU"}], strict=True)
+        _parse_board_tiles([{"label": "CPU"}])
     assert exc.value.path == [CONF_TILES]
     assert "invalid_tile" in str(exc.value)
 
@@ -3052,17 +2935,17 @@ def test_parse_board_tiles_strict_list_length_caps() -> None:
         {"label": "CPU", "entity_id": "sensor.c", "icon": "x" * (BOARD_TILE_ICON_MAX + 1)},
     ):
         with pytest.raises(vol.Invalid) as exc:
-            _parse_board_tiles([bad], strict=True)
+            _parse_board_tiles([bad])
         assert "invalid_tile" in str(exc.value), bad
 
 
 def test_parse_board_tiles_strict_list_rejects_bad_color_and_url() -> None:
     """An unknown color name or a schemeless URL bounces under strict parsing."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_board_tiles([{"label": "C", "entity_id": "sensor.c", "color": "chartreuse"}], strict=True)
+        _parse_board_tiles([{"label": "C", "entity_id": "sensor.c", "color": "chartreuse"}])
     assert "invalid_tile" in str(exc.value)
     with pytest.raises(vol.Invalid) as exc:
-        _parse_board_tiles([{"label": "C", "entity_id": "sensor.c", "url_action": "not a url"}], strict=True)
+        _parse_board_tiles([{"label": "C", "entity_id": "sensor.c", "url_action": "not a url"}])
     assert "invalid_url" in str(exc.value)
 
 
@@ -3072,7 +2955,7 @@ def test_parse_board_tiles_strict_list_accepts_named_and_hex_color() -> None:
         {"label": "A", "entity_id": "sensor.a", "color": "teal"},
         {"label": "B", "entity_id": "sensor.b", "color": "#00ff0080"},
     ]
-    assert _parse_board_tiles(tiles, strict=True) == tiles
+    assert _parse_board_tiles(tiles) == tiles
 
 
 def test_parse_widget_stat_rows_strict_list_length_caps() -> None:
@@ -3082,7 +2965,7 @@ def test_parse_widget_stat_rows_strict_list_length_caps() -> None:
         {"label": "U", "entity_id": "sensor.u", "unit": "x" * (WIDGET_STAT_UNIT_MAX + 1)},
     ):
         with pytest.raises(vol.Invalid) as exc:
-            _parse_widget_stat_rows([bad], strict=True)
+            _parse_widget_stat_rows([bad])
         assert "invalid_stat_row" in str(exc.value), bad
 
 
@@ -3118,12 +3001,6 @@ def test_parse_log_columns_attribute_with_unit() -> None:
     assert _parse_log_columns("color_temp_kelvin|K") == [{"attribute": "color_temp_kelvin", CONF_UNIT: "K"}]
 
 
-def test_parse_log_columns_caps_at_max() -> None:
-    """More than LOG_MAX_COLUMNS columns are truncated to the cap."""
-    raw = ", ".join(f"attr{i}" for i in range(LOG_MAX_COLUMNS + 3))
-    assert len(_parse_log_columns(raw)) == LOG_MAX_COLUMNS
-
-
 def test_parse_log_columns_empty() -> None:
     """Empty string and non-string inputs return an empty list."""
     assert _parse_log_columns("") == []
@@ -3139,21 +3016,19 @@ def test_parse_log_columns_list_round_trip() -> None:
         {CONF_ENTITY_ID: "sensor.temp", "attribute": "temperature"},
         {CONF_LABEL: "Door", CONF_ENTITY_ID: "binary_sensor.door"},
     ]
-    parsed = _parse_log_columns(rows, strict=True)
+    parsed = _parse_log_columns(rows)
     assert parsed == rows
-    assert _parse_log_columns(parsed, strict=True) == rows
+    assert _parse_log_columns(parsed) == rows
 
 
 def test_parse_log_columns_strict_list_source_semantics() -> None:
     """The three source modes survive strict parsing with their keys intact."""
     # tracked-entity attribute: attribute only, no entity_id.
-    assert _parse_log_columns([{"attribute": "brightness"}], strict=True) == [{"attribute": "brightness"}]
+    assert _parse_log_columns([{"attribute": "brightness"}]) == [{"attribute": "brightness"}]
     # companion state: entity_id only, no attribute.
-    assert _parse_log_columns([{CONF_ENTITY_ID: "binary_sensor.door"}], strict=True) == [
-        {CONF_ENTITY_ID: "binary_sensor.door"}
-    ]
+    assert _parse_log_columns([{CONF_ENTITY_ID: "binary_sensor.door"}]) == [{CONF_ENTITY_ID: "binary_sensor.door"}]
     # companion attribute: both.
-    assert _parse_log_columns([{CONF_ENTITY_ID: "sensor.t", "attribute": "temperature"}], strict=True) == [
+    assert _parse_log_columns([{CONF_ENTITY_ID: "sensor.t", "attribute": "temperature"}]) == [
         {CONF_ENTITY_ID: "sensor.t", "attribute": "temperature"}
     ]
 
@@ -3161,7 +3036,7 @@ def test_parse_log_columns_strict_list_source_semantics() -> None:
 def test_parse_log_columns_strict_list_rejects_sourceless_row() -> None:
     """A row with neither entity nor attribute bounces with invalid_log_column."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_log_columns([{CONF_LABEL: "Bright"}], strict=True)
+        _parse_log_columns([{CONF_LABEL: "Bright"}])
     assert exc.value.path == [CONF_LOG_COLUMNS]
     assert "invalid_log_column" in str(exc.value)
 
@@ -3169,7 +3044,7 @@ def test_parse_log_columns_strict_list_rejects_sourceless_row() -> None:
 def test_parse_log_columns_strict_list_label_cap() -> None:
     """A label past LOG_COLUMN_LABEL_MAX bounces with invalid_log_column."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_log_columns([{CONF_LABEL: "x" * (LOG_COLUMN_LABEL_MAX + 1), "attribute": "brightness"}], strict=True)
+        _parse_log_columns([{CONF_LABEL: "x" * (LOG_COLUMN_LABEL_MAX + 1), "attribute": "brightness"}])
     assert "invalid_log_column" in str(exc.value)
 
 
@@ -3177,7 +3052,7 @@ def test_parse_log_columns_strict_list_too_many() -> None:
     """More than LOG_MAX_COLUMNS rows bounces instead of silently truncating."""
     rows = [{"attribute": f"a{i}"} for i in range(LOG_MAX_COLUMNS + 1)]
     with pytest.raises(vol.Invalid) as exc:
-        _parse_log_columns(rows, strict=True)
+        _parse_log_columns(rows)
     assert "too_many_log_columns" in str(exc.value)
 
 
@@ -3204,17 +3079,6 @@ def test_parse_series_entities_state_and_attribute() -> None:
     ]
 
 
-def test_parse_series_entities_skips_bare_word() -> None:
-    """A bare word (no dot) is not an entity_id, so it is skipped."""
-    assert _parse_series_entities("brightness") == []
-
-
-def test_parse_series_entities_caps_at_max() -> None:
-    """More than TIMELINE_MAX_SERIES series entities are truncated to the cap."""
-    raw = ", ".join(f"sensor.s{i}" for i in range(TIMELINE_MAX_SERIES + 4))
-    assert len(_parse_series_entities(raw)) == TIMELINE_MAX_SERIES
-
-
 def test_parse_series_entities_empty() -> None:
     """Empty string and non-string inputs return an empty list."""
     assert _parse_series_entities("") == []
@@ -3227,15 +3091,15 @@ def test_parse_series_entities_list_round_trip() -> None:
         {CONF_LABEL: "Bedroom", CONF_ENTITY_ID: "sensor.bedroom"},
         {CONF_LABEL: "Set", CONF_ENTITY_ID: "climate.hvac", "attribute": "temperature"},
     ]
-    parsed = _parse_series_entities(rows, strict=True)
+    parsed = _parse_series_entities(rows)
     assert parsed == rows
-    assert _parse_series_entities(parsed, strict=True) == rows
+    assert _parse_series_entities(parsed) == rows
 
 
 def test_parse_series_entities_strict_list_rejects_missing_entity() -> None:
     """A row without an entity bounces with invalid_series_entity under strict parsing."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_series_entities([{CONF_LABEL: "Air"}], strict=True)
+        _parse_series_entities([{CONF_LABEL: "Air"}])
     assert exc.value.path == [CONF_SERIES_ENTITIES]
     assert "invalid_series_entity" in str(exc.value)
 
@@ -3243,9 +3107,7 @@ def test_parse_series_entities_strict_list_rejects_missing_entity() -> None:
 def test_parse_series_entities_strict_list_label_cap() -> None:
     """A label past TIMELINE_SERIES_LABEL_MAX bounces with invalid_series_entity."""
     with pytest.raises(vol.Invalid) as exc:
-        _parse_series_entities(
-            [{CONF_LABEL: "x" * (TIMELINE_SERIES_LABEL_MAX + 1), CONF_ENTITY_ID: "sensor.a"}], strict=True
-        )
+        _parse_series_entities([{CONF_LABEL: "x" * (TIMELINE_SERIES_LABEL_MAX + 1), CONF_ENTITY_ID: "sensor.a"}])
     assert "invalid_series_entity" in str(exc.value)
 
 
@@ -4264,7 +4126,7 @@ def test_decompose_steps_rows_full() -> None:
         {CONF_LABEL: "Test", "row": 2, "weight": 2.5, "color": ""},
         {CONF_LABEL: "Deploy", "row": 3, "weight": 1, "color": "#00ff00"},
     ]
-    out = _decompose_steps_rows(rows, 3, strict=True)
+    out = _decompose_steps_rows(rows, 3)
     assert out[CONF_STEP_LABELS] == {"1": "Build", "2": "Test", "3": "Deploy"}
     assert out[CONF_STEP_ROWS] == [1, 2, 3]
     assert out[CONF_STEP_WEIGHTS] == [1.0, 2.5, 1.0]
@@ -4274,7 +4136,7 @@ def test_decompose_steps_rows_full() -> None:
 def test_decompose_steps_rows_blank_colors_stay_positional() -> None:
     """A blank color holds its slot so later colors don't shift onto the wrong step."""
     rows = [{"color": "red"}, {"color": ""}, {"color": "blue"}]
-    out = _decompose_steps_rows(rows, 3, strict=True)
+    out = _decompose_steps_rows(rows, 3)
     assert out[CONF_STEP_COLORS] == ["red", "", "blue"]
     # No labels/rows/weights were set, so those stay empty.
     assert out[CONF_STEP_LABELS] == {}
@@ -4285,14 +4147,14 @@ def test_decompose_steps_rows_blank_colors_stay_positional() -> None:
 def test_decompose_steps_rows_row_and_weight_are_all_or_none() -> None:
     """A partial row/weight column is dropped whole (the server needs total_steps entries)."""
     rows = [{"row": 1, "weight": 1}, {"weight": 2}, {"row": 3, "weight": 1}]
-    out = _decompose_steps_rows(rows, 3, strict=True)
+    out = _decompose_steps_rows(rows, 3)
     assert out[CONF_STEP_ROWS] == []  # middle row has no height
     assert out[CONF_STEP_WEIGHTS] == [1.0, 2.0, 1.0]  # every row has a weight
 
 
 def test_decompose_steps_rows_empty_never_mismatches() -> None:
     """Zero rows is always valid, even when total_steps is set."""
-    assert _decompose_steps_rows([], 5, strict=True) == {
+    assert _decompose_steps_rows([], 5) == {
         CONF_STEP_LABELS: {},
         CONF_STEP_ROWS: [],
         CONF_STEP_WEIGHTS: [],
@@ -4303,15 +4165,9 @@ def test_decompose_steps_rows_empty_never_mismatches() -> None:
 def test_decompose_steps_rows_length_mismatch_strict() -> None:
     """A non-zero row count != total_steps raises step_length_mismatch on the editor field."""
     with pytest.raises(vol.Invalid) as exc:
-        _decompose_steps_rows([{"weight": 1}, {"weight": 2}], 3, strict=True)
+        _decompose_steps_rows([{"weight": 1}, {"weight": 2}], 3)
     assert exc.value.path == [CONF_STEPS_EDITOR]
     assert "step_length_mismatch" in str(exc.value)
-
-
-def test_decompose_steps_rows_lenient_skips_length_check() -> None:
-    """Non-strict (non-form) decompose keeps whatever rows it is given."""
-    out = _decompose_steps_rows([{CONF_LABEL: "Only"}], 4, strict=False)
-    assert out[CONF_STEP_LABELS] == {"1": "Only"}
 
 
 def test_steps_rows_compose_decompose_round_trip() -> None:
@@ -4329,7 +4185,7 @@ def test_steps_rows_compose_decompose_round_trip() -> None:
         {"row": 2, "weight": 2.5},
         {CONF_LABEL: "Deploy", "row": 3, "weight": 1.0, "color": "blue"},
     ]
-    back = _decompose_steps_rows(rows, 3, strict=True)
+    back = _decompose_steps_rows(rows, 3)
     assert back[CONF_STEP_LABELS] == stored[CONF_STEP_LABELS]
     assert back[CONF_STEP_ROWS] == stored[CONF_STEP_ROWS]
     assert back[CONF_STEP_WEIGHTS] == stored[CONF_STEP_WEIGHTS]
@@ -4412,53 +4268,31 @@ async def test_reconfigure_primary_series_dropdown_lists_stored_labels(hass: Hom
     assert selector.config["custom_value"] is True
 
 
-# --- strict= is opt-in: the low-level parsers stay lenient for non-form callers ---
+# --- a malformed legacy string bounces like a malformed row ---
 
 
-def test_strict_parsers_lenient_by_default_but_raise_when_strict() -> None:
-    """Existing non-form callers keep silent-skip behavior; strict=True raises."""
-    # _parse_int_list stays lenient (silent-skip); step-row strict validation
-    # lives in _decompose_steps_rows, not here.
-    assert _parse_int_list("1, x, 3") == [1, 3]
-
-    # _parse_float_list keeps inf/nan and zero lenient
-    assert _parse_float_list("1, 0, 2") == [1.0, 0.0, 2.0]
-
-    # _parse_color_list keeps empty positional slots
-    assert _parse_color_list("red, chartreuse") == ["red", "chartreuse"]
-
-    # _parse_thresholds
-    assert _parse_thresholds("abc") == []
+@pytest.mark.parametrize(
+    ("parse", "raw", "code"),
+    [
+        (_parse_thresholds, "abc", "invalid_threshold"),
+        (_parse_thresholds, ", ".join(str(i) for i in range(THRESHOLDS_MAX + 1)), "too_many_thresholds"),
+        (_parse_board_tiles, "nope", "invalid_tile"),
+        (_parse_board_tiles, ", ".join(f"R{i}=sensor.s{i}" for i in range(BOARD_MAX_TILES + 1)), "too_many_tiles"),
+        (_parse_series_entities, "brightness", "invalid_series_entity"),
+        (_parse_log_columns, "Label=", "invalid_log_column"),
+        (_parse_log_columns, ", ".join(f"attr{i}" for i in range(LOG_MAX_COLUMNS + 1)), "too_many_log_columns"),
+        (_parse_widget_stat_rows, "nope", "invalid_stat_row"),
+        (
+            _parse_widget_stat_rows,
+            ", ".join(f"R{i}=sensor.s{i}" for i in range(WIDGET_MAX_STAT_ROWS + 1)),
+            "too_many_stat_rows",
+        ),
+    ],
+)
+def test_row_parsers_raise_on_a_malformed_legacy_string(parse, raw: str, code: str) -> None:
     with pytest.raises(vol.Invalid) as exc:
-        _parse_thresholds("abc", strict=True)
-    assert "invalid_threshold" in str(exc.value)
-    with pytest.raises(vol.Invalid) as exc:
-        _parse_thresholds("1, 2, 3, 4, 5, 6", strict=True)
-    assert "too_many_thresholds" in str(exc.value)
-
-    # _parse_board_tiles
-    assert _parse_board_tiles("nope") == []
-    with pytest.raises(vol.Invalid) as exc:
-        _parse_board_tiles("nope", strict=True)
-    assert "invalid_tile" in str(exc.value)
-
-    # _parse_series_entities
-    assert _parse_series_entities("brightness") == []
-    with pytest.raises(vol.Invalid) as exc:
-        _parse_series_entities("brightness", strict=True)
-    assert "invalid_series_entity" in str(exc.value)
-
-    # _parse_log_columns
-    assert _parse_log_columns("Label=") == []
-    with pytest.raises(vol.Invalid) as exc:
-        _parse_log_columns("Label=", strict=True)
-    assert "invalid_log_column" in str(exc.value)
-
-    # _parse_widget_stat_rows
-    assert _parse_widget_stat_rows("nope") == []
-    with pytest.raises(vol.Invalid) as exc:
-        _parse_widget_stat_rows("nope", strict=True)
-    assert "invalid_stat_row" in str(exc.value)
+        parse(raw)
+    assert code in str(exc.value)
 
 
 # --- reconfigure round-trip: stored valid DSL re-serializes and re-parses strict cleanly ---
@@ -5123,15 +4957,9 @@ def test_parse_widget_input_subtitle_timer_style_coerced() -> None:
 
 def test_parse_widget_stat_rows_accepts_timer_style() -> None:
     rows = [{"label": "Next", "entity_id": "sensor.next", "timer_style": "relative"}]
-    assert _parse_widget_stat_rows(rows, strict=True) == rows
+    assert _parse_widget_stat_rows(rows) == rows
     with pytest.raises(vol.Invalid):
-        _parse_widget_stat_rows([{"label": "L", "entity_id": "sensor.a", "timer_style": "wrong"}], strict=True)
-
-
-def test_parse_widget_stat_rows_lenient_drops_bad_timer_style() -> None:
-    """A legacy/hand-written bad style loses the key, not the whole row."""
-    rows = [{"label": "L", "entity_id": "sensor.a", "timer_style": "wrong"}]
-    assert _parse_widget_stat_rows(rows) == [{"label": "L", "entity_id": "sensor.a"}]
+        _parse_widget_stat_rows([{"label": "L", "entity_id": "sensor.a", "timer_style": "wrong"}])
 
 
 @pytest.mark.parametrize("template", WIDGET_TEMPLATES)
