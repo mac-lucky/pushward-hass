@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Voortgangsentiteit",
                 "progress_attribute": "Voortgangsattribuut",
+                "progress_mode": "Voortgangsmodus",
                 "remaining_time_entity": "Resterende-tijd-entiteit",
                 "remaining_time_attribute": "Attribuut resterende tijd",
                 "live_progress": "Live voortgang-ETA",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Attribuut activeringstijd",
                 "subtitle_entity": "Ondertitel-entiteit",
                 "subtitle_attribute": "Ondertitelattribuut",
+                "subtitle_columns": "Ondertitelkolommen",
+                "state_text_entity": "Statustekst-entiteit",
+                "state_text_attribute": "Statustekst-attribuut",
+                "state_text_format": "Statustekst-opmaak",
+                "state_text_pattern": "Statustekst-patroon",
                 "series": "Reeksen",
                 "log_level_attribute": "Logniveau-attribuut"
               },
               "data_description": {
                 "progress_entity": "Lees de voortgang van een aparte entiteit in plaats van de gevolgde entiteit. Laat leeg om de gevolgde entiteit te gebruiken. Als het attribuutveld is ingesteld, leest het dat attribuut van deze entiteit; anders de status.",
                 "progress_attribute": "Entiteitsattribuut met een voortgangswaarde van 0–100. Voorbeeld: percentage",
+                "progress_mode": "Direct leest de voortgangsbron als 0-100. Resterend leest een waarde die naar 0 daalt (een afstand, resterende items): de balk vult zich vanaf de grootste waarde sinds de activiteit startte.",
                 "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
                 "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
                 "live_progress": "Vul de voortgangsbalk vloeiend en tel een ETA af naar de eindtijd op het apparaat, met behulp van de bovenstaande bron voor resterende tijd. Vereist een entiteit of attribuut voor resterende tijd. Bij het sjabloon steps vult dit de huidige stap in plaats van de hele run.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Entiteitsattribuut met de Unix-tijdstempel van de alert-activering. Alleen voor het sjabloon alert.",
                 "subtitle_entity": "Toon de ondertitel van een aparte entiteit (bijv. een programma-/modussensor). Laat leeg om de gevolgde entiteit te gebruiken. Gebruikt de status van de bronentiteit, tenzij een attribuut is ingesteld.",
                 "subtitle_attribute": "Entiteitsattribuut als ondertitel. Laat leeg om de vriendelijke naam van de entiteit te gebruiken.",
+                "subtitle_columns": "Stelt de ondertitel samen uit maximaal 6 waarden, elke rij een label, entiteit, attribuut en eenheid zoals bij de logkolommen. Een rij zonder label toont alleen de waarde. Zodra er een waarde is, vervangen ze de ondertitelbron.",
+                "state_text_entity": "Toont een waarde van een aparte entiteit in plaats van het statuslabel. Gebruikt de status, tenzij een attribuut is ingesteld. Zolang die niet beschikbaar is, wordt het statuslabel getoond.",
+                "state_text_attribute": "Attribuut dat in plaats van het statuslabel wordt getoond (van de statustekst-entiteit, of van de gevolgde entiteit als die niet is ingesteld).",
+                "state_text_format": "Automatisch: het getal van een entiteit met de weergaveprecisie en eenheid, al het andere ongewijzigd. Meters: 850 m of 3.2 km. Seconden en minuten: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Optionele tekst rond de waarde. Schrijf het woord value tussen accolades waar de waarde moet komen. Maximaal 64 tekens.",
                 "series": "Koppel entiteitsattributen aan benoemde reeksen. Eén rij per attribuut: de attribuutnaam en het reekslabel. Laat leeg om de entiteitsstatus als enkelvoudige reeks te gebruiken. Een oude tekenreeks attribuut=Label wordt nog steeds geaccepteerd.",
                 "log_level_attribute": "Attribuut dat het niveau van elke logregel levert (info/warn/error). Laat leeg voor geen niveaulabel. Alleen voor het sjabloon log."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Activiteitsnaam",
                 "icon": "Pictogram",
                 "icon_attribute": "Pictogramattribuut",
+                "icon_map": "Pictogram per status",
+                "icon_map_entity": "Entiteit voor pictogramstatus",
                 "priority": "Prioriteit (0-10)",
                 "sound": "Geluid",
                 "update_interval": "Min. bijwerkinterval (seconden)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Weergavenaam op de activiteit op je telefoon. Standaard is de vriendelijke naam van de entiteit.",
                 "icon": "Pictogram overschrijven. Laat leeg om het eigen pictogram van de entiteit te gebruiken (bijv. mdi:thermometer). SF Symbols worden ook ondersteund (bijv. lamp.desk.fill).",
                 "icon_attribute": "Entiteitsattribuut voor een dynamisch pictogram. Heeft voorrang op statisch pictogram en entiteitspictogram wanneer ingesteld.",
+                "icon_map": "Eén rij per status met het pictogram dat getoond wordt. Een rij die bij de huidige status past, gaat voor alle andere pictograminstellingen. MDI-pictogrammen en SF Symbols werken allebei.",
+                "icon_map_entity": "Vergelijk de pictogramrijen met de status van deze entiteit in plaats van die van de gevolgde entiteit (bijv. een sensor voor de rijrichting).",
                 "priority": "Activiteiten met hogere prioriteit worden langer bewaard wanneer de apparaatlimiet is bereikt (0 = laagst, 10 = hoogst).",
                 "sound": "Geluid dat bij elke update voor deze entiteit wordt afgespeeld. Laat leeg voor geen overschrijving.",
                 "update_interval": "Minimaal aantal seconden tussen bijwerkingen. Snelle statuswijzigingen worden vertraagd.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Accentkleur",
                 "accent_color_attribute": "Accentkleurattribuut",
+                "accent_from_progress": "Accent volgens voortgang",
                 "background_color": "Achtergrondkleur",
                 "background_color_attribute": "Achtergrondkleurattribuut",
                 "text_color": "Tekstkleur",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Accentkleur voor de Live Activity. Laat leeg voor standaard blauw.",
                 "accent_color_attribute": "Entiteitsattribuut voor een dynamische accentkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
+                "accent_from_progress": "Kleurt het accent volgens de voortgang: rood bij 0, geel halverwege, groen als hij vol is. Overschrijft de accentkleurinstellingen; het eindscherm blijft groen.",
                 "background_color": "Achtergrondkleur van de Live Activity. Laat leeg voor standaard.",
                 "background_color_attribute": "Entiteitsattribuut voor dynamische achtergrondkleur. Heeft voorrang op statische kleur. Ondersteunt RGB, HS, XY, Kelvin, kleurnamen en hex.",
                 "text_color": "Tekstkleur van de Live Activity. Laat leeg voor standaard.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "De favorietknop moet naar een script-entiteit verwijzen (script.something).",
         "invalid_run_while": "Elke voorwaarde heeft een entity_id en minstens één status nodig (bijv. device_tracker.me met home).",
         "too_many_run_while": "Er worden maximaal 5 voorwaarden ondersteund.",
-        "invalid_calendar_lead_minutes": "De voorlooptijd moet een geheel aantal minuten tussen 0 en 1440 zijn."
+        "invalid_calendar_lead_minutes": "De voorlooptijd moet een geheel aantal minuten tussen 0 en 1440 zijn.",
+        "invalid_icon_map": "Elk pictogram mag maximaal 128 tekens lang zijn.",
+        "invalid_state_text_pattern": "Het patroon mag maximaal 64 tekens lang zijn."
       },
       "abort": {
         "already_configured": "Deze entiteit wordt al gevolgd.",
@@ -2824,6 +2844,20 @@
         "poster": "Poster",
         "square": "Vierkant",
         "circle": "Cirkel"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Automatisch",
+        "distance_m": "Meters",
+        "duration_s": "Seconden",
+        "duration_min": "Minuten"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Direct (0-100)",
+        "remaining": "Resterend (daalt naar 0)"
       }
     },
     "battery_sort": {

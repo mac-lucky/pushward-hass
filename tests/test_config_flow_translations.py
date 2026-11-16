@@ -38,9 +38,11 @@ from custom_components.pushward.const import (
     HEATMAP_AGGREGATES,
     IMAGE_SHAPES,
     NAMED_COLORS,
+    PROGRESS_MODES,
     SCALES,
     SEVERITIES,
     SOUNDS,
+    STATE_TEXT_FORMATS,
     TEMPLATES,
     TIMER_STYLES,
     TODO_LEVELS,
@@ -81,6 +83,8 @@ SELECT_TRANSLATION_KEYS: dict[str, tuple[str, ...]] = {
     "todo_notification_level": tuple(TODO_LEVELS),
     "widget_style": (WIDGET_LOOK_UNSET, *WIDGET_STYLES),
     "widget_density": (WIDGET_LOOK_UNSET, *WIDGET_DENSITIES),
+    "state_text_format": tuple(STATE_TEXT_FORMATS),
+    "progress_mode": tuple(PROGRESS_MODES),
 }
 
 
@@ -196,10 +200,17 @@ _ENTITY_COMMON: set[str] = {
     "run_while",
     "subtitle_entity",
     "subtitle_attribute",
+    "subtitle_columns",
+    "state_text_entity",
+    "state_text_attribute",
+    "state_text_format",
+    "state_text_pattern",
     "slug",
     "activity_name",
     "icon",
     "icon_attribute",
+    "icon_map",
+    "icon_map_entity",
     "priority",
     "sound",
     "update_interval",
@@ -224,12 +235,15 @@ _ENTITY_COMMON: set[str] = {
 # (IMAGE_TEMPLATES): generic, steps and media.
 _ENTITY_IMAGE: set[str] = {"image_url", "image_shape", "image_thumbhash"}
 
+# The progress source's mode rides with the progress source (generic, steps); the
+# progress-driven accent with every template that sends a progress bar.
+_ENTITY_PROGRESS: set[str] = {"progress_entity", "progress_attribute", "progress_mode", "accent_from_progress"}
+
 ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
     "generic": _ENTITY_COMMON
     | _ENTITY_IMAGE
+    | _ENTITY_PROGRESS
     | {
-        "progress_entity",
-        "progress_attribute",
         "remaining_time_entity",
         "remaining_time_attribute",
         "live_progress",
@@ -258,9 +272,8 @@ ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
     },
     "steps": _ENTITY_COMMON
     | _ENTITY_IMAGE
+    | _ENTITY_PROGRESS
     | {
-        "progress_entity",
-        "progress_attribute",
         "remaining_time_entity",
         "remaining_time_attribute",
         "live_progress",
@@ -282,6 +295,7 @@ ENTITY_FROZEN_FIELDS: dict[str, set[str]] = {
         "min_value",
         "max_value",
         "unit",
+        "accent_from_progress",
     },
     "timeline": _ENTITY_COMMON
     | {

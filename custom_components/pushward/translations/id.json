@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Entitas Kemajuan",
                 "progress_attribute": "Atribut Kemajuan",
+                "progress_mode": "Mode Kemajuan",
                 "remaining_time_entity": "Entitas Waktu Tersisa",
                 "remaining_time_attribute": "Atribut Waktu Tersisa",
                 "live_progress": "ETA Kemajuan Live",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Atribut Waktu Dipicu",
                 "subtitle_entity": "Entitas Subjudul",
                 "subtitle_attribute": "Atribut Subjudul",
+                "subtitle_columns": "Kolom Subjudul",
+                "state_text_entity": "Entitas Teks Status",
+                "state_text_attribute": "Atribut Teks Status",
+                "state_text_format": "Format Teks Status",
+                "state_text_pattern": "Pola Teks Status",
                 "series": "Seri",
                 "log_level_attribute": "Atribut Tingkat Log"
               },
               "data_description": {
                 "progress_entity": "Baca kemajuan dari entitas terpisah alih-alih entitas yang dilacak. Biarkan kosong untuk menggunakan entitas yang dilacak. Jika kolom atribut disetel, baca atribut tersebut dari entitas ini; jika tidak, statusnya.",
                 "progress_attribute": "Atribut entitas yang menyimpan nilai kemajuan 0–100. Contoh: percentage",
+                "progress_mode": "Langsung membaca sumber kemajuan sebagai 0-100. Sisa membaca nilai yang turun menuju 0 (jarak, item tersisa): bilah terisi dari nilai terbesar sejak aktivitas dimulai.",
                 "remaining_time_entity": "Baca waktu tersisa dari entitas terpisah (mis. sensor waktu mesin cuci). Biarkan kosong untuk menggunakan entitas yang dilacak. Mengurai otomatis sensor stempel waktu (waktu selesai), sensor durasi dengan satuan, string H:MM:SS, atau detik biasa.",
                 "remaining_time_attribute": "Atribut entitas yang menyimpan waktu tersisa dalam detik. Contoh: remaining",
                 "live_progress": "Isi bilah kemajuan secara mulus dan hitung mundur ETA ke waktu selesai di perangkat, menggunakan sumber waktu tersisa di atas. Memerlukan entitas atau atribut waktu tersisa. Pada templat steps, ini mengisi langkah saat ini, bukan keseluruhan proses.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Atribut entitas yang berisi Unix timestamp saat dipicu. Digunakan untuk tampilan waktu relatif.",
                 "subtitle_entity": "Tampilkan subjudul dari entitas terpisah (mis. sensor program/mode). Biarkan kosong untuk menggunakan entitas yang dilacak. Menggunakan status entitas sumber kecuali atribut disetel.",
                 "subtitle_attribute": "Atribut entitas yang ditampilkan sebagai subjudul. Kosongkan untuk menggunakan nama ramah entitas.",
+                "subtitle_columns": "Menyusun subjudul dari paling banyak 6 nilai, tiap baris berisi label, entitas, atribut, dan satuan seperti Kolom Log. Baris tanpa label hanya menampilkan nilainya. Jika ada yang terbaca, kolom ini menggantikan sumber subjudul.",
+                "state_text_entity": "Menampilkan nilai dari entitas terpisah sebagai pengganti label status. Memakai statusnya kecuali atribut diatur. Selama tidak tersedia, label status yang ditampilkan.",
+                "state_text_attribute": "Atribut yang ditampilkan sebagai pengganti label status (pada entitas teks status, atau entitas yang dilacak jika tidak diatur).",
+                "state_text_format": "Otomatis: angka entitas dengan presisi tampilan dan satuannya, selain itu apa adanya. Meter: 850 m atau 3.2 km. Detik dan menit: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Teks opsional di sekitar nilai. Tulis kata value di dalam kurung kurawal di tempat nilai muncul. Maksimal 64 karakter.",
                 "series": "Petakan atribut entitas ke seri bernama. Satu baris per atribut: nama atribut dan label serinya. Kosongkan untuk menggunakan status entitas sebagai satu seri. String lama attribute=Label masih diterima.",
                 "log_level_attribute": "Atribut yang menyediakan level (info/warn/error) untuk setiap baris log. Kosongkan jika tidak ingin ada tag level. Hanya templat log."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Nama Aktivitas",
                 "icon": "Ikon",
                 "icon_attribute": "Atribut Ikon",
+                "icon_map": "Ikon per Status",
+                "icon_map_entity": "Entitas Status Ikon",
                 "priority": "Prioritas (0-10)",
                 "sound": "Suara",
                 "update_interval": "Interval Pembaruan Min. (detik)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Nama tampilan yang ditampilkan pada aktivitas di ponsel Anda. Default ke nama ramah entitas.",
                 "icon": "Ganti ikon. Kosongkan untuk menggunakan ikon asli entitas (misalnya mdi:thermometer). SF Symbols juga didukung (misalnya lamp.desk.fill).",
                 "icon_attribute": "Atribut entitas untuk ikon dinamis. Menggantikan ikon statis dan ikon entitas saat diatur.",
+                "icon_map": "Satu baris per status dengan ikon yang ditampilkan. Baris yang cocok dengan status saat ini mengalahkan semua pengaturan ikon lainnya. Ikon MDI dan SF Symbols sama-sama bisa dipakai.",
+                "icon_map_entity": "Cocokkan baris ikon dengan status entitas ini, bukan entitas yang dilacak (mis. sensor arah perjalanan).",
                 "priority": "Aktivitas dengan prioritas lebih tinggi disimpan lebih lama saat batas perangkat tercapai (0 = terendah, 10 = tertinggi).",
                 "sound": "Nama suara notifikasi untuk pembaruan ini. Kosongkan untuk menggunakan suara sistem iOS.",
                 "update_interval": "Minimum detik antar pembaruan. Perubahan status yang cepat akan dibatasi.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Warna Aksen",
                 "accent_color_attribute": "Atribut Warna Aksen",
+                "accent_from_progress": "Aksen dari Kemajuan",
                 "background_color": "Warna Latar",
                 "background_color_attribute": "Atribut Warna Latar",
                 "text_color": "Warna Teks",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Warna aksen untuk Live Activity. Kosongkan untuk biru default.",
                 "accent_color_attribute": "Atribut entitas untuk warna aksen dinamis. Menggantikan warna statis. Mendukung RGB, HS, XY, Kelvin, nama warna, dan hex.",
+                "accent_from_progress": "Mewarnai aksen sesuai kemajuan: merah di 0, kuning di tengah, hijau saat penuh. Menggantikan pengaturan warna aksen; layar selesai tetap hijau.",
                 "background_color": "Warna latar Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
                 "background_color_attribute": "Atribut entitas untuk warna latar dinamis. Menggantikan warna latar statis.",
                 "text_color": "Warna teks Live Activity. #RRGGBB atau nama warna. Kosongkan untuk default sistem.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "Tombol favorit harus mengarah ke entitas script (script.something).",
         "invalid_run_while": "Setiap kondisi memerlukan entity_id dan minimal satu status (mis. device_tracker.me dengan home).",
         "too_many_run_while": "Maksimal 5 kondisi yang didukung.",
-        "invalid_calendar_lead_minutes": "Waktu sebelum acara harus berupa bilangan bulat menit dari 0 hingga 1440."
+        "invalid_calendar_lead_minutes": "Waktu sebelum acara harus berupa bilangan bulat menit dari 0 hingga 1440.",
+        "invalid_icon_map": "Setiap ikon maksimal 128 karakter.",
+        "invalid_state_text_pattern": "Pola maksimal 64 karakter."
       },
       "abort": {
         "already_configured": "Entitas ini sudah dilacak.",
@@ -2824,6 +2844,20 @@
         "poster": "Poster",
         "square": "Persegi",
         "circle": "Lingkaran"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Otomatis",
+        "distance_m": "Meter",
+        "duration_s": "Detik",
+        "duration_min": "Menit"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Langsung (0-100)",
+        "remaining": "Sisa (turun ke 0)"
       }
     },
     "battery_sort": {

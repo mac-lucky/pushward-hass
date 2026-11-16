@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "进度实体",
                 "progress_attribute": "进度属性",
+                "progress_mode": "进度模式",
                 "remaining_time_entity": "剩余时间实体",
                 "remaining_time_attribute": "剩余时间属性",
                 "live_progress": "实时进度 ETA",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "触发时间属性",
                 "subtitle_entity": "副标题实体",
                 "subtitle_attribute": "副标题属性",
+                "subtitle_columns": "副标题列",
+                "state_text_entity": "状态文本实体",
+                "state_text_attribute": "状态文本属性",
+                "state_text_format": "状态文本格式",
+                "state_text_pattern": "状态文本模板",
                 "series": "系列",
                 "log_level_attribute": "日志级别属性"
               },
               "data_description": {
                 "progress_entity": "从单独的实体（而非被追踪实体）读取进度。留空则使用被追踪实体。若设置了属性字段，则读取此实体的该属性；否则读取其状态。",
                 "progress_attribute": "持有 0–100 进度值的实体属性。示例：percentage",
+                "progress_mode": "直接：将进度来源读作 0-100。剩余：读取一个逐渐降到 0 的值（距离、剩余项目数），进度条从活动开始以来见到的最大值起逐渐填满。",
                 "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
                 "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
                 "live_progress": "使用上面的剩余时间来源，平滑填充进度条，并在设备上倒计时显示到完成时间的 ETA。需要一个剩余时间实体或属性。在 steps 模板中，它填充的是当前步骤而不是整个流程。",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "持有告警触发时 Unix 时间戳的实体属性。仅适用于 alert 模板。",
                 "subtitle_entity": "从单独的实体（例如程序/模式传感器）显示副标题。留空则使用被追踪实体。除非设置了属性，否则使用源实体的状态值。",
                 "subtitle_attribute": "用作副标题的实体属性。留空则使用实体的友好名称。",
+                "subtitle_columns": "用最多 6 个值组成副标题，每行包含标签、实体、属性和单位，与日志列相同。没有标签的行只显示值。只要有值可读，它们就会替换副标题来源。",
+                "state_text_entity": "显示另一个实体的值来代替状态标签。除非设置了属性，否则使用其状态。该实体不可用时显示状态标签。",
+                "state_text_attribute": "代替状态标签显示的属性（取自状态文本实体；未设置时取自被跟踪的实体）。",
+                "state_text_format": "自动：实体的数值按其显示精度并带单位显示，其他内容原样显示。米：850 m 或 3.2 km。秒和分钟：45 s、15 min、1 h 5 min。",
+                "state_text_pattern": "值周围的可选文本。在值应出现的位置写上用花括号括起的 value 一词。最多 64 个字符。",
                 "series": "将实体属性映射到命名系列。每个属性一行：属性名称及其系列标签。留空则将实体状态用作单一系列。仍接受旧的 attribute=标签 字符串。",
                 "log_level_attribute": "提供每条日志行级别（info/warn/error）的实体属性。留空则不显示级别标签。仅适用于 log 模板。"
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "活动名称",
                 "icon": "图标",
                 "icon_attribute": "图标属性",
+                "icon_map": "按状态显示图标",
+                "icon_map_entity": "图标状态实体",
                 "priority": "优先级（0-10）",
                 "sound": "声音",
                 "update_interval": "最小更新间隔（秒）",
@@ -2312,6 +2326,8 @@
                 "activity_name": "在你手机上的活动中显示的名称。默认使用实体的友好名称。",
                 "icon": "覆盖图标。留空则使用实体的原生图标（例如 mdi:thermometer）。也支持 SF Symbols（例如 lamp.desk.fill）。",
                 "icon_attribute": "动态图标的实体属性。设置后将覆盖静态图标和实体图标。",
+                "icon_map": "每个状态一行，填写要显示的图标。与当前状态匹配的行优先于所有其他图标设置。MDI 图标和 SF Symbols 均可使用。",
+                "icon_map_entity": "将图标行与此实体的状态而不是被跟踪实体的状态进行匹配（例如行进方向传感器）。",
                 "priority": "当设备达到上限时，优先级较高的活动会保留更长时间（0 = 最低，10 = 最高）。",
                 "sound": "每次更新时为该实体播放的声音。留空则不覆盖任何声音。",
                 "update_interval": "两次更新之间的最小间隔（秒）。快速状态变化将被限流。",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "强调色",
                 "accent_color_attribute": "强调色属性",
+                "accent_from_progress": "按进度着色强调色",
                 "background_color": "背景颜色",
                 "background_color_attribute": "背景颜色属性",
                 "text_color": "文字颜色",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Live Activity 的强调色。留空则使用默认蓝色。",
                 "accent_color_attribute": "动态强调色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
+                "accent_from_progress": "按进度为强调色着色：0 时为红色，一半时为黄色，满时为绿色。覆盖强调色设置；完成画面保持绿色。",
                 "background_color": "Live Activity 的背景颜色。留空则使用默认颜色。",
                 "background_color_attribute": "动态背景颜色的实体属性。覆盖静态颜色。支持 RGB、HS、XY、Kelvin、命名颜色和十六进制。",
                 "text_color": "Live Activity 的文字颜色。留空则使用默认颜色。",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "收藏按钮必须指向一个 script 实体（script.something）。",
         "invalid_run_while": "每个条件都需要一个 entity_id 和至少一个状态（例如 device_tracker.me 搭配 home）。",
         "too_many_run_while": "最多支持 5 个条件。",
-        "invalid_calendar_lead_minutes": "提前时间必须是 0 到 1440 之间的整数分钟。"
+        "invalid_calendar_lead_minutes": "提前时间必须是 0 到 1440 之间的整数分钟。",
+        "invalid_icon_map": "每个图标最多 128 个字符。",
+        "invalid_state_text_pattern": "模板最多 64 个字符。"
       },
       "abort": {
         "already_configured": "此实体已被追踪。",
@@ -2824,6 +2844,20 @@
         "poster": "海报",
         "square": "正方形",
         "circle": "圆形"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "自动",
+        "distance_m": "米",
+        "duration_s": "秒",
+        "duration_min": "分钟"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "直接 (0-100)",
+        "remaining": "剩余（逐渐降到 0）"
       }
     },
     "battery_sort": {

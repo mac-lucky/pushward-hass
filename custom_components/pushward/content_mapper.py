@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import logging
 import math
 import re
@@ -12,7 +11,6 @@ from urllib.parse import urlparse
 
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, UnitOfTime
 from homeassistant.core import HomeAssistant, State
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 from homeassistant.util.color import (
@@ -44,6 +42,7 @@ from .const import (
     COMPACT_TRAILING_ICON_PATTERN,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
+    CONF_ACCENT_FROM_PROGRESS,
     CONF_ALARM,
     CONF_APPROVAL_DETAILS,
     CONF_APPROVAL_OPTIONS,
@@ -64,6 +63,8 @@ from .const import (
     CONF_FIRED_AT_ENTITY,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_ICON_MAP,
+    CONF_ICON_MAP_ENTITY,
     CONF_IMAGE_SHAPE,
     CONF_IMAGE_THUMBHASH,
     CONF_IMAGE_URL,
@@ -76,6 +77,7 @@ from .const import (
     CONF_PRIMARY_SERIES,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
+    CONF_PROGRESS_MODE,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SCALE,
@@ -90,11 +92,16 @@ from .const import (
     CONF_SMOOTHING,
     CONF_SNOOZE_SECONDS,
     CONF_STATE_LABELS,
+    CONF_STATE_TEXT_ATTRIBUTE,
+    CONF_STATE_TEXT_ENTITY,
+    CONF_STATE_TEXT_FORMAT,
+    CONF_STATE_TEXT_PATTERN,
     CONF_STEP_COLORS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_STEP_WEIGHTS,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_SUBTITLE_COLUMNS,
     CONF_SUBTITLE_ENTITY,
     CONF_TAP_ACTION_FOREGROUND,
     CONF_TAP_ACTION_URL,
@@ -140,6 +147,8 @@ from .const import (
     MEDIA_POSITION_MAX_AGE,
     MEDIA_TITLE_MAX,
     NAMED_COLORS,
+    PROGRESS_MODE_REMAINING,
+    STATE_TEXT_PLACEHOLDER,
     TAP_ACTION_METHODS,
     TIMELINE_SERIES_LABEL_MAX,
     is_valid_image_url,
@@ -357,18 +366,35 @@ def lookup_registry_icon(hass: HomeAssistant, entity_id: str | None) -> str | No
     return entry.icon or entry.original_icon or None
 
 
-def resolve_icon(state: State, config: dict, registry_icon: str | None = None) -> str:
-    """Resolve an entity's display icon via a 6-level fallback chain.
+def _mapped_icon(state: State, config: dict, hass: HomeAssistant | None) -> str:
+    """The CONF_ICON_MAP icon for the current state of the tracked entity or CONF_ICON_MAP_ENTITY, else ""."""
+    icon_map = config.get(CONF_ICON_MAP)
+    if not icon_map or not isinstance(icon_map, dict):
+        return ""
+    source_id = config.get(CONF_ICON_MAP_ENTITY)
+    source = state
+    if source_id and source_id != state.entity_id:
+        source = hass.states.get(source_id) if hass is not None else None
+        if source is None:
+            return ""
+    return str(icon_map.get(source.state) or "")
 
-    Order: icon_attribute (dynamic from HA attribute) → static CONF_ICON
-    (user-configured) → state.attributes["icon"] (legacy / _attr_icon) →
-    entity registry icon → device_class icon (mirrors HA frontend tables)
-    → domain default. Returns "" only when every step yields nothing,
+
+def resolve_icon(
+    state: State, config: dict, registry_icon: str | None = None, hass: HomeAssistant | None = None
+) -> str:
+    """Resolve an entity's display icon via a 7-level fallback chain.
+
+    Order: icon_map (an icon per state of the tracked or a companion entity;
+    the companion needs ``hass``) -> icon_attribute (dynamic from HA attribute) ->
+    static CONF_ICON (user-configured) -> state.attributes["icon"] (legacy /
+    _attr_icon) -> entity registry icon -> device_class icon (mirrors HA frontend
+    tables) -> domain default. Returns "" only when every step yields nothing,
     which is rare given the domain-default fallback.
     """
-    icon = ""
+    icon = _mapped_icon(state, config, hass)
     icon_attr = config.get(CONF_ICON_ATTRIBUTE)
-    if icon_attr:
+    if not icon and icon_attr:
         dynamic_icon = state.attributes.get(icon_attr)
         if dynamic_icon:
             icon = str(dynamic_icon)
@@ -401,6 +427,101 @@ def _format_state_label(state: State, entity_config: dict) -> str:
     return state.state.replace("_", " ").capitalize()
 
 
+def _state_at_display_precision(hass: HomeAssistant, entity_id: str, raw: str) -> str:
+    """Round a numeric sensor state the way HA's own UI shows it.
+
+    The state string carries the device's full precision ("23.06"); HA displays it
+    at the user's display_precision, else the integration's suggested one. A
+    non-numeric state, or an entity with neither set, is returned unchanged.
+    """
+    try:
+        entry = er.async_get(hass).async_get(entity_id)
+    except (AttributeError, KeyError):
+        return raw
+    if entry is None:
+        return raw
+    opts = entry.options.get("sensor") or {}
+    precision = opts.get("display_precision")
+    if precision is None:
+        precision = opts.get("suggested_display_precision")
+    if not isinstance(precision, int) or isinstance(precision, bool):
+        return raw
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return raw
+    if not math.isfinite(value):
+        return raw
+    return f"{value:.{precision}f}"
+
+
+def _finite_number(raw: object) -> float | None:
+    """A finite float from a state or attribute value, or None (bools are not numbers here)."""
+    if isinstance(raw, bool):
+        return None
+    try:
+        value = float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return value if math.isfinite(value) else None
+
+
+def _distance_text(metres: float) -> str:
+    """'850 m' under a kilometre, else '3.2 km'."""
+    rounded = round(metres)
+    return f"{rounded} m" if abs(rounded) < 1000 else f"{metres / 1000:.1f} km"
+
+
+def _duration_text(seconds: float) -> str:
+    """'45 s', '15 min' or '1 h 5 min'."""
+    secs = max(0, round(seconds))
+    if secs < 60:
+        return f"{secs} s"
+    hours, minutes = divmod(round(secs / 60), 60)
+    if not hours:
+        return f"{minutes} min"
+    return f"{hours} h {minutes} min" if minutes else f"{hours} h"
+
+
+def _state_text(state: State, entity_config: dict, hass: HomeAssistant | None) -> str | None:
+    """The configured state-text source as display text, or None when unset, missing or unavailable.
+
+    Read like the subtitle source; ``state_text_format`` shapes the value and an
+    optional ``state_text_pattern`` places it at ``{value}`` (plain replace).
+    """
+    entity_id = entity_config.get(CONF_STATE_TEXT_ENTITY)
+    attr = entity_config.get(CONF_STATE_TEXT_ATTRIBUTE)
+    if not entity_id and not attr:
+        return None
+    raw, source = _resolve_raw(state, entity_config, CONF_STATE_TEXT_ENTITY, CONF_STATE_TEXT_ATTRIBUTE, hass)
+    if raw is _NO_VALUE or str(raw) == "":
+        return None
+    number = _finite_number(raw)
+    fmt = entity_config.get(CONF_STATE_TEXT_FORMAT)
+    if number is not None and fmt == "distance_m":
+        text = _distance_text(number)
+    elif number is not None and fmt in ("duration_s", "duration_min"):
+        text = _duration_text(number * 60 if fmt == "duration_min" else number)
+    elif number is not None and not attr and source is not None:
+        # An entity's numeric state reads the way HA shows it: display precision plus unit.
+        text = _state_at_display_precision(hass, source.entity_id, str(raw)) if hass is not None else str(raw)
+        if unit := source.attributes.get("unit_of_measurement"):
+            text = f"{text}{'' if unit == '%' else ' '}{unit}"
+    else:
+        text = str(raw)
+    pattern = entity_config.get(CONF_STATE_TEXT_PATTERN) or ""
+    if pattern:
+        text = pattern.replace(STATE_TEXT_PLACEHOLDER, text)
+    return text[:MAX_TEXT_LEN]
+
+
+def progress_accent(progress: float) -> str:
+    """Hex on a red -> yellow -> green gradient: 0 is #FF0000, 0.5 #FFFF00, 1 #00FF00."""
+    p = max(0.0, min(1.0, progress))
+    red, green = (255, round(510 * p)) if p <= 0.5 else (round(510 * (1 - p)), 255)
+    return f"#{red:02X}{green:02X}00"
+
+
 def _state_epoch(state: State) -> int | None:
     """Return ``state.last_updated`` as a unix-second int, or None if unavailable.
 
@@ -417,8 +538,10 @@ def _state_epoch(state: State) -> int | None:
         return None
 
 
-def _resolve_log_columns(state: State, config: dict, hass: HomeAssistant | None) -> list[str]:
-    """Resolve CONF_LOG_COLUMNS into rendered column strings for one log line.
+def _resolve_log_columns(
+    state: State, config: dict, hass: HomeAssistant | None, key: str = CONF_LOG_COLUMNS
+) -> list[str]:
+    """Resolve CONF_LOG_COLUMNS (or the same-shaped rows under ``key``) into rendered column strings.
 
     Each column is ``{label?, entity_id?, attribute?, unit?}``:
       - no entity_id            → an attribute of the tracked (anchor) entity
@@ -433,7 +556,7 @@ def _resolve_log_columns(state: State, config: dict, hass: HomeAssistant | None)
     conversion) and prefixed ``Label: `` when a label is set.
     """
     out: list[str] = []
-    for column in config.get(CONF_LOG_COLUMNS) or []:
+    for column in config.get(key) or []:
         if not isinstance(column, dict):
             continue
         entity_id = column.get(CONF_ENTITY_ID)
@@ -1028,6 +1151,7 @@ def map_content(
     registry_icon: str | None = None,
     hass: HomeAssistant | None = None,
     last_content: dict | None = None,
+    progress_max: float | None = None,
 ) -> dict:
     """Map HA state + attributes to a PushWard content dict.
 
@@ -1038,11 +1162,15 @@ def map_content(
     ``last_content`` is the previously sent frame. It is only read by the steps
     template's live_progress anchor, which has to know when the current step
     began; see ``_apply_steps_live_progress``.
-    """
-    # State label: use custom label if configured, else default formatting
-    state_text = _format_state_label(state, entity_config)
 
-    icon = resolve_icon(state, entity_config, registry_icon=registry_icon)
+    ``progress_max`` is the largest progress-source value seen since the activity
+    started; only progress_mode "remaining" reads it (see ``_get_progress``).
+    """
+    # State text: a configured source when it resolves, else the custom label or default formatting
+    custom_state_text = _state_text(state, entity_config, hass)
+    state_text = custom_state_text or _format_state_label(state, entity_config)
+
+    icon = resolve_icon(state, entity_config, registry_icon=registry_icon, hass=hass)
 
     # Subtitle: subtitle_entity/subtitle_attribute > friendly_name
     raw_subtitle, _ = _resolve_raw(state, entity_config, CONF_SUBTITLE_ENTITY, CONF_SUBTITLE_ATTRIBUTE, hass)
@@ -1056,7 +1184,7 @@ def map_content(
 
     content: dict = {
         "template": entity_config.get(CONF_TEMPLATE, "generic"),
-        "progress": _get_progress(state, entity_config, hass),
+        "progress": _get_progress(state, entity_config, hass, progress_max=progress_max),
         "state": state_text,
         "icon": icon,
         "subtitle": subtitle,
@@ -1077,8 +1205,12 @@ def map_content(
         content["remaining_time"] = remaining
 
     calendar = calendar_phase(state, entity_config, now) if is_calendar_config(entity_config) else None
-    # A calendar's on/off state says nothing; the event's title does.
-    if calendar is not None and (message := str(state.attributes.get("message") or "").strip()):
+    # A calendar's on/off state says nothing; the event's title does, unless a state-text source resolved.
+    if (
+        calendar is not None
+        and custom_state_text is None
+        and (message := str(state.attributes.get("message") or "").strip())
+    ):
         content["state"] = message[:MAX_TEXT_LEN]
 
     _add_activity_actions(content, entity_config)
@@ -1193,6 +1325,13 @@ def map_content(
         if (end := _resolve_live_end(now, remaining, absolute_end)) is not None:
             content["live_progress"] = True
             content["end_date"] = end
+
+    # After the template branch, so the columns also win over the media card's artist.
+    if subtitle_columns := _resolve_log_columns(state, entity_config, hass, CONF_SUBTITLE_COLUMNS):
+        content["subtitle"] = " · ".join(subtitle_columns)[:MAX_TEXT_LEN]
+    # After the template branch too: gauge sets its progress there.
+    if entity_config.get(CONF_ACCENT_FROM_PROGRESS) and "progress" in content:
+        content["accent_color"] = progress_accent(content["progress"])
 
     _apply_image_fields(content, entity_config)
 
@@ -1447,7 +1586,7 @@ def _coerce_remaining_seconds(
 
     Smart-parses several appliance time formats:
       - device_class 'timestamp' (ISO finish time) -> absolute end + derived remaining
-      - device_class 'duration' (with unit_of_measurement) -> seconds
+      - a number with a time unit_of_measurement (s, min, h, d, ...) -> seconds
       - 'H:MM:SS' / 'MM:SS' string -> seconds
       - plain number -> seconds
     ``absolute_end_epoch`` is non-None only for a timestamp source. ``now`` lets
@@ -1480,16 +1619,26 @@ def _coerce_remaining_seconds(
         return None, None
 
     unit = source.attributes.get("unit_of_measurement") if source is not None else None
-    if device_class == "duration" and unit:
-        # Unknown/unsupported unit → treat the raw number as seconds.
-        with contextlib.suppress(HomeAssistantError):
-            value = DurationConverter.convert(value, str(unit), UnitOfTime.SECONDS)
+    # A time unit converts whatever the device_class (a 'min' sensor often has none);
+    # no unit or any other unit leaves the raw number as seconds.
+    if isinstance(unit, str) and unit in DurationConverter.VALID_UNITS:
+        value = DurationConverter.convert(value, unit, UnitOfTime.SECONDS)
     # An overrun estimate can report negative seconds; the server rejects those
     # (remaining_time must be non-negative) and the activity would freeze.
     return max(0, int(value)), None
 
 
-def _get_progress(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> float:
+def progress_remaining_value(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> float | None:
+    """The progress source as a plain number under progress_mode "remaining", else None."""
+    if entity_config.get(CONF_PROGRESS_MODE) != PROGRESS_MODE_REMAINING:
+        return None
+    raw, _source = _resolve_raw(state, entity_config, CONF_PROGRESS_ENTITY, CONF_PROGRESS_ATTRIBUTE, hass)
+    return None if raw is _NO_VALUE else _finite_number(raw)
+
+
+def _get_progress(
+    state: State, entity_config: dict, hass: HomeAssistant | None = None, *, progress_max: float | None = None
+) -> float:
     """Extract progress (0.0-1.0) from a companion entity or the tracked entity.
 
     Attributes in the 0-255 range (e.g. brightness) are divided by 255;
@@ -1498,7 +1647,16 @@ def _get_progress(state: State, entity_config: dict, hass: HomeAssistant | None 
     auto-detects fraction vs percent, with a value_scale config override. Do not
     unify the two -- auto-detect here would flip the meaning of the most common
     readings (0 and 1) for every existing activity.
+
+    progress_mode "remaining" reads the source as a value falling toward 0 instead:
+    1 - value / the largest value seen this run (``progress_max``, or the value itself).
     """
+    if entity_config.get(CONF_PROGRESS_MODE) == PROGRESS_MODE_REMAINING:
+        value = progress_remaining_value(state, entity_config, hass)
+        if value is None:
+            return 0.0
+        peak = max(progress_max or 0.0, value)
+        return round(max(0.0, min(1.0, 1 - value / peak)), 2) if peak > 0 else 0.0
     raw, _source = _resolve_raw(state, entity_config, CONF_PROGRESS_ENTITY, CONF_PROGRESS_ATTRIBUTE, hass)
     if raw is _NO_VALUE:
         return 0.0

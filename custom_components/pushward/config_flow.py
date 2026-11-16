@@ -52,6 +52,7 @@ from .const import (
     CALENDAR_LEAD_MINUTES_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
+    CONF_ACCENT_FROM_PROGRESS,
     CONF_ACTIVITY_NAME,
     CONF_ALARM,
     CONF_BACKGROUND_COLOR,
@@ -82,6 +83,8 @@ from .const import (
     CONF_HISTORY_PERIOD,
     CONF_ICON,
     CONF_ICON_ATTRIBUTE,
+    CONF_ICON_MAP,
+    CONF_ICON_MAP_ENTITY,
     CONF_IMAGE_SHAPE,
     CONF_IMAGE_THUMBHASH,
     CONF_IMAGE_URL,
@@ -102,6 +105,7 @@ from .const import (
     CONF_PRIORITY,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
+    CONF_PROGRESS_MODE,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_RUN_WHILE,
@@ -130,12 +134,17 @@ from .const import (
     CONF_START_STATES,
     CONF_STAT_ROWS,
     CONF_STATE_LABELS,
+    CONF_STATE_TEXT_ATTRIBUTE,
+    CONF_STATE_TEXT_ENTITY,
+    CONF_STATE_TEXT_FORMAT,
+    CONF_STATE_TEXT_PATTERN,
     CONF_STEP_COLORS,
     CONF_STEP_LABELS,
     CONF_STEP_ROWS,
     CONF_STEP_WEIGHTS,
     CONF_STEPS_EDITOR,
     CONF_SUBTITLE_ATTRIBUTE,
+    CONF_SUBTITLE_COLUMNS,
     CONF_SUBTITLE_ENTITY,
     CONF_SUBTITLE_TIMER_ATTRIBUTE,
     CONF_SUBTITLE_TIMER_ENTITY,
@@ -190,6 +199,7 @@ from .const import (
     DEFAULT_SCHEDULE_VALUE_KEY,
     DEFAULT_SERVER_URL,
     DEFAULT_SEVERITY,
+    DEFAULT_STATE_TEXT_FORMAT,
     DEFAULT_SUBTITLE_TIMER_STYLE,
     DEFAULT_TAP_ACTION_FOREGROUND,
     DEFAULT_TODO_ALL_DAY_TIME,
@@ -221,6 +231,7 @@ from .const import (
     LOG_MAX_COLUMNS,
     MAX_COMPACT_LABEL_LEN,
     MAX_COMPACT_TRAILING_LABEL_LEN,
+    MAX_ICON_LEN,
     MAX_LONG_TEXT_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_SLUG_LEN,
@@ -231,12 +242,16 @@ from .const import (
     PLAY_STORE_URL,
     PRIORITY_MAX,
     PRIORITY_MIN,
+    PROGRESS_MODE_DIRECT,
+    PROGRESS_MODES,
     RUN_WHILE_MAX,
     SCALES,
     SEVERITIES,
     SNOOZE_SECONDS_MAX,
     SNOOZE_SECONDS_MIN,
     SOUNDS,
+    STATE_TEXT_FORMATS,
+    STATE_TEXT_PATTERN_MAX,
     STEP_LABEL_MAX,
     STEP_ROW_MAX,
     STEP_ROW_MIN,
@@ -514,6 +529,19 @@ _STATE_LABELS_SELECTOR = ObjectSelector(
     )
 )
 
+# Icon per state, the same two-column editor: stored as {state: icon} like state_labels.
+_ICON_MAP_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            "state": {"label": "State", "selector": _ROW_TEXT},
+            CONF_ICON: {"label": "Icon", "selector": _ROW_ICON},
+        },
+        multiple=True,
+        label_field="state",
+        description_field=CONF_ICON,
+    )
+)
+
 # Timeline series attribute map: each row maps an attribute of the tracked entity to
 # a series label (stored as {attribute: label}).
 _SERIES_MAP_SELECTOR = ObjectSelector(
@@ -626,6 +654,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
     "data_sources": (
         CONF_PROGRESS_ENTITY,
         CONF_PROGRESS_ATTRIBUTE,
+        CONF_PROGRESS_MODE,
         CONF_REMAINING_TIME_ENTITY,
         CONF_REMAINING_TIME_ATTR,
         CONF_LIVE_PROGRESS,
@@ -635,6 +664,11 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_FIRED_AT_ATTRIBUTE,
         CONF_SUBTITLE_ENTITY,
         CONF_SUBTITLE_ATTRIBUTE,
+        CONF_SUBTITLE_COLUMNS,
+        CONF_STATE_TEXT_ENTITY,
+        CONF_STATE_TEXT_ATTRIBUTE,
+        CONF_STATE_TEXT_FORMAT,
+        CONF_STATE_TEXT_PATTERN,
         CONF_SERIES,
         CONF_LOG_LEVEL_ATTRIBUTE,
     ),
@@ -655,6 +689,8 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
         CONF_ACTIVITY_NAME,
         CONF_ICON,
         CONF_ICON_ATTRIBUTE,
+        CONF_ICON_MAP,
+        CONF_ICON_MAP_ENTITY,
         CONF_PRIORITY,
         CONF_SOUND,
         CONF_UPDATE_INTERVAL,
@@ -666,6 +702,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
     "colors": (
         CONF_ACCENT_COLOR,
         CONF_ACCENT_COLOR_ATTRIBUTE,
+        CONF_ACCENT_FROM_PROGRESS,
         CONF_BACKGROUND_COLOR,
         CONF_BACKGROUND_COLOR_ATTRIBUTE,
         CONF_TEXT_COLOR,
@@ -1133,6 +1170,15 @@ def _details_schema(
     if template in ("generic", "steps"):
         fields[_entity_source_key(CONF_PROGRESS_ENTITY, d)] = entity_selector
         fields[_attr_suggest_key(CONF_PROGRESS_ATTRIBUTE, d)] = attr_selector
+        fields[vol.Optional(CONF_PROGRESS_MODE, default=d.get(CONF_PROGRESS_MODE) or PROGRESS_MODE_DIRECT)] = (
+            SelectSelector(
+                SelectSelectorConfig(
+                    options=list(PROGRESS_MODES),
+                    mode=SelectSelectorMode.DROPDOWN,
+                    translation_key="progress_mode",
+                )
+            )
+        )
     # live_progress derives its window from the remaining-time source, so every
     # template offering the toggle below must offer the source here too.
     if template == "countdown" or template in LIVE_PROGRESS_TEMPLATES:
@@ -1348,6 +1394,10 @@ def _details_schema(
     ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
     fields[_attr_suggest_key(CONF_ICON, d)] = IconSelector(IconSelectorConfig())
     fields[_attr_suggest_key(CONF_ICON_ATTRIBUTE, d)] = attr_selector
+    # An icon per state (a two-column row editor) of the tracked entity, or of the
+    # entity picked next to it; a matching row wins over every other icon source.
+    fields[_object_rows_key(CONF_ICON_MAP, d, required=False)] = _ICON_MAP_SELECTOR
+    fields[_entity_source_key(CONF_ICON_MAP_ENTITY, d)] = entity_selector
     fields[
         vol.Optional(
             CONF_PRIORITY,
@@ -1378,6 +1428,26 @@ def _details_schema(
     # --- Optional fields ---
     fields[_entity_source_key(CONF_SUBTITLE_ENTITY, d)] = entity_selector
     fields[_attr_suggest_key(CONF_SUBTITLE_ATTRIBUTE, d)] = attr_selector
+    # Subtitle composed of columns (the log-columns row editor); resolved columns
+    # replace the subtitle source above.
+    fields[_object_rows_key(CONF_SUBTITLE_COLUMNS, d, required=False)] = _LOG_COLUMNS_SELECTOR
+    # State text read from an entity and/or attribute in place of the state label.
+    fields[_entity_source_key(CONF_STATE_TEXT_ENTITY, d)] = entity_selector
+    fields[_attr_suggest_key(CONF_STATE_TEXT_ATTRIBUTE, d)] = attr_selector
+    fields[vol.Optional(CONF_STATE_TEXT_FORMAT, default=d.get(CONF_STATE_TEXT_FORMAT) or DEFAULT_STATE_TEXT_FORMAT)] = (
+        SelectSelector(
+            SelectSelectorConfig(
+                options=list(STATE_TEXT_FORMATS),
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key="state_text_format",
+            )
+        )
+    )
+    # suggested_value, not default, so a cleared pattern stays cleared (see the island labels).
+    # Length is checked in the parse, where it maps to a translated error.
+    fields[
+        vol.Optional(CONF_STATE_TEXT_PATTERN, description={"suggested_value": d.get(CONF_STATE_TEXT_PATTERN, "")})
+    ] = str
     # Custom display text per state (a two-column row editor: state -> label). A
     # legacy 'state=Label, ...' string is still accepted by _parse_entity_input.
     fields[_object_rows_key(CONF_STATE_LABELS, d, required=False)] = _STATE_LABELS_SELECTOR
@@ -1437,6 +1507,10 @@ def _details_schema(
         )
     fields[accent_key] = ColorRGBSelector()
     fields[_attr_suggest_key(CONF_ACCENT_COLOR_ATTRIBUTE, d)] = attr_selector
+    if template in ("generic", "steps", "gauge"):
+        fields[vol.Optional(CONF_ACCENT_FROM_PROGRESS, default=d.get(CONF_ACCENT_FROM_PROGRESS, False))] = (
+            BooleanSelector()
+        )
     fields[bg_color_key] = ColorRGBSelector()
     fields[_attr_suggest_key(CONF_BACKGROUND_COLOR_ATTRIBUTE, d)] = attr_selector
     fields[text_color_key] = ColorRGBSelector()
@@ -1704,8 +1778,8 @@ def _parse_board_tiles(raw: object, *, strict: bool = False) -> list[dict]:
     return tiles[:BOARD_MAX_TILES]
 
 
-def _strict_log_column(item: object) -> dict:
-    """Validate + normalize one log-column row dict, raising on any problem.
+def _strict_log_column(item: object, path_key: str = CONF_LOG_COLUMNS) -> dict:
+    """Validate + normalize one log-column row dict, raising on any problem (at ``path_key``).
 
     A column reads a source: an attribute of the tracked entity (entity empty,
     attribute set), another entity's state (entity set, attribute empty), or that
@@ -1714,15 +1788,15 @@ def _strict_log_column(item: object) -> dict:
     column carrying only the non-empty storage keys.
     """
     if not isinstance(item, dict):
-        raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+        raise vol.Invalid("invalid_log_column", path=[path_key])
     entity_id = str(item.get(CONF_ENTITY_ID, "") or "").strip()
     attr = str(item.get(CONF_SERIES_ATTRIBUTE, "") or "").strip()
     if not entity_id and not attr:
-        raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+        raise vol.Invalid("invalid_log_column", path=[path_key])
     label = str(item.get(CONF_LABEL, "") or "").strip()
     unit = str(item.get(CONF_UNIT, "") or "").strip()
     if len(label) > LOG_COLUMN_LABEL_MAX:
-        raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+        raise vol.Invalid("invalid_log_column", path=[path_key])
     column: dict = {}
     if label:
         column[CONF_LABEL] = label
@@ -1735,8 +1809,8 @@ def _strict_log_column(item: object) -> dict:
     return column
 
 
-def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
-    """Parse log columns from a row-editor list (or the legacy comma string).
+def _parse_log_columns(raw: object, *, strict: bool = False, path_key: str = CONF_LOG_COLUMNS) -> list[dict]:
+    """Parse log or subtitle columns from a row-editor list (or the legacy comma string).
 
     From the form each row is a dict with the storage keys: ``{label?, entity_id?,
     attribute?, unit?}``. The legacy string form ('[Label=]source[|unit], ...') stays
@@ -1753,9 +1827,9 @@ def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
         if not strict:
             kept = [c for c in raw if isinstance(c, dict) and (c.get(CONF_ENTITY_ID) or c.get("attribute"))]
             return kept[:LOG_MAX_COLUMNS]
-        columns = [_strict_log_column(item) for item in raw]
+        columns = [_strict_log_column(item, path_key) for item in raw]
         if len(columns) > LOG_MAX_COLUMNS:
-            raise vol.Invalid("too_many_log_columns", path=[CONF_LOG_COLUMNS])
+            raise vol.Invalid("too_many_log_columns", path=[path_key])
         return columns
     if not isinstance(raw, str) or not raw.strip():
         return []
@@ -1773,7 +1847,7 @@ def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
         source = entry
         if not source:
             if strict:
-                raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+                raise vol.Invalid("invalid_log_column", path=[path_key])
             continue
         column: dict = {}
         if label:
@@ -1782,7 +1856,7 @@ def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
             entity_id, attr = (part.strip() for part in source.split(":", 1))
             if not entity_id:
                 if strict:
-                    raise vol.Invalid("invalid_log_column", path=[CONF_LOG_COLUMNS])
+                    raise vol.Invalid("invalid_log_column", path=[path_key])
                 continue
             column[CONF_ENTITY_ID] = entity_id
             if attr:
@@ -1797,7 +1871,7 @@ def _parse_log_columns(raw: object, *, strict: bool = False) -> list[dict]:
         if not strict and len(columns) >= LOG_MAX_COLUMNS:
             break
     if strict and len(columns) > LOG_MAX_COLUMNS:
-        raise vol.Invalid("too_many_log_columns", path=[CONF_LOG_COLUMNS])
+        raise vol.Invalid("too_many_log_columns", path=[path_key])
     return columns[:LOG_MAX_COLUMNS]
 
 
@@ -2108,6 +2182,15 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     total_steps = int(user_input.get(CONF_TOTAL_STEPS, DEFAULT_TOTAL_STEPS))
     step_fields = _steps_fields_from_input(user_input, total_steps, strict=template == "steps")
     log_columns = _parse_log_columns(user_input.get(CONF_LOG_COLUMNS, ""), strict=True)
+    subtitle_columns = _parse_log_columns(
+        user_input.get(CONF_SUBTITLE_COLUMNS, ""), strict=True, path_key=CONF_SUBTITLE_COLUMNS
+    )
+    icon_map = _kv_rows_to_map(user_input.get(CONF_ICON_MAP, ""), "state", CONF_ICON)
+    if any(len(icon) > MAX_ICON_LEN for icon in icon_map.values()):
+        raise vol.Invalid("invalid_icon_map", path=[CONF_ICON_MAP])
+    state_text_pattern = str(user_input.get(CONF_STATE_TEXT_PATTERN) or "").strip()
+    if len(state_text_pattern) > STATE_TEXT_PATTERN_MAX:
+        raise vol.Invalid("invalid_state_text_pattern", path=[CONF_STATE_TEXT_PATTERN])
     image_url, image_shape, image_thumbhash = _parse_image_fields(user_input)
 
     # The picker already filters to scripts; a hand-written config can still name
@@ -2126,6 +2209,8 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_ACTIVITY_NAME: user_input.get(CONF_ACTIVITY_NAME, "") or entity_id,
         CONF_ICON: user_input.get(CONF_ICON, ""),
         CONF_ICON_ATTRIBUTE: user_input.get(CONF_ICON_ATTRIBUTE, ""),
+        CONF_ICON_MAP: icon_map,
+        CONF_ICON_MAP_ENTITY: user_input.get(CONF_ICON_MAP_ENTITY, ""),
         CONF_PRIORITY: int(user_input.get(CONF_PRIORITY, DEFAULT_PRIORITY)),
         CONF_TEMPLATE: user_input.get(CONF_TEMPLATE, "generic"),
         CONF_START_STATES: start_states or defaults.get("start_states", []),
@@ -2133,6 +2218,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_UPDATE_INTERVAL: int(user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)),
         CONF_PROGRESS_ATTRIBUTE: user_input.get(CONF_PROGRESS_ATTRIBUTE, ""),
         CONF_PROGRESS_ENTITY: user_input.get(CONF_PROGRESS_ENTITY, ""),
+        CONF_PROGRESS_MODE: user_input.get(CONF_PROGRESS_MODE) or PROGRESS_MODE_DIRECT,
         CONF_REMAINING_TIME_ATTR: user_input.get(CONF_REMAINING_TIME_ATTR, ""),
         CONF_REMAINING_TIME_ENTITY: user_input.get(CONF_REMAINING_TIME_ENTITY, ""),
         CONF_LIVE_PROGRESS: bool(user_input.get(CONF_LIVE_PROGRESS, False)),
@@ -2141,6 +2227,11 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_IMAGE_THUMBHASH: image_thumbhash,
         CONF_SUBTITLE_ATTRIBUTE: user_input.get(CONF_SUBTITLE_ATTRIBUTE, ""),
         CONF_SUBTITLE_ENTITY: user_input.get(CONF_SUBTITLE_ENTITY, ""),
+        CONF_SUBTITLE_COLUMNS: subtitle_columns,
+        CONF_STATE_TEXT_ENTITY: user_input.get(CONF_STATE_TEXT_ENTITY, ""),
+        CONF_STATE_TEXT_ATTRIBUTE: user_input.get(CONF_STATE_TEXT_ATTRIBUTE, ""),
+        CONF_STATE_TEXT_FORMAT: user_input.get(CONF_STATE_TEXT_FORMAT) or DEFAULT_STATE_TEXT_FORMAT,
+        CONF_STATE_TEXT_PATTERN: state_text_pattern,
         CONF_STATE_LABELS: _kv_rows_to_map(user_input.get(CONF_STATE_LABELS, ""), "state", CONF_LABEL),
         CONF_COMPLETION_MESSAGE: user_input.get(CONF_COMPLETION_MESSAGE, ""),
         CONF_COMPACT_LABEL: user_input.get(CONF_COMPACT_LABEL, ""),
@@ -2158,6 +2249,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_UNIT: user_input.get(CONF_UNIT, ""),
         CONF_ACCENT_COLOR: _rgb_to_hex(user_input.get(CONF_ACCENT_COLOR)),
         CONF_ACCENT_COLOR_ATTRIBUTE: user_input.get(CONF_ACCENT_COLOR_ATTRIBUTE, ""),
+        CONF_ACCENT_FROM_PROGRESS: bool(user_input.get(CONF_ACCENT_FROM_PROGRESS, False)),
         **action_slots,
         CONF_ENDED_TTL: int(ended_ttl) if ended_ttl is not None else None,
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
@@ -2224,6 +2316,9 @@ def _entity_reconfigure_defaults(data: Mapping[str, Any]) -> dict[str, Any]:
     labels = current.get(CONF_STATE_LABELS)
     if isinstance(labels, dict):
         current[CONF_STATE_LABELS] = _map_to_kv_rows(labels, "state", CONF_LABEL)
+    icon_map = current.get(CONF_ICON_MAP)
+    if isinstance(icon_map, dict):
+        current[CONF_ICON_MAP] = _map_to_kv_rows(icon_map, "state", CONF_ICON)
     series = current.get(CONF_SERIES)
     if isinstance(series, dict):
         current[CONF_SERIES] = _map_to_kv_rows(series, "attribute", CONF_LABEL)
@@ -2246,8 +2341,9 @@ def _entity_reconfigure_defaults(data: Mapping[str, Any]) -> dict[str, Any]:
                 "url_action": MAX_URL_LEN,
             },
         )
-    if isinstance(current.get(CONF_LOG_COLUMNS), list):
-        current[CONF_LOG_COLUMNS] = _truncate_row_fields(current[CONF_LOG_COLUMNS], {CONF_LABEL: LOG_COLUMN_LABEL_MAX})
+    for key in (CONF_LOG_COLUMNS, CONF_SUBTITLE_COLUMNS):
+        if isinstance(current.get(key), list):
+            current[key] = _truncate_row_fields(current[key], {CONF_LABEL: LOG_COLUMN_LABEL_MAX})
     # run_while stores its states as a list; the row editor edits them as one comma string.
     current[CONF_RUN_WHILE] = [
         {CONF_ENTITY_ID: row[CONF_ENTITY_ID], CONF_RUN_WHILE_STATES: ", ".join(row[CONF_RUN_WHILE_STATES])}

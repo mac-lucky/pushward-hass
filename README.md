@@ -203,6 +203,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Lead Time | Calendar entities only: minutes before the next timed event that the activity opens (0-1440, default 30) |
 | Update Interval | Min seconds between updates (default: 5) |
 | Progress Entity / Attribute | 0-100 progress, optionally from a separate entity |
+| Progress Mode | `direct` (default) reads the progress source as 0-100; `remaining` reads a value falling toward 0 and fills the bar from the largest value seen this run (generic/steps templates) |
 | Live Progress ETA | Fill the progress bar smoothly and count down an ETA to the finish time, using the remaining-time source (generic/steps templates; on steps it fills the current step) |
 | Image URL / Shape / ThumbHash | Artwork beside the icon (generic/steps/media templates) - see [Activity images](#activity-images). On a media player, leave it empty and the cover art fills in |
 | Remaining Time Entity / Attribute | Seconds remaining (countdown), with smart time parsing |
@@ -224,16 +225,22 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Transport Buttons | Show previous/play-pause/next/stop/volume on the card, filtered to what the player supports (media template) |
 | Favorite Script | Script the heart button runs; hidden when empty (media template) |
 | Subtitle Entity / Attribute | Subtitle text, optionally from a separate entity |
+| Subtitle Columns | Rows composing the subtitle from values (label, entity, attribute, unit, like Log Columns), max 6; when any resolves they replace the subtitle |
+| State Text Entity / Attribute | A value shown instead of the state label, optionally from a separate entity; the label comes back while it is unavailable |
+| State Text Format | `auto`, `distance_m` (`850 m`, `3.2 km`), `duration_s` or `duration_min` (`45 s`, `15 min`, `1 h 5 min`) |
+| State Text Pattern | Text around the value, `{value}` marks where it goes (e.g. `{value} from home`), max 64 chars |
 | State Labels | Rows giving custom display text per state (a state and its label, e.g. `on` shows `Running`) |
+| Icon Per State / Icon State Entity | Rows giving an icon per state of the tracked entity, or of the entity you pick; a match beats every other icon setting |
 | Island Label | Up to 4 characters that replace the template's default in the compact view. On iPhone it is the Dynamic Island's leading ear, in place of the icon, the steps ring, or the timeline high/low stack (the minimal presentation ignores it); on Android 16 QPR2 and later it is the status-bar chip text |
 | Island Trailing Label | Up to 4 characters for the compact trailing ear, in place of what that template shows there (the step counter, the timer). Wins over Island Trailing Icon when both are set. Needs PushWard 1.19.1 or later |
 | Island Trailing Icon | SF Symbol or `mdi:` icon for the same ear, tinted with the accent color. Needs PushWard 1.19.1 or later; the minimal presentation ignores both trailing fields |
 | Completion Message | Text shown at end (default: "Complete") |
 | Accent / Background / Text Color (+ Attribute) | Static hex / named color, or an entity attribute |
+| Accent From Progress | Accent goes red -> yellow -> green as progress goes 0 -> 0.5 -> 1, over the accent settings above; the completion frame stays green (generic/steps/gauge templates) |
 | URL / Secondary URL | Deep-link URLs, http/https (steps/alert templates) |
 | Ended TTL / Stale TTL / Dismissal TTL | Auto-delete-after-end / auto-end-after-idle (1-2592000 s) / auto-dismiss the ended activity from the Lock Screen (0-14400 s) |
 
-Board tiles, stat rows, series entities, thresholds, log columns, state labels, the timeline series and per-series units maps, and the per-step details are all edited as row tables in the UI (add a row per entry). Stored configs and non-form callers keep working: the older comma-separated string forms for these fields are still accepted on input.
+Board tiles, stat rows, series entities, thresholds, log columns, subtitle columns, state labels, icons per state, the timeline series and per-series units maps, and the per-step details are all edited as row tables in the UI (add a row per entry). Stored configs and non-form callers keep working: the older comma-separated string forms for these fields are still accepted on input.
 
 </details>
 
@@ -243,17 +250,46 @@ Board tiles, stat rows, series entities, thresholds, log columns, state labels, 
 
 Run Only While adds conditions on other entities. Each row is an entity and the states it has to be in, comma-separated (`device_tracker.me`, `home`). The activity starts only when the tracked entity is in a start state and every row matches. When a row stops matching it ends with the usual completion frame, and it starts again once the row matches while the tracked entity is still in a start state. A condition entity that is unavailable counts as not matching.
 
-A `calendar` entity ignores Start/End States and follows its next timed event instead: Lead Time minutes before the event (30 by default) the activity opens and counts down to the start, from the start it counts down to the end, and it ends with the event. All-day events are skipped. The event title is the state text, and on the countdown template the start and end dates are pinned to the event so the bar fills across each phase. A calendar subentry saved before Lead Time existed keeps its start/end states until it is reconfigured and saved.
+A `calendar` entity ignores Start/End States and follows its next timed event instead: Lead Time minutes before the event (30 by default) the activity opens and counts down to the start, from the start it counts down to the end, and it ends with the event. All-day events are skipped. The event title is the state text unless a State Text source resolves, and on the countdown template the start and end dates are pinned to the event so the bar fills across each phase. A calendar subentry saved before Lead Time existed keeps its start/end states until it is reconfigured and saved.
 
 #### Reading values from separate entities
 
-By default every value (remaining time, progress, subtitle, gauge value, current step, fired-at) is read from the **tracked entity**, its state or one of its attributes. Many appliances expose these as **separate entities** (e.g. an LG washer has one sensor for the program state and another for remaining time). For each value you can set an optional **source entity**:
+By default every value (remaining time, progress, subtitle, state text, gauge value, current step, fired-at) is read from the **tracked entity**, its state or one of its attributes. Many appliances expose these as **separate entities** (e.g. an LG washer has one sensor for the program state and another for remaining time). For each value you can set an optional **source entity**:
 
 - **Source entity empty** -> read from the tracked entity (default).
 - **Source entity set, attribute empty** -> read that entity's **state**.
 - **Source entity set, attribute set** -> read that **attribute** of the source entity.
 
-**Smart time parsing**: the remaining-time source accepts a `timestamp`/finish-time sensor (anchors the end date directly, no drift), a `duration` sensor with a unit (`s`/`min`/`h`/`d`), an `H:MM:SS`/`MM:SS` string, or a plain number of seconds.
+**Smart time parsing**: the remaining-time source accepts a `timestamp`/finish-time sensor (anchors the end date directly, no drift), a number with a time unit (`s`/`min`/`h`/`d`, with or without the `duration` device class), an `H:MM:SS`/`MM:SS` string, or a plain number of seconds.
+
+<details>
+<summary><b>Computed text, progress, color and icon</b></summary>
+
+Some options build what the card shows out of other entities, which used to take a template sensor or a script. They all end up in the fields the app already knows (state, subtitle, icon, accent color, progress).
+
+State Text reads a value the way the subtitle source does and shows it instead of the state label. Numbers in metres, seconds or minutes get a format, and a pattern puts the result where `{value}` is (a plain replace, no templating).
+
+Progress Mode `remaining` is for values that drop toward 0. Progress is 1 minus the value divided by the largest value seen since the activity started, so the bar starts empty wherever the trip starts. Each new run starts its own maximum. Accent From Progress then colors the accent from that bar.
+
+Icon Per State maps the states of one entity, a direction-of-travel sensor for example, to icons. Subtitle Columns joins a few values with ` · `; a column without a label is just the value.
+
+Example, someone on the way home, tracked through their phone's `device_tracker` (Start States `*`, End States `home`). The distance sensor reports miles but has a `distance (meters)` attribute, the travel time sensor reports minutes with no device class:
+
+| Field | Value |
+|-------|-------|
+| State Text Entity / Attribute | `sensor.trip_distance` / `distance (meters)` |
+| State Text Format / Pattern | `distance_m` / `{value} from home` |
+| Progress Entity / Attribute | `sensor.trip_distance` / `distance (meters)` |
+| Progress Mode | `remaining` |
+| Accent From Progress | on |
+| Remaining Time Entity | `sensor.trip_travel_time` |
+| Icon State Entity | `sensor.trip_direction` |
+| Icon Per State | `Towards` -> `mdi:home-import-outline`, `AwayFrom` -> `mdi:map-marker-distance` |
+| Subtitle Columns | `ETA` / `sensor.trip_travel_time` / unit `min`, then `sensor.trip_direction` with no label |
+
+Halfway home that shows `750 m from home`, a half-full yellow bar, the home icon, a ticking 8 minute countdown and `ETA: 8min · Towards` (column units are glued on with no space, as in Log Columns). When they get home the usual completion frame runs and the activity ends.
+
+</details>
 
 <details>
 <summary><b>Multi-entity timeline series</b></summary>

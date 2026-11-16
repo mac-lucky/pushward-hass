@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "İlerleme Varlığı",
                 "progress_attribute": "İlerleme Niteliği",
+                "progress_mode": "İlerleme Modu",
                 "remaining_time_entity": "Kalan Süre Varlığı",
                 "remaining_time_attribute": "Kalan Süre Niteliği",
                 "live_progress": "Canlı İlerleme ETA",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Tetiklenme Zamanı Niteliği",
                 "subtitle_entity": "Alt Başlık Varlığı",
                 "subtitle_attribute": "Alt Başlık Niteliği",
+                "subtitle_columns": "Alt Başlık Sütunları",
+                "state_text_entity": "Durum Metni Varlığı",
+                "state_text_attribute": "Durum Metni Niteliği",
+                "state_text_format": "Durum Metni Biçimi",
+                "state_text_pattern": "Durum Metni Kalıbı",
                 "series": "Seri",
                 "log_level_attribute": "Günlük Düzeyi Özniteliği"
               },
               "data_description": {
                 "progress_entity": "İlerlemeyi izlenen varlık yerine ayrı bir varlıktan okur. İzlenen varlığı kullanmak için boş bırakın. Öznitelik alanı ayarlandığında bu varlığın o özniteliğini okur; aksi takdirde durumunu.",
                 "progress_attribute": "0–100 arasında ilerleme değeri tutan varlık niteliği. Örnek: percentage",
+                "progress_mode": "Doğrudan, ilerleme kaynağını 0-100 olarak okur. Kalan, 0'a doğru azalan bir değeri okur (bir mesafe, kalan öğeler): çubuk, etkinlik başladığından beri görülen en büyük değerden itibaren dolar.",
                 "remaining_time_entity": "Kalan süreyi ayrı bir varlıktan okur (ör. bir çamaşır makinesinin süre sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir zaman damgası (bitiş zamanı) sensörünü, birimli bir süre sensörünü, bir H:MM:SS dizesini veya düz saniyeyi otomatik olarak ayrıştırır.",
                 "remaining_time_attribute": "Saniye cinsinden kalan süreyi tutan varlık niteliği. Örnek: remaining",
                 "live_progress": "İlerleme çubuğunu düzgünce doldurur ve yukarıdaki kalan süre kaynağını kullanarak cihazda bitiş zamanına kadar tahmini süreyi (ETA) geri sayar. Bir kalan süre varlığı veya özniteliği gerektirir. steps şablonunda tüm süreç yerine yalnızca geçerli adımı doldurur.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Tetiklenme Unix zaman damgasını tutan varlık niteliği. Göreceli zaman görüntüsü için kullanılır.",
                 "subtitle_entity": "Alt başlığı ayrı bir varlıktan gösterir (ör. bir program/mod sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir öznitelik ayarlanmadıkça kaynak varlığın durumunu kullanır.",
                 "subtitle_attribute": "Alt başlık olarak gösterilecek varlık niteliği. Varlığın kolay adını kullanmak için boş bırakın.",
+                "subtitle_columns": "Alt başlığı en fazla 6 değerden oluşturur; her satır, günlük sütunlarında olduğu gibi etiket, varlık, nitelik ve birimdir. Etiketsiz bir satır yalnızca değerini gösterir. Herhangi biri çözümlendiğinde alt başlık kaynağının yerini alırlar.",
+                "state_text_entity": "Durum etiketi yerine ayrı bir varlığın değerini gösterir. Bir nitelik ayarlanmadıkça varlığın durumunu kullanır. Varlık kullanılamazken durum etiketi gösterilir.",
+                "state_text_attribute": "Durum etiketi yerine gösterilecek nitelik (durum metni varlığında veya hiçbiri ayarlanmadıysa izlenen varlıkta).",
+                "state_text_format": "Otomatik: bir varlığın sayısı görüntüleme hassasiyeti ve birimiyle, diğer her şey olduğu gibi. Metre: 850 m veya 3.2 km. Saniye ve dakika: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Değerin çevresindeki isteğe bağlı metin. Değerin geleceği yere süslü parantez içinde value kelimesini yazın. En fazla 64 karakter.",
                 "series": "Varlık niteliklerini adlandırılmış serilere eşleyin. Her nitelik için bir satır: nitelik adı ve seri etiketi. Tek seri olarak varlığın durumunu kullanmak için boş bırakın. Eski attribute=Etiket dizesi hâlâ kabul edilir.",
                 "log_level_attribute": "Her günlük satırının düzeyini (info/warn/error) sağlayan öznitelik. Düzey etiketi istemiyorsanız boş bırakın. Yalnızca log şablonu."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Aktivite Adı",
                 "icon": "Simge",
                 "icon_attribute": "Simge Niteliği",
+                "icon_map": "Duruma Göre Simge",
+                "icon_map_entity": "Simge Durumu Varlığı",
                 "priority": "Öncelik (0-10)",
                 "sound": "Ses",
                 "update_interval": "Min. Güncelleme Aralığı (saniye)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Telefonunuzdaki etkinlikte gösterilen görüntü adı. Varsayılan olarak varlığın kolay adını kullanır.",
                 "icon": "Simgeyi geçersiz kıl. Varlığın yerel simgesini kullanmak için boş bırakın (örn. mdi:thermometer). SF Symbols da desteklenir (örn. lamp.desk.fill).",
                 "icon_attribute": "Dinamik simge için varlık niteliği. Ayarlandığında statik simgeyi ve varlık simgesini geçersiz kılar.",
+                "icon_map": "Her durum için gösterilecek simgeyle bir satır. Geçerli durumla eşleşen satır diğer tüm simge ayarlarından önce gelir. MDI simgeleri ve SF Symbols ikisi de çalışır.",
+                "icon_map_entity": "Simge satırlarını izlenen varlık yerine bu varlığın durumuyla eşleştirir (örneğin bir hareket yönü sensörü).",
                 "priority": "Cihaz sınırına ulaşıldığında daha yüksek öncelikli aktiviteler daha uzun süre tutulur (0 = en düşük, 10 = en yüksek).",
                 "sound": "Bu güncelleme için bildirim sesi adı. iOS sistem sesini kullanmak için boş bırakın.",
                 "update_interval": "Güncellemeler arasındaki minimum saniye. Hızlı durum değişiklikleri kısıtlanır.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Vurgu Rengi",
                 "accent_color_attribute": "Vurgu Rengi Niteliği",
+                "accent_from_progress": "İlerlemeye Göre Vurgu",
                 "background_color": "Arka Plan Rengi",
                 "background_color_attribute": "Arka Plan Rengi Niteliği",
                 "text_color": "Metin Rengi",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Live Activity için vurgu rengi. Varsayılan mavi için boş bırakın.",
                 "accent_color_attribute": "Dinamik vurgu rengi için varlık niteliği. Statik rengi geçersiz kılar. RGB, HS, XY, Kelvin, adlandırılmış renkler ve onaltılık desteklenir.",
+                "accent_from_progress": "Vurguyu ilerlemeye göre renklendirir: 0'da kırmızı, yarıda sarı, dolunca yeşil. Vurgu rengi ayarlarını geçersiz kılar; tamamlanma ekranı yeşil kalır.",
                 "background_color": "Live Activity arka plan rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
                 "background_color_attribute": "Dinamik arka plan rengi için varlık niteliği. Statik arka plan rengini geçersiz kılar.",
                 "text_color": "Live Activity metin rengi. #RRGGBB veya adlandırılmış renk. Sistem varsayılanı için boş bırakın.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "Favori düğmesi bir script varlığını göstermelidir (script.something).",
         "invalid_run_while": "Her koşul bir entity_id ve en az bir durum gerektirir (örn. home ile device_tracker.me).",
         "too_many_run_while": "En fazla 5 koşul desteklenir.",
-        "invalid_calendar_lead_minutes": "Ön süre 0 ile 1440 arasında tam sayı dakika olmalıdır."
+        "invalid_calendar_lead_minutes": "Ön süre 0 ile 1440 arasında tam sayı dakika olmalıdır.",
+        "invalid_icon_map": "Her simge en fazla 128 karakter olabilir.",
+        "invalid_state_text_pattern": "Kalıp en fazla 64 karakter olabilir."
       },
       "abort": {
         "already_configured": "Bu varlık zaten izleniyor.",
@@ -2824,6 +2844,20 @@
         "poster": "Poster",
         "square": "Kare",
         "circle": "Daire"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Otomatik",
+        "distance_m": "Metre",
+        "duration_s": "Saniye",
+        "duration_min": "Dakika"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Doğrudan (0-100)",
+        "remaining": "Kalan (0'a düşer)"
       }
     },
     "battery_sort": {

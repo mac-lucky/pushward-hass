@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Fortschritts-Entität",
                 "progress_attribute": "Fortschritts-Attribut",
+                "progress_mode": "Fortschrittsmodus",
                 "remaining_time_entity": "Entität für verbleibende Zeit",
                 "remaining_time_attribute": "Attribut für verbleibende Zeit",
                 "live_progress": "Live-Fortschritt (ETA)",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Attribut 'Ausgelöst um'",
                 "subtitle_entity": "Untertitel-Entität",
                 "subtitle_attribute": "Untertitel-Attribut",
+                "subtitle_columns": "Untertitel-Spalten",
+                "state_text_entity": "Zustandstext-Entität",
+                "state_text_attribute": "Zustandstext-Attribut",
+                "state_text_format": "Zustandstext-Format",
+                "state_text_pattern": "Zustandstext-Muster",
                 "series": "Datenreihen",
                 "log_level_attribute": "Log-Stufen-Attribut"
               },
               "data_description": {
                 "progress_entity": "Fortschritt aus einer separaten Entität statt aus der verfolgten Entität lesen. Leer lassen, um die verfolgte Entität zu verwenden. Wenn das Attributfeld gesetzt ist, wird dieses Attribut dieser Entität gelesen, andernfalls ihr Zustand.",
                 "progress_attribute": "Entitätsattribut mit einem Fortschrittswert von 0–100. Beispiel: percentage",
+                "progress_mode": "Direkt liest die Fortschrittsquelle als 0-100. Verbleibend liest einen Wert, der gegen 0 sinkt (eine Entfernung, verbleibende Elemente): Der Balken füllt sich ab dem größten Wert seit dem Start der Aktivität.",
                 "remaining_time_entity": "Verbleibende Zeit aus einer separaten Entität lesen (z. B. dem Zeitsensor einer Waschmaschine). Leer lassen, um die verfolgte Entität zu verwenden. Erkennt automatisch einen Zeitstempel-Sensor (Endzeit), einen Dauersensor mit Einheiten, eine H:MM:SS-Zeichenkette oder reine Sekunden.",
                 "remaining_time_attribute": "Entitätsattribut mit der verbleibenden Zeit in Sekunden. Beispiel: remaining",
                 "live_progress": "Den Fortschrittsbalken flüssig füllen und auf dem Gerät eine voraussichtliche Restzeit (ETA) bis zum Endzeitpunkt herunterzählen, basierend auf der Restzeit-Quelle oben. Erfordert eine Entität oder ein Attribut für die verbleibende Zeit. Bei der Vorlage 'steps' füllt es den aktuellen Schritt statt des gesamten Durchlaufs.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Entitätsattribut mit dem Unix-Zeitstempel, wann der Alert ausgelöst wurde. Nur für die Vorlage 'alert'.",
                 "subtitle_entity": "Den Untertitel aus einer separaten Entität anzeigen (z. B. einem Programm-/Modus-Sensor). Leer lassen, um die verfolgte Entität zu verwenden. Verwendet den Zustand der Quell-Entität, sofern kein Attribut gesetzt ist.",
                 "subtitle_attribute": "Entitätsattribut, das als Untertitel angezeigt wird. Leer lassen, um den Anzeigenamen der Entität zu verwenden.",
+                "subtitle_columns": "Setzt den Untertitel aus bis zu 6 Werten zusammen, jede Zeile mit Beschriftung, Entität, Attribut und Einheit wie bei den Protokollspalten. Eine Zeile ohne Beschriftung zeigt nur ihren Wert. Sobald ein Wert vorliegt, ersetzen sie die Untertitel-Quelle.",
+                "state_text_entity": "Zeigt einen Wert einer separaten Entität statt der Zustandsbeschriftung. Nutzt ihren Zustand, sofern kein Attribut gesetzt ist. Solange sie nicht verfügbar ist, wird die Zustandsbeschriftung angezeigt.",
+                "state_text_attribute": "Attribut, das statt der Zustandsbeschriftung angezeigt wird (auf der Zustandstext-Entität oder, wenn keine gesetzt ist, auf der verfolgten Entität).",
+                "state_text_format": "Automatisch: die Zahl einer Entität mit ihrer Anzeigegenauigkeit und Einheit, alles andere unverändert. Meter: 850 m oder 3.2 km. Sekunden und Minuten: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Optionaler Text um den Wert. Schreibe das Wort value in geschweiften Klammern dorthin, wo der Wert stehen soll. Höchstens 64 Zeichen.",
                 "series": "Entitätsattribute benannten Datenreihen zuordnen. Eine Zeile pro Attribut: der Attributname und seine Datenreihen-Beschriftung. Leer lassen, um den Zustand der Entität als einzelne Datenreihe zu verwenden. Eine alte Zeichenkette attribute=Label wird weiterhin akzeptiert.",
                 "log_level_attribute": "Attribut, das die Stufe jeder Logzeile liefert (info/warn/error). Leer lassen für keine Stufenmarkierung. Nur für die Vorlage 'log'."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Name der Live Activity",
                 "icon": "Symbol",
                 "icon_attribute": "Symbol-Attribut",
+                "icon_map": "Symbol pro Zustand",
+                "icon_map_entity": "Entität für Symbolzustand",
                 "priority": "Priorität (0–10)",
                 "sound": "Ton",
                 "update_interval": "Min. Aktualisierungsintervall (Sekunden)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Anzeigename der Aktivität auf dem Telefon. Standardmäßig der Anzeigename der Entität.",
                 "icon": "Symbol überschreiben. Leer lassen, um das eigene Symbol der Entität zu verwenden (z. B. mdi:thermometer). SF Symbols werden ebenfalls unterstützt (z. B. lamp.desk.fill).",
                 "icon_attribute": "Entitätsattribut für ein dynamisches Symbol. Wenn gesetzt, überschreibt es das statische Symbol und das Entitätssymbol.",
+                "icon_map": "Eine Zeile pro Zustand mit dem anzuzeigenden Symbol. Eine Zeile, die zum aktuellen Zustand passt, hat Vorrang vor allen anderen Symboleinstellungen. MDI-Symbole und SF Symbols funktionieren beide.",
+                "icon_map_entity": "Vergleicht die Symbolzeilen mit dem Zustand dieser Entität statt mit dem der verfolgten Entität (z. B. ein Sensor für die Fahrtrichtung).",
                 "priority": "Live Activities mit höherer Priorität bleiben länger erhalten, wenn das Gerätelimit erreicht ist (0 = niedrigste, 10 = höchste).",
                 "sound": "Ton, der bei jedem Update für diese Entität abgespielt wird. Leer lassen, um keine Überschreibung zu verwenden.",
                 "update_interval": "Mindestanzahl Sekunden zwischen Aktualisierungen. Schnelle Zustandsänderungen werden gedrosselt.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Akzentfarbe",
                 "accent_color_attribute": "Attribut für Akzentfarbe",
+                "accent_from_progress": "Akzentfarbe aus Fortschritt",
                 "background_color": "Hintergrundfarbe",
                 "background_color_attribute": "Attribut für Hintergrundfarbe",
                 "text_color": "Textfarbe",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Akzentfarbe für die Live Activity. Leer lassen für das Standardblau.",
                 "accent_color_attribute": "Entitätsattribut für eine dynamische Akzentfarbe. Überschreibt die statische Farbe. Unterstützt RGB, HS, XY, Kelvin, benannte Farben und Hex.",
+                "accent_from_progress": "Färbt den Akzent nach Fortschritt: rot bei 0, gelb in der Mitte, grün wenn voll. Überschreibt die Akzentfarben-Einstellungen; der Abschlussbildschirm bleibt grün.",
                 "background_color": "Hintergrundfarbe der Live Activity. Leer lassen für Standard.",
                 "background_color_attribute": "Entitätsattribut für dynamische Hintergrundfarbe. Überschreibt die statische Farbe. Unterstützt RGB, HS, XY, Kelvin, benannte Farben und Hex.",
                 "text_color": "Textfarbe der Live Activity. Leer lassen für Standard.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "Die Favoriten-Schaltfläche muss auf eine Skript-Entität verweisen (script.something).",
         "invalid_run_while": "Jede Bedingung braucht eine entity_id und mindestens einen Zustand (z. B. device_tracker.me mit home).",
         "too_many_run_while": "Es werden höchstens 5 Bedingungen unterstützt.",
-        "invalid_calendar_lead_minutes": "Die Vorlaufzeit muss eine ganze Zahl von Minuten zwischen 0 und 1440 sein."
+        "invalid_calendar_lead_minutes": "Die Vorlaufzeit muss eine ganze Zahl von Minuten zwischen 0 und 1440 sein.",
+        "invalid_icon_map": "Jedes Symbol darf höchstens 128 Zeichen lang sein.",
+        "invalid_state_text_pattern": "Das Muster darf höchstens 64 Zeichen lang sein."
       },
       "abort": {
         "already_configured": "Diese Entität wird bereits verfolgt.",
@@ -2824,6 +2844,20 @@
         "poster": "Poster",
         "square": "Quadrat",
         "circle": "Kreis"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Automatisch",
+        "distance_m": "Meter",
+        "duration_s": "Sekunden",
+        "duration_min": "Minuten"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Direkt (0-100)",
+        "remaining": "Verbleibend (sinkt gegen 0)"
       }
     },
     "battery_sort": {

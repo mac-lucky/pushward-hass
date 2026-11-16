@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Entity ng Progreso",
                 "progress_attribute": "Attribute ng Progreso",
+                "progress_mode": "Mode ng Progreso",
                 "remaining_time_entity": "Entity ng Natitirang Oras",
                 "remaining_time_attribute": "Attribute ng Natitirang Oras",
                 "live_progress": "Live Progress ETA",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Attribute ng Oras ng Pag-trigger",
                 "subtitle_entity": "Entity ng Subtitle",
                 "subtitle_attribute": "Attribute ng Subtitle",
+                "subtitle_columns": "Mga Column ng Subtitle",
+                "state_text_entity": "Entity ng Teksto ng Estado",
+                "state_text_attribute": "Attribute ng Teksto ng Estado",
+                "state_text_format": "Format ng Teksto ng Estado",
+                "state_text_pattern": "Pattern ng Teksto ng Estado",
                 "series": "Serye",
                 "log_level_attribute": "Attribute ng Antas ng Log"
               },
               "data_description": {
                 "progress_entity": "Basahin ang progreso mula sa hiwalay na entity sa halip na sa na-track na entity. Iwanang blanko upang gamitin ang na-track na entity. Kapag nakatakda ang attribute field, babasahin ang attribute na iyon ng entity na ito; kung hindi, ang state nito.",
                 "progress_attribute": "Attribute ng entity na nagtataglay ng halaga ng progreso mula 0 hanggang 100. Halimbawa: percentage",
+                "progress_mode": "Direkta: binabasa ang pinagmulan ng progreso bilang 0-100. Natitira: binabasa ang halagang bumababa papunta sa 0 (layo, natitirang item); napupuno ang bar mula sa pinakamalaking halagang nakita mula nang magsimula ang activity.",
                 "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
                 "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
                 "live_progress": "Punuin nang maayos ang progress bar at mag-countdown ng ETA hanggang sa oras ng pagkumpleto sa device, gamit ang remaining-time source sa itaas. Nangangailangan ng remaining-time entity o attribute. Sa steps template, pinupuno nito ang kasalukuyang hakbang sa halip na ang buong run.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Attribute ng entity na naglalaman ng Unix timestamp ng pag-trigger. Ginagamit para ipakita ang kamag-anak na oras.",
                 "subtitle_entity": "Ipakita ang subtitle mula sa hiwalay na entity (hal. program/mode sensor). Iwanang blanko upang gamitin ang na-track na entity. Ginagamit ang state ng source entity maliban kung may nakatakdang attribute.",
                 "subtitle_attribute": "Attribute ng entity na ipinapakita bilang subtitle. Iwanan itong blangko para gamitin ang friendly name ng entity.",
+                "subtitle_columns": "Binubuo ang subtitle mula sa hanggang 6 na halaga, bawat row ay may label, entity, attribute at unit gaya ng Mga Column ng Log. Ang row na walang label ay halaga lang ang ipinapakita. Kapag may nabasang halaga, papalitan nila ang pinagmulan ng subtitle.",
+                "state_text_entity": "Nagpapakita ng halaga mula sa hiwalay na entity sa halip na label ng estado. Ginagamit ang estado nito maliban kung may attribute. Habang hindi ito available, ang label ng estado ang ipinapakita.",
+                "state_text_attribute": "Attribute na ipapakita sa halip na label ng estado (sa entity ng teksto ng estado, o sa sinusubaybayang entity kung wala).",
+                "state_text_format": "Awtomatiko: ang numero ng entity sa display precision nito kasama ang unit, ang iba ay kung ano ito. Metro: 850 m o 3.2 km. Segundo at minuto: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Opsyonal na teksto sa paligid ng halaga. Isulat ang salitang value sa loob ng curly braces kung saan ilalagay ang halaga. Hanggang 64 na character.",
                 "series": "I-map ang mga attribute ng entity sa mga pinangalanang serye. Isang hilera bawat attribute: ang pangalan ng attribute at ang label ng serye nito. Iwanang blangko para gamitin ang estado ng entity bilang isang serye. Tinatanggap pa rin ang lumang attribute=Label na string.",
                 "log_level_attribute": "Attribute na nagbibigay ng level (info/warn/error) ng bawat log line. Iwanang blangko para walang level tag. Para sa log template lamang."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Pangalan ng Activity",
                 "icon": "Icon",
                 "icon_attribute": "Attribute ng Icon",
+                "icon_map": "Icon Bawat Estado",
+                "icon_map_entity": "Entity ng Estado ng Icon",
                 "priority": "Priyoridad (0-10)",
                 "sound": "Tunog",
                 "update_interval": "Pinakamababang Agwat ng Update (segundo)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Display na pangalan na ipinapakita sa activity sa iyong phone. Nagde-default sa friendly name ng entity.",
                 "icon": "Override na icon. Iwanan itong blangko para gamitin ang native na icon ng entity (hal. mdi:thermometer). Sinusuportahan din ang SF Symbols (hal. lamp.desk.fill).",
                 "icon_attribute": "Attribute ng entity para sa dynamic na icon. Nino-override ang static icon at entity icon kapag nakatakda.",
+                "icon_map": "Isang row bawat estado kasama ang icon na ipapakita. Ang row na tugma sa kasalukuyang estado ang mananaig sa lahat ng iba pang setting ng icon. Gumagana ang mga MDI icon at SF Symbols.",
+                "icon_map_entity": "Itugma ang mga row ng icon sa estado ng entity na ito sa halip na sa sinusubaybayang entity (hal. sensor ng direksyon ng biyahe).",
                 "priority": "Mas mataas na priyoridad na mga activity ang pinananatili nang mas matagal kapag naabot ang limitasyon ng device (0 = pinakamababa, 10 = pinakamataas).",
                 "sound": "Pangalan ng tunog ng notification para sa update na ito. Iwanan itong blangko para gamitin ang tunog ng sistema ng iOS.",
                 "update_interval": "Pinakamababang mga segundo sa pagitan ng mga update. Ang mabilis na pagbabago ng estado ay nililimitahan.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Accent na Kulay",
                 "accent_color_attribute": "Attribute ng Accent na Kulay",
+                "accent_from_progress": "Accent Mula sa Progreso",
                 "background_color": "Kulay ng Background",
                 "background_color_attribute": "Attribute ng Kulay ng Background",
                 "text_color": "Kulay ng Teksto",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Accent color para sa Live Activity. Iwanan itong blangko para sa default na asul.",
                 "accent_color_attribute": "Attribute ng entity para sa dynamic na accent color. Nino-override ang static na kulay. Sinusuportahan ang RGB, HS, XY, Kelvin, mga pinangalanang kulay, at hex.",
+                "accent_from_progress": "Kinukulayan ang accent ayon sa progreso: pula sa 0, dilaw sa kalahati, berde kapag puno. Pinapalitan ang mga setting ng accent na kulay; nananatiling berde ang screen ng pagkumpleto.",
                 "background_color": "Kulay ng background ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
                 "background_color_attribute": "Attribute ng entity para sa dynamic na kulay ng background. Nino-override ang static na kulay ng background.",
                 "text_color": "Kulay ng teksto ng Live Activity. #RRGGBB o pangalan ng kulay. Iwanan itong blangko para sa default ng sistema.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "Dapat itumbok ng favorite button ang isang script entity (script.something).",
         "invalid_run_while": "Bawat kondisyon ay nangangailangan ng entity_id at kahit isang estado (hal. device_tracker.me na may home).",
         "too_many_run_while": "Hanggang 5 kondisyon lang ang suportado.",
-        "invalid_calendar_lead_minutes": "Ang lead time ay dapat buong bilang ng minuto mula 0 hanggang 1440."
+        "invalid_calendar_lead_minutes": "Ang lead time ay dapat buong bilang ng minuto mula 0 hanggang 1440.",
+        "invalid_icon_map": "Hanggang 128 character lang ang bawat icon.",
+        "invalid_state_text_pattern": "Hanggang 64 character lang ang pattern."
       },
       "abort": {
         "already_configured": "Ang entity na ito ay naka-track na.",
@@ -2824,6 +2844,20 @@
         "poster": "Poster",
         "square": "Parisukat",
         "circle": "Bilog"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Awtomatiko",
+        "distance_m": "Metro",
+        "duration_s": "Segundo",
+        "duration_min": "Minuto"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Direkta (0-100)",
+        "remaining": "Natitira (bumababa sa 0)"
       }
     },
     "battery_sort": {

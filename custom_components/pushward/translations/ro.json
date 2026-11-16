@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Entitate progres",
                 "progress_attribute": "Atribut progres",
+                "progress_mode": "Mod progres",
                 "remaining_time_entity": "Entitate timp rămas",
                 "remaining_time_attribute": "Atribut timp rămas",
                 "live_progress": "Progres live (ETA)",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Atribut timp declanșare",
                 "subtitle_entity": "Entitate subtitrare",
                 "subtitle_attribute": "Atribut subtitrare",
+                "subtitle_columns": "Coloane subtitrare",
+                "state_text_entity": "Entitate text stare",
+                "state_text_attribute": "Atribut text stare",
+                "state_text_format": "Format text stare",
+                "state_text_pattern": "Șablon text stare",
                 "series": "Serii",
                 "log_level_attribute": "Atribut nivel jurnal"
               },
               "data_description": {
                 "progress_entity": "Citește progresul dintr-o entitate separată în loc de entitatea urmărită. Lăsați gol pentru a folosi entitatea urmărită. Dacă este setat câmpul de atribut, citește acel atribut al acestei entități; altfel starea ei.",
                 "progress_attribute": "Atributul entității care conține o valoare de progres între 0 și 100. Exemplu: percentage",
+                "progress_mode": "Direct citește sursa de progres ca 0-100. Rămas citește o valoare care scade spre 0 (o distanță, elemente rămase): bara se umple de la cea mai mare valoare văzută de la pornirea activității.",
                 "remaining_time_entity": "Citește timpul rămas dintr-o entitate separată (de ex. senzorul de timp al unei mașini de spălat). Lăsați gol pentru a folosi entitatea urmărită. Analizează automat un senzor de marcă temporală (ora de finalizare), un senzor de durată cu unități, un șir H:MM:SS sau secunde simple.",
                 "remaining_time_attribute": "Atributul entității care conține timpul rămas în secunde. Exemplu: remaining",
                 "live_progress": "Umple lin bara de progres și numără invers un ETA până la ora de finalizare pe dispozitiv, folosind sursa de timp rămas de mai sus. Necesită o entitate sau un atribut de timp rămas. Pe șablonul steps, umple pasul curent, nu întreaga rulare.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Atribut entitate care conține marca temporală Unix a declanșării. Folosit pentru afișarea timpului relativ.",
                 "subtitle_entity": "Afișează subtitrarea dintr-o entitate separată (de ex. un senzor de program/mod). Lăsați gol pentru a folosi entitatea urmărită. Folosește starea entității sursă dacă nu este setat un atribut.",
                 "subtitle_attribute": "Atributul entității de afișat ca subtitrare. Lăsați gol pentru a folosi numele prietenos al entității.",
+                "subtitle_columns": "Compune subtitrarea din cel mult 6 valori, fiecare rând cu etichetă, entitate, atribut și unitate, ca la coloanele jurnalului. Un rând fără etichetă arată doar valoarea. Când oricare se rezolvă, înlocuiesc sursa subtitrării.",
+                "state_text_entity": "Arată o valoare de la o entitate separată în locul etichetei stării. Folosește starea ei, dacă nu e setat un atribut. Cât timp nu e disponibilă, se arată eticheta stării.",
+                "state_text_attribute": "Atributul arătat în locul etichetei stării (al entității textului de stare sau, dacă nu e setată, al entității urmărite).",
+                "state_text_format": "Automat: numărul unei entități la precizia de afișare, cu unitatea ei, restul neschimbat. Metri: 850 m sau 3.2 km. Secunde și minute: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Text opțional în jurul valorii. Scrie cuvântul value între acolade acolo unde vine valoarea. Maximum 64 de caractere.",
                 "series": "Asociați atributele entității cu serii denumite. Un rând pe atribut: numele atributului și eticheta seriei. Lăsați gol pentru a folosi starea entității ca serie unică. Un șir vechi atribut=Etichetă este încă acceptat.",
                 "log_level_attribute": "Atribut care furnizează nivelul fiecărei linii de jurnal (info/warn/error). Lăsați gol pentru a nu afișa nicio etichetă de nivel. Numai pentru șablonul log."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Nume activitate",
                 "icon": "Pictogramă",
                 "icon_attribute": "Atribut pictogramă",
+                "icon_map": "Pictogramă per stare",
+                "icon_map_entity": "Entitate stare pictogramă",
                 "priority": "Prioritate (0-10)",
                 "sound": "Sunet",
                 "update_interval": "Interval minim de actualizare (secunde)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Numele de afișare pe activitatea de pe telefon. Implicit este numele prietenos al entității.",
                 "icon": "Înlocuiți pictograma. Lăsați gol pentru a folosi pictograma nativă a entității (ex. mdi:thermometer). SF Symbols sunt de asemenea acceptate (ex. lamp.desk.fill).",
                 "icon_attribute": "Atributul entității pentru pictogramă dinamică. Suprascrie pictograma statică și cea a entității când este setat.",
+                "icon_map": "Câte un rând pentru fiecare stare, cu pictograma de afișat. Rândul care se potrivește cu starea curentă are prioritate față de orice altă setare de pictogramă. Funcționează atât pictogramele MDI, cât și SF Symbols.",
+                "icon_map_entity": "Compară rândurile de pictograme cu starea acestei entități în locul celei urmărite (de ex. un senzor pentru direcția de deplasare).",
                 "priority": "Activitățile cu prioritate mai mare sunt păstrate mai mult timp când se atinge limita dispozitivului (0 = cea mai mică, 10 = cea mai mare).",
                 "sound": "Numele sunetului de notificare pentru această actualizare. Lăsați gol pentru sunetul sistem iOS.",
                 "update_interval": "Numărul minim de secunde între actualizări. Modificările rapide ale stării sunt limitate ca rată.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Culoare accent",
                 "accent_color_attribute": "Atribut culoare accent",
+                "accent_from_progress": "Accent după progres",
                 "background_color": "Culoare fundal",
                 "background_color_attribute": "Atribut culoare fundal",
                 "text_color": "Culoare text",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Culoarea de accent pentru Live Activity. Lăsați gol pentru albastrul implicit.",
                 "accent_color_attribute": "Atributul entității pentru culoarea de accent dinamică. Suprascrie culoarea statică. Acceptă RGB, HS, XY, Kelvin, culori denumite și hex.",
+                "accent_from_progress": "Colorează accentul după progres: roșu la 0, galben la jumătate, verde când e plin. Înlocuiește setările culorii de accent; ecranul final rămâne verde.",
                 "background_color": "Culoarea de fundal a Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului.",
                 "background_color_attribute": "Atribut entitate pentru culoarea de fundal dinamică. Înlocuiește culoarea de fundal statică.",
                 "text_color": "Culoarea textului Live Activity. #RRGGBB sau culoare numită. Lăsați gol pentru valoarea implicită a sistemului.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "Butonul favorite trebuie să indice o entitate script (script.something).",
         "invalid_run_while": "Fiecare condiție necesită un entity_id și cel puțin o stare (ex. device_tracker.me cu home).",
         "too_many_run_while": "Sunt acceptate cel mult 5 condiții.",
-        "invalid_calendar_lead_minutes": "Timpul în avans trebuie să fie un număr întreg de minute între 0 și 1440."
+        "invalid_calendar_lead_minutes": "Timpul în avans trebuie să fie un număr întreg de minute între 0 și 1440.",
+        "invalid_icon_map": "Fiecare pictogramă poate avea cel mult 128 de caractere.",
+        "invalid_state_text_pattern": "Șablonul poate avea cel mult 64 de caractere."
       },
       "abort": {
         "already_configured": "Această entitate este deja urmărită.",
@@ -2824,6 +2844,20 @@
         "poster": "Poster",
         "square": "Pătrat",
         "circle": "Cerc"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Automat",
+        "distance_m": "Metri",
+        "duration_s": "Secunde",
+        "duration_min": "Minute"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Direct (0-100)",
+        "remaining": "Rămas (scade spre 0)"
       }
     },
     "battery_sort": {

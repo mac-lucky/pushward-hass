@@ -26,6 +26,7 @@ from custom_components.pushward.api import (
     PushWardQuotaExceededError,
 )
 from custom_components.pushward.const import (
+    CONF_ACCENT_FROM_PROGRESS,
     CONF_ACTIVITY_NAME,
     CONF_BATTERY_DEVICES,
     CONF_CHARGING_ENTITY,
@@ -34,6 +35,9 @@ from custom_components.pushward.const import (
     CONF_HEATMAP_AGGREGATE,
     CONF_HEATMAP_WEEKS,
     CONF_HISTORY_PERIOD,
+    CONF_ICON,
+    CONF_ICON_MAP,
+    CONF_ICON_MAP_ENTITY,
     CONF_IMAGE_URL,
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
@@ -41,13 +45,18 @@ from custom_components.pushward.const import (
     CONF_MEDIA_TOKEN,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
+    CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
+    CONF_PROGRESS_MODE,
     CONF_SERVER_URL,
     CONF_SLUG,
     CONF_SOUND,
     CONF_START_STATES,
     CONF_STAT_ROWS,
     CONF_STATE_LABELS,
+    CONF_STATE_TEXT_ENTITY,
+    CONF_STATE_TEXT_PATTERN,
+    CONF_SUBTITLE_COLUMNS,
     CONF_TEMPLATE,
     CONF_TILES,
     CONF_TODO_LEVEL,
@@ -579,6 +588,81 @@ async def test_preview_names_the_entities_each_subentry_reads(hass: HomeAssistan
     assert await bound(SUBENTRY_TYPE_ENTITY) == ["binary_sensor.home", "sensor.progress", "sensor.cpu"]
     assert await bound(SUBENTRY_TYPE_WIDGET) == ["sensor.phone", "binary_sensor.charging", "sensor.watch"]
     assert await bound(SUBENTRY_TYPE_TODO) == [EMPTY_LIST]
+
+
+async def test_preview_draft_shows_the_content_options(hass: HomeAssistant, loaded, ws) -> None:
+    entry, api = loaded
+    api.reset_mock()
+    draft = {
+        **_mock_core_input(**{CONF_ENTITY_ID: "sensor.temp", CONF_TEMPLATE: "generic"}),
+        **_mock_details_input(
+            "generic",
+            **{
+                CONF_STATE_TEXT_ENTITY: "sensor.users",
+                CONF_STATE_TEXT_PATTERN: "{value} users",
+                CONF_ICON_MAP: [{"state": "on", CONF_ICON: "mdi:washing-machine"}],
+                CONF_ICON_MAP_ENTITY: WASHER,
+                CONF_SUBTITLE_COLUMNS: [
+                    {CONF_LABEL: "Users", CONF_ENTITY_ID: "sensor.users"},
+                    {CONF_ENTITY_ID: WASHER},
+                ],
+                CONF_ACCENT_FROM_PROGRESS: True,
+            },
+        ),
+    }
+
+    reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_ENTITY, data=draft)
+
+    result = reply["result"]
+    content = result["payload"]["content"]
+    assert (content["state"], content["icon"]) == ("42 users", "mdi:washing-machine")
+    assert (content["subtitle"], content["accent_color"]) == ("Users: 42 · on", "#FF0000")
+    assert result["entity_ids"] == ["sensor.temp", "sensor.users", WASHER]
+    assert api.mock_calls == []
+
+
+async def test_preview_remaining_progress_uses_the_saved_runs_farthest_point(hass: HomeAssistant, ws) -> None:
+    trip = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "sensor.trip",
+            CONF_SLUG: "ha-trip",
+            CONF_START_STATES: ["on"],
+            CONF_PROGRESS_ATTRIBUTE: "distance",
+            CONF_PROGRESS_MODE: "remaining",
+        }
+    )
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="PushWard",
+        data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: "hlk_trip"},
+        version=2,
+        unique_id="user-trip",
+        subentries_data=[
+            ConfigSubentryData(data=trip, subentry_type=SUBENTRY_TYPE_ENTITY, title="Trip", unique_id="sensor.trip")
+        ],
+    )
+    hass.states.async_set("sensor.trip", "on", {"distance": 500})
+    await async_setup_with_api(hass, entry, _api())
+    tracked = _loaded_data(hass, entry)["manager"]._tracked["sensor.trip"]
+    assert tracked.progress_max == 500
+    tracked.last_content, tracked.progress_max = None, 1000.0
+    subentry_id = _subentry_id(entry, SUBENTRY_TYPE_ENTITY)
+
+    saved = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id)
+    assert saved["result"]["payload"]["content"]["progress"] == 0.5
+
+    draft = {
+        **_mock_core_input(**{CONF_ENTITY_ID: "sensor.trip"}),
+        **_mock_details_input("generic", **{CONF_PROGRESS_ATTRIBUTE: "distance", CONF_PROGRESS_MODE: "remaining"}),
+    }
+    reconfigure = await ws(
+        "pushward/preview",
+        entry_id=entry.entry_id,
+        subentry_id=subentry_id,
+        subentry_type=SUBENTRY_TYPE_ENTITY,
+        data=draft,
+    )
+    assert reconfigure["result"]["payload"]["content"]["progress"] == 0.0
 
 
 async def test_preview_saved_activity_is_pending_while_its_throttled_push_waits(

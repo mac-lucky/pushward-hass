@@ -178,6 +178,32 @@ CONF_BACKGROUND_COLOR_ATTRIBUTE = "background_color_attribute"
 CONF_TEXT_COLOR = "text_color"
 CONF_TEXT_COLOR_ATTRIBUTE = "text_color_attribute"
 
+# Activity content computed on this side into the existing wire fields (state,
+# progress, accent_color, icon, subtitle); none of it is a server key.
+# State text: a value read like the subtitle source (entity and/or attribute),
+# formatted per STATE_TEXT_FORMATS and put into an optional pattern's {value}.
+CONF_STATE_TEXT_ENTITY = "state_text_entity"
+CONF_STATE_TEXT_ATTRIBUTE = "state_text_attribute"
+CONF_STATE_TEXT_FORMAT = "state_text_format"
+CONF_STATE_TEXT_PATTERN = "state_text_pattern"
+STATE_TEXT_FORMATS = ("auto", "distance_m", "duration_s", "duration_min")
+DEFAULT_STATE_TEXT_FORMAT = "auto"
+STATE_TEXT_PATTERN_MAX = 64
+STATE_TEXT_PLACEHOLDER = "{value}"
+# "remaining" reads the progress source as a value falling toward 0 (a distance,
+# items left): the bar fills from the largest value seen since the activity started.
+CONF_PROGRESS_MODE = "progress_mode"
+PROGRESS_MODE_DIRECT = "direct"
+PROGRESS_MODE_REMAINING = "remaining"
+PROGRESS_MODES = (PROGRESS_MODE_DIRECT, PROGRESS_MODE_REMAINING)
+# Accent on a red -> yellow -> green gradient by progress while the activity runs.
+CONF_ACCENT_FROM_PROGRESS = "accent_from_progress"
+# {state: icon} for the tracked entity, or for CONF_ICON_MAP_ENTITY when set.
+CONF_ICON_MAP = "icon_map"
+CONF_ICON_MAP_ENTITY = "icon_map_entity"
+# Subtitle composed of columns shaped like CONF_LOG_COLUMNS rows, joined like a log line.
+CONF_SUBTITLE_COLUMNS = "subtitle_columns"
+
 # Lifecycle conditions on other entities: rows of {entity_id, states}; the activity
 # runs only while every row's entity is in one of its states. Stored states are a list.
 CONF_RUN_WHILE = "run_while"
@@ -350,6 +376,8 @@ MAX_COMPACT_LABEL_LEN = 4
 # names run past 64).
 MAX_COMPACT_TRAILING_LABEL_LEN = 4
 MAX_COMPACT_TRAILING_ICON_LEN = 128
+# The activity icon's own cap (server icon field).
+MAX_ICON_LEN = 128
 # Every SF Symbol and mdi name fits this set, and the server refuses anything else,
 # which keeps the 128-rune cap a byte bound in the push payload. \Z for the same
 # trailing-newline reason as APPROVAL_OPTION_ID_PATTERN.

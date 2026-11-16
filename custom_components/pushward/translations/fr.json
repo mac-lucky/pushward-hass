@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Entité de progression",
                 "progress_attribute": "Attribut de progression",
+                "progress_mode": "Mode de progression",
                 "remaining_time_entity": "Entité de temps restant",
                 "remaining_time_attribute": "Attribut de temps restant",
                 "live_progress": "Progression en direct (ETA)",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Attribut de déclenchement",
                 "subtitle_entity": "Entité de sous-titre",
                 "subtitle_attribute": "Attribut de sous-titre",
+                "subtitle_columns": "Colonnes du sous-titre",
+                "state_text_entity": "Entité du texte d'état",
+                "state_text_attribute": "Attribut du texte d'état",
+                "state_text_format": "Format du texte d'état",
+                "state_text_pattern": "Modèle du texte d'état",
                 "series": "Séries",
                 "log_level_attribute": "Attribut de niveau de journal"
               },
               "data_description": {
                 "progress_entity": "Lire la progression depuis une entité distincte plutôt que l'entité suivie. Laisser vide pour utiliser l'entité suivie. Si le champ d'attribut est défini, lit cet attribut de cette entité ; sinon son état.",
                 "progress_attribute": "Attribut de l'entité contenant une valeur de progression de 0 à 100. Exemple : percentage",
+                "progress_mode": "Direct lit la source de progression comme 0-100. Restant lit une valeur qui descend vers 0 (une distance, des éléments restants) : la barre se remplit depuis la plus grande valeur vue depuis le début de l'activité.",
                 "remaining_time_entity": "Lire le temps restant depuis une entité distincte (ex. le capteur de temps d'un lave-linge). Laisser vide pour utiliser l'entité suivie. Analyse automatiquement un capteur d'horodatage (heure de fin), un capteur de durée avec unités, une chaîne H:MM:SS ou de simples secondes.",
                 "remaining_time_attribute": "Attribut de l'entité contenant le temps restant en secondes. Exemple : remaining",
                 "live_progress": "Remplit la barre de progression en douceur et affiche un compte à rebours d'ETA jusqu'à l'heure de fin sur l'appareil, à partir de la source de temps restant ci-dessus. Nécessite une entité ou un attribut de temps restant. Sur le modèle steps, elle remplit l'étape en cours plutôt que l'ensemble du parcours.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Attribut de l'entité contenant l'horodatage Unix du déclenchement de l'alert. Modèle alert uniquement.",
                 "subtitle_entity": "Afficher le sous-titre depuis une entité distincte (ex. un capteur de programme/mode). Laisser vide pour utiliser l'entité suivie. Utilise l'état de l'entité source à moins qu'un attribut ne soit défini.",
                 "subtitle_attribute": "Attribut de l'entité à afficher comme sous-titre. Laisser vide pour utiliser le nom convivial de l'entité.",
+                "subtitle_columns": "Compose le sous-titre à partir de 6 valeurs au plus, chaque ligne avec un libellé, une entité, un attribut et une unité comme les colonnes de journal. Une ligne sans libellé affiche seulement sa valeur. Dès qu'une valeur est disponible, elles remplacent la source du sous-titre.",
+                "state_text_entity": "Affiche une valeur d'une autre entité à la place du libellé d'état. Utilise son état sauf si un attribut est défini. Tant qu'elle est indisponible, le libellé d'état est affiché.",
+                "state_text_attribute": "Attribut affiché à la place du libellé d'état (sur l'entité du texte d'état, ou sur l'entité suivie si aucune n'est définie).",
+                "state_text_format": "Automatique : le nombre d'une entité à sa précision d'affichage avec son unité, le reste tel quel. Mètres : 850 m ou 3.2 km. Secondes et minutes : 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Texte facultatif autour de la valeur. Écrivez le mot value entre accolades là où la valeur doit apparaître. 64 caractères au maximum.",
                 "series": "Associer les attributs de l'entité à des séries nommées. Une ligne par attribut : le nom de l'attribut et son libellé de série. Laisser vide pour utiliser l'état de l'entité comme série unique. Une ancienne chaîne attribut=Libellé est toujours acceptée.",
                 "log_level_attribute": "Attribut fournissant le niveau de chaque ligne de journal (info/warn/error). Laisser vide pour aucune étiquette de niveau. Modèle journal uniquement."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Nom de la Live Activity",
                 "icon": "Icône",
                 "icon_attribute": "Attribut d'icône",
+                "icon_map": "Icône par état",
+                "icon_map_entity": "Entité de l'état d'icône",
                 "priority": "Priorité (0-10)",
                 "sound": "Son",
                 "update_interval": "Intervalle min. de mise à jour (secondes)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Nom d'affichage de l'activité sur votre téléphone. Par défaut, le nom convivial de l'entité.",
                 "icon": "Icône de remplacement. Laisser vide pour utiliser l'icône native de l'entité (ex. mdi:thermometer). Les SF Symbols sont également pris en charge (ex. lamp.desk.fill).",
                 "icon_attribute": "Attribut de l'entité pour une icône dynamique. Remplace l'icône statique et l'icône de l'entité lorsqu'il est défini.",
+                "icon_map": "Une ligne par état avec l'icône à afficher. La ligne qui correspond à l'état actuel l'emporte sur tous les autres réglages d'icône. Les icônes MDI et les SF Symbols fonctionnent.",
+                "icon_map_entity": "Compare les lignes d'icônes à l'état de cette entité plutôt qu'à celui de l'entité suivie (p. ex. un capteur de direction de déplacement).",
                 "priority": "Les Live Activities de priorité plus élevée sont conservées plus longtemps lorsque la limite de l'appareil est atteinte (0 = la plus basse, 10 = la plus haute).",
                 "sound": "Son joué à chaque mise à jour pour cette entité. Laisser vide pour ne pas forcer de son.",
                 "update_interval": "Nombre minimal de secondes entre les mises à jour. Les changements d'état rapides sont limités.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Couleur d'accentuation",
                 "accent_color_attribute": "Attribut de couleur d'accentuation",
+                "accent_from_progress": "Accent selon la progression",
                 "background_color": "Couleur d'arrière-plan",
                 "background_color_attribute": "Attribut de couleur d'arrière-plan",
                 "text_color": "Couleur du texte",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Couleur d'accentuation de la Live Activity. Laisser vide pour le bleu par défaut.",
                 "accent_color_attribute": "Attribut de l'entité pour une couleur d'accentuation dynamique. Remplace la couleur statique. Prend en charge RGB, HS, XY, Kelvin, les couleurs nommées et l'hexadécimal.",
+                "accent_from_progress": "Colore l'accent selon la progression : rouge à 0, jaune à mi-parcours, vert une fois plein. Remplace les réglages de couleur d'accentuation ; l'écran de fin reste vert.",
                 "background_color": "Couleur d'arrière-plan de la Live Activity. Laisser vide pour la valeur par défaut.",
                 "background_color_attribute": "Attribut de l'entité pour la couleur d'arrière-plan dynamique. Remplace la couleur statique. Prend en charge RGB, HS, XY, Kelvin, les couleurs nommées et l'hexadécimal.",
                 "text_color": "Couleur du texte de la Live Activity. Laisser vide pour la valeur par défaut.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "Le bouton favori doit pointer vers une entité script (script.something).",
         "invalid_run_while": "Chaque condition nécessite un entity_id et au moins un état (ex. device_tracker.me avec home).",
         "too_many_run_while": "5 conditions au maximum sont prises en charge.",
-        "invalid_calendar_lead_minutes": "Le délai d'avance doit être un nombre entier de minutes entre 0 et 1440."
+        "invalid_calendar_lead_minutes": "Le délai d'avance doit être un nombre entier de minutes entre 0 et 1440.",
+        "invalid_icon_map": "Chaque icône peut contenir au plus 128 caractères.",
+        "invalid_state_text_pattern": "Le modèle peut contenir au plus 64 caractères."
       },
       "abort": {
         "already_configured": "Cette entité est déjà suivie.",
@@ -2824,6 +2844,20 @@
         "poster": "Affiche",
         "square": "Carré",
         "circle": "Cercle"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Automatique",
+        "distance_m": "Mètres",
+        "duration_s": "Secondes",
+        "duration_min": "Minutes"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Direct (0-100)",
+        "remaining": "Restant (descend vers 0)"
       }
     },
     "battery_sort": {

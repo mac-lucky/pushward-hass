@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Entidade de progresso",
                 "progress_attribute": "Atributo de Progresso",
+                "progress_mode": "Modo de Progresso",
                 "remaining_time_entity": "Entidade de tempo restante",
                 "remaining_time_attribute": "Atributo de Tempo Restante",
                 "live_progress": "Progresso ao Vivo (ETA)",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Atributo de Disparo",
                 "subtitle_entity": "Entidade de subtítulo",
                 "subtitle_attribute": "Atributo de Subtítulo",
+                "subtitle_columns": "Colunas do subtítulo",
+                "state_text_entity": "Entidade do texto de estado",
+                "state_text_attribute": "Atributo do texto de estado",
+                "state_text_format": "Formato do texto de estado",
+                "state_text_pattern": "Padrão do texto de estado",
                 "series": "Séries",
                 "log_level_attribute": "Atributo de Nível de Registro"
               },
               "data_description": {
                 "progress_entity": "Lê o progresso de uma entidade separada em vez da entidade monitorada. Deixe vazio para usar a entidade monitorada. Com o campo de atributo definido, lê esse atributo desta entidade; caso contrário, seu estado.",
                 "progress_attribute": "Atributo da entidade que contém um valor de progresso de 0 a 100. Exemplo: percentage",
+                "progress_mode": "Direto lê a fonte de progresso como 0-100. Restante lê um valor que cai até 0 (uma distância, itens restantes): a barra se enche a partir do maior valor visto desde o início da atividade.",
                 "remaining_time_entity": "Lê o tempo restante de uma entidade separada (ex.: o sensor de tempo de uma lavadora). Deixe vazio para usar a entidade monitorada. Interpreta automaticamente um sensor de timestamp (hora de término), um sensor de duração com unidades, uma string H:MM:SS ou segundos simples.",
                 "remaining_time_attribute": "Atributo da entidade que contém o tempo restante em segundos. Exemplo: remaining",
                 "live_progress": "Preenche a barra de progresso suavemente e faz uma contagem regressiva de ETA até o horário de término no dispositivo, usando a fonte de tempo restante acima. Requer uma entidade ou atributo de tempo restante. No modelo steps, ela preenche a etapa atual em vez da execução inteira.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Atributo da entidade com o timestamp Unix de quando o alert foi disparado. Apenas para o modelo alert.",
                 "subtitle_entity": "Mostra o subtítulo de uma entidade separada (ex.: um sensor de programa/modo). Deixe vazio para usar a entidade monitorada. Usa o estado da entidade de origem, a menos que um atributo seja definido.",
                 "subtitle_attribute": "Atributo da entidade a exibir como subtítulo. Deixe vazio para usar o nome amigável da entidade.",
+                "subtitle_columns": "Monta o subtítulo com até 6 valores, cada linha com rótulo, entidade, atributo e unidade como nas colunas de registro. Uma linha sem rótulo mostra só o valor. Quando algum é resolvido, eles substituem a fonte do subtítulo.",
+                "state_text_entity": "Mostra um valor de outra entidade no lugar do rótulo de estado. Usa o estado dela, a menos que um atributo esteja definido. Enquanto estiver indisponível, o rótulo de estado é mostrado.",
+                "state_text_attribute": "Atributo mostrado no lugar do rótulo de estado (na entidade do texto de estado ou, se nenhuma estiver definida, na entidade monitorada).",
+                "state_text_format": "Automático: o número de uma entidade na sua precisão de exibição com a unidade, o resto como está. Metros: 850 m ou 3.2 km. Segundos e minutos: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Texto opcional em volta do valor. Escreva a palavra value entre chaves onde o valor deve aparecer. Máximo de 64 caracteres.",
                 "series": "Mapear atributos da entidade para séries nomeadas. Uma linha por atributo: o nome do atributo e seu rótulo de série. Deixe vazio para usar o estado da entidade como série única. Uma string antiga atributo=Rótulo ainda é aceita.",
                 "log_level_attribute": "Atributo que fornece o nível de cada linha de registro (info/warn/error). Deixe vazio para nenhuma marca de nível. Apenas modelo de registro."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Nome da Atividade",
                 "icon": "Ícone",
                 "icon_attribute": "Atributo de Ícone",
+                "icon_map": "Ícone por estado",
+                "icon_map_entity": "Entidade do estado do ícone",
                 "priority": "Prioridade (0–10)",
                 "sound": "Som",
                 "update_interval": "Intervalo Mínimo de Atualização (segundos)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Nome de exibição mostrado na atividade do seu celular. Padrão: nome amigável da entidade.",
                 "icon": "Substituir ícone. Deixe vazio para usar o ícone nativo da entidade (ex.: mdi:thermometer). SF Symbols também suportado (ex.: lamp.desk.fill).",
                 "icon_attribute": "Atributo da entidade para ícone dinâmico. Substitui o ícone estático e o ícone da entidade quando definido.",
+                "icon_map": "Uma linha por estado com o ícone a mostrar. A linha que corresponde ao estado atual tem prioridade sobre qualquer outra configuração de ícone. Ícones MDI e SF Symbols funcionam.",
+                "icon_map_entity": "Compara as linhas de ícones com o estado desta entidade em vez do estado da entidade monitorada (por exemplo, um sensor de direção de deslocamento).",
                 "priority": "Atividades com prioridade mais alta são mantidas por mais tempo quando o limite do dispositivo é atingido (0 = menor, 10 = maior).",
                 "sound": "Som reproduzido em cada atualização para esta entidade. Deixe vazio para não usar substituição.",
                 "update_interval": "Intervalo mínimo em segundos entre atualizações. Mudanças de estado rápidas são limitadas.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Cor de Destaque",
                 "accent_color_attribute": "Atributo de Cor de Destaque",
+                "accent_from_progress": "Destaque pelo progresso",
                 "background_color": "Cor de Fundo",
                 "background_color_attribute": "Atributo de Cor de Fundo",
                 "text_color": "Cor do Texto",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Cor de destaque para a Live Activity. Deixe vazio para o azul padrão.",
                 "accent_color_attribute": "Atributo da entidade para cor de destaque dinâmica. Substitui a cor estática. Suporta RGB, HS, XY, Kelvin, cores nomeadas e hexadecimal.",
+                "accent_from_progress": "Colore o destaque pelo progresso: vermelho em 0, amarelo na metade, verde quando completo. Substitui as configurações de cor de destaque; a tela de conclusão continua verde.",
                 "background_color": "Cor de fundo da Live Activity. Deixe vazio para o padrão.",
                 "background_color_attribute": "Atributo da entidade para cor de fundo dinâmica. Substitui a cor estática. Suporta RGB, HS, XY, Kelvin, cores nomeadas e hexadecimal.",
                 "text_color": "Cor do texto da Live Activity. Deixe vazio para o padrão.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "O botão de favorito precisa apontar para uma entidade script (script.something).",
         "invalid_run_while": "Cada condição precisa de um entity_id e pelo menos um estado (ex.: device_tracker.me com home).",
         "too_many_run_while": "São suportadas no máximo 5 condições.",
-        "invalid_calendar_lead_minutes": "A antecedência deve ser um número inteiro de minutos entre 0 e 1440."
+        "invalid_calendar_lead_minutes": "A antecedência deve ser um número inteiro de minutos entre 0 e 1440.",
+        "invalid_icon_map": "Cada ícone pode ter no máximo 128 caracteres.",
+        "invalid_state_text_pattern": "O padrão pode ter no máximo 64 caracteres."
       },
       "abort": {
         "already_configured": "Esta entidade já está sendo monitorada.",
@@ -2824,6 +2844,20 @@
         "poster": "Pôster",
         "square": "Quadrado",
         "circle": "Círculo"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Automático",
+        "distance_m": "Metros",
+        "duration_s": "Segundos",
+        "duration_min": "Minutos"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Direto (0-100)",
+        "remaining": "Restante (cai até 0)"
       }
     },
     "battery_sort": {

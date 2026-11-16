@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "進捗エンティティ",
                 "progress_attribute": "進捗属性",
+                "progress_mode": "進捗モード",
                 "remaining_time_entity": "残り時間エンティティ",
                 "remaining_time_attribute": "残り時間属性",
                 "live_progress": "ライブ進捗ETA",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "発火時刻属性",
                 "subtitle_entity": "サブタイトルエンティティ",
                 "subtitle_attribute": "サブタイトル属性",
+                "subtitle_columns": "サブタイトル列",
+                "state_text_entity": "状態テキストエンティティ",
+                "state_text_attribute": "状態テキスト属性",
+                "state_text_format": "状態テキスト形式",
+                "state_text_pattern": "状態テキストパターン",
                 "series": "シリーズ",
                 "log_level_attribute": "ログレベル属性"
               },
               "data_description": {
                 "progress_entity": "追跡エンティティの代わりに別のエンティティから進捗を読み取ります。空白のままにすると追跡エンティティを使用します。属性フィールドを設定するとこのエンティティのその属性を、設定しない場合は状態を読み取ります。",
                 "progress_attribute": "0〜100の進捗値を持つエンティティ属性。例: percentage",
+                "progress_mode": "直接は進捗ソースを0-100として読み取ります。残りは0に向かって減る値(距離、残り項目数)を読み取り、アクティビティ開始以降の最大値からバーを満たします。",
                 "remaining_time_entity": "別のエンティティ（例: 洗濯機の時間センサー）から残り時間を読み取ります。空白のままにすると追跡エンティティを使用します。タイムスタンプ（終了時刻）センサー、単位付きの継続時間センサー、H:MM:SS 文字列、または単純な秒数を自動的に解析します。",
                 "remaining_time_attribute": "残り時間（秒）を持つエンティティ属性。例: remaining",
                 "live_progress": "上記の残り時間ソースを使用して、進捗バーをスムーズに埋め、デバイス上で完了時刻までのETAをカウントダウンします。残り時間のエンティティまたは属性が必要です。steps テンプレートでは、実行全体ではなく現在のステップを埋めます。",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "alert が発火したときの Unix タイムスタンプを持つエンティティ属性。alert テンプレートのみ。",
                 "subtitle_entity": "別のエンティティ（例: プログラム/モードセンサー）からサブタイトルを表示します。空白のままにすると追跡エンティティを使用します。属性を設定しない限りソースエンティティの状態を使用します。",
                 "subtitle_attribute": "サブタイトルとして表示するエンティティ属性。空白のままにするとエンティティのフレンドリー名を使用します。",
+                "subtitle_columns": "最大6個の値からサブタイトルを組み立てます。各行はログ列と同じくラベル、エンティティ、属性、単位です。ラベルのない行は値だけを表示します。いずれかの値が取得できると、サブタイトルのソースを置き換えます。",
+                "state_text_entity": "状態ラベルの代わりに別のエンティティの値を表示します。属性を設定しない限り、そのエンティティの状態を使います。利用できない間は状態ラベルを表示します。",
+                "state_text_attribute": "状態ラベルの代わりに表示する属性です(状態テキストエンティティ、未設定の場合は追跡中のエンティティ)。",
+                "state_text_format": "自動: エンティティの数値を表示精度と単位付きで、それ以外はそのまま表示します。メートル: 850 m または 3.2 km。秒と分: 45 s、15 min、1 h 5 min。",
+                "state_text_pattern": "値の前後に付ける任意のテキストです。値を入れる位置に、波かっこで囲んだ value という語を書きます。最大64文字。",
                 "series": "エンティティ属性を名前付きシリーズにマッピングします。属性ごとに1行: 属性名とシリーズラベル。空白のままにするとエンティティの状態を単一シリーズとして使用します。従来の attribute=Label 文字列も引き続き使用できます。",
                 "log_level_attribute": "各ログ行のレベル（info/warn/error）を示すエンティティ属性。レベルタグを付けない場合は空のままにします。log テンプレートのみ。"
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "アクティビティ名",
                 "icon": "アイコン",
                 "icon_attribute": "アイコン属性",
+                "icon_map": "状態ごとのアイコン",
+                "icon_map_entity": "アイコン状態エンティティ",
                 "priority": "優先度 (0〜10)",
                 "sound": "サウンド",
                 "update_interval": "最小更新間隔（秒）",
@@ -2312,6 +2326,8 @@
                 "activity_name": "スマートフォンのアクティビティに表示される名前。デフォルトはエンティティのフレンドリー名です。",
                 "icon": "アイコンの上書き。空白のままにするとエンティティのネイティブアイコンを使用します（例: mdi:thermometer）。SF Symbolsもサポートされています（例: lamp.desk.fill）。",
                 "icon_attribute": "動的アイコン用のエンティティ属性。設定すると静的アイコンおよびエンティティアイコンより優先されます。",
+                "icon_map": "状態ごとに1行、表示するアイコンを指定します。現在の状態に一致する行は、他のどのアイコン設定よりも優先されます。MDIアイコンとSF Symbolsの両方が使えます。",
+                "icon_map_entity": "アイコンの行を、追跡中のエンティティではなくこのエンティティの状態と照合します(例: 進行方向センサー)。",
                 "priority": "デバイスの上限に達した場合、優先度の高いアクティビティが長く保持されます（0 = 最低, 10 = 最高）。",
                 "sound": "このエンティティの毎回の更新で再生されるサウンド。空白のままにすると上書きなし。",
                 "update_interval": "更新間の最小秒数。急速な状態変化はスロットリングされます。",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "アクセントカラー",
                 "accent_color_attribute": "アクセントカラー属性",
+                "accent_from_progress": "進捗に応じたアクセント",
                 "background_color": "背景色",
                 "background_color_attribute": "背景色属性",
                 "text_color": "テキスト色",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Live Activityのアクセントカラー。空白のままにするとデフォルトの青色を使用します。",
                 "accent_color_attribute": "動的アクセントカラー用のエンティティ属性。静的カラーより優先されます。RGB、HS、XY、ケルビン、カラー名、16進数に対応しています。",
+                "accent_from_progress": "進捗に応じてアクセントを色付けします: 0で赤、半分で黄、満タンで緑。アクセントカラーの設定を上書きします。完了画面は緑のままです。",
                 "background_color": "Live Activity の背景色。空白のままにするとデフォルト色を使用します。",
                 "background_color_attribute": "動的背景色のエンティティ属性。静的色より優先されます。RGB、HS、XY、ケルビン、色名、16進数に対応しています。",
                 "text_color": "Live Activity のテキスト色。空白のままにするとデフォルト色を使用します。",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "お気に入りボタンは script エンティティ（script.something）を指定する必要があります。",
         "invalid_run_while": "各条件には entity_id と 1 つ以上の状態が必要です（例: device_tracker.me と home）。",
         "too_many_run_while": "条件は最大 5 つまでです。",
-        "invalid_calendar_lead_minutes": "事前時間は 0 から 1440 までの整数（分）で指定してください。"
+        "invalid_calendar_lead_minutes": "事前時間は 0 から 1440 までの整数（分）で指定してください。",
+        "invalid_icon_map": "各アイコンは128文字以内にしてください。",
+        "invalid_state_text_pattern": "パターンは64文字以内にしてください。"
       },
       "abort": {
         "already_configured": "このエンティティはすでに追跡されています。",
@@ -2824,6 +2844,20 @@
         "poster": "ポスター",
         "square": "正方形",
         "circle": "円形"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "自動",
+        "distance_m": "メートル",
+        "duration_s": "秒",
+        "duration_min": "分"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "直接 (0-100)",
+        "remaining": "残り (0に向かって減少)"
       }
     },
     "battery_sort": {

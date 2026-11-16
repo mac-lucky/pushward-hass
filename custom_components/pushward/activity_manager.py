@@ -46,6 +46,7 @@ from .const import (
     CONF_ENTITY_ID,
     CONF_FIRED_AT_ENTITY,
     CONF_HISTORY_PERIOD,
+    CONF_ICON_MAP_ENTITY,
     CONF_LOG_COLUMNS,
     CONF_PRIORITY,
     CONF_PROGRESS_ENTITY,
@@ -57,6 +58,8 @@ from .const import (
     CONF_SOUND,
     CONF_STALE_TTL,
     CONF_START_STATES,
+    CONF_STATE_TEXT_ENTITY,
+    CONF_SUBTITLE_COLUMNS,
     CONF_SUBTITLE_ENTITY,
     CONF_TEMPLATE,
     CONF_TILES,
@@ -79,6 +82,7 @@ from .content_mapper import (
     lookup_registry_icon,
     map_completion_content,
     map_content,
+    progress_remaining_value,
 )
 from .image_hash import async_ensure_thumbhash
 from .media_control import async_ensure_media_artwork
@@ -106,6 +110,8 @@ _COMPANION_ENTITY_KEYS = (
     CONF_CURRENT_STEP_ENTITY,
     CONF_FIRED_AT_ENTITY,
     CONF_SUBTITLE_ENTITY,
+    CONF_STATE_TEXT_ENTITY,
+    CONF_ICON_MAP_ENTITY,
 )
 
 
@@ -117,7 +123,7 @@ def _companion_entity_ids(config: dict) -> list[str]:
     For log templates the per-column entities (bare-attribute columns excepted) are
     companions too: a change to any appends a freshly composed line. For timeline
     templates the per-series entities are companions: a change to any re-samples
-    the sparkline.
+    the sparkline. On every template the subtitle-column entities are companions.
     """
     ids = [eid for key in _COMPANION_ENTITY_KEYS if (eid := config.get(key))]
     template = config.get(CONF_TEMPLATE)
@@ -133,6 +139,9 @@ def _companion_entity_ids(config: dict) -> list[str]:
         for series in config.get(CONF_SERIES_ENTITIES) or []:
             if isinstance(series, dict) and (eid := series.get(CONF_ENTITY_ID)):
                 ids.append(eid)
+    for column in config.get(CONF_SUBTITLE_COLUMNS) or []:
+        if isinstance(column, dict) and (eid := column.get(CONF_ENTITY_ID)):
+            ids.append(eid)
     return list(dict.fromkeys(ids))
 
 
@@ -237,6 +246,8 @@ class TrackedEntity:
     # Newest-first log lines for the log template. Appended on every state change
     # (and seeded at start) so the pushed snapshot accrues history up to the cap.
     log_buffer: deque = field(default_factory=lambda: deque(maxlen=LOG_MAX_LINES))
+    # progress_mode "remaining": the largest progress-source value seen this run.
+    progress_max: float | None = None
 
 
 class ActivityManager:
@@ -796,6 +807,12 @@ class ActivityManager:
         if lines:
             content["lines"] = lines
 
+    def _track_progress_max(self, tracked: TrackedEntity, state: State) -> None:
+        """Raise progress_max to the current progress-source value (progress_mode remaining only)."""
+        value = progress_remaining_value(state, tracked.config, self._hass)
+        if value is not None:
+            tracked.progress_max = max(tracked.progress_max or 0.0, value)
+
     async def _start_activity(self, entity_id: str) -> None:
         """Create and start a PushWard Live Activity."""
         tracked = self._tracked[entity_id]
@@ -815,11 +832,20 @@ class ActivityManager:
                 return
 
             tracked.registry_icon = self._get_registry_icon(entity_id)
+            # A new run measures its remaining progress from its own farthest point.
+            tracked.progress_max = None
+            self._track_progress_max(tracked, current_state)
             # Deliberately no last_content: a (re)start must open a fresh
             # live_progress window. Carrying the prior run's frame would resume its
             # step clock, so a restart on the same step number would render the bar
             # already part-filled. See content_mapper._apply_steps_live_progress.
-            content = map_content(current_state, config, registry_icon=tracked.registry_icon, hass=self._hass)
+            content = map_content(
+                current_state,
+                config,
+                registry_icon=tracked.registry_icon,
+                hass=self._hass,
+                progress_max=tracked.progress_max,
+            )
 
             # A board needs >=1 renderable tile. If every tile entity is still
             # unavailable (e.g. the anchor resumes a start state right after
@@ -1014,12 +1040,14 @@ class ActivityManager:
         if current_state is None:
             return
 
+        self._track_progress_max(tracked, current_state)
         content = map_content(
             current_state,
             tracked.config,
             registry_icon=tracked.registry_icon,
             hass=self._hass,
             last_content=tracked.last_content,
+            progress_max=tracked.progress_max,
         )
         # Inject the full log buffer before the dedup check so a new line counts as a change.
         self._apply_log_lines(tracked, content)

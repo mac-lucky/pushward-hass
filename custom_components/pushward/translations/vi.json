@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Thực thể tiến trình",
                 "progress_attribute": "Thuộc Tính Tiến Độ",
+                "progress_mode": "Chế Độ Tiến Độ",
                 "remaining_time_entity": "Thực thể thời gian còn lại",
                 "remaining_time_attribute": "Thuộc Tính Thời Gian Còn Lại",
                 "live_progress": "ETA tiến độ trực tiếp",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Thuộc Tính Thời Điểm Kích Hoạt",
                 "subtitle_entity": "Thực thể phụ đề",
                 "subtitle_attribute": "Thuộc Tính Phụ Đề",
+                "subtitle_columns": "Cột phụ đề",
+                "state_text_entity": "Thực thể văn bản trạng thái",
+                "state_text_attribute": "Thuộc tính văn bản trạng thái",
+                "state_text_format": "Định dạng văn bản trạng thái",
+                "state_text_pattern": "Mẫu văn bản trạng thái",
                 "series": "Chuỗi Dữ Liệu",
                 "log_level_attribute": "Thuộc tính mức nhật ký"
               },
               "data_description": {
                 "progress_entity": "Đọc tiến trình từ một thực thể riêng thay vì thực thể được theo dõi. Để trống để dùng thực thể được theo dõi. Nếu đặt trường thuộc tính, đọc thuộc tính đó của thực thể này; nếu không thì đọc trạng thái của nó.",
                 "progress_attribute": "Thuộc tính thực thể chứa giá trị tiến độ 0–100. Ví dụ: percentage",
+                "progress_mode": "Trực tiếp đọc nguồn tiến độ theo thang 0-100. Còn lại đọc một giá trị giảm dần về 0 (khoảng cách, số mục còn lại): thanh được lấp đầy tính từ giá trị lớn nhất kể từ khi hoạt động bắt đầu.",
                 "remaining_time_entity": "Đọc thời gian còn lại từ một thực thể riêng (ví dụ cảm biến thời gian của máy giặt). Để trống để dùng thực thể được theo dõi. Tự động phân tích cảm biến dấu thời gian (thời điểm hoàn thành), cảm biến thời lượng có đơn vị, chuỗi H:MM:SS, hoặc số giây thuần.",
                 "remaining_time_attribute": "Thuộc tính thực thể chứa thời gian còn lại tính bằng giây. Ví dụ: remaining",
                 "live_progress": "Lấp đầy thanh tiến độ một cách mượt mà và đếm ngược ETA đến thời điểm hoàn thành trên thiết bị, sử dụng nguồn thời gian còn lại ở trên. Cần một thực thể hoặc thuộc tính thời gian còn lại. Trên mẫu steps, nó lấp đầy bước hiện tại thay vì toàn bộ quá trình.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Thuộc tính thực thể chứa dấu thời gian Unix khi kích hoạt. Dùng để hiển thị thời gian tương đối.",
                 "subtitle_entity": "Hiển thị phụ đề từ một thực thể riêng (ví dụ cảm biến chương trình/chế độ). Để trống để dùng thực thể được theo dõi. Dùng trạng thái của thực thể nguồn trừ khi đặt một thuộc tính.",
                 "subtitle_attribute": "Thuộc tính thực thể hiển thị làm phụ đề. Để trống để dùng tên thân thiện của thực thể.",
+                "subtitle_columns": "Ghép phụ đề từ tối đa 6 giá trị, mỗi hàng gồm nhãn, thực thể, thuộc tính và đơn vị như Cột nhật ký. Hàng không có nhãn chỉ hiện giá trị. Khi có giá trị nào đọc được, chúng thay thế nguồn phụ đề.",
+                "state_text_entity": "Hiện giá trị từ một thực thể khác thay cho nhãn trạng thái. Dùng trạng thái của nó trừ khi đặt thuộc tính. Khi nó không khả dụng, nhãn trạng thái được hiện.",
+                "state_text_attribute": "Thuộc tính hiển thị thay cho nhãn trạng thái (trên thực thể văn bản trạng thái, hoặc thực thể được theo dõi nếu chưa đặt).",
+                "state_text_format": "Tự động: số của thực thể theo độ chính xác hiển thị kèm đơn vị, còn lại giữ nguyên. Mét: 850 m hoặc 3.2 km. Giây và phút: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Văn bản tùy chọn quanh giá trị. Viết chữ value trong dấu ngoặc nhọn tại chỗ đặt giá trị. Tối đa 64 ký tự.",
                 "series": "Ánh xạ thuộc tính thực thể sang chuỗi có tên. Mỗi thuộc tính một hàng: tên thuộc tính và nhãn chuỗi. Để trống để dùng trạng thái của thực thể làm chuỗi duy nhất. Chuỗi cũ attribute=Label vẫn được chấp nhận.",
                 "log_level_attribute": "Thuộc tính cung cấp mức (info/warn/error) cho mỗi dòng nhật ký. Để trống nếu không muốn có nhãn mức. Chỉ dành cho mẫu nhật ký."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Tên Hoạt Động",
                 "icon": "Biểu Tượng",
                 "icon_attribute": "Thuộc Tính Biểu Tượng",
+                "icon_map": "Biểu tượng theo trạng thái",
+                "icon_map_entity": "Thực thể trạng thái biểu tượng",
                 "priority": "Ưu Tiên (0-10)",
                 "sound": "Âm Thanh",
                 "update_interval": "Khoảng Cập Nhật Tối Thiểu (giây)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Tên hiển thị trên hoạt động trên điện thoại của bạn. Mặc định là tên thân thiện của thực thể.",
                 "icon": "Ghi đè biểu tượng. Để trống để dùng biểu tượng gốc của thực thể (ví dụ: mdi:thermometer). Cũng hỗ trợ SF Symbols (ví dụ: lamp.desk.fill).",
                 "icon_attribute": "Thuộc tính thực thể cho biểu tượng động. Ghi đè biểu tượng tĩnh và biểu tượng thực thể khi được đặt.",
+                "icon_map": "Mỗi hàng là một trạng thái và biểu tượng cần hiện. Hàng khớp với trạng thái hiện tại được ưu tiên hơn mọi thiết lập biểu tượng khác. Dùng được cả biểu tượng MDI và SF Symbols.",
+                "icon_map_entity": "So khớp các hàng biểu tượng với trạng thái của thực thể này thay vì thực thể được theo dõi (ví dụ cảm biến hướng di chuyển).",
                 "priority": "Hoạt động có mức ưu tiên cao hơn được giữ lâu hơn khi đạt giới hạn thiết bị (0 = thấp nhất, 10 = cao nhất).",
                 "sound": "Tên âm thanh thông báo cho bản cập nhật này. Để trống để dùng âm thanh hệ thống iOS.",
                 "update_interval": "Số giây tối thiểu giữa các lần cập nhật. Các thay đổi trạng thái nhanh sẽ bị giới hạn tốc độ.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Màu Nhấn",
                 "accent_color_attribute": "Thuộc Tính Màu Nhấn",
+                "accent_from_progress": "Màu nhấn theo tiến độ",
                 "background_color": "Màu Nền",
                 "background_color_attribute": "Thuộc Tính Màu Nền",
                 "text_color": "Màu Chữ",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Màu nhấn cho Live Activity. Để trống để dùng màu xanh mặc định.",
                 "accent_color_attribute": "Thuộc tính thực thể cho màu nhấn động. Ghi đè màu tĩnh. Hỗ trợ RGB, HS, XY, Kelvin, tên màu và hex.",
+                "accent_from_progress": "Tô màu nhấn theo tiến độ: đỏ ở 0, vàng ở giữa, xanh lá khi đầy. Ghi đè các thiết lập màu nhấn; màn hình hoàn tất vẫn màu xanh lá.",
                 "background_color": "Màu nền Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống.",
                 "background_color_attribute": "Thuộc tính thực thể cho màu nền động. Ghi đè màu nền tĩnh.",
                 "text_color": "Màu chữ Live Activity. #RRGGBB hoặc tên màu. Để trống để dùng giá trị mặc định của hệ thống.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "Nút yêu thích phải trỏ đến một thực thể script (script.something).",
         "invalid_run_while": "Mỗi điều kiện cần một entity_id và ít nhất một trạng thái (vd. device_tracker.me với home).",
         "too_many_run_while": "Hỗ trợ tối đa 5 điều kiện.",
-        "invalid_calendar_lead_minutes": "Thời gian báo trước phải là số phút nguyên từ 0 đến 1440."
+        "invalid_calendar_lead_minutes": "Thời gian báo trước phải là số phút nguyên từ 0 đến 1440.",
+        "invalid_icon_map": "Mỗi biểu tượng tối đa 128 ký tự.",
+        "invalid_state_text_pattern": "Mẫu tối đa 64 ký tự."
       },
       "abort": {
         "already_configured": "Thực thể này đã được theo dõi.",
@@ -2824,6 +2844,20 @@
         "poster": "Áp phích",
         "square": "Vuông",
         "circle": "Tròn"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Tự động",
+        "distance_m": "Mét",
+        "duration_s": "Giây",
+        "duration_min": "Phút"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Trực tiếp (0-100)",
+        "remaining": "Còn lại (giảm về 0)"
       }
     },
     "battery_sort": {

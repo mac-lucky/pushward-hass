@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Entidad de progreso",
                 "progress_attribute": "Atributo de progreso",
+                "progress_mode": "Modo de progreso",
                 "remaining_time_entity": "Entidad de tiempo restante",
                 "remaining_time_attribute": "Atributo de tiempo restante",
                 "live_progress": "Progreso en vivo (ETA)",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Atributo de activación",
                 "subtitle_entity": "Entidad de subtítulo",
                 "subtitle_attribute": "Atributo de subtítulo",
+                "subtitle_columns": "Columnas del subtítulo",
+                "state_text_entity": "Entidad del texto de estado",
+                "state_text_attribute": "Atributo del texto de estado",
+                "state_text_format": "Formato del texto de estado",
+                "state_text_pattern": "Patrón del texto de estado",
                 "series": "Series",
                 "log_level_attribute": "Atributo de nivel de registro"
               },
               "data_description": {
                 "progress_entity": "Lee el progreso de una entidad distinta en lugar de la entidad rastreada. Déjalo vacío para usar la entidad rastreada. Si el campo de atributo está definido, lee ese atributo de esta entidad; de lo contrario, su estado.",
                 "progress_attribute": "Atributo de la entidad que contiene un valor de progreso entre 0 y 100. Ejemplo: percentage",
+                "progress_mode": "Directo lee la fuente de progreso como 0-100. Restante lee un valor que baja hacia 0 (una distancia, elementos pendientes): la barra se llena desde el mayor valor visto desde que empezó la actividad.",
                 "remaining_time_entity": "Lee el tiempo restante de una entidad distinta (p. ej., el sensor de tiempo de una lavadora). Déjalo vacío para usar la entidad rastreada. Interpreta automáticamente un sensor de marca de tiempo (hora de finalización), un sensor de duración con unidades, una cadena H:MM:SS o segundos sin más.",
                 "remaining_time_attribute": "Atributo de la entidad que contiene el tiempo restante en segundos. Ejemplo: remaining",
                 "live_progress": "Rellena la barra de progreso de forma fluida y cuenta atrás una ETA hasta la hora de finalización en el dispositivo, usando la fuente de tiempo restante indicada arriba. Necesita una entidad o atributo de tiempo restante. En la plantilla steps, rellena el paso actual en lugar de todo el recorrido.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Atributo de la entidad que contiene la marca de tiempo Unix cuando se activó el alert. Solo para la plantilla alert.",
                 "subtitle_entity": "Muestra el subtítulo de una entidad distinta (p. ej., un sensor de programa/modo). Déjalo vacío para usar la entidad rastreada. Usa el estado de la entidad de origen salvo que se defina un atributo.",
                 "subtitle_attribute": "Atributo de la entidad que se muestra como subtítulo. Dejar vacío para usar el nombre descriptivo de la entidad.",
+                "subtitle_columns": "Compone el subtítulo con hasta 6 valores; cada fila es una etiqueta, entidad, atributo y unidad, como en las columnas de registro. Una fila sin etiqueta muestra solo su valor. Cuando alguno se resuelve, reemplazan la fuente del subtítulo.",
+                "state_text_entity": "Muestra un valor de otra entidad en lugar de la etiqueta de estado. Usa su estado salvo que se indique un atributo. Mientras no esté disponible se muestra la etiqueta de estado.",
+                "state_text_attribute": "Atributo que se muestra en lugar de la etiqueta de estado (de la entidad del texto de estado o, si no hay ninguna, de la entidad seguida).",
+                "state_text_format": "Automático: el número de una entidad con su precisión de visualización y su unidad; lo demás tal cual. Metros: 850 m o 3.2 km. Segundos y minutos: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Texto opcional alrededor del valor. Escribe la palabra value entre llaves donde va el valor. Máximo 64 caracteres.",
                 "series": "Asociar atributos de la entidad a series con nombre. Una fila por atributo: el nombre del atributo y su etiqueta de serie. Dejar vacío para usar el estado de la entidad como serie única. Se sigue aceptando una cadena antigua attribute=Etiqueta.",
                 "log_level_attribute": "Atributo que proporciona el nivel de cada línea de registro (info/warn/error). Dejar vacío para no incluir etiqueta de nivel. Solo plantilla de registro."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Nombre de actividad",
                 "icon": "Icono",
                 "icon_attribute": "Atributo de icono",
+                "icon_map": "Icono por estado",
+                "icon_map_entity": "Entidad del estado del icono",
                 "priority": "Prioridad (0-10)",
                 "sound": "Sonido",
                 "update_interval": "Intervalo mínimo de actualización (segundos)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Nombre que se muestra en la actividad de tu teléfono. Por defecto, el nombre descriptivo de la entidad.",
                 "icon": "Sobrescribir el icono. Dejar vacío para usar el icono nativo de la entidad (p. ej. mdi:thermometer). También se admiten SF Symbols (p. ej. lamp.desk.fill).",
                 "icon_attribute": "Atributo de la entidad para el icono dinámico. Tiene prioridad sobre el icono estático y el de la entidad cuando está definido.",
+                "icon_map": "Una fila por estado con el icono que se muestra. La fila que coincide con el estado actual tiene prioridad sobre cualquier otro ajuste de icono. Funcionan los iconos MDI y los SF Symbols.",
+                "icon_map_entity": "Compara las filas de iconos con el estado de esta entidad en lugar del de la entidad seguida (p. ej., un sensor de dirección de viaje).",
                 "priority": "Las actividades de mayor prioridad se conservan más tiempo cuando se alcanza el límite del dispositivo (0 = mínima, 10 = máxima).",
                 "sound": "Sonido que se reproduce en cada actualización para esta entidad. Dejar vacío para no forzar ningún sonido.",
                 "update_interval": "Segundos mínimos entre actualizaciones. Los cambios de estado rápidos se limitan.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Color de acento",
                 "accent_color_attribute": "Atributo de color de acento",
+                "accent_from_progress": "Acento según el progreso",
                 "background_color": "Color de fondo",
                 "background_color_attribute": "Atributo de color de fondo",
                 "text_color": "Color del texto",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Color de acento para la Live Activity. Dejar vacío para el azul predeterminado.",
                 "accent_color_attribute": "Atributo de la entidad para el color de acento dinámico. Tiene prioridad sobre el color estático. Admite RGB, HS, XY, Kelvin, colores con nombre y hexadecimal.",
+                "accent_from_progress": "Colorea el acento según el progreso: rojo en 0, amarillo a la mitad, verde al completarse. Sustituye los ajustes del color de acento; la pantalla final sigue en verde.",
                 "background_color": "Color de fondo de la Live Activity. Dejar vacío para el valor predeterminado.",
                 "background_color_attribute": "Atributo de la entidad para el color de fondo dinámico. Anula el color estático. Admite RGB, HS, XY, Kelvin, colores con nombre y hexadecimal.",
                 "text_color": "Color del texto de la Live Activity. Dejar vacío para el valor predeterminado.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "El botón de favorito debe apuntar a una entidad script (script.something).",
         "invalid_run_while": "Cada condición necesita un entity_id y al menos un estado (p. ej. device_tracker.me con home).",
         "too_many_run_while": "Se admiten como máximo 5 condiciones.",
-        "invalid_calendar_lead_minutes": "La antelación debe ser un número entero de minutos entre 0 y 1440."
+        "invalid_calendar_lead_minutes": "La antelación debe ser un número entero de minutos entre 0 y 1440.",
+        "invalid_icon_map": "Cada icono puede tener como máximo 128 caracteres.",
+        "invalid_state_text_pattern": "El patrón puede tener como máximo 64 caracteres."
       },
       "abort": {
         "already_configured": "Esta entidad ya está rastreada.",
@@ -2824,6 +2844,20 @@
         "poster": "Póster",
         "square": "Cuadrado",
         "circle": "Círculo"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Automático",
+        "distance_m": "Metros",
+        "duration_s": "Segundos",
+        "duration_min": "Minutos"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Directo (0-100)",
+        "remaining": "Restante (baja hacia 0)"
       }
     },
     "battery_sort": {

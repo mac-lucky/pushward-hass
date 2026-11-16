@@ -2210,6 +2210,7 @@
               "data": {
                 "progress_entity": "Progress Entity",
                 "progress_attribute": "Progress Attribute",
+                "progress_mode": "Progress Mode",
                 "remaining_time_entity": "Remaining Time Entity",
                 "remaining_time_attribute": "Remaining Time Attribute",
                 "live_progress": "Live Progress ETA",
@@ -2219,12 +2220,18 @@
                 "fired_at_attribute": "Fired At Attribute",
                 "subtitle_entity": "Subtitle Entity",
                 "subtitle_attribute": "Subtitle Attribute",
+                "subtitle_columns": "Subtitle Columns",
+                "state_text_entity": "State Text Entity",
+                "state_text_attribute": "State Text Attribute",
+                "state_text_format": "State Text Format",
+                "state_text_pattern": "State Text Pattern",
                 "series": "Series",
                 "log_level_attribute": "Log Level Attribute"
               },
               "data_description": {
                 "progress_entity": "Read progress from a separate entity instead of the tracked entity. Leave empty to use the tracked entity. With the attribute field set, reads that attribute of this entity; otherwise its state.",
                 "progress_attribute": "Attribute holding a 0–100 progress value (on the source entity, or the tracked entity if no source is set). Example: percentage",
+                "progress_mode": "Direct reads the progress source as 0-100. Remaining reads a value that falls toward 0 (a distance, items left): the bar fills from the largest value seen since the activity started.",
                 "remaining_time_entity": "Read remaining time from a separate entity (e.g. a washer's time sensor). Leave empty to use the tracked entity. Auto-parses a timestamp (finish-time) sensor, a duration sensor with units, an H:MM:SS string, or plain seconds.",
                 "remaining_time_attribute": "Attribute holding remaining time (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state. Example: remaining",
                 "live_progress": "Fill the progress bar smoothly and count down an ETA to the finish time on the device, using the remaining-time source above. Needs a remaining-time entity or attribute. On the steps template it fills the current step rather than the whole run.",
@@ -2234,6 +2241,11 @@
                 "fired_at_attribute": "Attribute holding the unix timestamp when the alert fired (on the source entity, or the tracked entity if no source is set). Alert template only.",
                 "subtitle_entity": "Show the subtitle from a separate entity (e.g. a program/mode sensor). Leave empty to use the tracked entity. Uses the source entity's state unless an attribute is set.",
                 "subtitle_attribute": "Attribute to show as subtitle (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state, or the friendly name when no source is set.",
+                "subtitle_columns": "Build the subtitle from up to 6 values, each row a label, entity, attribute and unit like Log Columns. A row without a label shows only its value. When any resolves, they replace the subtitle source.",
+                "state_text_entity": "Show a value from a separate entity instead of the state label. Uses its state unless an attribute is set. While it is unavailable the state label is shown.",
+                "state_text_attribute": "Attribute to show instead of the state label (on the state text entity, or the tracked entity if none is set).",
+                "state_text_format": "Automatic: an entity's number at its display precision with its unit, anything else as is. Meters: 850 m or 3.2 km. Seconds and minutes: 45 s, 15 min, 1 h 5 min.",
+                "state_text_pattern": "Optional text around the value. Write the word value in curly braces where the value goes. Max 64 characters.",
                 "series": "Map entity attributes to named series. One row per attribute: the attribute name and its series label. Leave empty to use the entity's state as a single series. A legacy attribute=Label string is still accepted.",
                 "log_level_attribute": "Attribute supplying each log line's level (info/warn/error). Leave empty for no level tag. Log template only."
               }
@@ -2299,6 +2311,8 @@
                 "activity_name": "Activity Name",
                 "icon": "Icon",
                 "icon_attribute": "Icon Attribute",
+                "icon_map": "Icon Per State",
+                "icon_map_entity": "Icon State Entity",
                 "priority": "Priority (0-10)",
                 "sound": "Sound",
                 "update_interval": "Min. Update Interval (seconds)",
@@ -2312,6 +2326,8 @@
                 "activity_name": "Display name shown on the activity on your phone. Defaults to the entity's friendly name.",
                 "icon": "Override icon. Leave empty to use the entity’s native icon (e.g. mdi:thermometer). SF Symbols also supported (e.g. lamp.desk.fill).",
                 "icon_attribute": "Entity attribute for dynamic icon. Overrides static icon and entity icon when set.",
+                "icon_map": "One row per state with the icon to show. A row matching the current state wins over every other icon setting. MDI icons and SF Symbols both work.",
+                "icon_map_entity": "Match the icon rows against this entity's state instead of the tracked entity's (e.g. a direction of travel sensor).",
                 "priority": "Higher priority activities are kept longer when the device limit is reached (0 = lowest, 10 = highest).",
                 "sound": "Sound played on every update for this entity. Leave empty to use no override.",
                 "update_interval": "Minimum seconds between updates. Rapid state changes are throttled.",
@@ -2326,6 +2342,7 @@
               "data": {
                 "accent_color": "Accent Color",
                 "accent_color_attribute": "Accent Color Attribute",
+                "accent_from_progress": "Accent From Progress",
                 "background_color": "Background Color",
                 "background_color_attribute": "Background Color Attribute",
                 "text_color": "Text Color",
@@ -2334,6 +2351,7 @@
               "data_description": {
                 "accent_color": "Accent color for the Live Activity. Leave empty for default blue.",
                 "accent_color_attribute": "Entity attribute for dynamic accent color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
+                "accent_from_progress": "Color the accent by progress: red at 0, yellow halfway, green when full. Overrides the accent color settings; the completion screen stays green.",
                 "background_color": "Background color for the Live Activity. Leave empty for default.",
                 "background_color_attribute": "Entity attribute for dynamic background color. Overrides static color. Supports RGB, HS, XY, Kelvin, named colors, and hex.",
                 "text_color": "Text color for the Live Activity. Leave empty for default.",
@@ -2415,7 +2433,9 @@
         "invalid_favorite_script": "The favorite button must point at a script entity (script.something).",
         "invalid_run_while": "Each condition needs an entity_id and at least one state (e.g. device_tracker.me with home).",
         "too_many_run_while": "At most 5 conditions are supported.",
-        "invalid_calendar_lead_minutes": "Lead time must be a whole number of minutes from 0 to 1440."
+        "invalid_calendar_lead_minutes": "Lead time must be a whole number of minutes from 0 to 1440.",
+        "invalid_icon_map": "Each icon can be at most 128 characters.",
+        "invalid_state_text_pattern": "The pattern can be at most 64 characters."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",
@@ -2824,6 +2844,20 @@
         "poster": "Poster",
         "square": "Square",
         "circle": "Circle"
+      }
+    },
+    "state_text_format": {
+      "options": {
+        "auto": "Automatic",
+        "distance_m": "Meters",
+        "duration_s": "Seconds",
+        "duration_min": "Minutes"
+      }
+    },
+    "progress_mode": {
+      "options": {
+        "direct": "Direct (0-100)",
+        "remaining": "Remaining (falls to 0)"
       }
     },
     "battery_sort": {
