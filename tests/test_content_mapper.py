@@ -81,6 +81,7 @@ from custom_components.pushward.const import (
     IMAGE_THUMBHASH_MAX,
     MAX_COMPACT_TRAILING_ICON_LEN,
     MAX_SEVERITY_LABEL_LEN,
+    MAX_TEXT_LEN,
     MEDIA_DURATION_MAX,
     MEDIA_POSITION_MAX_AGE,
     MEDIA_TITLE_MAX,
@@ -123,6 +124,14 @@ from .server_contract import assert_valid_activity_content
 )
 def test_sanitize_slug(entity_id: str, expected: str):
     assert sanitize_slug(entity_id) == expected
+
+
+def test_sanitize_slug_long_entity_id_stays_within_server_max():
+    """The ha- prefix counts toward the 128-char cap, so a long object id still yields a valid slug."""
+    slug = sanitize_slug("sensor." + "a" * 140)
+    assert len(slug) == 128
+    assert slug.startswith("ha-sensor-a")
+    validate_slug(slug)
 
 
 # --- normalize_slug ---
@@ -957,6 +966,17 @@ def test_map_content_subtitle_attribute_empty():
     content = map_content(state, config)
 
     assert content["subtitle"] == "Lamp"
+
+
+def test_map_content_subtitle_capped_at_server_limit():
+    """An over-long subtitle source is cut to MAX_TEXT_LEN rather than refusing the push."""
+    state = _make_state("on", {"friendly_name": "Lamp", "note": "n" * 400})
+    config = {CONF_TEMPLATE: "generic", CONF_SUBTITLE_ATTRIBUTE: "note"}
+
+    content = map_content(state, config)
+
+    assert content["subtitle"] == "n" * MAX_TEXT_LEN
+    assert_valid_activity_content(content, where="long subtitle")
 
 
 # --- Feature 2: state labels ---
@@ -3672,6 +3692,12 @@ def test_media_title_is_truncated_to_the_server_cap():
 def test_media_subtitle_falls_through_the_attribute_chain(attrs, expected):
     content = map_content(_media_state(**attrs), {CONF_TEMPLATE: "media"})
     assert content["subtitle"] == expected
+
+
+def test_media_subtitle_capped_at_server_limit():
+    content = map_content(_media_state(media_artist="a" * 400), {CONF_TEMPLATE: "media"})
+    assert content["subtitle"] == "a" * MAX_TEXT_LEN
+    assert_valid_activity_content(content, where="long media artist")
 
 
 def test_media_subtitle_respects_a_configured_source():

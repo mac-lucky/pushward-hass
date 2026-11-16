@@ -195,7 +195,7 @@ def sanitize_slug(entity_id: str) -> str:
 
     sensor.washing_machine_status -> ha-sensor-washing-machine-status
     """
-    return f"ha-{normalize_slug(entity_id)}"
+    return normalize_slug(f"ha-{entity_id}")
 
 
 def color_to_str(value: object) -> str:
@@ -841,7 +841,7 @@ def _apply_media_fields(
     # over that default, never over a configured source.
     configured_subtitle = entity_config.get(CONF_SUBTITLE_ENTITY) or entity_config.get(CONF_SUBTITLE_ATTRIBUTE)
     if not configured_subtitle and (subtitle := _first_attr(state, _MEDIA_SUBTITLE_ATTRS)):
-        content["subtitle"] = subtitle
+        content["subtitle"] = subtitle[:MAX_TEXT_LEN]
 
     content["playback_state"] = _PLAYBACK_STATES.get(state.state, "stopped")
 
@@ -1177,7 +1177,7 @@ def map_content(
 
     # Subtitle: subtitle_entity/subtitle_attribute > friendly_name
     raw_subtitle, _ = _resolve_raw(state, entity_config, CONF_SUBTITLE_ENTITY, CONF_SUBTITLE_ATTRIBUTE, hass)
-    subtitle = str(raw_subtitle) if raw_subtitle is not _NO_VALUE else state.attributes.get("friendly_name", "")
+    subtitle = str(raw_subtitle) if raw_subtitle is not _NO_VALUE else str(state.attributes.get("friendly_name") or "")
 
     # Accent color resolution: accent_color_attribute > static accent_color > "blue"
     accent = resolve_color(state, entity_config, CONF_ACCENT_COLOR, CONF_ACCENT_COLOR_ATTRIBUTE) or "blue"
@@ -1196,7 +1196,7 @@ def map_content(
         ),
         "state": state_text,
         "icon": icon,
-        "subtitle": subtitle,
+        "subtitle": subtitle[:MAX_TEXT_LEN],
         "accent_color": accent,
     }
 
