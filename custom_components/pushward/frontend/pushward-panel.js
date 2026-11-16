@@ -14,6 +14,7 @@ const FLOW_HEADERS = { "HA-Frontend-Base": `${location.protocol}//${location.hos
 const REFRESH_MS = 1000;
 const DRAFT_MS = 300;
 const FORM_WAIT_MS = 5000;
+const LAST_SENT_KEY = "pushward-panel:last-sent";
 
 // No version query: the embed's chunks import the entry by its bare URL, and a second URL would load it twice.
 const EMBED_URL = new URL("./embed/pushward-embed.js", import.meta.url).href;
@@ -54,6 +55,19 @@ function debounce(fn, ms) {
   };
   run.cancel = () => clearTimeout(timer);
   return run;
+}
+
+/** The test items still on a phone, "entry_id:kind" -> subentry_id, as stored across visits; unreadable counts as none. */
+function loadLastSent() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(LAST_SENT_KEY));
+    if (stored && typeof stored === "object" && !Array.isArray(stored)) {
+      return Object.fromEntries(Object.entries(stored).filter(([, id]) => typeof id === "string"));
+    }
+  } catch (_err) {
+    // Corrupt or blocked storage: start empty.
+  }
+  return {};
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -260,7 +274,7 @@ class PushWardPanel extends HTMLElement {
     this._unloaded = [];
     this._subentries = {}; // entry_id -> its subentries
     this._cards = new Map(); // subentry_id -> card state
-    this._lastSent = {}; // "entry_id:kind" -> the card whose test item is on that account's phone
+    this._lastSent = loadLastSent(); // "entry_id:kind" -> the card whose test item is on that account's phone
     this._localizers = [];
     this._loadSeq = 0;
     this._scheduleLoad = debounce(() => this._load(), 500);
@@ -301,6 +315,8 @@ class PushWardPanel extends HTMLElement {
   disconnectedCallback() {
     this._unsubscribe?.then((unsub) => unsub?.()).catch(() => {});
     this._unsubscribe = null;
+    // Nothing fires from a panel that is gone: the list reload, the draft preview (closing cancels it), card refreshes.
+    this._scheduleLoad.cancel();
     this._closeEditor();
     for (const card of this._cards.values()) {
       clearTimeout(card.timer);
@@ -341,7 +357,7 @@ class PushWardPanel extends HTMLElement {
 
   _loadTranslations() {
     const hass = this._hass;
-    this._localizers = [];
+    // The previous language's localizers answer until the new ones are in, so no raw key shows meanwhile.
     const loads = [
       hass.loadBackendTranslation("config_subentries", DOMAIN),
       hass.loadBackendTranslation("selector", DOMAIN),
@@ -357,7 +373,7 @@ class PushWardPanel extends HTMLElement {
       this._ready = true;
       this._render();
       // When the list arrived first, its cards are drawn only now and still need their previews.
-      if (this._loaded && this._tab === "tracked" && !this._editor) this._refreshAll();
+      if (this._loaded && this._tab === "tracked" && !this._editor && this.isConnected) this._refreshAll();
     });
   }
 
@@ -367,7 +383,7 @@ class PushWardPanel extends HTMLElement {
     if (old.language !== hass.language) this._loadTranslations();
     if (old.localize !== hass.localize) this._render();
     if (old.language !== hass.language || old.themes?.darkMode !== hass.themes?.darkMode) this._applyLook();
-    if (this._tab !== "tracked" || this._editor || old.states === hass.states) return;
+    if (!this.isConnected || this._tab !== "tracked" || this._editor || old.states === hass.states) return;
     for (const card of this._cards.values()) {
       if (card.timer || !card.entityIds.some((id) => old.states[id] !== hass.states[id])) continue;
       // Changes within a second share one preview call, also for an entity that changes every moment.
@@ -442,13 +458,17 @@ class PushWardPanel extends HTMLElement {
       const lists = await Promise.all(
         loaded.map((entry) => hass.callWS({ type: "config_entries/subentries/list", entry_id: entry.entry_id }))
       );
-      if (seq !== this._loadSeq) return;
+      // A reply that comes back after the panel left is dropped; coming back loads again.
+      if (seq !== this._loadSeq || !this.isConnected) return;
       this._entries = loaded;
       this._unloaded = entries.filter((entry) => entry.state !== "loaded");
       this._subentries = Object.fromEntries(loaded.map((entry, i) => [entry.entry_id, lists[i]]));
       this._loadError = null;
+      // A removed entry took its test items with it.
+      const ids = new Set(entries.map((entry) => entry.entry_id));
+      for (const key of Object.keys(this._lastSent)) if (!ids.has(key.split(":")[0])) this._setLastSent(key, null);
     } catch (err) {
-      if (seq !== this._loadSeq) return;
+      if (seq !== this._loadSeq || !this.isConnected) return;
       this._loadError = err;
     }
     this._loaded = true;
@@ -475,15 +495,17 @@ class PushWardPanel extends HTMLElement {
 
   _render() {
     if (!this._root) return;
+    // The tabs wait for the panel's strings, so a cold load never shows their keys.
     fill(
       this._tabs,
-      Object.entries(TABS).map(([tab, label]) =>
-        h(
-          "button",
-          { class: "tab", role: "tab", "aria-selected": String(this._tab === tab), "@click": () => this._setTab(tab) },
-          this._p(label)
+      this._ready &&
+        Object.entries(TABS).map(([tab, label]) =>
+          h(
+            "button",
+            { class: "tab", role: "tab", "aria-selected": String(this._tab === tab), "@click": () => this._setTab(tab) },
+            this._p(label)
+          )
         )
-      )
     );
     if (!this._ready || !this._loaded) {
       fill(this._main, h("p", { class: "note" }, this._t("ui.common.loading")));
@@ -555,13 +577,28 @@ class PushWardPanel extends HTMLElement {
     }
     card.entryId = entry.entry_id;
     card.sub = sub;
-    card.el = h("article", { class: "card" });
+    const kind = KINDS[sub.subentry_type];
+    // Built once per render: a refresh repaints only the preview, the status and the buttons' state, so focus stays.
+    card.previewBox = h("div");
+    card.statusEl = h("p", { role: "status" });
+    card.buttons = {
+      send: h("button", { "@click": () => this._send(card, "send") }, this._p("send")),
+      end: h("button", { "@click": () => this._send(card, "end") }, this._p("end")),
+      playground: h(
+        "button",
+        { "@click": () => this._openPlayground(card.entryId, kind, card.result.payload) },
+        this._p("open_playground")
+      ),
+    };
+    card.actions = h("div", { class: "actions" });
+    card.el = h("article", { class: "card" }, h("h4", {}, sub.title), card.previewBox, card.statusEl, card.actions);
+    this._paintActions(card);
     this._paintCard(card);
     return card.el;
   }
 
   _paintCard(card) {
-    const { sub, result, error } = card;
+    const { sub, result, error, status, buttons } = card;
     const kind = KINDS[sub.subentry_type];
     const payload = result?.available ? result.payload : null;
     let preview;
@@ -570,41 +607,48 @@ class PushWardPanel extends HTMLElement {
     else if (!payload) preview = h("p", { class: "note" }, this._p("unavailable"));
     else if (this._embedOk === false) preview = h("p", { class: "note" }, this._p("embed_unavailable"));
     else preview = this._previewEl(card, kind, payload);
+    if (card.previewBox.firstChild !== preview) fill(card.previewBox, preview);
 
-    const actions = card.confirming
-      ? [
-          h("span", {}, this._p("delete_confirm", { name: sub.title })),
-          h("button", { class: "danger", "@click": () => this._delete(card) }, this._t("ui.common.delete")),
-          h("button", { "@click": () => this._paintConfirm(card, false) }, this._t("ui.common.cancel")),
-        ]
-      : [
-          h(
-            "button",
-            { "@click": () => this._openEditor(card.entryId, sub.subentry_type, sub.subentry_id) },
-            this._t("ui.common.edit")
-          ),
-          h("button", { class: "danger", "@click": () => this._paintConfirm(card, true) }, this._t("ui.common.delete")),
-          h("button", { ".disabled": !payload || card.busy, "@click": () => this._send(card, "send") }, this._p("send")),
-          this._lastSent[`${card.entryId}:${kind}`] === card.id &&
-            h("button", { ".disabled": card.busy, "@click": () => this._send(card, "end") }, this._p("end")),
-          h(
-            "button",
-            { ".disabled": !payload, "@click": () => this._openPlayground(card.entryId, kind, payload) },
-            this._p("open_playground")
-          ),
-        ];
+    card.statusEl.hidden = !status;
+    if (status) {
+      card.statusEl.className = status.ok ? "note" : "error";
+      // Unchanged text stays as it is, or the live region would announce it again.
+      if (card.statusEl.textContent !== status.text) card.statusEl.textContent = status.text;
+    }
+    buttons.send.disabled = !payload || Boolean(card.busy);
+    buttons.end.disabled = Boolean(card.busy);
+    buttons.end.hidden = this._lastSent[`${card.entryId}:${kind}`] !== card.id;
+    buttons.playground.disabled = !payload;
+  }
+
+  /** The action row: the card's buttons, or the delete confirmation in their place. */
+  _paintActions(card) {
+    const { sub, buttons } = card;
     fill(
-      card.el,
-      h("h4", {}, sub.title),
-      preview,
-      card.status && h("p", { class: card.status.ok ? "note" : "error", role: "status" }, card.status.text),
-      h("div", { class: "actions" }, actions)
+      card.actions,
+      card.confirming
+        ? [
+            h("span", {}, this._p("delete_confirm", { name: sub.title })),
+            h("button", { class: "danger", "@click": () => this._delete(card) }, this._t("ui.common.delete")),
+            h("button", { "@click": () => this._paintConfirm(card, false) }, this._t("ui.common.cancel")),
+          ]
+        : [
+            h(
+              "button",
+              { "@click": () => this._openEditor(card.entryId, sub.subentry_type, sub.subentry_id) },
+              this._t("ui.common.edit")
+            ),
+            h("button", { class: "danger", "@click": () => this._paintConfirm(card, true) }, this._t("ui.common.delete")),
+            buttons.send,
+            buttons.end,
+            buttons.playground,
+          ]
     );
   }
 
   _paintConfirm(card, confirming) {
     card.confirming = confirming;
-    this._paintCard(card);
+    this._paintActions(card);
   }
 
   _refreshAll() {
@@ -622,8 +666,8 @@ class PushWardPanel extends HTMLElement {
     } catch (err) {
       error = err;
     }
-    // A slower, older reply never paints over a newer one.
-    if (ticket !== card.seq) return;
+    // A slower, older reply never paints over a newer one, and one for a panel that left is dropped.
+    if (ticket !== card.seq || !this.isConnected) return;
     card.result = result;
     card.error = error;
     if (result) card.entityIds = result.entity_ids || [];
@@ -643,7 +687,7 @@ class PushWardPanel extends HTMLElement {
       const msg = { type: "pushward/send_test", entry_id: card.entryId, kind, action };
       if (action === "send") msg.payload = card.result.payload;
       await this._hass.callWS(msg);
-      if (kind !== "notification") this._lastSent[`${card.entryId}:${kind}`] = action === "send" ? card.id : undefined;
+      if (kind !== "notification") this._setLastSent(`${card.entryId}:${kind}`, action === "send" ? card.id : null);
       card.status = { ok: true, text: action === "send" ? this._p("sent") : this._p("ended") };
     } catch (err) {
       card.status = { ok: false, text: errorText(err) };
@@ -653,12 +697,23 @@ class PushWardPanel extends HTMLElement {
     for (const other of this._cards.values()) if (other.el) this._paintCard(other);
   }
 
+  /** Remember (cardId) or forget (null) the test item on a phone, across visits and reloads. */
+  _setLastSent(key, cardId) {
+    if (cardId) this._lastSent[key] = cardId;
+    else delete this._lastSent[key];
+    try {
+      localStorage.setItem(LAST_SENT_KEY, JSON.stringify(this._lastSent));
+    } catch (_err) {
+      // Full or blocked storage: End is then offered for this visit only.
+    }
+  }
+
   async _delete(card) {
     try {
       await this._hass.callWS({ type: "config_entries/subentries/delete", entry_id: card.entryId, subentry_id: card.id });
     } catch (err) {
-      card.confirming = false;
       card.status = { ok: false, text: errorText(err) };
+      this._paintConfirm(card, false);
       this._paintCard(card);
       return;
     }
@@ -924,7 +979,9 @@ class PushWardPanel extends HTMLElement {
     const step = ed.step;
     if (ed.type === "tracked_todo" || step.step_id === "details") {
       const data = { ...ed.step1, ...submitData(step.data_schema, ed.data) };
-      return data.entity_id ? { subentry_type: ed.type, data } : null;
+      if (!data.entity_id) return null;
+      // On reconfigure the saved subentry supplies the defaults its form fills on submit.
+      return ed.subentryId ? { subentry_type: ed.type, subentry_id: ed.subentryId, data } : { subentry_type: ed.type, data };
     }
     return ed.subentryId ? { subentry_id: ed.subentryId } : null;
   }
