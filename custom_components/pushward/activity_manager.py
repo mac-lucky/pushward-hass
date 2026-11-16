@@ -16,7 +16,7 @@ from typing import Any, Literal
 import aiohttp
 from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
+from homeassistant.const import ATTR_ENTITY_PICTURE, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import (
@@ -47,6 +47,8 @@ from .const import (
     CONF_FIRED_AT_ENTITY,
     CONF_HISTORY_PERIOD,
     CONF_ICON_MAP_ENTITY,
+    CONF_IMAGE_SHAPE,
+    CONF_IMAGE_THUMBHASH,
     CONF_LOG_COLUMNS,
     CONF_PRIORITY,
     CONF_PROGRESS_ENTITY,
@@ -1008,7 +1010,12 @@ class ActivityManager:
         if requested:
             # Paused from the failure, not the request: the client may have retried it for a while.
             interval = config.get(CONF_UPDATE_INTERVAL, 5)
-            tracked.start_retry_at = time.monotonic() + max(interval, _START_RETRY_MIN_S)
+            pause = max(interval, _START_RETRY_MIN_S)
+            tracked.start_retry_at = time.monotonic() + pause
+            if tracked.update_pending and tracked.retry_unsub is None:
+                # A change landed while this start was on the wire: retry it once the pause ends.
+                tracked.update_pending = False
+                tracked.retry_unsub = async_call_later(self._hass, pause, partial(self._on_start_retry, entity_id))
 
     def _activity_name(self, entity_id: str, config: dict) -> str:
         """Resolve activity name: configured name > friendly name > entity_id."""
@@ -1106,8 +1113,8 @@ class ActivityManager:
             # The completion card owns the activity during the end window; a live
             # update here would overwrite it moments before ENDED lands.
             return
-        if tracked.pending_task is not None and not tracked.pending_task.done():
-            # A send is in flight; mark dirty so the newest state goes out after.
+        if self._in_flight(tracked):
+            # Mark dirty so the newest state goes out after it.
             tracked.update_pending = True
             return
 
@@ -1131,6 +1138,18 @@ class ActivityManager:
         task = self._hass.async_create_task(self._send_update(entity_id))
         tracked.pending_task = task
         task.add_done_callback(partial(self._on_send_done, entity_id))
+
+    @staticmethod
+    def _in_flight(tracked: TrackedEntity) -> bool:
+        """Whether a send or a (re)start of this entity runs, other than the caller.
+
+        A send during a restart would build on the previous run's frame.
+        """
+        current = asyncio.current_task()
+        return any(
+            task is not None and not task.done() and task is not current
+            for task in (tracked.pending_task, tracked.start_task)
+        )
 
     def _on_send_done(self, entity_id: str, task: asyncio.Task) -> None:
         tracked = self._tracked.get(entity_id)
@@ -1175,6 +1194,19 @@ class ActivityManager:
         # cover art resolves first, so the URL it may have found gets a hash too.
         await async_ensure_media_artwork(self._hass, current_state, tracked.config, content)
         await async_ensure_thumbhash(self._hass, content)
+        # A failed cover-art read is not "no artwork": while the player still has a
+        # picture, keep the art on the card instead of clearing it.
+        last = tracked.last_content
+        if (
+            last
+            and CONF_IMAGE_THUMBHASH in last
+            and CONF_IMAGE_THUMBHASH not in content
+            and tracked.config.get(CONF_TEMPLATE) == "media"
+            and current_state.attributes.get(ATTR_ENTITY_PICTURE)
+        ):
+            content[CONF_IMAGE_THUMBHASH] = last[CONF_IMAGE_THUMBHASH]
+            if CONF_IMAGE_SHAPE in last:
+                content.setdefault(CONF_IMAGE_SHAPE, last[CONF_IMAGE_SHAPE])
         if content == tracked.last_content:
             return
 
@@ -1222,7 +1254,7 @@ class ActivityManager:
         tracked.flush_unsub = None
         if not tracked.is_active or self._is_ending(tracked):
             return
-        if tracked.pending_task is not None and not tracked.pending_task.done():
+        if self._in_flight(tracked):
             tracked.update_pending = True
             return
         self._spawn_send(entity_id, tracked)

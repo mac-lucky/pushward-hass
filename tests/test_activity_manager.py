@@ -65,6 +65,7 @@ from custom_components.pushward.const import (
     LOG_MAX_LINES,
 )
 from custom_components.pushward.content_mapper import OPTIONAL_CONTENT_KEYS
+from custom_components.pushward.image_hash import clear_thumbhash_cache
 from custom_components.pushward.media_control import EMITTED_CONTROL_SLOTS
 from custom_components.pushward.quota import quota_released_signal
 
@@ -637,6 +638,55 @@ async def test_start_state_reached_during_the_pause_starts_once_it_ends(hass: Ho
     await hass.async_block_till_done()
     assert api.create_activity.await_count == 2
     assert manager._tracked["binary_sensor.washer"].is_active
+    await manager.async_stop()
+
+
+async def test_change_during_a_failed_start_is_retried_once_the_pause_ends(hass: HomeAssistant, freezer) -> None:
+    """A change that landed while a start was on the wire is not lost when that start fails."""
+    api = _mock_api()
+    gate = asyncio.Event()
+
+    async def _fails_after_a_while(*_args, **_kwargs) -> None:
+        await gate.wait()
+        raise PushWardApiError("unavailable", status_code=503)
+
+    api.create_activity.side_effect = _fails_after_a_while
+    manager = ActivityManager(hass, api, [_entity_config(**{CONF_PROGRESS_ATTRIBUTE: "progress"})], _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 1})
+    await _pump()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 2})
+    await _pump()
+    gate.set()
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
+
+    api.create_activity.side_effect = None
+    freezer.tick(timedelta(seconds=31))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+    assert api.create_activity.await_count == 2
+    assert manager._tracked["binary_sensor.washer"].is_active
+    await manager.async_stop()
+
+
+async def test_no_update_goes_out_while_a_restart_is_on_the_wire(hass: HomeAssistant) -> None:
+    """A change during a restart waits for it: a send now would build on the previous run's frame."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 0, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager, tracked = await _start_active(hass, api, config, off_attrs={"progress": 0}, on_attrs={"progress": 1})
+    api.reset_mock()
+    gate = asyncio.Event()
+    tracked.start_task = hass.async_create_task(gate.wait())
+
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 2})
+    await _pump()
+
+    api.update_activity.assert_not_awaited()
+    assert tracked.update_pending
+    gate.set()
+    await hass.async_block_till_done()
     await manager.async_stop()
 
 
@@ -2763,6 +2813,25 @@ async def test_media_unreadable_cover_art_does_not_block_the_push(hass: HomeAssi
     assert content["media_title"] == "Snooze"
     assert_valid_activity_content(content, where="media without artwork")
 
+    await manager.async_stop()
+
+
+async def test_media_keeps_its_cover_art_when_a_later_read_fails(hass: HomeAssistant) -> None:
+    """A failed re-read once the hash cache expired is not "no artwork": the card keeps its art."""
+    api = _mock_api()
+    body = png_bytes(16, 16)
+    with patch_media_image(hass, body):
+        manager = await _start_player(hass, api, _media_config(), entity_picture=_MEDIA_PICTURE)
+
+    clear_thumbhash_cache(hass)
+    with patch_media_image(hass, None, error=RuntimeError("cloud API is down")):
+        await bump_state(
+            manager, hass, _MEDIA_ENTITY, _MEDIA_ENTITY, "paused", _media_attrs(entity_picture=_MEDIA_PICTURE)
+        )
+
+    content = activity_updates(api, "ongoing")[-1]
+    assert content["playback_state"] == "paused"
+    assert content["image_thumbhash"] == expected_thumbhash(body)
     await manager.async_stop()
 
 
