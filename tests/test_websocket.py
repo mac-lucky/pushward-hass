@@ -16,7 +16,7 @@ from homeassistant.components import frontend
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 from homeassistant.data_entry_flow import InvalidData
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.pushward import panel
 from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
@@ -24,6 +24,8 @@ from custom_components.pushward.const import (
     CONF_BATTERY_DEVICES,
     CONF_CHARGING_ENTITY,
     CONF_ENTITY_ID,
+    CONF_HEATMAP_AGGREGATE,
+    CONF_HEATMAP_WEEKS,
     CONF_HISTORY_PERIOD,
     CONF_IMAGE_URL,
     CONF_INTEGRATION_KEY,
@@ -52,6 +54,7 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_TODO,
     SUBENTRY_TYPE_WIDGET,
     WIDGET_TEMPLATE_BATTERY,
+    WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_TREND,
 )
@@ -248,6 +251,7 @@ async def test_preview_saved_running_activity_is_its_last_pushed_frame(hass: Hom
         "errors": None,
         "available": True,
         "entity_ids": [WASHER],
+        "pending": False,
     }
 
 
@@ -303,6 +307,7 @@ async def test_preview_draft_activity_errors_match_the_details_step(hass: HomeAs
         "errors": flow["errors"],
         "available": False,
         "entity_ids": [],
+        "pending": False,
     }
 
 
@@ -352,6 +357,7 @@ async def test_preview_unavailable_entity(hass: HomeAssistant, loaded, ws) -> No
         "errors": None,
         "available": False,
         "entity_ids": ["sensor.missing"],
+        "pending": False,
     }
 
 
@@ -379,6 +385,7 @@ async def test_preview_saved_widget_without_its_entity_is_unavailable(hass: Home
         "errors": None,
         "available": False,
         "entity_ids": ["sensor.users"],
+        "pending": False,
     }
 
 
@@ -560,6 +567,105 @@ async def test_preview_names_the_entities_each_subentry_reads(hass: HomeAssistan
     assert await bound(SUBENTRY_TYPE_ENTITY) == ["binary_sensor.home", "sensor.progress", "sensor.cpu"]
     assert await bound(SUBENTRY_TYPE_WIDGET) == ["sensor.phone", "binary_sensor.charging", "sensor.watch"]
     assert await bound(SUBENTRY_TYPE_TODO) == [EMPTY_LIST]
+
+
+async def test_preview_saved_activity_is_pending_while_its_throttled_push_waits(
+    hass: HomeAssistant, loaded, ws, freezer
+) -> None:
+    entry, _ = loaded
+    tracked = _loaded_data(hass, entry)["manager"]._tracked[WASHER]
+    subentry_id = _subentry_id(entry, SUBENTRY_TYPE_ENTITY)
+
+    async def preview() -> dict:
+        return (await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id))["result"]
+
+    assert (await preview())["pending"] is False
+
+    # Inside update_interval of the last push: the manager defers the next one.
+    hass.states.async_set(WASHER, "on", {"friendly_name": "Washer", "remaining": 12})
+    await hass.async_block_till_done()
+    assert tracked.flush_unsub is not None
+    assert (await preview())["pending"] is True
+
+    freezer.tick(10)
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+    assert tracked.flush_unsub is None
+    assert (await preview())["pending"] is False
+
+
+async def test_preview_saved_widget_is_pending_while_its_push_is_in_flight(hass: HomeAssistant, loaded, ws) -> None:
+    entry, api = loaded
+    subentry_id = _subentry_id(entry, SUBENTRY_TYPE_WIDGET)
+    release = asyncio.Event()
+
+    async def slow_patch(*_args: Any, **_kwargs: Any) -> None:
+        await release.wait()
+
+    api.patch_widget.side_effect = slow_patch
+    hass.states.async_set("sensor.users", "43", {"friendly_name": "Users"})
+    await asyncio.sleep(0)
+
+    reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id)
+    assert reply["result"]["pending"] is True
+
+    release.set()
+    await hass.async_block_till_done()
+    reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id)
+    assert reply["result"]["pending"] is False
+    assert reply["result"]["payload"]["content"]["value"] == 43
+
+
+async def test_preview_draft_is_never_pending(loaded, ws) -> None:
+    entry, _ = loaded
+    reply = await ws(
+        "pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_TODO, data={CONF_ENTITY_ID: TODO_LIST}
+    )
+    assert reply["result"]["pending"] is False
+
+
+async def test_preview_saved_heatmap_reuses_the_managers_read_of_today(hass: HomeAssistant, ws) -> None:
+    heatmap = make_widget_config(
+        **{
+            CONF_ENTITY_ID: "sensor.energy",
+            CONF_SLUG: "ha-energy",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_HEATMAP,
+            CONF_MIN_VALUE: None,
+            CONF_MAX_VALUE: None,
+            CONF_HEATMAP_WEEKS: 1,
+            CONF_HEATMAP_AGGREGATE: "change",
+        }
+    )
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="PushWard",
+        data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: "hlk_heatmap"},
+        version=2,
+        unique_id="user-heatmap",
+        subentries_data=[
+            ConfigSubentryData(data=heatmap, subentry_type=SUBENTRY_TYPE_WIDGET, title="Energy", unique_id="ha-energy")
+        ],
+    )
+    hass.states.async_set("sensor.energy", "120.5", {"friendly_name": "Energy", "unit_of_measurement": "kWh"})
+    week = [1.0, None, 3.0, 4.0, 5.0, 6.0, 7.5]
+    with patch("custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=week)):
+        await async_setup_with_api(hass, entry, _api())
+    tracked = _loaded_data(hass, entry)["widget_manager"]._tracked["ha-energy"]
+    subentry_id = _subentry_id(entry, SUBENTRY_TYPE_WIDGET)
+
+    with patch("custom_components.pushward.websocket.async_daily_values", AsyncMock(return_value=week)) as read:
+        for value in ("121", "122", "123"):
+            hass.states.async_set("sensor.energy", value, {"friendly_name": "Energy", "unit_of_measurement": "kWh"})
+            reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id)
+            assert reply["result"]["available"]
+        read.assert_not_awaited()
+
+        # Once the hourly read is due again, a preview reads for itself rather than show a stale day.
+        tracked.cells_read_day = None
+        tracked.last_content = None
+        reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id)
+        read.assert_awaited_once_with(hass, "sensor.energy", 7, "change")
+    assert reply["result"]["payload"]["content"]["cells"] == week
 
 
 @pytest.mark.parametrize(

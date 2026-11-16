@@ -8,6 +8,7 @@ embedded playground's requests, limited to an allowlist of endpoints.
 
 from __future__ import annotations
 
+import asyncio
 import json
 from collections.abc import Callable, Coroutine
 from functools import wraps
@@ -18,6 +19,7 @@ import voluptuous as vol
 from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import section
+from homeassistant.util import dt as dt_util
 
 from .activity_manager import _companion_entity_ids
 from .api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
@@ -229,13 +231,20 @@ async def _widget_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: boo
     if tracked is not None:
         scratch.points_buffer.extend(tracked.points_buffer)
     await widget_manager._seed_points(scratch)
+    cells = None
+    if heatmap:
+        # The manager's read of today when it has one: the panel previews on every state change.
+        if tracked is not None and tracked.cells_read_day == dt_util.now().date():
+            cells = tracked.cells
+        else:
+            cells = await async_daily_values(hass, *heatmap_read(cfg))
     # Mapped fresh even when a frame was sent: what cannot map now, the manager no longer pushes.
     content = map_widget_content(
         hass,
         cfg,
         registry_icon=widget_manager._lookup_registry_icon(cfg),
         points=widget_manager._sample_points(scratch),
-        cells=await async_daily_values(hass, *heatmap_read(cfg)) if heatmap else None,
+        cells=cells,
     )
     if content is None:
         return None
@@ -256,6 +265,30 @@ def _bound_entity_ids(subentry_type: str, cfg: dict) -> list[str]:
     if subentry_type == SUBENTRY_TYPE_WIDGET:
         return _entity_ids_for_widget(cfg)
     return [cfg[CONF_ENTITY_ID]]
+
+
+def _running(task: asyncio.Task | None) -> bool:
+    return task is not None and not task.done()
+
+
+def _push_pending(data: dict, subentry_type: str, cfg: dict) -> bool:
+    """Whether a manager still has a push of this subentry queued, in flight or ending.
+
+    A saved preview shows the last pushed frame, so until that push lands it shows
+    the one before; the panel asks again while this is true.
+    """
+    if subentry_type == SUBENTRY_TYPE_ENTITY:
+        activity = data["manager"]._tracked.get(cfg[CONF_ENTITY_ID])
+        return activity is not None and (
+            activity.flush_unsub is not None
+            or activity.update_pending
+            or _running(activity.pending_task)
+            or _running(activity.end_task)
+        )
+    if subentry_type == SUBENTRY_TYPE_WIDGET:
+        widget = data["widget_manager"]._tracked.get(cfg[CONF_SLUG])
+        return widget is not None and (widget.update_pending or _running(widget.pending_task))
+    return False
 
 
 _PREVIEWS = {
@@ -310,6 +343,7 @@ async def ws_preview(hass: HomeAssistant, connection: websocket_api.ActiveConnec
             "errors": errors or None,
             "available": payload is not None,
             "entity_ids": _bound_entity_ids(subentry_type, cfg) if cfg is not None else [],
+            "pending": saved and _push_pending(data, subentry_type, cfg),
         },
     )
 
