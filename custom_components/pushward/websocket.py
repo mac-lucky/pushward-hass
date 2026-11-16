@@ -58,7 +58,7 @@ from .const import (
 from .content_mapper import lookup_registry_icon, map_content
 from .e2e import E2EError, seal
 from .recorder_history import async_daily_values
-from .widget_manager import heatmap_read
+from .widget_manager import TrackedWidget, heatmap_read
 from .widget_mapper import map_widget_content, widget_name_from_config
 
 PREVIEW_ACTIVITY_SLUG = "ha-preview"
@@ -222,17 +222,23 @@ async def _activity_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: b
 async def _widget_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: bool) -> dict | None:
     widget_manager = data["widget_manager"]
     heatmap = cfg.get(CONF_WIDGET_TEMPLATE) == WIDGET_TEMPLATE_HEATMAP
+    tracked = widget_manager._tracked.get(cfg[CONF_SLUG]) if saved else None
+    # Trend points sampled the way a push samples them, on a copy so the manager's buffer stays as it is.
+    scratch = TrackedWidget(config=cfg)
+    if tracked is not None:
+        scratch.points_buffer.extend(tracked.points_buffer)
+    await widget_manager._seed_points(scratch)
     # Mapped fresh even when a frame was sent: what cannot map now, the manager no longer pushes.
     content = map_widget_content(
         hass,
         cfg,
         registry_icon=widget_manager._lookup_registry_icon(cfg),
+        points=widget_manager._sample_points(scratch),
         cells=await async_daily_values(hass, *heatmap_read(cfg)) if heatmap else None,
     )
     if content is None:
         return None
-    tracked = widget_manager._tracked.get(cfg[CONF_SLUG]) if saved else None
-    # The last sent frame carries the trend points a fresh map has none of.
+    # The last sent frame matches what the phone shows (its trend arrow included).
     if tracked is not None and tracked.last_content is not None:
         content = tracked.last_content
     return {"name": widget_name_from_config(cfg, hass), "template": cfg[CONF_WIDGET_TEMPLATE], "content": content}

@@ -21,6 +21,7 @@ from custom_components.pushward import panel
 from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
 from custom_components.pushward.const import (
     CONF_ENTITY_ID,
+    CONF_HISTORY_PERIOD,
     CONF_IMAGE_URL,
     CONF_INTEGRATION_KEY,
     CONF_MAX_VALUE,
@@ -45,6 +46,7 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_TODO,
     SUBENTRY_TYPE_WIDGET,
     WIDGET_TEMPLATE_STAT_LIST,
+    WIDGET_TEMPLATE_TREND,
 )
 from custom_components.pushward.e2e import E2EError, open_envelope
 from custom_components.pushward.panel import PANEL_URL_PATH, STATIC_URL_PATH
@@ -356,6 +358,55 @@ async def test_preview_draft_widget(hass: HomeAssistant, loaded, ws) -> None:
     assert payload["name"] == "Draft"
     assert payload["template"] == "value"
     assert payload["content"]["value"] == 21.5
+    assert api.mock_calls == []
+
+
+async def test_preview_saved_trend_widget_has_its_points(hass: HomeAssistant, loaded, ws) -> None:
+    trend = make_widget_config(
+        **{CONF_ENTITY_ID: "sensor.temp", CONF_SLUG: "ha-temp", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_TREND}
+    )
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="PushWard",
+        data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: "hlk_trend"},
+        version=2,
+        unique_id="user-trend",
+        subentries_data=[
+            ConfigSubentryData(data=trend, subentry_type=SUBENTRY_TYPE_WIDGET, title="Temp", unique_id="ha-temp")
+        ],
+    )
+    await async_setup_with_api(hass, entry, _api())
+    hass.states.async_set("sensor.temp", "22.5", {"friendly_name": "Temperature"})
+    await hass.async_block_till_done()
+    tracked = _loaded_data(hass, entry)["widget_manager"]._tracked["ha-temp"]
+    assert tracked.last_content["points"] == [21.5, 22.5]
+    buffer = list(tracked.points_buffer)
+
+    reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=_subentry_id(entry, SUBENTRY_TYPE_WIDGET))
+
+    assert reply["result"]["available"]
+    assert reply["result"]["payload"]["content"] == tracked.last_content
+    assert list(tracked.points_buffer) == buffer
+
+
+async def test_preview_draft_trend_widget_reads_its_history(hass: HomeAssistant, loaded, ws) -> None:
+    entry, api = loaded
+    api.reset_mock()
+    draft = {
+        CONF_ENTITY_ID: "sensor.temp",
+        CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_TREND,
+        CONF_SLUG: "",
+        **_nest_widget(WIDGET_TEMPLATE_TREND, {CONF_WIDGET_NAME: "Temp", CONF_HISTORY_PERIOD: 60}),
+    }
+    history = {"sensor.temp": [{"timestamp": 1000.0, "value": 19.0}, {"timestamp": 2000.0, "value": 20.0}]}
+
+    with patch(
+        "custom_components.pushward.widget_manager.async_recorder_states", AsyncMock(return_value=history)
+    ) as read:
+        reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_WIDGET, data=draft)
+
+    read.assert_awaited_once()
+    assert reply["result"]["payload"]["content"]["points"] == [19.0, 20.0, 21.5]
     assert api.mock_calls == []
 
 
