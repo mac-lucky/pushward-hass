@@ -126,6 +126,38 @@ async def test_premium_uncapped_and_daily_notifications(hass: HomeAssistant) -> 
     assert n_attrs["daily_resets_at"] == "2026-06-15T00:00:00Z"
 
 
+_TOMORROW = "2026-11-17T00:00:00Z"
+
+
+def _paid_november(**overrides) -> dict:
+    """A paid account on 2026-11-16: quota_resets_at is the daily notifications reset."""
+    paid = {"quota_period_month": 202611, "quota_resets_at": _TOMORROW, "quota_resets_day_at": _TOMORROW}
+    return make_premium_usage_payload(**{**paid, **overrides})
+
+
+async def test_paid_monthly_counters_reset_at_the_next_month(hass: HomeAssistant) -> None:
+    coordinator, entry = _coordinator(hass, _paid_november())
+
+    for key in ("emails_used", "live_activity_updates_used", "widget_updates_used"):
+        assert _usage_sensor(coordinator, entry, key).extra_state_attributes["resets_at"] == "2026-12-01T00:00:00Z"
+    attrs = _usage_sensor(coordinator, entry, "notifications_used").extra_state_attributes
+    assert attrs["resets_at"] == _TOMORROW
+    assert attrs["daily_resets_at"] == _TOMORROW
+
+
+@pytest.mark.parametrize(
+    ("overrides", "expected"),
+    [
+        ({"quota_period_month": 202612}, "2027-01-01T00:00:00Z"),
+        ({"quota_period_month": None}, _TOMORROW),
+    ],
+    ids=["december_rolls_over", "no_month_falls_back"],
+)
+async def test_monthly_reset_edges(hass: HomeAssistant, overrides: dict, expected: str) -> None:
+    coordinator, entry = _coordinator(hass, _paid_november(**overrides))
+    assert _usage_sensor(coordinator, entry, "emails_used").extra_state_attributes["resets_at"] == expected
+
+
 # --- tier sensor ---
 
 

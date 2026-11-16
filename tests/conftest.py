@@ -361,6 +361,8 @@ def make_premium_usage_payload(**overrides) -> dict:
         notifications_used=12,
         notifications_limit=5000,
         notifications_used_month=420,
+        # Paid: the notifications counter is daily, so both resets are the next midnight.
+        quota_resets_at="2026-06-15T00:00:00Z",
         quota_resets_day_at="2026-06-15T00:00:00Z",
     )
     payload.pop("live_activity_updates_limit", None)

@@ -22,6 +22,7 @@ from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     DOMAIN,
     PRICING_URL,
+    QUOTA_KIND_NOTIFICATIONS,
     QUOTA_RESET_KEY,
     USAGE_LIMIT_RESOURCES,
     USAGE_UPDATE_INTERVAL,
@@ -41,6 +42,19 @@ def _format_reset(value: Any) -> str:
     if isinstance(value, str) and value:
         return value.split("T", 1)[0]
     return "the next reset"
+
+
+def monthly_resets_at(data: dict[str, Any]) -> Any:
+    """When the monthly counters reset: the first of the month after quota_period_month, 00:00 UTC.
+
+    ``quota_resets_at`` is the notifications counter's reset, the next midnight on a
+    paid account, so it stands in only when the ``YYYYMM`` month is missing.
+    """
+    period = data.get("quota_period_month")
+    if isinstance(period, int) and not isinstance(period, bool) and 1 <= period % 100 <= 12:
+        year, month = divmod(period, 100)
+        return f"{year + month // 12:04d}-{month % 12 + 1:02d}-01T00:00:00Z"
+    return data.get(QUOTA_RESET_KEY)
 
 
 def _is_over_limit(used: Any, limit: Any) -> bool:
@@ -113,7 +127,11 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 if self._quota_gate is not None:
                     self._quota_gate.release(resource.kind)
                 continue
-            reset = data.get(resource.reset_key) or data.get(QUOTA_RESET_KEY)
+            reset = (
+                data.get(resource.reset_key) or data.get(QUOTA_RESET_KEY)
+                if resource.kind == QUOTA_KIND_NOTIFICATIONS
+                else monthly_resets_at(data)
+            )
             ir.async_create_issue(
                 self.hass,
                 DOMAIN,

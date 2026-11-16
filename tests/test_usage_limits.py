@@ -169,6 +169,25 @@ async def test_premium_notifications_use_daily_reset(hass: HomeAssistant) -> Non
     assert issue.translation_placeholders["resets_at"] == "2026-06-15"
 
 
+async def test_premium_monthly_counter_uses_the_month_reset(hass: HomeAssistant) -> None:
+    """On a paid account quota_resets_at is tomorrow; emails still reset with the month."""
+    coordinator, entry = _coordinator(
+        hass,
+        make_premium_usage_payload(
+            quota_period_month=202611,
+            quota_resets_at="2026-11-17T00:00:00Z",
+            quota_resets_day_at="2026-11-17T00:00:00Z",
+            emails_used=200,
+            emails_limit=200,
+            notifications_used=5000,
+            notifications_limit=5000,
+        ),
+    )
+    await coordinator._async_update_data()
+    assert _issue(hass, entry, "emails_used").translation_placeholders["resets_at"] == "2026-12-01"
+    assert _issue(hass, entry, "notifications_used").translation_placeholders["resets_at"] == "2026-11-17"
+
+
 # --- multi-entry isolation ---
 
 
