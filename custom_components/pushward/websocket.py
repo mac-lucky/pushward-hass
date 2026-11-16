@@ -456,7 +456,14 @@ async def ws_api(hass: HomeAssistant, connection: websocket_api.ActiveConnection
         return
     api = data["api"]
     notification = route == ("POST", "/notifications")
-    if notification and body is not None and api.e2e_key is not None and "encrypted" not in body:
+    if notification and body is not None and "encrypted" in body:
+        # A sealed body goes out as it is, so plaintext next to the envelope would reach the server.
+        if any(body.get(name) is not None for name in _SEALED_FIELDS):
+            connection.send_error(
+                msg["id"], websocket_api.ERR_NOT_ALLOWED, "A sealed notification cannot also carry its text in plain"
+            )
+            return
+    elif notification and body is not None and api.e2e_key is not None:
         body = _sealed_notification(api.e2e_key, body)
     status, answer = await api._request_with_retry(
         msg["method"],

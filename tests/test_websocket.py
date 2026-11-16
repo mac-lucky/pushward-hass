@@ -876,6 +876,25 @@ async def test_api_seals_a_notification_with_the_entry_key(loaded, ws) -> None:
     api._request_with_retry.assert_not_awaited()
 
 
+@pytest.mark.parametrize("key", [bytes(range(32)), None])
+async def test_api_refuses_plaintext_next_to_an_envelope(loaded, ws, key: bytes | None) -> None:
+    entry, api = loaded
+    api.e2e_key = key
+    api._request_with_retry.reset_mock()
+
+    for field in ("title", "subtitle", "body", "url"):
+        body = {"encrypted": "pw1.sealed", "level": "active", field: "in plain"}
+        reply = await ws("pushward/api", entry_id=entry.entry_id, method="POST", path="/notifications", body=body)
+        assert reply["error"]["code"] == "not_allowed"
+    api._request_with_retry.assert_not_awaited()
+
+    # An envelope alone goes out as it is.
+    body = {"encrypted": "pw1.sealed", "level": "active"}
+    reply = await ws("pushward/api", entry_id=entry.entry_id, method="POST", path="/notifications", body=body)
+    assert reply["success"]
+    assert api._request_with_retry.call_args.kwargs["json"] == body
+
+
 async def test_api_refuses_an_oversized_body(loaded, ws) -> None:
     entry, api = loaded
     api._request_with_retry.reset_mock()
