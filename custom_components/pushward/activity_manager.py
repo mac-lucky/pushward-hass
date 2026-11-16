@@ -292,6 +292,8 @@ class ActivityManager:
         # (HA 2024.8+ no longer stores light attributes in the recorder DB, so
         # we cannot reconstruct history from HA itself).
         self._history_store: Store = build_history_store(hass, entry.entry_id)
+        # True while a delayed history write is armed (see _schedule_history_save).
+        self._history_save_armed = False
 
     def _get_registry_icon(self, entity_id: str) -> str | None:
         return lookup_registry_icon(self._hass, entity_id)
@@ -427,7 +429,7 @@ class ActivityManager:
         if stale:
             _LOGGER.debug("Pruning persisted history for removed entities: %s", sorted(stale))
             try:
-                await self._history_store.async_save(self._serialize_history())
+                await self._async_save_history()
             except Exception:
                 _LOGGER.debug("Failed to prune persisted history", exc_info=True)
 
@@ -470,8 +472,26 @@ class ActivityManager:
 
     @callback
     def _schedule_history_save(self) -> None:
-        """Debounced write of all ring buffers to .storage."""
-        self._history_store.async_delay_save(self._serialize_history, _HISTORY_SAVE_DELAY_S)
+        """Write all ring buffers to .storage _HISTORY_SAVE_DELAY_S after the first unsaved sample.
+
+        async_delay_save pushes an armed write back on every call, so an entity
+        sampled more often than the delay would only ever be saved on a clean stop.
+        """
+        if self._history_save_armed:
+            return
+        self._history_save_armed = True
+        self._history_store.async_delay_save(self._serialize_armed_history, _HISTORY_SAVE_DELAY_S)
+
+    @callback
+    def _serialize_armed_history(self) -> dict:
+        """Payload of the armed delayed write; the next sample arms a new one."""
+        self._history_save_armed = False
+        return self._serialize_history()
+
+    async def _async_save_history(self) -> None:
+        """Write the ring buffers now; this supersedes an armed delayed write."""
+        self._history_save_armed = False
+        await self._history_store.async_save(self._serialize_history())
 
     @callback
     def _serialize_history(self) -> dict:
@@ -491,15 +511,6 @@ class ActivityManager:
 
     async def async_stop(self) -> None:
         """End all active activities and unsubscribe listeners."""
-        # Flush any pending debounced history write before tearing down. Store
-        # also listens to EVENT_HOMEASSISTANT_FINAL_WRITE for full HA shutdown,
-        # but config-entry reloads don't fire that event.
-        if self._tracked:
-            try:
-                await self._history_store.async_save(self._serialize_history())
-            except Exception:
-                _LOGGER.warning("Failed to flush history buffer on stop", exc_info=True)
-
         # Cancel in-flight work and wait for it to settle so a mid-flight send or
         # end can't fire against the tracker after async_start rebuilds it on a
         # reload. A cancelled end task leaves is_active untouched (the canceller
@@ -539,6 +550,16 @@ class ActivityManager:
         # Concurrent, so an outage costs a reload one retry budget per 5 activities (the
         # API client's request semaphore) rather than one per activity.
         await asyncio.gather(*(self._end_on_stop(t) for t in self._tracked.values() if t.is_active))
+
+        # Flush the buffers last, once no listener can add a sample: one landing
+        # mid-flush would arm a delayed write that runs after the clear below and saves
+        # empty buffers. Store also listens to EVENT_HOMEASSISTANT_FINAL_WRITE for full
+        # HA shutdown, but config-entry reloads don't fire that event.
+        if self._tracked:
+            try:
+                await self._async_save_history()
+            except Exception:
+                _LOGGER.warning("Failed to flush history buffer on stop", exc_info=True)
 
         self._tracked.clear()
 

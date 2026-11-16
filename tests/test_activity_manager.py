@@ -24,6 +24,7 @@ from custom_components.pushward.activity_manager import (
     _companion_entity_ids,
     _downsample_evenly,
     _forbidden_notification_id,
+    history_storage_key,
 )
 from custom_components.pushward.api import (
     PushWardApiError,
@@ -1622,6 +1623,72 @@ async def test_stale_persisted_history_pruned_on_start(hass: HomeAssistant) -> N
     for section in payload.values():
         assert "sensor.removed" not in section
 
+    await manager.async_stop()
+
+
+def _buffer_values(manager: ActivityManager, entity_id: str) -> list[float]:
+    return [next(iter(values.values())) for _ts, values in manager._tracked[entity_id].history_buffer]
+
+
+async def test_reload_restores_every_history_sample(hass: HomeAssistant, hass_storage, freezer) -> None:
+    """A sample landing while stop flushes the store must not leave an empty write behind."""
+    api = _mock_api()
+    entry = make_mock_entry()
+    config = _timeline_numeric_config()
+    hass.states.async_set("sensor.power", "1")
+    manager = ActivityManager(hass, api, [config], entry)
+    await manager.async_start()
+    for value in range(2, 7):
+        hass.states.async_set("sensor.power", str(value))
+        await hass.async_block_till_done()
+    assert _buffer_values(manager, "sensor.power") == [1, 2, 3, 4, 5, 6]
+
+    store = manager._history_store
+    real_save = store.async_save
+
+    async def _sample_lands_during_the_flush(data):
+        await real_save(data)
+        # The real write awaits the executor; a state change can land meanwhile.
+        hass.states.async_set("sensor.power", "7")
+        await _pump()
+
+    with patch.object(store, "async_save", _sample_lands_during_the_flush):
+        await manager.async_stop()
+    # Any delayed write armed during stop runs now.
+    freezer.tick(31)
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+
+    reloaded = ActivityManager(hass, api, [config], entry)
+    await reloaded.async_start()
+    # The six saved samples plus the restart's seed of the current value.
+    assert _buffer_values(reloaded, "sensor.power") == [1, 2, 3, 4, 5, 6, 7]
+    await reloaded.async_stop()
+
+
+async def test_history_saves_while_samples_keep_coming(hass: HomeAssistant, hass_storage, freezer) -> None:
+    """Samples arriving faster than the save delay no longer push the write back forever."""
+    entry = make_mock_entry()
+    hass.states.async_set("sensor.power", "1")
+    manager = ActivityManager(hass, _mock_api(), [_timeline_numeric_config()], entry)
+    await manager.async_start()
+    # A sample every 10 s; the first one armed the 30 s write.
+    for value in range(2, 5):
+        freezer.tick(10)
+        hass.states.async_set("sensor.power", str(value))
+        await hass.async_block_till_done()
+
+    freezer.tick(1)
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+
+    saved = hass_storage[history_storage_key(entry.entry_id)]["data"]["samples"]["sensor.power"]
+    assert [values["sensor.power"] for _ts, values in saved] == [1, 2, 3, 4]
+    # The write re-arms on the next sample.
+    assert not manager._history_save_armed
+    hass.states.async_set("sensor.power", "12")
+    await hass.async_block_till_done()
+    assert manager._history_save_armed
     await manager.async_stop()
 
 
