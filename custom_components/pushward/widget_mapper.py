@@ -10,6 +10,7 @@ from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, State
 from homeassistant.util import dt as dt_util
 
+from .answer_stream import _iso
 from .const import (
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
@@ -215,11 +216,6 @@ def _widget_date_ok(value: datetime) -> bool:
     ts = value.timestamp()
     horizon = dt_util.utcnow() + timedelta(days=WIDGET_DATE_HORIZON_DAYS)
     return WIDGET_DATE_FLOOR_TS <= ts <= horizon.timestamp()
-
-
-def _iso(value: datetime) -> str:
-    """Serialize an aware datetime as the RFC 3339 string the server decodes."""
-    return dt_util.as_utc(value).isoformat()
 
 
 def _read_datetime(
