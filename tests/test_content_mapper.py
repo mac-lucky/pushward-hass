@@ -249,6 +249,34 @@ def test_map_content_clamps_progress():
     assert content_neg["progress"] == 0.0
 
 
+@pytest.mark.parametrize("raw", ["inf", "-inf", "nan", float("inf")])
+def test_map_content_non_finite_progress_gives_no_progress(raw):
+    """float() takes 'inf' and 'nan'; clamped they would draw a full bar, so they read as no progress."""
+    state = _make_state("running", {"progress": raw})
+    config = {CONF_TEMPLATE: "generic", CONF_PROGRESS_ATTRIBUTE: "progress"}
+
+    assert map_content(state, config)["progress"] == 0.0
+
+
+@pytest.mark.parametrize("raw", ["nan", "inf"])
+def test_map_content_timeline_non_finite_state_has_no_value(raw):
+    """A sensor reporting 'nan' has no timeline value: one NaN in the frame gets the push refused."""
+    state = _make_state(raw, {"friendly_name": "Temp"})
+
+    assert "value" not in map_content(state, {CONF_TEMPLATE: "timeline"})
+
+
+def test_map_content_gauge_and_steps_ignore_non_finite_sources():
+    """A non-finite gauge value reads as missing, and an 'inf' step does not crash the mapper."""
+    gauge = map_content(_make_state("nan", {}), {CONF_TEMPLATE: "gauge", CONF_MAX_VALUE: 50.0})
+    assert gauge["value"] == 0.0
+    steps = map_content(
+        _make_state("on", {"step": "inf"}),
+        {CONF_TEMPLATE: "steps", CONF_TOTAL_STEPS: 3, CONF_CURRENT_STEP_ATTR: "step"},
+    )
+    assert steps["current_step"] == 0
+
+
 def test_map_content_progress_brightness_scale():
     """Brightness (0-255) is auto-detected and scaled correctly."""
     # brightness=26 in HA ≈ 10% → should be ~0.102

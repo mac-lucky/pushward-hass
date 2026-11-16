@@ -19,6 +19,8 @@ from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 
+from .content_mapper import _finite_number
+
 _LOGGER = logging.getLogger(__name__)
 
 # Statistics-seed period cutoff (minutes). 5-minute short-term stats share raw-state
@@ -129,10 +131,11 @@ async def _statistics_points(hass: HomeAssistant, entity_ids: list[str], period_
             value = row.get("mean")
             if value is None:  # total / total_increasing have no mean
                 value = row.get("state")
+            value = _finite_number(value)
             if start_ts is None or value is None:
                 continue
             with contextlib.suppress(ValueError, TypeError):
-                points.append({"timestamp": int(start_ts), "value": float(value)})
+                points.append({"timestamp": int(start_ts), "value": value})
         if points:
             result[entity_id] = points
     return result
@@ -182,8 +185,8 @@ async def _raw_recorder_points(
         for state_obj in states.get(entity_id, []):
             if state_obj.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
                 continue
-            with contextlib.suppress(ValueError, TypeError):
-                points.append({"timestamp": int(state_obj.last_updated.timestamp()), "value": float(state_obj.state)})
+            if (value := _finite_number(state_obj.state)) is not None:
+                points.append({"timestamp": int(state_obj.last_updated.timestamp()), "value": value})
         if points:
             result[entity_id] = points
     return result

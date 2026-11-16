@@ -1762,7 +1762,7 @@ async def test_seed_timeline_series_entities_batched_and_labeled(hass: HomeAssis
 
 async def test_recorder_states_returns_points_per_entity(hass: HomeAssistant) -> None:
     """The batched recorder query returns ascending {timestamp, value} points
-    per entity, skipping unavailable / non-numeric rows."""
+    per entity, skipping unavailable / non-numeric / non-finite rows."""
     api = _mock_api()
     manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
 
@@ -1773,6 +1773,9 @@ async def test_recorder_states_returns_points_per_entity(hass: HomeAssistant) ->
             _recorder_state("unavailable", t0 + 60),
             _recorder_state("not-a-number", t0 + 120),
             _recorder_state("41.5", t0 + 180),
+            # float() takes these, the server would refuse the whole seed.
+            _recorder_state("nan", t0 + 240),
+            _recorder_state("inf", t0 + 300),
         ],
         "sensor.b": [_recorder_state("unknown", t0)],
     }
@@ -1900,8 +1903,9 @@ async def test_recorder_states_statistics_empty_falls_back(hass: HomeAssistant) 
 
 
 async def test_recorder_states_statistics_skips_bad_buckets(hass: HomeAssistant) -> None:
-    """Buckets with no value, a missing start, or a non-coercible field are dropped,
-    not emitted and not raised; a fractional start truncates to whole seconds."""
+    """Buckets with no value, a missing start, a non-coercible field or a non-finite
+    value are dropped, not emitted and not raised; a fractional start truncates to
+    whole seconds."""
     api = _mock_api()
     manager = ActivityManager(hass, api, [_timeline_numeric_config()], _mock_entry())
     hass.states.async_set("sensor.power", "42.0", {"state_class": "measurement"})
@@ -1912,6 +1916,8 @@ async def test_recorder_states_statistics_skips_bad_buckets(hass: HomeAssistant)
             {"mean": 1.0},  # missing start -> skip (no KeyError)
             {"start": "bad", "mean": 2.0},  # non-coercible start -> suppressed
             {"start": float(t0 + 300) + 0.9, "mean": 41.5},  # fractional -> truncates
+            {"start": float(t0 + 600), "mean": float("nan")},  # not finite -> skip
+            {"start": float(t0 + 900), "mean": None, "state": float("inf")},  # not finite -> skip
         ]
     }
     instance = MagicMock()

@@ -1685,15 +1685,14 @@ def _get_progress(
     if raw is _NO_VALUE:
         return 0.0
     attr_name = entity_config.get(CONF_PROGRESS_ATTRIBUTE)
-    try:
-        value = float(raw)  # type: ignore[arg-type]
-        # Open-coded rather than _rescale_attr: that helper maps 0-255 to 0-100
-        # while this one needs 0-1.
-        scale = 255.0 if attr_name in _ATTRS_0_255 else 100.0
-        return round(max(0.0, min(1.0, value / scale)), 2)
-    except (ValueError, TypeError):
+    value = _coerce_scaled_value(raw, None)
+    if value is None:
         _LOGGER.debug("Could not parse progress for %s", state.entity_id)
         return 0.0
+    # Open-coded rather than _rescale_attr: that helper maps 0-255 to 0-100
+    # while this one needs 0-1.
+    scale = 255.0 if attr_name in _ATTRS_0_255 else 100.0
+    return round(max(0.0, min(1.0, value / scale)), 2)
 
 
 def _get_current_step(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> int:
@@ -1705,7 +1704,7 @@ def _get_current_step(state: State, entity_config: dict, hass: HomeAssistant | N
     try:
         value = int(float(raw))  # type: ignore[arg-type]
         return max(0, min(total, value))
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
         _LOGGER.debug("Could not parse current_step for %s", state.entity_id)
         return 0
 
@@ -1725,10 +1724,13 @@ def _get_remaining_seconds(
 
 
 def _coerce_scaled_value(raw: object, attr_name: str | None) -> float | None:
-    """Coerce a raw value to float, rescaling 0-255 attributes to 0-100. None if unparseable."""
+    """Coerce a raw value to float, rescaling 0-255 attributes to 0-100. None if unparseable or not finite."""
     try:
         value = float(raw)  # type: ignore[arg-type]
     except (ValueError, TypeError):
+        return None
+    # float() takes "nan" and "inf"; the server refuses a non-finite number.
+    if not math.isfinite(value):
         return None
     return _rescale_attr(value, attr_name) if attr_name else value
 
