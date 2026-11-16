@@ -72,6 +72,7 @@ from .const import (
     QUOTA_KIND_LIVE_ACTIVITY_UPDATES,
     RUN_WHILE_MAX,
     START_STATE_ANY,
+    TIMELINE_SERIES_LABEL_MAX,
 )
 from .content_mapper import (
     _build_log_line,
@@ -446,7 +447,8 @@ class ActivityManager:
                 # Tolerate JSON round-tripping: lists instead of tuples, stringified keys.
                 try:
                     ts = int(entry[0])
-                    values = {str(k): float(v) for k, v in entry[1].items()}
+                    # Capped like the live labels, so samples saved under an over-long name join their series.
+                    values = {str(k)[:TIMELINE_SERIES_LABEL_MAX]: float(v) for k, v in entry[1].items()}
                 except (KeyError, TypeError, ValueError, IndexError):
                     continue
                 rehydrated.append((ts, values))

@@ -1891,14 +1891,33 @@ def test_map_content_timeline_primary_series_first_series_entity():
 
 
 def test_map_content_timeline_primary_series_long_label_omitted():
-    """Labels over the server's 32-char key cap are not sent as primary."""
-    long_name = "x" * 33
-    state = _make_state("22.5", {"friendly_name": long_name})
-    config = {CONF_TEMPLATE: "timeline", CONF_ICON: "mdi:thermometer"}
+    """An explicit primary over the server's 32-char key cap is not sent."""
+    state = _make_state("22.5", {"friendly_name": "Temp"})
+    config = {CONF_TEMPLATE: "timeline", CONF_ICON: "mdi:thermometer", CONF_PRIMARY_SERIES: "x" * 33}
 
     content = map_content(state, config)
 
     assert "primary_series" not in content
+
+
+def test_map_content_timeline_single_series_long_friendly_name_capped():
+    """A friendly name over the label cap names the default series by its first 32 characters.
+
+    The value key, the primary series and the recorder seed label stay equal, so seeded
+    points join the live series and the push is not refused for an over-long label.
+    """
+    name = "Living Room Thermostat Current Temperature"
+    assert len(name) > TIMELINE_SERIES_LABEL_MAX
+    label = name[:TIMELINE_SERIES_LABEL_MAX]
+    state = _make_state("21.5", {"friendly_name": name}, entity_id="sensor.living_room")
+    config = {CONF_TEMPLATE: "timeline"}
+
+    content = map_content(state, config)
+
+    assert content["value"] == {label: 21.5}
+    assert content["primary_series"] == label
+    assert _timeline_recorder_sources(state, config) == {label: "sensor.living_room"}
+    assert_valid_activity_content(content, where="timeline")
 
 
 def test_map_content_timeline_multi_series_partial():

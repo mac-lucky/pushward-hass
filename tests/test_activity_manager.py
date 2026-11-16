@@ -1519,6 +1519,18 @@ async def test_stale_persisted_history_pruned_on_start(hass: HomeAssistant) -> N
     await manager.async_stop()
 
 
+async def test_persisted_history_labels_capped_on_load(hass: HomeAssistant) -> None:
+    """Samples saved under an over-long series label load under the capped label the live series uses."""
+    manager = ActivityManager(hass, _mock_api(), [], _mock_entry())
+    long_label = "Living Room Thermostat Current Temperature"
+    raw = {"samples": {"sensor.t": [[100, {long_label: 21.5}]]}, "logs": {}}
+
+    with patch.object(manager._history_store, "async_load", AsyncMock(return_value=raw)):
+        history, _logs = await manager._async_load_history()
+
+    assert history == {"sensor.t": [(100, {long_label[:32]: 21.5})]}
+
+
 def _log_columns_config(columns):
     """Log config tracking a light, with the given log_columns."""
     return _entity_config(

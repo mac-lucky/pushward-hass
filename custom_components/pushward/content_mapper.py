@@ -1733,6 +1733,11 @@ def _coerce_scaled_value(raw: object, attr_name: str | None) -> float | None:
     return _rescale_attr(value, attr_name) if attr_name else value
 
 
+def _single_series_label(state: State) -> str:
+    """The single-series label: the tracked entity's friendly name, cut to the server's label cap."""
+    return str(state.attributes.get("friendly_name", state.entity_id))[:TIMELINE_SERIES_LABEL_MAX]
+
+
 def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant | None = None) -> dict[str, float]:
     """Extract the labeled value map for a timeline template.
 
@@ -1787,7 +1792,7 @@ def _get_timeline_values(state: State, entity_config: dict, hass: HomeAssistant 
 
     # Single series: keep the label anchored to the tracked entity so samples
     # from a companion value entity land in the same series.
-    label = state.attributes.get("friendly_name", state.entity_id)
+    label = _single_series_label(state)
     raw, _source = _resolve_raw(
         state, entity_config, CONF_VALUE_ENTITY, CONF_VALUE_ATTRIBUTE, hass, state_fallback=True
     )
@@ -1817,7 +1822,7 @@ def _get_timeline_primary(state: State, entity_config: dict) -> str | None:
     for series in entity_config.get(CONF_SERIES_ENTITIES) or []:
         if isinstance(series, dict) and series.get(CONF_LABEL):
             return series[CONF_LABEL]
-    return state.attributes.get("friendly_name", state.entity_id)
+    return _single_series_label(state)
 
 
 def _get_timeline_units(
@@ -1871,8 +1876,7 @@ def _timeline_recorder_sources(state: State, entity_config: dict) -> dict[str, s
             sources[label] = entity_id
 
     if not entity_config.get(CONF_SERIES) and not series_entities and not entity_config.get(CONF_VALUE_ATTRIBUTE):
-        label = state.attributes.get("friendly_name", state.entity_id)
-        sources[label] = entity_config.get(CONF_VALUE_ENTITY) or state.entity_id
+        sources[_single_series_label(state)] = entity_config.get(CONF_VALUE_ENTITY) or state.entity_id
 
     return sources
 
