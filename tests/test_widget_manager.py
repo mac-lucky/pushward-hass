@@ -1516,8 +1516,9 @@ async def test_heatmap_without_history_sends_nothing_and_warns_once(
         assert read.await_count == 4
         api.create_widget.assert_not_awaited()
         assert len(warnings()) == 1
-        # The entity's state values stay out of the log.
-        assert not any(f"{4242 + n}.5" in caplog.text for n in range(4))
+        # The entity's state values stay out of the integration's log (core logs every state change at debug).
+        ours = [r.getMessage() for r in caplog.records if r.name.startswith("custom_components.pushward")]
+        assert not any(f"{4242 + n}.5" in line for line in ours for n in range(4))
 
         # History comes back: the widget is created and the warning re-arms.
         read.return_value = list(_WEEK)
