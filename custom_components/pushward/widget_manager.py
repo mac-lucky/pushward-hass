@@ -301,6 +301,12 @@ class WidgetManager:
             self._subscribe(tracked)
             pending.append(tracked)
 
+        # A cached widget no subentry owns any more (removed while this entry was not
+        # loaded, or its delete failed) is still on the server with its phone
+        # registrations. It stays cached until a delete lands so the next start tries
+        # again; set before the initial sync, whose debounced save can fire mid-delete.
+        self._leftover = {slug: cached for slug, cached in persisted.items() if slug not in self._tracked}
+
         # Idempotent server upsert per widget — fan out so HA boot isn't
         # serialized on N round-trips. The API client semaphore caps concurrency.
         # Each sync claims the widget's single-flight slot: a state change landing
@@ -310,13 +316,11 @@ class WidgetManager:
             tasks = [self._claim_slot(tracked, self._initial_sync(tracked)) for tracked in pending]
             await asyncio.gather(*tasks, return_exceptions=True)
 
-        # A cached widget no subentry owns any more (removed while this entry was not
-        # loaded, or its delete failed) is still on the server with its phone
-        # registrations. Delete it now, and keep it cached until a delete lands so the
-        # next start tries again.
-        leftover = [slug for slug in persisted if slug not in self._tracked]
+        leftover = list(self._leftover)
         deleted = await asyncio.gather(*(self._delete_widget(slug) for slug in leftover), return_exceptions=True)
-        self._leftover = {slug: persisted[slug] for slug, ok in zip(leftover, deleted, strict=True) if ok is not True}
+        for slug, ok in zip(leftover, deleted, strict=True):
+            if ok is True:
+                self._leftover.pop(slug, None)
 
         # Rewrite the cache only when its key set differs from the new tracked
         # set — otherwise this startup-time save is a redundant disk write.
@@ -827,12 +831,9 @@ class WidgetManager:
 
     @callback
     def _serialize_cache(self) -> dict:
-        return {
-            "widgets": {
-                **self._leftover,
-                **{slug: self._serialize_widget(t) for slug, t in self._tracked.items() if t.last_content is not None},
-            }
-        }
+        # A widget with no content yet is cached too: its create may have reached the
+        # server, so removing its subentry must still delete it on the next start.
+        return {"widgets": {**self._leftover, **{slug: self._serialize_widget(t) for slug, t in self._tracked.items()}}}
 
     @staticmethod
     def _serialize_widget(tracked: TrackedWidget) -> dict:

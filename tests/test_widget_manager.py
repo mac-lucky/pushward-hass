@@ -192,6 +192,58 @@ async def test_start_keeps_a_leftover_widget_cached_while_its_delete_fails(
     await manager.async_stop()
 
 
+async def test_start_keeps_a_leftover_cached_when_a_debounced_save_lands_mid_delete(
+    hass: HomeAssistant, hass_storage: dict
+) -> None:
+    """The initial sync's debounced save can fire while a slow delete still retries: the slug stays cached."""
+    _seed_widget_cache(hass_storage, "ha-users", "ha-gone")
+    api = _mock_api()
+    release = asyncio.Event()
+
+    async def slow_failing_delete(_slug: str) -> None:
+        await release.wait()
+        raise aiohttp.ClientConnectionError("down")
+
+    api.delete_widget.side_effect = slow_failing_delete
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config()], make_mock_entry())
+    start = hass.async_create_task(manager.async_start())
+    for _ in range(100):
+        if api.delete_widget.await_count:
+            break
+        await asyncio.sleep(0)
+    api.create_widget.assert_awaited_once()
+
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=31))
+    for _ in range(10):
+        await asyncio.sleep(0)
+    assert _cached_slugs(hass_storage) == {"ha-users", "ha-gone"}
+
+    release.set()
+    await start
+    await hass.async_block_till_done()
+    assert _cached_slugs(hass_storage) == {"ha-users", "ha-gone"}
+
+    await manager.async_stop()
+
+
+async def test_reload_deletes_a_removed_widget_that_never_got_content(hass: HomeAssistant, hass_storage: dict) -> None:
+    """A widget whose initial POST was skipped (entity unavailable) is still deleted when its subentry goes."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", STATE_UNAVAILABLE)
+    config = make_widget_config()
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
+    await manager.async_start()
+    api.create_widget.assert_not_awaited()
+
+    await manager.async_reload([])
+
+    api.delete_widget.assert_awaited_once_with("ha-users")
+    assert _cached_slugs(hass_storage) == set()
+
+    await manager.async_stop()
+
+
 async def test_start_drops_a_leftover_widget_the_server_no_longer_has(hass: HomeAssistant, hass_storage: dict) -> None:
     """A 404 on the delete means the widget is already gone."""
     _seed_widget_cache(hass_storage, "ha-gone")
