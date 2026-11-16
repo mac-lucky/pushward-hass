@@ -69,6 +69,7 @@ from .const import (
     CHECKLIST_ITEMS_MIN,
     COMPACT_TRAILING_ICON_PATTERN,
     CONF_E2E_KEY,
+    CONF_ENTITY_ID,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
     CONF_SLUG,
@@ -1759,8 +1760,33 @@ def _adopt_account_id(hass: HomeAssistant, entry: ConfigEntry, me: dict | None) 
     hass.config_entries.async_update_entry(entry, unique_id=account_id)
 
 
+@callback
+def _heal_subentry_unique_ids(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Give each tracked entity and widget the unique_id of what it tracks.
+
+    Older versions moved a subentry to another entity or slug on reconfigure but kept
+    the old unique_id, which then blocks adding or moving another subentry onto it.
+    The stale ones drop their id first, so swapped or chained ids all resolve; a
+    duplicate of an id another subentry rightly holds stays without one.
+    """
+    keys = {SUBENTRY_TYPE_ENTITY: CONF_ENTITY_ID, SUBENTRY_TYPE_WIDGET: CONF_SLUG}
+    stale = [
+        sub
+        for sub in entry.subentries.values()
+        if sub.subentry_type in keys and sub.unique_id != sub.data.get(keys[sub.subentry_type])
+    ]
+    for sub in stale:
+        hass.config_entries.async_update_subentry(entry, sub, unique_id=None)
+    for sub in stale:
+        want = sub.data.get(keys[sub.subentry_type])
+        if want and all(other.unique_id != want for other in entry.subentries.values()):
+            hass.config_entries.async_update_subentry(entry, sub, unique_id=want)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up PushWard from a config entry."""
+    # Before the update listener is registered, so the re-keying reloads nothing.
+    _heal_subentry_unique_ids(hass, entry)
     session = async_get_clientsession(hass)
     # One quota gate per entry: the client arms it on a quota 429, the coordinator
     # releases it once /auth/me shows the counters back under the cap.
@@ -1805,6 +1831,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "quota_gate": quota_gate,
         "answer_stream": answer_stream,
         "e2e_key": entry.options.get(CONF_E2E_KEY),
+        # Two saves close together (back-to-back panel edits) must not interleave reloads.
+        "reload_lock": asyncio.Lock(),
     }
     await async_register_panel(hass)
 
@@ -1828,16 +1856,18 @@ async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
         if (todo_manager := data.get("todo_manager")) is not None:
             todo_manager.async_retry_refused()
         return
-    entities = _entity_configs(entry)
-    widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
-    widget_manager: WidgetManager | None = data.get("widget_manager")
-    todo_manager: TodoReminderManager | None = data.get("todo_manager")
-    reloads = [data["manager"].async_reload(entities)]
-    if widget_manager is not None:
-        reloads.append(widget_manager.async_reload(widgets))
-    if todo_manager is not None:
-        reloads.append(todo_manager.async_reload(todo_configs(entry)))
-    await asyncio.gather(*reloads)
+    async with data["reload_lock"]:
+        # Read inside the lock, so a reload that waited applies the newest subentries.
+        entities = _entity_configs(entry)
+        widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
+        widget_manager: WidgetManager | None = data.get("widget_manager")
+        todo_manager: TodoReminderManager | None = data.get("todo_manager")
+        reloads = [data["manager"].async_reload(entities)]
+        if widget_manager is not None:
+            reloads.append(widget_manager.async_reload(widgets))
+        if todo_manager is not None:
+            reloads.append(todo_manager.async_reload(todo_configs(entry)))
+        await asyncio.gather(*reloads)
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
