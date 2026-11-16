@@ -10,6 +10,7 @@ from homeassistant import config_entries
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType, InvalidData, section
+from homeassistant.helpers.selector import EntitySelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward.api import PushWardAuthError
@@ -5361,3 +5362,34 @@ def test_parse_widget_input_stores_no_heatmap_keys_on_other_templates() -> None:
     """Adding the template leaves every other template's stored data as it was."""
     result = _parse_widget_input(_widget_details(), _widget_step1())
     assert CONF_HEATMAP_WEEKS not in result and CONF_HEATMAP_AGGREGATE not in result
+
+
+def _entity_selector_suggestions(schema: vol.Schema) -> list[tuple[str, object]]:
+    """(field, suggested value or default) of every EntitySelector, sections included."""
+    found = []
+    for key, value in schema.schema.items():
+        if isinstance(value, section):
+            found += _entity_selector_suggestions(value.schema)
+        elif isinstance(value, EntitySelector):
+            description = getattr(key, "description", None) or {}
+            default = key.default() if callable(getattr(key, "default", None)) else None
+            found.append((str(key), description.get("suggested_value", default)))
+    return found
+
+
+@pytest.mark.parametrize("template", WIDGET_TEMPLATES)
+def test_new_widget_form_suggests_no_empty_entity(template: str) -> None:
+    """A new widget's form must not pre-fill an EntitySelector with "".
+
+    HA drops an empty value only at the top level of a submit; inside a section the
+    "" reaches the EntitySelector, which refuses it, so the form could never be saved.
+    """
+    schema = _widget_details_schema("sensor.power", template)
+    assert [f for f, v in _entity_selector_suggestions(schema) if v == ""] == []
+
+
+@pytest.mark.parametrize("template", TEMPLATES)
+def test_new_activity_form_suggests_no_empty_entity(template: str) -> None:
+    """Same guard for the activity details form."""
+    schema = _details_schema("sensor.power", template)
+    assert [f for f, v in _entity_selector_suggestions(schema) if v == ""] == []

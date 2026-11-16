@@ -2698,12 +2698,8 @@ def _widget_details_schema(
         # A subtitle timer needs a date to anchor on, which the group templates
         # (no single state) have nowhere to read from. Top-level fields may use
         # real selectors - the ObjectSelector sub-field restriction is not in play.
-        fields[
-            vol.Optional(
-                CONF_SUBTITLE_TIMER_ENTITY,
-                description={"suggested_value": d.get(CONF_SUBTITLE_TIMER_ENTITY, "")},
-            )
-        ] = EntitySelector(EntitySelectorConfig())
+        # No "" suggestion: inside a section HA submits it as is and the EntitySelector refuses it.
+        fields[_entity_source_key(CONF_SUBTITLE_TIMER_ENTITY, d)] = EntitySelector(EntitySelectorConfig())
         fields[_attr_suggest_key(CONF_SUBTITLE_TIMER_ATTRIBUTE, d)] = attr_selector
         fields[
             vol.Optional(
