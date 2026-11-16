@@ -57,17 +57,17 @@ function debounce(fn, ms) {
   return run;
 }
 
-/** The test items still on a phone, "entry_id:kind" -> subentry_id, as stored across visits; unreadable counts as none. */
-function loadLastSent() {
+/** The test items still on a phone, "entry_id:kind" -> subentry_id, as stored across visits; fallback when unreadable. */
+function loadLastSent(fallback = {}) {
   try {
     const stored = JSON.parse(localStorage.getItem(LAST_SENT_KEY));
     if (stored && typeof stored === "object" && !Array.isArray(stored)) {
       return Object.fromEntries(Object.entries(stored).filter(([, id]) => typeof id === "string"));
     }
   } catch (_err) {
-    // Corrupt or blocked storage: start empty.
+    // Corrupt or blocked storage: keep the fallback.
   }
-  return {};
+  return fallback;
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -617,7 +617,7 @@ class PushWardPanel extends HTMLElement {
     }
     buttons.send.disabled = !payload || Boolean(card.busy);
     buttons.end.disabled = Boolean(card.busy);
-    buttons.end.hidden = this._lastSent[`${card.entryId}:${kind}`] !== card.id;
+    buttons.end.hidden = this._endCard(card.entryId, kind) !== card.id;
     buttons.playground.disabled = !payload;
   }
 
@@ -697,8 +697,18 @@ class PushWardPanel extends HTMLElement {
     for (const other of this._cards.values()) if (other.el) this._paintCard(other);
   }
 
+  /** The card offering End for an account's test item: the one that sent it, else the first left of its kind. */
+  _endCard(entryId, kind) {
+    const id = this._lastSent[`${entryId}:${kind}`];
+    if (!id) return null;
+    const subs = (this._subentries[entryId] || []).filter((sub) => KINDS[sub.subentry_type] === kind);
+    return subs.some((sub) => sub.subentry_id === id) ? id : (subs[0]?.subentry_id ?? null);
+  }
+
   /** Remember (cardId) or forget (null) the test item on a phone, across visits and reloads. */
   _setLastSent(key, cardId) {
+    // Storage first: another panel tab may have sent or ended a test since this one read it.
+    this._lastSent = loadLastSent(this._lastSent);
     if (cardId) this._lastSent[key] = cardId;
     else delete this._lastSent[key];
     try {
