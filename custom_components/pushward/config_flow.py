@@ -619,7 +619,7 @@ def _object_rows_key(conf_key: str, current: dict, *, required: bool) -> vol.Mar
 
 # The tap-actions section is the same on both detail forms: the surface-wide tap
 # target plus the two button slots. Shared so the two can't drift apart -
-# _sections_to_expand reads these to decide which section opens on an error.
+# _section_errors reads these to decide which section shows an error.
 _TAP_ACTION_SECTION_FIELDS: tuple[str, ...] = (
     CONF_TAP_ACTION_URL,
     CONF_TAP_ACTION_FOREGROUND,
@@ -861,15 +861,22 @@ def _flatten_section_input(user_input: dict, section_keys) -> dict:
     return flat
 
 
-def _sections_to_expand(
+def _section_errors(
     sections_def: dict[str, tuple[str, ...]],
     toplevel: set[str] | frozenset[str],
-    errors: dict,
-) -> set[str]:
-    """Name the sections to render open: any whose non-top-level fields hold a
-    validation error, so the field that failed is revealed rather than collapsed."""
-    error_keys = set(errors)
-    return {sec for sec, fs in sections_def.items() if error_keys & (set(fs) - toplevel)}
+    errors: dict[str, str],
+) -> dict[str, str]:
+    """Key each error of a sectioned field by its section name, keeping the code.
+
+    HA's form shows an error only under a top-level schema item, and a section passes
+    none down to its fields, so a field-keyed error inside one would never show.
+    base and top-level fields keep their key; one error per section is enough.
+    """
+    shown: dict[str, str] = {}
+    for field, code in errors.items():
+        sec = next((sec for sec, fs in sections_def.items() if field in fs and field not in toplevel), field)
+        shown.setdefault(sec, code)
+    return shown
 
 
 async def _validate_integration_key(
@@ -2666,9 +2673,9 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
                 )
 
         defaults = self._details_defaults if self._is_reconfigure else None
-        # Reveal any section that holds a field that failed validation.
-        toplevel = _entity_toplevel_fields(template)
-        expand = _sections_to_expand(ENTITY_SECTIONS, toplevel, errors)
+        # Show each error on its section and open that section.
+        errors = _section_errors(ENTITY_SECTIONS, _entity_toplevel_fields(template), errors)
+        expand = set(errors) & ENTITY_SECTIONS.keys()
         schema = _details_schema(entity_id, template, defaults=defaults, hass=self.hass, expand=expand)
         if errors and user_input is not None:
             # Re-fill the form with what the user just submitted instead of dropping it.
@@ -3582,7 +3589,8 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
         defaults = _widget_details_defaults(
             template, self._details_defaults if self._is_reconfigure else {}, self._statistics_info
         )
-        expand = _sections_to_expand(WIDGET_SECTIONS, _WIDGET_TOPLEVEL, errors)
+        errors = _section_errors(WIDGET_SECTIONS, _WIDGET_TOPLEVEL, errors)
+        expand = set(errors) & WIDGET_SECTIONS.keys()
         schema = _widget_details_schema(entity_id, template, defaults=defaults, expand=expand)
         if errors and user_input is not None:
             # Re-fill the form with what the user just submitted instead of dropping it.

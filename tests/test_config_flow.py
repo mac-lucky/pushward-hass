@@ -22,6 +22,7 @@ from custom_components.pushward.config_flow import (
     _details_schema,
     _entity_details_to_config,
     _entity_reconfigure_defaults,
+    _entity_toplevel_fields,
     _flatten_section_input,
     _hex_to_rgb,
     _kv_rows_to_map,
@@ -42,6 +43,7 @@ from custom_components.pushward.config_flow import (
     _primary_series_options,
     _resolve_series_entity_labels,
     _rgb_to_hex,
+    _section_errors,
     _suggest_template,
     _suggest_widget_template,
     _validate_integration_key,
@@ -2187,7 +2189,7 @@ async def test_subentry_rejects_dangerous_url_scheme(hass: HomeAssistant) -> Non
         user_input=_mock_details_input("alert", **{CONF_URL: "javascript:alert(1)"}),
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_URL: "invalid_url"}
+    assert result["errors"] == {"tap_actions": "invalid_url"}
 
 
 async def test_subentry_rejects_dangerous_secondary_url(hass: HomeAssistant) -> None:
@@ -2212,7 +2214,7 @@ async def test_subentry_rejects_dangerous_secondary_url(hass: HomeAssistant) -> 
         user_input=_mock_details_input("alert", **{CONF_SECONDARY_URL: "data:text/html,bad"}),
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_SECONDARY_URL: "invalid_url"}
+    assert result["errors"] == {"tap_actions": "invalid_url"}
 
 
 # --- _parse_thresholds ---
@@ -3717,7 +3719,7 @@ async def test_flow_step_length_mismatch(hass: HomeAssistant) -> None:
         details_overrides={CONF_TOTAL_STEPS: 3, CONF_STEPS_EDITOR: [{"weight": 1}, {"weight": 2}]},
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEPS_EDITOR: "step_length_mismatch"}
+    assert result["errors"] == {"steps_options": "step_length_mismatch"}
 
 
 async def test_flow_invalid_step_weights_non_positive(hass: HomeAssistant) -> None:
@@ -3734,7 +3736,7 @@ async def test_flow_invalid_step_weights_non_positive(hass: HomeAssistant) -> No
         },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_weights"}
+    assert result["errors"] == {"steps_options": "invalid_step_weights"}
 
 
 async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
@@ -3751,7 +3753,7 @@ async def test_flow_invalid_step_colors(hass: HomeAssistant) -> None:
         },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_colors"}
+    assert result["errors"] == {"steps_options": "invalid_step_colors"}
 
 
 async def test_flow_step_label_too_long_bounces(hass: HomeAssistant) -> None:
@@ -3768,7 +3770,7 @@ async def test_flow_step_label_too_long_bounces(hass: HomeAssistant) -> None:
         },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_labels"}
+    assert result["errors"] == {"steps_options": "invalid_step_labels"}
 
     # Exactly at the cap is accepted.
     result = await _add_entity_subentry(
@@ -3801,7 +3803,7 @@ async def test_flow_out_of_range_step_row_bounces_translated(hass: HomeAssistant
         },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_rows"}
+    assert result["errors"] == {"steps_options": "invalid_step_rows"}
 
 
 async def test_flow_timeline_series_map_label_truncated(hass: HomeAssistant) -> None:
@@ -4025,7 +4027,7 @@ async def test_flow_invalid_threshold(hass: HomeAssistant) -> None:
         details_overrides={CONF_THRESHOLDS: [{"color": "red", "label": "Hot"}]},
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_THRESHOLDS: "invalid_threshold"}
+    assert result["errors"] == {"timeline_options": "invalid_threshold"}
 
 
 async def test_flow_threshold_label_over_cap(hass: HomeAssistant) -> None:
@@ -4039,7 +4041,7 @@ async def test_flow_threshold_label_over_cap(hass: HomeAssistant) -> None:
         details_overrides={CONF_THRESHOLDS: [{"value": 25.0, "label": "x" * (THRESHOLD_LABEL_MAX + 1)}]},
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_THRESHOLDS: "invalid_threshold"}
+    assert result["errors"] == {"timeline_options": "invalid_threshold"}
 
 
 async def test_flow_too_many_thresholds(hass: HomeAssistant) -> None:
@@ -4054,7 +4056,7 @@ async def test_flow_too_many_thresholds(hass: HomeAssistant) -> None:
         details_overrides={CONF_THRESHOLDS: rows},
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_THRESHOLDS: "too_many_thresholds"}
+    assert result["errors"] == {"timeline_options": "too_many_thresholds"}
 
 
 async def test_flow_thresholds_persist_through_row_editor(hass: HomeAssistant) -> None:
@@ -4102,7 +4104,7 @@ async def test_flow_unknown_primary_series(hass: HomeAssistant) -> None:
         details_overrides={CONF_PRIMARY_SERIES: "Nope"},
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_PRIMARY_SERIES: "unknown_primary_series"}
+    assert result["errors"] == {"timeline_options": "unknown_primary_series"}
 
 
 async def test_flow_primary_series_matching_configured_label_passes(hass: HomeAssistant) -> None:
@@ -4245,7 +4247,7 @@ async def test_flow_error_preserves_submitted_dsl(hass: HomeAssistant) -> None:
         },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_weights"}
+    assert result["errors"] == {"steps_options": "invalid_step_weights"}
     suggested = _suggested_values(result)
     assert suggested[CONF_STEPS_EDITOR] == rows
     assert suggested[CONF_ACTIVITY_NAME] == "My Steps"
@@ -4595,7 +4597,7 @@ async def test_details_error_expands_only_the_offending_section(hass: HomeAssist
         },
     )
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_STEPS_EDITOR: "invalid_step_weights"}
+    assert result["errors"] == {"steps_options": "invalid_step_weights"}
 
     collapsed = _section_collapsed(result["data_schema"])
     assert "steps_options" in collapsed
@@ -5106,7 +5108,7 @@ def test_parse_entity_input_rejects_an_image_url_the_server_would_reject(url: st
 
 
 async def test_details_image_url_error_surfaces_and_reopens_the_image_section(hass: HomeAssistant) -> None:
-    """A bad image URL comes back as a translated field error with its section open.
+    """A bad image URL comes back as a translated error on its section, which opens.
 
     The bracketed-host form is the one that used to escape ``_parse_entity_input`` as
     a bare ValueError out of urlparse, which the flow reported as a generic unknown
@@ -5122,11 +5124,62 @@ async def test_details_image_url_error_surfaces_and_reopens_the_image_section(ha
     )
 
     assert result["type"] is FlowResultType.FORM
-    assert result["errors"] == {CONF_IMAGE_URL: "invalid_image_url"}
+    assert result["errors"] == {"image_options": "invalid_image_url"}
 
     collapsed = _section_collapsed(result["data_schema"])
     assert "image_options" in collapsed
     assert collapsed["image_options"] is False, "the section holding the bad URL should render open"
+
+
+async def test_details_error_in_a_section_is_keyed_by_the_section(hass: HomeAssistant) -> None:
+    """HA's form shows an error only on a top-level item, so a sectioned field's error moves to its section."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        template="alert",
+        details_overrides={CONF_TAP_ACTION_URL: "javascript:alert(1)", CONF_SECONDARY_URL: "javascript:alert(2)"},
+    )
+
+    assert result["errors"] == {"tap_actions": "invalid_url"}
+    assert _section_collapsed(result["data_schema"])["tap_actions"] is False
+
+
+async def test_details_top_level_error_keeps_its_field(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_entity_subentry(
+        hass, entry, template="gauge", details_overrides={CONF_MIN_VALUE: 100.0, CONF_MAX_VALUE: 50.0}
+    )
+
+    assert result["errors"] == {CONF_MIN_VALUE: "invalid_gauge_range"}
+    assert not any(collapsed is False for collapsed in _section_collapsed(result["data_schema"]).values())
+
+
+async def test_widget_details_error_in_a_section_is_keyed_by_the_section(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    result = await _add_widget_subentry(
+        hass, entry, WIDGET_TEMPLATE_VALUE, _widget_details(**{CONF_TAP_ACTION_URL: "javascript:alert(1)"})
+    )
+
+    assert result["errors"] == {"tap_actions": "invalid_url"}
+    assert _section_collapsed(result["data_schema"])["tap_actions"] is False
+
+
+def test_section_errors_keeps_base_and_fields_top_level_for_the_template() -> None:
+    """remaining_time sits in data_sources on generic but stays top-level on countdown."""
+    errors = {"base": "unknown", CONF_REMAINING_TIME_ENTITY: "invalid_number"}
+
+    assert _section_errors(ENTITY_SECTIONS, _entity_toplevel_fields("countdown"), errors) == errors
+    assert _section_errors(ENTITY_SECTIONS, _entity_toplevel_fields("generic"), errors) == {
+        "base": "unknown",
+        "data_sources": "invalid_number",
+    }
 
 
 def test_parse_entity_input_rejects_an_unknown_image_shape() -> None:
