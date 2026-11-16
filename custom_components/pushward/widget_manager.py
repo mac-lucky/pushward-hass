@@ -215,6 +215,18 @@ def _trend_min_gap(config: dict) -> float:
     return max(60.0, period * 60 / WIDGET_MAX_TREND_POINTS)
 
 
+def heatmap_read(config: dict) -> tuple[str, int, str]:
+    """The entity, day count and daily statistic a heatmap reads, clamped to what the server takes."""
+    try:
+        weeks = int(config.get(CONF_HEATMAP_WEEKS) or DEFAULT_HEATMAP_WEEKS)
+    except (TypeError, ValueError):
+        weeks = DEFAULT_HEATMAP_WEEKS
+    aggregate = config.get(CONF_HEATMAP_AGGREGATE)
+    if aggregate not in HEATMAP_AGGREGATES:
+        aggregate = HEATMAP_AGGREGATE_MEAN
+    return config.get(CONF_ENTITY_ID) or "", max(1, min(WIDGET_HEATMAP_WEEKS_MAX, weeks)) * 7, aggregate
+
+
 def _extract_numeric(content: dict | None) -> float | None:
     """Pull the trend-relevant numeric value out of a rendered payload."""
     if not content:
@@ -718,15 +730,7 @@ class WidgetManager:
             return tracked.cells
         # Stamped before the read: an hourly reset landing during it must win.
         tracked.cells_read_day = today
-        try:
-            weeks = int(cfg.get(CONF_HEATMAP_WEEKS) or DEFAULT_HEATMAP_WEEKS)
-        except (TypeError, ValueError):
-            weeks = DEFAULT_HEATMAP_WEEKS
-        aggregate = cfg.get(CONF_HEATMAP_AGGREGATE)
-        if aggregate not in HEATMAP_AGGREGATES:
-            aggregate = HEATMAP_AGGREGATE_MEAN
-        entity_id = cfg.get(CONF_ENTITY_ID) or ""
-        days = max(1, min(WIDGET_HEATMAP_WEEKS_MAX, weeks)) * 7
+        entity_id, days, aggregate = heatmap_read(cfg)
         tracked.cells = await async_daily_values(self._hass, entity_id, days, aggregate)
         if tracked.cells and any(cell is not None for cell in tracked.cells):
             tracked.cells_missing_warned = False

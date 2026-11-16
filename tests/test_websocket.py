@@ -18,7 +18,7 @@ from homeassistant.data_entry_flow import InvalidData
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pushward import panel
-from custom_components.pushward.api import PushWardAuthError, PushWardQuotaExceededError
+from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
 from custom_components.pushward.const import (
     CONF_ENTITY_ID,
     CONF_IMAGE_URL,
@@ -46,6 +46,7 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_WIDGET,
     WIDGET_TEMPLATE_STAT_LIST,
 )
+from custom_components.pushward.e2e import E2EError, open_envelope
 from custom_components.pushward.panel import PANEL_URL_PATH, STATIC_URL_PATH
 from custom_components.pushward.websocket import MAX_PAYLOAD_BYTES
 
@@ -72,6 +73,7 @@ def _api() -> AsyncMock:
     api.list_scheduled_notifications = AsyncMock(return_value=[])
     api.get_scheduled_notification = AsyncMock(return_value=None)
     api._request_with_retry = AsyncMock(return_value=(201, {"slug": "ha-x"}))
+    api.e2e_key = None
     return api
 
 
@@ -333,6 +335,16 @@ async def test_preview_saved_widget_is_its_last_sent_content(hass: HomeAssistant
     assert reply["result"]["payload"] == {"name": "Users", "template": "value", "content": tracked.last_content}
 
 
+async def test_preview_saved_widget_without_its_entity_is_unavailable(hass: HomeAssistant, loaded, ws) -> None:
+    entry, _ = loaded
+    assert _loaded_data(hass, entry)["widget_manager"]._tracked["ha-users"].last_content is not None
+    hass.states.async_remove("sensor.users")
+
+    reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=_subentry_id(entry, SUBENTRY_TYPE_WIDGET))
+
+    assert reply["result"] == {"kind": "widget", "payload": None, "errors": None, "available": False}
+
+
 async def test_preview_draft_widget(hass: HomeAssistant, loaded, ws) -> None:
     entry, api = loaded
     api.reset_mock()
@@ -509,6 +521,8 @@ async def test_send_test_rejects_bad_requests_without_a_call(loaded, ws, kind: s
     [
         (PushWardQuotaExceededError("widget_updates"), "quota_exceeded"),
         (PushWardAuthError("Invalid integration key", status_code=401), "auth_failed"),
+        (PushWardApiError("DELETE /widgets/ha-preview-widget failed (422): bad slug", status_code=422), "api_error"),
+        (E2EError("title and body must not be empty"), "api_error"),
     ],
 )
 async def test_send_test_maps_client_errors(loaded, ws, error: Exception, code: str) -> None:
@@ -585,6 +599,30 @@ async def test_api_refuses_everything_else_without_a_call(loaded, ws, method: st
     reply = await ws("pushward/api", entry_id=entry.entry_id, method=method, path=path)
 
     assert reply["error"]["code"] == "not_allowed"
+    api._request_with_retry.assert_not_awaited()
+
+
+async def test_api_seals_a_notification_with_the_entry_key(loaded, ws) -> None:
+    entry, api = loaded
+    api.e2e_key = bytes(range(32))
+    api._request_with_retry.reset_mock()
+
+    reply = await ws(
+        "pushward/api",
+        entry_id=entry.entry_id,
+        method="POST",
+        path="/notifications",
+        body={"title": "Hi", "body": "there", "level": "active"},
+    )
+
+    assert reply["success"]
+    sent = api._request_with_retry.call_args.kwargs["json"]
+    assert set(sent) == {"level", "encrypted"}
+    assert open_envelope(api.e2e_key, sent["encrypted"]) == {"title": "Hi", "body": "there"}
+
+    api._request_with_retry.reset_mock()
+    reply = await ws("pushward/api", entry_id=entry.entry_id, method="POST", path="/notifications", body={"title": 1})
+    assert reply["error"]["code"] == "api_error"
     api._request_with_retry.assert_not_awaited()
 
 

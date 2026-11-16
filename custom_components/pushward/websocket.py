@@ -37,16 +37,12 @@ from .const import (
     ACTIVITY_STATE_ONGOING,
     ACTIVITY_STATES,
     CONF_ENTITY_ID,
-    CONF_HEATMAP_AGGREGATE,
-    CONF_HEATMAP_WEEKS,
     CONF_SLUG,
     CONF_SUBENTRY_ID,
     CONF_TEMPLATE,
     CONF_WIDGET_TEMPLATE,
-    DEFAULT_HEATMAP_WEEKS,
     DEFAULT_PRIORITY,
     DOMAIN,
-    HEATMAP_AGGREGATE_MEAN,
     NOTIFICATION_LEVELS,
     QUOTA_KIND_LIVE_ACTIVITY_UPDATES,
     QUOTA_KIND_NOTIFICATIONS,
@@ -60,8 +56,9 @@ from .const import (
     WIDGET_TEMPLATES,
 )
 from .content_mapper import lookup_registry_icon, map_content
-from .e2e import E2EError
+from .e2e import E2EError, seal
 from .recorder_history import async_daily_values
+from .widget_manager import heatmap_read
 from .widget_mapper import map_widget_content, widget_name_from_config
 
 PREVIEW_ACTIVITY_SLUG = "ha-preview"
@@ -121,6 +118,8 @@ _PLAYGROUND_ROUTES: dict[tuple[str, str], str | None] = {
 }
 _SLUG_COLLECTIONS = ("/activities", "/widgets")
 _CONTENT_TYPES = ("application/json", "application/merge-patch+json")
+# The notification text an e2e key seals (create_notification seals the same four).
+_SEALED_FIELDS = ("title", "subtitle", "body", "url")
 
 
 @callback
@@ -220,28 +219,22 @@ async def _activity_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: b
     return {"name": manager._activity_name(entity_id, cfg), "content": content}
 
 
-async def _heatmap_cells(hass: HomeAssistant, cfg: dict) -> list | None:
-    if cfg.get(CONF_WIDGET_TEMPLATE) != WIDGET_TEMPLATE_HEATMAP:
-        return None
-    days = int(cfg.get(CONF_HEATMAP_WEEKS) or DEFAULT_HEATMAP_WEEKS) * 7
-    aggregate = cfg.get(CONF_HEATMAP_AGGREGATE) or HEATMAP_AGGREGATE_MEAN
-    return await async_daily_values(hass, cfg[CONF_ENTITY_ID], days, aggregate)
-
-
 async def _widget_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: bool) -> dict | None:
     widget_manager = data["widget_manager"]
-    tracked = widget_manager._tracked.get(cfg[CONF_SLUG]) if saved else None
-    # The last sent frame carries the trend points a fresh map has none of.
-    content = tracked.last_content if tracked is not None else None
-    if content is None:
-        content = map_widget_content(
-            hass,
-            cfg,
-            registry_icon=widget_manager._lookup_registry_icon(cfg),
-            cells=await _heatmap_cells(hass, cfg),
-        )
+    heatmap = cfg.get(CONF_WIDGET_TEMPLATE) == WIDGET_TEMPLATE_HEATMAP
+    # Mapped fresh even when a frame was sent: what cannot map now, the manager no longer pushes.
+    content = map_widget_content(
+        hass,
+        cfg,
+        registry_icon=widget_manager._lookup_registry_icon(cfg),
+        cells=await async_daily_values(hass, *heatmap_read(cfg)) if heatmap else None,
+    )
     if content is None:
         return None
+    tracked = widget_manager._tracked.get(cfg[CONF_SLUG]) if saved else None
+    # The last sent frame carries the trend points a fresh map has none of.
+    if tracked is not None and tracked.last_content is not None:
+        content = tracked.last_content
     return {"name": widget_name_from_config(cfg, hass), "template": cfg[CONF_WIDGET_TEMPLATE], "content": content}
 
 
@@ -362,6 +355,21 @@ def _route(method: str, path: str) -> tuple[str, str] | None:
     return method, path
 
 
+def _sealed_notification(key: bytes, body: dict) -> dict:
+    """A playground notification with its text sealed, the way create_notification sends it."""
+    text = {name: body[name] for name in _SEALED_FIELDS if body.get(name) is not None}
+    if not all(isinstance(value, str) for value in text.values()):
+        raise E2EError("title, subtitle, body and url must be text to be sealed")
+    envelope = seal(
+        key,
+        title=text.get("title", ""),
+        body=text.get("body", ""),
+        subtitle=text.get("subtitle"),
+        url=text.get("url"),
+    )
+    return {**{name: value for name, value in body.items() if name not in _SEALED_FIELDS}, "encrypted": envelope}
+
+
 @websocket_api.websocket_command(
     {
         vol.Required("type"): "pushward/api",
@@ -387,14 +395,16 @@ async def ws_api(hass: HomeAssistant, connection: websocket_api.ActiveConnection
     if body is not None and _too_big(body):
         connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "The body is too large")
         return
-    # shortcut: notification text goes out as typed, not sealed with the entry's e2e key;
-    # route it through create_notification if the playground has to honour encryption.
-    status, answer = await data["api"]._request_with_retry(
+    api = data["api"]
+    notification = route == ("POST", "/notifications")
+    if notification and body is not None and api.e2e_key is not None and "encrypted" not in body:
+        body = _sealed_notification(api.e2e_key, body)
+    status, answer = await api._request_with_retry(
         msg["method"],
         msg["path"],
         json=body,
         quota_kind=_PLAYGROUND_ROUTES[route],
-        idempotency_key=uuid4().hex if route == ("POST", "/notifications") else None,
+        idempotency_key=uuid4().hex if notification else None,
         content_type=msg.get("content_type"),
         raw=True,
     )

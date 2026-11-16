@@ -39,7 +39,9 @@ from custom_components.pushward.const import (
     CONF_WIDGET_STYLE,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    HEATMAP_AGGREGATE_MEAN,
     WIDGET_GROUP_TEMPLATES,
+    WIDGET_HEATMAP_WEEKS_MAX,
     WIDGET_STALE_AFTER_MIN,
     WIDGET_TEMPLATE_BATTERY,
     WIDGET_TEMPLATE_FLOW,
@@ -58,6 +60,7 @@ from custom_components.pushward.widget_manager import (
     WidgetManager,
     _entity_ids_for_widget,
     _permission_notification_id,
+    heatmap_read,
 )
 
 from .conftest import make_mock_entry, make_quota_error, make_widget_config
@@ -1552,3 +1555,17 @@ async def test_heatmap_manual_refresh_reads_again(hass: HomeAssistant) -> None:
     assert read.await_args.args[2] == 154
     api.patch_widget.assert_awaited_once()
     await manager.async_stop()
+
+
+@pytest.mark.parametrize(
+    ("weeks", "aggregate", "days", "read_aggregate"),
+    [
+        ("x", "bogus", WIDGET_HEATMAP_WEEKS_MAX * 7, HEATMAP_AGGREGATE_MEAN),
+        (999, "max", WIDGET_HEATMAP_WEEKS_MAX * 7, "max"),
+        (-3, "min", 7, "min"),
+        (4, "change", 28, "change"),
+    ],
+)
+def test_heatmap_read_clamps_what_a_hand_edited_config_holds(weeks, aggregate, days, read_aggregate) -> None:
+    config = _heatmap_config(**{CONF_HEATMAP_WEEKS: weeks, CONF_HEATMAP_AGGREGATE: aggregate})
+    assert heatmap_read(config) == ("sensor.energy", days, read_aggregate)
