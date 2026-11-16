@@ -2131,6 +2131,51 @@ def _entity_details_to_config(
         return None, dict.fromkeys(exc.path, str(exc.msg))
 
 
+def _entity_reconfigure_defaults(data: Mapping[str, Any]) -> dict[str, Any]:
+    """The details form's defaults on reconfigure, prepared from the stored config.
+
+    Shared with the panel preview, so a reconfigure draft fills the defaults its save does.
+    """
+    # The map fields (state_labels, series, units) rehydrate their two-column row
+    # editors from the stored dict; the unified steps editor composes one row per
+    # step from the four stored step keys, which stay untouched in storage.
+    current = dict(data)
+    labels = current.get(CONF_STATE_LABELS)
+    if isinstance(labels, dict):
+        current[CONF_STATE_LABELS] = _map_to_kv_rows(labels, "state", CONF_LABEL)
+    series = current.get(CONF_SERIES)
+    if isinstance(series, dict):
+        current[CONF_SERIES] = _map_to_kv_rows(series, "attribute", CONF_LABEL)
+    units = current.get(CONF_UNITS)
+    if isinstance(units, dict):
+        current[CONF_UNITS] = _map_to_kv_rows(units, "series", CONF_UNIT)
+    current[CONF_STEPS_EDITOR] = _compose_steps_rows(current)
+    # series_entities and thresholds stay lists: their ObjectSelector row
+    # editors rehydrate from the stored list directly. tiles and log_columns
+    # also rehydrate as lists, but a pre-0.37 config may hold fields the strict
+    # parser now rejects, so sanitize the form defaults (storage untouched):
+    # truncate over-cap tile/log fields to their caps.
+    if isinstance(current.get(CONF_TILES), list):
+        current[CONF_TILES] = _truncate_row_fields(
+            current[CONF_TILES],
+            {
+                CONF_LABEL: BOARD_TILE_LABEL_MAX,
+                CONF_UNIT: BOARD_TILE_UNIT_MAX,
+                CONF_ICON: BOARD_TILE_ICON_MAX,
+                "url_action": MAX_URL_LEN,
+            },
+        )
+    if isinstance(current.get(CONF_LOG_COLUMNS), list):
+        current[CONF_LOG_COLUMNS] = _truncate_row_fields(current[CONF_LOG_COLUMNS], {CONF_LABEL: LOG_COLUMN_LABEL_MAX})
+    # Drop a stored primary_series that names no configured series label
+    # (legacy free text, or a series later renamed/removed): the strict parse
+    # rejects an unknown value and would otherwise dead-end the reconfigure.
+    primary = current.get(CONF_PRIMARY_SERIES)
+    if primary and primary not in _primary_series_options(current):
+        current[CONF_PRIMARY_SERIES] = ""
+    return current
+
+
 class PushWardConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle initial PushWard configuration."""
 
@@ -2359,47 +2404,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         if user_input is not None:
             self._step1_input = user_input
             self._is_reconfigure = True
-            # Prepare defaults for step 2 from existing config. The map fields
-            # (state_labels, series, units) rehydrate their two-column row editors
-            # from the stored dict; the unified steps editor composes one row per
-            # step from the four stored step keys, which stay untouched in storage.
-            current = dict(subentry.data)
-            labels = current.get(CONF_STATE_LABELS)
-            if isinstance(labels, dict):
-                current[CONF_STATE_LABELS] = _map_to_kv_rows(labels, "state", CONF_LABEL)
-            series = current.get(CONF_SERIES)
-            if isinstance(series, dict):
-                current[CONF_SERIES] = _map_to_kv_rows(series, "attribute", CONF_LABEL)
-            units = current.get(CONF_UNITS)
-            if isinstance(units, dict):
-                current[CONF_UNITS] = _map_to_kv_rows(units, "series", CONF_UNIT)
-            current[CONF_STEPS_EDITOR] = _compose_steps_rows(current)
-            # series_entities and thresholds stay lists: their ObjectSelector row
-            # editors rehydrate from the stored list directly. tiles and log_columns
-            # also rehydrate as lists, but a pre-0.37 config may hold fields the strict
-            # parser now rejects, so sanitize the form defaults (storage untouched):
-            # truncate over-cap tile/log fields to their caps.
-            if isinstance(current.get(CONF_TILES), list):
-                current[CONF_TILES] = _truncate_row_fields(
-                    current[CONF_TILES],
-                    {
-                        CONF_LABEL: BOARD_TILE_LABEL_MAX,
-                        CONF_UNIT: BOARD_TILE_UNIT_MAX,
-                        CONF_ICON: BOARD_TILE_ICON_MAX,
-                        "url_action": MAX_URL_LEN,
-                    },
-                )
-            if isinstance(current.get(CONF_LOG_COLUMNS), list):
-                current[CONF_LOG_COLUMNS] = _truncate_row_fields(
-                    current[CONF_LOG_COLUMNS], {CONF_LABEL: LOG_COLUMN_LABEL_MAX}
-                )
-            # Drop a stored primary_series that names no configured series label
-            # (legacy free text, or a series later renamed/removed): the strict parse
-            # rejects an unknown value and would otherwise dead-end the reconfigure.
-            primary = current.get(CONF_PRIMARY_SERIES)
-            if primary and primary not in _primary_series_options(current):
-                current[CONF_PRIMARY_SERIES] = ""
-            self._details_defaults = current
+            self._details_defaults = _entity_reconfigure_defaults(subentry.data)
             return await self.async_step_details()
 
         current = dict(subentry.data)
@@ -3207,6 +3212,40 @@ def _widget_details_to_config(
     return widget_cfg, {}
 
 
+def _widget_reconfigure_defaults(data: Mapping[str, Any]) -> dict[str, Any]:
+    """The details form's defaults on reconfigure, prepared from the stored config.
+
+    Shared with the panel preview, so a reconfigure draft fills the defaults its save does.
+    """
+    current = dict(data)
+    # stat_rows rehydrate as a list, but a pre-0.37 config may hold fields the
+    # strict parser now rejects, so truncate over-cap fields for the form
+    # default (storage stays untouched until the user submits).
+    if isinstance(current.get(CONF_STAT_ROWS), list):
+        current[CONF_STAT_ROWS] = _truncate_row_fields(
+            current[CONF_STAT_ROWS],
+            {CONF_LABEL: WIDGET_STAT_LABEL_MAX, CONF_UNIT: WIDGET_STAT_UNIT_MAX},
+        )
+    node_caps = {CONF_NODE_NAME: WIDGET_NODE_NAME_MAX, CONF_ICON: WIDGET_NODE_ICON_MAX}
+    for rows_key in (CONF_BATTERY_DEVICES, CONF_FLOW_NODES):
+        if isinstance(current.get(rows_key), list):
+            current[rows_key] = _truncate_row_fields(current[rows_key], node_caps)
+    return current
+
+
+def _widget_details_defaults(
+    template: str, saved: Mapping[str, Any], statistics_info: dict[str, Any]
+) -> dict[str, Any]:
+    """The details form's defaults: the prepared stored config on reconfigure, {} on add."""
+    defaults = dict(saved)
+    # A stored choice the (possibly new) entity cannot serve falls back to its default.
+    if template == WIDGET_TEMPLATE_HEATMAP and not _heatmap_aggregate_supported(
+        defaults.get(CONF_HEATMAP_AGGREGATE), statistics_info
+    ):
+        defaults[CONF_HEATMAP_AGGREGATE] = _default_heatmap_aggregate(statistics_info)
+    return defaults
+
+
 class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
     """Two-step flow for adding / reconfiguring a tracked widget."""
 
@@ -3273,20 +3312,7 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                 )
             self._step1_input = user_input
             self._is_reconfigure = True
-            current = dict(subentry.data)
-            # stat_rows rehydrate as a list, but a pre-0.37 config may hold fields the
-            # strict parser now rejects, so truncate over-cap fields for the form
-            # default (storage stays untouched until the user submits).
-            if isinstance(current.get(CONF_STAT_ROWS), list):
-                current[CONF_STAT_ROWS] = _truncate_row_fields(
-                    current[CONF_STAT_ROWS],
-                    {CONF_LABEL: WIDGET_STAT_LABEL_MAX, CONF_UNIT: WIDGET_STAT_UNIT_MAX},
-                )
-            node_caps = {CONF_NODE_NAME: WIDGET_NODE_NAME_MAX, CONF_ICON: WIDGET_NODE_ICON_MAX}
-            for rows_key in (CONF_BATTERY_DEVICES, CONF_FLOW_NODES):
-                if isinstance(current.get(rows_key), list):
-                    current[rows_key] = _truncate_row_fields(current[rows_key], node_caps)
-            self._details_defaults = current
+            self._details_defaults = _widget_reconfigure_defaults(subentry.data)
             return await self.async_step_details()
         current = dict(subentry.data)
         return self.async_show_form(
@@ -3318,12 +3344,9 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
                     unique_id=widget_cfg[CONF_SLUG],
                 )
 
-        defaults = dict(self._details_defaults) if self._is_reconfigure else {}
-        # A stored choice the (possibly new) entity cannot serve falls back to its default.
-        if template == WIDGET_TEMPLATE_HEATMAP and not _heatmap_aggregate_supported(
-            defaults.get(CONF_HEATMAP_AGGREGATE), self._statistics_info
-        ):
-            defaults[CONF_HEATMAP_AGGREGATE] = _default_heatmap_aggregate(self._statistics_info)
+        defaults = _widget_details_defaults(
+            template, self._details_defaults if self._is_reconfigure else {}, self._statistics_info
+        )
         expand = _sections_to_expand(WIDGET_SECTIONS, _WIDGET_TOPLEVEL, errors)
         schema = _widget_details_schema(entity_id, template, defaults=defaults, expand=expand)
         if errors and user_input is not None:

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import json
-from collections.abc import Callable, Coroutine
+from collections.abc import Callable, Coroutine, Mapping
 from functools import wraps
 from typing import Any
 from uuid import uuid4
@@ -26,12 +26,15 @@ from .api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
 from .config_flow import (
     _details_schema,
     _entity_details_to_config,
+    _entity_reconfigure_defaults,
     _entity_template_schema,
     _heatmap_statistics,
     _todo_data,
     _todo_schema,
+    _widget_details_defaults,
     _widget_details_schema,
     _widget_details_to_config,
+    _widget_reconfigure_defaults,
     _widget_step1_schema,
 )
 from .const import (
@@ -55,7 +58,6 @@ from .const import (
     SUBENTRY_TYPE_TODO,
     SUBENTRY_TYPE_WIDGET,
     WIDGET_TEMPLATE_HEATMAP,
-    WIDGET_TEMPLATE_VALUE,
     WIDGET_TEMPLATES,
 )
 from .content_mapper import lookup_registry_icon, map_content
@@ -163,50 +165,53 @@ def _api_errors(func: Callable[..., Coroutine[Any, Any, None]]) -> Callable[...,
 # --- pushward/preview ---
 
 
-def _form_errors(schema: vol.Schema, values: dict) -> dict[str, str]:
-    """{field: message} for the given values the form's selectors refuse.
+def _submitted(schema: vol.Schema, values: dict) -> tuple[dict | None, dict[str, str]]:
+    """values as a step handler gets them once HA ran the submit through the form schema.
 
-    HA runs a submit through the form schema before the step handler sees it.
-    Fields the draft leaves out are not checked; the form fills their defaults.
+    Defaults fill what is left out; otherwise {field: message} for what the schema
+    refuses. A missing section counts as empty: the form always sends one.
     """
-    errors: dict[str, str] = {}
-    for key, validator in schema.schema.items():
-        if (name := str(key)) not in values:
-            continue
-        if isinstance(validator, section):
-            if isinstance(values[name], dict):
-                errors.update(_form_errors(validator.schema, values[name]))
-            else:
-                errors[name] = "expected a dictionary"
-            continue
-        try:
-            vol.Schema(validator)(values[name])
-        except vol.Invalid as err:
-            errors[name] = err.error_message
-    return errors
+    sections = {str(key): {} for key, validator in schema.schema.items() if isinstance(validator, section)}
+    try:
+        return schema({**sections, **values}), {}
+    except vol.MultipleInvalid as err:
+        return None, {str(error.path[-1]) if error.path else "base": error.error_message for error in err.errors}
 
 
-async def _parse_draft(hass: HomeAssistant, subentry_type: str, draft: dict) -> tuple[dict | None, dict[str, str]]:
-    """A draft through what its flow's form submit goes through: the selectors, then the parse."""
+async def _parse_draft(
+    hass: HomeAssistant, subentry_type: str, draft: dict, saved: Mapping[str, Any] | None
+) -> tuple[dict | None, dict[str, str]]:
+    """A draft taken the way its flow takes a form submit, so what previews is what saves.
+
+    HA's frontend leaves top-level empty strings out, the step schemas fill their
+    defaults (built from the saved subentry on reconfigure), then the details parse runs.
+    """
+    draft = {key: value for key, value in draft.items() if value != ""}
     if subentry_type == SUBENTRY_TYPE_TODO:
-        errors = _form_errors(_todo_schema(), draft)
-        return (None, errors) if errors else (_todo_data(draft), {})
-    entity_id = draft[CONF_ENTITY_ID]
-    if subentry_type == SUBENTRY_TYPE_ENTITY:
-        if errors := _form_errors(_entity_template_schema(), draft):
-            return None, errors
-        if errors := _form_errors(_details_schema(entity_id, draft.get(CONF_TEMPLATE, "generic"), hass=hass), draft):
-            return None, errors
-        return _entity_details_to_config(draft, {}, hass)
-    if errors := _form_errors(_widget_step1_schema(), draft):
-        return None, errors
-    info, errors = await _heatmap_statistics(hass, draft)
+        values, errors = _submitted(_todo_schema(saved), draft)
+        return (None, errors) if errors else (_todo_data(values), {})
+    step1_schema = (_entity_template_schema if subentry_type == SUBENTRY_TYPE_ENTITY else _widget_step1_schema)(
+        dict(saved) if saved is not None else None
+    )
+    step1_keys = {str(key) for key in step1_schema.schema}
+    step1, errors = _submitted(step1_schema, {key: value for key, value in draft.items() if key in step1_keys})
     if errors:
         return None, errors
-    template = draft.get(CONF_WIDGET_TEMPLATE, WIDGET_TEMPLATE_VALUE)
-    if errors := _form_errors(_widget_details_schema(entity_id, template), draft):
+    details = {key: value for key, value in draft.items() if key not in step1_keys}
+    entity_id = step1[CONF_ENTITY_ID]
+    if subentry_type == SUBENTRY_TYPE_ENTITY:
+        defaults = _entity_reconfigure_defaults(saved) if saved is not None else None
+        schema = _details_schema(entity_id, step1[CONF_TEMPLATE], defaults=defaults, hass=hass)
+        user_input, errors = _submitted(schema, details)
+        return (None, errors) if errors else _entity_details_to_config(step1, user_input, hass)
+    info, errors = await _heatmap_statistics(hass, step1)
+    if errors:
         return None, errors
-    return _widget_details_to_config(draft, draft, info)
+    template = step1[CONF_WIDGET_TEMPLATE]
+    stored = _widget_reconfigure_defaults(saved) if saved is not None else {}
+    defaults = _widget_details_defaults(template, stored, info)
+    user_input, errors = _submitted(_widget_details_schema(entity_id, template, defaults=defaults), details)
+    return (None, errors) if errors else _widget_details_to_config(step1, user_input, info)
 
 
 async def _activity_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: bool) -> dict | None:
@@ -302,8 +307,9 @@ _PREVIEWS = {
     {
         vol.Required("type"): "pushward/preview",
         vol.Required("entry_id"): str,
-        vol.Exclusive("subentry_id", "source"): str,
-        vol.Exclusive("subentry_type", "source"): vol.In(list(_KINDS)),
+        # A draft may name the subentry it reconfigures; that only supplies the saved defaults.
+        vol.Optional("subentry_id"): str,
+        vol.Optional("subentry_type"): vol.In(list(_KINDS)),
         vol.Optional("data"): dict,
     }
 )
@@ -313,27 +319,31 @@ async def ws_preview(hass: HomeAssistant, connection: websocket_api.ActiveConnec
     """What a saved subentry (subentry_id) or a draft (subentry_type + data) shows. Read-only."""
     if (data := _entry_data(hass, connection, msg)) is None:
         return
-    if "subentry_id" in msg and "data" not in msg:
-        entry = hass.config_entries.async_get_entry(msg["entry_id"])
-        if entry is None or (sub := entry.subentries.get(msg["subentry_id"])) is None:
-            connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "No subentry with that id")
-            return
-        subentry_type, saved = sub.subentry_type, True
-        cfg: dict | None = {**sub.data, CONF_SUBENTRY_ID: sub.subentry_id}
-        errors: dict[str, str] = {}
-    elif "subentry_type" in msg and "data" in msg:
-        subentry_type, saved = msg["subentry_type"], False
-        try:
-            cfg, errors = await _parse_draft(hass, subentry_type, msg["data"])
-        except (KeyError, TypeError, ValueError, AttributeError):
-            # Shapes the form's own schema would have refused before the parse.
-            connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "The draft cannot be parsed")
-            return
-    else:
+    is_draft = "data" in msg
+    if is_draft != ("subentry_type" in msg) or not (is_draft or "subentry_id" in msg):
         connection.send_error(
             msg["id"], websocket_api.ERR_INVALID_FORMAT, "Give subentry_id, or subentry_type and data"
         )
         return
+    sub = None
+    if "subentry_id" in msg:
+        entry = hass.config_entries.async_get_entry(msg["entry_id"])
+        sub = entry.subentries.get(msg["subentry_id"]) if entry is not None else None
+        if sub is None or (is_draft and sub.subentry_type != msg["subentry_type"]):
+            connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "No subentry with that id")
+            return
+    if not is_draft:
+        subentry_type, saved = sub.subentry_type, True
+        cfg: dict | None = {**sub.data, CONF_SUBENTRY_ID: sub.subentry_id}
+        errors: dict[str, str] = {}
+    else:
+        subentry_type, saved = msg["subentry_type"], False
+        try:
+            cfg, errors = await _parse_draft(hass, subentry_type, msg["data"], sub.data if sub else None)
+        except (KeyError, TypeError, ValueError, AttributeError):
+            # Shapes the form's own schema would have refused before the parse.
+            connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "The draft cannot be parsed")
+            return
     payload = await _PREVIEWS[subentry_type](hass, data, cfg, saved) if cfg is not None else None
     connection.send_result(
         msg["id"],

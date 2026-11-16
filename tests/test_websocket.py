@@ -15,14 +15,16 @@ from homeassistant import config_entries
 from homeassistant.components import frontend
 from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
-from homeassistant.data_entry_flow import InvalidData
+from homeassistant.data_entry_flow import FlowResultType, InvalidData
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.pushward import panel
 from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
 from custom_components.pushward.const import (
+    CONF_ACTIVITY_NAME,
     CONF_BATTERY_DEVICES,
     CONF_CHARGING_ENTITY,
+    CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_HEATMAP_AGGREGATE,
     CONF_HEATMAP_WEEKS,
@@ -31,12 +33,14 @@ from custom_components.pushward.const import (
     CONF_INTEGRATION_KEY,
     CONF_LABEL,
     CONF_MAX_VALUE,
+    CONF_MEDIA_TOKEN,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
     CONF_PROGRESS_ENTITY,
     CONF_SERVER_URL,
     CONF_SLUG,
     CONF_SOUND,
+    CONF_START_STATES,
     CONF_STAT_ROWS,
     CONF_TEMPLATE,
     CONF_TILES,
@@ -60,7 +64,7 @@ from custom_components.pushward.const import (
 )
 from custom_components.pushward.e2e import E2EError, open_envelope
 from custom_components.pushward.panel import PANEL_URL_PATH, STATIC_URL_PATH
-from custom_components.pushward.websocket import MAX_PAYLOAD_BYTES
+from custom_components.pushward.websocket import MAX_PAYLOAD_BYTES, _parse_draft
 
 from .conftest import (
     IMAGE_URL,
@@ -270,8 +274,8 @@ async def test_preview_draft_activity_maps_without_network(hass: HomeAssistant, 
     entry, api = loaded
     api.reset_mock()
     draft = {
-        **_mock_core_input(**{CONF_ENTITY_ID: "sensor.temp", CONF_TEMPLATE: "gauge"}),
-        **_mock_details_input("gauge", **{CONF_IMAGE_URL: IMAGE_URL}),
+        **_mock_core_input(**{CONF_ENTITY_ID: "sensor.temp", CONF_TEMPLATE: "generic"}),
+        **_mock_details_input("generic", **{CONF_IMAGE_URL: IMAGE_URL}),
     }
 
     with patch_image_download(b"not fetched") as session:
@@ -279,7 +283,8 @@ async def test_preview_draft_activity_maps_without_network(hass: HomeAssistant, 
 
     result = reply["result"]
     assert result["available"]
-    assert result["payload"]["content"]["template"] == "gauge"
+    assert result["payload"]["content"]["template"] == "generic"
+    assert result["payload"]["content"]["image_url"] == IMAGE_URL
     assert "thumbhash" not in str(result["payload"]["content"])
     session.get.assert_not_called()
     assert api.mock_calls == []
@@ -668,6 +673,78 @@ async def test_preview_saved_heatmap_reuses_the_managers_read_of_today(hass: Hom
     assert reply["result"]["payload"]["content"]["cells"] == week
 
 
+async def test_preview_new_draft_fills_the_form_defaults_like_the_save(hass: HomeAssistant, loaded) -> None:
+    entry, _ = loaded
+    hass.states.async_set("binary_sensor.door", "on", {"friendly_name": "Door"})
+    core = {CONF_ENTITY_ID: "binary_sensor.door"}  # the template left to its default
+    details = _mock_details_input("generic", **{CONF_SLUG: "ha-door", CONF_ACTIVITY_NAME: "Door"})
+    # Cleared top-level fields: the frontend leaves them out, the form fills the domain's states.
+    del details[CONF_START_STATES], details[CONF_END_STATES]
+
+    cfg, errors = await _parse_draft(hass, SUBENTRY_TYPE_ENTITY, {**core, **details, CONF_START_STATES: ""}, None)
+
+    flow = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY), context={"source": config_entries.SOURCE_USER}
+    )
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=core)
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=details)
+    assert flow["type"] is FlowResultType.CREATE_ENTRY
+    [stored] = [sub.data for sub in entry.subentries.values() if sub.unique_id == "binary_sensor.door"]
+    assert errors == {}
+    assert cfg == {key: value for key, value in stored.items() if key != CONF_MEDIA_TOKEN}
+    assert cfg[CONF_START_STATES] == ["on"]
+    assert cfg[CONF_END_STATES] == ["off"]
+
+
+async def test_preview_new_widget_draft_fills_its_template(loaded, ws) -> None:
+    entry, _ = loaded
+    reply = await ws(
+        "pushward/preview",
+        entry_id=entry.entry_id,
+        subentry_type=SUBENTRY_TYPE_WIDGET,
+        data={CONF_ENTITY_ID: "sensor.temp", CONF_SLUG: ""},
+    )
+    assert reply["result"]["payload"]["template"] == "value"
+    assert reply["result"]["payload"]["content"]["value"] == 21.5
+
+
+async def test_preview_reconfigure_draft_that_clears_the_name_shows_the_stored_one(
+    hass: HomeAssistant, loaded, ws
+) -> None:
+    entry, _ = loaded
+    subentry_id = _subentry_id(entry, SUBENTRY_TYPE_WIDGET)
+    assert entry.subentries[subentry_id].data[CONF_WIDGET_NAME] == "Users"
+    # A friendly name apart from the stored one, so a fallback to it would show.
+    hass.states.async_set("sensor.users", "42", {"friendly_name": "Members"})
+    step1 = {CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: "value", CONF_SLUG: "ha-users"}
+    details = _nest_widget("value", {})  # the cleared name is left out, as the frontend submits it
+    draft = {**step1, CONF_WIDGET_NAME: "", **details}
+
+    async def preview(**fields: Any) -> dict:
+        reply = await ws(
+            "pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_WIDGET, data=draft, **fields
+        )
+        return reply["result"]["payload"]
+
+    assert (await preview(subentry_id=subentry_id))["name"] == "Users"
+    assert (await preview())["name"] == "Members"  # an add form has no stored name to fill
+
+    flow = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=step1)
+    flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=details)
+    assert flow["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_WIDGET_NAME] == "Users"
+
+
+async def test_preview_draft_without_an_entity_is_refused_like_the_form(loaded, ws) -> None:
+    entry, _ = loaded
+    reply = await ws(
+        "pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_ENTITY, data={"no_entity": True}
+    )
+    assert set(reply["result"]["errors"]) == {CONF_ENTITY_ID}
+    assert reply["result"]["payload"] is None
+
+
 @pytest.mark.parametrize(
     "fields",
     [
@@ -675,7 +752,7 @@ async def test_preview_saved_heatmap_reuses_the_managers_read_of_today(hass: Hom
         {"subentry_type": SUBENTRY_TYPE_ENTITY},
         {"data": {CONF_ENTITY_ID: WASHER}},
         {"subentry_id": "x", "data": {CONF_ENTITY_ID: WASHER}},
-        {"subentry_type": SUBENTRY_TYPE_ENTITY, "data": {"no_entity": True}},
+        {"subentry_id": "x", "subentry_type": SUBENTRY_TYPE_ENTITY},
     ],
 )
 async def test_preview_needs_exactly_one_form(loaded, ws, fields: dict) -> None:
@@ -688,6 +765,17 @@ async def test_preview_unknown_subentry(loaded, ws) -> None:
     entry, _ = loaded
     reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id="nope")
     assert reply["error"]["code"] == "not_found"
+
+    # A draft's subentry must be one of its own type in the same entry.
+    for subentry_id in ("nope", _subentry_id(entry, SUBENTRY_TYPE_TODO)):
+        reply = await ws(
+            "pushward/preview",
+            entry_id=entry.entry_id,
+            subentry_type=SUBENTRY_TYPE_ENTITY,
+            subentry_id=subentry_id,
+            data={CONF_ENTITY_ID: WASHER},
+        )
+        assert reply["error"]["code"] == "not_found"
 
 
 # --- pushward/send_test ---
