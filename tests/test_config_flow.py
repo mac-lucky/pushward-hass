@@ -4674,6 +4674,55 @@ async def test_add_form_submitted_as_offered_creates_with_the_optional_fields_un
     assert {key: result["data"][key] for key in fields} == {key: cleared for key, (_, cleared) in fields.items()}
 
 
+async def _submit_cleared_with_a_bad_url(hass: HomeAssistant, result: dict) -> dict:
+    """Clear the tap URL and break the second button's URL in one submit, then submit the re-shown form fixed."""
+    details = _reconfigure_details_defaults(result)
+    _omit_fields(details, CONF_TAP_ACTION_URL)
+    details["tap_actions"][CONF_SECONDARY_URL] = "javascript:x"
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=details)
+    assert result["errors"] == {"tap_actions": "invalid_url"}
+    assert _suggested_values(result)[CONF_TAP_ACTION_URL] is None
+
+    fixed = _reconfigure_details_defaults(result)
+    _omit_fields(fixed, CONF_SECONDARY_URL)
+    return await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=fixed)
+
+
+async def test_error_reshow_keeps_a_cleared_field_cleared(hass: HomeAssistant) -> None:
+    hass.states.async_set("binary_sensor.washer", "off")
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    await _add_entity_subentry(
+        hass, entry, template="alert", details_overrides={CONF_TAP_ACTION_URL: "https://example.com/tap"}
+    )
+    subentry_id = next(iter(entry.subentries))
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**{CONF_TEMPLATE: "alert"})
+    )
+
+    result = await _submit_cleared_with_a_bad_url(hass, result)
+
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_TAP_ACTION_URL] == ""
+
+
+async def test_widget_error_reshow_keeps_a_cleared_field_cleared(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    await _add_widget_subentry(hass, entry, WIDGET_TEMPLATE_VALUE, {CONF_TAP_ACTION_URL: "https://example.com/tap"})
+    subentry_id = next(iter(entry.subentries))
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_VALUE}
+    )
+
+    result = await _submit_cleared_with_a_bad_url(hass, result)
+
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.subentries[subentry_id].data[CONF_TAP_ACTION_URL] == ""
+
+
 _CLEARED_WIDGET_FIELDS: dict[str, dict] = {
     WIDGET_TEMPLATE_VALUE: {
         CONF_WIDGET_NAME: ("Online", ""),

@@ -879,6 +879,22 @@ def _section_errors(
     return shown
 
 
+def _refill_values(schema: vol.Schema, submitted: Mapping[str, Any]) -> dict[str, Any]:
+    """What a re-shown form suggests: the submission, and None for each field it left out.
+
+    add_suggested_values_to_schema keeps a field's own suggestion when the field is
+    missing, so a field the user just cleared would come back with its stored value.
+    """
+    values: dict[str, Any] = {}
+    for key, val in schema.schema.items():
+        name = key.schema if isinstance(key, vol.Marker) else key
+        if isinstance(val, section):
+            values[name] = _refill_values(val.schema, submitted.get(name) or {})
+        else:
+            values[name] = submitted.get(name)
+    return values
+
+
 async def _validate_integration_key(
     hass: HomeAssistant,
     key: str,
@@ -2618,7 +2634,7 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
             # Re-fill the form with what the user just submitted instead of dropping it.
             # user_input is still nested per section; add_suggested_values recurses into
             # sections, so the re-fill lands on the right keys.
-            schema = self.add_suggested_values_to_schema(schema, user_input)
+            schema = self.add_suggested_values_to_schema(schema, _refill_values(schema, user_input))
         return self.async_show_form(
             step_id="details",
             data_schema=schema,
@@ -3469,7 +3485,7 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
         schema = _widget_details_schema(entity_id, template, defaults=defaults, expand=expand)
         if errors and user_input is not None:
             # Re-fill the form with what the user just submitted instead of dropping it.
-            schema = self.add_suggested_values_to_schema(schema, user_input)
+            schema = self.add_suggested_values_to_schema(schema, _refill_values(schema, user_input))
         return self.async_show_form(
             step_id="details",
             data_schema=schema,
