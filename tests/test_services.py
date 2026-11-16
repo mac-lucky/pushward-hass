@@ -2874,8 +2874,9 @@ async def test_async_remove_entry_deletes_server_widgets(hass: HomeAssistant) ->
         await async_remove_entry(hass, entry)
 
     assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-one", "ha-two", "ha-preview-widget"}
-    # The panel's test activity is ended too.
-    api.update_activity.assert_awaited_once_with("ha-preview", "ended", {})
+    # The panel's test activity goes too, through the un-metered DELETE.
+    api.delete_activity.assert_awaited_once_with("ha-preview")
+    api.update_activity.assert_not_awaited()
 
 
 async def test_async_remove_entry_caps_the_panel_cleanup_on_an_unreachable_server(hass: HomeAssistant) -> None:
@@ -2887,7 +2888,7 @@ async def test_async_remove_entry_caps_the_panel_cleanup_on_an_unreachable_serve
         await never.wait()
 
     api.delete_widget.side_effect = unreachable
-    api.update_activity.side_effect = unreachable
+    api.delete_activity.side_effect = unreachable
     entry = _mock_entry()
     entry.add_to_hass(hass)
 
@@ -2899,7 +2900,7 @@ async def test_async_remove_entry_caps_the_panel_cleanup_on_an_unreachable_serve
             await async_remove_entry(hass, entry)
 
     api.delete_widget.assert_awaited_once_with("ha-preview-widget")
-    api.update_activity.assert_awaited_once_with("ha-preview", "ended", {})
+    api.delete_activity.assert_awaited_once_with("ha-preview")
 
 
 async def test_action_objects_satisfy_server_contract(hass: HomeAssistant) -> None:

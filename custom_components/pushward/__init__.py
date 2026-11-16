@@ -1905,7 +1905,8 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     # never had any, so their cleanup gets a short cap instead of the full retry loop.
     await asyncio.gather(
         _panel_cleanup(api.delete_widget(PREVIEW_WIDGET_SLUG), "widget"),
-        _panel_cleanup(api.update_activity(PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ENDED, {}), "activity"),
+        # DELETE ends the test activity too, and unlike an ended update it is not metered and 404-safe.
+        _panel_cleanup(api.delete_activity(PREVIEW_ACTIVITY_SLUG), "activity"),
         *(api.delete_widget(slug) for slug in widget_slugs),
         return_exceptions=True,
     )
