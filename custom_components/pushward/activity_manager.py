@@ -908,13 +908,15 @@ class ActivityManager:
             tracked.last_sent_at = time.monotonic()
             tracked.recreate_attempted = False
 
-            # A run_while row or calendar window that closed while this start was on the
-            # wire found nothing active to end. State-driven entities keep ending on end
-            # states only, so an in-between state does not end them here.
+            # A run_while row, calendar window or end state reached while this start was
+            # on the wire found nothing active to end. State-driven entities keep ending
+            # on end states only, so an in-between state does not end them here.
+            now_state = self._hass.states.get(entity_id)
             if is_calendar_config(config):
-                still_wanted = self._should_run(tracked, self._hass.states.get(entity_id))
+                still_wanted = self._should_run(tracked, now_state)
             else:
-                still_wanted = self._conditions_hold(config)
+                ended = now_state is not None and now_state.state in config.get(CONF_END_STATES, [])
+                still_wanted = self._conditions_hold(config) and not ended
             if not still_wanted:
                 self._schedule_end(entity_id)
 

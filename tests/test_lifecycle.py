@@ -316,6 +316,34 @@ async def test_run_while_condition_lost_while_starting_ends_the_activity(hass: H
     await manager.async_stop()
 
 
+async def test_end_state_reached_while_starting_ends_the_activity(hass: HomeAssistant) -> None:
+    """The state handler sees nothing active mid-start, so the end state has to be caught after it."""
+    api = make_activity_api()
+    gate = asyncio.Event()
+
+    async def _on_the_wire(*_args, **_kwargs) -> None:
+        await gate.wait()
+
+    api.create_activity.side_effect = _on_the_wire
+    await _set(hass, PHONE, "home")
+    manager = await _start(hass, api, _trip_config(**{CONF_RUN_WHILE: []}))
+    tracked = manager._tracked[PHONE]
+
+    with patch(END_DELAY_TARGET, 0):
+        hass.states.async_set(PHONE, "not_home")
+        await _pump()
+        api.create_activity.assert_awaited_once()
+        hass.states.async_set(PHONE, "home")
+        await _pump()
+        gate.set()
+        await hass.async_block_till_done()
+        await _end_window(manager, hass, PHONE)
+
+    assert len(activity_updates(api, "ended")) == 1
+    assert not tracked.is_active
+    await manager.async_stop()
+
+
 async def test_run_while_gates_the_deferred_board_start(hass: HomeAssistant) -> None:
     api = make_activity_api()
     config = make_entity_config(
