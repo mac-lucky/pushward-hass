@@ -1974,12 +1974,12 @@ def _timeline_series_labels(
 
     Mirrors how content_mapper labels series: CONF_SERIES values, each resolved
     CONF_SERIES_ENTITIES label, and - when neither source is configured - the
-    single default series labelled with the tracked entity's friendly name (see
-    _get_timeline_values).
+    single default series labelled with the tracked entity's friendly name, capped
+    at TIMELINE_SERIES_LABEL_MAX as the mapper caps it (see _get_timeline_values).
     """
     labels: set[str] = set(_series_label_sources(series, series_entities))
     if not series and not series_entities:
-        labels.add(_entity_friendly_name(hass, entity_id))
+        labels.add(_entity_friendly_name(hass, entity_id)[:TIMELINE_SERIES_LABEL_MAX])
     return labels
 
 

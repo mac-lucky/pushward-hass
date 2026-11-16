@@ -43,6 +43,7 @@ from custom_components.pushward.config_flow import (
     _section_errors,
     _suggest_template,
     _suggest_widget_template,
+    _timeline_series_labels,
     _validate_integration_key,
     _widget_details_schema,
 )
@@ -4004,6 +4005,24 @@ async def test_flow_primary_series_matching_default_entity_label_passes(hass: Ho
         details_overrides={CONF_PRIMARY_SERIES: "binary_sensor.washer"},
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
+
+
+async def test_flow_primary_series_default_label_is_capped_like_the_mapper(hass: HomeAssistant) -> None:
+    """The mapper caps the default series label, so primary_series must name the capped one."""
+    name = "Basement laundry room washer power draw kW"
+    assert len(name) == 42
+    hass.states.async_set("binary_sensor.washer", "off", {"friendly_name": name})
+    capped = name[:TIMELINE_SERIES_LABEL_MAX]
+
+    assert _timeline_series_labels({}, [], "binary_sensor.washer", hass) == {capped}
+
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass, entry, template="timeline", details_overrides={CONF_PRIMARY_SERIES: capped}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_PRIMARY_SERIES] == capped
 
 
 async def test_flow_invalid_stat_row(hass: HomeAssistant) -> None:
