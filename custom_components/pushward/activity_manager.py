@@ -1121,6 +1121,9 @@ class ActivityManager:
             return
 
         slug = tracked.config[CONF_SLUG]
+        # Stamped before the send: a refused push still spaces the next one, and the
+        # throttle's trailing flush delivers the newest state once the interval passes.
+        tracked.last_sent_at = time.monotonic()
         async with self._api_error_guard(slug, "updating"):
             sound = tracked.config.get(CONF_SOUND) or None
             try:
@@ -1149,7 +1152,6 @@ class ActivityManager:
                 tracked.recreate_attempted = False
             self._clear_forbidden_notification(slug)
             tracked.last_content = content
-            tracked.last_sent_at = time.monotonic()
 
     @callback
     def _flush_update(self, entity_id: str, _now: datetime | None = None) -> None:

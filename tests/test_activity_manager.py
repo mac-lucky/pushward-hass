@@ -15,6 +15,7 @@ from homeassistant.components.media_player import MediaPlayerEntityFeature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.util import dt as dt_util
+from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.pushward.activity_manager import (
     ActivityManager,
@@ -239,6 +240,29 @@ async def test_throttled_update_dedup(hass: HomeAssistant) -> None:
     # Should not have sent another update (same content)
     assert api.update_activity.await_count == initial_count
 
+    await manager.async_stop()
+
+
+async def test_refused_updates_still_honor_the_interval(hass: HomeAssistant) -> None:
+    """A push the server keeps refusing still spaces the next one; the newest state goes out after."""
+    api = _mock_api()
+    config = _entity_config(**{CONF_UPDATE_INTERVAL: 30, CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager, tracked = await _start_active(hass, api, config, on_attrs={"progress": 0})
+    api.update_activity.side_effect = PushWardApiError("server error", status_code=500)
+    tracked.last_sent_at = time.monotonic() - 86400
+
+    for progress in range(1, 11):
+        hass.states.async_set("binary_sensor.washer", "on", {"progress": progress})
+        await hass.async_block_till_done()
+
+    assert api.update_activity.await_count == 1
+    assert tracked.flush_unsub is not None
+
+    api.update_activity.side_effect = None
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=31))
+    await hass.async_block_till_done()
+    assert api.update_activity.await_count == 2
+    assert api.update_activity.call_args.args[2]["progress"] == 0.1
     await manager.async_stop()
 
 
