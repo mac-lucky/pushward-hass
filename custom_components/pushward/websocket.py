@@ -405,9 +405,13 @@ async def ws_send_test(hass: HomeAssistant, connection: websocket_api.ActiveConn
         # An empty merge patch keeps the stored frame and only ends it. A 404 is already gone
         # (dismissed and cleaned up, or deleted elsewhere): nothing is left to end.
         with contextlib.suppress(PushWardNotFoundError):
-            await api.update_activity(
-                PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ENDED, payload["content"] if payload else {}
-            )
+            try:
+                await api.update_activity(
+                    PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ENDED, payload["content"] if payload else {}
+                )
+            except PushWardQuotaExceededError:
+                # Out of updates: the unmetered DELETE still takes it off the phone, like the manager's end.
+                await api.delete_activity(PREVIEW_ACTIVITY_SLUG)
     elif kind == "widget" and action == "send":
         name = payload.get("name") or "PushWard preview"
         await api.create_widget(PREVIEW_WIDGET_SLUG, name, payload["template"], payload["content"])

@@ -879,6 +879,17 @@ async def test_send_test_activity_end_of_a_gone_activity_counts_as_ended(loaded,
     assert reply["success"]
 
 
+async def test_send_test_activity_end_out_of_updates_deletes_it(loaded, ws) -> None:
+    entry, api = loaded
+    api.update_activity.side_effect = PushWardQuotaExceededError("live_activity_updates")
+
+    reply = await ws("pushward/send_test", entry_id=entry.entry_id, kind="activity", action="end")
+
+    # The metered end is refused; the unmetered DELETE still takes the test off the phone.
+    assert reply["success"]
+    api.delete_activity.assert_awaited_once_with("ha-preview")
+
+
 async def test_send_test_widget_send_and_end(loaded, ws) -> None:
     entry, api = loaded
     api.reset_mock()
