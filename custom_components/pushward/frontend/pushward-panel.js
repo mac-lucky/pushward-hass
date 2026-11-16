@@ -15,9 +15,9 @@ const REFRESH_MS = 1000;
 const DRAFT_MS = 300;
 const FORM_WAIT_MS = 5000;
 
-const EMBED_URL = new URL("./embed/pushward-embed.js", import.meta.url);
-// The panel's module URL carries the integration version; the embed entry takes it too, against stale caches.
-EMBED_URL.search = new URL(import.meta.url).search;
+// No version query: the embed's chunks import the entry by its bare URL, and a second URL would load it twice.
+const EMBED_URL = new URL("./embed/pushward-embed.js", import.meta.url).href;
+const NOT_ALL_REQUIRED = "ui.panel.config.integrations.config_flow.not_all_required_fields";
 
 // Home Assistant has no translation category for panels. The panel's own strings
 // live under selector.panel.options: hassfest accepts that shape, and
@@ -118,6 +118,17 @@ function submitData(schema, data) {
   return out;
 }
 
+/** Whether every required field holds a value, checked the way HA's form does before it submits. */
+function requiredFilled(schema, data = {}) {
+  return schema.every(
+    (field) =>
+      (!field.required || !["", undefined].includes(data[field.name])) &&
+      (field.type !== "expandable" ||
+        (!field.required && data[field.name] === undefined) ||
+        requiredFilled(field.schema, data[field.name]))
+  );
+}
+
 /** ha-form exists only once a Home Assistant page needed it; the config panel's automation editor loads it. */
 async function loadHaForm() {
   if (customElements.get("ha-form")) return true;
@@ -167,8 +178,8 @@ const STYLE = `
   color: var(--app-header-text-color, var(--text-primary-color, #fff));
   border-bottom: var(--app-header-border-bottom, none);
 }
-.toolbar .title { font-size: 20px; margin-left: 12px; }
-.tabs { display: flex; gap: 4px; margin-left: auto; }
+.toolbar .title { font-size: 20px; margin-left: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tabs { display: flex; gap: 4px; margin-left: auto; flex-shrink: 0; }
 .tab {
   color: inherit;
   border: none;
@@ -183,7 +194,7 @@ h3 { font-size: 16px; font-weight: 500; margin: 20px 0 12px; color: var(--second
 h4 { font-size: 16px; font-weight: 500; margin: 0; overflow-wrap: anywhere; }
 .account { margin-bottom: 32px; }
 .account-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 16px; }
 .card {
   background: var(--card-background-color, var(--ha-card-background));
   border: 1px solid var(--divider-color);
@@ -233,6 +244,8 @@ select {
 }
 @media (max-width: 870px) {
   main { padding: 12px; }
+  .toolbar .title { margin-left: 4px; }
+  .tab { padding-left: 8px; padding-right: 8px; }
   .editor { grid-template-columns: minmax(0, 1fr); }
   .preview-pane { position: static; order: -1; }
 }
@@ -247,7 +260,7 @@ class PushWardPanel extends HTMLElement {
     this._unloaded = [];
     this._subentries = {}; // entry_id -> its subentries
     this._cards = new Map(); // subentry_id -> card state
-    this._lastSent = {}; // kind -> the card whose test item is on the phone
+    this._lastSent = {}; // "entry_id:kind" -> the card whose test item is on that account's phone
     this._localizers = [];
     this._loadSeq = 0;
     this._scheduleLoad = debounce(() => this._load(), 500);
@@ -305,7 +318,10 @@ class PushWardPanel extends HTMLElement {
     this._root = h("div", {}, h("div", { class: "toolbar" }, this._menu, h("div", { class: "title" }, "PushWard"), this._tabs), this._main);
     this.shadowRoot.append(h("style", {}, STYLE), this._root);
 
-    import(EMBED_URL.href)
+    // Revalidated first: the entry keeps its name across builds, so a cached copy could predate an upgrade.
+    fetch(EMBED_URL, { cache: "no-cache" })
+      .catch(() => {})
+      .then(() => import(EMBED_URL))
       .then(
         () => true,
         (err) => {
@@ -331,6 +347,8 @@ class PushWardPanel extends HTMLElement {
       hass.loadBackendTranslation("selector", DOMAIN),
       // Abort reasons shared across integrations.
       hass.loadBackendTranslation("config", "homeassistant"),
+      // The config panel's strings, for the required-fields message.
+      hass.loadFragmentTranslation?.("config"),
     ];
     this._translations = Promise.all(loads.map((load) => Promise.resolve(load).catch(() => undefined))).then((fns) => {
       if (hass.language !== this._hass.language) return;
@@ -338,6 +356,8 @@ class PushWardPanel extends HTMLElement {
       this._localizers = fns.filter((fn) => typeof fn === "function");
       this._ready = true;
       this._render();
+      // When the list arrived first, its cards are drawn only now and still need their previews.
+      if (this._loaded && this._tab === "tracked" && !this._editor) this._refreshAll();
     });
   }
 
@@ -474,6 +494,11 @@ class PushWardPanel extends HTMLElement {
     else if (this._editor) view = this._renderEditor();
     else view = this._renderTracked();
     fill(this._main, view);
+    // Off its tab the playground stays on the page, hidden: removing it ends its component and the edits made in it.
+    if (this._pgBox) {
+      this._pgBox.hidden = !this._main.contains(this._pgBox);
+      this._main.append(this._pgBox);
+    }
   }
 
   _link() {
@@ -560,7 +585,7 @@ class PushWardPanel extends HTMLElement {
           ),
           h("button", { class: "danger", "@click": () => this._paintConfirm(card, true) }, this._t("ui.common.delete")),
           h("button", { ".disabled": !payload || card.busy, "@click": () => this._send(card, "send") }, this._p("send")),
-          this._lastSent[kind] === card.id &&
+          this._lastSent[`${card.entryId}:${kind}`] === card.id &&
             h("button", { ".disabled": card.busy, "@click": () => this._send(card, "end") }, this._p("end")),
           h(
             "button",
@@ -603,6 +628,10 @@ class PushWardPanel extends HTMLElement {
     card.error = error;
     if (result) card.entityIds = result.entity_ids || [];
     if (card.el) this._paintCard(card);
+    // The manager has not pushed the newest frame yet (throttled or in flight): ask again shortly.
+    if (result?.pending && !card.timer && this._tab === "tracked" && !this._editor && this.isConnected) {
+      card.timer = setTimeout(() => this._refreshCard(card), REFRESH_MS);
+    }
   }
 
   async _send(card, action) {
@@ -614,7 +643,7 @@ class PushWardPanel extends HTMLElement {
       const msg = { type: "pushward/send_test", entry_id: card.entryId, kind, action };
       if (action === "send") msg.payload = card.result.payload;
       await this._hass.callWS(msg);
-      if (kind !== "notification") this._lastSent[kind] = action === "send" ? card.id : undefined;
+      if (kind !== "notification") this._lastSent[`${card.entryId}:${kind}`] = action === "send" ? card.id : undefined;
       card.status = { ok: true, text: action === "send" ? this._p("sent") : this._p("ended") };
     } catch (err) {
       card.status = { ok: false, text: errorText(err) };
@@ -653,6 +682,7 @@ class PushWardPanel extends HTMLElement {
     if (this._embedOk === false) return [h("p", { class: "note" }, this._p("embed_unavailable"))];
     if (!this._entries.length) return [this._empty(this._p("no_entries"))];
     this._playground ??= document.createElement("pushward-playground");
+    this._pgBox ??= h("div");
     this._look(this._playground);
     this._playground.initial = this._initial ?? null;
     const picker =
@@ -669,7 +699,7 @@ class PushWardPanel extends HTMLElement {
           )
         )
       );
-    return [picker, this._playground];
+    return fill(this._pgBox, picker, this._playground);
   }
 
   // --- Editor ---
@@ -764,9 +794,14 @@ class PushWardPanel extends HTMLElement {
   async _submit(ed) {
     const step = ed.step;
     if (ed.busy || !step) return;
+    ed.submitErrors = null;
+    if (!requiredFilled(step.data_schema, ed.data)) {
+      ed.message = this._t(NOT_ALL_REQUIRED) || this._t("ui.common.error_required");
+      this._render();
+      return;
+    }
     ed.busy = true;
     ed.message = null;
-    ed.submitErrors = null;
     this._render();
     const data = submitData(step.data_schema, ed.data);
     try {
@@ -793,10 +828,17 @@ class PushWardPanel extends HTMLElement {
       field.type === "expandable"
         ? this._t(`${stepKey()}.sections.${field.name}.name`, placeholders()) || field.name
         : this._t(`${stepKey()}.${prefix(options)}data.${field.name}`, placeholders()) || field.name;
-    form.computeHelper = (field, options) =>
-      field.type === "expandable"
-        ? this._t(`${stepKey()}.sections.${field.name}.description`, placeholders())
-        : this._t(`${stepKey()}.${prefix(options)}data_description.${field.name}`, placeholders());
+    // One node per field: a new one on every render would redraw the markdown on each keystroke.
+    const helpers = new Map();
+    form.computeHelper = (field, options) => {
+      if (field.type === "expandable") return this._t(`${stepKey()}.sections.${field.name}.description`, placeholders());
+      const key = `${stepKey()}.${prefix(options)}data_description.${field.name}`;
+      const text = this._t(key, placeholders());
+      // HA's dialog renders field helpers as markdown.
+      if (!text || !customElements.get("ha-markdown")) return text;
+      if (helpers.get(key)?.content !== text) helpers.set(key, h("ha-markdown", { ".content": text, ".breaks": true }));
+      return helpers.get(key);
+    };
     form.computeError = (error) => this._t(subentryKey(ed.type, `error.${error}`), placeholders()) || error;
     form.localizeValue = (key, values) => this._t(`component.${DOMAIN}.selector.${key}`, values);
     form.addEventListener("value-changed", (ev) => {

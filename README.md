@@ -167,7 +167,7 @@ If all you want is to share Live Activities, the app can do it without a second 
 
 Once an account is set up, admin users get a **PushWard** item in the sidebar. It lists the tracked entities, widgets and to-do lists of every account, each with a preview of what the phone shows, redrawn when the entities it reads change. From there you can add, edit and delete them, with the preview following the form as you type. The forms are the config flow's own, so the fields, checks and translations are the same.
 
-**Send to phone** pushes the previewed item to your phone as a test. Tests reuse fixed slugs (`ha-preview` for activities, `ha-preview-widget` for widgets), so a new test replaces the last one, and **End on phone** ends the activity or removes the widget again. **Open in playground** loads the item into the playground from pushward.app, which sends through this integration's key.
+**Send to phone** pushes the previewed item to your phone as a test. Tests reuse fixed slugs (`ha-preview` for activities, `ha-preview-widget` for widgets), so a new test replaces the last one sent from the same account, and **End on phone** ends the activity or removes the widget again. **Open in playground** loads the item into the playground from pushward.app, which sends through this integration's key.
 
 Everything still works from **Settings > Devices & Services > PushWard** as before; the panel only saves the trip there. Users who are not admins don't see it.
 
