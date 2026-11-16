@@ -2860,6 +2860,29 @@
         "compact": "紧凑",
         "comfortable": "宽松"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "追踪中",
+        "tab_playground": "Playground",
+        "account": "账户",
+        "send": "发送到手机",
+        "end": "在手机上结束",
+        "sent": "已发送到你的手机。",
+        "ended": "已在你的手机上结束。",
+        "open_playground": "在 Playground 中打开",
+        "delete_confirm": "删除 {name}？",
+        "preview": "预览",
+        "preview_invalid": "预览正在等待有效的值：",
+        "preview_failed": "无法加载预览：{error}",
+        "unavailable": "该实体不可用，因此没有可预览的内容。",
+        "embed_unavailable": "预览组件未能加载。重新安装此集成应能恢复它们。",
+        "form_unavailable": "编辑器需要 Home Assistant 的表单组件，但它未在此页面加载。集成页面可以打开相同的设置。",
+        "open_integration": "打开 PushWard 集成",
+        "no_entries": "尚未设置任何 PushWard 账户。",
+        "no_subentries": "这里还没有追踪任何内容。使用上方的按钮添加实体、小组件或待办事项列表。",
+        "not_loaded": "账户 {name} 当前未加载，因此其项目已隐藏。"
+      }
     }
   }
 }

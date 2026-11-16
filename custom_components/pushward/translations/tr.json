@@ -2860,6 +2860,29 @@
         "compact": "Kompakt",
         "comfortable": "Geniş"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "İzlenenler",
+        "tab_playground": "Playground",
+        "account": "Hesap",
+        "send": "Telefona gönder",
+        "end": "Telefonda bitir",
+        "sent": "Telefonunuza gönderildi.",
+        "ended": "Telefonunuzda bitirildi.",
+        "open_playground": "Playground'da aç",
+        "delete_confirm": "{name} silinsin mi?",
+        "preview": "Önizleme",
+        "preview_invalid": "Önizleme geçerli değerleri bekliyor:",
+        "preview_failed": "Önizleme yüklenemedi: {error}",
+        "unavailable": "Varlık kullanılamıyor, bu yüzden önizlenecek bir şey yok.",
+        "embed_unavailable": "Önizleme bileşenleri yüklenmedi. Entegrasyonu yeniden kurmak onları geri getirmelidir.",
+        "form_unavailable": "Düzenleyicinin Home Assistant form bileşenine ihtiyacı var, ancak bu sayfada yüklenmedi. Entegrasyon sayfası aynı ayarları açar.",
+        "open_integration": "PushWard entegrasyonunu aç",
+        "no_entries": "Henüz bir PushWard hesabı kurulmadı.",
+        "no_subentries": "Burada henüz hiçbir şey izlenmiyor. Bir varlık, widget veya yapılacaklar listesi eklemek için yukarıdaki düğmeleri kullanın.",
+        "not_loaded": "{name} hesabı şu anda yüklü değil, bu yüzden öğeleri gizlendi."
+      }
     }
   }
 }

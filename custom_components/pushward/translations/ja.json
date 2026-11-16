@@ -2860,6 +2860,29 @@
         "compact": "コンパクト",
         "comfortable": "ゆったり"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "追跡中",
+        "tab_playground": "プレイグラウンド",
+        "account": "アカウント",
+        "send": "スマートフォンに送信",
+        "end": "スマートフォンで終了",
+        "sent": "スマートフォンに送信しました。",
+        "ended": "スマートフォンで終了しました。",
+        "open_playground": "プレイグラウンドで開く",
+        "delete_confirm": "{name} を削除しますか？",
+        "preview": "プレビュー",
+        "preview_invalid": "プレビューは有効な値を待っています:",
+        "preview_failed": "プレビューを読み込めませんでした: {error}",
+        "unavailable": "エンティティが利用できないため、プレビューできるものがありません。",
+        "embed_unavailable": "プレビューのコンポーネントを読み込めませんでした。統合を再インストールすると戻るはずです。",
+        "form_unavailable": "エディターには Home Assistant のフォームコンポーネントが必要ですが、このページでは読み込まれませんでした。統合ページから同じ設定を開けます。",
+        "open_integration": "PushWard 統合を開く",
+        "no_entries": "PushWard アカウントはまだ設定されていません。",
+        "no_subentries": "ここではまだ何も追跡していません。上のボタンからエンティティ、ウィジェット、ToDo リストを追加してください。",
+        "not_loaded": "アカウント {name} は現在読み込まれていないため、その項目は非表示です。"
+      }
     }
   }
 }

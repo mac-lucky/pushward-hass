@@ -2860,6 +2860,29 @@
         "compact": "Thu gọn",
         "comfortable": "Thoải mái"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Đang theo dõi",
+        "tab_playground": "Playground",
+        "account": "Tài khoản",
+        "send": "Gửi đến điện thoại",
+        "end": "Kết thúc trên điện thoại",
+        "sent": "Đã gửi đến điện thoại của bạn.",
+        "ended": "Đã kết thúc trên điện thoại của bạn.",
+        "open_playground": "Mở trong playground",
+        "delete_confirm": "Xóa {name}?",
+        "preview": "Xem trước",
+        "preview_invalid": "Bản xem trước đang chờ giá trị hợp lệ:",
+        "preview_failed": "Không thể tải bản xem trước: {error}",
+        "unavailable": "Thực thể không khả dụng, nên không có gì để xem trước.",
+        "embed_unavailable": "Các thành phần xem trước chưa tải được. Cài đặt lại tích hợp sẽ khôi phục chúng.",
+        "form_unavailable": "Trình chỉnh sửa cần thành phần biểu mẫu của Home Assistant, nhưng thành phần này chưa tải trên trang này. Trang tích hợp mở cùng các cài đặt đó.",
+        "open_integration": "Mở tích hợp PushWard",
+        "no_entries": "Chưa có tài khoản PushWard nào được thiết lập.",
+        "no_subentries": "Chưa có gì được theo dõi ở đây. Dùng các nút bên trên để thêm thực thể, widget hoặc danh sách việc cần làm.",
+        "not_loaded": "Tài khoản {name} hiện chưa được tải, nên các mục của nó bị ẩn."
+      }
     }
   }
 }

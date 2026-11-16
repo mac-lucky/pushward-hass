@@ -2860,6 +2860,29 @@
         "compact": "Kompakt",
         "comfortable": "Geräumig"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Verfolgt",
+        "tab_playground": "Playground",
+        "account": "Konto",
+        "send": "Ans Telefon senden",
+        "end": "Auf dem Telefon beenden",
+        "sent": "Ans Telefon gesendet.",
+        "ended": "Auf dem Telefon beendet.",
+        "open_playground": "Im Playground öffnen",
+        "delete_confirm": "{name} löschen?",
+        "preview": "Vorschau",
+        "preview_invalid": "Die Vorschau wartet auf gültige Werte:",
+        "preview_failed": "Die Vorschau konnte nicht geladen werden: {error}",
+        "unavailable": "Die Entität ist nicht verfügbar, daher gibt es keine Vorschau.",
+        "embed_unavailable": "Die Vorschau-Komponenten wurden nicht geladen. Eine Neuinstallation der Integration sollte sie zurückbringen.",
+        "form_unavailable": "Der Editor braucht die Formular-Komponente von Home Assistant, die auf dieser Seite nicht geladen wurde. Die Integrationsseite öffnet dieselben Einstellungen.",
+        "open_integration": "PushWard-Integration öffnen",
+        "no_entries": "Es ist noch kein PushWard-Konto eingerichtet.",
+        "no_subentries": "Hier wird noch nichts verfolgt. Über die Schaltflächen oben lässt sich eine Entität, ein Widget oder eine To-do-Liste hinzufügen.",
+        "not_loaded": "Das Konto {name} ist gerade nicht geladen, daher sind seine Einträge ausgeblendet."
+      }
     }
   }
 }

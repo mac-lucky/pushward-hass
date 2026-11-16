@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -218,6 +219,15 @@ async def test_panel_survives_an_account_set_up_while_the_last_one_stops(hass: H
     assert second.state is config_entries.ConfigEntryState.LOADED
     assert PANEL_URL_PATH in panels
     await panel.async_register_panel(hass)  # registering a present panel again is a no-op
+
+
+def test_panel_strings_match_the_panel_script() -> None:
+    """Every string the panel asks for has an en.json label, and every label is still used."""
+    root = Path(panel.__file__).parent
+    script = (root / "frontend" / "pushward-panel.js").read_text()
+    used = set(re.findall(r'_p\(\s*"([a-z_]+)"', script)) | set(re.findall(r'"(tab_[a-z_]+)"', script))
+    labels = json.loads((root / "translations" / "en.json").read_text())["selector"]["panel"]["options"]
+    assert used == set(labels)
 
 
 # --- pushward/preview ---

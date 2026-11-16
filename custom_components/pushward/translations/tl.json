@@ -2860,6 +2860,29 @@
         "compact": "Siksik",
         "comfortable": "Maluwag"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Na-track",
+        "tab_playground": "Playground",
+        "account": "Account",
+        "send": "Ipadala sa telepono",
+        "end": "Tapusin sa telepono",
+        "sent": "Naipadala sa iyong telepono.",
+        "ended": "Natapos sa iyong telepono.",
+        "open_playground": "Buksan sa playground",
+        "delete_confirm": "Burahin ang {name}?",
+        "preview": "Preview",
+        "preview_invalid": "Naghihintay ang preview ng mga wastong value:",
+        "preview_failed": "Hindi ma-load ang preview: {error}",
+        "unavailable": "Hindi available ang entity, kaya walang maipapakitang preview.",
+        "embed_unavailable": "Hindi na-load ang mga component ng preview. Dapat silang maibalik ng muling pag-install ng integration.",
+        "form_unavailable": "Kailangan ng editor ang form component ng Home Assistant, na hindi na-load sa page na ito. Binubuksan ng page ng integration ang parehong mga setting.",
+        "open_integration": "Buksan ang PushWard integration",
+        "no_entries": "Wala pang naka-set up na PushWard account.",
+        "no_subentries": "Wala pang tina-track dito. Gamitin ang mga button sa itaas para magdagdag ng entity, widget, o to-do list.",
+        "not_loaded": "Hindi naka-load ngayon ang account na {name}, kaya nakatago ang mga item nito."
+      }
     }
   }
 }

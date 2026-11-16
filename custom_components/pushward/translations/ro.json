@@ -2860,6 +2860,29 @@
         "compact": "Compact",
         "comfortable": "Spațios"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Urmărite",
+        "tab_playground": "Playground",
+        "account": "Cont",
+        "send": "Trimiteți pe telefon",
+        "end": "Încheiați pe telefon",
+        "sent": "Trimis pe telefonul dumneavoastră.",
+        "ended": "Încheiat pe telefonul dumneavoastră.",
+        "open_playground": "Deschideți în playground",
+        "delete_confirm": "Ștergeți {name}?",
+        "preview": "Previzualizare",
+        "preview_invalid": "Previzualizarea așteaptă valori valide:",
+        "preview_failed": "Previzualizarea nu a putut fi încărcată: {error}",
+        "unavailable": "Entitatea nu este disponibilă, așa că nu există nimic de previzualizat.",
+        "embed_unavailable": "Componentele de previzualizare nu s-au încărcat. Reinstalarea integrării ar trebui să le aducă înapoi.",
+        "form_unavailable": "Editorul are nevoie de componenta de formulare din Home Assistant, care nu s-a încărcat pe această pagină. Pagina integrării deschide aceleași setări.",
+        "open_integration": "Deschideți integrarea PushWard",
+        "no_entries": "Încă nu este configurat niciun cont PushWard.",
+        "no_subentries": "Aici nu se urmărește încă nimic. Folosiți butoanele de mai sus pentru a adăuga o entitate, un widget sau o listă de sarcini.",
+        "not_loaded": "Contul {name} nu este încărcat acum, așa că elementele lui sunt ascunse."
+      }
     }
   }
 }

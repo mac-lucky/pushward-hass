@@ -2860,6 +2860,29 @@
         "compact": "Kompaktowy",
         "comfortable": "Wygodny"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Śledzone",
+        "tab_playground": "Playground",
+        "account": "Konto",
+        "send": "Wyślij na telefon",
+        "end": "Zakończ na telefonie",
+        "sent": "Wysłano na twój telefon.",
+        "ended": "Zakończono na twoim telefonie.",
+        "open_playground": "Otwórz w playgroundzie",
+        "delete_confirm": "Usunąć {name}?",
+        "preview": "Podgląd",
+        "preview_invalid": "Podgląd czeka na poprawne wartości:",
+        "preview_failed": "Nie udało się wczytać podglądu: {error}",
+        "unavailable": "Encja jest niedostępna, więc nie ma czego pokazać w podglądzie.",
+        "embed_unavailable": "Komponenty podglądu się nie wczytały. Ponowna instalacja integracji powinna je przywrócić.",
+        "form_unavailable": "Edytor potrzebuje komponentu formularzy Home Assistant, który nie wczytał się na tej stronie. Strona integracji otwiera te same ustawienia.",
+        "open_integration": "Otwórz integrację PushWard",
+        "no_entries": "Nie skonfigurowano jeszcze żadnego konta PushWard.",
+        "no_subentries": "Nic tu jeszcze nie jest śledzone. Użyj przycisków powyżej, aby dodać encję, widżet lub listę zadań.",
+        "not_loaded": "Konto {name} nie jest teraz wczytane, więc jego elementy są ukryte."
+      }
     }
   }
 }

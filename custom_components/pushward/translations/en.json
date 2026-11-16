@@ -2860,6 +2860,29 @@
         "compact": "Compact",
         "comfortable": "Comfortable"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Tracked",
+        "tab_playground": "Playground",
+        "account": "Account",
+        "send": "Send to phone",
+        "end": "End on phone",
+        "sent": "Sent to your phone.",
+        "ended": "Ended on your phone.",
+        "open_playground": "Open in playground",
+        "delete_confirm": "Delete {name}?",
+        "preview": "Preview",
+        "preview_invalid": "The preview waits for valid values:",
+        "preview_failed": "The preview could not be loaded: {error}",
+        "unavailable": "The entity is unavailable, so there is nothing to preview.",
+        "embed_unavailable": "The preview components did not load. Reinstalling the integration should bring them back.",
+        "form_unavailable": "The editor needs the Home Assistant form component, which did not load on this page. The integration page opens the same settings.",
+        "open_integration": "Open the PushWard integration",
+        "no_entries": "No PushWard account is set up yet.",
+        "no_subentries": "Nothing is tracked here yet. Use the buttons above to add an entity, a widget or a to-do list.",
+        "not_loaded": "The account {name} is not loaded right now, so its items are hidden."
+      }
     }
   }
 }

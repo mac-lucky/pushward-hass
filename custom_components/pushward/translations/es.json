@@ -2860,6 +2860,29 @@
         "compact": "Compacta",
         "comfortable": "Amplia"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Rastreados",
+        "tab_playground": "Playground",
+        "account": "Cuenta",
+        "send": "Enviar al teléfono",
+        "end": "Finalizar en el teléfono",
+        "sent": "Enviado a tu teléfono.",
+        "ended": "Finalizado en tu teléfono.",
+        "open_playground": "Abrir en el playground",
+        "delete_confirm": "¿Eliminar {name}?",
+        "preview": "Vista previa",
+        "preview_invalid": "La vista previa espera valores válidos:",
+        "preview_failed": "No se pudo cargar la vista previa: {error}",
+        "unavailable": "La entidad no está disponible, así que no hay nada que previsualizar.",
+        "embed_unavailable": "Los componentes de vista previa no se cargaron. Reinstalar la integración debería recuperarlos.",
+        "form_unavailable": "El editor necesita el componente de formularios de Home Assistant, que no se cargó en esta página. La página de la integración abre los mismos ajustes.",
+        "open_integration": "Abrir la integración PushWard",
+        "no_entries": "Todavía no hay ninguna cuenta de PushWard configurada.",
+        "no_subentries": "Aquí todavía no se rastrea nada. Usa los botones de arriba para añadir una entidad, un widget o una lista de tareas.",
+        "not_loaded": "La cuenta {name} no está cargada ahora mismo, así que sus elementos están ocultos."
+      }
     }
   }
 }

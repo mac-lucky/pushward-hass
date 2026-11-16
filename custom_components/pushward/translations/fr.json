@@ -2860,6 +2860,29 @@
         "compact": "Compact",
         "comfortable": "Espacé"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Suivis",
+        "tab_playground": "Playground",
+        "account": "Compte",
+        "send": "Envoyer au téléphone",
+        "end": "Terminer sur le téléphone",
+        "sent": "Envoyé sur votre téléphone.",
+        "ended": "Terminé sur votre téléphone.",
+        "open_playground": "Ouvrir dans le playground",
+        "delete_confirm": "Supprimer {name} ?",
+        "preview": "Aperçu",
+        "preview_invalid": "L'aperçu attend des valeurs valides :",
+        "preview_failed": "Impossible de charger l'aperçu : {error}",
+        "unavailable": "L'entité est indisponible, il n'y a donc rien à prévisualiser.",
+        "embed_unavailable": "Les composants d'aperçu ne se sont pas chargés. Réinstaller l'intégration devrait les rétablir.",
+        "form_unavailable": "L'éditeur a besoin du composant de formulaire de Home Assistant, qui ne s'est pas chargé sur cette page. La page de l'intégration ouvre les mêmes réglages.",
+        "open_integration": "Ouvrir l'intégration PushWard",
+        "no_entries": "Aucun compte PushWard n'est encore configuré.",
+        "no_subentries": "Rien n'est encore suivi ici. Utilisez les boutons ci-dessus pour ajouter une entité, un widget ou une liste de tâches.",
+        "not_loaded": "Le compte {name} n'est pas chargé pour le moment, ses éléments sont donc masqués."
+      }
     }
   }
 }

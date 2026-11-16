@@ -1,0 +1,13 @@
+Copyright (c) 2026 mac-lucky. All rights reserved.
+
+The files in this directory are the compiled PushWard playground and preview
+components, built from a private repository. They are redistributed only as
+part of the PushWard Home Assistant integration and may not be copied,
+modified or used outside it. The rest of this repository is covered by the
+MIT license in the repository root.
+
+The reservation above covers only the first-party code. Third-party code and
+icons compiled into these files keep their own licenses: THIRD_PARTY_NOTICES.txt
+lists each package with its license text and the source of the service logos,
+and the Material Design Icons by Pictogrammers are redistributed under the
+Apache License 2.0; see LICENSE-mdi.

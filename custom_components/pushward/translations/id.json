@@ -2860,6 +2860,29 @@
         "compact": "Kompak",
         "comfortable": "Luas"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Terlacak",
+        "tab_playground": "Playground",
+        "account": "Akun",
+        "send": "Kirim ke ponsel",
+        "end": "Akhiri di ponsel",
+        "sent": "Terkirim ke ponsel Anda.",
+        "ended": "Diakhiri di ponsel Anda.",
+        "open_playground": "Buka di playground",
+        "delete_confirm": "Hapus {name}?",
+        "preview": "Pratinjau",
+        "preview_invalid": "Pratinjau menunggu nilai yang valid:",
+        "preview_failed": "Pratinjau tidak dapat dimuat: {error}",
+        "unavailable": "Entitas tidak tersedia, jadi tidak ada yang bisa dipratinjau.",
+        "embed_unavailable": "Komponen pratinjau tidak dimuat. Memasang ulang integrasi seharusnya mengembalikannya.",
+        "form_unavailable": "Editor memerlukan komponen formulir Home Assistant, yang tidak dimuat di halaman ini. Halaman integrasi membuka pengaturan yang sama.",
+        "open_integration": "Buka integrasi PushWard",
+        "no_entries": "Belum ada akun PushWard yang disiapkan.",
+        "no_subentries": "Belum ada yang dilacak di sini. Gunakan tombol di atas untuk menambahkan entitas, widget, atau daftar tugas.",
+        "not_loaded": "Akun {name} sedang tidak dimuat, jadi itemnya disembunyikan."
+      }
     }
   }
 }

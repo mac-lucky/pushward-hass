@@ -2860,6 +2860,29 @@
         "compact": "Compact",
         "comfortable": "Ruim"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Gevolgd",
+        "tab_playground": "Playground",
+        "account": "Account",
+        "send": "Naar telefoon sturen",
+        "end": "Op telefoon beëindigen",
+        "sent": "Naar je telefoon gestuurd.",
+        "ended": "Op je telefoon beëindigd.",
+        "open_playground": "Openen in playground",
+        "delete_confirm": "{name} verwijderen?",
+        "preview": "Voorbeeld",
+        "preview_invalid": "Het voorbeeld wacht op geldige waarden:",
+        "preview_failed": "Het voorbeeld kon niet worden geladen: {error}",
+        "unavailable": "De entiteit is niet beschikbaar, dus er valt niets te tonen.",
+        "embed_unavailable": "De voorbeeldonderdelen zijn niet geladen. De integratie opnieuw installeren zou ze terug moeten brengen.",
+        "form_unavailable": "De editor heeft het formulieronderdeel van Home Assistant nodig, dat op deze pagina niet is geladen. De integratiepagina opent dezelfde instellingen.",
+        "open_integration": "PushWard-integratie openen",
+        "no_entries": "Er is nog geen PushWard-account ingesteld.",
+        "no_subentries": "Hier wordt nog niets gevolgd. Gebruik de knoppen hierboven om een entiteit, een widget of een takenlijst toe te voegen.",
+        "not_loaded": "Het account {name} is nu niet geladen, dus de items zijn verborgen."
+      }
     }
   }
 }

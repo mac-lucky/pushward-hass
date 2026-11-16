@@ -2860,6 +2860,29 @@
         "compact": "Compatta",
         "comfortable": "Ampia"
       }
+    },
+    "panel": {
+      "options": {
+        "tab_tracked": "Monitorati",
+        "tab_playground": "Playground",
+        "account": "Account",
+        "send": "Invia al telefono",
+        "end": "Termina sul telefono",
+        "sent": "Inviato al tuo telefono.",
+        "ended": "Terminato sul tuo telefono.",
+        "open_playground": "Apri nel playground",
+        "delete_confirm": "Eliminare {name}?",
+        "preview": "Anteprima",
+        "preview_invalid": "L'anteprima attende valori validi:",
+        "preview_failed": "Impossibile caricare l'anteprima: {error}",
+        "unavailable": "L'entità non è disponibile, quindi non c'è nulla da mostrare in anteprima.",
+        "embed_unavailable": "I componenti di anteprima non sono stati caricati. Reinstallare l'integrazione dovrebbe ripristinarli.",
+        "form_unavailable": "L'editor richiede il componente dei moduli di Home Assistant, che non è stato caricato in questa pagina. La pagina dell'integrazione apre le stesse impostazioni.",
+        "open_integration": "Apri l'integrazione PushWard",
+        "no_entries": "Nessun account PushWard è ancora configurato.",
+        "no_subentries": "Qui non viene ancora monitorato nulla. Usa i pulsanti sopra per aggiungere un'entità, un widget o una lista di cose da fare.",
+        "not_loaded": "L'account {name} non è caricato al momento, quindi i suoi elementi sono nascosti."
+      }
     }
   }
 }
