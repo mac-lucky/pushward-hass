@@ -27,7 +27,7 @@ The entity you track shows up on the phone as a Live Activity, a Home/Lock Scree
 
 ## Contents
 
-[What it looks like](#what-it-looks-like) | [How it works](#how-it-works) | [Features](#features) | [Android](#android) | [Prerequisites](#prerequisites) | [Installation](#installation) | [Configuration](#configuration) | [Account sensors](#account-sensors) | [Notify entity](#notify-entity) | [Services](#services) | [Domain Defaults](#domain-defaults) | [Contributing](#contributing) | [Support](#support) | [Translations](#translations) | [Development](#development) | [CI/CD & Releases](#cicd--releases) | [Server compatibility](#server-compatibility) | [Troubleshooting](#troubleshooting) | [Requirements & License](#requirements--license)
+[What it looks like](#what-it-looks-like) | [How it works](#how-it-works) | [Features](#features) | [Android](#android) | [Prerequisites](#prerequisites) | [Installation](#installation) | [Agent skill](#agent-skill) | [Configuration](#configuration) | [Account sensors](#account-sensors) | [Notify entity](#notify-entity) | [Services](#services) | [Domain Defaults](#domain-defaults) | [Contributing](#contributing) | [Support](#support) | [Translations](#translations) | [Development](#development) | [CI/CD & Releases](#cicd--releases) | [Server compatibility](#server-compatibility) | [Troubleshooting](#troubleshooting) | [Requirements & License](#requirements--license)
 
 ## How it works
 
@@ -132,6 +132,14 @@ directly in HACS; then download and restart. Or do it manually:
 ### Manual
 
 Copy the `custom_components/pushward` directory into your Home Assistant `config/custom_components/` folder and restart Home Assistant.
+
+## Agent skill
+
+```sh
+npx skills add mac-lucky/pushward-hass --skill pushward-home-assistant
+```
+
+This installs a skill for Claude Code, Codex, Cursor and other agents that read `SKILL.md` files. It teaches them which PushWard item fits "show the washer on my Lock Screen", "count down to my next calendar event" or "a widget with the room temperatures", which fields to fill in the PushWard panel, and how to create the same items through the [ha-mcp](https://github.com/homeassistant-ai/ha-mcp) server when it is connected. The agent never needs your integration key: you paste it into Home Assistant yourself.
 
 ## Configuration
 
