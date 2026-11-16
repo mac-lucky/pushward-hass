@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -13,7 +14,7 @@ from homeassistant.data_entry_flow import FlowResultType, InvalidData, section
 from homeassistant.helpers.selector import EntitySelector
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.pushward import _heal_subentry_unique_ids
+from custom_components.pushward import _async_entry_updated, _heal_subentry_unique_ids
 from custom_components.pushward.api import PushWardAuthError
 from custom_components.pushward.config_flow import (
     ENTITY_SECTIONS,
@@ -1371,6 +1372,23 @@ def test_heal_swaps_two_subentries_holding_each_other_s_id(hass: HomeAssistant) 
         "binary_sensor.dryer": "binary_sensor.dryer",
         "binary_sensor.washer": "binary_sensor.washer",
     }
+
+
+async def test_a_reload_queued_behind_an_unload_leaves_the_managers_stopped(hass: HomeAssistant) -> None:
+    """A save that waited on the reload lock must not restart managers its entry no longer owns."""
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    manager = AsyncMock()
+    data = {"manager": manager, "e2e_key": None, "reload_lock": asyncio.Lock()}
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = data
+
+    async with data["reload_lock"]:
+        queued = hass.async_create_task(_async_entry_updated(hass, entry))
+        await asyncio.sleep(0)
+        hass.data[DOMAIN].pop(entry.entry_id)
+    await queued
+
+    manager.async_reload.assert_not_awaited()
 
 
 def _widget_subentry_data(**overrides) -> ConfigSubentryData:

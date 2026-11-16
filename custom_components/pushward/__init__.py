@@ -1857,6 +1857,8 @@ async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
             todo_manager.async_retry_refused()
         return
     async with data["reload_lock"]:
+        if hass.data.get(DOMAIN, {}).get(entry.entry_id) is not data:
+            return  # unloaded while this reload waited: restarting its managers would orphan them
         # Read inside the lock, so a reload that waited applies the newest subentries.
         entities = _entity_configs(entry)
         widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
@@ -1894,12 +1896,14 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if data:
         widget_manager: WidgetManager | None = data.get("widget_manager")
         todo_manager: TodoReminderManager | None = data.get("todo_manager")
-        stops = [data["manager"].async_stop()]
-        if widget_manager is not None:
-            stops.append(widget_manager.async_stop())
-        if todo_manager is not None:
-            stops.append(todo_manager.async_stop())
-        await asyncio.gather(*stops)
+        # Waits out a reload already running; one still queued finds the entry gone and skips.
+        async with data["reload_lock"]:
+            stops = [data["manager"].async_stop()]
+            if widget_manager is not None:
+                stops.append(widget_manager.async_stop())
+            if todo_manager is not None:
+                stops.append(todo_manager.async_stop())
+            await asyncio.gather(*stops)
 
     # Non-persistent usage-limit repair issues clear on restart but not on a plain
     # unload/reload — drop any outstanding ones so they don't linger after teardown.
