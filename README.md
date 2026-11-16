@@ -25,6 +25,12 @@ The entity you track shows up on the phone as a Live Activity, a Home/Lock Scree
 
 <p align="center"><em>Lock Screen Live Activities &nbsp;|&nbsp; Home Screen widgets &nbsp;|&nbsp; the in-app activity list. More examples at <a href="https://pushward.app">pushward.app</a>.</em></p>
 
+In Home Assistant, the [PushWard panel](#pushward-panel) in the sidebar lists everything you track, each with a live preview of what the phone shows.
+
+<p align="center">
+  <img src="assets/ha-panel-tracked.jpg" alt="The PushWard panel in Home Assistant listing tracked entities, widgets and a to-do list, each with a live preview" width="720">
+</p>
+
 ## Contents
 
 [What it looks like](#what-it-looks-like) | [How it works](#how-it-works) | [Features](#features) | [Android](#android) | [Prerequisites](#prerequisites) | [Installation](#installation) | [Agent skill](#agent-skill) | [Configuration](#configuration) | [Account sensors](#account-sensors) | [Notify entity](#notify-entity) | [Services](#services) | [Domain Defaults](#domain-defaults) | [Contributing](#contributing) | [Support](#support) | [Translations](#translations) | [Development](#development) | [CI/CD & Releases](#cicd--releases) | [Server compatibility](#server-compatibility) | [Troubleshooting](#troubleshooting) | [Requirements & License](#requirements--license)
@@ -176,6 +182,13 @@ If all you want is to share Live Activities, the app can do it without a second 
 Once an account is set up, admin users get a **PushWard** item in the sidebar. It lists the tracked entities, widgets and to-do lists of every account, each with a preview of what the phone shows, redrawn when the entities it reads change. From there you can add, edit and delete them, with the preview following the form as you type. The forms are the config flow's own, so the fields, checks and translations are the same.
 
 **Send to phone** pushes the previewed item to your phone as a test. Tests reuse fixed slugs (`ha-preview` for activities, `ha-preview-widget` for widgets), so a new test replaces the last one sent from the same account, and **End on phone** ends the activity or removes the widget again. `ha-preview` matches a `ha-*` pattern share, so whoever you share with gets your test activities too, and End ends them on their phone as well. Pattern shares cover activities only, so test widgets are not shared. **Open in playground** loads the item into the playground from pushward.app, which sends through this integration's key.
+
+<p align="center">
+  <img src="assets/ha-panel-editor.jpg" alt="Editing a tracked heat pump in the PushWard panel: the gauge preview follows the form as the value attribute changes" width="420">
+  <img src="assets/ha-panel-playground.jpg" alt="A tracked media player opened in the playground tab of the PushWard panel" width="420">
+</p>
+
+<p align="center"><em>Editing with the live preview &nbsp;|&nbsp; a tracked item opened in the playground</em></p>
 
 Everything still works from **Settings > Devices & Services > PushWard** as before; the panel only saves the trip there. Users who are not admins don't see it.
 
