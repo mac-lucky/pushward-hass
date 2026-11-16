@@ -921,8 +921,9 @@ class MeteredResource(NamedTuple):
     # what a `quota.exceeded` 429 names and what the quota gate is keyed on.
     kind: str
     translation_key: str
-    # Preferred /auth/me reset key; falls back to QUOTA_RESET_KEY when absent.
-    reset_key: str
+    # Preferred /auth/me reset key, falling back to QUOTA_RESET_KEY when absent; None for a
+    # month-to-date counter, which resets at the start of the month after quota_period_month.
+    reset_key: str | None
 
     @property
     def used_key(self) -> str:
@@ -946,9 +947,9 @@ QUOTA_KIND_EMAILS = "emails"
 # name as a placeholder (which would arrive untranslated in every locale).
 USAGE_LIMIT_RESOURCES = (
     MeteredResource(QUOTA_KIND_NOTIFICATIONS, "usage_limit_notifications", QUOTA_DAILY_RESET_KEY),
-    MeteredResource(QUOTA_KIND_LIVE_ACTIVITY_UPDATES, "usage_limit_live_activity", QUOTA_RESET_KEY),
-    MeteredResource(QUOTA_KIND_WIDGET_UPDATES, "usage_limit_widgets", QUOTA_RESET_KEY),
-    MeteredResource(QUOTA_KIND_EMAILS, "usage_limit_emails", QUOTA_RESET_KEY),
+    MeteredResource(QUOTA_KIND_LIVE_ACTIVITY_UPDATES, "usage_limit_live_activity", None),
+    MeteredResource(QUOTA_KIND_WIDGET_UPDATES, "usage_limit_widgets", None),
+    MeteredResource(QUOTA_KIND_EMAILS, "usage_limit_emails", None),
 )
 
 

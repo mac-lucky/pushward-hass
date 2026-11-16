@@ -22,7 +22,6 @@ from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     DOMAIN,
     PRICING_URL,
-    QUOTA_KIND_NOTIFICATIONS,
     QUOTA_RESET_KEY,
     USAGE_LIMIT_RESOURCES,
     USAGE_UPDATE_INTERVAL,
@@ -129,7 +128,7 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 continue
             reset = (
                 data.get(resource.reset_key) or data.get(QUOTA_RESET_KEY)
-                if resource.kind == QUOTA_KIND_NOTIFICATIONS
+                if resource.reset_key
                 else monthly_resets_at(data)
             )
             ir.async_create_issue(
