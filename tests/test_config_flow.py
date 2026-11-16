@@ -1192,6 +1192,108 @@ async def test_subentry_dismissal_ttl_round_trips(hass: HomeAssistant) -> None:
     assert entry.subentries[subentry_id].data[CONF_DISMISSAL_TTL] == 0
 
 
+def _snapshot(subentry) -> tuple:
+    """A copy of what reconfigure may change (HA updates the subentry object in place)."""
+    return dict(subentry.data), subentry.unique_id, subentry.title
+
+
+async def _reconfigure_entity_onto(hass: HomeAssistant, entry: MockConfigEntry, subentry_id: str, entity_id: str):
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**{CONF_ENTITY_ID: entity_id})
+    )
+    return await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=_mock_details_input())
+
+
+async def test_reconfigure_entity_onto_a_tracked_entity_aborts(hass: HomeAssistant) -> None:
+    """Two subentries tracking one entity would leave one of them listening forever."""
+    entry = _mock_entry(
+        subentries_data=[
+            _entity_subentry_data(),
+            _entity_subentry_data(**{CONF_ENTITY_ID: "binary_sensor.dryer", CONF_ACTIVITY_NAME: "Dryer"}),
+        ]
+    )
+    entry.add_to_hass(hass)
+    washer_id = next(sid for sid, sub in entry.subentries.items() if sub.unique_id == "binary_sensor.washer")
+    before = _snapshot(entry.subentries[washer_id])
+
+    result = await _reconfigure_entity_onto(hass, entry, washer_id, "binary_sensor.dryer")
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert _snapshot(entry.subentries[washer_id]) == before
+
+
+async def test_reconfigure_entity_onto_a_free_entity_moves_the_unique_id(hass: HomeAssistant) -> None:
+    entry = _mock_entry(subentries_data=[_entity_subentry_data()])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_entity_onto(hass, entry, subentry_id, "binary_sensor.dishwasher")
+
+    assert result["reason"] == "reconfigure_successful"
+    subentry = entry.subentries[subentry_id]
+    assert subentry.data[CONF_ENTITY_ID] == "binary_sensor.dishwasher"
+    assert subentry.unique_id == "binary_sensor.dishwasher"
+
+
+async def test_reconfigure_entity_left_on_another_unique_id_still_aborts(hass: HomeAssistant) -> None:
+    """A subentry an older version moved keeps its old unique_id; its data still counts."""
+    moved = _entity_subentry_data(**{CONF_ENTITY_ID: "binary_sensor.dryer"})
+    moved["unique_id"] = "binary_sensor.old"
+    entry = _mock_entry(subentries_data=[_entity_subentry_data(), moved])
+    entry.add_to_hass(hass)
+    washer_id = next(sid for sid, sub in entry.subentries.items() if sub.unique_id == "binary_sensor.washer")
+
+    result = await _reconfigure_entity_onto(hass, entry, washer_id, "binary_sensor.dryer")
+
+    assert result["reason"] == "already_configured"
+    assert entry.subentries[washer_id].data[CONF_ENTITY_ID] == "binary_sensor.washer"
+
+
+def _widget_subentry_data(**overrides) -> ConfigSubentryData:
+    data = make_widget_config(**overrides)
+    return ConfigSubentryData(
+        data=data, subentry_type=SUBENTRY_TYPE_WIDGET, title=data[CONF_WIDGET_NAME], unique_id=data[CONF_SLUG]
+    )
+
+
+async def _reconfigure_widget_onto(hass: HomeAssistant, entry: MockConfigEntry, subentry_id: str, slug: str):
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_widget_step1(**{CONF_SLUG: slug})
+    )
+    return await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_nest_widget(WIDGET_TEMPLATE_VALUE, _widget_details())
+    )
+
+
+async def test_reconfigure_widget_onto_a_taken_slug_aborts(hass: HomeAssistant) -> None:
+    entry = _mock_entry(subentries_data=[_widget_subentry_data(), _widget_subentry_data(**{CONF_SLUG: "ha-load"})])
+    entry.add_to_hass(hass)
+    users_id = next(sid for sid, sub in entry.subentries.items() if sub.unique_id == "ha-users")
+    before = _snapshot(entry.subentries[users_id])
+
+    result = await _reconfigure_widget_onto(hass, entry, users_id, "ha-load")
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert _snapshot(entry.subentries[users_id]) == before
+
+
+async def test_reconfigure_widget_onto_a_free_slug_moves_the_unique_id(hass: HomeAssistant) -> None:
+    entry = _mock_entry(subentries_data=[_widget_subentry_data()])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_widget_onto(hass, entry, subentry_id, "ha-members")
+
+    assert result["reason"] == "reconfigure_successful"
+    subentry = entry.subentries[subentry_id]
+    assert subentry.data[CONF_SLUG] == "ha-members"
+    assert subentry.unique_id == "ha-members"
+
+
 # --- Template auto-suggestion tests ---
 
 

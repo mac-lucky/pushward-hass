@@ -2560,6 +2560,20 @@ def _media_control_token(entity_cfg: dict, existing: str | None) -> str:
     return existing or new_control_token()
 
 
+def _tracked_elsewhere(
+    entry: config_entries.ConfigEntry, subentry_type: str, key: str, value: str, own_subentry_id: str | None = None
+) -> bool:
+    """Whether another subentry of this type already stores value under key.
+
+    Read from the data rather than the unique_id: a subentry an older version moved
+    to another entity still carries the unique_id of the one it left.
+    """
+    return any(
+        sub.subentry_type == subentry_type and sub.data.get(key) == value and sub.subentry_id != own_subentry_id
+        for sub in entry.subentries.values()
+    )
+
+
 class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
     """Handle adding and reconfiguring tracked entities (two-step flow)."""
 
@@ -2625,15 +2639,24 @@ class PushWardEntitySubentryFlow(config_entries.ConfigSubentryFlow):
         if user_input is not None:
             entity_cfg, errors = _entity_details_to_config(self._step1_input, user_input, self.hass)
             if entity_cfg is not None:
-                if self._is_reconfigure:
-                    entry = self._get_entry()
-                    subentry = self._get_reconfigure_subentry()
+                entry = self._get_entry()
+                subentry = self._get_reconfigure_subentry() if self._is_reconfigure else None
+                if _tracked_elsewhere(
+                    entry,
+                    SUBENTRY_TYPE_ENTITY,
+                    CONF_ENTITY_ID,
+                    entity_cfg[CONF_ENTITY_ID],
+                    subentry.subentry_id if subentry else None,
+                ):
+                    return self.async_abort(reason="already_configured")
+                if subentry is not None:
                     entity_cfg[CONF_MEDIA_TOKEN] = _media_control_token(entity_cfg, subentry.data.get(CONF_MEDIA_TOKEN))
                     return self.async_update_and_abort(
                         entry,
                         subentry,
                         data=entity_cfg,
                         title=entity_cfg[CONF_ACTIVITY_NAME],
+                        unique_id=entity_cfg[CONF_ENTITY_ID],
                     )
                 entity_cfg[CONF_MEDIA_TOKEN] = _media_control_token(entity_cfg, None)
                 return self.async_create_entry(
@@ -3532,14 +3555,23 @@ class PushWardWidgetSubentryFlow(config_entries.ConfigSubentryFlow):
             widget_cfg, errors = _widget_details_to_config(self._step1_input, user_input, self._statistics_info)
             if widget_cfg is not None:
                 title = widget_cfg.get(CONF_WIDGET_NAME) or widget_cfg[CONF_SLUG]
-                if self._is_reconfigure:
-                    entry = self._get_entry()
-                    subentry = self._get_reconfigure_subentry()
+                entry = self._get_entry()
+                subentry = self._get_reconfigure_subentry() if self._is_reconfigure else None
+                if _tracked_elsewhere(
+                    entry,
+                    SUBENTRY_TYPE_WIDGET,
+                    CONF_SLUG,
+                    widget_cfg[CONF_SLUG],
+                    subentry.subentry_id if subentry else None,
+                ):
+                    return self.async_abort(reason="already_configured")
+                if subentry is not None:
                     return self.async_update_and_abort(
                         entry,
                         subentry,
                         data=widget_cfg,
                         title=title,
+                        unique_id=widget_cfg[CONF_SLUG],
                     )
                 return self.async_create_entry(
                     title=title,
@@ -4074,19 +4106,11 @@ def _todo_title(hass: HomeAssistant, entity_id: str) -> str:
 class PushWardTodoSubentryFlow(config_entries.ConfigSubentryFlow):
     """Add or reconfigure a tracked to-do list (one form)."""
 
-    def _tracked_elsewhere(self, entity_id: str, own_subentry_id: str | None = None) -> bool:
-        return any(
-            sub.subentry_type == SUBENTRY_TYPE_TODO
-            and sub.data.get(CONF_ENTITY_ID) == entity_id
-            and sub.subentry_id != own_subentry_id
-            for sub in self._get_entry().subentries.values()
-        )
-
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> config_entries.SubentryFlowResult:
         if user_input is not None:
             data = _todo_data(user_input)
             entity_id = data[CONF_ENTITY_ID]
-            if self._tracked_elsewhere(entity_id):
+            if _tracked_elsewhere(self._get_entry(), SUBENTRY_TYPE_TODO, CONF_ENTITY_ID, entity_id):
                 return self.async_abort(reason="already_configured")
             return self.async_create_entry(
                 title=_todo_title(self.hass, entity_id), data=data, unique_id=_todo_unique_id(entity_id)
@@ -4100,7 +4124,9 @@ class PushWardTodoSubentryFlow(config_entries.ConfigSubentryFlow):
         if user_input is not None:
             data = _todo_data(user_input)
             entity_id = data[CONF_ENTITY_ID]
-            if self._tracked_elsewhere(entity_id, subentry.subentry_id):
+            if _tracked_elsewhere(
+                self._get_entry(), SUBENTRY_TYPE_TODO, CONF_ENTITY_ID, entity_id, subentry.subentry_id
+            ):
                 return self.async_abort(reason="already_configured")
             return self.async_update_and_abort(
                 self._get_entry(),
