@@ -32,6 +32,7 @@ from custom_components.pushward.const import (
     CONF_MIN_VALUE,
     CONF_SLUG,
     CONF_STAT_ROWS,
+    CONF_SUBTITLE_ATTRIBUTE,
     CONF_SUBTITLE_TIMER_ENTITY,
     CONF_WIDGET_DENSITY,
     CONF_WIDGET_POLL_INTERVAL,
@@ -59,6 +60,7 @@ from custom_components.pushward.widget_manager import (
     _GROUP_ROW_SOURCES,
     WidgetManager,
     _entity_ids_for_widget,
+    _merge_patch,
     _permission_notification_id,
     heatmap_read,
 )
@@ -526,6 +528,41 @@ async def test_looks_dropped_on_the_patch_path_send_null(hass: HomeAssistant) ->
     assert _looks_of(api2.patch_widget.call_args.args[1]["content"]) == {"style": "bold"}
 
     await manager2.async_stop()
+
+
+async def test_any_key_dropped_since_the_last_push_is_sent_as_null(hass: HomeAssistant) -> None:
+    """A merge patch keeps a left-out key, so a subtitle whose attribute went is nulled once."""
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42", {"status": "Busy"})
+    config = make_widget_config(**{CONF_SUBTITLE_ATTRIBUTE: "status"})
+    manager = WidgetManager(hass, api, [config], make_mock_entry())
+    await manager.async_start()
+    assert api.create_widget.call_args.kwargs["content"]["subtitle"] == "Busy"
+
+    hass.states.async_set("sensor.users", "42")
+    await hass.async_block_till_done()
+    sent = api.patch_widget.call_args.args[1]["content"]
+    assert sent["subtitle"] is None
+    last = manager._tracked["ha-users"].last_content
+    assert "subtitle" not in last
+    assert None not in last.values()
+
+    # The same frame again (only an unrelated attribute changed) is still deduped.
+    hass.states.async_set("sensor.users", "42", {"other": 1})
+    await hass.async_block_till_done()
+    assert api.patch_widget.await_count == 1
+
+    await manager.async_stop()
+
+
+def test_merge_patch_nulls_dropped_nested_keys() -> None:
+    """Nested objects merge the same way on the server, so a node dropped inside flow is nulled too."""
+    last = {"flow": {"inputs": [1], "storage": {"value": 3}}, "unit": "W", "value": 1}
+    assert _merge_patch({"flow": {"inputs": [2]}, "value": 2}, last) == {
+        "flow": {"inputs": [2], "storage": None},
+        "unit": None,
+        "value": 2,
+    }
 
 
 async def test_set_looks_ride_every_patch(hass: HomeAssistant) -> None:

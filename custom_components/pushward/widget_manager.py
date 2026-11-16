@@ -71,7 +71,6 @@ from .const import (
     WIDGET_GROUP_TEMPLATES,
     WIDGET_HEATMAP_REFRESH_MINUTE,
     WIDGET_HEATMAP_WEEKS_MAX,
-    WIDGET_LOOKS,
     WIDGET_MAX_TREND_POINTS,
     WIDGET_MIN_TREND_POINTS,
     WIDGET_STALE_AFTER_MAX,
@@ -96,9 +95,6 @@ _WIDGET_STORAGE_VERSION = 1
 # Floor on the heartbeat tick. A stale_after at the 60 s minimum would otherwise
 # ask for a push every 30 s, which is already more than the quota is worth.
 _HEARTBEAT_MIN_INTERVAL = 30
-# style, style_by_size, density, density_by_size: the content keys the PATCH path
-# null-clears when the config drops them.
-_LOOK_FIELDS = tuple(k for field in WIDGET_LOOKS for k in (field, f"{field}_by_size"))
 
 
 def _widget_storage_key(entry_id: str) -> str:
@@ -225,6 +221,22 @@ def heatmap_read(config: dict) -> tuple[str, int, str]:
     if aggregate not in HEATMAP_AGGREGATES:
         aggregate = HEATMAP_AGGREGATE_MEAN
     return config.get(CONF_ENTITY_ID) or "", max(1, min(WIDGET_HEATMAP_WEEKS_MAX, weeks)) * 7, aggregate
+
+
+def _merge_patch(content: dict, last: dict) -> dict:
+    """content as a merge patch over last: every key last had and content lacks becomes null.
+
+    The server merges a widget PATCH with RFC 7396, which keeps a key the patch leaves
+    out, so a subtitle whose attribute went or a dropped look would stay on the phone.
+    Nested objects (flow nodes, tap actions) are merged the same way, so recurse.
+    """
+    patch = dict(content)
+    for key, old in last.items():
+        if key not in content:
+            patch[key] = None
+        elif isinstance(old, dict) and isinstance(content[key], dict):
+            patch[key] = _merge_patch(content[key], old)
+    return patch
 
 
 def _extract_numeric(content: dict | None) -> float | None:
@@ -616,12 +628,9 @@ class WidgetManager:
                 # First successful render after a deferred initial POST.
                 await self._create_widget(tracked, content)
             else:
-                # The subentry dropped a look (or moved off stat_list, taking the
-                # density with it) since the last push. A merge patch keeps a
-                # left-out key, so clear it with null once; after that the key
-                # stays out and the app's pick applies.
-                last = tracked.last_content or {}
-                patch_content = {**content, **{k: None for k in _LOOK_FIELDS if k not in content and last.get(k)}}
+                # Keys dropped since the last push go out as null once; last_content
+                # keeps the frame without them, so the next diff compares like with like.
+                patch_content = _merge_patch(content, tracked.last_content or {})
                 # stale_after rides every PATCH, null included: the merge patch
                 # null-clears, so a widget created before the field existed (or
                 # one whose config lost it) converges instead of keeping a value
