@@ -297,6 +297,17 @@ def test_remaining_progress_fills_from_the_farthest_point(metres: object, peak, 
     assert map_content(state, cfg, progress_max=peak)["progress"] == progress
 
 
+def test_remaining_progress_holds_while_the_source_is_missing() -> None:
+    _state, cfg = _remaining(0, **{CONF_ACCENT_FROM_PROGRESS: True})
+    lost = make_mock_state("not_home", {}, PHONE)
+    held = map_content(lost, cfg, progress_max=1500.0, last_content={"progress": 0.5})
+    assert (held["progress"], held["accent_color"]) == (0.5, "#FFFF00")
+    # Nothing sent yet, or direct mode: a missing value still reads as 0.
+    assert map_content(lost, cfg, progress_max=1500.0)["progress"] == 0.0
+    direct = {**cfg, CONF_PROGRESS_MODE: "direct"}
+    assert map_content(lost, direct, last_content={"progress": 0.5})["progress"] == 0.0
+
+
 def test_direct_progress_is_unchanged() -> None:
     state, cfg = _remaining(50, **{CONF_PROGRESS_MODE: "direct"})
     assert map_content(state, cfg, progress_max=2000.0)["progress"] == 0.5
@@ -448,6 +459,13 @@ async def test_trip_through_the_manager(hass: HomeAssistant) -> None:
         assert (halfway["icon"], halfway["remaining_time"]) == ("mdi:home-import-outline", 480)
         assert manager._tracked[PHONE].progress_max == 1500
         assert_valid_activity_content(halfway)
+
+        # The distance sensor drops out: the text falls back, the bar and its color hold.
+        hass.states.async_set(DIST, "unavailable")
+        await hass.async_block_till_done()
+        lost = activity_updates(api, "ongoing")[-1]
+        assert lost["state"] != halfway["state"]
+        assert (lost["progress"], lost["accent_color"]) == (0.5, "#FFFF00")
 
         hass.states.async_set(PHONE, "home")
         await hass.async_block_till_done()

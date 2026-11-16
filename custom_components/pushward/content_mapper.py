@@ -1159,9 +1159,10 @@ def map_content(
     separate companion entity (CONF_*_ENTITY); without it those fields fall back
     to the tracked entity.
 
-    ``last_content`` is the previously sent frame. It is only read by the steps
+    ``last_content`` is the previously sent frame. It is read by the steps
     template's live_progress anchor, which has to know when the current step
-    began; see ``_apply_steps_live_progress``.
+    began (see ``_apply_steps_live_progress``), and by remaining-mode progress,
+    which holds its bar while the source is missing.
 
     ``progress_max`` is the largest progress-source value seen since the activity
     started; only progress_mode "remaining" reads it (see ``_get_progress``).
@@ -1184,7 +1185,13 @@ def map_content(
 
     content: dict = {
         "template": entity_config.get(CONF_TEMPLATE, "generic"),
-        "progress": _get_progress(state, entity_config, hass, progress_max=progress_max),
+        "progress": _get_progress(
+            state,
+            entity_config,
+            hass,
+            progress_max=progress_max,
+            last_progress=(last_content or {}).get("progress"),
+        ),
         "state": state_text,
         "icon": icon,
         "subtitle": subtitle,
@@ -1639,7 +1646,12 @@ def progress_remaining_value(state: State, entity_config: dict, hass: HomeAssist
 
 
 def _get_progress(
-    state: State, entity_config: dict, hass: HomeAssistant | None = None, *, progress_max: float | None = None
+    state: State,
+    entity_config: dict,
+    hass: HomeAssistant | None = None,
+    *,
+    progress_max: float | None = None,
+    last_progress: object = None,
 ) -> float:
     """Extract progress (0.0-1.0) from a companion entity or the tracked entity.
 
@@ -1652,11 +1664,12 @@ def _get_progress(
 
     progress_mode "remaining" reads the source as a value falling toward 0 instead:
     1 - value / the largest value seen this run (``progress_max``, or the value itself).
+    While that value is missing the bar holds ``last_progress``, the last frame's.
     """
     if entity_config.get(CONF_PROGRESS_MODE) == PROGRESS_MODE_REMAINING:
         value = progress_remaining_value(state, entity_config, hass)
         if value is None:
-            return 0.0
+            return float(last_progress) if isinstance(last_progress, (int, float)) else 0.0
         peak = max(progress_max or 0.0, value)
         return round(max(0.0, min(1.0, 1 - value / peak)), 2) if peak > 0 else 0.0
     raw, _source = _resolve_raw(state, entity_config, CONF_PROGRESS_ENTITY, CONF_PROGRESS_ATTRIBUTE, hass)
