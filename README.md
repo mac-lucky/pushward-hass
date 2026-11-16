@@ -269,7 +269,7 @@ Some options build what the card shows out of other entities, which used to take
 
 State Text reads a value the way the subtitle source does and shows it instead of the state label. Numbers in metres, seconds or minutes get a format, and a pattern puts the result where `{value}` is (a plain replace, no templating).
 
-Progress Mode `remaining` is for values that drop toward 0. Progress is 1 minus the value divided by the largest value seen since the activity started, so the bar starts empty wherever the trip starts. Each new run starts its own maximum. Accent From Progress then colors the accent from that bar.
+Progress Mode `remaining` is for values that drop toward 0. Progress is 1 minus the value divided by the largest value seen since the activity started, so the bar starts empty wherever the trip starts. Each new run starts its own maximum, and while the value is missing the bar keeps its last position. Accent From Progress then colors the accent from that bar.
 
 Icon Per State maps the states of one entity, a direction-of-travel sensor for example, to icons. Subtitle Columns joins a few values with ` · `; a column without a label is just the value.
 
@@ -287,7 +287,7 @@ Example, someone on the way home, tracked through their phone's `device_tracker`
 | Icon Per State | `Towards` -> `mdi:home-import-outline`, `AwayFrom` -> `mdi:map-marker-distance` |
 | Subtitle Columns | `ETA` / `sensor.trip_travel_time` / unit `min`, then `sensor.trip_direction` with no label |
 
-Halfway home that shows `750 m from home`, a half-full yellow bar, the home icon, a ticking 8 minute countdown and `ETA: 8min · Towards` (column units are glued on with no space, as in Log Columns). When they get home the usual completion frame runs and the activity ends.
+Halfway home that shows `750 m from home`, a half-full yellow bar, the home icon, `8:00` left (it moves with each update, it does not tick on its own) and `ETA: 8min · Towards` (column units are glued on with no space, as in Log Columns). When they get home the usual completion frame runs and the activity ends.
 
 </details>
 
