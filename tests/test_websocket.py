@@ -47,10 +47,12 @@ from custom_components.pushward.const import (
     CONF_SOUND,
     CONF_START_STATES,
     CONF_STAT_ROWS,
+    CONF_STATE_LABELS,
     CONF_TEMPLATE,
     CONF_TILES,
     CONF_TODO_LEVEL,
     CONF_TODO_MAX_SCHEDULED,
+    CONF_TODO_OFFSET_MINUTES,
     CONF_UPDATE_INTERVAL,
     CONF_WIDGET_NAME,
     CONF_WIDGET_TEMPLATE,
@@ -739,6 +741,65 @@ async def test_preview_reconfigure_draft_that_clears_the_name_shows_the_stored_o
     flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=details)
     assert flow["reason"] == "reconfigure_successful"
     assert entry.subentries[subentry_id].data[CONF_WIDGET_NAME] == "Users"
+
+
+async def test_preview_reconfigure_entity_draft_fills_the_stored_defaults_like_the_save(
+    hass: HomeAssistant, loaded
+) -> None:
+    entry, _ = loaded
+    subentry_id = _subentry_id(entry, SUBENTRY_TYPE_ENTITY)
+    core = _mock_core_input()
+
+    async def reconfigure(details: dict) -> dict:
+        flow = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+        flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=core)
+        flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=details)
+        assert flow["reason"] == "reconfigure_successful"
+        return dict(entry.subentries[subentry_id].data)
+
+    # Stored values apart from the add form's defaults; the labels are a row editor the defaults rebuild.
+    saved = await reconfigure(
+        _mock_details_input(
+            **{CONF_START_STATES: ["on", "spinning"], CONF_STATE_LABELS: [{"state": "on", CONF_LABEL: "Spinning"}]}
+        )
+    )
+    assert saved[CONF_STATE_LABELS] == {"on": "Spinning"}
+    # Both left out of the submit: the cleared top-level field and the untouched label rows.
+    details = _mock_details_input()
+    del details[CONF_START_STATES]
+    for group in (details, *(value for value in details.values() if isinstance(value, dict))):
+        group.pop(CONF_STATE_LABELS, None)
+
+    cfg, errors = await _parse_draft(hass, SUBENTRY_TYPE_ENTITY, {**core, **details}, saved)
+
+    assert errors == {}
+    assert cfg[CONF_START_STATES] == ["on", "spinning"]
+    assert cfg[CONF_STATE_LABELS] == {"on": "Spinning"}
+    stored = await reconfigure(details)
+    assert cfg == {key: value for key, value in stored.items() if key != CONF_MEDIA_TOKEN}
+
+
+async def test_preview_reconfigure_todo_draft_fills_the_stored_defaults_like_the_save(
+    hass: HomeAssistant, loaded
+) -> None:
+    entry, _ = loaded
+    subentry_id = _subentry_id(entry, SUBENTRY_TYPE_TODO)
+
+    async def reconfigure(user_input: dict) -> dict:
+        flow = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+        flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=user_input)
+        assert flow["reason"] == "reconfigure_successful"
+        return dict(entry.subentries[subentry_id].data)
+
+    saved = await reconfigure({CONF_ENTITY_ID: TODO_LIST, CONF_TODO_OFFSET_MINUTES: 30, CONF_TODO_LEVEL: "passive"})
+    draft = {CONF_ENTITY_ID: TODO_LIST, CONF_TODO_OFFSET_MINUTES: ""}  # the offset cleared
+
+    cfg, errors = await _parse_draft(hass, SUBENTRY_TYPE_TODO, draft, saved)
+
+    assert errors == {}
+    assert cfg[CONF_TODO_OFFSET_MINUTES] == 30
+    assert cfg[CONF_TODO_LEVEL] == "passive"
+    assert cfg == await reconfigure({CONF_ENTITY_ID: TODO_LIST})
 
 
 async def test_preview_draft_without_an_entity_is_refused_like_the_form(loaded, ws) -> None:
