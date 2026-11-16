@@ -575,6 +575,13 @@ class ActivityManager:
 
         config = tracked.config
         if is_calendar_config(config):
+            old_state: State | None = event.data.get("old_state")
+            if old_state is not None and old_state.attributes == new_state.attributes:
+                # Only on/off flipped: HA's alarm at the event start or end, the boundary
+                # the timer already handles. Deciding here too would start a second time.
+                if tracked.is_active:
+                    self._schedule_throttled_update(entity_id)
+                return
             # A new event or edited times move the window; states play no part.
             self._calendar_evaluate(entity_id)
             return
@@ -676,6 +683,9 @@ class ActivityManager:
         if tracked is None:
             return
         tracked.calendar_unsub = None
+        # At the event start the countdown target moves to the end. The server ends a
+        # countdown whose end_date has passed, so that frame skips the update interval.
+        tracked.last_sent_at = float("-inf")
         self._calendar_evaluate(entity_id)
 
     @callback
@@ -848,6 +858,16 @@ class ActivityManager:
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
             tracked.recreate_attempted = False
+
+            # A run_while row or calendar window that closed while this start was on the
+            # wire found nothing active to end. State-driven entities keep ending on end
+            # states only, so an in-between state does not end them here.
+            if is_calendar_config(config):
+                still_wanted = self._should_run(tracked, self._hass.states.get(entity_id))
+            else:
+                still_wanted = self._conditions_hold(config)
+            if not still_wanted:
+                self._schedule_end(entity_id)
 
     def _activity_name(self, entity_id: str, config: dict) -> str:
         """Resolve activity name: configured name > friendly name > entity_id."""

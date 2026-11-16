@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -22,11 +22,13 @@ from custom_components.pushward.const import (
     CONF_CALENDAR_LEAD_MINUTES,
     CONF_END_STATES,
     CONF_ENTITY_ID,
+    CONF_LABEL,
     CONF_RUN_WHILE,
     CONF_RUN_WHILE_STATES,
     CONF_SLUG,
     CONF_START_STATES,
     CONF_TEMPLATE,
+    CONF_TILES,
     CONF_UPDATE_INTERVAL,
     MAX_TEXT_LEN,
     RUN_WHILE_MAX,
@@ -280,6 +282,63 @@ async def test_run_while_flap_during_the_end_window_keeps_the_activity(hass: Hom
     await manager.async_stop()
 
 
+async def test_run_while_condition_lost_while_starting_ends_the_activity(hass: HomeAssistant) -> None:
+    api = make_activity_api()
+    gate = asyncio.Event()
+
+    async def _on_the_wire(*_args, **_kwargs) -> None:
+        await gate.wait()
+
+    api.create_activity.side_effect = _on_the_wire
+    await _set(hass, ME, "home")
+    await _set(hass, PHONE, "home")
+    manager = await _start(hass, api, _trip_config())
+    tracked = manager._tracked[PHONE]
+
+    with patch(END_DELAY_TARGET, 0):
+        hass.states.async_set(PHONE, "not_home")
+        await _pump()
+        api.create_activity.assert_awaited_once()
+        # The condition fails before the create returns, while nothing is active yet.
+        hass.states.async_set(ME, "not_home")
+        await _pump()
+        gate.set()
+        await hass.async_block_till_done()
+        await _end_window(manager, hass, PHONE)
+
+    assert len(activity_updates(api, "ended")) == 1
+    assert not tracked.is_active
+    await manager.async_stop()
+
+
+async def test_run_while_gates_the_deferred_board_start(hass: HomeAssistant) -> None:
+    api = make_activity_api()
+    config = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.home",
+            CONF_SLUG: "ha-board",
+            CONF_TEMPLATE: "board",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_UPDATE_INTERVAL: 0,
+            CONF_TILES: [{CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu"}],
+            CONF_RUN_WHILE: [{CONF_ENTITY_ID: ME, CONF_RUN_WHILE_STATES: ["home"]}],
+        }
+    )
+    await _set(hass, ME, "not_home")
+    await _set(hass, "sensor.cpu", "unavailable")
+    await _set(hass, "binary_sensor.home", "on")
+    manager = await _start(hass, api, config)
+
+    # A tile turning up retries a deferred board start; the condition still fails.
+    await _set(hass, "sensor.cpu", "42")
+    api.create_activity.assert_not_awaited()
+
+    await _set(hass, ME, "home")
+    api.create_activity.assert_awaited_once()
+    await manager.async_stop()
+
+
 async def test_run_while_unavailable_condition_never_matches(hass: HomeAssistant) -> None:
     api = make_activity_api()
     config = _trip_config(**{CONF_RUN_WHILE: [{CONF_ENTITY_ID: ME, CONF_RUN_WHILE_STATES: ["home", "unavailable"]}]})
@@ -509,18 +568,56 @@ async def test_calendar_ends_with_the_event(hass: HomeAssistant, calendar, freez
 
 async def test_calendar_rearms_when_the_event_changes(hass: HomeAssistant, calendar, freezer) -> None:
     start, api = calendar
-    await start(_event())
+    await start(_event("12:00", "13:00", "Lunch"))
 
-    # The 10:00 event was moved; the entity now shows the 12:00 one.
-    await _set(hass, CAL, "off", _event("12:00", "13:00", "Lunch"))
-    await _at(hass, freezer, _local(9, 30))
+    # The entity now shows an earlier event than the one the 11:30 timer was armed for,
+    # so only a re-armed timer opens its window at 09:30.
+    await _set(hass, CAL, "off", _event("10:00", "11:00", "Dentist"))
+    await _at(hass, freezer, _local(9, 29))
     api.create_activity.assert_not_awaited()
 
-    await _at(hass, freezer, _local(11, 30))
+    await _at(hass, freezer, _local(9, 30))
     api.create_activity.assert_awaited_once()
     content = activity_updates(api, "ongoing")[-1]
-    assert content["state"] == "Lunch"
-    assert content["end_date"] == _ts(12)
+    assert content["state"] == "Dentist"
+    assert (content["start_date"], content["end_date"]) == (_ts(9, 30), _ts(10))
+
+
+async def test_calendar_switches_the_target_at_the_start_despite_the_throttle(
+    hass: HomeAssistant, calendar, freezer
+) -> None:
+    """The server ends a countdown whose end_date has passed, so the switch cannot wait."""
+    start, api = calendar
+    await start(_event(), **{CONF_UPDATE_INTERVAL: 60})
+    await _at(hass, freezer, _local(9, 30))
+    # A frame 20s before the start puts the boundary inside the update interval.
+    freezer.move_to(_local(9, 59) + timedelta(seconds=40))
+    await _set(hass, CAL, "off", _event(message="Dentist, room 4"))
+    assert activity_updates(api, "ongoing")[-1]["state"] == "Dentist, room 4"
+
+    await _at(hass, freezer, _local(10))
+    assert activity_updates(api, "ongoing")[-1]["end_date"] == _ts(11)
+
+
+async def test_calendar_without_lead_starts_once_when_ha_flips_on_too(hass: HomeAssistant, calendar, freezer) -> None:
+    """HA's own alarm writes 'on' at the event start, the same instant as the boundary timer."""
+    start, api = calendar
+
+    gate = asyncio.Event()
+
+    async def _on_the_wire(*_args, **_kwargs) -> None:
+        await gate.wait()
+
+    api.create_activity.side_effect = _on_the_wire
+    await start(_event(), **{CONF_CALENDAR_LEAD_MINUTES: 0})
+
+    freezer.move_to(_local(10))
+    async_fire_time_changed(hass, _local(10))
+    hass.states.async_set(CAL, "on", _event())
+    await _pump()
+    gate.set()
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
 
 
 async def test_calendar_moves_on_to_the_next_event(hass: HomeAssistant, calendar, freezer) -> None:
