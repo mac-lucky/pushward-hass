@@ -1266,8 +1266,7 @@ def _details_schema(
         ] = NumberSelector(NumberSelectorConfig(min=1, max=TOTAL_STEPS_MAX, mode=NumberSelectorMode.BOX))
         fields[_entity_source_key(CONF_CURRENT_STEP_ENTITY, d)] = entity_selector
         fields[_attr_suggest_key(CONF_CURRENT_STEP_ATTR, d)] = attr_selector
-        # One row per step (label / row height / weight / color) in step order. A
-        # legacy per-key comma string is still accepted by _parse_entity_input.
+        # One row per step (label / row height / weight / color) in step order.
         fields[_object_rows_key(CONF_STEPS_EDITOR, d, required=False)] = _STEPS_EDITOR_SELECTOR
     if template == "alert":
         fields[
