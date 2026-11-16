@@ -732,6 +732,17 @@ class PushWardPanel extends HTMLElement {
     this._subentries[card.entryId] = (this._subentries[card.entryId] || []).filter(
       (sub) => sub.subentry_id !== card.id
     );
+    // The last card of its kind takes the End button with it, so end that test item now.
+    const kind = KINDS[card.sub.subentry_type];
+    const key = `${card.entryId}:${kind}`;
+    if (kind !== "notification" && this._lastSent[key] && !this._endCard(card.entryId, kind)) {
+      try {
+        await this._hass.callWS({ type: "pushward/send_test", entry_id: card.entryId, kind, action: "end" });
+        this._setLastSent(key, null);
+      } catch (_err) {
+        // Kept: End shows again on the next card of this kind, and entry removal cleans up.
+      }
+    }
     this._render();
   }
 
