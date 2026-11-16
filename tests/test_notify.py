@@ -138,8 +138,13 @@ async def test_send_message_at_quota_raises_a_validation_error(hass: HomeAssista
 
 async def _send_sealed(hass: HomeAssistant, **data) -> dict:
     """Send through the real client on an entry with an e2e key; return the request body."""
+    return await _send_through_client(hass, {CONF_E2E_KEY: _E2E_KEY.hex()}, **data)
+
+
+async def _send_through_client(hass: HomeAssistant, options: dict, **data) -> dict:
+    """Send through the real client on an entry with these options; return the request body."""
     session = make_mock_session(make_mock_response(201, json_body={"id": 7}))
-    entry = _entry(options={CONF_E2E_KEY: _E2E_KEY.hex()})
+    entry = _entry(options=options)
     entry.add_to_hass(hass)
     with (
         patch("custom_components.pushward.async_get_clientsession", return_value=session),
@@ -175,3 +180,11 @@ async def test_a_message_too_long_to_seal_is_shortened(hass: HomeAssistant) -> N
     assert opened["title"] == "Dishwasher"
     assert 0 < len(opened["body"]) < len(message)
     assert opened["body"].startswith("The dishwasher reports a fault.")
+
+
+async def test_a_message_over_the_server_caps_is_cut_without_a_key(hass: HomeAssistant) -> None:
+    """Unsealed, a 5000-character body would get a 422; it goes out cut to the 4096 cap."""
+    body = await _send_through_client(hass, {}, message="x" * 5000, title="T" * 300)
+
+    assert len(body["body"]) == 4096
+    assert len(body["title"]) == 256
