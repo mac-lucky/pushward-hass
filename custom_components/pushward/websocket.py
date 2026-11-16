@@ -9,6 +9,7 @@ embedded playground's requests, limited to an allowlist of endpoints.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 from collections.abc import Callable, Coroutine, Mapping
 from functools import wraps
@@ -22,7 +23,7 @@ from homeassistant.data_entry_flow import section
 from homeassistant.util import dt as dt_util
 
 from .activity_manager import _companion_entity_ids
-from .api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
+from .api import PushWardApiError, PushWardAuthError, PushWardNotFoundError, PushWardQuotaExceededError
 from .config_flow import (
     _details_schema,
     _entity_details_to_config,
@@ -395,13 +396,18 @@ async def ws_send_test(hass: HomeAssistant, connection: websocket_api.ActiveConn
             return
     api = data["api"]
     if kind == "activity" and action == "send":
-        # Lowest priority: at the account's Live Activity cap the server evicts the lowest
-        # first, so a test goes before any tracked activity does.
+        # Priority 0, the lowest: at the account's Live Activity cap the server evicts the
+        # lowest-priority, least recently updated activity, so a test already on the phone
+        # goes before any tracked activity above priority 0.
         await api.create_activity(PREVIEW_ACTIVITY_SLUG, payload["name"], PRIORITY_MIN)
         await api.update_activity(PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ONGOING, payload["content"])
     elif kind == "activity":
-        # An empty merge patch keeps the stored frame and only ends it.
-        await api.update_activity(PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ENDED, payload["content"] if payload else {})
+        # An empty merge patch keeps the stored frame and only ends it. A 404 is already gone
+        # (dismissed and cleaned up, or deleted elsewhere): nothing is left to end.
+        with contextlib.suppress(PushWardNotFoundError):
+            await api.update_activity(
+                PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ENDED, payload["content"] if payload else {}
+            )
     elif kind == "widget" and action == "send":
         name = payload.get("name") or "PushWard preview"
         await api.create_widget(PREVIEW_WIDGET_SLUG, name, payload["template"], payload["content"])

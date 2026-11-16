@@ -19,7 +19,12 @@ from homeassistant.data_entry_flow import FlowResultType, InvalidData
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.pushward import panel
-from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
+from custom_components.pushward.api import (
+    PushWardApiError,
+    PushWardAuthError,
+    PushWardNotFoundError,
+    PushWardQuotaExceededError,
+)
 from custom_components.pushward.const import (
     CONF_ACTIVITY_NAME,
     CONF_BATTERY_DEVICES,
@@ -794,13 +799,23 @@ async def test_send_test_activity_send_and_end(loaded, ws) -> None:
         payload={"name": "Washer", "content": content},
     )
     assert reply["success"]
-    # Priority 0, below every tracked activity: at the Live Activity cap the server evicts the test first.
+    # Priority 0, the lowest: at the Live Activity cap a test on the phone goes before tracked activities above it.
     api.create_activity.assert_awaited_once_with("ha-preview", "Washer", 0)
     api.update_activity.assert_awaited_once_with("ha-preview", "ongoing", content)
 
     reply = await ws("pushward/send_test", entry_id=entry.entry_id, kind="activity", action="end")
     assert reply["success"]
     api.update_activity.assert_awaited_with("ha-preview", "ended", {})
+
+
+async def test_send_test_activity_end_of_a_gone_activity_counts_as_ended(loaded, ws) -> None:
+    entry, api = loaded
+    api.update_activity.side_effect = PushWardNotFoundError("PATCH /activities/ha-preview failed (404)", 404)
+
+    reply = await ws("pushward/send_test", entry_id=entry.entry_id, kind="activity", action="end")
+
+    # Dismissed and cleaned up, or deleted elsewhere: End succeeds, so the panel forgets it.
+    assert reply["success"]
 
 
 async def test_send_test_widget_send_and_end(loaded, ws) -> None:
