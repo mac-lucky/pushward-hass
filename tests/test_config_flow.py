@@ -127,6 +127,7 @@ from custom_components.pushward.const import (
     CONF_SLUG,
     CONF_SMOOTHING,
     CONF_SOUND,
+    CONF_STALE_TTL,
     CONF_START_STATES,
     CONF_STAT_ROWS,
     CONF_STATE_LABELS,
@@ -4477,12 +4478,13 @@ def _reconfigure_details_defaults(result: dict) -> dict:
     the remaining key=value fields come back as serialized strings, and each
     section's defaults come back nested under its key (the shape HA submits).
 
-    Composed from the same two helpers the flat/nest tests use: pull every baked-in
-    default flat, then reshape it into the schema's section layout (every section
-    key present, empty when it has no defaulted field).
+    Composed from the same helpers the flat/nest tests use: pull every suggested value
+    and baked-in default flat (the frontend prefills both), then reshape it into the
+    schema's section layout (every section key present, empty when it has no field).
     """
     schema = result["data_schema"]
-    return _nest_for_schema(schema, _all_field_defaults(schema))
+    suggested = {key: value for key, value in _suggested_values(result).items() if value is not None}
+    return _nest_for_schema(schema, {**suggested, **_all_field_defaults(schema)})
 
 
 @pytest.mark.parametrize(
@@ -4653,12 +4655,154 @@ async def test_sectioned_submission_stores_flat_and_reconfigure_prefills(hass: H
     )
     assert result["step_id"] == "details"
 
-    # Sectioned fields come back prefilled (icon via suggested_value, the rest via default).
+    # Sectioned fields come back prefilled (the optional ones via suggested_value, the rest via default).
     suggested = _suggested_values(result)
     assert suggested.get(CONF_ICON) == "mdi:washing-machine"
+    assert suggested.get(CONF_ENDED_TTL) == 120
     defaults = _all_field_defaults(result["data_schema"])
-    assert defaults[CONF_ENDED_TTL] == 120
     assert defaults[CONF_UPDATE_INTERVAL] == 45
+
+
+# Per template: optional fields as {field: (set value, value once cleared)}. A cleared
+# field gets what a never-set one gets: empty text, no TTL, the derived slug and name.
+_CLEARED_ENTITY_FIELDS: dict[str, dict] = {
+    "alert": {
+        CONF_TAP_ACTION_URL: ("https://example.com/tap", ""),
+        CONF_URL: ("https://example.com/a", ""),
+        CONF_URL_TITLE: ("Open", ""),
+        CONF_SECONDARY_URL: ("https://example.com/b", ""),
+        CONF_SECONDARY_URL_TITLE: ("More", ""),
+        CONF_SEVERITY_LABEL: ("Leak", ""),
+        CONF_ENDED_TTL: (120, None),
+        CONF_STALE_TTL: (600, None),
+        CONF_DISMISSAL_TTL: (60, None),
+        CONF_SLUG: ("my-washer", "ha-binary_sensor-washer"),
+        CONF_ACTIVITY_NAME: ("My Washer", "binary_sensor.washer"),
+    },
+    "countdown": {CONF_COMPLETION_MESSAGE: ("Done!", "")},
+    "gauge": {CONF_UNIT: ("%", "")},
+    "generic": {CONF_IMAGE_URL: (IMAGE_URL, ""), CONF_IMAGE_THUMBHASH: (IMAGE_THUMBHASH, "")},
+    "timeline": {CONF_UNIT: ("W", ""), CONF_PRIMARY_SERIES: ("Washer", "")},
+}
+
+
+@pytest.mark.parametrize("template", list(_CLEARED_ENTITY_FIELDS))
+async def test_reconfigure_stores_an_emptied_optional_field_as_cleared(hass: HomeAssistant, template: str) -> None:
+    """HA leaves a cleared field out of the submit; the stored value must not come back."""
+    hass.states.async_set("binary_sensor.washer", "off", {"friendly_name": "Washer"})
+    fields = _CLEARED_ENTITY_FIELDS[template]
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass, entry, template=template, details_overrides={key: value for key, (value, _) in fields.items()}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**{CONF_TEMPLATE: template})
+    )
+    details = _reconfigure_details_defaults(result)
+    _omit_fields(details, *fields)
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=details)
+
+    assert result["reason"] == "reconfigure_successful"
+    data = entry.subentries[subentry_id].data
+    assert {key: data[key] for key in fields} == {key: cleared for key, (_, cleared) in fields.items()}
+
+
+@pytest.mark.parametrize("template", list(_CLEARED_ENTITY_FIELDS))
+async def test_add_form_submitted_as_offered_creates_with_the_optional_fields_unset(
+    hass: HomeAssistant, template: str
+) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_ENTITY), context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_core_input(**{CONF_TEMPLATE: template})
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    fields = _CLEARED_ENTITY_FIELDS[template]
+    assert {key: result["data"][key] for key in fields} == {key: cleared for key, (_, cleared) in fields.items()}
+
+
+_CLEARED_WIDGET_FIELDS: dict[str, dict] = {
+    WIDGET_TEMPLATE_VALUE: {
+        CONF_WIDGET_NAME: ("Online", ""),
+        CONF_UNIT: ("ppl", ""),
+        CONF_LABEL: ("Now", ""),
+        CONF_TAP_ACTION_URL: ("https://example.com/tap", ""),
+        CONF_URL: ("https://example.com/a", ""),
+        CONF_URL_TITLE: ("Open", ""),
+        CONF_SECONDARY_URL: ("https://example.com/b", ""),
+        CONF_SECONDARY_URL_TITLE: ("More", ""),
+        CONF_WIDGET_STALE_AFTER: (900, None),
+    },
+    WIDGET_TEMPLATE_STATUS: {CONF_SEVERITY: ("warning", "")},
+    WIDGET_TEMPLATE_COUNTDOWN: {CONF_EXPIRED_TEXT: ("Over", "")},
+    WIDGET_TEMPLATE_SCHEDULE: {CONF_SCHEDULE_ATTRIBUTES: ("raw_today", [])},
+}
+
+
+@pytest.mark.parametrize("template", list(_CLEARED_WIDGET_FIELDS))
+async def test_widget_reconfigure_stores_an_emptied_optional_field_as_cleared(
+    hass: HomeAssistant, template: str
+) -> None:
+    fields = _CLEARED_WIDGET_FIELDS[template]
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_widget_subentry(
+        hass,
+        entry,
+        template,
+        {key: value for key, (value, _) in fields.items()},
+        step1_extra={CONF_SLUG: "my-users"},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentry_id = next(iter(entry.subentries))
+    assert all(entry.subentries[subentry_id].data[key] != cleared for key, (_, cleared) in fields.items())
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    # The slug left out of step 1 as well: it falls back to the one derived from the entity.
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: template}
+    )
+    details = _reconfigure_details_defaults(result)
+    _omit_fields(details, *fields)
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], user_input=details)
+
+    assert result["reason"] == "reconfigure_successful"
+    subentry = entry.subentries[subentry_id]
+    assert {key: subentry.data[key] for key in fields} == {key: cleared for key, (_, cleared) in fields.items()}
+    assert subentry.data[CONF_SLUG] == subentry.unique_id == "ha-sensor-users"
+
+
+@pytest.mark.parametrize("template", list(_CLEARED_WIDGET_FIELDS))
+async def test_widget_add_form_submitted_as_offered_creates_with_the_optional_fields_unset(
+    hass: HomeAssistant, template: str
+) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await hass.config_entries.subentries.async_init(
+        (entry.entry_id, SUBENTRY_TYPE_WIDGET), context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input={CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: template}
+    )
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_reconfigure_details_defaults(result)
+    )
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    fields = _CLEARED_WIDGET_FIELDS[template]
+    assert {key: result["data"][key] for key in fields} == {key: cleared for key, (_, cleared) in fields.items()}
 
 
 async def test_reconfigure_round_trip_preserves_widget_stat_rows(hass: HomeAssistant) -> None:
@@ -5010,7 +5154,7 @@ def test_widget_details_schema_builds_for_every_template(template) -> None:
     if template == WIDGET_TEMPLATE_SCHEDULE:
         # The stored list is a CSV string in the form.
         marker = next(k for k in schema.schema if getattr(k, "schema", None) == CONF_SCHEDULE_ATTRIBUTES)
-        assert marker.default() == "raw_today, raw_tomorrow"
+        assert marker.description == {"suggested_value": "raw_today, raw_tomorrow"}
 
 
 @pytest.mark.parametrize(

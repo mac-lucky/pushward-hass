@@ -1084,13 +1084,11 @@ def _add_button_action_fields(fields: dict, d: dict) -> None:
     fields land in the same order inside each form's tap_actions section.
     """
     for url_key, foreground_key, title_key in _BUTTON_FIELD_KEYS:
-        fields[vol.Optional(url_key, default=d.get(url_key, ""))] = vol.All(str, vol.Length(max=MAX_URL_LEN))
+        fields[_attr_suggest_key(url_key, d)] = vol.All(str, vol.Length(max=MAX_URL_LEN))
         fields[vol.Optional(foreground_key, default=d.get(foreground_key, DEFAULT_TAP_ACTION_FOREGROUND))] = (
             BooleanSelector()
         )
-        fields[vol.Optional(title_key, default=d.get(title_key, ""))] = vol.All(
-            str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN)
-        )
+        fields[_attr_suggest_key(title_key, d)] = vol.All(str, vol.Length(max=MAX_TAP_ACTION_TITLE_LEN))
 
 
 def _details_schema(
@@ -1143,10 +1141,9 @@ def _details_schema(
     bg_color_key = _color_vol_key(CONF_BACKGROUND_COLOR, d)
     text_color_key = _color_vol_key(CONF_TEXT_COLOR, d)
 
-    # TTL defaults: only set a default when a value is stored
-    ended_ttl_key = _ttl_key(CONF_ENDED_TTL, d)
-    stale_ttl_key = _ttl_key(CONF_STALE_TTL, d)
-    dismissal_ttl_key = _ttl_key(CONF_DISMISSAL_TTL, d)
+    ended_ttl_key = _opt_number_key(CONF_ENDED_TTL, d)
+    stale_ttl_key = _opt_number_key(CONF_STALE_TTL, d)
+    dismissal_ttl_key = _opt_number_key(CONF_DISMISSAL_TTL, d)
 
     fields: dict = {}
 
@@ -1215,12 +1212,7 @@ def _details_schema(
         # tier that always renders; leaving it blank lets the integration derive one
         # from the URL, and pushward.generate_thumbhash produces one from any image
         # Home Assistant can read (including plain-http LAN cameras).
-        fields[
-            vol.Optional(
-                CONF_IMAGE_URL,
-                default=d.get(CONF_IMAGE_URL, ""),
-            )
-        ] = vol.All(str, vol.Length(max=IMAGE_URL_MAX))
+        fields[_attr_suggest_key(CONF_IMAGE_URL, d)] = vol.All(str, vol.Length(max=IMAGE_URL_MAX))
         fields[
             vol.Optional(
                 CONF_IMAGE_SHAPE,
@@ -1233,12 +1225,7 @@ def _details_schema(
                 translation_key="image_shape",
             )
         )
-        fields[
-            vol.Optional(
-                CONF_IMAGE_THUMBHASH,
-                default=d.get(CONF_IMAGE_THUMBHASH, ""),
-            )
-        ] = vol.All(str, vol.Length(max=IMAGE_THUMBHASH_MAX))
+        fields[_attr_suggest_key(CONF_IMAGE_THUMBHASH, d)] = vol.All(str, vol.Length(max=IMAGE_THUMBHASH_MAX))
     if template == "media":
         # The transport row rides on a callback that cannot ask for a Home Assistant
         # token, so anyone holding the pushed URL can drive the player. Turning this
@@ -1279,12 +1266,7 @@ def _details_schema(
                 translation_key="severity",
             )
         )
-        fields[
-            vol.Optional(
-                CONF_SEVERITY_LABEL,
-                default=d.get(CONF_SEVERITY_LABEL, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_SEVERITY_LABEL_LEN))
+        fields[_attr_suggest_key(CONF_SEVERITY_LABEL, d)] = vol.All(str, vol.Length(max=MAX_SEVERITY_LABEL_LEN))
         fields[_entity_source_key(CONF_FIRED_AT_ENTITY, d)] = entity_selector
         fields[_attr_suggest_key(CONF_FIRED_AT_ATTRIBUTE, d)] = attr_selector
     if template == "gauge":
@@ -1302,12 +1284,7 @@ def _details_schema(
                 default=d.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE),
             )
         ] = _NUMBER_BOX_ANY
-        fields[
-            vol.Optional(
-                CONF_UNIT,
-                default=d.get(CONF_UNIT, ""),
-            )
-        ] = vol.All(str, vol.Length(max=ACTIVITY_UNIT_MAX))
+        fields[_attr_suggest_key(CONF_UNIT, d)] = vol.All(str, vol.Length(max=ACTIVITY_UNIT_MAX))
     if template == "timeline":
         # Map attributes of the tracked entity to named series (a two-column row
         # editor: attribute -> label). A legacy 'attr=Label, ...' string is still accepted.
@@ -1323,12 +1300,7 @@ def _details_schema(
         # value. Options are the stored labels on reconfigure and empty on first add
         # (custom_value lets the user type one before any series is saved); the
         # authoritative check stays unknown_primary_series in _parse_entity_input.
-        fields[
-            vol.Optional(
-                CONF_PRIMARY_SERIES,
-                default=d.get(CONF_PRIMARY_SERIES, ""),
-            )
-        ] = SelectSelector(
+        fields[_attr_suggest_key(CONF_PRIMARY_SERIES, d)] = SelectSelector(
             SelectSelectorConfig(
                 options=_primary_series_options(d),
                 custom_value=True,
@@ -1337,12 +1309,7 @@ def _details_schema(
         )
         fields[_entity_source_key(CONF_VALUE_ENTITY, d)] = entity_selector
         fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
-        fields[
-            vol.Optional(
-                CONF_UNIT,
-                default=d.get(CONF_UNIT, ""),
-            )
-        ] = vol.All(str, vol.Length(max=ACTIVITY_UNIT_MAX))
+        fields[_attr_suggest_key(CONF_UNIT, d)] = vol.All(str, vol.Length(max=ACTIVITY_UNIT_MAX))
         fields[
             vol.Optional(
                 CONF_SCALE,
@@ -1400,13 +1367,8 @@ def _details_schema(
         fields[_attr_suggest_key(CONF_LOG_LEVEL_ATTRIBUTE, d)] = attr_selector
 
     # --- Identity fields ---
-    fields[vol.Optional(CONF_SLUG, default=d.get(CONF_SLUG, ""))] = vol.All(str, vol.Length(max=MAX_SLUG_LEN))
-    fields[
-        vol.Optional(
-            CONF_ACTIVITY_NAME,
-            default=d.get(CONF_ACTIVITY_NAME, ""),
-        )
-    ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+    fields[_attr_suggest_key(CONF_SLUG, d)] = vol.All(str, vol.Length(max=MAX_SLUG_LEN))
+    fields[_attr_suggest_key(CONF_ACTIVITY_NAME, d)] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
     fields[_attr_suggest_key(CONF_ICON, d)] = IconSelector(IconSelectorConfig())
     fields[_attr_suggest_key(CONF_ICON_ATTRIBUTE, d)] = attr_selector
     # An icon per state (a two-column row editor) of the tracked entity, or of the
@@ -1482,12 +1444,7 @@ def _details_schema(
     ] = vol.All(str, _TrimmedLength(max=MAX_COMPACT_TRAILING_LABEL_LEN))
     fields[_attr_suggest_key(CONF_COMPACT_TRAILING_ICON, d)] = IconSelector(IconSelectorConfig())
     if template == "countdown":
-        fields[
-            vol.Optional(
-                CONF_COMPLETION_MESSAGE,
-                default=d.get(CONF_COMPLETION_MESSAGE, ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
+        fields[_attr_suggest_key(CONF_COMPLETION_MESSAGE, d)] = vol.All(str, vol.Length(max=MAX_LONG_TEXT_LEN))
         fields[
             vol.Optional(
                 CONF_WARNING_THRESHOLD,
@@ -1530,12 +1487,7 @@ def _details_schema(
     fields[_attr_suggest_key(CONF_BACKGROUND_COLOR_ATTRIBUTE, d)] = attr_selector
     fields[text_color_key] = ColorRGBSelector()
     fields[_attr_suggest_key(CONF_TEXT_COLOR_ATTRIBUTE, d)] = attr_selector
-    fields[
-        vol.Optional(
-            CONF_TAP_ACTION_URL,
-            default=d.get(CONF_TAP_ACTION_URL, ""),
-        )
-    ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
+    fields[_attr_suggest_key(CONF_TAP_ACTION_URL, d)] = vol.All(str, vol.Length(max=MAX_URL_LEN))
     fields[
         vol.Optional(
             CONF_TAP_ACTION_FOREGROUND,
@@ -2712,10 +2664,7 @@ def _widget_step1_schema(defaults: dict | None = None) -> vol.Schema:
                     translation_key="widget_template",
                 )
             ),
-            vol.Optional(
-                CONF_SLUG,
-                default=d.get(CONF_SLUG, ""),
-            ): vol.All(str, vol.Length(max=MAX_SLUG_LEN)),
+            _attr_suggest_key(CONF_SLUG, d): vol.All(str, vol.Length(max=MAX_SLUG_LEN)),
         }
     )
 
@@ -2741,12 +2690,7 @@ def _widget_details_schema(
 
     fields: dict = {}
 
-    fields[
-        vol.Optional(
-            CONF_WIDGET_NAME,
-            default=d.get(CONF_WIDGET_NAME, ""),
-        )
-    ] = vol.All(str, vol.Length(max=WIDGET_NAME_MAX))
+    fields[_attr_suggest_key(CONF_WIDGET_NAME, d)] = vol.All(str, vol.Length(max=WIDGET_NAME_MAX))
 
     # Template-specific
     if template in (
@@ -2760,12 +2704,7 @@ def _widget_details_schema(
     ):
         if template not in (WIDGET_TEMPLATE_SCHEDULE, WIDGET_TEMPLATE_FLOW, WIDGET_TEMPLATE_HEATMAP):
             fields[_attr_suggest_key(CONF_VALUE_ATTRIBUTE, d)] = attr_selector
-        fields[
-            vol.Optional(
-                CONF_UNIT,
-                default=d.get(CONF_UNIT, ""),
-            )
-        ] = vol.All(str, vol.Length(max=WIDGET_UNIT_MAX))
+        fields[_attr_suggest_key(CONF_UNIT, d)] = vol.All(str, vol.Length(max=WIDGET_UNIT_MAX))
 
     if template == WIDGET_TEMPLATE_TREND:
         fields[
@@ -2820,12 +2759,7 @@ def _widget_details_schema(
         fields[_attr_suggest_key(CONF_START_DATE_ATTRIBUTE, d)] = attr_selector
 
     if template == WIDGET_TEMPLATE_COUNTDOWN:
-        fields[
-            vol.Optional(
-                CONF_EXPIRED_TEXT,
-                default=d.get(CONF_EXPIRED_TEXT, ""),
-            )
-        ] = vol.All(str, vol.Length(max=WIDGET_EXPIRED_TEXT_MAX))
+        fields[_attr_suggest_key(CONF_EXPIRED_TEXT, d)] = vol.All(str, vol.Length(max=WIDGET_EXPIRED_TEXT_MAX))
 
     if template == WIDGET_TEMPLATE_BATTERY:
         fields[_object_rows_key(CONF_BATTERY_DEVICES, d, required=True)] = _BATTERY_DEVICES_SELECTOR
@@ -2846,12 +2780,10 @@ def _widget_details_schema(
 
     if template == WIDGET_TEMPLATE_SCHEDULE:
         stored_attrs = d.get(CONF_SCHEDULE_ATTRIBUTES)
-        fields[
-            vol.Optional(
-                CONF_SCHEDULE_ATTRIBUTES,
-                default=", ".join(stored_attrs) if isinstance(stored_attrs, list) else (stored_attrs or ""),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
+        joined = ", ".join(stored_attrs) if isinstance(stored_attrs, list) else (stored_attrs or "")
+        fields[vol.Optional(CONF_SCHEDULE_ATTRIBUTES, description={"suggested_value": joined})] = vol.All(
+            str, vol.Length(max=MAX_TEXT_LEN)
+        )
         fields[
             vol.Optional(
                 CONF_SCHEDULE_START_KEY,
@@ -2899,12 +2831,8 @@ def _widget_details_schema(
         ] = _NUMBER_BOX_ANY
 
     if template == WIDGET_TEMPLATE_STATUS:
-        fields[
-            vol.Optional(
-                CONF_SEVERITY,
-                default=d.get(CONF_SEVERITY, ""),
-            )
-        ] = SelectSelector(
+        # HA leaves the top-level "" (none) out of the submit, so a default would bring the old severity back.
+        fields[_attr_suggest_key(CONF_SEVERITY, d)] = SelectSelector(
             SelectSelectorConfig(
                 options=WIDGET_SEVERITIES,
                 mode=SelectSelectorMode.DROPDOWN,
@@ -2932,12 +2860,7 @@ def _widget_details_schema(
             fields[vol.Optional(key, default=stored if stored in allowed else WIDGET_LOOK_UNSET)] = look_selector
 
     # Cosmetic fields (all templates)
-    fields[
-        vol.Optional(
-            CONF_LABEL,
-            default=d.get(CONF_LABEL, ""),
-        )
-    ] = vol.All(str, vol.Length(max=WIDGET_LABEL_MAX))
+    fields[_attr_suggest_key(CONF_LABEL, d)] = vol.All(str, vol.Length(max=WIDGET_LABEL_MAX))
     fields[_attr_suggest_key(CONF_LABEL_ATTRIBUTE, d)] = attr_selector
     fields[_attr_suggest_key(CONF_SUBTITLE_ATTRIBUTE, d)] = attr_selector
     if template not in WIDGET_GROUP_TEMPLATES:
@@ -2967,12 +2890,7 @@ def _widget_details_schema(
     fields[text_color_key] = ColorRGBSelector()
 
     # Widget-wide tap action (universal across all templates)
-    fields[
-        vol.Optional(
-            CONF_TAP_ACTION_URL,
-            default=d.get(CONF_TAP_ACTION_URL, ""),
-        )
-    ] = vol.All(str, vol.Length(max=MAX_URL_LEN))
+    fields[_attr_suggest_key(CONF_TAP_ACTION_URL, d)] = vol.All(str, vol.Length(max=MAX_URL_LEN))
     fields[
         vol.Optional(
             CONF_TAP_ACTION_FOREGROUND,
@@ -3014,7 +2932,7 @@ def _widget_details_schema(
     )
     # Optional with no default: an empty field means "never demote to stale",
     # which is the pre-1.6 behaviour every existing widget already has.
-    fields[_ttl_key(CONF_WIDGET_STALE_AFTER, d)] = NumberSelector(
+    fields[_opt_number_key(CONF_WIDGET_STALE_AFTER, d)] = NumberSelector(
         NumberSelectorConfig(
             min=WIDGET_STALE_AFTER_MIN,
             max=WIDGET_STALE_AFTER_MAX,
@@ -3626,12 +3544,6 @@ def _color_vol_key(conf_key: str, current: dict) -> vol.Optional:
     return vol.Optional(conf_key, default=rgb) if rgb is not None else vol.Optional(conf_key)
 
 
-def _ttl_key(conf_key: str, current: dict) -> vol.Optional:
-    """Build a vol.Optional key for a TTL NumberSelector, setting a default only when one is stored."""
-    value = current.get(conf_key)
-    return vol.Optional(conf_key, default=value) if value is not None else vol.Optional(conf_key)
-
-
 def _opt_number_key(conf_key: str, current: dict) -> vol.Optional:
     """Build a vol.Optional key for a genuinely optional number.
 
@@ -3659,10 +3571,10 @@ def _entity_source_key(conf_key: str, current: dict) -> vol.Optional:
 
 
 def _attr_suggest_key(conf_key: str, current: dict) -> vol.Optional:
-    """Build a vol.Optional key that pre-fills an attribute/icon field via suggested_value.
+    """Build a vol.Optional key that pre-fills an optional text, attribute or icon field via suggested_value.
 
-    The shared shape for the attribute-picker and icon fields: an empty-string
-    suggested value so a cleared field submits as absent rather than a stale default.
+    HA leaves a cleared optional field out of the submit, and a default would put the
+    stored value straight back; a suggested value lets the clear reach the parse.
     """
     return vol.Optional(conf_key, description={"suggested_value": current.get(conf_key, "")})
 

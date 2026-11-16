@@ -813,13 +813,13 @@ async def test_preview_new_widget_draft_fills_its_template(loaded, ws) -> None:
     assert reply["result"]["payload"]["content"]["value"] == 21.5
 
 
-async def test_preview_reconfigure_draft_that_clears_the_name_shows_the_stored_one(
+async def test_preview_reconfigure_draft_that_clears_the_name_falls_back_like_the_save(
     hass: HomeAssistant, loaded, ws
 ) -> None:
     entry, _ = loaded
     subentry_id = _subentry_id(entry, SUBENTRY_TYPE_WIDGET)
     assert entry.subentries[subentry_id].data[CONF_WIDGET_NAME] == "Users"
-    # A friendly name apart from the stored one, so a fallback to it would show.
+    # A friendly name apart from the stored one, so the fallback to it shows.
     hass.states.async_set("sensor.users", "42", {"friendly_name": "Members"})
     step1 = {CONF_ENTITY_ID: "sensor.users", CONF_WIDGET_TEMPLATE: "value", CONF_SLUG: "ha-users"}
     details = _nest_widget("value", {})  # the cleared name is left out, as the frontend submits it
@@ -831,14 +831,15 @@ async def test_preview_reconfigure_draft_that_clears_the_name_shows_the_stored_o
         )
         return reply["result"]["payload"]
 
-    assert (await preview(subentry_id=subentry_id))["name"] == "Users"
-    assert (await preview())["name"] == "Members"  # an add form has no stored name to fill
+    # The stored name only prefills the field, so clearing it leaves no name on reconfigure either.
+    assert (await preview(subentry_id=subentry_id))["name"] == "Members"
+    assert (await preview())["name"] == "Members"
 
     flow = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
     flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=step1)
     flow = await hass.config_entries.subentries.async_configure(flow["flow_id"], user_input=details)
     assert flow["reason"] == "reconfigure_successful"
-    assert entry.subentries[subentry_id].data[CONF_WIDGET_NAME] == "Users"
+    assert entry.subentries[subentry_id].data[CONF_WIDGET_NAME] == ""
 
 
 async def test_preview_reconfigure_entity_draft_fills_the_stored_defaults_like_the_save(
