@@ -161,13 +161,13 @@ Each PushWard account gets its own entry. On a Family plan every member has thei
 - Actions reach every account unless you pick one, see [Choosing the account](#choosing-the-account).
 - Each entry has its own [account sensors](#account-sensors) and its own quota.
 
-If all you want is to share Live Activities, the app can do it without a second entry. **Settings > Sharing > Create Pattern Share** with a pattern like `ha-*` gives a code the other person redeems once under **Join with Code**. The code expires after 7 days at most; the share doesn't. Every current and future activity whose slug matches reaches them, including the ones your automations end and create again. Notifications are not shared this way.
+If all you want is to share Live Activities, the app can do it without a second entry. **Settings > Sharing > Create Pattern Share** with a pattern like `ha-*` gives a code the other person redeems once under **Join with Code**. The code expires after 7 days at most; the share doesn't. Every current and future activity whose slug matches reaches them, including the ones your automations end and create again, and the [panel's](#pushward-panel) test sends. Notifications are not shared this way.
 
 ### PushWard panel
 
 Once an account is set up, admin users get a **PushWard** item in the sidebar. It lists the tracked entities, widgets and to-do lists of every account, each with a preview of what the phone shows, redrawn when the entities it reads change. From there you can add, edit and delete them, with the preview following the form as you type. The forms are the config flow's own, so the fields, checks and translations are the same.
 
-**Send to phone** pushes the previewed item to your phone as a test. Tests reuse fixed slugs (`ha-preview` for activities, `ha-preview-widget` for widgets), so a new test replaces the last one sent from the same account, and **End on phone** ends the activity or removes the widget again. **Open in playground** loads the item into the playground from pushward.app, which sends through this integration's key.
+**Send to phone** pushes the previewed item to your phone as a test. Tests reuse fixed slugs (`ha-preview` for activities, `ha-preview-widget` for widgets), so a new test replaces the last one sent from the same account, and **End on phone** ends the activity or removes the widget again. Both slugs match a `ha-*` pattern share, so whoever you share with gets your tests too, and End takes them off their phone as well. **Open in playground** loads the item into the playground from pushward.app, which sends through this integration's key.
 
 Everything still works from **Settings > Devices & Services > PushWard** as before; the panel only saves the trip there. Users who are not admins don't see it.
 
