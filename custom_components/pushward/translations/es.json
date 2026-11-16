@@ -2161,6 +2161,8 @@
             "start_states": "Estados de inicio",
             "end_states": "Estados de fin",
             "calendar_lead_minutes": "Antelación (minutos)",
+            "calendar_subtitle_before": "Subtítulo antes del evento",
+            "calendar_subtitle_during": "Subtítulo durante el evento",
             "run_while": "Solo mientras",
             "remaining_time_entity": "Entidad de tiempo restante",
             "remaining_time_attribute": "Atributo de tiempo restante",
@@ -2184,6 +2186,8 @@
             "start_states": "Estados de la entidad que inician la Live Activity. Seleccionar de la lista o introducir valores personalizados. `*` la inicia con cualquier estado que no sea de fin (unavailable y unknown nunca la inician).",
             "end_states": "Estados de la entidad que finalizan la Live Activity. Seleccionar de la lista o introducir valores personalizados.",
             "calendar_lead_minutes": "Las entidades de calendario ignoran los estados de inicio y fin: la actividad se abre estos minutos antes del próximo evento con hora, cuenta atrás hasta su inicio, luego hasta su fin, y termina con el evento. Los eventos de todo el día se omiten. 0-1440.",
+            "calendar_subtitle_before": "Se muestra durante la cuenta atrás hasta el inicio del evento. Déjalo vacío para mostrar el nombre del calendario. Ejemplo: Empieza pronto",
+            "calendar_subtitle_during": "Se muestra mientras el evento está en curso. Déjalo vacío para mostrar el nombre del calendario. Ejemplo: En curso",
             "run_while": "Mantener la actividad solo mientras se cumplan todas las filas: cada fila es una entidad y una lista de sus estados separados por comas (p. ej. device_tracker.me y home). Si una fila deja de cumplirse, la actividad termina; cuando vuelven a cumplirse todas, se inicia si la entidad rastreada está en un estado de inicio. Una entidad no disponible nunca se cumple. Hasta 5 filas.",
             "remaining_time_entity": "Lee el tiempo restante de una entidad distinta (p. ej., el sensor de tiempo de una lavadora). Déjalo vacío para usar la entidad rastreada. Interpreta automáticamente un sensor de marca de tiempo (hora de finalización), un sensor de duración con unidades, una cadena H:MM:SS o segundos sin más.",
             "remaining_time_attribute": "Atributo de la entidad que contiene el tiempo restante en segundos. Ejemplo: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Quitar en cuanto termine",
                 "ended_ttl": "Eliminar automáticamente tras finalizar (segundos)",
                 "stale_ttl": "Finalizar automáticamente por inactividad (segundos)",
                 "dismissal_ttl": "Quitar automáticamente de la pantalla de bloqueo (segundos)"
               },
               "data_description": {
+                "remove_on_end": "Omite la pantalla de finalización y quita la actividad de la pantalla de bloqueo en cuanto termina. Anula el tiempo de eliminación automática.",
                 "ended_ttl": "Segundos tras la finalización de la actividad antes de eliminarla automáticamente del servidor. Dejar vacío para conservarla indefinidamente. Ejemplo: 300",
                 "stale_ttl": "Segundos de inactividad antes de que el servidor finalice automáticamente la actividad. Dejar vacío para desactivar. Ejemplo: 1800",
                 "dismissal_ttl": "Segundos que la actividad finalizada permanece en la pantalla de bloqueo antes de eliminarse. 0 la elimina de inmediato al finalizar. Ejemplo: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Cada condición necesita un entity_id y al menos un estado (p. ej. device_tracker.me con home).",
         "too_many_run_while": "Se admiten como máximo 5 condiciones.",
         "invalid_calendar_lead_minutes": "La antelación debe ser un número entero de minutos entre 0 y 1440.",
+        "invalid_calendar_subtitle": "Un subtítulo de calendario puede tener como máximo 64 caracteres.",
         "invalid_icon_map": "Cada icono puede tener como máximo 128 caracteres.",
         "invalid_state_text_pattern": "El patrón puede tener como máximo 64 caracteres."
       },

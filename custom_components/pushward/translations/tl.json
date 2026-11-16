@@ -2161,6 +2161,8 @@
             "start_states": "Mga Start State",
             "end_states": "Mga End State",
             "calendar_lead_minutes": "Lead Time (minuto)",
+            "calendar_subtitle_before": "Subtitle Bago ang Event",
+            "calendar_subtitle_during": "Subtitle Habang May Event",
             "run_while": "Habang Lamang",
             "remaining_time_entity": "Entity ng Natitirang Oras",
             "remaining_time_attribute": "Attribute ng Natitirang Oras",
@@ -2184,6 +2186,8 @@
             "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga. Sinisimulan ito ng `*` sa anumang estado na hindi end state (hindi ito sinisimulan ng unavailable at unknown).",
             "end_states": "Mga estado ng entity na nagtatapos ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
             "calendar_lead_minutes": "Hindi pinapansin ng mga calendar entity ang mga start at end state: magbubukas ang activity nang ganitong dami ng minuto bago ang susunod na event na may oras, magbibilang pababa hanggang sa simula nito, pagkatapos hanggang sa pagtatapos, at magtatapos kasabay ng event. Nilalaktawan ang mga buong-araw na event. 0-1440.",
+            "calendar_subtitle_before": "Ipinapakita habang nagbibilang pababa hanggang sa simula ng event. Iwanang blangko para ipakita ang pangalan ng kalendaryo. Halimbawa: Malapit nang magsimula",
+            "calendar_subtitle_during": "Ipinapakita habang nagaganap ang event. Iwanang blangko para ipakita ang pangalan ng kalendaryo. Halimbawa: Nagaganap",
             "run_while": "Panatilihin ang activity habang tumutugma lang ang bawat row: ang bawat row ay isang entity at listahan ng mga estado nito na hiniwalay ng kuwit (hal. device_tracker.me at home). Kapag huminto sa pagtugma ang isang row, magtatapos ang activity; kapag tumugma muli ang lahat, magsisimula ito kung nasa start state ang sinusubaybayang entity. Hindi kailanman tumutugma ang entity na unavailable. Hanggang 5 row.",
             "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
             "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Alisin Agad Pagkatapos",
                 "ended_ttl": "Awtomatikong Burahin Pagkatapos ng Pagtatapos (segundo)",
                 "stale_ttl": "Awtomatikong Tapusin Pagkatapos ng Kawalan ng Aktibidad (segundo)",
                 "dismissal_ttl": "Awtomatikong Alisin sa Lock Screen (segundo)"
               },
               "data_description": {
+                "remove_on_end": "Nilalaktawan ang completion screen at inaalis agad ang activity sa Lock Screen pagkatapos nito. Ino-override ang oras ng awtomatikong pag-alis.",
                 "ended_ttl": "Mga segundo pagkatapos matapos ang activity bago ito awtomatikong mabura mula sa server. Iwanan itong blangko para panatilihing walang hanggan. Halimbawa: 300",
                 "stale_ttl": "Mga segundo ng kawalan ng aktibidad bago awtomatikong tapusin ng server ang activity. Iwanan itong blangko para i-disable. Halimbawa: 1800",
                 "dismissal_ttl": "Bilang ng segundo na nananatili sa Lock Screen ang natapos na aktibidad bago ito alisin. Ang 0 ay agad itong inaalis kapag natapos. Halimbawa: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Bawat kondisyon ay nangangailangan ng entity_id at kahit isang estado (hal. device_tracker.me na may home).",
         "too_many_run_while": "Hanggang 5 kondisyon lang ang suportado.",
         "invalid_calendar_lead_minutes": "Ang lead time ay dapat buong bilang ng minuto mula 0 hanggang 1440.",
+        "invalid_calendar_subtitle": "Hanggang 64 na character lang ang subtitle ng kalendaryo.",
         "invalid_icon_map": "Hanggang 128 character lang ang bawat icon.",
         "invalid_state_text_pattern": "Hanggang 64 character lang ang pattern."
       },

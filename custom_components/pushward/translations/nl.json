@@ -2161,6 +2161,8 @@
             "start_states": "Startstatussen",
             "end_states": "Eindstatussen",
             "calendar_lead_minutes": "Voorlooptijd (minuten)",
+            "calendar_subtitle_before": "Ondertitel vóór de afspraak",
+            "calendar_subtitle_during": "Ondertitel tijdens de afspraak",
             "run_while": "Alleen zolang",
             "remaining_time_entity": "Resterende-tijd-entiteit",
             "remaining_time_attribute": "Attribuut resterende tijd",
@@ -2184,6 +2186,8 @@
             "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden. `*` start hem bij elke status die geen eindstatus is (unavailable en unknown starten hem nooit).",
             "end_states": "Entiteitsstatussen die de Live Activity beëindigen. Selecteer uit de lijst of typ aangepaste waarden.",
             "calendar_lead_minutes": "Agenda-entiteiten negeren de start- en eindstatussen: de activiteit opent zoveel minuten voor de volgende afspraak met tijd, telt af tot het begin, daarna tot het einde, en eindigt met de afspraak. Afspraken van een hele dag worden overgeslagen. 0-1440.",
+            "calendar_subtitle_before": "Getoond tijdens het aftellen tot het begin van de afspraak. Laat leeg om de naam van de agenda te tonen. Voorbeeld: Begint zo",
+            "calendar_subtitle_during": "Getoond terwijl de afspraak bezig is. Laat leeg om de naam van de agenda te tonen. Voorbeeld: Bezig",
             "run_while": "Houd de activiteit alleen actief zolang elke rij klopt: elke rij is een entiteit en een kommagescheiden lijst van haar statussen (bijv. device_tracker.me en home). Klopt een rij niet meer, dan eindigt de activiteit; kloppen ze weer allemaal, dan start ze als de gevolgde entiteit in een startstatus is. Een niet-beschikbare entiteit klopt nooit. Maximaal 5 rijen.",
             "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
             "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Direct verwijderen na afloop",
                 "ended_ttl": "Automatisch verwijderen na beëindigen (seconden)",
                 "stale_ttl": "Automatisch beëindigen na inactiviteit (seconden)",
                 "dismissal_ttl": "Automatisch verwijderen van toegangsscherm (seconden)"
               },
               "data_description": {
+                "remove_on_end": "Slaat het voltooiingsscherm over en haalt de activiteit van het toegangsscherm zodra die eindigt. Gaat vóór de tijd voor automatisch verwijderen.",
                 "ended_ttl": "Seconden na het beëindigen van de activiteit voordat deze automatisch van de server wordt verwijderd. Laat leeg om onbeperkt te bewaren. Voorbeeld: 300",
                 "stale_ttl": "Seconden inactiviteit voordat de server de activiteit automatisch beëindigt. Laat leeg om uit te schakelen. Voorbeeld: 1800",
                 "dismissal_ttl": "Aantal seconden dat de beëindigde activiteit op het toegangsscherm blijft staan voordat deze wordt verwijderd. 0 verwijdert deze meteen bij beëindiging. Voorbeeld: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Elke voorwaarde heeft een entity_id en minstens één status nodig (bijv. device_tracker.me met home).",
         "too_many_run_while": "Er worden maximaal 5 voorwaarden ondersteund.",
         "invalid_calendar_lead_minutes": "De voorlooptijd moet een geheel aantal minuten tussen 0 en 1440 zijn.",
+        "invalid_calendar_subtitle": "Een agenda-ondertitel mag maximaal 64 tekens zijn.",
         "invalid_icon_map": "Elk pictogram mag maximaal 128 tekens lang zijn.",
         "invalid_state_text_pattern": "Het patroon mag maximaal 64 tekens lang zijn."
       },

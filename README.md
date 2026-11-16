@@ -201,6 +201,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Start / End States | States that trigger start or end. `*` as a start state matches any state that is not an end state |
 | Run Only While | Rows of an entity and its comma-separated states; the activity runs only while every row matches, max 5 |
 | Lead Time | Calendar entities only: minutes before the next timed event that the activity opens (0-1440, default 30) |
+| Subtitle Before / During the Event | Calendar entities only: subtitle while counting down to the start, and while the event runs (max 64 chars each); empty shows the calendar name |
 | Update Interval | Min seconds between updates (default: 5) |
 | Progress Entity / Attribute | 0-100 progress, optionally from a separate entity |
 | Progress Mode | `direct` (default) reads the progress source as 0-100; `remaining` reads a value falling toward 0 and fills the bar from the largest value seen this run (generic/steps templates) |
@@ -238,6 +239,7 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Accent / Background / Text Color (+ Attribute) | Static hex / named color, or an entity attribute |
 | Accent From Progress | Accent goes red -> yellow -> green as progress goes 0 -> 0.5 -> 1, over the accent settings above; the completion frame stays green (generic/steps/gauge templates) |
 | URL / Secondary URL | Deep-link URLs, http/https (steps/alert templates) |
+| Remove Right Away When It Ends | Skip the completion frame and take the card off the Lock Screen as soon as the activity ends (overrides Dismissal TTL) |
 | Ended TTL / Stale TTL / Dismissal TTL | Auto-delete-after-end / auto-end-after-idle (1-2592000 s) / auto-dismiss the ended activity from the Lock Screen (0-14400 s) |
 
 Board tiles, stat rows, series entities, thresholds, log columns, subtitle columns, state labels, icons per state, the timeline series and per-series units maps, and the per-step details are all edited as row tables in the UI (add a row per entry). Stored configs and non-form callers keep working: the older comma-separated string forms for these fields are still accepted on input.
@@ -250,7 +252,11 @@ Board tiles, stat rows, series entities, thresholds, log columns, subtitle colum
 
 Run Only While adds conditions on other entities. Each row is an entity and the states it has to be in, comma-separated (`device_tracker.me`, `home`). The activity starts only when the tracked entity is in a start state and every row matches. When a row stops matching it ends with the usual completion frame, and it starts again once the row matches while the tracked entity is still in a start state. A condition entity that is unavailable counts as not matching.
 
-A `calendar` entity ignores Start/End States and follows its next timed event instead: Lead Time minutes before the event (30 by default) the activity opens and counts down to the start, from the start it counts down to the end, and it ends with the event. All-day events are skipped. The event title is the state text unless a State Text source resolves, and on the countdown template the start and end dates are pinned to the event so the bar fills across each phase. A calendar subentry saved before Lead Time existed keeps its start/end states until it is reconfigured and saved.
+A `calendar` entity ignores Start/End States and follows its next timed event instead: Lead Time minutes before the event (30 by default) the activity opens and counts down to the start, from the start it counts down to the end, and it ends with the event. All-day events are skipped. The event title is the state text unless a State Text source resolves, and on the countdown template the start and end dates are pinned to the event so the bar fills across each phase. Subtitle Before the Event and Subtitle During the Event replace the calendar name for each phase (for example `In progress` while it runs); a Subtitle source or Subtitle Columns still win over both. A calendar subentry saved before Lead Time existed keeps its start/end states until it is reconfigured and saved.
+
+#### Ending
+
+When an activity ends it first shows a completion frame (green, with the Completion Message) for 5 seconds, then ends, and the ended card stays on the Lock Screen for a while (Dismissal TTL sets how long). Turn on **Remove Right Away When It Ends** (Advanced) to skip all of that: one push ends the activity and takes the card off the phone at once.
 
 #### Reading values from separate entities
 

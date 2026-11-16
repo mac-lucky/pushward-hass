@@ -54,6 +54,7 @@ from custom_components.pushward.const import (
     BOARD_TILE_LABEL_MAX,
     BOARD_TILE_UNIT_MAX,
     CALENDAR_LEAD_MINUTES_MAX,
+    CALENDAR_SUBTITLE_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
@@ -62,6 +63,8 @@ from custom_components.pushward.const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
     CONF_CALENDAR_LEAD_MINUTES,
+    CONF_CALENDAR_SUBTITLE_BEFORE,
+    CONF_CALENDAR_SUBTITLE_DURING,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
     CONF_COMPACT_TRAILING_LABEL,
@@ -102,6 +105,7 @@ from custom_components.pushward.const import (
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_REMOVE_ON_END,
     CONF_RUN_WHILE,
     CONF_RUN_WHILE_STATES,
     CONF_SCALE,
@@ -5489,6 +5493,42 @@ def test_calendar_form_offers_the_lead_time_with_its_default() -> None:
     stored = _all_field_defaults(_details_schema("calendar.family", "countdown", {CONF_CALENDAR_LEAD_MINUTES: 10}))
     assert stored[CONF_CALENDAR_LEAD_MINUTES] == 10
     assert CONF_CALENDAR_LEAD_MINUTES not in _flow_schema_keys(_details_schema("binary_sensor.washer", "countdown"))
+
+
+def test_calendar_subtitles_are_stripped_and_stored_for_calendars_only() -> None:
+    stored = _parse_entity_input(
+        _calendar_input(
+            **{CONF_CALENDAR_SUBTITLE_BEFORE: "  Starts soon ", CONF_CALENDAR_SUBTITLE_DURING: "In progress"}
+        )
+    )
+    assert stored[CONF_CALENDAR_SUBTITLE_BEFORE] == "Starts soon"
+    assert stored[CONF_CALENDAR_SUBTITLE_DURING] == "In progress"
+    assert _parse_entity_input(_calendar_input())[CONF_CALENDAR_SUBTITLE_DURING] == ""
+    washer = _parse_entity_input(
+        _calendar_input(**{CONF_ENTITY_ID: "binary_sensor.washer", CONF_CALENDAR_SUBTITLE_DURING: "x"})
+    )
+    assert CONF_CALENDAR_SUBTITLE_DURING not in washer
+
+
+@pytest.mark.parametrize("key", [CONF_CALENDAR_SUBTITLE_BEFORE, CONF_CALENDAR_SUBTITLE_DURING])
+def test_calendar_subtitle_too_long_is_a_form_error(key) -> None:
+    cfg, errors = _entity_details_to_config(_calendar_input(), {key: "x" * (CALENDAR_SUBTITLE_MAX + 1)}, None)
+    assert cfg is None
+    assert errors == {key: "invalid_calendar_subtitle"}
+
+
+def test_calendar_subtitles_prefill_as_suggestions_so_clearing_sticks() -> None:
+    stored = {CONF_CALENDAR_SUBTITLE_DURING: "In progress"}
+    suggested = _suggested_values({"data_schema": _details_schema("calendar.family", "countdown", stored)})
+    assert suggested[CONF_CALENDAR_SUBTITLE_DURING] == "In progress"
+    assert suggested[CONF_CALENDAR_SUBTITLE_BEFORE] == ""
+
+
+def test_remove_on_end_is_stored_and_prefilled() -> None:
+    assert _parse_entity_input(_calendar_input())[CONF_REMOVE_ON_END] is False
+    assert _parse_entity_input(_calendar_input(**{CONF_REMOVE_ON_END: True}))[CONF_REMOVE_ON_END] is True
+    defaults = _all_field_defaults(_details_schema("binary_sensor.washer", "generic", {CONF_REMOVE_ON_END: True}))
+    assert defaults[CONF_REMOVE_ON_END] is True
 
 
 async def test_calendar_suggests_the_countdown_template(hass: HomeAssistant) -> None:

@@ -2161,6 +2161,8 @@
             "start_states": "开始状态",
             "end_states": "结束状态",
             "calendar_lead_minutes": "提前时间（分钟）",
+            "calendar_subtitle_before": "日程开始前的副标题",
+            "calendar_subtitle_during": "日程进行中的副标题",
             "run_while": "仅在以下条件下运行",
             "remaining_time_entity": "剩余时间实体",
             "remaining_time_attribute": "剩余时间属性",
@@ -2184,6 +2186,8 @@
             "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。`*` 表示在任何非结束状态下启动（unavailable 和 unknown 永远不会启动）。",
             "end_states": "结束 Live Activity 的实体状态。从列表中选择或输入自定义值。",
             "calendar_lead_minutes": "日历实体会忽略启动和结束状态：活动在下一个有具体时间的日程开始前这么多分钟打开，倒计时到开始，然后倒计时到结束，并随日程一起结束。全天日程会被跳过。0-1440。",
+            "calendar_subtitle_before": "在倒计时到日程开始期间显示。留空则显示日历名称。示例：即将开始",
+            "calendar_subtitle_during": "在日程进行期间显示。留空则显示日历名称。示例：进行中",
             "run_while": "仅在每一行都匹配时保持活动：每行是一个实体及其状态的逗号分隔列表（例如 device_tracker.me 和 home）。任一行不再匹配时活动结束；全部再次匹配时，如果被跟踪的实体处于启动状态，活动会再次启动。不可用的实体永远不匹配。最多 5 行。",
             "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
             "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "结束后立即移除",
                 "ended_ttl": "结束后自动删除（秒）",
                 "stale_ttl": "空闲后自动结束（秒）",
                 "dismissal_ttl": "从锁定屏幕自动移除（秒）"
               },
               "data_description": {
+                "remove_on_end": "跳过完成画面，并在活动结束时立即将其从锁定屏幕移除。优先于自动移除时间。",
                 "ended_ttl": "活动结束后从服务器自动删除前等待的秒数。留空则永久保留。示例：300",
                 "stale_ttl": "服务器自动结束活动前的空闲秒数。留空则禁用。示例：1800",
                 "dismissal_ttl": "已结束的活动在从锁定屏幕移除前保留的秒数。0 表示结束时立即移除。 示例：60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "每个条件都需要一个 entity_id 和至少一个状态（例如 device_tracker.me 搭配 home）。",
         "too_many_run_while": "最多支持 5 个条件。",
         "invalid_calendar_lead_minutes": "提前时间必须是 0 到 1440 之间的整数分钟。",
+        "invalid_calendar_subtitle": "日历副标题最多 64 个字符。",
         "invalid_icon_map": "每个图标最多 128 个字符。",
         "invalid_state_text_pattern": "模板最多 64 个字符。"
       },

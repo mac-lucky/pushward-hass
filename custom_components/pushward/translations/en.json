@@ -2161,6 +2161,8 @@
             "start_states": "Start States",
             "end_states": "End States",
             "calendar_lead_minutes": "Lead Time (minutes)",
+            "calendar_subtitle_before": "Subtitle Before the Event",
+            "calendar_subtitle_during": "Subtitle During the Event",
             "run_while": "Run Only While",
             "remaining_time_entity": "Remaining Time Entity",
             "remaining_time_attribute": "Remaining Time Attribute",
@@ -2184,6 +2186,8 @@
             "start_states": "Entity states that start the Live Activity. Select from the list or type custom values. `*` starts it on any state that is not an end state (unavailable and unknown never do).",
             "end_states": "Entity states that end the Live Activity. Select from the list or type custom values.",
             "calendar_lead_minutes": "Calendar entities ignore the start and end states: the activity opens this many minutes before the next timed event, counts down to its start, then to its end, and ends with the event. All-day events are skipped. 0-1440.",
+            "calendar_subtitle_before": "Shown while counting down to the event's start. Leave empty to show the calendar name. Example: Starts soon",
+            "calendar_subtitle_during": "Shown while the event is in progress. Leave empty to show the calendar name. Example: In progress",
             "run_while": "Keep the activity up only while every row matches: each row is an entity and a comma-separated list of its states (e.g. device_tracker.me and home). When a row stops matching the activity ends; once all match again it starts if the tracked entity is in a start state. An unavailable entity never matches. Up to 5 rows.",
             "remaining_time_entity": "Read remaining time from a separate entity (e.g. a washer's time sensor). Leave empty to use the tracked entity. Auto-parses a timestamp (finish-time) sensor, a duration sensor with units, an H:MM:SS string, or plain seconds.",
             "remaining_time_attribute": "Attribute holding remaining time (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state. Example: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Remove Right Away When It Ends",
                 "ended_ttl": "Auto-Delete After End (seconds)",
                 "stale_ttl": "Auto-End After Idle (seconds)",
                 "dismissal_ttl": "Auto-Remove From Lock Screen (seconds)"
               },
               "data_description": {
+                "remove_on_end": "Skip the completion screen and take the activity off the Lock Screen as soon as it ends. Overrides the auto-remove time.",
                 "ended_ttl": "Seconds after the activity ends before the server auto-deletes it. This also controls how soon the ended card leaves the iPhone Lock Screen (iOS caps it at 4 hours regardless). Leave empty to keep indefinitely. Example: 300",
                 "stale_ttl": "Seconds of inactivity before the server auto-ends the activity. Leave empty to disable. Example: 1800",
                 "dismissal_ttl": "Seconds the ended activity lingers on the Lock Screen before it is removed. 0 removes it immediately on end. Example: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Each condition needs an entity_id and at least one state (e.g. device_tracker.me with home).",
         "too_many_run_while": "At most 5 conditions are supported.",
         "invalid_calendar_lead_minutes": "Lead time must be a whole number of minutes from 0 to 1440.",
+        "invalid_calendar_subtitle": "A calendar subtitle can be at most 64 characters.",
         "invalid_icon_map": "Each icon can be at most 128 characters.",
         "invalid_state_text_pattern": "The pattern can be at most 64 characters."
       },

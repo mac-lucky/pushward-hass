@@ -229,6 +229,7 @@ _ENTITY_COMMON: set[str] = {
     "ended_ttl",
     "stale_ttl",
     "dismissal_ttl",
+    "remove_on_end",
 }
 
 # The image trio rides on the templates the server gives an image slot to
@@ -420,15 +421,18 @@ def test_entity_sections_cover_frozen_field_set() -> None:
         assert not unknown, f"{template}: unknown section {unknown}"
 
 
-def test_calendar_entity_form_adds_only_the_lead_time() -> None:
-    """A calendar gets the lead time on top of its template's frozen set, kept top-level and labelled."""
+_CALENDAR_FIELDS = {"calendar_lead_minutes", "calendar_subtitle_before", "calendar_subtitle_during"}
+
+
+def test_calendar_entity_form_adds_only_the_calendar_fields() -> None:
+    """A calendar gets the lead time and subtitles on top of its template's frozen set, top-level and labelled."""
     for template in TEMPLATES:
         top, sections = _partition(_details_schema("calendar.family", template, {}))
         sectioned = {f for fs in sections.values() for f in fs}
-        assert top | sectioned == ENTITY_FROZEN_FIELDS[template] | {"calendar_lead_minutes"}, template
-        assert "calendar_lead_minutes" in top, template
+        assert top | sectioned == ENTITY_FROZEN_FIELDS[template] | _CALENDAR_FIELDS, template
+        assert top >= _CALENDAR_FIELDS, template
     details = _en_translations()["config_subentries"]["tracked_entity"]["step"]["details"]
-    for field in ("calendar_lead_minutes", "run_while"):
+    for field in (*sorted(_CALENDAR_FIELDS), "run_while"):
         assert field in details["data"], f"en: top-level data missing {field}"
         assert field in details["data_description"], f"en: top-level data_description missing {field}"
 

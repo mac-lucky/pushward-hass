@@ -51,6 +51,7 @@ from .const import (
     CONF_PRIORITY,
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_REMOVE_ON_END,
     CONF_RUN_WHILE,
     CONF_RUN_WHILE_STATES,
     CONF_SERIES_ENTITIES,
@@ -538,7 +539,9 @@ class ActivityManager:
         slug = tracked.config[CONF_SLUG]
         try:
             content = map_completion_content(tracked.config, tracked.last_content)
-            await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, content)
+            await self._api.update_activity(
+                slug, ACTIVITY_STATE_ENDED, content, dismissal_ttl=0 if tracked.config.get(CONF_REMOVE_ON_END) else None
+            )
         except PushWardQuotaExceededError:
             # Updates are metered, deletes are not: still take the card down.
             await self._delete_quietly(slug, "shutdown")
@@ -931,7 +934,7 @@ class ActivityManager:
             config.get(CONF_PRIORITY, 1),
             ended_ttl=config.get(CONF_ENDED_TTL),
             stale_ttl=config.get(CONF_STALE_TTL),
-            dismissal_ttl=config.get(CONF_DISMISSAL_TTL),
+            dismissal_ttl=0 if config.get(CONF_REMOVE_ON_END) else config.get(CONF_DISMISSAL_TTL),
         )
 
     async def _seed_timeline_history(
@@ -1155,6 +1158,7 @@ class ActivityManager:
         slug = config[CONF_SLUG]
         gen_at_start = tracked.generation
 
+        remove_now = bool(config.get(CONF_REMOVE_ON_END))
         cancelled = False
         try:
             async with self._api_error_guard(slug, "ending"):
@@ -1163,21 +1167,26 @@ class ActivityManager:
                 # merge patch leaves what the server already stored in place.
                 completion = map_completion_content(config, tracked.last_content)
                 try:
-                    await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, completion)
+                    if remove_now:
+                        # One push: ENDED with dismissal 0 takes the card off the phone at once.
+                        await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, completion, dismissal_ttl=0)
+                    else:
+                        await self._api.update_activity(slug, ACTIVITY_STATE_ONGOING, completion)
                 except PushWardNotFoundError:
                     # Dismissed on the phone or TTL-expired; nothing left to end.
                     _LOGGER.debug("Activity %s already gone server-side; skipping end", slug)
                     return
 
-                # Wait for user to see the completion state
-                await asyncio.sleep(END_DELAY_SECONDS)
+                if not remove_now:
+                    # Wait for user to see the completion state
+                    await asyncio.sleep(END_DELAY_SECONDS)
 
-                # Abort if a new start happened during the sleep
-                if tracked.generation != gen_at_start:
-                    return
+                    # Abort if a new start happened during the sleep
+                    if tracked.generation != gen_at_start:
+                        return
 
-                # Phase 2: end the activity
-                await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, completion)
+                    # Phase 2: end the activity
+                    await self._api.update_activity(slug, ACTIVITY_STATE_ENDED, completion)
                 self._clear_forbidden_notification(slug)
         except asyncio.CancelledError:
             cancelled = True

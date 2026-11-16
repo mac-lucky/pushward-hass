@@ -50,6 +50,7 @@ from .const import (
     BOARD_TILE_LABEL_MAX,
     BOARD_TILE_UNIT_MAX,
     CALENDAR_LEAD_MINUTES_MAX,
+    CALENDAR_SUBTITLE_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACCENT_FROM_PROGRESS,
@@ -59,6 +60,8 @@ from .const import (
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
     CONF_CALENDAR_LEAD_MINUTES,
+    CONF_CALENDAR_SUBTITLE_BEFORE,
+    CONF_CALENDAR_SUBTITLE_DURING,
     CONF_CHARGING_ENTITY,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
@@ -108,6 +111,7 @@ from .const import (
     CONF_PROGRESS_MODE,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_REMOVE_ON_END,
     CONF_RUN_WHILE,
     CONF_RUN_WHILE_STATES,
     CONF_SCALE,
@@ -710,6 +714,7 @@ ENTITY_SECTIONS: dict[str, tuple[str, ...]] = {
     ),
     "tap_actions": _TAP_ACTION_SECTION_FIELDS,
     "advanced": (
+        CONF_REMOVE_ON_END,
         CONF_ENDED_TTL,
         CONF_STALE_TTL,
         CONF_DISMISSAL_TTL,
@@ -1164,6 +1169,9 @@ def _details_schema(
                 default=d.get(CONF_CALENDAR_LEAD_MINUTES, DEFAULT_CALENDAR_LEAD_MINUTES),
             )
         ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step=1, unit_of_measurement="minutes"))
+        # suggested_value so a cleared subtitle stays cleared; the parse checks the length.
+        for key in (CONF_CALENDAR_SUBTITLE_BEFORE, CONF_CALENDAR_SUBTITLE_DURING):
+            fields[vol.Optional(key, description={"suggested_value": d.get(key, "")})] = str
     fields[_object_rows_key(CONF_RUN_WHILE, d, required=False)] = _RUN_WHILE_SELECTOR
 
     # --- Template-specific fields ---
@@ -1530,6 +1538,7 @@ def _details_schema(
     # Only the two templates that render a button row get the button slots.
     if template in ("steps", "alert"):
         _add_button_action_fields(fields, d)
+    fields[vol.Optional(CONF_REMOVE_ON_END, default=d.get(CONF_REMOVE_ON_END, False))] = BooleanSelector()
     fields[ended_ttl_key] = NumberSelector(
         NumberSelectorConfig(
             min=ACTIVITY_TTL_MIN,
@@ -2103,6 +2112,17 @@ def _parse_calendar_lead_minutes(user_input: dict) -> int:
     return int(value)
 
 
+def _parse_calendar_fields(user_input: dict) -> dict:
+    """The calendar window keys; a subtitle longer than CALENDAR_SUBTITLE_MAX is invalid_calendar_subtitle."""
+    fields: dict = {CONF_CALENDAR_LEAD_MINUTES: _parse_calendar_lead_minutes(user_input)}
+    for key in (CONF_CALENDAR_SUBTITLE_BEFORE, CONF_CALENDAR_SUBTITLE_DURING):
+        text = str(user_input.get(key) or "").strip()
+        if len(text) > CALENDAR_SUBTITLE_MAX:
+            raise vol.Invalid("invalid_calendar_subtitle", path=[key])
+        fields[key] = text
+    return fields
+
+
 def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> dict:
     """Normalize user input into an entity config dict.
 
@@ -2201,7 +2221,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
 
     run_while = _parse_run_while(user_input.get(CONF_RUN_WHILE, []), strict=True)
     # Only a calendar gets the key: its presence is what switches the window lifecycle on.
-    calendar = {CONF_CALENDAR_LEAD_MINUTES: _parse_calendar_lead_minutes(user_input)} if domain == "calendar" else {}
+    calendar = _parse_calendar_fields(user_input) if domain == "calendar" else {}
 
     return {
         CONF_ENTITY_ID: entity_id,
@@ -2254,6 +2274,7 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_ENDED_TTL: int(ended_ttl) if ended_ttl is not None else None,
         CONF_STALE_TTL: int(stale_ttl) if stale_ttl is not None else None,
         CONF_DISMISSAL_TTL: int(dismissal_ttl) if dismissal_ttl is not None else None,
+        CONF_REMOVE_ON_END: bool(user_input.get(CONF_REMOVE_ON_END, False)),
         CONF_SERIES: series,
         CONF_SERIES_ENTITIES: series_entities,
         CONF_PRIMARY_SERIES: primary_series,

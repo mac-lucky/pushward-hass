@@ -2161,6 +2161,8 @@
             "start_states": "Startzustände",
             "end_states": "Endzustände",
             "calendar_lead_minutes": "Vorlaufzeit (Minuten)",
+            "calendar_subtitle_before": "Untertitel vor dem Termin",
+            "calendar_subtitle_during": "Untertitel während des Termins",
             "run_while": "Nur aktiv solange",
             "remaining_time_entity": "Entität für verbleibende Zeit",
             "remaining_time_attribute": "Attribut für verbleibende Zeit",
@@ -2184,6 +2186,8 @@
             "start_states": "Entitätszustände, die die Live Activity starten. Aus der Liste wählen oder eigene Werte eingeben. `*` startet sie bei jedem Zustand, der kein Endzustand ist (unavailable und unknown starten sie nie).",
             "end_states": "Entitätszustände, die die Live Activity beenden. Aus der Liste wählen oder eigene Werte eingeben.",
             "calendar_lead_minutes": "Kalender-Entitäten ignorieren die Start- und Endzustände: Die Live Activity öffnet so viele Minuten vor dem nächsten Termin mit Uhrzeit, zählt bis zu seinem Beginn herunter, dann bis zu seinem Ende, und endet mit dem Termin. Ganztägige Termine werden übersprungen. 0-1440.",
+            "calendar_subtitle_before": "Wird beim Countdown bis zum Beginn des Termins angezeigt. Leer lassen, um den Kalendernamen anzuzeigen. Beispiel: Beginnt bald",
+            "calendar_subtitle_during": "Wird angezeigt, während der Termin läuft. Leer lassen, um den Kalendernamen anzuzeigen. Beispiel: Läuft",
             "run_while": "Die Live Activity läuft nur, solange jede Zeile zutrifft: Jede Zeile ist eine Entität und eine kommagetrennte Liste ihrer Zustände (z. B. device_tracker.me und home). Trifft eine Zeile nicht mehr zu, endet sie; treffen wieder alle zu, startet sie, wenn die verfolgte Entität in einem Startzustand ist. Eine nicht verfügbare Entität trifft nie zu. Bis zu 5 Zeilen.",
             "remaining_time_entity": "Verbleibende Zeit aus einer separaten Entität lesen (z. B. dem Zeitsensor einer Waschmaschine). Leer lassen, um die verfolgte Entität zu verwenden. Erkennt automatisch einen Zeitstempel-Sensor (Endzeit), einen Dauersensor mit Einheiten, eine H:MM:SS-Zeichenkette oder reine Sekunden.",
             "remaining_time_attribute": "Entitätsattribut mit der verbleibenden Zeit in Sekunden. Beispiel: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Sofort entfernen, wenn sie endet",
                 "ended_ttl": "Automatisch löschen nach Beendigung (Sekunden)",
                 "stale_ttl": "Automatisch beenden nach Inaktivität (Sekunden)",
                 "dismissal_ttl": "Automatisch vom Sperrbildschirm entfernen (Sekunden)"
               },
               "data_description": {
+                "remove_on_end": "Überspringt den Abschlussbildschirm und entfernt die Live Activity vom Sperrbildschirm, sobald sie endet. Hat Vorrang vor der Zeit für automatisches Entfernen.",
                 "ended_ttl": "Sekunden nach dem Beenden der Live Activity, bevor sie automatisch vom Server gelöscht wird. Leer lassen, um unbegrenzt aufzubewahren. Beispiel: 300",
                 "stale_ttl": "Sekunden Inaktivität, bevor der Server die Live Activity automatisch beendet. Leer lassen, um zu deaktivieren. Beispiel: 1800",
                 "dismissal_ttl": "Sekunden, die die beendete Aktivität auf dem Sperrbildschirm verbleibt, bevor sie entfernt wird. 0 entfernt sie sofort bei Ende. Beispiel: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Jede Bedingung braucht eine entity_id und mindestens einen Zustand (z. B. device_tracker.me mit home).",
         "too_many_run_while": "Es werden höchstens 5 Bedingungen unterstützt.",
         "invalid_calendar_lead_minutes": "Die Vorlaufzeit muss eine ganze Zahl von Minuten zwischen 0 und 1440 sein.",
+        "invalid_calendar_subtitle": "Ein Kalender-Untertitel darf höchstens 64 Zeichen lang sein.",
         "invalid_icon_map": "Jedes Symbol darf höchstens 128 Zeichen lang sein.",
         "invalid_state_text_pattern": "Das Muster darf höchstens 64 Zeichen lang sein."
       },

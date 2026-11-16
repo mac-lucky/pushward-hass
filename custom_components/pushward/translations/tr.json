@@ -2161,6 +2161,8 @@
             "start_states": "Başlangıç Durumları",
             "end_states": "Bitiş Durumları",
             "calendar_lead_minutes": "Ön Süre (dakika)",
+            "calendar_subtitle_before": "Etkinlikten Önce Alt Başlık",
+            "calendar_subtitle_during": "Etkinlik Sırasında Alt Başlık",
             "run_while": "Yalnızca şu sürece",
             "remaining_time_entity": "Kalan Süre Varlığı",
             "remaining_time_attribute": "Kalan Süre Niteliği",
@@ -2184,6 +2186,8 @@
             "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin. `*` bitiş durumu olmayan her durumda başlatır (unavailable ve unknown asla başlatmaz).",
             "end_states": "Live Activity'yi sonlandıran varlık durumları. Listeden seçin veya özel değer girin.",
             "calendar_lead_minutes": "Takvim varlıkları başlangıç ve bitiş durumlarını yok sayar: aktivite saati belli bir sonraki etkinlikten bu kadar dakika önce açılır, başlangıcına, ardından bitişine kadar geri sayar ve etkinlikle birlikte sona erer. Tüm gün süren etkinlikler atlanır. 0-1440.",
+            "calendar_subtitle_before": "Etkinliğin başlangıcına geri sayım sırasında gösterilir. Takvim adını göstermek için boş bırakın. Örnek: Birazdan başlıyor",
+            "calendar_subtitle_during": "Etkinlik devam ederken gösterilir. Takvim adını göstermek için boş bırakın. Örnek: Devam ediyor",
             "run_while": "Aktivite yalnızca her satır eşleştiği sürece sürer: her satır bir varlık ve durumlarının virgülle ayrılmış listesidir (örn. device_tracker.me ve home). Bir satır eşleşmeyi bıraktığında aktivite sona erer; hepsi yeniden eşleştiğinde, izlenen varlık bir başlangıç durumundaysa başlar. Kullanılamayan bir varlık asla eşleşmez. En fazla 5 satır.",
             "remaining_time_entity": "Kalan süreyi ayrı bir varlıktan okur (ör. bir çamaşır makinesinin süre sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir zaman damgası (bitiş zamanı) sensörünü, birimli bir süre sensörünü, bir H:MM:SS dizesini veya düz saniyeyi otomatik olarak ayrıştırır.",
             "remaining_time_attribute": "Saniye cinsinden kalan süreyi tutan varlık niteliği. Örnek: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Biter Bitmez Kaldır",
                 "ended_ttl": "Bitişten Sonra Otomatik Sil (saniye)",
                 "stale_ttl": "Hareketsizlikte Otomatik Sonlandır (saniye)",
                 "dismissal_ttl": "Kilit Ekranından Otomatik Kaldır (saniye)"
               },
               "data_description": {
+                "remove_on_end": "Tamamlanma ekranını atlar ve aktiviteyi biter bitmez Kilit Ekranından kaldırır. Otomatik kaldırma süresinin yerine geçer.",
                 "ended_ttl": "Aktivite sona erdikten kaç saniye sonra sunucudan otomatik silineceği. Süresiz tutmak için boş bırakın. Örnek: 300",
                 "stale_ttl": "Sunucunun aktiviteyi otomatik sonlandırmasından önceki hareketsizlik süresi (saniye). Devre dışı bırakmak için boş bırakın. Örnek: 1800",
                 "dismissal_ttl": "Sona eren etkinliğin kaldırılmadan önce Kilit Ekranı'nda kaç saniye kaldığı. 0, etkinlik bitince onu hemen kaldırır. Örnek: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Her koşul bir entity_id ve en az bir durum gerektirir (örn. home ile device_tracker.me).",
         "too_many_run_while": "En fazla 5 koşul desteklenir.",
         "invalid_calendar_lead_minutes": "Ön süre 0 ile 1440 arasında tam sayı dakika olmalıdır.",
+        "invalid_calendar_subtitle": "Takvim alt başlığı en fazla 64 karakter olabilir.",
         "invalid_icon_map": "Her simge en fazla 128 karakter olabilir.",
         "invalid_state_text_pattern": "Kalıp en fazla 64 karakter olabilir."
       },

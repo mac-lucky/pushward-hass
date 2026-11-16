@@ -216,6 +216,12 @@ START_STATE_ANY = "*"
 CONF_CALENDAR_LEAD_MINUTES = "calendar_lead_minutes"
 DEFAULT_CALENDAR_LEAD_MINUTES = 30
 CALENDAR_LEAD_MINUTES_MAX = 1440
+# Subtitle text for the two phases of a calendar window; empty keeps the default subtitle.
+CONF_CALENDAR_SUBTITLE_BEFORE = "calendar_subtitle_before"
+CONF_CALENDAR_SUBTITLE_DURING = "calendar_subtitle_during"
+CALENDAR_SUBTITLE_MAX = 64
+# End with a single ENDED push that removes the card at once: no completion frame, no linger.
+CONF_REMOVE_ON_END = "remove_on_end"
 
 # Widget-specific config keys
 CONF_WIDGET_TEMPLATE = "widget_template"

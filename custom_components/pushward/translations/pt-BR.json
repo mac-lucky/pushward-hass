@@ -2161,6 +2161,8 @@
             "start_states": "Estados de Início",
             "end_states": "Estados de Término",
             "calendar_lead_minutes": "Antecedência (minutos)",
+            "calendar_subtitle_before": "Subtítulo antes do evento",
+            "calendar_subtitle_during": "Subtítulo durante o evento",
             "run_while": "Somente enquanto",
             "remaining_time_entity": "Entidade de tempo restante",
             "remaining_time_attribute": "Atributo de Tempo Restante",
@@ -2184,6 +2186,8 @@
             "start_states": "Estados da entidade que iniciam a Live Activity. Selecione na lista ou digite valores personalizados. `*` a inicia em qualquer estado que não seja de fim (unavailable e unknown nunca a iniciam).",
             "end_states": "Estados da entidade que encerram a Live Activity. Selecione na lista ou digite valores personalizados.",
             "calendar_lead_minutes": "Entidades de calendário ignoram os estados de início e fim: a atividade abre esta quantidade de minutos antes do próximo evento com horário, faz a contagem regressiva até o início, depois até o fim, e termina com o evento. Eventos de dia inteiro são ignorados. 0-1440.",
+            "calendar_subtitle_before": "Exibido durante a contagem regressiva até o início do evento. Deixe vazio para mostrar o nome do calendário. Exemplo: Começa em breve",
+            "calendar_subtitle_during": "Exibido enquanto o evento está em andamento. Deixe vazio para mostrar o nome do calendário. Exemplo: Em andamento",
             "run_while": "Manter a atividade apenas enquanto todas as linhas corresponderem: cada linha é uma entidade e uma lista de seus estados separados por vírgula (ex.: device_tracker.me e home). Quando uma linha deixa de corresponder, a atividade termina; quando todas voltam a corresponder, ela inicia se a entidade monitorada estiver em um estado de início. Uma entidade indisponível nunca corresponde. Até 5 linhas.",
             "remaining_time_entity": "Lê o tempo restante de uma entidade separada (ex.: o sensor de tempo de uma lavadora). Deixe vazio para usar a entidade monitorada. Interpreta automaticamente um sensor de timestamp (hora de término), um sensor de duração com unidades, uma string H:MM:SS ou segundos simples.",
             "remaining_time_attribute": "Atributo da entidade que contém o tempo restante em segundos. Exemplo: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Remover Assim Que Terminar",
                 "ended_ttl": "Exclusão Automática Após Término (segundos)",
                 "stale_ttl": "Encerramento Automático por Inatividade (segundos)",
                 "dismissal_ttl": "Remoção Automática da Tela Bloqueada (segundos)"
               },
               "data_description": {
+                "remove_on_end": "Pula a tela de conclusão e tira a atividade da Tela Bloqueada assim que ela termina. Substitui o tempo de remoção automática.",
                 "ended_ttl": "Segundos após o encerramento da atividade antes de ser excluída automaticamente do servidor. Deixe vazio para manter indefinidamente. Exemplo: 300",
                 "stale_ttl": "Segundos de inatividade antes de o servidor encerrar automaticamente a atividade. Deixe vazio para desativar. Exemplo: 1800",
                 "dismissal_ttl": "Segundos que a atividade encerrada permanece na Tela Bloqueada antes de ser removida. 0 a remove imediatamente ao encerrar. Exemplo: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Cada condição precisa de um entity_id e pelo menos um estado (ex.: device_tracker.me com home).",
         "too_many_run_while": "São suportadas no máximo 5 condições.",
         "invalid_calendar_lead_minutes": "A antecedência deve ser um número inteiro de minutos entre 0 e 1440.",
+        "invalid_calendar_subtitle": "Um subtítulo de calendário pode ter no máximo 64 caracteres.",
         "invalid_icon_map": "Cada ícone pode ter no máximo 128 caracteres.",
         "invalid_state_text_pattern": "O padrão pode ter no máximo 64 caracteres."
       },

@@ -2161,6 +2161,8 @@
             "start_states": "États de démarrage",
             "end_states": "États de fin",
             "calendar_lead_minutes": "Délai d'avance (minutes)",
+            "calendar_subtitle_before": "Sous-titre avant l'événement",
+            "calendar_subtitle_during": "Sous-titre pendant l'événement",
             "run_while": "Uniquement tant que",
             "remaining_time_entity": "Entité de temps restant",
             "remaining_time_attribute": "Attribut de temps restant",
@@ -2184,6 +2186,8 @@
             "start_states": "États de l'entité qui démarrent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées. `*` la démarre sur tout état qui n'est pas un état de fin (unavailable et unknown ne la démarrent jamais).",
             "end_states": "États de l'entité qui terminent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées.",
             "calendar_lead_minutes": "Les entités de calendrier ignorent les états de début et de fin : la Live Activity s'ouvre ce nombre de minutes avant le prochain événement avec horaire, décompte jusqu'à son début, puis jusqu'à sa fin, et se termine avec l'événement. Les événements sur toute la journée sont ignorés. 0-1440.",
+            "calendar_subtitle_before": "Affiché pendant le compte à rebours jusqu'au début de l'événement. Laissez vide pour afficher le nom du calendrier. Exemple : Bientôt",
+            "calendar_subtitle_during": "Affiché pendant que l'événement est en cours. Laissez vide pour afficher le nom du calendrier. Exemple : En cours",
             "run_while": "Ne garder la Live Activity que tant que chaque ligne correspond : chaque ligne est une entité et une liste de ses états séparés par des virgules (ex. device_tracker.me et home). Si une ligne ne correspond plus, elle se termine ; quand toutes correspondent à nouveau, elle démarre si l'entité suivie est dans un état de début. Une entité indisponible ne correspond jamais. Jusqu'à 5 lignes.",
             "remaining_time_entity": "Lire le temps restant depuis une entité distincte (ex. le capteur de temps d'un lave-linge). Laisser vide pour utiliser l'entité suivie. Analyse automatiquement un capteur d'horodatage (heure de fin), un capteur de durée avec unités, une chaîne H:MM:SS ou de simples secondes.",
             "remaining_time_attribute": "Attribut de l'entité contenant le temps restant en secondes. Exemple : remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Retirer dès la fin",
                 "ended_ttl": "Suppression automatique après la fin (secondes)",
                 "stale_ttl": "Fin automatique après inactivité (secondes)",
                 "dismissal_ttl": "Retrait automatique de l'écran verrouillé (secondes)"
               },
               "data_description": {
+                "remove_on_end": "Ignore l'écran de fin et retire la Live Activity de l'écran verrouillé dès qu'elle se termine. Remplace le délai de retrait automatique.",
                 "ended_ttl": "Secondes après la fin de la Live Activity avant sa suppression automatique du serveur. Laisser vide pour la conserver indéfiniment. Exemple : 300",
                 "stale_ttl": "Secondes d'inactivité avant que le serveur ne termine automatiquement la Live Activity. Laisser vide pour désactiver. Exemple : 1800",
                 "dismissal_ttl": "Nombre de secondes pendant lesquelles l'activité terminée reste sur l'écran verrouillé avant d'être supprimée. 0 la supprime immédiatement à la fin. Exemple : 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Chaque condition nécessite un entity_id et au moins un état (ex. device_tracker.me avec home).",
         "too_many_run_while": "5 conditions au maximum sont prises en charge.",
         "invalid_calendar_lead_minutes": "Le délai d'avance doit être un nombre entier de minutes entre 0 et 1440.",
+        "invalid_calendar_subtitle": "Un sous-titre de calendrier ne peut pas dépasser 64 caractères.",
         "invalid_icon_map": "Chaque icône peut contenir au plus 128 caractères.",
         "invalid_state_text_pattern": "Le modèle peut contenir au plus 64 caractères."
       },

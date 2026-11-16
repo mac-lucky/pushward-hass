@@ -50,6 +50,8 @@ from .const import (
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_CALENDAR_LEAD_MINUTES,
+    CONF_CALENDAR_SUBTITLE_BEFORE,
+    CONF_CALENDAR_SUBTITLE_DURING,
     CONF_CHECKLIST_ITEMS,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
@@ -1219,6 +1221,13 @@ def map_content(
         and (message := str(state.attributes.get("message") or "").strip())
     ):
         content["state"] = message[:MAX_TEXT_LEN]
+    # Per-phase subtitle text, unless a subtitle source resolved. During the event the
+    # phase starts at the event start (a phase implies a window).
+    if calendar is not None and raw_subtitle is _NO_VALUE:
+        during = calendar[0] == _calendar_window(state, entity_config)[1]
+        phase_subtitle = entity_config.get(CONF_CALENDAR_SUBTITLE_DURING if during else CONF_CALENDAR_SUBTITLE_BEFORE)
+        if phase_subtitle:
+            content["subtitle"] = phase_subtitle
 
     _add_activity_actions(content, entity_config)
 

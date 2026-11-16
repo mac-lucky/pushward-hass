@@ -20,13 +20,18 @@ from custom_components.pushward.activity_manager import (
 )
 from custom_components.pushward.const import (
     CONF_CALENDAR_LEAD_MINUTES,
+    CONF_CALENDAR_SUBTITLE_BEFORE,
+    CONF_CALENDAR_SUBTITLE_DURING,
+    CONF_DISMISSAL_TTL,
     CONF_END_STATES,
     CONF_ENTITY_ID,
     CONF_LABEL,
+    CONF_REMOVE_ON_END,
     CONF_RUN_WHILE,
     CONF_RUN_WHILE_STATES,
     CONF_SLUG,
     CONF_START_STATES,
+    CONF_SUBTITLE_ENTITY,
     CONF_TEMPLATE,
     CONF_TILES,
     CONF_UPDATE_INTERVAL,
@@ -748,3 +753,106 @@ def test_calendar_zero_length_event_never_opens() -> None:
     start = parse_ha_datetime(state.attributes["start_time"]).timestamp()
     assert calendar_phase(state, config, start) is None
     assert calendar_next_boundary(state, config, start - 1) == int(start)
+
+
+_PHASE_SUBTITLES = {CONF_CALENDAR_SUBTITLE_BEFORE: "Starts soon", CONF_CALENDAR_SUBTITLE_DURING: "In progress"}
+
+
+async def test_calendar_subtitle_follows_the_phase(hass: HomeAssistant, calendar, freezer) -> None:
+    start, api = calendar
+    await start(_event(), **_PHASE_SUBTITLES)
+
+    await _at(hass, freezer, _local(9, 30))
+    assert activity_updates(api, "ongoing")[-1]["subtitle"] == "Starts soon"
+
+    await _at(hass, freezer, _local(10))
+    content = activity_updates(api, "ongoing")[-1]
+    assert content["subtitle"] == "In progress"
+    assert_valid_activity_content(content)
+
+
+async def test_calendar_subtitle_empty_keeps_the_calendar_name(hass: HomeAssistant, calendar, freezer) -> None:
+    start, api = calendar
+    await start(_event(), **{CONF_CALENDAR_SUBTITLE_DURING: "In progress"})
+
+    await _at(hass, freezer, _local(9, 30))
+    assert activity_updates(api, "ongoing")[-1]["subtitle"] == "Family"
+
+
+async def test_calendar_subtitle_source_wins_over_the_phase_text(hass: HomeAssistant, calendar, freezer) -> None:
+    start, api = calendar
+    hass.states.async_set("sensor.room", "Room 4")
+    await start(_event(), **_PHASE_SUBTITLES, **{CONF_SUBTITLE_ENTITY: "sensor.room"})
+
+    await _at(hass, freezer, _local(10))
+    assert activity_updates(api, "ongoing")[-1]["subtitle"] == "Room 4"
+
+
+WASHER = "binary_sensor.washer"
+
+
+def _washer_config(**overrides) -> dict:
+    return make_entity_config(
+        **{
+            CONF_ENTITY_ID: WASHER,
+            CONF_SLUG: "ha-washer",
+            CONF_START_STATES: ["on"],
+            CONF_END_STATES: ["off"],
+            CONF_UPDATE_INTERVAL: 0,
+            **overrides,
+        }
+    )
+
+
+async def _running_washer(hass: HomeAssistant, api: AsyncMock, **overrides) -> ActivityManager:
+    hass.states.async_set(WASHER, "on")
+    manager = ActivityManager(hass, api, [_washer_config(**overrides)], make_mock_entry())
+    await manager.async_start()
+    await hass.async_block_till_done()
+    assert manager._tracked[WASHER].is_active
+    return manager
+
+
+async def test_remove_on_end_sends_one_ended_push_that_dismisses_at_once(hass: HomeAssistant) -> None:
+    api = make_activity_api()
+    manager = await _running_washer(hass, api, **{CONF_REMOVE_ON_END: True, CONF_DISMISSAL_TTL: 120})
+    api.reset_mock()
+
+    with patch(SLEEP_TARGET, new_callable=AsyncMock) as sleep:
+        await manager._async_end_activity(WASHER)
+
+    sleep.assert_not_awaited()
+    api.update_activity.assert_awaited_once()
+    call = api.update_activity.call_args
+    assert call.args[1] == "ended"
+    assert call.kwargs["dismissal_ttl"] == 0
+    assert not manager._tracked[WASHER].is_active
+    await manager.async_stop()
+
+
+async def test_remove_on_end_creates_with_zero_dismissal(hass: HomeAssistant) -> None:
+    api = make_activity_api()
+    manager = await _running_washer(hass, api, **{CONF_REMOVE_ON_END: True, CONF_DISMISSAL_TTL: 120})
+    assert api.create_activity.call_args.kwargs["dismissal_ttl"] == 0
+    await manager.async_stop()
+
+
+async def test_remove_on_end_shutdown_end_dismisses_at_once(hass: HomeAssistant) -> None:
+    api = make_activity_api()
+    manager = await _running_washer(hass, api, **{CONF_REMOVE_ON_END: True})
+    api.reset_mock()
+
+    await manager.async_stop()
+    call = api.update_activity.call_args
+    assert call.args[1] == "ended"
+    assert call.kwargs["dismissal_ttl"] == 0
+
+
+async def test_without_remove_on_end_the_configured_dismissal_stays(hass: HomeAssistant) -> None:
+    api = make_activity_api()
+    manager = await _running_washer(hass, api, **{CONF_DISMISSAL_TTL: 120})
+    assert api.create_activity.call_args.kwargs["dismissal_ttl"] == 120
+    api.reset_mock()
+
+    await manager.async_stop()
+    assert api.update_activity.call_args.kwargs["dismissal_ttl"] is None

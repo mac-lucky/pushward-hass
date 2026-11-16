@@ -2161,6 +2161,8 @@
             "start_states": "Trạng Thái Bắt Đầu",
             "end_states": "Trạng Thái Kết Thúc",
             "calendar_lead_minutes": "Thời Gian Báo Trước (phút)",
+            "calendar_subtitle_before": "Phụ Đề Trước Sự Kiện",
+            "calendar_subtitle_during": "Phụ Đề Trong Sự Kiện",
             "run_while": "Chỉ Chạy Khi",
             "remaining_time_entity": "Thực thể thời gian còn lại",
             "remaining_time_attribute": "Thuộc Tính Thời Gian Còn Lại",
@@ -2184,6 +2186,8 @@
             "start_states": "Trạng thái thực thể khởi động Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh. `*` khởi động khi ở bất kỳ trạng thái nào không phải trạng thái kết thúc (unavailable và unknown không bao giờ khởi động).",
             "end_states": "Trạng thái thực thể kết thúc Live Activity. Chọn từ danh sách hoặc nhập giá trị tùy chỉnh.",
             "calendar_lead_minutes": "Thực thể lịch bỏ qua trạng thái bắt đầu và kết thúc: hoạt động mở trước sự kiện có giờ tiếp theo số phút này, đếm ngược đến lúc bắt đầu, rồi đến lúc kết thúc, và kết thúc cùng sự kiện. Sự kiện cả ngày bị bỏ qua. 0-1440.",
+            "calendar_subtitle_before": "Hiển thị khi đếm ngược đến lúc sự kiện bắt đầu. Để trống để hiển thị tên lịch. Ví dụ: Sắp bắt đầu",
+            "calendar_subtitle_during": "Hiển thị khi sự kiện đang diễn ra. Để trống để hiển thị tên lịch. Ví dụ: Đang diễn ra",
             "run_while": "Chỉ giữ hoạt động khi mọi hàng đều khớp: mỗi hàng là một thực thể và danh sách trạng thái của nó, phân tách bằng dấu phẩy (vd. device_tracker.me và home). Khi một hàng không còn khớp, hoạt động kết thúc; khi tất cả khớp lại, hoạt động bắt đầu nếu thực thể được theo dõi đang ở trạng thái bắt đầu. Thực thể không khả dụng không bao giờ khớp. Tối đa 5 hàng.",
             "remaining_time_entity": "Đọc thời gian còn lại từ một thực thể riêng (ví dụ cảm biến thời gian của máy giặt). Để trống để dùng thực thể được theo dõi. Tự động phân tích cảm biến dấu thời gian (thời điểm hoàn thành), cảm biến thời lượng có đơn vị, chuỗi H:MM:SS, hoặc số giây thuần.",
             "remaining_time_attribute": "Thuộc tính thực thể chứa thời gian còn lại tính bằng giây. Ví dụ: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Gỡ Ngay Khi Kết Thúc",
                 "ended_ttl": "Tự Động Xóa Sau Khi Kết Thúc (giây)",
                 "stale_ttl": "Tự Động Kết Thúc Khi Không Hoạt Động (giây)",
                 "dismissal_ttl": "Tự Động Gỡ Khỏi Màn Hình Khóa (giây)"
               },
               "data_description": {
+                "remove_on_end": "Bỏ qua màn hình hoàn tất và gỡ hoạt động khỏi Màn Hình Khóa ngay khi kết thúc. Ghi đè thời gian tự động gỡ.",
                 "ended_ttl": "Số giây sau khi hoạt động kết thúc trước khi tự động xóa khỏi máy chủ. Để trống để giữ vô thời hạn. Ví dụ: 300",
                 "stale_ttl": "Số giây không hoạt động trước khi máy chủ tự động kết thúc hoạt động. Để trống để tắt. Ví dụ: 1800",
                 "dismissal_ttl": "Số giây hoạt động đã kết thúc còn hiển thị trên Màn hình khóa trước khi bị gỡ bỏ. 0 sẽ gỡ bỏ ngay khi kết thúc. Ví dụ: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Mỗi điều kiện cần một entity_id và ít nhất một trạng thái (vd. device_tracker.me với home).",
         "too_many_run_while": "Hỗ trợ tối đa 5 điều kiện.",
         "invalid_calendar_lead_minutes": "Thời gian báo trước phải là số phút nguyên từ 0 đến 1440.",
+        "invalid_calendar_subtitle": "Phụ đề lịch tối đa 64 ký tự.",
         "invalid_icon_map": "Mỗi biểu tượng tối đa 128 ký tự.",
         "invalid_state_text_pattern": "Mẫu tối đa 64 ký tự."
       },

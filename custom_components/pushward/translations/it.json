@@ -2161,6 +2161,8 @@
             "start_states": "Stati di avvio",
             "end_states": "Stati di fine",
             "calendar_lead_minutes": "Anticipo (minuti)",
+            "calendar_subtitle_before": "Sottotitolo prima dell'evento",
+            "calendar_subtitle_during": "Sottotitolo durante l'evento",
             "run_while": "Solo finché",
             "remaining_time_entity": "Entità tempo rimanente",
             "remaining_time_attribute": "Attributo tempo rimanente",
@@ -2184,6 +2186,8 @@
             "start_states": "Stati dell'entità che avviano la Live Activity. Selezionare dall'elenco o digitare valori personalizzati. `*` la avvia con qualsiasi stato che non sia di fine (unavailable e unknown non la avviano mai).",
             "end_states": "Stati dell'entità che terminano la Live Activity. Selezionare dall'elenco o digitare valori personalizzati.",
             "calendar_lead_minutes": "Le entità calendario ignorano gli stati di avvio e di fine: l'attività si apre questi minuti prima del prossimo evento con orario, fa il conto alla rovescia fino al suo inizio, poi fino alla sua fine, e termina con l'evento. Gli eventi di tutto il giorno vengono saltati. 0-1440.",
+            "calendar_subtitle_before": "Mostrato durante il conto alla rovescia fino all'inizio dell'evento. Lascia vuoto per mostrare il nome del calendario. Esempio: Inizia a breve",
+            "calendar_subtitle_during": "Mostrato mentre l'evento è in corso. Lascia vuoto per mostrare il nome del calendario. Esempio: In corso",
             "run_while": "Mantenere l'attività solo finché ogni riga corrisponde: ogni riga è un'entità e un elenco dei suoi stati separati da virgole (es. device_tracker.me e home). Quando una riga smette di corrispondere l'attività termina; quando tutte corrispondono di nuovo si avvia se l'entità monitorata è in uno stato di avvio. Un'entità non disponibile non corrisponde mai. Fino a 5 righe.",
             "remaining_time_entity": "Legge il tempo rimanente da un'entità separata (ad es. il sensore di tempo di una lavatrice). Lascia vuoto per usare l'entità monitorata. Analizza automaticamente un sensore timestamp (ora di fine), un sensore di durata con unità, una stringa H:MM:SS o semplici secondi.",
             "remaining_time_attribute": "Attributo dell'entità che contiene il tempo rimanente in secondi. Esempio: remaining",
@@ -2384,11 +2388,13 @@
             "advanced": {
               "name": "Advanced",
               "data": {
+                "remove_on_end": "Rimuovi subito alla fine",
                 "ended_ttl": "Eliminazione automatica dopo la fine (secondi)",
                 "stale_ttl": "Fine automatica dopo inattività (secondi)",
                 "dismissal_ttl": "Rimozione automatica dalla schermata di blocco (secondi)"
               },
               "data_description": {
+                "remove_on_end": "Salta la schermata di completamento e rimuove l'attività dalla schermata di blocco appena termina. Ha la precedenza sul tempo di rimozione automatica.",
                 "ended_ttl": "Secondi trascorsi i quali l'attività viene eliminata automaticamente dal server dopo la conclusione. Lasciare vuoto per conservarla indefinitamente. Esempio: 300",
                 "stale_ttl": "Secondi di inattività dopo i quali il server termina automaticamente l'attività. Lasciare vuoto per disabilitare. Esempio: 1800",
                 "dismissal_ttl": "Secondi per cui l'attività terminata resta sulla schermata di blocco prima di essere rimossa. 0 la rimuove immediatamente al termine. Esempio: 60"
@@ -2434,6 +2440,7 @@
         "invalid_run_while": "Ogni condizione richiede un entity_id e almeno uno stato (es. device_tracker.me con home).",
         "too_many_run_while": "Sono supportate al massimo 5 condizioni.",
         "invalid_calendar_lead_minutes": "L'anticipo deve essere un numero intero di minuti tra 0 e 1440.",
+        "invalid_calendar_subtitle": "Un sottotitolo del calendario può avere al massimo 64 caratteri.",
         "invalid_icon_map": "Ogni icona può avere al massimo 128 caratteri.",
         "invalid_state_text_pattern": "Il modello può avere al massimo 64 caratteri."
       },
