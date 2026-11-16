@@ -346,7 +346,8 @@ async def ws_send_test(hass: HomeAssistant, connection: websocket_api.ActiveConn
     elif kind == "widget":
         await api.delete_widget(PREVIEW_WIDGET_SLUG)
     else:
-        await api.create_notification(**payload, collapse_id=PREVIEW_COLLAPSE_ID)
+        # Same trimming the reminder manager uses, so a long to-do preview still seals.
+        await api.create_notification(**payload, collapse_id=PREVIEW_COLLAPSE_ID, trim_to_fit=True)
     connection.send_result(msg["id"])
 
 

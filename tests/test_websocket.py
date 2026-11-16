@@ -540,7 +540,9 @@ async def test_send_test_notification_uses_the_preview_collapse_id(loaded, ws) -
     reply = await ws("pushward/send_test", entry_id=entry.entry_id, kind="notification", action="send", payload=payload)
 
     assert reply["success"]
-    api.create_notification.assert_awaited_once_with(title="Milk", body="shopping", collapse_id="ha-preview")
+    api.create_notification.assert_awaited_once_with(
+        title="Milk", body="shopping", collapse_id="ha-preview", trim_to_fit=True
+    )
 
 
 @pytest.mark.parametrize(
