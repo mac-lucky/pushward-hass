@@ -801,6 +801,7 @@ bambulab-<hash>.svg is the Bambu Lab icon from Simple Icons
 (https://github.com/simple-icons/simple-icons), released under CC0 1.0 Universal
 (https://creativecommons.org/publicdomain/zero/1.0/).
 
-webhook-<hash>.svg, a generic webhook glyph, is not part of selfh.st/icons.
+webhook-<hash>.svg is the "webhook" glyph of Material Design Icons (@mdi/js),
+coloured, licensed under the Apache License 2.0 as LICENSE-mdi states.
 
 Each logo is a trademark of its owner and is shown only to name that service.
