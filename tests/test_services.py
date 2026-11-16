@@ -2904,8 +2904,11 @@ async def test_delete_widget_by_entity_id_refuses_two_widgets_on_it(hass: HomeAs
     await manager.async_stop()
 
 
-async def test_async_remove_entry_deletes_server_widgets(hass: HomeAssistant) -> None:
-    """Removing the whole integration deletes every tracked widget server-side (no orphan leak)."""
+async def test_async_remove_entry_deletes_server_widgets(hass: HomeAssistant, hass_storage: dict) -> None:
+    """Removing the whole integration deletes every tracked widget server-side (no orphan leak).
+
+    That includes a removed subentry's widget still cached because its delete has not landed.
+    """
     api = _mock_api()
     subentries = [
         ConfigSubentryData(
@@ -2925,11 +2928,23 @@ async def test_async_remove_entry_deletes_server_widgets(hass: HomeAssistant) ->
         subentries_data=subentries,
     )
     entry.add_to_hass(hass)
+    store_key = f"pushward.widgets.{entry.entry_id}"
+    hass_storage[store_key] = {
+        "version": 1,
+        "key": store_key,
+        "data": {"widgets": {slug: {"content": {"value": 1.0}, "created": True} for slug in ("ha-one", "ha-gone")}},
+    }
 
     with patch("custom_components.pushward.PushWardApiClient", return_value=api):
         await async_remove_entry(hass, entry)
 
-    assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-one", "ha-two", "ha-preview-widget"}
+    assert sorted(c.args[0] for c in api.delete_widget.await_args_list) == [
+        "ha-gone",
+        "ha-one",
+        "ha-preview-widget",
+        "ha-two",
+    ]
+    assert store_key not in hass_storage
     # The panel's test activity goes too, through the un-metered DELETE.
     api.delete_activity.assert_awaited_once_with("ha-preview")
     api.update_activity.assert_not_awaited()

@@ -147,7 +147,7 @@ from .panel import async_register_panel, async_register_static_path, async_remov
 from .quota import QuotaGate
 from .todo_reminders import TodoReminderManager, async_cancel_stored_schedules, todo_configs
 from .websocket import PREVIEW_ACTIVITY_SLUG, PREVIEW_WIDGET_SLUG, async_register_commands
-from .widget_manager import WidgetManager, build_widget_store
+from .widget_manager import WidgetManager, async_load_widget_cache, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -1901,11 +1901,13 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     managers' async_reload, but no manager is live here (async_unload_entry already ran
     and popped hass.data), so build a throwaway client from entry.data.
     """
-    widget_slugs = [
+    widget_store = build_widget_store(hass, entry.entry_id)
+    # The cache also holds removed subentries' widgets whose delete has not landed yet.
+    widget_slugs = set(await async_load_widget_cache(widget_store)) | {
         slug
         for sub in entry.subentries.values()
         if sub.subentry_type == SUBENTRY_TYPE_WIDGET and (slug := sub.data.get(CONF_SLUG))
-    ]
+    }
     api = PushWardApiClient(
         async_get_clientsession(hass),
         entry.data[CONF_SERVER_URL],
@@ -1923,5 +1925,5 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     )
     await async_cancel_stored_schedules(hass, api, entry.entry_id)
     await build_history_store(hass, entry.entry_id).async_remove()
-    await build_widget_store(hass, entry.entry_id).async_remove()
+    await widget_store.async_remove()
     await build_answer_store(hass, entry.entry_id).async_remove()

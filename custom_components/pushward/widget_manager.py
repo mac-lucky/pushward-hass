@@ -105,6 +105,21 @@ def build_widget_store(hass: HomeAssistant, entry_id: str) -> Store:
     return Store(hass, _WIDGET_STORAGE_VERSION, _widget_storage_key(entry_id), atomic_writes=True)
 
 
+async def async_load_widget_cache(store: Store) -> dict[str, dict]:
+    """The cached widgets by slug; {} when the store is missing or unreadable."""
+    try:
+        raw = await store.async_load()
+    except (HomeAssistantError, OSError, ValueError):
+        _LOGGER.debug("Failed to load widget cache; starting fresh", exc_info=True)
+        return {}
+    if not raw or not isinstance(raw, dict):
+        return {}
+    widgets = raw.get("widgets")
+    if not isinstance(widgets, dict):
+        return {}
+    return widgets
+
+
 # Persistent notification ids carry the entry: each account has its own key and its own
 # slugs, so one account's success must not dismiss another's notice.
 def _forbidden_notification_id(entry_id: str, slug: str) -> str:
@@ -277,7 +292,7 @@ class WidgetManager:
 
     async def async_start(self) -> None:
         """Set up listeners, restore cached state, and POST initial widgets."""
-        persisted = await self._async_load_cache()
+        persisted = await async_load_widget_cache(self._store)
 
         if self._unsub_quota is None:
             self._unsub_quota = async_dispatcher_connect(
@@ -817,19 +832,6 @@ class WidgetManager:
             return DEFAULT_WIDGET_POLL_INTERVAL
 
     # ----- cache persistence -----
-
-    async def _async_load_cache(self) -> dict[str, dict]:
-        try:
-            raw = await self._store.async_load()
-        except (HomeAssistantError, OSError, ValueError):
-            _LOGGER.debug("Failed to load widget cache; starting fresh", exc_info=True)
-            return {}
-        if not raw or not isinstance(raw, dict):
-            return {}
-        widgets = raw.get("widgets")
-        if not isinstance(widgets, dict):
-            return {}
-        return widgets
 
     @callback
     def _schedule_cache_save(self) -> None:
