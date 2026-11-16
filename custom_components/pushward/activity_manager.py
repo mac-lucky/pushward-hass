@@ -251,6 +251,8 @@ class TrackedEntity:
     # attempt before start_retry_at (time.monotonic()).
     start_task: asyncio.Task | None = field(default=None, repr=False)
     start_retry_at: float = 0.0
+    # Re-checks the start once the pause ends, so a start state reached during it is not lost.
+    retry_unsub: Callable | None = None
     # At most one _send_update task runs per entity; changes landing while one
     # is in flight set update_pending so the newest state is re-sent afterwards.
     pending_task: asyncio.Task | None = field(default=None, repr=False)
@@ -512,12 +514,22 @@ class ActivityManager:
 
     async def async_stop(self) -> None:
         """End all active activities and unsubscribe listeners."""
+        # First, so a quota release dispatched while the cancelled tasks settle cannot
+        # spawn a start that nothing cancels.
+        if self._unsub_quota is not None:
+            self._unsub_quota()
+            self._unsub_quota = None
+
         # Cancel in-flight work and wait for it to settle so a mid-flight send or
         # end can't fire against the tracker after async_start rebuilds it on a
         # reload. A cancelled end task leaves is_active untouched (the canceller
         # owns the state), so the ENDED push below still goes out.
         cancelled: list[asyncio.Task] = []
         for tracked in self._tracked.values():
+            if tracked.retry_unsub:
+                tracked.retry_unsub()
+                tracked.retry_unsub = None
+
             for task in (tracked.start_task, tracked.end_task, tracked.pending_task):
                 if task and not task.done():
                     task.cancel()
@@ -543,10 +555,6 @@ class ActivityManager:
 
         if cancelled:
             await asyncio.gather(*cancelled, return_exceptions=True)
-
-        if self._unsub_quota is not None:
-            self._unsub_quota()
-            self._unsub_quota = None
 
         # Concurrent, so an outage costs a reload one retry budget per 5 activities (the
         # API client's request semaphore) rather than one per activity.
@@ -878,10 +886,23 @@ class ActivityManager:
         if tracked.start_task is not None and not tracked.start_task.done():
             tracked.update_pending = True
             return None
-        if time.monotonic() < tracked.start_retry_at:
+        wait = tracked.start_retry_at - time.monotonic()
+        if wait > 0:
+            if tracked.retry_unsub is None:
+                tracked.retry_unsub = async_call_later(self._hass, wait, partial(self._on_start_retry, entity_id))
             return None
         tracked.start_task = self._hass.async_create_task(self._start_activity(entity_id))
         return tracked.start_task
+
+    @callback
+    def _on_start_retry(self, entity_id: str, _now: datetime) -> None:
+        """Start once the pause after a failed start ends, if the entity still wants to run."""
+        tracked = self._tracked.get(entity_id)
+        if tracked is None:
+            return
+        tracked.retry_unsub = None
+        if not tracked.is_active and self._should_run(tracked, self._hass.states.get(entity_id)):
+            self._spawn_start(entity_id)
 
     async def _start_activity(self, entity_id: str) -> None:
         """Create and start a PushWard Live Activity."""

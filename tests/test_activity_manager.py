@@ -619,6 +619,27 @@ async def test_failed_start_pauses_from_the_failure(hass: HomeAssistant, freezer
     await manager.async_stop()
 
 
+async def test_start_state_reached_during_the_pause_starts_once_it_ends(hass: HomeAssistant, freezer) -> None:
+    """An event the pause drops is not lost: with no later event, the start runs when the pause ends."""
+    api = _mock_api()
+    api.create_activity.side_effect = [PushWardApiError("unavailable", status_code=503), None]
+    manager = ActivityManager(hass, api, [_entity_config(**{CONF_PROGRESS_ATTRIBUTE: "progress"})], _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 1})
+    await hass.async_block_till_done()
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 2})
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
+
+    freezer.tick(timedelta(seconds=31))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+    assert api.create_activity.await_count == 2
+    assert manager._tracked["binary_sensor.washer"].is_active
+    await manager.async_stop()
+
+
 async def test_update_404_recreates_activity(hass: HomeAssistant) -> None:
     """A PATCH that 404s (activity gone server-side) self-heals via a recreate POST."""
     api = _mock_api()
