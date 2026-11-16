@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "Tidak ada widget PushWard yang cocok dengan slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "Beberapa widget PushWard terikat ke {entity_id} ({slugs}). Hapus salah satunya dengan slug-nya."
+    },
     "thumbhash_failed": {
       "message": "Tidak dapat membuat ThumbHash: {error}"
     },

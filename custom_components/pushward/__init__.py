@@ -1593,7 +1593,8 @@ async def _async_handle_delete_widget(hass: HomeAssistant, call: ServiceCall) ->
     still drives this slug it will be recreated on the next restart/sync — remove the subentry
     to delete it permanently (subentry removal also deletes the server widget automatically).
     A slug is deleted on every targeted account (404 is a no-op); an entity_id only on the
-    accounts whose tracked widget is bound to it, each by its own slug.
+    accounts with a tracked widget whose own entity it is (a stat-list row does not count),
+    each by its own slug. Two such widgets on one account are refused: the slug tells them apart.
     """
     targets = _target_entries(hass, call)
     if (slug := call.data.get("slug")) is not None:
@@ -1603,7 +1604,7 @@ async def _async_handle_delete_widget(hass: HomeAssistant, call: ServiceCall) ->
     owners = [
         (entry, data)
         for entry, data in targets
-        if (manager := data.get("widget_manager")) is not None and manager.slug_for_entity(entity_id)
+        if (manager := data.get("widget_manager")) is not None and manager.slugs_for_entity(entity_id)
     ]
     if not owners:
         raise ServiceValidationError(
@@ -1611,7 +1612,17 @@ async def _async_handle_delete_widget(hass: HomeAssistant, call: ServiceCall) ->
             translation_key="widget_not_found",
             translation_placeholders={"slug": "", "entity_id": entity_id},
         )
-    await _fan_out(owners, lambda data: data["api"].delete_widget(data["widget_manager"].slug_for_entity(entity_id)))
+    # Checked on every account before any delete, so a refusal deletes nothing.
+    for _, data in owners:
+        if len(slugs := data["widget_manager"].slugs_for_entity(entity_id)) > 1:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="widget_entity_ambiguous",
+                translation_placeholders={"entity_id": entity_id, "slugs": ", ".join(slugs)},
+            )
+    await _fan_out(
+        owners, lambda data: data["api"].delete_widget(data["widget_manager"].slugs_for_entity(entity_id)[0])
+    )
 
 
 def _register_services(hass: HomeAssistant) -> None:

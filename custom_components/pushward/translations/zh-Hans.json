@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "没有与 slug={slug} entity_id={entity_id} 匹配的 PushWard 小组件。"
     },
+    "widget_entity_ambiguous": {
+      "message": "有多个 PushWard 小组件绑定到 {entity_id}（{slugs}）。请改用 slug 删除其中一个。"
+    },
     "thumbhash_failed": {
       "message": "无法生成 ThumbHash：{error}"
     },

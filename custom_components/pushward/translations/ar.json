@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "لا توجد أداة PushWard تطابق slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "عدة أدوات PushWard مرتبطة بـ {entity_id} ({slugs}). احذف إحداها باستخدام slug الخاص بها بدلاً من ذلك."
+    },
     "thumbhash_failed": {
       "message": "تعذّر إنشاء ThumbHash: {error}"
     },

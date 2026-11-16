@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "slug={slug} entity_id={entity_id} కు సరిపోలే PushWard విడ్జెట్ లేదు."
     },
+    "widget_entity_ambiguous": {
+      "message": "అనేక PushWard విడ్జెట్‌లు {entity_id} కు కట్టుబడి ఉన్నాయి ({slugs}). బదులుగా ఒకదాన్ని దాని slug తో తొలగించండి."
+    },
     "thumbhash_failed": {
       "message": "ThumbHash రూపొందించలేకపోయాము: {error}"
     },

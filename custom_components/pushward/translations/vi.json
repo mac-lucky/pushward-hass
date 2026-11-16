@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "Không có widget PushWard nào khớp với slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "Có nhiều widget PushWard gắn với {entity_id} ({slugs}). Hãy xóa một widget theo slug của nó."
+    },
     "thumbhash_failed": {
       "message": "Không thể tạo ThumbHash: {error}"
     },

@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "slug={slug} entity_id={entity_id} ile eşleşen PushWard widget'ı yok."
     },
+    "widget_entity_ambiguous": {
+      "message": "{entity_id} öğesine bağlı birden fazla PushWard widget'ı var ({slugs}). Bunun yerine birini slug'ı ile silin."
+    },
     "thumbhash_failed": {
       "message": "ThumbHash oluşturulamadı: {error}"
     },

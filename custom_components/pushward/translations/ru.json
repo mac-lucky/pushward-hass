@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "Нет виджета PushWard, соответствующего slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "К {entity_id} привязано несколько виджетов PushWard ({slugs}). Удалите нужный по его slug."
+    },
     "thumbhash_failed": {
       "message": "Не удалось создать ThumbHash: {error}"
     },

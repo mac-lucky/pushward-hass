@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "Aucun widget PushWard ne correspond à slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "Plusieurs widgets PushWard sont liés à {entity_id} ({slugs}). Supprimez-en un par son slug."
+    },
     "thumbhash_failed": {
       "message": "Impossible de générer un ThumbHash : {error}"
     },

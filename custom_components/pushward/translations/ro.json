@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "Niciun widget PushWard nu corespunde slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "Mai multe widgeturi PushWard sunt legate de {entity_id} ({slugs}). Șterge unul după slug-ul său."
+    },
     "thumbhash_failed": {
       "message": "Nu s-a putut genera ThumbHash: {error}"
     },

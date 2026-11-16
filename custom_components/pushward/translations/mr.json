@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "slug={slug} entity_id={entity_id} शी जुळणारे कोणतेही PushWard विजेट नाही."
     },
+    "widget_entity_ambiguous": {
+      "message": "अनेक PushWard विजेट {entity_id} शी जोडलेले आहेत ({slugs}). त्याऐवजी एखादे त्याच्या slug ने हटवा."
+    },
     "thumbhash_failed": {
       "message": "ThumbHash तयार करता आला नाही: {error}"
     },

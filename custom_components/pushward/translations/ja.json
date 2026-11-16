@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "slug={slug} entity_id={entity_id} に一致する PushWard ウィジェットがありません。"
     },
+    "widget_entity_ambiguous": {
+      "message": "{entity_id} に紐づく PushWard ウィジェットが複数あります（{slugs}）。slug を指定して削除してください。"
+    },
     "thumbhash_failed": {
       "message": "ThumbHash を生成できませんでした: {error}"
     },

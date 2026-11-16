@@ -371,20 +371,35 @@ class WidgetManager:
             return True
         return False
 
-    def slug_for_entity(self, entity_id: str | None) -> str | None:
-        """Return the slug of the tracked widget bound to entity_id, if any."""
-        target = self._resolve_target(entity_id=entity_id)
-        return target.config.get(CONF_SLUG) if target else None
+    def slugs_for_entity(self, entity_id: str | None) -> list[str]:
+        """Slugs of the tracked widgets whose own entity is entity_id.
+
+        A group row, a companion or a subtitle timer on that entity does not count:
+        deleting by entity must not take a whole stat list with it.
+        """
+        return [
+            slug
+            for slug, tracked in self._tracked.items()
+            if entity_id
+            and tracked.config.get(CONF_WIDGET_TEMPLATE) not in WIDGET_GROUP_TEMPLATES
+            and tracked.config.get(CONF_ENTITY_ID) == entity_id
+        ]
 
     async def async_refresh(self, slug: str | None = None, entity_id: str | None = None) -> None:
         """Manual refresh: bypass diff cache and force a PATCH.
 
-        Resolves the widget by slug or by primary entity_id. Raises ValueError
-        if neither identifies a tracked widget.
+        Refreshes the widget with that slug, or every widget that shows entity_id
+        (rows and companions included). Raises ValueError if none is tracked.
         """
-        target = self._resolve_target(slug=slug, entity_id=entity_id)
-        if target is None:
+        if slug:
+            targets = [target] if (target := self._tracked.get(slug)) else []
+        else:
+            targets = [t for t in self._tracked.values() if entity_id and entity_id in _entity_ids_for_widget(t.config)]
+        if not targets:
             raise ValueError(f"No tracked widget for slug={slug!r} entity_id={entity_id!r}")
+        await asyncio.gather(*(self._force_refresh(target) for target in targets))
+
+    async def _force_refresh(self, target: TrackedWidget) -> None:
         # Wait out any in-flight send first -- two _send_update calls for the same
         # widget must never interleave (they race last_content and the 404
         # recreate flag). The forced send then claims the single-flight slot like
@@ -771,16 +786,6 @@ class WidgetManager:
         buffer.append((ts, value))
 
     # ----- helpers -----
-
-    def _resolve_target(self, *, slug: str | None = None, entity_id: str | None = None) -> TrackedWidget | None:
-        if slug:
-            return self._tracked.get(slug)
-        if not entity_id:
-            return None
-        for tracked in self._tracked.values():
-            if entity_id in _entity_ids_for_widget(tracked.config):
-                return tracked
-        return None
 
     def _lookup_registry_icon(self, cfg: dict) -> str | None:
         # stat_list / battery / flow have no single anchoring entity; the static

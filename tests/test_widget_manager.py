@@ -206,17 +206,57 @@ async def test_start_drops_a_leftover_widget_the_server_no_longer_has(hass: Home
     await manager.async_stop()
 
 
-async def test_slug_for_entity_resolves_and_misses(hass: HomeAssistant) -> None:
-    """slug_for_entity maps a bound entity to its widget slug, else None."""
+async def test_slugs_for_entity_resolves_and_misses(hass: HomeAssistant) -> None:
+    """slugs_for_entity maps a bound entity to its widget slugs, else nothing."""
     api = _mock_api()
     hass.states.async_set("sensor.users", "42")
     config = make_widget_config(slug="ha-users", entity_id="sensor.users")
     manager = WidgetManager(hass, api, [config], make_mock_entry())
     await manager.async_start()
 
-    assert manager.slug_for_entity("sensor.users") == "ha-users"
-    assert manager.slug_for_entity("sensor.nope") is None
-    assert manager.slug_for_entity(None) is None
+    assert manager.slugs_for_entity("sensor.users") == ["ha-users"]
+    assert manager.slugs_for_entity("sensor.nope") == []
+    assert manager.slugs_for_entity(None) == []
+
+    await manager.async_stop()
+
+
+def _stat_list_and_gauge_on_temp() -> list[dict]:
+    """A 'Home' stat list with a row on sensor.temp, listed first, and a gauge on sensor.temp."""
+    return [
+        make_widget_config(
+            slug="ha-home",
+            entity_id="",
+            **{
+                CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+                CONF_STAT_ROWS: [{"label": "Temp", "entity_id": "sensor.temp"}],
+            },
+        ),
+        make_widget_config(slug="ha-temp", entity_id="sensor.temp", **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_GAUGE}),
+    ]
+
+
+async def test_slugs_for_entity_skips_a_group_row_on_the_entity(hass: HomeAssistant) -> None:
+    """Only the widget whose own entity it is resolves; a stat-list row on it does not."""
+    hass.states.async_set("sensor.temp", "21")
+    manager = WidgetManager(hass, _mock_api(), _stat_list_and_gauge_on_temp(), make_mock_entry())
+    await manager.async_start()
+
+    assert manager.slugs_for_entity("sensor.temp") == ["ha-temp"]
+
+    await manager.async_stop()
+
+
+async def test_manual_refresh_by_entity_id_refreshes_every_widget_showing_it(hass: HomeAssistant) -> None:
+    """A refresh by entity reaches the stat list with the row and the gauge alike."""
+    api = _mock_api()
+    hass.states.async_set("sensor.temp", "21")
+    manager = WidgetManager(hass, api, _stat_list_and_gauge_on_temp(), make_mock_entry())
+    await manager.async_start()
+    api.reset_mock()
+
+    await manager.async_refresh(entity_id="sensor.temp")
+    assert sorted(c.args[0] for c in api.patch_widget.await_args_list) == ["ha-home", "ha-temp"]
 
     await manager.async_stop()
 

@@ -30,6 +30,8 @@ from custom_components.pushward.const import (
     CONF_E2E_KEY,
     CONF_INTEGRATION_KEY,
     CONF_SERVER_URL,
+    CONF_STAT_ROWS,
+    CONF_WIDGET_TEMPLATE,
     DEFAULT_SERVER_URL,
     DOMAIN,
     IMAGE_THUMBHASH_MAX,
@@ -37,6 +39,8 @@ from custom_components.pushward.const import (
     MAX_URL_LEN,
     SERVICE_TEMPLATES,
     SUBENTRY_TYPE_WIDGET,
+    WIDGET_TEMPLATE_GAUGE,
+    WIDGET_TEMPLATE_STAT_LIST,
     validate_tap_action_url,
 )
 from custom_components.pushward.e2e import E2EError, open_envelope
@@ -2836,7 +2840,7 @@ async def test_delete_widget_by_entity_id_resolves_and_deletes(hass: HomeAssista
     entry = await _setup_entry(hass, api)
 
     # Seed a tracked widget bound to an entity and expose it via hass.data so the service's
-    # slug_for_entity lookup has something to resolve.
+    # slugs_for_entity lookup has something to resolve.
     hass.states.async_set("sensor.users", "42")
     manager = WidgetManager(hass, api, [make_widget_config(slug="ha-users", entity_id="sensor.users")], entry)
     await manager.async_start()
@@ -2845,6 +2849,58 @@ async def test_delete_widget_by_entity_id_resolves_and_deletes(hass: HomeAssista
     await hass.services.async_call(DOMAIN, "delete_widget", {"entity_id": "sensor.users"}, blocking=True)
 
     api.delete_widget.assert_awaited_once_with("ha-users")
+    await manager.async_stop()
+
+
+async def _widget_manager_with(hass: HomeAssistant, api: AsyncMock, configs: list[dict]) -> WidgetManager:
+    api.create_widget = AsyncMock()
+    api.patch_widget = AsyncMock()
+    entry = await _setup_entry(hass, api)
+    manager = WidgetManager(hass, api, configs, entry)
+    await manager.async_start()
+    hass.data[DOMAIN][entry.entry_id]["widget_manager"] = manager
+    return manager
+
+
+async def test_delete_widget_by_entity_id_skips_a_stat_list_row_on_it(hass: HomeAssistant) -> None:
+    """The gauge on sensor.temp goes; the 'Home' stat list with a row on it stays."""
+    api = _mock_api()
+    hass.states.async_set("sensor.temp", "21")
+    stat_list = make_widget_config(
+        slug="ha-home",
+        entity_id="",
+        **{
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_STAT_LIST,
+            CONF_STAT_ROWS: [{"label": "T", "entity_id": "sensor.temp"}],
+        },
+    )
+    gauge = make_widget_config(slug="ha-temp", entity_id="sensor.temp", **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_GAUGE})
+    manager = await _widget_manager_with(hass, api, [stat_list, gauge])
+
+    await hass.services.async_call(DOMAIN, "delete_widget", {"entity_id": "sensor.temp"}, blocking=True)
+
+    api.delete_widget.assert_awaited_once_with("ha-temp")
+    await manager.async_stop()
+
+
+async def test_delete_widget_by_entity_id_refuses_two_widgets_on_it(hass: HomeAssistant) -> None:
+    """Two widgets of their own on one entity need the slug: nothing is deleted."""
+    api = _mock_api()
+    hass.states.async_set("sensor.temp", "21")
+    configs = [
+        make_widget_config(slug="ha-temp", entity_id="sensor.temp"),
+        make_widget_config(
+            slug="ha-temp-gauge", entity_id="sensor.temp", **{CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_GAUGE}
+        ),
+    ]
+    manager = await _widget_manager_with(hass, api, configs)
+
+    with pytest.raises(ServiceValidationError) as err:
+        await hass.services.async_call(DOMAIN, "delete_widget", {"entity_id": "sensor.temp"}, blocking=True)
+
+    assert err.value.translation_key == "widget_entity_ambiguous"
+    assert err.value.translation_placeholders == {"entity_id": "sensor.temp", "slugs": "ha-temp, ha-temp-gauge"}
+    api.delete_widget.assert_not_awaited()
     await manager.async_stop()
 
 

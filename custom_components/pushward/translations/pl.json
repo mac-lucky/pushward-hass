@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "Żaden widżet PushWard nie pasuje do slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "Kilka widżetów PushWard jest powiązanych z {entity_id} ({slugs}). Usuń jeden, podając jego slug."
+    },
     "thumbhash_failed": {
       "message": "Nie udało się wygenerować ThumbHash: {error}"
     },

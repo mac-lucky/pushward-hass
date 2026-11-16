@@ -2035,6 +2035,9 @@
     "widget_not_found": {
       "message": "Walang PushWard widget na tumutugma sa slug={slug} entity_id={entity_id}."
     },
+    "widget_entity_ambiguous": {
+      "message": "Mahigit sa isang PushWard widget ang nakatali sa {entity_id} ({slugs}). Burahin ang isa gamit ang slug nito."
+    },
     "thumbhash_failed": {
       "message": "Hindi makagawa ng ThumbHash: {error}"
     },
