@@ -60,7 +60,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.helpers.translation import async_get_translations
 from homeassistant.util import dt as dt_util
 
-from .answer_stream import notification_answer_signal
+from .answer_stream import _from_iso, _iso, _key_hash, notification_answer_signal
 from .api import (
     PushWardApiClient,
     PushWardApiError,
@@ -176,10 +176,6 @@ def todo_configs(entry: ConfigEntry) -> list[dict]:
     ]
 
 
-def _key_hash(integration_key: str) -> str:
-    return hashlib.sha256(integration_key.encode()).hexdigest()[:16]
-
-
 async def async_cancel_stored_schedules(hass: HomeAssistant, api: PushWardApiClient, entry_id: str) -> None:
     """Cancel every pending reminder a removed config entry left, then drop its store."""
     store = build_todo_store(hass, entry_id)
@@ -231,17 +227,6 @@ def _parse_due(due: Any, all_day_time: time) -> datetime | None:
 def _parse_time(value: Any) -> time:
     parsed = dt_util.parse_time(str(value or "")) if not isinstance(value, time) else value
     return parsed or dt_util.parse_time(DEFAULT_TODO_ALL_DAY_TIME) or time(9, 0)
-
-
-def _iso(value: datetime) -> str:
-    return value.astimezone(dt_util.UTC).isoformat()
-
-
-def _from_iso(value: Any) -> datetime | None:
-    parsed = dt_util.parse_datetime(str(value or ""))
-    if parsed is not None and parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=dt_util.UTC)
-    return parsed
 
 
 def _due_key(item: dict) -> str:
