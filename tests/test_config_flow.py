@@ -4737,7 +4737,12 @@ _CLEARED_WIDGET_FIELDS: dict[str, dict] = {
     },
     WIDGET_TEMPLATE_STATUS: {CONF_SEVERITY: ("warning", "")},
     WIDGET_TEMPLATE_COUNTDOWN: {CONF_EXPIRED_TEXT: ("Over", "")},
-    WIDGET_TEMPLATE_SCHEDULE: {CONF_SCHEDULE_ATTRIBUTES: ("raw_today", [])},
+    WIDGET_TEMPLATE_SCHEDULE: {
+        CONF_SCHEDULE_ATTRIBUTES: ("raw_today", []),
+        # A cleared key falls back to the default a never-set one gets.
+        CONF_SCHEDULE_START_KEY: ("begin", DEFAULT_SCHEDULE_START_KEY),
+        CONF_SCHEDULE_VALUE_KEY: ("level", DEFAULT_SCHEDULE_VALUE_KEY),
+    },
 }
 
 

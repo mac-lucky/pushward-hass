@@ -2785,18 +2785,13 @@ def _widget_details_schema(
         fields[vol.Optional(CONF_SCHEDULE_ATTRIBUTES, description={"suggested_value": joined})] = vol.All(
             str, vol.Length(max=MAX_TEXT_LEN)
         )
-        fields[
-            vol.Optional(
-                CONF_SCHEDULE_START_KEY,
-                default=d.get(CONF_SCHEDULE_START_KEY, DEFAULT_SCHEDULE_START_KEY),
+        for conf_key, default in (
+            (CONF_SCHEDULE_START_KEY, DEFAULT_SCHEDULE_START_KEY),
+            (CONF_SCHEDULE_VALUE_KEY, DEFAULT_SCHEDULE_VALUE_KEY),
+        ):
+            fields[vol.Optional(conf_key, description={"suggested_value": d.get(conf_key, default)})] = vol.All(
+                str, vol.Length(max=MAX_TEXT_LEN)
             )
-        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
-        fields[
-            vol.Optional(
-                CONF_SCHEDULE_VALUE_KEY,
-                default=d.get(CONF_SCHEDULE_VALUE_KEY, DEFAULT_SCHEDULE_VALUE_KEY),
-            )
-        ] = vol.All(str, vol.Length(max=MAX_TEXT_LEN))
         fields[_opt_number_key(CONF_SCHEDULE_LOW_MAX, d)] = _NUMBER_BOX_ANY
         fields[_opt_number_key(CONF_SCHEDULE_HIGH_MIN, d)] = _NUMBER_BOX_ANY
 
