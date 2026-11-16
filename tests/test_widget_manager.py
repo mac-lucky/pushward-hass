@@ -1432,6 +1432,66 @@ async def test_heatmap_reads_each_hour_once_compiled_without_a_state_change(hass
     await manager.async_stop()
 
 
+async def test_heatmap_hourly_read_armed_only_for_heatmap(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    hass.states.async_set("sensor.energy", "1")
+    with patch("custom_components.pushward.widget_manager.async_daily_values", AsyncMock(return_value=list(_WEEK))):
+        manager = WidgetManager(hass, api, [make_widget_config(), _heatmap_config()], make_mock_entry())
+        await manager.async_start()
+        assert manager._tracked["ha-users"].unsub_hourly is None
+        heatmap = manager._tracked["ha-energy"]
+        assert heatmap.unsub_hourly is not None
+        await manager.async_stop()
+    # async_stop (and so every reload) detaches, so no old hourly listener outlives its tracker.
+    assert heatmap.unsub_hourly is None
+
+
+async def test_heatmap_hourly_read_landing_mid_read_reads_again(hass: HomeAssistant, freezer) -> None:
+    """The 08:05 read fires while a send is still reading the statistics from before the
+    compile: that read must not stamp the day over the reset, or the 07:00-08:00 hour only
+    goes out at 09:05."""
+    await hass.config.async_set_time_zone("Europe/Warsaw")
+    freezer.move_to("2026-11-12T08:04:58+01:00")
+    api = _mock_api()
+    hass.states.async_set("sensor.energy", "1")
+    release = asyncio.Event()
+
+    async def daily_values(*_args) -> list:
+        if read.await_count == 2:
+            await release.wait()
+            return [*_WEEK[:-1], 8.0]
+        return list(_WEEK) if read.await_count == 1 else [*_WEEK[:-1], 9.0]
+
+    with patch(
+        "custom_components.pushward.widget_manager.async_daily_values", AsyncMock(side_effect=daily_values)
+    ) as read:
+        manager = WidgetManager(hass, api, [_heatmap_config()], make_mock_entry())
+        await manager.async_start()
+        tracked = manager._tracked["ha-energy"]
+
+        tracked.cells_read_day = None
+        hass.states.async_set("sensor.energy", "2")
+        for _ in range(20):
+            if read.await_count == 2:
+                break
+            await asyncio.sleep(0)
+        assert read.await_count == 2  # the send is now parked inside the read
+
+        refresh = datetime.fromisoformat("2026-11-12T08:05:00+01:00")
+        freezer.move_to(refresh)
+        async_fire_time_changed(hass, refresh)
+        assert tracked.update_pending
+
+        release.set()
+        await hass.async_block_till_done()
+
+    assert read.await_count == 3
+    assert api.patch_widget.await_count == 2
+    assert api.patch_widget.call_args.args[1]["content"]["cells"][-1] == 9.0
+    await manager.async_stop()
+
+
 async def test_heatmap_without_history_sends_nothing_and_warns_once(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ) -> None:
