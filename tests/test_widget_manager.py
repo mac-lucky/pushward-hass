@@ -227,6 +227,24 @@ async def test_start_keeps_a_leftover_cached_when_a_debounced_save_lands_mid_del
     await manager.async_stop()
 
 
+async def test_start_gives_up_a_leftover_widget_the_key_may_not_delete(hass: HomeAssistant, hass_storage: dict) -> None:
+    """A 403 on the delete repeats on every start, so the slug is dropped and no permission notice goes up."""
+    _seed_widget_cache(hass_storage, "ha-gone")
+    api = _mock_api()
+    api.delete_widget.side_effect = PushWardWidgetPermissionError("widgets permission required")
+    manager = WidgetManager(hass, api, [], make_mock_entry())
+    with patch("custom_components.pushward.widget_manager.persistent_notification.async_create") as create_notif:
+        await manager.async_start()
+        await manager.async_stop()
+        await manager.async_start()
+
+    api.delete_widget.assert_awaited_once_with("ha-gone")
+    create_notif.assert_not_called()
+    assert _cached_slugs(hass_storage) == set()
+
+    await manager.async_stop()
+
+
 async def test_reload_deletes_a_removed_widget_that_never_got_content(hass: HomeAssistant, hass_storage: dict) -> None:
     """A widget whose initial POST was skipped (entity unavailable) is still deleted when its subentry goes."""
     api = _mock_api()

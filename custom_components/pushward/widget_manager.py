@@ -369,9 +369,16 @@ class WidgetManager:
                 self._schedule_update(tracked)
 
     async def _delete_widget(self, slug: str) -> bool:
-        """Delete a server-side widget whose subentry was removed; True once it is gone (404 included)."""
+        """Delete a server-side widget whose subentry was removed.
+
+        True once a retry cannot help: it is gone (404 included), or the key may not
+        delete it (403), which every later start would only hit again.
+        """
         async with self._api_error_guard(slug, "deleting"):
-            await self._api.delete_widget(slug)
+            try:
+                await self._api.delete_widget(slug)
+            except PushWardForbiddenError as err:
+                _LOGGER.warning("PushWard widget %s stays on the server, this key may not delete it: %s", slug, err)
             return True
         return False
 
