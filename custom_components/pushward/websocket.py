@@ -19,6 +19,7 @@ from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import section
 
+from .activity_manager import _companion_entity_ids
 from .api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
 from .config_flow import (
     _details_schema,
@@ -58,7 +59,7 @@ from .const import (
 from .content_mapper import lookup_registry_icon, map_content
 from .e2e import E2EError, seal
 from .recorder_history import async_daily_values
-from .widget_manager import TrackedWidget, heatmap_read
+from .widget_manager import TrackedWidget, _entity_ids_for_widget, heatmap_read
 from .widget_mapper import map_widget_content, widget_name_from_config
 
 PREVIEW_ACTIVITY_SLUG = "ha-preview"
@@ -248,6 +249,15 @@ async def _todo_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: bool)
     return await data["todo_manager"].async_preview(cfg, cfg.get(CONF_SUBENTRY_ID, ""))
 
 
+def _bound_entity_ids(subentry_type: str, cfg: dict) -> list[str]:
+    """The entities whose changes the managers react to, so the panel knows when to refresh a preview."""
+    if subentry_type == SUBENTRY_TYPE_ENTITY:
+        return list(dict.fromkeys([cfg[CONF_ENTITY_ID], *_companion_entity_ids(cfg)]))
+    if subentry_type == SUBENTRY_TYPE_WIDGET:
+        return _entity_ids_for_widget(cfg)
+    return [cfg[CONF_ENTITY_ID]]
+
+
 _PREVIEWS = {
     SUBENTRY_TYPE_ENTITY: _activity_preview,
     SUBENTRY_TYPE_WIDGET: _widget_preview,
@@ -294,7 +304,13 @@ async def ws_preview(hass: HomeAssistant, connection: websocket_api.ActiveConnec
     payload = await _PREVIEWS[subentry_type](hass, data, cfg, saved) if cfg is not None else None
     connection.send_result(
         msg["id"],
-        {"kind": _KINDS[subentry_type], "payload": payload, "errors": errors or None, "available": payload is not None},
+        {
+            "kind": _KINDS[subentry_type],
+            "payload": payload,
+            "errors": errors or None,
+            "available": payload is not None,
+            "entity_ids": _bound_entity_ids(subentry_type, cfg) if cfg is not None else [],
+        },
     )
 
 

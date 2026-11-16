@@ -20,18 +20,23 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.pushward import panel
 from custom_components.pushward.api import PushWardApiError, PushWardAuthError, PushWardQuotaExceededError
 from custom_components.pushward.const import (
+    CONF_BATTERY_DEVICES,
+    CONF_CHARGING_ENTITY,
     CONF_ENTITY_ID,
     CONF_HISTORY_PERIOD,
     CONF_IMAGE_URL,
     CONF_INTEGRATION_KEY,
+    CONF_LABEL,
     CONF_MAX_VALUE,
     CONF_MIN_VALUE,
     CONF_PRIORITY,
+    CONF_PROGRESS_ENTITY,
     CONF_SERVER_URL,
     CONF_SLUG,
     CONF_SOUND,
     CONF_STAT_ROWS,
     CONF_TEMPLATE,
+    CONF_TILES,
     CONF_TODO_LEVEL,
     CONF_TODO_MAX_SCHEDULED,
     CONF_UPDATE_INTERVAL,
@@ -45,6 +50,7 @@ from custom_components.pushward.const import (
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_TODO,
     SUBENTRY_TYPE_WIDGET,
+    WIDGET_TEMPLATE_BATTERY,
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_TREND,
 )
@@ -231,6 +237,7 @@ async def test_preview_saved_running_activity_is_its_last_pushed_frame(hass: Hom
         "payload": {"name": "Washer", "content": tracked.last_content},
         "errors": None,
         "available": True,
+        "entity_ids": [WASHER],
     }
 
 
@@ -280,7 +287,13 @@ async def test_preview_draft_activity_errors_match_the_details_step(hass: HomeAs
         "pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_ENTITY, data={**core, **details}
     )
 
-    assert reply["result"] == {"kind": "activity", "payload": None, "errors": flow["errors"], "available": False}
+    assert reply["result"] == {
+        "kind": "activity",
+        "payload": None,
+        "errors": flow["errors"],
+        "available": False,
+        "entity_ids": [],
+    }
 
 
 @pytest.mark.parametrize(("field", "value"), [(CONF_UPDATE_INTERVAL, 0), (CONF_PRIORITY, 11), (CONF_SOUND, "bogus")])
@@ -323,7 +336,13 @@ async def test_preview_unavailable_entity(hass: HomeAssistant, loaded, ws) -> No
 
     reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_ENTITY, data=draft)
 
-    assert reply["result"] == {"kind": "activity", "payload": None, "errors": None, "available": False}
+    assert reply["result"] == {
+        "kind": "activity",
+        "payload": None,
+        "errors": None,
+        "available": False,
+        "entity_ids": ["sensor.missing"],
+    }
 
 
 async def test_preview_saved_widget_is_its_last_sent_content(hass: HomeAssistant, loaded, ws) -> None:
@@ -344,7 +363,13 @@ async def test_preview_saved_widget_without_its_entity_is_unavailable(hass: Home
 
     reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=_subentry_id(entry, SUBENTRY_TYPE_WIDGET))
 
-    assert reply["result"] == {"kind": "widget", "payload": None, "errors": None, "available": False}
+    assert reply["result"] == {
+        "kind": "widget",
+        "payload": None,
+        "errors": None,
+        "available": False,
+        "entity_ids": ["sensor.users"],
+    }
 
 
 async def test_preview_draft_widget(hass: HomeAssistant, loaded, ws) -> None:
@@ -470,6 +495,61 @@ async def test_preview_draft_todo_without_due_items_is_a_sample(hass: HomeAssist
     assert payload["title"] == "Sample reminder"
     assert payload["source_display_name"] == "chores"
     assert api.mock_calls == []
+
+
+async def test_preview_names_the_entities_each_subentry_reads(hass: HomeAssistant, ws) -> None:
+    board = make_entity_config(
+        **{
+            CONF_ENTITY_ID: "binary_sensor.home",
+            CONF_SLUG: "ha-board",
+            CONF_TEMPLATE: "board",
+            CONF_PROGRESS_ENTITY: "sensor.progress",
+            CONF_TILES: [
+                {CONF_LABEL: "CPU", CONF_ENTITY_ID: "sensor.cpu"},
+                {CONF_LABEL: "Home", CONF_ENTITY_ID: "binary_sensor.home"},
+            ],
+        }
+    )
+    battery = make_widget_config(
+        **{
+            CONF_SLUG: "ha-batteries",
+            CONF_WIDGET_TEMPLATE: WIDGET_TEMPLATE_BATTERY,
+            CONF_BATTERY_DEVICES: [
+                {"name": "Phone", CONF_ENTITY_ID: "sensor.phone", CONF_CHARGING_ENTITY: "binary_sensor.charging"},
+                {"name": "Watch", CONF_ENTITY_ID: "sensor.watch"},
+            ],
+        }
+    )
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="PushWard",
+        data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: "hlk_bound"},
+        version=2,
+        unique_id="user-bound",
+        subentries_data=[
+            ConfigSubentryData(
+                data=board, subentry_type=SUBENTRY_TYPE_ENTITY, title="Board", unique_id="binary_sensor.home"
+            ),
+            ConfigSubentryData(
+                data=battery, subentry_type=SUBENTRY_TYPE_WIDGET, title="Batteries", unique_id="ha-batteries"
+            ),
+            ConfigSubentryData(
+                data={CONF_ENTITY_ID: EMPTY_LIST},
+                subentry_type=SUBENTRY_TYPE_TODO,
+                title="Chores",
+                unique_id=f"todo:{EMPTY_LIST}",
+            ),
+        ],
+    )
+    await async_setup_with_api(hass, entry, _api())
+
+    async def bound(subentry_type: str) -> list[str]:
+        reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=_subentry_id(entry, subentry_type))
+        return reply["result"]["entity_ids"]
+
+    assert await bound(SUBENTRY_TYPE_ENTITY) == ["binary_sensor.home", "sensor.progress", "sensor.cpu"]
+    assert await bound(SUBENTRY_TYPE_WIDGET) == ["sensor.phone", "binary_sensor.charging", "sensor.watch"]
+    assert await bound(SUBENTRY_TYPE_TODO) == [EMPTY_LIST]
 
 
 @pytest.mark.parametrize(
