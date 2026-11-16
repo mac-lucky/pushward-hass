@@ -146,10 +146,13 @@ from .media_control import async_register_media_control_view
 from .panel import async_register_panel, async_register_static_path, async_remove_panel
 from .quota import QuotaGate
 from .todo_reminders import TodoReminderManager, async_cancel_stored_schedules, todo_configs
-from .websocket import PREVIEW_WIDGET_SLUG, async_register_commands
+from .websocket import PREVIEW_ACTIVITY_SLUG, PREVIEW_WIDGET_SLUG, async_register_commands
 from .widget_manager import WidgetManager, build_widget_store
 
 _LOGGER = logging.getLogger(__name__)
+
+# Seconds async_remove_entry gives each of the panel's test-item cleanups.
+PANEL_CLEANUP_TIMEOUT = 10
 
 PLATFORMS = [Platform.NOTIFY, Platform.SENSOR]
 
@@ -1869,6 +1872,15 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
+async def _panel_cleanup(call: Coroutine[Any, Any, None], what: str) -> None:
+    """One best-effort call removing a panel test item, given up after PANEL_CLEANUP_TIMEOUT."""
+    try:
+        async with asyncio.timeout(PANEL_CLEANUP_TIMEOUT):
+            await call
+    except Exception as err:
+        _LOGGER.debug("Could not remove the panel's test %s: %r", what, err)
+
+
 async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Delete server-side widgets and pending to-do reminders, then the persisted stores.
 
@@ -1878,14 +1890,10 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     managers' async_reload, but no manager is live here (async_unload_entry already ran
     and popped hass.data), so build a throwaway client from entry.data.
     """
-    # The panel's test widget too: it outlives the subentries that previewed it.
     widget_slugs = [
-        PREVIEW_WIDGET_SLUG,
-        *(
-            slug
-            for sub in entry.subentries.values()
-            if sub.subentry_type == SUBENTRY_TYPE_WIDGET and (slug := sub.data.get(CONF_SLUG))
-        ),
+        slug
+        for sub in entry.subentries.values()
+        if sub.subentry_type == SUBENTRY_TYPE_WIDGET and (slug := sub.data.get(CONF_SLUG))
     ]
     api = PushWardApiClient(
         async_get_clientsession(hass),
@@ -1893,7 +1901,14 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
         entry.data[CONF_INTEGRATION_KEY],
     )
     # delete_widget is 404-safe; isolate failures so one bad slug can't strand the rest.
-    await asyncio.gather(*(api.delete_widget(slug) for slug in widget_slugs), return_exceptions=True)
+    # The panel's test items outlive the subentries that previewed them, but most entries
+    # never had any, so their cleanup gets a short cap instead of the full retry loop.
+    await asyncio.gather(
+        _panel_cleanup(api.delete_widget(PREVIEW_WIDGET_SLUG), "widget"),
+        _panel_cleanup(api.update_activity(PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ENDED, {}), "activity"),
+        *(api.delete_widget(slug) for slug in widget_slugs),
+        return_exceptions=True,
+    )
     await async_cancel_stored_schedules(hass, api, entry.entry_id)
     await build_history_store(hass, entry.entry_id).async_remove()
     await build_widget_store(hass, entry.entry_id).async_remove()

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import time
 from datetime import UTC, datetime
@@ -2873,6 +2874,32 @@ async def test_async_remove_entry_deletes_server_widgets(hass: HomeAssistant) ->
         await async_remove_entry(hass, entry)
 
     assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-one", "ha-two", "ha-preview-widget"}
+    # The panel's test activity is ended too.
+    api.update_activity.assert_awaited_once_with("ha-preview", "ended", {})
+
+
+async def test_async_remove_entry_caps_the_panel_cleanup_on_an_unreachable_server(hass: HomeAssistant) -> None:
+    """The panel's test items cannot hold up removing an entry past their short cap."""
+    api = _mock_api()
+    never = asyncio.Event()
+
+    async def unreachable(*_args, **_kwargs) -> None:
+        await never.wait()
+
+    api.delete_widget.side_effect = unreachable
+    api.update_activity.side_effect = unreachable
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+
+    with (
+        patch("custom_components.pushward.PushWardApiClient", return_value=api),
+        patch("custom_components.pushward.PANEL_CLEANUP_TIMEOUT", 0.05),
+    ):
+        async with asyncio.timeout(5):
+            await async_remove_entry(hass, entry)
+
+    api.delete_widget.assert_awaited_once_with("ha-preview-widget")
+    api.update_activity.assert_awaited_once_with("ha-preview", "ended", {})
 
 
 async def test_action_objects_satisfy_server_contract(hass: HomeAssistant) -> None:
