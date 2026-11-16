@@ -424,6 +424,88 @@ async def test_stop_during_end_window_sends_ended(hass: HomeAssistant) -> None:
     assert wire_states == ["ongoing", "ended"]
 
 
+def _slow_create(api: AsyncMock) -> asyncio.Event:
+    """Hold every create_activity call until the returned gate is set."""
+    gate = asyncio.Event()
+
+    async def _on_the_wire(*_args, **_kwargs) -> None:
+        await gate.wait()
+
+    api.create_activity.side_effect = _on_the_wire
+    return gate
+
+
+async def test_state_changes_during_a_slow_start_start_it_once(hass: HomeAssistant) -> None:
+    """Changes landing while a start is on the wire join it instead of racing parallel creates."""
+    api = _mock_api()
+    gate = _slow_create(api)
+    manager = ActivityManager(hass, api, [_entity_config(**{CONF_PROGRESS_ATTRIBUTE: "progress"})], _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    for progress in range(5):
+        hass.states.async_set("binary_sensor.washer", "on", {"progress": progress})
+        await _pump()
+    gate.set()
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_awaited_once()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    # The newest state still goes out after the start, through the throttle.
+    assert tracked.flush_unsub is not None
+    await manager.async_stop()
+
+
+async def test_stop_cancels_an_in_flight_start(hass: HomeAssistant) -> None:
+    """A start still on the wire at stop never lands a card that nothing would end."""
+    api = _mock_api()
+    gate = _slow_create(api)
+    manager = ActivityManager(hass, api, [_entity_config()], _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+    hass.states.async_set("binary_sensor.washer", "on")
+    await _pump()
+    start_task = manager._tracked["binary_sensor.washer"].start_task
+    assert start_task is not None and not start_task.done()
+
+    await manager.async_stop()
+    gate.set()
+    await hass.async_block_till_done()
+
+    assert start_task.cancelled()
+    api.create_activity.assert_awaited_once()
+    api.update_activity.assert_not_awaited()
+
+
+async def test_refused_start_waits_out_the_retry_pause(hass: HomeAssistant) -> None:
+    """A refused start is not retried on every state change, only once the pause has passed."""
+    api = _mock_api()
+    api.create_activity.side_effect = [PushWardApiError("limit", status_code=409), None]
+    config = _entity_config(**{CONF_PROGRESS_ATTRIBUTE: "progress"})
+    manager = ActivityManager(hass, api, [config], _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "off")
+    await manager.async_start()
+
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 1})
+    await hass.async_block_till_done()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert not tracked.is_active
+    assert tracked.start_retry_at - time.monotonic() == pytest.approx(30, abs=2)
+
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 2})
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
+
+    tracked.start_retry_at = time.monotonic() - 1  # the pause has passed
+    hass.states.async_set("binary_sensor.washer", "on", {"progress": 3})
+    await hass.async_block_till_done()
+    assert api.create_activity.await_count == 2
+    assert tracked.is_active
+    assert tracked.start_retry_at == 0.0
+    await manager.async_stop()
+
+
 async def test_update_404_recreates_activity(hass: HomeAssistant) -> None:
     """A PATCH that 404s (activity gone server-side) self-heals via a recreate POST."""
     api = _mock_api()

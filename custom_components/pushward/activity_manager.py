@@ -97,6 +97,8 @@ _HISTORY_BUFFER_MAX = 300
 _HISTORY_STORAGE_VERSION = 1
 _HISTORY_SAVE_DELAY_S = 30
 _HISTORY_SAMPLES_KEY = "samples"
+# Floor for the pause after a refused or failed start; the update interval wins when longer.
+_START_RETRY_MIN_S = 30
 # Persisted log ring buffers live in the same Store as timeline history so log
 # templates survive restarts (the server backlog is the durable source of truth,
 # but this avoids a visible gap before the first post-restart push).
@@ -244,6 +246,10 @@ class TrackedEntity:
     calendar_unsub: Callable | None = None
     flush_unsub: Callable | None = None
     end_task: asyncio.Task | None = field(default=None, repr=False)
+    # At most one start runs per entity; after a refused or failed one, no new
+    # attempt before start_retry_at (time.monotonic()).
+    start_task: asyncio.Task | None = field(default=None, repr=False)
+    start_retry_at: float = 0.0
     # At most one _send_update task runs per entity; changes landing while one
     # is in flight set update_pending so the newest state is re-sent afterwards.
     pending_task: asyncio.Task | None = field(default=None, repr=False)
@@ -412,8 +418,8 @@ class ActivityManager:
             if is_calendar_config(entity_cfg):
                 self._arm_calendar_timer(entity_id, tracked)
             # Resume if entity is currently in a start state (HA restart)
-            if self._should_run(tracked, current):
-                await self._start_activity(entity_id)
+            if self._should_run(tracked, current) and (task := self._spawn_start(entity_id)):
+                await asyncio.wait([task])
 
         # Prune buffers persisted for entities whose subentry was removed;
         # otherwise they linger in .storage until an unrelated debounced save.
@@ -500,7 +506,7 @@ class ActivityManager:
         # owns the state), so the ENDED push below still goes out.
         cancelled: list[asyncio.Task] = []
         for tracked in self._tracked.values():
-            for task in (tracked.end_task, tracked.pending_task):
+            for task in (tracked.start_task, tracked.end_task, tracked.pending_task):
                 if task and not task.done():
                     task.cancel()
                     cancelled.append(task)
@@ -578,7 +584,9 @@ class ActivityManager:
                     self._schedule_throttled_update(entity_id)
                 continue
             if self._should_run(tracked, self._hass.states.get(entity_id)):
-                self._hass.async_create_task(self._start_activity(entity_id))
+                # The quota is what refused it, and that just came back.
+                tracked.start_retry_at = 0.0
+                self._spawn_start(entity_id)
 
     async def async_reload(self, new_entities: list[dict]) -> None:
         """Reload with new entity configuration."""
@@ -626,7 +634,7 @@ class ActivityManager:
             and conditions_hold
             and (not tracked.is_active or self._is_ending(tracked))
         ):
-            self._hass.async_create_task(self._start_activity(entity_id))
+            self._spawn_start(entity_id)
         elif tracked.is_active and (new_state.state in end_states or not conditions_hold):
             self._schedule_end(entity_id)
         elif tracked.is_active:
@@ -648,7 +656,7 @@ class ActivityManager:
         elif (not tracked.is_active or self._is_ending(tracked)) and self._in_start(
             tracked, self._hass.states.get(entity_id)
         ):
-            self._hass.async_create_task(self._start_activity(entity_id))
+            self._spawn_start(entity_id)
 
     def _conditions_hold(self, config: dict) -> bool:
         """Every run_while row's entity is in one of its states; unavailable/unknown never match."""
@@ -683,7 +691,7 @@ class ActivityManager:
         self._arm_calendar_timer(entity_id, tracked)
         should_run = self._should_run(tracked, self._hass.states.get(entity_id))
         if should_run and (not tracked.is_active or self._is_ending(tracked)):
-            self._hass.async_create_task(self._start_activity(entity_id))
+            self._spawn_start(entity_id)
         elif tracked.is_active and not should_run:
             self._schedule_end(entity_id)
         elif tracked.is_active:
@@ -740,7 +748,7 @@ class ActivityManager:
             # changed, provided the anchor is still in a start state. Logs never
             # defer — a log always has >=1 line from the tracked state.
             if is_board and self._should_run(tracked, self._hass.states.get(entity_id)):
-                self._hass.async_create_task(self._start_activity(entity_id))
+                self._spawn_start(entity_id)
             return
 
         unavailable = new_state is None or new_state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN)
@@ -834,6 +842,22 @@ class ActivityManager:
         if value is not None:
             tracked.progress_max = max(tracked.progress_max or 0.0, value)
 
+    @callback
+    def _spawn_start(self, entity_id: str) -> asyncio.Task | None:
+        """Run _start_activity as the entity's single in-flight start, or None when it may not start now.
+
+        A start already running gets the newest state sent once it lands; a start
+        refused or failed recently is not retried before start_retry_at.
+        """
+        tracked = self._tracked[entity_id]
+        if tracked.start_task is not None and not tracked.start_task.done():
+            tracked.update_pending = True
+            return None
+        if time.monotonic() < tracked.start_retry_at:
+            return None
+        tracked.start_task = self._hass.async_create_task(self._start_activity(entity_id))
+        return tracked.start_task
+
     async def _start_activity(self, entity_id: str) -> None:
         """Create and start a PushWard Live Activity."""
         tracked = self._tracked[entity_id]
@@ -884,6 +908,9 @@ class ActivityManager:
                 content.get("icon"),
             )
 
+            # Armed until the start lands, so a refused or failed one pauses the next attempts.
+            interval = config.get(CONF_UPDATE_INTERVAL, 5)
+            tracked.start_retry_at = time.monotonic() + max(interval, _START_RETRY_MIN_S)
             await self._create_activity(entity_id, config)
 
             # Seed timeline back-history from HA recorder if configured
@@ -907,6 +934,7 @@ class ActivityManager:
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
             tracked.recreate_attempted = False
+            tracked.start_retry_at = 0.0
 
             # A run_while row, calendar window or end state reached while this start was
             # on the wire found nothing active to end. State-driven entities keep ending
@@ -919,6 +947,10 @@ class ActivityManager:
                 still_wanted = self._conditions_hold(config) and not ended
             if not still_wanted:
                 self._schedule_end(entity_id)
+            elif tracked.update_pending:
+                # Changes that landed while this start was on the wire.
+                tracked.update_pending = False
+                self._schedule_throttled_update(entity_id)
 
     def _activity_name(self, entity_id: str, config: dict) -> str:
         """Resolve activity name: configured name > friendly name > entity_id."""
