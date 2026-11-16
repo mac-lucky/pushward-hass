@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Papan mendukung maksimal 4 tile.",
         "invalid_series_entity": "Setiap entitas seri harus merujuk ke entity_id (mis. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Setiap kolom memerlukan sumber: atribut, entity_id, atau entity_id:attribute.",
-        "too_many_log_columns": "Satu baris log mendukung maksimal 6 kolom.",
+        "too_many_log_columns": "Maksimal 6 kolom diperbolehkan.",
         "invalid_threshold": "Setiap ambang harus diawali angka (mis. 25:red:Hot).",
         "too_many_thresholds": "Satu timeline mendukung maksimal 5 ambang.",
         "invalid_number": "Masukkan angka yang valid.",

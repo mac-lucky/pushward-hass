@@ -2422,7 +2422,7 @@
         "too_many_tiles": "看板最多支持 4 个磁贴。",
         "invalid_series_entity": "每个系列实体必须引用一个 entity_id（例如 Bedroom=sensor.bedroom_pm25）。",
         "invalid_log_column": "每一列都需要一个来源：属性、entity_id 或 entity_id:attribute。",
-        "too_many_log_columns": "一条日志行最多支持 6 列。",
+        "too_many_log_columns": "最多允许 6 列。",
         "invalid_threshold": "每个阈值必须以数字开头（例如 25:red:Hot）。",
         "too_many_thresholds": "时间线最多支持 5 个阈值。",
         "invalid_number": "请输入有效的数字。",

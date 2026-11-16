@@ -1580,7 +1580,7 @@ def _coerce_epoch(raw: object) -> int | None:
 
 
 def _coerce_remaining_seconds(
-    raw: object, source: State | None, now: int | None = None
+    raw: object, source: State | None, now: int | None = None, *, from_state: bool = True
 ) -> tuple[int | None, int | None]:
     """Coerce a raw value into ``(remaining_seconds, absolute_end_epoch)``.
 
@@ -1590,7 +1590,9 @@ def _coerce_remaining_seconds(
       - 'H:MM:SS' / 'MM:SS' string -> seconds
       - plain number -> seconds
     ``absolute_end_epoch`` is non-None only for a timestamp source. ``now`` lets
-    the caller share a single clock read across the emitted fields.
+    the caller share a single clock read across the emitted fields. ``from_state``
+    is False when ``raw`` is an attribute: the unit describes the state, so an
+    attribute converts only under the 'duration' device class, as it always has.
     """
     device_class = source.attributes.get("device_class") if source is not None else None
 
@@ -1619,9 +1621,9 @@ def _coerce_remaining_seconds(
         return None, None
 
     unit = source.attributes.get("unit_of_measurement") if source is not None else None
-    # A time unit converts whatever the device_class (a 'min' sensor often has none);
-    # no unit or any other unit leaves the raw number as seconds.
-    if isinstance(unit, str) and unit in DurationConverter.VALID_UNITS:
+    # A time unit on the state converts whatever the device_class (a 'min' sensor often
+    # has none); no unit or any other unit leaves the raw number as seconds.
+    if isinstance(unit, str) and unit in DurationConverter.VALID_UNITS and (from_state or device_class == "duration"):
         value = DurationConverter.convert(value, unit, UnitOfTime.SECONDS)
     # An overrun estimate can report negative seconds; the server rejects those
     # (remaining_time must be non-negative) and the activity would freeze.
@@ -1697,7 +1699,7 @@ def _get_remaining_seconds(
     raw, source = _resolve_raw(state, entity_config, CONF_REMAINING_TIME_ENTITY, CONF_REMAINING_TIME_ATTR, hass)
     if raw is _NO_VALUE:
         return None, None
-    return _coerce_remaining_seconds(raw, source, now)
+    return _coerce_remaining_seconds(raw, source, now, from_state=not entity_config.get(CONF_REMAINING_TIME_ATTR))
 
 
 def _coerce_scaled_value(raw: object, attr_name: str | None) -> float | None:

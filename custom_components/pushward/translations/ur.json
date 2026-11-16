@@ -2422,7 +2422,7 @@
         "too_many_tiles": "ایک بورڈ زیادہ سے زیادہ 4 ٹائلز کی حمایت کرتا ہے۔",
         "invalid_series_entity": "ہر سیریز انٹیٹی کو کسی entity_id کا حوالہ دینا چاہیے (مثلاً Bedroom=sensor.bedroom_pm25)۔",
         "invalid_log_column": "ہر کالم کو ایک ماخذ درکار ہے: ایک ایٹریبیوٹ، entity_id، یا entity_id:attribute۔",
-        "too_many_log_columns": "ایک لاگ لائن زیادہ سے زیادہ 6 کالمز کی حمایت کرتی ہے۔",
+        "too_many_log_columns": "زیادہ سے زیادہ 6 کالمز کی اجازت ہے۔",
         "invalid_threshold": "ہر تھریش ہولڈ نمبر سے شروع ہونا چاہیے (مثلاً 25:red:Hot)۔",
         "too_many_thresholds": "ایک ٹائم لائن زیادہ سے زیادہ 5 تھریش ہولڈز کی حمایت کرتی ہے۔",
         "invalid_number": "ایک درست نمبر درج کریں۔",

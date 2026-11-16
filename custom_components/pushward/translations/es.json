@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Un panel admite como máximo 4 mosaicos.",
         "invalid_series_entity": "Cada entidad de serie debe referenciar un entity_id (p. ej. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Cada columna necesita una fuente: un atributo, entity_id o entity_id:attribute.",
-        "too_many_log_columns": "Una línea de registro admite como máximo 6 columnas.",
+        "too_many_log_columns": "Se permiten como máximo 6 columnas.",
         "invalid_threshold": "Cada umbral debe empezar con un número (p. ej. 25:red:Hot).",
         "too_many_thresholds": "Una línea de tiempo admite como máximo 5 umbrales.",
         "invalid_number": "Introduce un número válido.",

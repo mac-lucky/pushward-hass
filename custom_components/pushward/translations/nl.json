@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Een board ondersteunt maximaal 4 tegels.",
         "invalid_series_entity": "Elke reeks-entiteit moet naar een entity_id verwijzen (bijv. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Elke kolom heeft een bron nodig: een attribuut, entity_id of entity_id:attribute.",
-        "too_many_log_columns": "Een logregel ondersteunt maximaal 6 kolommen.",
+        "too_many_log_columns": "Maximaal 6 kolommen toegestaan.",
         "invalid_threshold": "Elke drempel moet met een getal beginnen (bijv. 25:red:Hot).",
         "too_many_thresholds": "Een tijdlijn ondersteunt maximaal 5 drempels.",
         "invalid_number": "Voer een geldig getal in.",

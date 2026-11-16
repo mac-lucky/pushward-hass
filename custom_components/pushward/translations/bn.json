@@ -2422,7 +2422,7 @@
         "too_many_tiles": "একটি বোর্ড সর্বাধিক 4টি টাইল সমর্থন করে।",
         "invalid_series_entity": "প্রতিটি সিরিজ এন্টিটি একটি entity_id নির্দেশ করতে হবে (যেমন Bedroom=sensor.bedroom_pm25)।",
         "invalid_log_column": "প্রতিটি কলামের একটি উৎস প্রয়োজন: একটি অ্যাট্রিবিউট, entity_id, বা entity_id:attribute।",
-        "too_many_log_columns": "একটি লগ লাইন সর্বাধিক 6টি কলাম সমর্থন করে।",
+        "too_many_log_columns": "সর্বাধিক 6টি কলাম অনুমোদিত।",
         "invalid_threshold": "প্রতিটি থ্রেশহোল্ড একটি সংখ্যা দিয়ে শুরু হতে হবে (যেমন 25:red:Hot)।",
         "too_many_thresholds": "একটি টাইমলাইন সর্বাধিক 5টি থ্রেশহোল্ড সমর্থন করে।",
         "invalid_number": "একটি বৈধ সংখ্যা লিখুন।",

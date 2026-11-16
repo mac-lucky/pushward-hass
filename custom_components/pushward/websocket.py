@@ -224,13 +224,14 @@ async def _activity_preview(hass: HomeAssistant, data: dict, cfg: dict, saved: b
     # A running activity's last frame has what a fresh map lacks: log lines, artwork, thumbhash.
     content = tracked.last_content if tracked is not None else None
     if content is None:
-        # A saved subentry fills its remaining-mode progress from the running activity's farthest point.
+        # Remaining-mode progress fills from the running activity's farthest point; an ended
+        # run's maximum is stale, the next start measures from its own.
         content = map_content(
             state,
             cfg,
             registry_icon=lookup_registry_icon(hass, entity_id),
             hass=hass,
-            progress_max=tracked.progress_max if tracked is not None else None,
+            progress_max=tracked.progress_max if tracked is not None and tracked.is_active else None,
         )
     return {"name": manager._activity_name(entity_id, cfg), "content": content}
 

@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Tablica obsługuje maksymalnie 4 kafelki.",
         "invalid_series_entity": "Każda encja serii musi wskazywać entity_id (np. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Każda kolumna wymaga źródła: atrybutu, entity_id lub entity_id:attribute.",
-        "too_many_log_columns": "Wiersz dziennika obsługuje maksymalnie 6 kolumn.",
+        "too_many_log_columns": "Dozwolonych jest maksymalnie 6 kolumn.",
         "invalid_threshold": "Każdy próg musi zaczynać się od liczby (np. 25:red:Hot).",
         "too_many_thresholds": "Oś czasu obsługuje maksymalnie 5 progów.",
         "invalid_number": "Wprowadź prawidłową liczbę.",

@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Un tableau prend en charge au maximum 4 tuiles.",
         "invalid_series_entity": "Chaque entité de série doit référencer un entity_id (ex. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Chaque colonne a besoin d'une source : un attribut, un entity_id ou entity_id:attribute.",
-        "too_many_log_columns": "Une ligne de journal prend en charge au maximum 6 colonnes.",
+        "too_many_log_columns": "6 colonnes au maximum sont autorisées.",
         "invalid_threshold": "Chaque seuil doit commencer par un nombre (ex. 25:red:Hot).",
         "too_many_thresholds": "Une timeline prend en charge au maximum 5 seuils.",
         "invalid_number": "Saisissez un nombre valide.",

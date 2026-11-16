@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Um painel suporta no máximo 4 blocos.",
         "invalid_series_entity": "Cada entidade de série deve referenciar um entity_id (ex.: Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Cada coluna precisa de uma fonte: um atributo, entity_id ou entity_id:attribute.",
-        "too_many_log_columns": "Uma linha de log suporta no máximo 6 colunas.",
+        "too_many_log_columns": "São permitidas no máximo 6 colunas.",
         "invalid_threshold": "Cada limite deve começar com um número (ex.: 25:red:Hot).",
         "too_many_thresholds": "Uma linha do tempo suporta no máximo 5 limites.",
         "invalid_number": "Insira um número válido.",

@@ -2422,7 +2422,7 @@
         "too_many_tiles": "बोर्ड जास्तीत जास्त 4 टाइल्सना समर्थन देतो.",
         "invalid_series_entity": "प्रत्येक सीरीज एंटिटीने entity_id चा संदर्भ द्यावा (उदा. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "प्रत्येक स्तंभाला स्रोत आवश्यक आहे: एक अ‍ॅट्रिब्यूट, entity_id, किंवा entity_id:attribute.",
-        "too_many_log_columns": "एक लॉग ओळ जास्तीत जास्त 6 स्तंभांना समर्थन देते.",
+        "too_many_log_columns": "जास्तीत जास्त 6 स्तंभांना परवानगी आहे.",
         "invalid_threshold": "प्रत्येक थ्रेशोल्ड संख्येने सुरू व्हावा (उदा. 25:red:Hot).",
         "too_many_thresholds": "एक टाइमलाइन जास्तीत जास्त 5 थ्रेशोल्डना समर्थन देते.",
         "invalid_number": "वैध संख्या प्रविष्ट करा.",

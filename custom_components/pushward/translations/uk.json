@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Дошка підтримує щонайбільше 4 плитки.",
         "invalid_series_entity": "Кожна сутність ряду має посилатися на entity_id (напр. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Кожен стовпець потребує джерела: атрибут, entity_id або entity_id:attribute.",
-        "too_many_log_columns": "Рядок журналу підтримує щонайбільше 6 стовпців.",
+        "too_many_log_columns": "Допускається щонайбільше 6 стовпців.",
         "invalid_threshold": "Кожен поріг має починатися з числа (напр. 25:red:Hot).",
         "too_many_thresholds": "Часова шкала підтримує щонайбільше 5 порогів.",
         "invalid_number": "Введіть коректне число.",

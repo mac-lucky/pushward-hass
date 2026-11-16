@@ -2422,7 +2422,7 @@
         "too_many_tiles": "A board supports at most 4 tiles.",
         "invalid_series_entity": "Each series entity must reference an entity_id (e.g. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Each column needs a source: an attribute, entity_id, or entity_id:attribute.",
-        "too_many_log_columns": "A log line supports at most 6 columns.",
+        "too_many_log_columns": "At most 6 columns are allowed.",
         "invalid_threshold": "Each threshold must start with a number (e.g. 25:red:Hot).",
         "too_many_thresholds": "A timeline supports at most 5 thresholds.",
         "invalid_number": "Enter a valid number.",

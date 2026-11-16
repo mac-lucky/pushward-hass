@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Bir pano en fazla 4 kutu destekler.",
         "invalid_series_entity": "Her seri varlığı bir entity_id belirtmelidir (örn. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Her sütun bir kaynak gerektirir: bir öznitelik, entity_id veya entity_id:attribute.",
-        "too_many_log_columns": "Bir günlük satırı en fazla 6 sütun destekler.",
+        "too_many_log_columns": "En fazla 6 sütuna izin verilir.",
         "invalid_threshold": "Her eşik bir sayıyla başlamalıdır (örn. 25:red:Hot).",
         "too_many_thresholds": "Bir zaman çizelgesi en fazla 5 eşik destekler.",
         "invalid_number": "Geçerli bir sayı girin.",

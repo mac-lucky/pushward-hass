@@ -260,7 +260,7 @@ By default every value (remaining time, progress, subtitle, state text, gauge va
 - **Source entity set, attribute empty** -> read that entity's **state**.
 - **Source entity set, attribute set** -> read that **attribute** of the source entity.
 
-**Smart time parsing**: the remaining-time source accepts a `timestamp`/finish-time sensor (anchors the end date directly, no drift), a number with a time unit (`s`/`min`/`h`/`d`, with or without the `duration` device class), an `H:MM:SS`/`MM:SS` string, or a plain number of seconds.
+**Smart time parsing**: the remaining-time source accepts a `timestamp`/finish-time sensor (anchors the end date directly, no drift), a numeric state with a time unit (`s`/`min`/`h`/`d`, with or without the `duration` device class), an `H:MM:SS`/`MM:SS` string, or a plain number of seconds.
 
 <details>
 <summary><b>Computed text, progress, color and icon</b></summary>

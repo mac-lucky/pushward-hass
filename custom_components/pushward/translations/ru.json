@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Доска поддерживает не более 4 плиток.",
         "invalid_series_entity": "Каждая сущность ряда должна ссылаться на entity_id (напр. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Каждому столбцу нужен источник: атрибут, entity_id или entity_id:attribute.",
-        "too_many_log_columns": "Строка журнала поддерживает не более 6 столбцов.",
+        "too_many_log_columns": "Допускается не более 6 столбцов.",
         "invalid_threshold": "Каждый порог должен начинаться с числа (напр. 25:red:Hot).",
         "too_many_thresholds": "Временная шкала поддерживает не более 5 порогов.",
         "invalid_number": "Введите допустимое число.",

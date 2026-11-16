@@ -2422,7 +2422,7 @@
         "too_many_tiles": "O tablă acceptă cel mult 4 dale.",
         "invalid_series_entity": "Fiecare entitate de serie trebuie să indice un entity_id (ex. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Fiecare coloană are nevoie de o sursă: un atribut, entity_id sau entity_id:attribute.",
-        "too_many_log_columns": "O linie de jurnal acceptă cel mult 6 coloane.",
+        "too_many_log_columns": "Sunt permise cel mult 6 coloane.",
         "invalid_threshold": "Fiecare prag trebuie să înceapă cu un număr (ex. 25:red:Hot).",
         "too_many_thresholds": "O cronologie acceptă cel mult 5 praguri.",
         "invalid_number": "Introduceți un număr valid.",

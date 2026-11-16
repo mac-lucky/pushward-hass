@@ -145,6 +145,17 @@ def _companion_entity_ids(config: dict) -> list[str]:
     return list(dict.fromkeys(ids))
 
 
+def _fallback_companion_ids(config: dict) -> set[str]:
+    """Companions whose loss still changes the card.
+
+    The state text falls back to the state label, the icon map to the next icon
+    source, and a subtitle column drops out of the composed subtitle.
+    """
+    ids = {config.get(CONF_STATE_TEXT_ENTITY), config.get(CONF_ICON_MAP_ENTITY)}
+    ids.update(c.get(CONF_ENTITY_ID) for c in config.get(CONF_SUBTITLE_COLUMNS) or [] if isinstance(c, dict))
+    return {eid for eid in ids if eid}
+
+
 def _is_start(state: str, config: dict) -> bool:
     """Whether ``state`` starts the activity: a listed start state, or any non-end state for '*'.
 
@@ -732,8 +743,13 @@ class ActivityManager:
         # ignore it. A board tile or a log column going unavailable IS a meaningful
         # change (the tile drops from the grid / the column drops from the composed
         # line), so still refresh and let _build_board_tiles / _build_log_line
-        # re-render without it.
-        if unavailable and not is_board and not is_log:
+        # re-render without it. So is a state text, icon map or subtitle column source.
+        if (
+            unavailable
+            and not is_board
+            and not is_log
+            and event.data.get("entity_id") not in _fallback_companion_ids(tracked.config)
+        ):
             return
 
         if is_log:

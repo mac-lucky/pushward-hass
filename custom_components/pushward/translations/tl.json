@@ -2422,7 +2422,7 @@
         "too_many_tiles": "Ang isang board ay sumusuporta ng hanggang 4 na tile.",
         "invalid_series_entity": "Ang bawat series entity ay dapat tumukoy sa isang entity_id (hal. Bedroom=sensor.bedroom_pm25).",
         "invalid_log_column": "Kailangan ng bawat column ng pinagmulan: isang attribute, entity_id, o entity_id:attribute.",
-        "too_many_log_columns": "Ang isang log line ay sumusuporta ng hanggang 6 na column.",
+        "too_many_log_columns": "Hanggang 6 na column lang ang pinapayagan.",
         "invalid_threshold": "Ang bawat threshold ay dapat magsimula sa numero (hal. 25:red:Hot).",
         "too_many_thresholds": "Ang isang timeline ay sumusuporta ng hanggang 5 threshold.",
         "invalid_number": "Maglagay ng wastong numero.",

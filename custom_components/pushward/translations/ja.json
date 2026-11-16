@@ -2422,7 +2422,7 @@
         "too_many_tiles": "ボードは最大4つのタイルまで対応しています。",
         "invalid_series_entity": "各シリーズのエンティティは entity_id を参照する必要があります（例: Bedroom=sensor.bedroom_pm25）。",
         "invalid_log_column": "各列にはソースが必要です: 属性、entity_id、または entity_id:attribute。",
-        "too_many_log_columns": "ログ行は最大6列まで対応しています。",
+        "too_many_log_columns": "列は最大6列までです。",
         "invalid_threshold": "各しきい値は数値で始める必要があります（例: 25:red:Hot）。",
         "too_many_thresholds": "タイムラインは最大5つのしきい値まで対応しています。",
         "invalid_number": "有効な数値を入力してください。",

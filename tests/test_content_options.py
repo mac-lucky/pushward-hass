@@ -35,6 +35,7 @@ from custom_components.pushward.const import (
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
     CONF_PROGRESS_MODE,
+    CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_SLUG,
     CONF_START_STATES,
@@ -144,6 +145,22 @@ async def test_travel_time_in_minutes_without_device_class(hass: HomeAssistant) 
     state = make_mock_state("not_home", {}, PHONE)
     content = map_content(state, make_entity_config(**{CONF_REMAINING_TIME_ENTITY: ETA}), hass=hass)
     assert content["remaining_time"] == 900
+
+
+async def test_remaining_time_attribute_ignores_the_state_unit(hass: HomeAssistant) -> None:
+    hass.states.async_set("sensor.job", "2", {"unit_of_measurement": "h", "seconds_left": 120})
+    washer = make_mock_state("on", {"left": 30, "unit_of_measurement": "min"}, "sensor.washer")
+
+    def remaining(**cfg) -> int:
+        return map_content(washer, make_entity_config(**cfg), hass=hass)["remaining_time"]
+
+    job = {CONF_REMAINING_TIME_ENTITY: "sensor.job", CONF_REMAINING_TIME_ATTR: "seconds_left"}
+    assert remaining(**job) == 120
+    assert remaining(**{CONF_REMAINING_TIME_ATTR: "left"}) == 30
+    # Under the duration device class an attribute converts, as it did before.
+    duration = {"unit_of_measurement": "h", "device_class": "duration", "seconds_left": 2}
+    hass.states.async_set("sensor.job", "2", duration)
+    assert remaining(**job) == 7200
 
 
 # --- state text ---
@@ -391,6 +408,8 @@ def test_log_lines_render_exactly_as_before() -> None:
 
 
 def test_content_companions_are_tracked() -> None:
+    sources = {CONF_STATE_TEXT_ENTITY: "sensor.text", CONF_ICON_MAP_ENTITY: "sensor.icon"}
+    assert _companion_entity_ids(make_entity_config(**sources)) == ["sensor.text", "sensor.icon"]
     assert _companion_entity_ids(_trip()) == [ETA, DIST, DIR]
     log = _trip(**{CONF_TEMPLATE: "log", CONF_LOG_COLUMNS: [{CONF_ENTITY_ID: "sensor.door"}]})
     assert _companion_entity_ids(log) == [ETA, DIST, DIR, "sensor.door"]
@@ -443,6 +462,46 @@ async def test_trip_through_the_manager(hass: HomeAssistant) -> None:
         assert manager._tracked[PHONE].progress_max == 300
         assert activity_updates(api, "ongoing")[-1]["progress"] == 0.0
         await manager.async_stop()
+
+
+async def test_content_sources_refresh_the_card_and_fall_back_when_lost(hass: HomeAssistant) -> None:
+    api = make_activity_api()
+    hass.states.async_set("sensor.text", "Driving")
+    hass.states.async_set(DIR, "AwayFrom")
+    hass.states.async_set(ETA, "15", {"unit_of_measurement": "min"})
+    hass.states.async_set(PHONE, "home")
+    cfg = make_entity_config(
+        **{
+            CONF_ENTITY_ID: PHONE,
+            CONF_START_STATES: ["*"],
+            CONF_END_STATES: ["home"],
+            CONF_UPDATE_INTERVAL: 0,
+            CONF_ICON: "mdi:map-marker",
+            CONF_STATE_LABELS: {"not_home": "Away"},
+            CONF_STATE_TEXT_ENTITY: "sensor.text",
+            CONF_ICON_MAP: ICONS,
+            CONF_ICON_MAP_ENTITY: DIR,
+            CONF_SUBTITLE_COLUMNS: [{CONF_LABEL: "ETA", CONF_ENTITY_ID: ETA, CONF_UNIT: "min"}, {"attribute": "zone"}],
+        }
+    )
+    manager = ActivityManager(hass, api, [cfg], make_mock_entry())
+    await manager.async_start()
+
+    async def card(entity_id: str, value: str) -> dict:
+        hass.states.async_set(entity_id, value)
+        await hass.async_block_till_done()
+        latest = activity_updates(api, "ongoing")[-1]
+        return {key: latest[key] for key in ("state", "icon", "subtitle")}
+
+    first = await card(PHONE, "not_home")
+    assert first == {"state": "Driving", "icon": "mdi:map-marker-distance", "subtitle": "ETA: 15min"}
+    # Each source alone refreshes the card, and losing it falls back.
+    assert (await card(DIR, "Towards"))["icon"] == "mdi:home-import-outline"
+    assert (await card("sensor.text", "unavailable"))["state"] == "Away"
+    assert (await card(DIR, "unavailable"))["icon"] == "mdi:map-marker"
+    hass.states.async_set(PHONE, "not_home", {"zone": "Work"})
+    assert (await card(ETA, "unknown"))["subtitle"] == "Work"
+    await manager.async_stop()
 
 
 # --- config flow ---

@@ -603,21 +603,22 @@ async def test_preview_draft_shows_the_content_options(hass: HomeAssistant, load
                 CONF_ICON_MAP: [{"state": "on", CONF_ICON: "mdi:washing-machine"}],
                 CONF_ICON_MAP_ENTITY: WASHER,
                 CONF_SUBTITLE_COLUMNS: [
-                    {CONF_LABEL: "Users", CONF_ENTITY_ID: "sensor.users"},
-                    {CONF_ENTITY_ID: WASHER},
+                    {CONF_LABEL: "Mode", CONF_ENTITY_ID: "sensor.mode"},
+                    {"attribute": "friendly_name"},
                 ],
                 CONF_ACCENT_FROM_PROGRESS: True,
             },
         ),
     }
+    hass.states.async_set("sensor.mode", "Eco")
 
     reply = await ws("pushward/preview", entry_id=entry.entry_id, subentry_type=SUBENTRY_TYPE_ENTITY, data=draft)
 
     result = reply["result"]
     content = result["payload"]["content"]
     assert (content["state"], content["icon"]) == ("42 users", "mdi:washing-machine")
-    assert (content["subtitle"], content["accent_color"]) == ("Users: 42 · on", "#FF0000")
-    assert result["entity_ids"] == ["sensor.temp", "sensor.users", WASHER]
+    assert (content["subtitle"], content["accent_color"]) == ("Mode: Eco · Temperature", "#FF0000")
+    assert result["entity_ids"] == ["sensor.temp", "sensor.users", WASHER, "sensor.mode"]
     assert api.mock_calls == []
 
 
@@ -645,11 +646,24 @@ async def test_preview_remaining_progress_uses_the_saved_runs_farthest_point(has
     await async_setup_with_api(hass, entry, _api())
     tracked = _loaded_data(hass, entry)["manager"]._tracked["sensor.trip"]
     assert tracked.progress_max == 500
-    tracked.last_content, tracked.progress_max = None, 1000.0
     subentry_id = _subentry_id(entry, SUBENTRY_TYPE_ENTITY)
 
-    saved = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id)
-    assert saved["result"]["payload"]["content"]["progress"] == 0.5
+    async def saved_progress() -> float:
+        saved = await ws("pushward/preview", entry_id=entry.entry_id, subentry_id=subentry_id)
+        return saved["result"]["payload"]["content"]["progress"]
+
+    frame = tracked.last_content
+    tracked.last_content, tracked.progress_max = None, 1000.0
+    assert await saved_progress() == 0.5
+    tracked.last_content = frame
+
+    # An ended run keeps its maximum until the next start resets it; the preview shows that next start.
+    with patch("custom_components.pushward.activity_manager.END_DELAY_SECONDS", 0):
+        hass.states.async_set("sensor.trip", "off", {"distance": 250})
+        await hass.async_block_till_done()
+        await tracked.end_task
+    assert (tracked.is_active, tracked.progress_max) == (False, 1000.0)
+    assert await saved_progress() == 0.0
 
     draft = {
         **_mock_core_input(**{CONF_ENTITY_ID: "sensor.trip"}),
