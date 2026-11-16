@@ -44,9 +44,9 @@ from .const import (
     CONF_SUBENTRY_ID,
     CONF_TEMPLATE,
     CONF_WIDGET_TEMPLATE,
-    DEFAULT_PRIORITY,
     DOMAIN,
     NOTIFICATION_LEVELS,
+    PRIORITY_MIN,
     QUOTA_KIND_LIVE_ACTIVITY_UPDATES,
     QUOTA_KIND_NOTIFICATIONS,
     QUOTA_KIND_WIDGET_UPDATES,
@@ -385,7 +385,9 @@ async def ws_send_test(hass: HomeAssistant, connection: websocket_api.ActiveConn
             return
     api = data["api"]
     if kind == "activity" and action == "send":
-        await api.create_activity(PREVIEW_ACTIVITY_SLUG, payload["name"], DEFAULT_PRIORITY)
+        # Lowest priority: at the account's Live Activity cap the server evicts the lowest
+        # first, so a test goes before any tracked activity does.
+        await api.create_activity(PREVIEW_ACTIVITY_SLUG, payload["name"], PRIORITY_MIN)
         await api.update_activity(PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ONGOING, payload["content"])
     elif kind == "activity":
         # An empty merge patch keeps the stored frame and only ends it.

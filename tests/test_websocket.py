@@ -706,7 +706,8 @@ async def test_send_test_activity_send_and_end(loaded, ws) -> None:
         payload={"name": "Washer", "content": content},
     )
     assert reply["success"]
-    api.create_activity.assert_awaited_once_with("ha-preview", "Washer", 1)
+    # Priority 0, below every tracked activity: at the Live Activity cap the server evicts the test first.
+    api.create_activity.assert_awaited_once_with("ha-preview", "Washer", 0)
     api.update_activity.assert_awaited_once_with("ha-preview", "ongoing", content)
 
     reply = await ws("pushward/send_test", entry_id=entry.entry_id, kind="activity", action="end")
