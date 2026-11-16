@@ -270,6 +270,8 @@ class WidgetManager:
         # Slugs currently in a push-failure streak: WARN once on entry, DEBUG after.
         self._failed_slugs: set[str] = set()
         self._unsub_quota: Callable[[], None] | None = None
+        # Cache entries of widgets no subentry owns whose server delete has not landed yet.
+        self._leftover: dict[str, dict] = {}
 
     # ----- public lifecycle -----
 
@@ -308,9 +310,17 @@ class WidgetManager:
             tasks = [self._claim_slot(tracked, self._initial_sync(tracked)) for tracked in pending]
             await asyncio.gather(*tasks, return_exceptions=True)
 
+        # A cached widget no subentry owns any more (removed while this entry was not
+        # loaded, or its delete failed) is still on the server with its phone
+        # registrations. Delete it now, and keep it cached until a delete lands so the
+        # next start tries again.
+        leftover = [slug for slug in persisted if slug not in self._tracked]
+        deleted = await asyncio.gather(*(self._delete_widget(slug) for slug in leftover), return_exceptions=True)
+        self._leftover = {slug: persisted[slug] for slug, ok in zip(leftover, deleted, strict=True) if ok is not True}
+
         # Rewrite the cache only when its key set differs from the new tracked
         # set — otherwise this startup-time save is a redundant disk write.
-        if set(persisted.keys()) != set(self._tracked.keys()):
+        if set(persisted) != set(self._tracked) | set(self._leftover):
             try:
                 await self._store.async_save(self._serialize_cache())
             except (HomeAssistantError, OSError, ValueError):
@@ -338,16 +348,11 @@ class WidgetManager:
         self._tracked.clear()
 
     async def async_reload(self, widgets: list[dict]) -> None:
-        # A removed tracked_widget subentry must delete its server-side widget, otherwise the
-        # row + device widget-push token leak forever (HA just stops driving it). Diff against
-        # the previous config set BEFORE reassigning self._widgets below.
-        removed = self._slug_set(self._widgets) - self._slug_set(widgets)
+        # A removed subentry's widget is still in the cache async_stop writes, so the
+        # async_start below deletes it from the server.
         await self.async_stop()
         self._widgets = widgets
         await self.async_start()
-        # _delete_widget swallows expected API errors per slug; return_exceptions keeps an
-        # unexpected one from stranding the rest.
-        await asyncio.gather(*(self._delete_widget(slug) for slug in removed), return_exceptions=True)
 
     @callback
     def _on_quota_released(self, kind: str) -> None:
@@ -359,14 +364,12 @@ class WidgetManager:
                 tracked.quota_refused = False
                 self._schedule_update(tracked)
 
-    @staticmethod
-    def _slug_set(widgets: list[dict]) -> set[str]:
-        return {cfg[CONF_SLUG] for cfg in widgets if cfg.get(CONF_SLUG)}
-
-    async def _delete_widget(self, slug: str) -> None:
-        """Delete a server-side widget whose subentry was removed (best-effort, 404-safe)."""
+    async def _delete_widget(self, slug: str) -> bool:
+        """Delete a server-side widget whose subentry was removed; True once it is gone (404 included)."""
         async with self._api_error_guard(slug, "deleting"):
             await self._api.delete_widget(slug)
+            return True
+        return False
 
     def slug_for_entity(self, entity_id: str | None) -> str | None:
         """Return the slug of the tracked widget bound to entity_id, if any."""
@@ -821,7 +824,8 @@ class WidgetManager:
     def _serialize_cache(self) -> dict:
         return {
             "widgets": {
-                slug: self._serialize_widget(t) for slug, t in self._tracked.items() if t.last_content is not None
+                **self._leftover,
+                **{slug: self._serialize_widget(t) for slug, t in self._tracked.items() if t.last_content is not None},
             }
         }
 

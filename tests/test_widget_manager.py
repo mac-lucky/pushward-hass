@@ -8,6 +8,7 @@ import time
 from datetime import date, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import aiohttp
 import pytest
 from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
@@ -65,7 +66,14 @@ from custom_components.pushward.widget_manager import (
     heatmap_read,
 )
 
-from .conftest import make_mock_entry, make_quota_error, make_widget_config
+from .conftest import (
+    make_api_client,
+    make_mock_entry,
+    make_mock_response,
+    make_mock_session,
+    make_quota_error,
+    make_widget_config,
+)
 from .server_contract import assert_valid_widget_content
 
 
@@ -129,6 +137,71 @@ async def test_reload_isolates_delete_failures(hass: HomeAssistant) -> None:
 
     assert api.delete_widget.await_count == 2
     assert {c.args[0] for c in api.delete_widget.await_args_list} == {"ha-a", "ha-b"}
+
+    await manager.async_stop()
+
+
+_WIDGET_STORE_KEY = "pushward.widgets.test_entry"
+
+
+def _seed_widget_cache(hass_storage: dict, *slugs: str) -> None:
+    widgets = {slug: {"content": {"value": 1.0}, "created": True} for slug in slugs}
+    hass_storage[_WIDGET_STORE_KEY] = {
+        "version": 1,
+        "minor_version": 1,
+        "key": _WIDGET_STORE_KEY,
+        "data": {"widgets": widgets},
+    }
+
+
+def _cached_slugs(hass_storage: dict) -> set[str]:
+    return set(hass_storage[_WIDGET_STORE_KEY]["data"]["widgets"])
+
+
+async def test_start_deletes_a_cached_widget_no_subentry_owns(hass: HomeAssistant, hass_storage: dict) -> None:
+    """A subentry removed while the entry was not loaded leaves its widget in the cache: delete it at setup."""
+    _seed_widget_cache(hass_storage, "ha-users", "ha-gone")
+    api = _mock_api()
+    hass.states.async_set("sensor.users", "42")
+    manager = WidgetManager(hass, api, [make_widget_config()], make_mock_entry())
+    await manager.async_start()
+
+    api.delete_widget.assert_awaited_once_with("ha-gone")
+    assert _cached_slugs(hass_storage) == {"ha-users"}
+
+    await manager.async_stop()
+
+
+async def test_start_keeps_a_leftover_widget_cached_while_its_delete_fails(
+    hass: HomeAssistant, hass_storage: dict
+) -> None:
+    """A delete that hits a network error is tried again on the next start, not forgotten."""
+    _seed_widget_cache(hass_storage, "ha-gone")
+    api = _mock_api()
+    api.delete_widget.side_effect = aiohttp.ClientConnectionError("down")
+    manager = WidgetManager(hass, api, [], make_mock_entry())
+    await manager.async_start()
+    await manager.async_stop()
+    assert _cached_slugs(hass_storage) == {"ha-gone"}
+
+    api.delete_widget.side_effect = None
+    await manager.async_start()
+    assert api.delete_widget.await_count == 2
+    assert _cached_slugs(hass_storage) == set()
+
+    await manager.async_stop()
+
+
+async def test_start_drops_a_leftover_widget_the_server_no_longer_has(hass: HomeAssistant, hass_storage: dict) -> None:
+    """A 404 on the delete means the widget is already gone."""
+    _seed_widget_cache(hass_storage, "ha-gone")
+    session = make_mock_session(make_mock_response(404))
+    manager = WidgetManager(hass, make_api_client(session), [], make_mock_entry())
+    await manager.async_start()
+
+    method, url = session.request.call_args.args[:2]
+    assert (method, url.rsplit("/", 2)[-2:]) == ("DELETE", ["widgets", "ha-gone"])
+    assert _cached_slugs(hass_storage) == set()
 
     await manager.async_stop()
 
