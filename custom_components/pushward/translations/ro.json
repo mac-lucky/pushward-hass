@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Stări de pornire",
             "end_states": "Stări de încheiere",
+            "calendar_lead_minutes": "Timp în avans (minute)",
+            "run_while": "Doar cât timp",
             "remaining_time_entity": "Entitate timp rămas",
             "remaining_time_attribute": "Atribut timp rămas",
             "total_steps": "Total steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Coloane jurnal"
           },
           "data_description": {
-            "start_states": "Stările entității care pornesc Live Activity. Selectați din listă sau introduceți valori personalizate.",
+            "start_states": "Stările entității care pornesc Live Activity. Selectați din listă sau introduceți valori personalizate. `*` o pornește la orice stare care nu este o stare de final (unavailable și unknown nu o pornesc niciodată).",
             "end_states": "Stările entității care încheie Live Activity. Selectați din listă sau introduceți valori personalizate.",
+            "calendar_lead_minutes": "Entitățile de calendar ignoră stările de pornire și de final: activitatea se deschide cu atâtea minute înainte de următorul eveniment cu oră, numără invers până la începutul lui, apoi până la sfârșit, și se încheie odată cu evenimentul. Evenimentele de o zi întreagă sunt omise. 0-1440.",
+            "run_while": "Păstrați activitatea doar cât timp fiecare rând se potrivește: fiecare rând este o entitate și o listă a stărilor ei separate prin virgulă (ex. device_tracker.me și home). Când un rând nu se mai potrivește, activitatea se încheie; când toate se potrivesc din nou, pornește dacă entitatea urmărită este într-o stare de pornire. O entitate indisponibilă nu se potrivește niciodată. Până la 5 rânduri.",
             "remaining_time_entity": "Citește timpul rămas dintr-o entitate separată (de ex. senzorul de timp al unei mașini de spălat). Lăsați gol pentru a folosi entitatea urmărită. Analizează automat un senzor de marcă temporală (ora de finalizare), un senzor de durată cu unități, un șir H:MM:SS sau secunde simple.",
             "remaining_time_attribute": "Atributul entității care conține timpul rămas în secunde. Exemplu: remaining",
             "total_steps": "Numărul total de steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "Adresa imaginii trebuie să fie https, cu gazdă și fără nume de utilizator sau parolă.",
         "invalid_image_shape": "Forma imaginii trebuie să fie poster, square sau circle.",
         "invalid_image_thumbhash": "ThumbHash-ul imaginii trebuie să fie base64 cu alfabet standard și umplutură, de cel mult 64 de caractere. Folosiți acțiunea Generate ThumbHash pentru a genera unul.",
-        "invalid_favorite_script": "Butonul favorite trebuie să indice o entitate script (script.something)."
+        "invalid_favorite_script": "Butonul favorite trebuie să indice o entitate script (script.something).",
+        "invalid_run_while": "Fiecare condiție necesită un entity_id și cel puțin o stare (ex. device_tracker.me cu home).",
+        "too_many_run_while": "Sunt acceptate cel mult 5 condiții.",
+        "invalid_calendar_lead_minutes": "Timpul în avans trebuie să fie un număr întreg de minute între 0 și 1440."
       },
       "abort": {
         "already_configured": "Această entitate este deja urmărită.",

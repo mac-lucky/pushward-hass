@@ -63,6 +63,7 @@ from custom_components.pushward.const import (
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_RUN_WHILE,
     CONF_SCALE,
     CONF_SCHEDULE_ATTRIBUTES,
     CONF_SCHEDULE_HIGH_MIN,
@@ -223,6 +224,7 @@ def make_entity_config(**overrides) -> dict:
         CONF_APPROVAL_OPTIONS: [],
         CONF_APPROVAL_DETAILS: [],
         CONF_APPROVAL_SOURCE: "",
+        CONF_RUN_WHILE: [],
     }
     config.update(overrides)
     return config

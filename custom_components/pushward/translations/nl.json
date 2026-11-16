@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Startstatussen",
             "end_states": "Eindstatussen",
+            "calendar_lead_minutes": "Voorlooptijd (minuten)",
+            "run_while": "Alleen zolang",
             "remaining_time_entity": "Resterende-tijd-entiteit",
             "remaining_time_attribute": "Attribuut resterende tijd",
             "total_steps": "Totaal aantal steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Logkolommen"
           },
           "data_description": {
-            "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden.",
+            "start_states": "Entiteitsstatussen die de Live Activity starten. Selecteer uit de lijst of typ aangepaste waarden. `*` start hem bij elke status die geen eindstatus is (unavailable en unknown starten hem nooit).",
             "end_states": "Entiteitsstatussen die de Live Activity beëindigen. Selecteer uit de lijst of typ aangepaste waarden.",
+            "calendar_lead_minutes": "Agenda-entiteiten negeren de start- en eindstatussen: de activiteit opent zoveel minuten voor de volgende afspraak met tijd, telt af tot het begin, daarna tot het einde, en eindigt met de afspraak. Afspraken van een hele dag worden overgeslagen. 0-1440.",
+            "run_while": "Houd de activiteit alleen actief zolang elke rij klopt: elke rij is een entiteit en een kommagescheiden lijst van haar statussen (bijv. device_tracker.me en home). Klopt een rij niet meer, dan eindigt de activiteit; kloppen ze weer allemaal, dan start ze als de gevolgde entiteit in een startstatus is. Een niet-beschikbare entiteit klopt nooit. Maximaal 5 rijen.",
             "remaining_time_entity": "Lees de resterende tijd van een aparte entiteit (bijv. de tijdsensor van een wasmachine). Laat leeg om de gevolgde entiteit te gebruiken. Verwerkt automatisch een tijdstempel(eindtijd)-sensor, een duursensor met eenheden, een H:MM:SS-tekst of gewone seconden.",
             "remaining_time_attribute": "Entiteitsattribuut met de resterende tijd in seconden. Voorbeeld: remaining",
             "total_steps": "Totaal aantal steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "De afbeeldings-URL moet een https-adres met host zijn, zonder gebruikersnaam of wachtwoord.",
         "invalid_image_shape": "De afbeeldingsvorm moet poster, square of circle zijn.",
         "invalid_image_thumbhash": "De afbeeldings-ThumbHash moet base64 met standaardalfabet en opvulling zijn, maximaal 64 tekens. Gebruik de actie Generate ThumbHash om er een te maken.",
-        "invalid_favorite_script": "De favorietknop moet naar een script-entiteit verwijzen (script.something)."
+        "invalid_favorite_script": "De favorietknop moet naar een script-entiteit verwijzen (script.something).",
+        "invalid_run_while": "Elke voorwaarde heeft een entity_id en minstens één status nodig (bijv. device_tracker.me met home).",
+        "too_many_run_while": "Er worden maximaal 5 voorwaarden ondersteund.",
+        "invalid_calendar_lead_minutes": "De voorlooptijd moet een geheel aantal minuten tussen 0 en 1440 zijn."
       },
       "abort": {
         "already_configured": "Deze entiteit wordt al gevolgd.",

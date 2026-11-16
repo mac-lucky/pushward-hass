@@ -50,6 +50,7 @@ from .const import (
     CONF_APPROVAL_SOURCE,
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
+    CONF_CALENDAR_LEAD_MINUTES,
     CONF_CHECKLIST_ITEMS,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
@@ -113,6 +114,7 @@ from .const import (
     CONF_VALUE_ATTRIBUTE,
     CONF_VALUE_ENTITY,
     CONF_WARNING_THRESHOLD,
+    DEFAULT_CALENDAR_LEAD_MINUTES,
     DEFAULT_DECIMALS,
     DEFAULT_MAX_VALUE,
     DEFAULT_MIN_VALUE,
@@ -133,6 +135,7 @@ from .const import (
     MAX_COMPACT_TRAILING_LABEL_LEN,
     MAX_SEVERITY_LABEL_LEN,
     MAX_TAP_ACTION_ICON_LEN,
+    MAX_TEXT_LEN,
     MEDIA_DURATION_MAX,
     MEDIA_POSITION_MAX_AGE,
     MEDIA_TITLE_MAX,
@@ -970,6 +973,54 @@ def _add_compact_ear_fields(content: dict, entity_config: dict) -> None:
         content["compact_trailing_icon"] = ""
 
 
+def is_calendar_config(entity_config: dict) -> bool:
+    """True when a calendar entity runs on its event window rather than start/end states."""
+    entity_id = str(entity_config.get(CONF_ENTITY_ID) or "")
+    return entity_id.startswith("calendar.") and CONF_CALENDAR_LEAD_MINUTES in entity_config
+
+
+def _calendar_window(state: State, entity_config: dict) -> tuple[int, int, int] | None:
+    """(window open, event start, event end) in unix seconds for the entity's current or next event.
+
+    None for an all-day event or one without a parseable start_time. A missing or
+    inverted end reads as the start, so such an event closes the moment it begins.
+    """
+    attrs = state.attributes
+    if attrs.get("all_day"):
+        return None
+    start = parse_ha_datetime(attrs.get("start_time"))
+    if start is None:
+        return None
+    end = parse_ha_datetime(attrs.get("end_time"))
+    start_ts = int(start.timestamp())
+    end_ts = max(int(end.timestamp()), start_ts) if end is not None else start_ts
+    lead = int(entity_config.get(CONF_CALENDAR_LEAD_MINUTES, DEFAULT_CALENDAR_LEAD_MINUTES) or 0)
+    return start_ts - lead * 60, start_ts, end_ts
+
+
+def calendar_phase(state: State, entity_config: dict, now: float) -> tuple[int, int] | None:
+    """(phase start, countdown target) while the event window is open at ``now``, else None.
+
+    Before the event the countdown runs from the window opening to the start; during
+    it, from the start to the end.
+    """
+    window = _calendar_window(state, entity_config)
+    if window is None:
+        return None
+    opens, start, end = window
+    if opens <= now < start:
+        return opens, start
+    if start <= now < end:
+        return start, end
+    return None
+
+
+def calendar_next_boundary(state: State, entity_config: dict, now: float) -> int | None:
+    """The next window open / event start / event end after ``now``, or None."""
+    window = _calendar_window(state, entity_config)
+    return next((ts for ts in window if ts > now), None) if window else None
+
+
 def map_content(
     state: State,
     entity_config: dict,
@@ -1025,6 +1076,11 @@ def map_content(
     if remaining is not None:
         content["remaining_time"] = remaining
 
+    calendar = calendar_phase(state, entity_config, now) if is_calendar_config(entity_config) else None
+    # A calendar's on/off state says nothing; the event's title does.
+    if calendar is not None and (message := str(state.attributes.get("message") or "").strip()):
+        content["state"] = message[:MAX_TEXT_LEN]
+
     _add_activity_actions(content, entity_config)
 
     # Template-specific required fields
@@ -1042,6 +1098,9 @@ def map_content(
             content["completion_message"] = completion_msg
         if remaining is not None:
             content["start_date"] = now
+        if calendar is not None:
+            # Both ends pinned to the event, so the bar fills across the phase.
+            content["start_date"], content["end_date"] = calendar
         warning_threshold = entity_config.get(CONF_WARNING_THRESHOLD)
         if warning_threshold is not None:
             content["warning_threshold"] = int(warning_threshold)
@@ -1345,12 +1404,39 @@ def _parse_clock_string(raw: str) -> int | None:
     return max(0, int(delta.total_seconds()))
 
 
+def parse_ha_datetime(raw: object) -> datetime | None:
+    """Parse an HA attribute into an aware UTC datetime, or None.
+
+    Accepts what integrations actually publish: an RFC 3339 / ISO string, a real
+    datetime, or a unix epoch number. A naive datetime is read as HA local time,
+    matching how HA renders one (a calendar's start_time is naive local), never as
+    the process time zone.
+    """
+    if raw is None or isinstance(raw, bool):
+        return None
+    if isinstance(raw, datetime):
+        return dt_util.as_utc(raw) if raw.tzinfo else dt_util.as_utc(dt_util.as_local(raw))
+    if isinstance(raw, (int, float)):
+        if not math.isfinite(raw):
+            return None
+        try:
+            return datetime.fromtimestamp(raw, tz=UTC)
+        except (OverflowError, OSError, ValueError):
+            return None
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    parsed = dt_util.parse_datetime(raw.strip())
+    if parsed is None:
+        return None
+    return dt_util.as_utc(parsed) if parsed.tzinfo else dt_util.as_utc(dt_util.as_local(parsed))
+
+
 def _coerce_epoch(raw: object) -> int | None:
     """Coerce a raw value to a unix epoch int: numeric seconds, or an ISO datetime."""
     try:
         return int(float(raw))  # type: ignore[arg-type]
-    except (ValueError, TypeError):
-        parsed = dt_util.parse_datetime(str(raw))
+    except (ValueError, TypeError, OverflowError):
+        parsed = parse_ha_datetime(raw)
         return int(parsed.timestamp()) if parsed is not None else None
 
 
@@ -1370,7 +1456,7 @@ def _coerce_remaining_seconds(
     device_class = source.attributes.get("device_class") if source is not None else None
 
     if device_class == "timestamp":
-        parsed = dt_util.parse_datetime(str(raw))
+        parsed = parse_ha_datetime(raw)
         if parsed is None:
             return None, None
         end = int(parsed.timestamp())

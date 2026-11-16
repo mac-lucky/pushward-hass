@@ -178,6 +178,19 @@ CONF_BACKGROUND_COLOR_ATTRIBUTE = "background_color_attribute"
 CONF_TEXT_COLOR = "text_color"
 CONF_TEXT_COLOR_ATTRIBUTE = "text_color_attribute"
 
+# Lifecycle conditions on other entities: rows of {entity_id, states}; the activity
+# runs only while every row's entity is in one of its states. Stored states are a list.
+CONF_RUN_WHILE = "run_while"
+CONF_RUN_WHILE_STATES = "states"
+RUN_WHILE_MAX = 5
+# A start state that matches any state except the end states (and unavailable/unknown).
+START_STATE_ANY = "*"
+# Calendar subentries saved with this key run on the event's time window instead of
+# start/end states; one saved before it existed keeps the state-driven lifecycle.
+CONF_CALENDAR_LEAD_MINUTES = "calendar_lead_minutes"
+DEFAULT_CALENDAR_LEAD_MINUTES = 30
+CALENDAR_LEAD_MINUTES_MAX = 1440
+
 # Widget-specific config keys
 CONF_WIDGET_TEMPLATE = "widget_template"
 CONF_WIDGET_NAME = "widget_name"
@@ -1001,6 +1014,23 @@ DOMAIN_DEFAULTS: dict[str, dict] = {
         "icon": "mdi:water-boiler",
         "start_states": ["heating"],
         "end_states": ["off", "idle"],
+    },
+    # Away from home: a zone name or not_home both start it, coming home ends it.
+    "device_tracker": {
+        "icon": "mdi:map-marker-account",
+        "start_states": [START_STATE_ANY],
+        "end_states": ["home"],
+    },
+    "person": {
+        "icon": "mdi:account-arrow-right",
+        "start_states": [START_STATE_ANY],
+        "end_states": ["home"],
+    },
+    # Driven by the event's time window, not by states.
+    "calendar": {
+        "icon": "mdi:calendar",
+        "start_states": [],
+        "end_states": [],
     },
 }
 

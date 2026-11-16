@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Stany początkowe",
             "end_states": "Stany końcowe",
+            "calendar_lead_minutes": "Wyprzedzenie (minuty)",
+            "run_while": "Tylko gdy",
             "remaining_time_entity": "Encja pozostałego czasu",
             "remaining_time_attribute": "Atrybut pozostałego czasu",
             "total_steps": "Łączna liczba steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Kolumny dziennika"
           },
           "data_description": {
-            "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości.",
+            "start_states": "Stany encji, które uruchamiają Live Activity. Wybierz z listy lub wpisz własne wartości. `*` uruchamia ją przy każdym stanie, który nie jest stanem końcowym (unavailable i unknown nigdy jej nie uruchamiają).",
             "end_states": "Stany encji, które kończą Live Activity. Wybierz z listy lub wpisz własne wartości.",
+            "calendar_lead_minutes": "Encje kalendarza ignorują stany startowe i końcowe: Live Activity otwiera się tyle minut przed najbliższym wydarzeniem z godziną, odlicza do jego początku, potem do końca, i kończy się razem z wydarzeniem. Wydarzenia całodniowe są pomijane. 0-1440.",
+            "run_while": "Live Activity działa tylko wtedy, gdy każdy wiersz jest spełniony: każdy wiersz to encja i lista jej stanów oddzielonych przecinkami (np. device_tracker.me i home). Gdy wiersz przestaje być spełniony, Live Activity się kończy; gdy znów wszystkie są spełnione, startuje, jeśli śledzona encja jest w stanie startowym. Niedostępna encja nigdy nie jest spełniona. Do 5 wierszy.",
             "remaining_time_entity": "Odczytuj pozostały czas z osobnej encji (np. czujnika czasu pralki). Pozostaw puste, aby użyć śledzonej encji. Automatycznie analizuje czujnik znacznika czasu (czas zakończenia), czujnik czasu trwania z jednostkami, ciąg H:MM:SS lub zwykłe sekundy.",
             "remaining_time_attribute": "Atrybut encji przechowujący pozostały czas w sekundach. Przykład: remaining",
             "total_steps": "Łączna liczba steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "URL obrazu musi być adresem https z hostem, bez nazwy użytkownika i hasła.",
         "invalid_image_shape": "Kształt obrazu musi mieć wartość poster, square lub circle.",
         "invalid_image_thumbhash": "ThumbHash obrazu musi być zapisany w base64 (standardowy alfabet, z dopełnieniem) i mieć najwyżej 64 znaki. Użyj akcji Generate ThumbHash, aby go wygenerować.",
-        "invalid_favorite_script": "Przycisk ulubionych musi wskazywać encję script (script.something)."
+        "invalid_favorite_script": "Przycisk ulubionych musi wskazywać encję script (script.something).",
+        "invalid_run_while": "Każdy warunek wymaga entity_id i co najmniej jednego stanu (np. device_tracker.me z home).",
+        "too_many_run_while": "Obsługiwanych jest maksymalnie 5 warunków.",
+        "invalid_calendar_lead_minutes": "Wyprzedzenie musi być całkowitą liczbą minut od 0 do 1440."
       },
       "abort": {
         "already_configured": "Ta encja jest już śledzona.",

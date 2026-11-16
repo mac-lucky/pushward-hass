@@ -20,6 +20,8 @@ from custom_components.pushward.config_flow import (
     _compose_steps_rows,
     _decompose_steps_rows,
     _details_schema,
+    _entity_details_to_config,
+    _entity_reconfigure_defaults,
     _flatten_section_input,
     _hex_to_rgb,
     _kv_rows_to_map,
@@ -31,6 +33,7 @@ from custom_components.pushward.config_flow import (
     _parse_float_list,
     _parse_int_list,
     _parse_log_columns,
+    _parse_run_while,
     _parse_series_entities,
     _parse_state_labels,
     _parse_thresholds,
@@ -50,6 +53,7 @@ from custom_components.pushward.const import (
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
     BOARD_TILE_UNIT_MAX,
+    CALENDAR_LEAD_MINUTES_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
@@ -57,6 +61,7 @@ from custom_components.pushward.const import (
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
+    CONF_CALENDAR_LEAD_MINUTES,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
     CONF_COMPACT_TRAILING_LABEL,
@@ -97,6 +102,8 @@ from custom_components.pushward.const import (
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_RUN_WHILE,
+    CONF_RUN_WHILE_STATES,
     CONF_SCALE,
     CONF_SCHEDULE_ATTRIBUTES,
     CONF_SCHEDULE_HIGH_MIN,
@@ -150,6 +157,7 @@ from custom_components.pushward.const import (
     CONF_WIDGET_STYLE,
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
+    DEFAULT_CALENDAR_LEAD_MINUTES,
     DEFAULT_IMAGE_SHAPE,
     DEFAULT_SCHEDULE_START_KEY,
     DEFAULT_SCHEDULE_VALUE_KEY,
@@ -169,6 +177,7 @@ from custom_components.pushward.const import (
     MAX_SEVERITY_LABEL_LEN,
     MAX_URL_LEN,
     PLAY_STORE_URL,
+    RUN_WHILE_MAX,
     SUBENTRY_TYPE_ENTITY,
     SUBENTRY_TYPE_WIDGET,
     TEMPLATES,
@@ -5393,3 +5402,179 @@ def test_new_activity_form_suggests_no_empty_entity(template: str) -> None:
     """Same guard for the activity details form."""
     schema = _details_schema("sensor.power", template)
     assert [f for f, v in _entity_selector_suggestions(schema) if v == ""] == []
+
+
+# --- lifecycle: run_while rows and the calendar lead time ---
+
+_ME = "device_tracker.me"
+
+
+def test_parse_run_while_strict_normalizes_rows() -> None:
+    rows = _parse_run_while(
+        [
+            {CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: " home , work,"},
+            {CONF_ENTITY_ID: "input_boolean.trip", CONF_RUN_WHILE_STATES: "on"},
+        ],
+        strict=True,
+    )
+    assert rows == [
+        {CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: ["home", "work"]},
+        {CONF_ENTITY_ID: "input_boolean.trip", CONF_RUN_WHILE_STATES: ["on"]},
+    ]
+    assert _parse_run_while([], strict=True) == []
+    assert _parse_run_while("", strict=True) == []
+
+
+@pytest.mark.parametrize(
+    "rows",
+    [
+        [{CONF_ENTITY_ID: _ME}],
+        [{CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: " , "}],
+        [{CONF_RUN_WHILE_STATES: "home"}],
+        [{CONF_ENTITY_ID: "me", CONF_RUN_WHILE_STATES: "home"}],
+        ["device_tracker.me=home"],
+        "device_tracker.me=home",
+    ],
+)
+def test_parse_run_while_strict_rejects_bad_rows(rows) -> None:
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_run_while(rows, strict=True)
+    assert exc.value.msg == "invalid_run_while"
+    assert exc.value.path == [CONF_RUN_WHILE]
+
+
+def test_parse_run_while_strict_rejects_too_many_rows() -> None:
+    rows = [{CONF_ENTITY_ID: f"sensor.s{i}", CONF_RUN_WHILE_STATES: "on"} for i in range(RUN_WHILE_MAX + 1)]
+    with pytest.raises(vol.Invalid) as exc:
+        _parse_run_while(rows, strict=True)
+    assert exc.value.msg == "too_many_run_while"
+
+
+def test_parse_run_while_lenient_skips_and_truncates() -> None:
+    rows = [{CONF_ENTITY_ID: f"sensor.s{i}", CONF_RUN_WHILE_STATES: ["on"]} for i in range(RUN_WHILE_MAX + 1)]
+    assert len(_parse_run_while([None, {CONF_ENTITY_ID: _ME}, *rows])) == RUN_WHILE_MAX
+
+
+def _calendar_input(**overrides) -> dict:
+    return {
+        CONF_ENTITY_ID: "calendar.family",
+        CONF_TEMPLATE: "countdown",
+        CONF_START_STATES: [],
+        CONF_END_STATES: [],
+        **overrides,
+    }
+
+
+def test_calendar_lead_time_is_stored_for_calendars_only() -> None:
+    assert _parse_entity_input(_calendar_input())[CONF_CALENDAR_LEAD_MINUTES] == DEFAULT_CALENDAR_LEAD_MINUTES
+    assert _parse_entity_input(_calendar_input(**{CONF_CALENDAR_LEAD_MINUTES: 0.0}))[CONF_CALENDAR_LEAD_MINUTES] == 0
+    stored = _parse_entity_input(_calendar_input(**{CONF_CALENDAR_LEAD_MINUTES: 1440.0}))
+    assert stored[CONF_CALENDAR_LEAD_MINUTES] == CALENDAR_LEAD_MINUTES_MAX
+    assert stored[CONF_RUN_WHILE] == []
+
+    washer = _parse_entity_input(_calendar_input(**{CONF_ENTITY_ID: "binary_sensor.washer"}))
+    assert CONF_CALENDAR_LEAD_MINUTES not in washer
+
+
+@pytest.mark.parametrize("lead", [-1, CALENDAR_LEAD_MINUTES_MAX + 1, 2.5, "soon", float("nan"), None])
+def test_calendar_lead_time_out_of_range_is_a_form_error(lead) -> None:
+    cfg, errors = _entity_details_to_config(_calendar_input(), {CONF_CALENDAR_LEAD_MINUTES: lead}, None)
+    assert cfg is None
+    assert errors == {CONF_CALENDAR_LEAD_MINUTES: "invalid_calendar_lead_minutes"}
+
+
+def test_calendar_form_offers_the_lead_time_with_its_default() -> None:
+    defaults = _all_field_defaults(_details_schema("calendar.family", "countdown", {}))
+    assert defaults[CONF_CALENDAR_LEAD_MINUTES] == DEFAULT_CALENDAR_LEAD_MINUTES
+    stored = _all_field_defaults(_details_schema("calendar.family", "countdown", {CONF_CALENDAR_LEAD_MINUTES: 10}))
+    assert stored[CONF_CALENDAR_LEAD_MINUTES] == 10
+    assert CONF_CALENDAR_LEAD_MINUTES not in _flow_schema_keys(_details_schema("binary_sensor.washer", "countdown"))
+
+
+async def test_calendar_suggests_the_countdown_template(hass: HomeAssistant) -> None:
+    assert _suggest_template(hass, "calendar.family") == "countdown"
+
+
+async def test_flow_run_while_rows_store_states_as_a_list(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        details_overrides={CONF_RUN_WHILE: [{CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: "home, work"}]},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    stored = next(iter(entry.subentries.values())).data
+    assert stored[CONF_RUN_WHILE] == [{CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: ["home", "work"]}]
+
+
+async def test_flow_invalid_run_while(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass, entry, details_overrides={CONF_RUN_WHILE: [{CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: ""}]}
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_RUN_WHILE: "invalid_run_while"}
+
+
+async def test_flow_too_many_run_while(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    rows = [{CONF_ENTITY_ID: f"sensor.s{i}", CONF_RUN_WHILE_STATES: "on"} for i in range(RUN_WHILE_MAX + 1)]
+    result = await _add_entity_subentry(hass, entry, details_overrides={CONF_RUN_WHILE: rows})
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_RUN_WHILE: "too_many_run_while"}
+
+
+async def test_flow_calendar_stores_the_lead_time(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        core_overrides={CONF_ENTITY_ID: "calendar.family"},
+        template="countdown",
+        details_overrides={CONF_CALENDAR_LEAD_MINUTES: 45},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert next(iter(entry.subentries.values())).data[CONF_CALENDAR_LEAD_MINUTES] == 45
+
+
+async def test_flow_calendar_lead_time_out_of_range(hass: HomeAssistant) -> None:
+    entry = _mock_entry()
+    entry.add_to_hass(hass)
+    result = await _add_entity_subentry(
+        hass,
+        entry,
+        core_overrides={CONF_ENTITY_ID: "calendar.family"},
+        template="countdown",
+        details_overrides={CONF_CALENDAR_LEAD_MINUTES: CALENDAR_LEAD_MINUTES_MAX + 1},
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {CONF_CALENDAR_LEAD_MINUTES: "invalid_calendar_lead_minutes"}
+
+
+async def test_reconfigure_run_while_rehydrates_as_comma_strings(hass: HomeAssistant) -> None:
+    stored_rows = [{CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: ["home", "work"]}]
+    entry = _mock_entry(subentries_data=[_entity_subentry_data(**{CONF_RUN_WHILE: stored_rows})])
+    entry.add_to_hass(hass)
+    subentry_id = next(iter(entry.subentries))
+
+    result = await _reconfigure_to_details(hass, entry, subentry_id, "generic")
+    rows = _all_field_defaults(result["data_schema"])[CONF_RUN_WHILE]
+    assert rows == [{CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: "home, work"}]
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], user_input=_mock_details_input("generic", **{CONF_RUN_WHILE: rows})
+    )
+    assert result["type"] is FlowResultType.ABORT
+    assert entry.subentries[subentry_id].data[CONF_RUN_WHILE] == stored_rows
+
+
+def test_reconfigure_defaults_tolerate_old_and_hand_written_run_while() -> None:
+    old = make_entity_config()
+    del old[CONF_RUN_WHILE]
+    assert _entity_reconfigure_defaults(old)[CONF_RUN_WHILE] == []
+    messy = make_entity_config(**{CONF_RUN_WHILE: [{CONF_ENTITY_ID: _ME}, {CONF_ENTITY_ID: _ME, "states": "home"}]})
+    assert _entity_reconfigure_defaults(messy)[CONF_RUN_WHILE] == [{CONF_ENTITY_ID: _ME, CONF_RUN_WHILE_STATES: "home"}]

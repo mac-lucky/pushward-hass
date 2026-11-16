@@ -193,6 +193,7 @@ def test_every_locale_has_complete_selector_options() -> None:
 _ENTITY_COMMON: set[str] = {
     "start_states",
     "end_states",
+    "run_while",
     "subtitle_entity",
     "subtitle_attribute",
     "slug",
@@ -403,6 +404,19 @@ def test_entity_sections_cover_frozen_field_set() -> None:
         assert top | set(sectioned) == ENTITY_FROZEN_FIELDS[template], f"{template}: field set drifted"
         unknown = set(sections) - set(ENTITY_SECTIONS)
         assert not unknown, f"{template}: unknown section {unknown}"
+
+
+def test_calendar_entity_form_adds_only_the_lead_time() -> None:
+    """A calendar gets the lead time on top of its template's frozen set, kept top-level and labelled."""
+    for template in TEMPLATES:
+        top, sections = _partition(_details_schema("calendar.family", template, {}))
+        sectioned = {f for fs in sections.values() for f in fs}
+        assert top | sectioned == ENTITY_FROZEN_FIELDS[template] | {"calendar_lead_minutes"}, template
+        assert "calendar_lead_minutes" in top, template
+    details = _en_translations()["config_subentries"]["tracked_entity"]["step"]["details"]
+    for field in ("calendar_lead_minutes", "run_while"):
+        assert field in details["data"], f"en: top-level data missing {field}"
+        assert field in details["data_description"], f"en: top-level data_description missing {field}"
 
 
 def test_widget_sections_cover_frozen_field_set() -> None:

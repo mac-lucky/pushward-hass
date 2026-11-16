@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Başlangıç Durumları",
             "end_states": "Bitiş Durumları",
+            "calendar_lead_minutes": "Ön Süre (dakika)",
+            "run_while": "Yalnızca şu sürece",
             "remaining_time_entity": "Kalan Süre Varlığı",
             "remaining_time_attribute": "Kalan Süre Niteliği",
             "total_steps": "Toplam steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Günlük Sütunları"
           },
           "data_description": {
-            "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin.",
+            "start_states": "Live Activity'yi başlatan varlık durumları. Listeden seçin veya özel değer girin. `*` bitiş durumu olmayan her durumda başlatır (unavailable ve unknown asla başlatmaz).",
             "end_states": "Live Activity'yi sonlandıran varlık durumları. Listeden seçin veya özel değer girin.",
+            "calendar_lead_minutes": "Takvim varlıkları başlangıç ve bitiş durumlarını yok sayar: aktivite saati belli bir sonraki etkinlikten bu kadar dakika önce açılır, başlangıcına, ardından bitişine kadar geri sayar ve etkinlikle birlikte sona erer. Tüm gün süren etkinlikler atlanır. 0-1440.",
+            "run_while": "Aktivite yalnızca her satır eşleştiği sürece sürer: her satır bir varlık ve durumlarının virgülle ayrılmış listesidir (örn. device_tracker.me ve home). Bir satır eşleşmeyi bıraktığında aktivite sona erer; hepsi yeniden eşleştiğinde, izlenen varlık bir başlangıç durumundaysa başlar. Kullanılamayan bir varlık asla eşleşmez. En fazla 5 satır.",
             "remaining_time_entity": "Kalan süreyi ayrı bir varlıktan okur (ör. bir çamaşır makinesinin süre sensörü). İzlenen varlığı kullanmak için boş bırakın. Bir zaman damgası (bitiş zamanı) sensörünü, birimli bir süre sensörünü, bir H:MM:SS dizesini veya düz saniyeyi otomatik olarak ayrıştırır.",
             "remaining_time_attribute": "Saniye cinsinden kalan süreyi tutan varlık niteliği. Örnek: remaining",
             "total_steps": "Toplam steps adedi.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "Görsel URL'si, ana makine içeren bir https adresi olmalı ve kullanıcı adı ya da parola içermemelidir.",
         "invalid_image_shape": "Görsel biçimi poster, square veya circle olmalıdır.",
         "invalid_image_thumbhash": "Görsel ThumbHash'i, standart alfabeli ve dolgulu base64 olmalı ve en fazla 64 karakter uzunluğunda olmalıdır. Üretmek için Generate ThumbHash eylemini kullanın.",
-        "invalid_favorite_script": "Favori düğmesi bir script varlığını göstermelidir (script.something)."
+        "invalid_favorite_script": "Favori düğmesi bir script varlığını göstermelidir (script.something).",
+        "invalid_run_while": "Her koşul bir entity_id ve en az bir durum gerektirir (örn. home ile device_tracker.me).",
+        "too_many_run_while": "En fazla 5 koşul desteklenir.",
+        "invalid_calendar_lead_minutes": "Ön süre 0 ile 1440 arasında tam sayı dakika olmalıdır."
       },
       "abort": {
         "already_configured": "Bu varlık zaten izleniyor.",

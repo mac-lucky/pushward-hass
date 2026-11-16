@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant, State, callback
+from homeassistant.core import HomeAssistant, State, callback, valid_entity_id
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import (
@@ -38,6 +38,7 @@ from homeassistant.helpers.selector import (
 )
 from homeassistant.helpers.typing import UNDEFINED
 
+from .activity_manager import run_while_rows
 from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     ACTIVITY_TTL_MAX,
@@ -48,6 +49,7 @@ from .const import (
     BOARD_TILE_ICON_MAX,
     BOARD_TILE_LABEL_MAX,
     BOARD_TILE_UNIT_MAX,
+    CALENDAR_LEAD_MINUTES_MAX,
     CONF_ACCENT_COLOR,
     CONF_ACCENT_COLOR_ATTRIBUTE,
     CONF_ACTIVITY_NAME,
@@ -55,6 +57,7 @@ from .const import (
     CONF_BACKGROUND_COLOR,
     CONF_BACKGROUND_COLOR_ATTRIBUTE,
     CONF_BATTERY_DEVICES,
+    CONF_CALENDAR_LEAD_MINUTES,
     CONF_CHARGING_ENTITY,
     CONF_COMPACT_LABEL,
     CONF_COMPACT_TRAILING_ICON,
@@ -101,6 +104,8 @@ from .const import (
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_RUN_WHILE,
+    CONF_RUN_WHILE_STATES,
     CONF_SCALE,
     CONF_SCHEDULE_ATTRIBUTES,
     CONF_SCHEDULE_HIGH_MIN,
@@ -171,6 +176,7 @@ from .const import (
     CONF_WIDGET_TEMPLATE,
     CONF_WIDGET_TRIGGER_MODE,
     DANGEROUS_URL_SCHEMES,
+    DEFAULT_CALENDAR_LEAD_MINUTES,
     DEFAULT_DECIMALS,
     DEFAULT_HEATMAP_WEEKS,
     DEFAULT_HISTORY_PERIOD,
@@ -225,6 +231,7 @@ from .const import (
     PLAY_STORE_URL,
     PRIORITY_MAX,
     PRIORITY_MIN,
+    RUN_WHILE_MAX,
     SCALES,
     SEVERITIES,
     SNOOZE_SECONDS_MAX,
@@ -473,6 +480,21 @@ _LOG_COLUMNS_SELECTOR = ObjectSelector(
         multiple=True,
         label_field=CONF_LABEL,
         description_field=CONF_ENTITY_ID,
+    )
+)
+
+# Run-while conditions: an entity and the comma-separated states it has to be in.
+# Text fields, not entity/state selectors - see the note on _BOARD_TILES_SELECTOR above.
+# Stored with the states split into a list; reconfigure joins them back.
+_RUN_WHILE_SELECTOR = ObjectSelector(
+    ObjectSelectorConfig(
+        fields={
+            CONF_ENTITY_ID: {"label": "Entity", "selector": _ROW_TEXT},
+            CONF_RUN_WHILE_STATES: {"label": "States", "selector": _ROW_TEXT},
+        },
+        multiple=True,
+        label_field=CONF_ENTITY_ID,
+        description_field=CONF_RUN_WHILE_STATES,
     )
 )
 
@@ -948,7 +970,7 @@ def _suggest_template(hass: HomeAssistant | None, entity_id: str) -> str:
 
     domain = _entity_domain(entity_id)
 
-    if domain == "timer":
+    if domain in ("timer", "calendar"):
         return "countdown"
     if domain == "light":
         return "gauge"
@@ -1096,6 +1118,16 @@ def _details_schema(
             mode=SelectSelectorMode.DROPDOWN,
         )
     )
+    if domain == "calendar":
+        # No min/max on the box: _parse_calendar_lead_minutes checks the range with a
+        # translated error, where a bounded selector would fail with a raw one.
+        fields[
+            vol.Optional(
+                CONF_CALENDAR_LEAD_MINUTES,
+                default=d.get(CONF_CALENDAR_LEAD_MINUTES, DEFAULT_CALENDAR_LEAD_MINUTES),
+            )
+        ] = NumberSelector(NumberSelectorConfig(mode=NumberSelectorMode.BOX, step=1, unit_of_measurement="minutes"))
+    fields[_object_rows_key(CONF_RUN_WHILE, d, required=False)] = _RUN_WHILE_SELECTOR
 
     # --- Template-specific fields ---
     if template in ("generic", "steps"):
@@ -1954,6 +1986,49 @@ def _primary_series_options(config: dict) -> list[str]:
     return list(dict.fromkeys(_series_label_sources(config.get(CONF_SERIES), config.get(CONF_SERIES_ENTITIES))))
 
 
+def _strict_run_while_row(item: object) -> dict:
+    """Validate + normalize one run_while row, raising invalid_run_while on any problem.
+
+    The entity must be a valid entity_id and the comma-separated states must name at
+    least one state. Returns the row with its states as a list.
+    """
+    rows = run_while_rows([item])
+    if not rows or not valid_entity_id(rows[0][CONF_ENTITY_ID]):
+        raise vol.Invalid("invalid_run_while", path=[CONF_RUN_WHILE])
+    return rows[0]
+
+
+def _parse_run_while(raw: object, *, strict: bool = False) -> list[dict]:
+    """Parse run_while conditions from the row editor ({entity_id, states}, states comma-separated).
+
+    Stored as ``{entity_id, states: [...]}``. Lenient (default) skips malformed rows and
+    truncates past RUN_WHILE_MAX; strict (form paths) raises invalid_run_while /
+    too_many_run_while instead. The field is new, so there is no older string form.
+    """
+    if not strict:
+        return run_while_rows(raw)
+    if not isinstance(raw, list):
+        if raw:
+            raise vol.Invalid("invalid_run_while", path=[CONF_RUN_WHILE])
+        return []
+    rows = [_strict_run_while_row(item) for item in raw]
+    if len(rows) > RUN_WHILE_MAX:
+        raise vol.Invalid("too_many_run_while", path=[CONF_RUN_WHILE])
+    return rows
+
+
+def _parse_calendar_lead_minutes(user_input: dict) -> int:
+    """The calendar lead time as whole minutes in 0..CALENDAR_LEAD_MINUTES_MAX, else invalid_calendar_lead_minutes."""
+    raw = user_input.get(CONF_CALENDAR_LEAD_MINUTES, DEFAULT_CALENDAR_LEAD_MINUTES)
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        raise vol.Invalid("invalid_calendar_lead_minutes", path=[CONF_CALENDAR_LEAD_MINUTES]) from None
+    if not math.isfinite(value) or value != int(value) or not 0 <= value <= CALENDAR_LEAD_MINUTES_MAX:
+        raise vol.Invalid("invalid_calendar_lead_minutes", path=[CONF_CALENDAR_LEAD_MINUTES])
+    return int(value)
+
+
 def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> dict:
     """Normalize user input into an entity config dict.
 
@@ -2041,6 +2116,10 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
     if favorite_script and _entity_domain(favorite_script) != "script":
         raise vol.Invalid("invalid_favorite_script", path=[CONF_MEDIA_FAVORITE_SCRIPT])
 
+    run_while = _parse_run_while(user_input.get(CONF_RUN_WHILE, []), strict=True)
+    # Only a calendar gets the key: its presence is what switches the window lifecycle on.
+    calendar = {CONF_CALENDAR_LEAD_MINUTES: _parse_calendar_lead_minutes(user_input)} if domain == "calendar" else {}
+
     return {
         CONF_ENTITY_ID: entity_id,
         CONF_SLUG: slug,
@@ -2115,6 +2194,8 @@ def _parse_entity_input(user_input: dict, hass: HomeAssistant | None = None) -> 
         CONF_LOG_COLUMNS: log_columns,
         CONF_MEDIA_CONTROLS: bool(user_input.get(CONF_MEDIA_CONTROLS, DEFAULT_MEDIA_CONTROLS)),
         CONF_MEDIA_FAVORITE_SCRIPT: favorite_script,
+        CONF_RUN_WHILE: run_while,
+        **calendar,
     }
 
 
@@ -2167,6 +2248,11 @@ def _entity_reconfigure_defaults(data: Mapping[str, Any]) -> dict[str, Any]:
         )
     if isinstance(current.get(CONF_LOG_COLUMNS), list):
         current[CONF_LOG_COLUMNS] = _truncate_row_fields(current[CONF_LOG_COLUMNS], {CONF_LABEL: LOG_COLUMN_LABEL_MAX})
+    # run_while stores its states as a list; the row editor edits them as one comma string.
+    current[CONF_RUN_WHILE] = [
+        {CONF_ENTITY_ID: row[CONF_ENTITY_ID], CONF_RUN_WHILE_STATES: ", ".join(row[CONF_RUN_WHILE_STATES])}
+        for row in _parse_run_while(current.get(CONF_RUN_WHILE))
+    ]
     # Drop a stored primary_series that names no configured series label
     # (legacy free text, or a series later renamed/removed): the strict parse
     # rejects an unknown value and would otherwise dead-end the reconfigure.

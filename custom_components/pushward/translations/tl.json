@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Mga Start State",
             "end_states": "Mga End State",
+            "calendar_lead_minutes": "Lead Time (minuto)",
+            "run_while": "Habang Lamang",
             "remaining_time_entity": "Entity ng Natitirang Oras",
             "remaining_time_attribute": "Attribute ng Natitirang Oras",
             "total_steps": "Kabuuang Steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Mga Column ng Log"
           },
           "data_description": {
-            "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
+            "start_states": "Mga estado ng entity na nagsisimula ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga. Sinisimulan ito ng `*` sa anumang estado na hindi end state (hindi ito sinisimulan ng unavailable at unknown).",
             "end_states": "Mga estado ng entity na nagtatapos ng Live Activity. Pumili mula sa listahan o mag-type ng mga custom na halaga.",
+            "calendar_lead_minutes": "Hindi pinapansin ng mga calendar entity ang mga start at end state: magbubukas ang activity nang ganitong dami ng minuto bago ang susunod na event na may oras, magbibilang pababa hanggang sa simula nito, pagkatapos hanggang sa pagtatapos, at magtatapos kasabay ng event. Nilalaktawan ang mga buong-araw na event. 0-1440.",
+            "run_while": "Panatilihin ang activity habang tumutugma lang ang bawat row: ang bawat row ay isang entity at listahan ng mga estado nito na hiniwalay ng kuwit (hal. device_tracker.me at home). Kapag huminto sa pagtugma ang isang row, magtatapos ang activity; kapag tumugma muli ang lahat, magsisimula ito kung nasa start state ang sinusubaybayang entity. Hindi kailanman tumutugma ang entity na unavailable. Hanggang 5 row.",
             "remaining_time_entity": "Basahin ang natitirang oras mula sa hiwalay na entity (hal. time sensor ng washer). Iwanang blanko upang gamitin ang na-track na entity. Awtomatikong pina-parse ang timestamp (finish-time) sensor, duration sensor na may units, H:MM:SS string, o plain na segundo.",
             "remaining_time_attribute": "Attribute ng entity na nagtataglay ng natitirang oras sa mga segundo. Halimbawa: remaining",
             "total_steps": "Kabuuang bilang ng mga steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "Dapat https address na may host ang URL ng larawan, at walang username o password.",
         "invalid_image_shape": "Dapat poster, square, o circle ang hugis ng larawan.",
         "invalid_image_thumbhash": "Dapat base64 na standard alphabet na may padding ang ThumbHash ng larawan, at hindi hihigit sa 64 na character. Gamitin ang aksyong Generate ThumbHash para makagawa.",
-        "invalid_favorite_script": "Dapat itumbok ng favorite button ang isang script entity (script.something)."
+        "invalid_favorite_script": "Dapat itumbok ng favorite button ang isang script entity (script.something).",
+        "invalid_run_while": "Bawat kondisyon ay nangangailangan ng entity_id at kahit isang estado (hal. device_tracker.me na may home).",
+        "too_many_run_while": "Hanggang 5 kondisyon lang ang suportado.",
+        "invalid_calendar_lead_minutes": "Ang lead time ay dapat buong bilang ng minuto mula 0 hanggang 1440."
       },
       "abort": {
         "already_configured": "Ang entity na ito ay naka-track na.",

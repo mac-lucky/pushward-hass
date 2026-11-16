@@ -21,9 +21,11 @@ from homeassistant.core import Event, HomeAssistant, State, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import (
     async_call_later,
+    async_track_point_in_utc_time,
     async_track_state_change_event,
 )
 from homeassistant.helpers.storage import Store
+from homeassistant.util import dt as dt_util
 
 from .api import (
     PushWardApiClient,
@@ -48,6 +50,8 @@ from .const import (
     CONF_PRIORITY,
     CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_RUN_WHILE,
+    CONF_RUN_WHILE_STATES,
     CONF_SERIES_ENTITIES,
     CONF_SLUG,
     CONF_SOUND,
@@ -62,11 +66,16 @@ from .const import (
     HISTORY_SEED_MAX,
     LOG_MAX_LINES,
     QUOTA_KIND_LIVE_ACTIVITY_UPDATES,
+    RUN_WHILE_MAX,
+    START_STATE_ANY,
 )
 from .content_mapper import (
     _build_log_line,
     _get_timeline_values,
     _timeline_recorder_sources,
+    calendar_next_boundary,
+    calendar_phase,
+    is_calendar_config,
     lookup_registry_icon,
     map_completion_content,
     map_content,
@@ -127,6 +136,39 @@ def _companion_entity_ids(config: dict) -> list[str]:
     return list(dict.fromkeys(ids))
 
 
+def _is_start(state: str, config: dict) -> bool:
+    """Whether ``state`` starts the activity: a listed start state, or any non-end state for '*'.
+
+    unavailable/unknown never start, whatever the lists say.
+    """
+    if state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+        return False
+    start_states = config.get(CONF_START_STATES) or []
+    if state in start_states:
+        return True
+    return START_STATE_ANY in start_states and state not in (config.get(CONF_END_STATES) or [])
+
+
+def run_while_rows(raw: object) -> list[dict]:
+    """The run_while rows that name an entity and at least one state, states as a list.
+
+    Tolerates a hand-written config: non-dict rows and rows missing either side are
+    skipped, states may be a comma-separated string, and rows past the cap are dropped.
+    """
+    rows: list[dict] = []
+    for row in raw if isinstance(raw, list) else []:
+        if not isinstance(row, dict):
+            continue
+        entity_id = str(row.get(CONF_ENTITY_ID) or "").strip()
+        states = row.get(CONF_RUN_WHILE_STATES)
+        if isinstance(states, str):
+            states = states.split(",")
+        states = [s.strip() for s in states if isinstance(s, str) and s.strip()] if isinstance(states, list) else []
+        if entity_id and states:
+            rows.append({CONF_ENTITY_ID: entity_id, CONF_RUN_WHILE_STATES: states})
+    return rows[:RUN_WHILE_MAX]
+
+
 def _same_log_line(head: dict | None, line: dict) -> bool:
     """Two log lines are "the same event" when text+level match (``at`` ignored).
 
@@ -174,6 +216,10 @@ class TrackedEntity:
     registry_icon: str | None = None
     unsub_state: Callable | None = None
     companion_unsubs: list[Callable] = field(default_factory=list)
+    # run_while entities: their own listener, since they gate start/end and companions never do.
+    condition_unsub: Callable | None = None
+    # Calendar lifecycle: the timer for the event window's next boundary.
+    calendar_unsub: Callable | None = None
     flush_unsub: Callable | None = None
     end_task: asyncio.Task | None = field(default=None, repr=False)
     # At most one _send_update task runs per entity; changes landing while one
@@ -320,6 +366,14 @@ class ActivityManager:
                     )
                 )
 
+            condition_ids = [row[CONF_ENTITY_ID] for row in run_while_rows(entity_cfg.get(CONF_RUN_WHILE))]
+            if condition_ids:
+                tracked.condition_unsub = async_track_state_change_event(
+                    self._hass,
+                    list(dict.fromkeys(condition_ids)),
+                    partial(self._async_on_condition_change, entity_id),
+                )
+
             self._tracked[entity_id] = tracked
 
             current = self._hass.states.get(entity_id)
@@ -330,8 +384,10 @@ class ActivityManager:
                 self._record_log_sample(tracked, current)
 
             # Resume if entity is currently in a start state (HA restart)
-            if current and current.state in entity_cfg.get(CONF_START_STATES, []):
+            if self._should_run(tracked, current):
                 await self._start_activity(entity_id)
+            if is_calendar_config(entity_cfg):
+                self._arm_calendar_timer(entity_id, tracked)
 
         # Prune buffers persisted for entities whose subentry was removed;
         # otherwise they linger in .storage until an unrelated debounced save.
@@ -432,6 +488,14 @@ class ActivityManager:
                 unsub()
             tracked.companion_unsubs.clear()
 
+            if tracked.condition_unsub:
+                tracked.condition_unsub()
+                tracked.condition_unsub = None
+
+            if tracked.calendar_unsub:
+                tracked.calendar_unsub()
+                tracked.calendar_unsub = None
+
         if cancelled:
             await asyncio.gather(*cancelled, return_exceptions=True)
 
@@ -484,8 +548,7 @@ class ActivityManager:
                 if not self._is_ending(tracked):
                     self._schedule_throttled_update(entity_id)
                 continue
-            current = self._hass.states.get(entity_id)
-            if current is not None and current.state in tracked.config.get(CONF_START_STATES, []):
+            if self._should_run(tracked, self._hass.states.get(entity_id)):
                 self._hass.async_create_task(self._start_activity(entity_id))
 
     async def async_reload(self, new_entities: list[dict]) -> None:
@@ -511,18 +574,109 @@ class ActivityManager:
         self._record_log_sample(tracked, new_state)
 
         config = tracked.config
-        start_states = config.get(CONF_START_STATES, [])
+        if is_calendar_config(config):
+            # A new event or edited times move the window; states play no part.
+            self._calendar_evaluate(entity_id)
+            return
+
         end_states = config.get(CONF_END_STATES, [])
+        conditions_hold = self._conditions_hold(config)
 
         # A start state during the completion window means the entity came back
         # before the two-phase end finished -- restart instead of letting the
         # window run out and end an activity whose device is on again.
-        if new_state.state in start_states and (not tracked.is_active or self._is_ending(tracked)):
+        if (
+            _is_start(new_state.state, config)
+            and conditions_hold
+            and (not tracked.is_active or self._is_ending(tracked))
+        ):
             self._hass.async_create_task(self._start_activity(entity_id))
-        elif new_state.state in end_states and tracked.is_active:
+        elif tracked.is_active and (new_state.state in end_states or not conditions_hold):
             self._schedule_end(entity_id)
         elif tracked.is_active:
             self._schedule_throttled_update(entity_id)
+
+    @callback
+    def _async_on_condition_change(self, entity_id: str, _event: Event) -> None:
+        """A run_while entity changed: end when a row stops matching, start when all match again.
+
+        Starting again still needs the tracked entity in a start state (or its calendar
+        window open); a change that leaves the outcome as it was does nothing.
+        """
+        tracked = self._tracked.get(entity_id)
+        if tracked is None:
+            return
+        if not self._conditions_hold(tracked.config):
+            if tracked.is_active:
+                self._schedule_end(entity_id)
+        elif (not tracked.is_active or self._is_ending(tracked)) and self._in_start(
+            tracked, self._hass.states.get(entity_id)
+        ):
+            self._hass.async_create_task(self._start_activity(entity_id))
+
+    def _conditions_hold(self, config: dict) -> bool:
+        """Every run_while row's entity is in one of its states; unavailable/unknown never match."""
+        for row in run_while_rows(config.get(CONF_RUN_WHILE)):
+            state = self._hass.states.get(row[CONF_ENTITY_ID])
+            if (
+                state is None
+                or state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN)
+                or state.state not in row[CONF_RUN_WHILE_STATES]
+            ):
+                return False
+        return True
+
+    def _in_start(self, tracked: TrackedEntity, state: State | None) -> bool:
+        """The tracked entity's own start condition: a start state, or an open calendar window."""
+        if state is None:
+            return False
+        if is_calendar_config(tracked.config):
+            return calendar_phase(state, tracked.config, time.time()) is not None
+        return _is_start(state.state, tracked.config)
+
+    def _should_run(self, tracked: TrackedEntity, state: State | None) -> bool:
+        """Whether the activity belongs up now: its own start condition and every run_while row."""
+        return self._in_start(tracked, state) and self._conditions_hold(tracked.config)
+
+    @callback
+    def _calendar_evaluate(self, entity_id: str) -> None:
+        """Re-arm the next window boundary, then start, update or end the calendar activity."""
+        tracked = self._tracked.get(entity_id)
+        if tracked is None:
+            return
+        self._arm_calendar_timer(entity_id, tracked)
+        should_run = self._should_run(tracked, self._hass.states.get(entity_id))
+        if should_run and (not tracked.is_active or self._is_ending(tracked)):
+            self._hass.async_create_task(self._start_activity(entity_id))
+        elif tracked.is_active and not should_run:
+            self._schedule_end(entity_id)
+        elif tracked.is_active:
+            # Crossing the event start moves the countdown target to the end.
+            self._schedule_throttled_update(entity_id)
+
+    @callback
+    def _arm_calendar_timer(self, entity_id: str, tracked: TrackedEntity) -> None:
+        """Run _calendar_evaluate at the event's next boundary: window open, start or end."""
+        if tracked.calendar_unsub is not None:
+            tracked.calendar_unsub()
+            tracked.calendar_unsub = None
+        state = self._hass.states.get(entity_id)
+        boundary = calendar_next_boundary(state, tracked.config, time.time()) if state is not None else None
+        if boundary is None:
+            return
+        # Never in the past, so a boundary that slipped by cannot re-arm an immediate timer.
+        when = max(dt_util.utc_from_timestamp(boundary), dt_util.utcnow())
+        tracked.calendar_unsub = async_track_point_in_utc_time(
+            self._hass, partial(self._on_calendar_boundary, entity_id), when
+        )
+
+    @callback
+    def _on_calendar_boundary(self, entity_id: str, _now: datetime) -> None:
+        tracked = self._tracked.get(entity_id)
+        if tracked is None:
+            return
+        tracked.calendar_unsub = None
+        self._calendar_evaluate(entity_id)
 
     @callback
     def _async_on_companion_change(self, entity_id: str, event: Event) -> None:
@@ -546,10 +700,8 @@ class ActivityManager:
             # entity unavailable, e.g. right after restart). Retry now that a tile
             # changed, provided the anchor is still in a start state. Logs never
             # defer — a log always has >=1 line from the tracked state.
-            if is_board:
-                anchor = self._hass.states.get(entity_id)
-                if anchor is not None and anchor.state in tracked.config.get(CONF_START_STATES, []):
-                    self._hass.async_create_task(self._start_activity(entity_id))
+            if is_board and self._should_run(tracked, self._hass.states.get(entity_id)):
+                self._hass.async_create_task(self._start_activity(entity_id))
             return
 
         unavailable = new_state is None or new_state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN)

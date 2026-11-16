@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "开始状态",
             "end_states": "结束状态",
+            "calendar_lead_minutes": "提前时间（分钟）",
+            "run_while": "仅在以下条件下运行",
             "remaining_time_entity": "剩余时间实体",
             "remaining_time_attribute": "剩余时间属性",
             "total_steps": "总 steps 数",
@@ -2179,8 +2181,10 @@
             "log_columns": "日志列"
           },
           "data_description": {
-            "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。",
+            "start_states": "启动 Live Activity 的实体状态。从列表中选择或输入自定义值。`*` 表示在任何非结束状态下启动（unavailable 和 unknown 永远不会启动）。",
             "end_states": "结束 Live Activity 的实体状态。从列表中选择或输入自定义值。",
+            "calendar_lead_minutes": "日历实体会忽略启动和结束状态：活动在下一个有具体时间的日程开始前这么多分钟打开，倒计时到开始，然后倒计时到结束，并随日程一起结束。全天日程会被跳过。0-1440。",
+            "run_while": "仅在每一行都匹配时保持活动：每行是一个实体及其状态的逗号分隔列表（例如 device_tracker.me 和 home）。任一行不再匹配时活动结束；全部再次匹配时，如果被跟踪的实体处于启动状态，活动会再次启动。不可用的实体永远不匹配。最多 5 行。",
             "remaining_time_entity": "从单独的实体（例如洗衣机的时间传感器）读取剩余时间。留空则使用被追踪实体。可自动解析时间戳（完成时间）传感器、带单位的时长传感器、H:MM:SS 字符串或纯秒数。",
             "remaining_time_attribute": "持有剩余时间（秒）的实体属性。示例：remaining",
             "total_steps": "steps 总数。",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "图片 URL 必须是带主机名的 https 地址，且不能包含用户名或密码。",
         "invalid_image_shape": "图片形状必须是 poster、square 或 circle。",
         "invalid_image_thumbhash": "图片 ThumbHash 必须是标准字母表且带填充的 base64，最多 64 个字符。可使用 Generate ThumbHash 动作生成。",
-        "invalid_favorite_script": "收藏按钮必须指向一个 script 实体（script.something）。"
+        "invalid_favorite_script": "收藏按钮必须指向一个 script 实体（script.something）。",
+        "invalid_run_while": "每个条件都需要一个 entity_id 和至少一个状态（例如 device_tracker.me 搭配 home）。",
+        "too_many_run_while": "最多支持 5 个条件。",
+        "invalid_calendar_lead_minutes": "提前时间必须是 0 到 1440 之间的整数分钟。"
       },
       "abort": {
         "already_configured": "此实体已被追踪。",

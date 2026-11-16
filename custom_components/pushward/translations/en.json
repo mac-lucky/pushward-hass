@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Start States",
             "end_states": "End States",
+            "calendar_lead_minutes": "Lead Time (minutes)",
+            "run_while": "Run Only While",
             "remaining_time_entity": "Remaining Time Entity",
             "remaining_time_attribute": "Remaining Time Attribute",
             "total_steps": "Total Steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Log Columns"
           },
           "data_description": {
-            "start_states": "Entity states that start the Live Activity. Select from the list or type custom values.",
+            "start_states": "Entity states that start the Live Activity. Select from the list or type custom values. `*` starts it on any state that is not an end state (unavailable and unknown never do).",
             "end_states": "Entity states that end the Live Activity. Select from the list or type custom values.",
+            "calendar_lead_minutes": "Calendar entities ignore the start and end states: the activity opens this many minutes before the next timed event, counts down to its start, then to its end, and ends with the event. All-day events are skipped. 0-1440.",
+            "run_while": "Keep the activity up only while every row matches: each row is an entity and a comma-separated list of its states (e.g. device_tracker.me and home). When a row stops matching the activity ends; once all match again it starts if the tracked entity is in a start state. An unavailable entity never matches. Up to 5 rows.",
             "remaining_time_entity": "Read remaining time from a separate entity (e.g. a washer's time sensor). Leave empty to use the tracked entity. Auto-parses a timestamp (finish-time) sensor, a duration sensor with units, an H:MM:SS string, or plain seconds.",
             "remaining_time_attribute": "Attribute holding remaining time (on the source entity, or the tracked entity if no source is set). Leave empty to use the source entity's state. Example: remaining",
             "total_steps": "Total number of steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "Image URL must be an https address with a host and no username or password.",
         "invalid_image_shape": "Image shape must be poster, square, or circle.",
         "invalid_image_thumbhash": "Image ThumbHash must be padded standard-alphabet base64, at most 64 characters. Use the Generate ThumbHash action to produce one.",
-        "invalid_favorite_script": "The favorite button must point at a script entity (script.something)."
+        "invalid_favorite_script": "The favorite button must point at a script entity (script.something).",
+        "invalid_run_while": "Each condition needs an entity_id and at least one state (e.g. device_tracker.me with home).",
+        "too_many_run_while": "At most 5 conditions are supported.",
+        "invalid_calendar_lead_minutes": "Lead time must be a whole number of minutes from 0 to 1440."
       },
       "abort": {
         "already_configured": "This entity is already tracked.",

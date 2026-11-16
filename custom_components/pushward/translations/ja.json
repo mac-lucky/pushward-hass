@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "開始状態",
             "end_states": "終了状態",
+            "calendar_lead_minutes": "事前時間（分）",
+            "run_while": "実行条件",
             "remaining_time_entity": "残り時間エンティティ",
             "remaining_time_attribute": "残り時間属性",
             "total_steps": "総 steps 数",
@@ -2179,8 +2181,10 @@
             "log_columns": "ログ列"
           },
           "data_description": {
-            "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
+            "start_states": "Live Activityを開始するエンティティの状態。リストから選択するか、カスタム値を入力してください。`*` は終了状態以外のすべての状態で開始します（unavailable と unknown では開始しません）。",
             "end_states": "Live Activityを終了するエンティティの状態。リストから選択するか、カスタム値を入力してください。",
+            "calendar_lead_minutes": "カレンダーエンティティは開始状態と終了状態を無視します。アクティビティは時刻付きの次の予定のこの分数前に開き、開始時刻まで、その後終了時刻までカウントダウンし、予定とともに終了します。終日の予定はスキップされます。0-1440。",
+            "run_while": "すべての行が一致している間だけアクティビティを表示します。各行はエンティティと、その状態のカンマ区切りリストです（例: device_tracker.me と home）。一致しない行があるとアクティビティは終了し、再びすべて一致したとき、追跡中のエンティティが開始状態であれば開始します。利用できないエンティティは一致しません。最大 5 行。",
             "remaining_time_entity": "別のエンティティ（例: 洗濯機の時間センサー）から残り時間を読み取ります。空白のままにすると追跡エンティティを使用します。タイムスタンプ（終了時刻）センサー、単位付きの継続時間センサー、H:MM:SS 文字列、または単純な秒数を自動的に解析します。",
             "remaining_time_attribute": "残り時間（秒）を持つエンティティ属性。例: remaining",
             "total_steps": "steps の総数。",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "画像 URL はホストを含む https アドレスで、ユーザー名とパスワードを含めることはできません。",
         "invalid_image_shape": "画像の形は poster、square、circle のいずれかにしてください。",
         "invalid_image_thumbhash": "画像の ThumbHash は標準アルファベットのパディング付き base64 で、64 文字以内にしてください。Generate ThumbHash アクションで生成できます。",
-        "invalid_favorite_script": "お気に入りボタンは script エンティティ（script.something）を指定する必要があります。"
+        "invalid_favorite_script": "お気に入りボタンは script エンティティ（script.something）を指定する必要があります。",
+        "invalid_run_while": "各条件には entity_id と 1 つ以上の状態が必要です（例: device_tracker.me と home）。",
+        "too_many_run_while": "条件は最大 5 つまでです。",
+        "invalid_calendar_lead_minutes": "事前時間は 0 から 1440 までの整数（分）で指定してください。"
       },
       "abort": {
         "already_configured": "このエンティティはすでに追跡されています。",

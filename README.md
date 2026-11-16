@@ -198,7 +198,9 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 | Activity Name | Display name on the phone |
 | Icon / Icon Attribute | Static MDI/SF Symbol, or an entity attribute for a dynamic icon |
 | Priority | 0-10 (default: 1) |
-| Start / End States | States that trigger start or end |
+| Start / End States | States that trigger start or end. `*` as a start state matches any state that is not an end state |
+| Run Only While | Rows of an entity and its comma-separated states; the activity runs only while every row matches, max 5 |
+| Lead Time | Calendar entities only: minutes before the next timed event that the activity opens (0-1440, default 30) |
 | Update Interval | Min seconds between updates (default: 5) |
 | Progress Entity / Attribute | 0-100 progress, optionally from a separate entity |
 | Live Progress ETA | Fill the progress bar smoothly and count down an ETA to the finish time, using the remaining-time source (generic/steps templates; on steps it fills the current step) |
@@ -234,6 +236,14 @@ A two-step flow. **Step 1** picks the entity and a template (a better template i
 Board tiles, stat rows, series entities, thresholds, log columns, state labels, the timeline series and per-series units maps, and the per-step details are all edited as row tables in the UI (add a row per entry). Stored configs and non-form callers keep working: the older comma-separated string forms for these fields are still accepted on input.
 
 </details>
+
+#### Wildcard start, run-while conditions, calendars
+
+`*` in Start States matches any state that is not an end state, so a `device_tracker` or `person` (whose defaults are `*` and `home`) keeps the activity up while it is away, whatever zone it is in. `unavailable` and `unknown` never start an activity.
+
+Run Only While adds conditions on other entities. Each row is an entity and the states it has to be in, comma-separated (`device_tracker.me`, `home`). The activity starts only when the tracked entity is in a start state and every row matches. When a row stops matching it ends with the usual completion frame, and it starts again once the row matches while the tracked entity is still in a start state. A condition entity that is unavailable counts as not matching.
+
+A `calendar` entity ignores Start/End States and follows its next timed event instead: Lead Time minutes before the event (30 by default) the activity opens and counts down to the start, from the start it counts down to the end, and it ends with the event. All-day events are skipped. The event title is the state text, and on the countdown template the start and end dates are pinned to the event so the bar fills across each phase. A calendar subentry saved before Lead Time existed keeps its start/end states until it is reconfigured and saved.
 
 #### Reading values from separate entities
 
@@ -1355,6 +1365,9 @@ apply at add time only - a player tracked before 0.43.0 still carries the old me
 | timer | active | idle, paused | mdi:timer-outline |
 | update | on | off | mdi:package-up |
 | water_heater | heating | off, idle | mdi:water-boiler |
+| device_tracker | `*` (any state but the end states) | home | mdi:map-marker-account |
+| person | `*` (any state but the end states) | home | mdi:account-arrow-right |
+| calendar | *(not used: the event window drives it)* | *(not used)* | mdi:calendar |
 | sensor | *(user-defined)* | *(user-defined)* | mdi:eye |
 | weather | *(user-defined)* | *(user-defined)* | mdi:weather-cloudy |
 

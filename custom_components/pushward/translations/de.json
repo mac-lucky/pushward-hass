@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Startzustände",
             "end_states": "Endzustände",
+            "calendar_lead_minutes": "Vorlaufzeit (Minuten)",
+            "run_while": "Nur aktiv solange",
             "remaining_time_entity": "Entität für verbleibende Zeit",
             "remaining_time_attribute": "Attribut für verbleibende Zeit",
             "total_steps": "Anzahl Steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Protokollspalten"
           },
           "data_description": {
-            "start_states": "Entitätszustände, die die Live Activity starten. Aus der Liste wählen oder eigene Werte eingeben.",
+            "start_states": "Entitätszustände, die die Live Activity starten. Aus der Liste wählen oder eigene Werte eingeben. `*` startet sie bei jedem Zustand, der kein Endzustand ist (unavailable und unknown starten sie nie).",
             "end_states": "Entitätszustände, die die Live Activity beenden. Aus der Liste wählen oder eigene Werte eingeben.",
+            "calendar_lead_minutes": "Kalender-Entitäten ignorieren die Start- und Endzustände: Die Live Activity öffnet so viele Minuten vor dem nächsten Termin mit Uhrzeit, zählt bis zu seinem Beginn herunter, dann bis zu seinem Ende, und endet mit dem Termin. Ganztägige Termine werden übersprungen. 0-1440.",
+            "run_while": "Die Live Activity läuft nur, solange jede Zeile zutrifft: Jede Zeile ist eine Entität und eine kommagetrennte Liste ihrer Zustände (z. B. device_tracker.me und home). Trifft eine Zeile nicht mehr zu, endet sie; treffen wieder alle zu, startet sie, wenn die verfolgte Entität in einem Startzustand ist. Eine nicht verfügbare Entität trifft nie zu. Bis zu 5 Zeilen.",
             "remaining_time_entity": "Verbleibende Zeit aus einer separaten Entität lesen (z. B. dem Zeitsensor einer Waschmaschine). Leer lassen, um die verfolgte Entität zu verwenden. Erkennt automatisch einen Zeitstempel-Sensor (Endzeit), einen Dauersensor mit Einheiten, eine H:MM:SS-Zeichenkette oder reine Sekunden.",
             "remaining_time_attribute": "Entitätsattribut mit der verbleibenden Zeit in Sekunden. Beispiel: remaining",
             "total_steps": "Gesamtanzahl der steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "Die Bild-URL muss eine https-Adresse mit Host sein und darf keinen Benutzernamen und kein Passwort enthalten.",
         "invalid_image_shape": "Die Bildform muss poster, square oder circle sein.",
         "invalid_image_thumbhash": "Der Bild-ThumbHash muss Base64 im Standardalphabet mit Auffüllung sein und höchstens 64 Zeichen lang. Mit der Aktion Generate ThumbHash lässt sich einer erzeugen.",
-        "invalid_favorite_script": "Die Favoriten-Schaltfläche muss auf eine Skript-Entität verweisen (script.something)."
+        "invalid_favorite_script": "Die Favoriten-Schaltfläche muss auf eine Skript-Entität verweisen (script.something).",
+        "invalid_run_while": "Jede Bedingung braucht eine entity_id und mindestens einen Zustand (z. B. device_tracker.me mit home).",
+        "too_many_run_while": "Es werden höchstens 5 Bedingungen unterstützt.",
+        "invalid_calendar_lead_minutes": "Die Vorlaufzeit muss eine ganze Zahl von Minuten zwischen 0 und 1440 sein."
       },
       "abort": {
         "already_configured": "Diese Entität wird bereits verfolgt.",

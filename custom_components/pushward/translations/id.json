@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "Status Awal",
             "end_states": "Status Akhir",
+            "calendar_lead_minutes": "Waktu Sebelum Acara (menit)",
+            "run_while": "Hanya Selama",
             "remaining_time_entity": "Entitas Waktu Tersisa",
             "remaining_time_attribute": "Atribut Waktu Tersisa",
             "total_steps": "Total Langkah",
@@ -2179,8 +2181,10 @@
             "log_columns": "Kolom Log"
           },
           "data_description": {
-            "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom.",
+            "start_states": "Status entitas yang memulai Live Activity. Pilih dari daftar atau ketik nilai kustom. `*` memulainya pada status apa pun yang bukan status akhir (unavailable dan unknown tidak pernah memulainya).",
             "end_states": "Status entitas yang mengakhiri Live Activity. Pilih dari daftar atau ketik nilai kustom.",
+            "calendar_lead_minutes": "Entitas kalender mengabaikan status mulai dan akhir: aktivitas dibuka sekian menit sebelum acara berwaktu berikutnya, menghitung mundur ke awalnya, lalu ke akhirnya, dan berakhir bersama acara. Acara sepanjang hari dilewati. 0-1440.",
+            "run_while": "Pertahankan aktivitas hanya selama setiap baris cocok: setiap baris adalah entitas dan daftar statusnya yang dipisahkan koma (mis. device_tracker.me dan home). Saat satu baris tidak lagi cocok, aktivitas berakhir; saat semuanya cocok lagi, aktivitas dimulai jika entitas yang dilacak berada dalam status mulai. Entitas yang tidak tersedia tidak pernah cocok. Hingga 5 baris.",
             "remaining_time_entity": "Baca waktu tersisa dari entitas terpisah (mis. sensor waktu mesin cuci). Biarkan kosong untuk menggunakan entitas yang dilacak. Mengurai otomatis sensor stempel waktu (waktu selesai), sensor durasi dengan satuan, string H:MM:SS, atau detik biasa.",
             "remaining_time_attribute": "Atribut entitas yang menyimpan waktu tersisa dalam detik. Contoh: remaining",
             "total_steps": "Total jumlah steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "URL gambar harus berupa alamat https dengan host, tanpa nama pengguna atau kata sandi.",
         "invalid_image_shape": "Bentuk gambar harus poster, square, atau circle.",
         "invalid_image_thumbhash": "ThumbHash gambar harus base64 alfabet standar dengan padding, maksimal 64 karakter. Gunakan aksi Generate ThumbHash untuk membuatnya.",
-        "invalid_favorite_script": "Tombol favorit harus mengarah ke entitas script (script.something)."
+        "invalid_favorite_script": "Tombol favorit harus mengarah ke entitas script (script.something).",
+        "invalid_run_while": "Setiap kondisi memerlukan entity_id dan minimal satu status (mis. device_tracker.me dengan home).",
+        "too_many_run_while": "Maksimal 5 kondisi yang didukung.",
+        "invalid_calendar_lead_minutes": "Waktu sebelum acara harus berupa bilangan bulat menit dari 0 hingga 1440."
       },
       "abort": {
         "already_configured": "Entitas ini sudah dilacak.",

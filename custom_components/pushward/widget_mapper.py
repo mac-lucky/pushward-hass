@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import math
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant, State
@@ -101,6 +101,7 @@ from .content_mapper import (
     add_all_tap_actions,
     color_to_str,
     is_valid_color,
+    parse_ha_datetime,
     resolve_color,
     resolve_icon,
 )
@@ -203,32 +204,6 @@ def _is_unavailable(state: State | None) -> bool:
 # ----- dates and timers -----
 
 
-def _parse_widget_datetime(raw: object) -> datetime | None:
-    """Parse an HA attribute into an aware datetime, or None.
-
-    Accepts what integrations actually publish: an RFC 3339 / ISO string, a real
-    datetime, or a unix epoch number. A naive datetime is read as HA local time,
-    matching how HA renders one.
-    """
-    if raw is None or isinstance(raw, bool):
-        return None
-    if isinstance(raw, datetime):
-        return dt_util.as_utc(raw) if raw.tzinfo else dt_util.as_utc(dt_util.as_local(raw))
-    if isinstance(raw, (int, float)):
-        if not math.isfinite(raw):
-            return None
-        try:
-            return datetime.fromtimestamp(raw, tz=UTC)
-        except (OverflowError, OSError, ValueError):
-            return None
-    if not isinstance(raw, str) or not raw.strip():
-        return None
-    parsed = dt_util.parse_datetime(raw.strip())
-    if parsed is None:
-        return None
-    return dt_util.as_utc(parsed) if parsed.tzinfo else dt_util.as_utc(dt_util.as_local(parsed))
-
-
 def _widget_date_ok(value: datetime) -> bool:
     """True when the server's date bounds would accept ``value``.
 
@@ -269,7 +244,7 @@ def _read_datetime(
     assert source is not None
     attr = config.get(attr_key) if attr_key else None
     raw = source.attributes.get(attr) if attr else source.state
-    parsed = _parse_widget_datetime(raw)
+    parsed = parse_ha_datetime(raw)
     if parsed is None or not _widget_date_ok(parsed):
         return None
     return parsed
@@ -763,7 +738,7 @@ def _map_schedule(state: State, config: dict, content: dict) -> dict | None:
 
     by_start: dict[float, dict] = {}
     for item in raw_periods:
-        when = _parse_widget_datetime(item.get(start_key))
+        when = parse_ha_datetime(item.get(start_key))
         if when is None or not _widget_date_ok(when):
             continue
         value = _finite(_coerce_float(item.get(value_key)))
@@ -942,7 +917,7 @@ def _map_stat_list(hass: HomeAssistant, config: dict) -> dict | None:
             out["unit"] = _truncate(str(unit), WIDGET_STAT_UNIT_MAX)
         style = str(row.get("timer_style", "") or "").strip().lower()
         if style in TIMER_STYLES:
-            when = _parse_widget_datetime(raw)
+            when = parse_ha_datetime(raw)
             if when is not None and _widget_date_ok(when):
                 out["timer"] = {"date": _iso(when), "style": style}
         rows_out.append(out)

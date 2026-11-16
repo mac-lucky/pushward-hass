@@ -2160,6 +2160,8 @@
           "data": {
             "start_states": "États de démarrage",
             "end_states": "États de fin",
+            "calendar_lead_minutes": "Délai d'avance (minutes)",
+            "run_while": "Uniquement tant que",
             "remaining_time_entity": "Entité de temps restant",
             "remaining_time_attribute": "Attribut de temps restant",
             "total_steps": "Nombre total de steps",
@@ -2179,8 +2181,10 @@
             "log_columns": "Colonnes de journal"
           },
           "data_description": {
-            "start_states": "États de l'entité qui démarrent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées.",
+            "start_states": "États de l'entité qui démarrent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées. `*` la démarre sur tout état qui n'est pas un état de fin (unavailable et unknown ne la démarrent jamais).",
             "end_states": "États de l'entité qui terminent la Live Activity. Sélectionner dans la liste ou saisir des valeurs personnalisées.",
+            "calendar_lead_minutes": "Les entités de calendrier ignorent les états de début et de fin : la Live Activity s'ouvre ce nombre de minutes avant le prochain événement avec horaire, décompte jusqu'à son début, puis jusqu'à sa fin, et se termine avec l'événement. Les événements sur toute la journée sont ignorés. 0-1440.",
+            "run_while": "Ne garder la Live Activity que tant que chaque ligne correspond : chaque ligne est une entité et une liste de ses états séparés par des virgules (ex. device_tracker.me et home). Si une ligne ne correspond plus, elle se termine ; quand toutes correspondent à nouveau, elle démarre si l'entité suivie est dans un état de début. Une entité indisponible ne correspond jamais. Jusqu'à 5 lignes.",
             "remaining_time_entity": "Lire le temps restant depuis une entité distincte (ex. le capteur de temps d'un lave-linge). Laisser vide pour utiliser l'entité suivie. Analyse automatiquement un capteur d'horodatage (heure de fin), un capteur de durée avec unités, une chaîne H:MM:SS ou de simples secondes.",
             "remaining_time_attribute": "Attribut de l'entité contenant le temps restant en secondes. Exemple : remaining",
             "total_steps": "Nombre total de steps.",
@@ -2408,7 +2412,10 @@
         "invalid_image_url": "L'URL de l'image doit être une adresse https avec un hôte, sans nom d'utilisateur ni mot de passe.",
         "invalid_image_shape": "La forme de l'image doit être poster, square ou circle.",
         "invalid_image_thumbhash": "Le ThumbHash de l'image doit être en base64 alphabet standard avec remplissage, et faire au plus 64 caractères. Utilisez l'action Generate ThumbHash pour en produire un.",
-        "invalid_favorite_script": "Le bouton favori doit pointer vers une entité script (script.something)."
+        "invalid_favorite_script": "Le bouton favori doit pointer vers une entité script (script.something).",
+        "invalid_run_while": "Chaque condition nécessite un entity_id et au moins un état (ex. device_tracker.me avec home).",
+        "too_many_run_while": "5 conditions au maximum sont prises en charge.",
+        "invalid_calendar_lead_minutes": "Le délai d'avance doit être un nombre entier de minutes entre 0 et 1440."
       },
       "abort": {
         "already_configured": "Cette entité est déjà suivie.",
