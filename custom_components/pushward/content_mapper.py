@@ -552,6 +552,12 @@ def _build_checklist_items(entity_config: dict) -> list[dict]:
     ``checked`` goes out only when the row sets it, so the server keeps a tick
     made on a phone.
     """
+    # Latent tick-wipe hazard, unreachable today: TEMPLATES does not offer checklist,
+    # so no config flow writes CONF_CHECKLIST_ITEMS and only tests reach this. The
+    # server lets an explicit `checked` override the stored tick, so a row that sets
+    # it would be re-sent on every state change of the tracked entity and undo a tick
+    # made on a phone. Before the flow offers checklist, keep `checked` off the rows
+    # (or send it on the first frame only).
     items: list[dict] = []
     for raw in entity_config.get(CONF_CHECKLIST_ITEMS) or []:
         if not isinstance(raw, dict):
