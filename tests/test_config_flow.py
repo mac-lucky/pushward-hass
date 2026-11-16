@@ -1263,6 +1263,21 @@ def _uids(entry: MockConfigEntry) -> dict[str, str | None]:
     return {sub.data[CONF_ENTITY_ID]: sub.unique_id for sub in entry.subentries.values()}
 
 
+def _count_updates(entry: MockConfigEntry) -> AsyncMock:
+    """An update listener; each call is one reload of every manager."""
+    listener = AsyncMock()
+    entry.add_update_listener(listener)
+    return listener
+
+
+async def _assert_one_update(hass: HomeAssistant, entry: MockConfigEntry, listener: AsyncMock) -> None:
+    """One submit is one saved entry update, the re-keyed holder included."""
+    await hass.async_block_till_done()
+    assert listener.call_count == 1
+    saved = {sub["subentry_id"]: sub["unique_id"] for sub in entry.as_dict()["subentries"]}
+    assert saved == {sid: sub.unique_id for sid, sub in entry.subentries.items()}
+
+
 async def test_reconfigure_entity_onto_an_entity_held_only_as_a_stale_unique_id(hass: HomeAssistant) -> None:
     entry = _mock_entry(
         subentries_data=[
@@ -1272,6 +1287,7 @@ async def test_reconfigure_entity_onto_an_entity_held_only_as_a_stale_unique_id(
     )
     entry.add_to_hass(hass)
     dishwasher_id = next(sid for sid, sub in entry.subentries.items() if sub.unique_id == "binary_sensor.dishwasher")
+    updates = _count_updates(entry)
 
     result = await _reconfigure_entity_onto(hass, entry, dishwasher_id, "binary_sensor.washer")
 
@@ -1280,6 +1296,7 @@ async def test_reconfigure_entity_onto_an_entity_held_only_as_a_stale_unique_id(
         "binary_sensor.dryer": "binary_sensor.dryer",
         "binary_sensor.washer": "binary_sensor.washer",
     }
+    await _assert_one_update(hass, entry, updates)
 
 
 async def test_reconfigure_entity_in_place_frees_its_id_from_a_stale_holder(hass: HomeAssistant) -> None:
@@ -1292,6 +1309,7 @@ async def test_reconfigure_entity_in_place_frees_its_id_from_a_stale_holder(hass
     )
     entry.add_to_hass(hass)
     dryer_id = next(sid for sid, sub in entry.subentries.items() if sub.data[CONF_ENTITY_ID] == "binary_sensor.dryer")
+    updates = _count_updates(entry)
 
     result = await _reconfigure_entity_onto(hass, entry, dryer_id, "binary_sensor.dryer")
 
@@ -1300,6 +1318,7 @@ async def test_reconfigure_entity_in_place_frees_its_id_from_a_stale_holder(hass
         "binary_sensor.dryer": "binary_sensor.dryer",
         "binary_sensor.dishwasher": "binary_sensor.dishwasher",
     }
+    await _assert_one_update(hass, entry, updates)
 
 
 async def test_add_entity_frees_a_stale_id_and_leaves_a_holder_whose_own_id_is_held_without_one(
@@ -1312,6 +1331,7 @@ async def test_add_entity_frees_a_stale_id_and_leaves_a_holder_whose_own_id_is_h
         ]
     )
     entry.add_to_hass(hass)
+    updates = _count_updates(entry)
 
     result = await _add_entity_subentry(hass, entry)
 
@@ -1321,6 +1341,7 @@ async def test_add_entity_frees_a_stale_id_and_leaves_a_holder_whose_own_id_is_h
         "binary_sensor.oven": "binary_sensor.dishwasher",
         "binary_sensor.washer": "binary_sensor.washer",
     }
+    await _assert_one_update(hass, entry, updates)
 
 
 def _widget_subentry_data(**overrides) -> ConfigSubentryData:
@@ -1372,6 +1393,7 @@ async def test_reconfigure_widget_onto_a_slug_held_only_as_a_stale_unique_id(has
     entry = _mock_entry(subentries_data=[moved, _widget_subentry_data()])
     entry.add_to_hass(hass)
     users_id = next(sid for sid, sub in entry.subentries.items() if sub.unique_id == "ha-users")
+    updates = _count_updates(entry)
 
     result = await _reconfigure_widget_onto(hass, entry, users_id, "ha-members")
 
@@ -1380,6 +1402,7 @@ async def test_reconfigure_widget_onto_a_slug_held_only_as_a_stale_unique_id(has
         "ha-old": "ha-old",
         "ha-members": "ha-members",
     }
+    await _assert_one_update(hass, entry, updates)
 
 
 # --- Template auto-suggestion tests ---
