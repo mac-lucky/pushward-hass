@@ -78,6 +78,7 @@ from custom_components.pushward.const import (
     WIDGET_TEMPLATE_STAT_LIST,
     WIDGET_TEMPLATE_TREND,
 )
+from custom_components.pushward.content_mapper import with_cleared_keys
 from custom_components.pushward.e2e import E2EError, open_envelope
 from custom_components.pushward.panel import PANEL_URL_PATH, STATIC_URL_PATH
 from custom_components.pushward.websocket import MAX_PAYLOAD_BYTES, _parse_draft
@@ -961,7 +962,9 @@ async def test_send_test_activity_send_and_end(loaded, ws) -> None:
     assert reply["success"]
     # Priority 0, the lowest: at the Live Activity cap a test on the phone goes before tracked activities above it.
     api.create_activity.assert_awaited_once_with("ha-preview", "Washer", 0)
-    api.update_activity.assert_awaited_once_with("ha-preview", "ongoing", content)
+    # Each test clears what the last one left stored: the upsert never resets content.
+    api.update_activity.assert_awaited_once_with("ha-preview", "ongoing", with_cleared_keys(content, None))
+    assert api.update_activity.await_args.args[2]["image_url"] is None
 
     reply = await ws("pushward/send_test", entry_id=entry.entry_id, kind="activity", action="end")
     assert reply["success"]

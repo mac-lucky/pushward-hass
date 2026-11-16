@@ -1217,6 +1217,10 @@ OPTIONAL_CONTENT_KEYS = frozenset(
 )
 
 
+_ACTION_KEYS = ("tap_action", "url_action", "secondary_url_action")
+_OPTIONAL_ACTION_FIELDS = frozenset({"method", "headers", "body", "title"})
+
+
 def with_cleared_keys(content: dict, last_content: dict | None) -> dict:
     """``content`` plus a null for each optional key the server may still hold that this frame omits.
 
@@ -1226,7 +1230,13 @@ def with_cleared_keys(content: dict, last_content: dict | None) -> dict:
     previous run's keys are still stored.
     """
     held = OPTIONAL_CONTENT_KEYS if last_content is None else OPTIONAL_CONTENT_KEYS & last_content.keys()
-    return content | dict.fromkeys(held - content.keys())
+    patch = content | dict.fromkeys(held - content.keys())
+    # The server merges an action object field by field as well: a POST method left from
+    # an http URL would make a later custom-scheme URL fail validation on every push.
+    for key in _ACTION_KEYS:
+        if isinstance(action := content.get(key), dict):
+            patch[key] = dict.fromkeys(_OPTIONAL_ACTION_FIELDS - action.keys()) | action
+    return patch
 
 
 def map_content(

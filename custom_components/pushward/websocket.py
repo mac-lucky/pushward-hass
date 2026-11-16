@@ -61,7 +61,7 @@ from .const import (
     WIDGET_TEMPLATE_HEATMAP,
     WIDGET_TEMPLATES,
 )
-from .content_mapper import lookup_registry_icon, map_content
+from .content_mapper import lookup_registry_icon, map_content, with_cleared_keys
 from .e2e import E2EError, seal
 from .recorder_history import async_daily_values
 from .widget_manager import TrackedWidget, _entity_ids_for_widget, heatmap_read
@@ -408,7 +408,10 @@ async def ws_send_test(hass: HomeAssistant, connection: websocket_api.ActiveConn
         # lowest-priority, least recently updated activity, so a test already on the phone
         # goes before any tracked activity above priority 0.
         await api.create_activity(PREVIEW_ACTIVITY_SLUG, payload["name"], PRIORITY_MIN)
-        await api.update_activity(PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ONGOING, payload["content"])
+        # Every test is a first frame: the upsert keeps the last test's content, so clear it.
+        await api.update_activity(
+            PREVIEW_ACTIVITY_SLUG, ACTIVITY_STATE_ONGOING, with_cleared_keys(payload["content"], None)
+        )
     elif kind == "activity":
         # An empty merge patch keeps the stored frame and only ends it. A 404 is already gone
         # (dismissed and cleaned up, or deleted elsewhere): nothing is left to end.

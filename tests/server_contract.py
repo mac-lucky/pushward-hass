@@ -262,6 +262,8 @@ def _check_tap_action(action: object, field: str, where: str) -> None:
         return
     if not isinstance(action, dict):
         _fail(where, f"{field} must be an object, got {type(action).__name__}")
+    # A null field is a merge-patch delete: the server validates the action without it.
+    action = {k: v for k, v in action.items() if v is not None}
     url = action.get("url", "")
     if not url:
         _fail(where, f"{field}.url is required when {field} is present")

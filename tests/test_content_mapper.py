@@ -821,6 +821,17 @@ def test_with_cleared_keys_nulls_what_the_server_may_still_hold():
     assert content == {"template": "generic", "subtitle": "Washer", "unit": "W"}
 
 
+def test_with_cleared_keys_nulls_the_action_fields_a_frame_drops():
+    """The server merges an action field by field: a POST left from an http URL fails a custom-scheme one."""
+    action = {"url": "homeassistant://navigate/lovelace/home", "foreground": False}
+    cleared = {**action, "method": None, "headers": None, "body": None, "title": None}
+    last = {"tap_action": {"url": "https://hook.example/x", "foreground": False, "method": "POST"}}
+
+    assert with_cleared_keys({"template": "generic", "tap_action": action}, last)["tap_action"] == cleared
+    assert with_cleared_keys({"template": "generic", "url_action": action}, None)["url_action"] == cleared
+    assert action == {"url": "homeassistant://navigate/lovelace/home", "foreground": False}
+
+
 def test_every_key_the_mapper_writes_is_classified():
     """A key the mapper sets only sometimes belongs in OPTIONAL_CONTENT_KEYS, or it is never nulled.
 
