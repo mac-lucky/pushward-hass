@@ -2,7 +2,7 @@ Third-party software and assets compiled into the files in this directory, with 
 
 ------------------------------------------------------------------------------
 
-@inlang/paraglide-js 3.2.1 (MIT)
+@inlang/paraglide-js 3.2.2 (MIT)
 
 MIT License
 
