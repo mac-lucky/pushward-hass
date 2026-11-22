@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from homeassistant.config_entries import ConfigSubentry
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -15,10 +16,11 @@ from custom_components.pushward.const import (
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
     DOMAIN,
+    SUBENTRY_TYPE_ENTITY,
 )
 from custom_components.pushward.e2e import key_id
 
-from .conftest import make_usage_payload
+from .conftest import make_entity_config, make_usage_payload
 
 KEY_HEX = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
 KID = key_id(bytes.fromhex(KEY_HEX))
@@ -148,3 +150,33 @@ async def test_changing_the_key_swaps_it_in_without_a_reload(hass: HomeAssistant
     reload.assert_not_called()
     # A reminder refused under the old key gets another try under the new one.
     assert retry_refused.call_count == 2
+
+
+async def test_only_a_manager_whose_configs_changed_restarts(hass: HomeAssistant) -> None:
+    """An entry update that leaves the activity and widget configs alone keeps every card up."""
+    api = AsyncMock()
+    api.get_me = AsyncMock(return_value=make_usage_payload())
+    entry = _entry()
+    entry.add_to_hass(hass)
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    data = hass.data[DOMAIN][entry.entry_id]
+    with (
+        patch.object(data["manager"], "async_reload") as reload,
+        patch.object(data["widget_manager"], "async_reload") as widget_reload,
+    ):
+        hass.config_entries.async_update_entry(entry, title="Home")
+        await hass.async_block_till_done()
+        reload.assert_not_called()
+
+        config = make_entity_config()
+        hass.config_entries.async_add_subentry(
+            entry,
+            ConfigSubentry(data=config, subentry_type=SUBENTRY_TYPE_ENTITY, title="Washer", unique_id="washer"),
+        )
+        await hass.async_block_till_done()
+    reload.assert_awaited_once()
+    assert [cfg["entity_id"] for cfg in reload.await_args.args[0]] == [config["entity_id"]]
+    widget_reload.assert_not_called()

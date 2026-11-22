@@ -1864,8 +1864,12 @@ async def _async_entry_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
         widgets = [dict(sub.data) for sub in entry.subentries.values() if sub.subentry_type == SUBENTRY_TYPE_WIDGET]
         widget_manager: WidgetManager | None = data.get("widget_manager")
         todo_manager: TodoReminderManager | None = data.get("todo_manager")
-        reloads = [data["manager"].async_reload(entities)]
-        if widget_manager is not None:
+        # Only a manager whose configs changed restarts: a reload ends and restarts
+        # every card it owns, and every subentry save, reauth or id heal lands here.
+        reloads = []
+        if entities != data["manager"]._entities:
+            reloads.append(data["manager"].async_reload(entities))
+        if widget_manager is not None and widgets != widget_manager._widgets:
             reloads.append(widget_manager.async_reload(widgets))
         if todo_manager is not None:
             reloads.append(todo_manager.async_reload(todo_configs(entry)))
