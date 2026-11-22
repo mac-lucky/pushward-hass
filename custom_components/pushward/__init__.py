@@ -1412,10 +1412,18 @@ async def _async_handle_generate_thumbhash(hass: HomeAssistant, call: ServiceCal
         else:
             thumbhash = await async_thumbhash_for_path(hass, path)
     except ThumbhashError as err:
+        detail = str(err)
+        if (user_id := call.context.user_id) is not None:
+            user = await hass.auth.async_get_user(user_id)
+            if user is None or not user.is_admin:
+                # Which hosts and ports answer, and how, is not a non-admin's to map;
+                # the detail goes to the log for the admin instead.
+                _LOGGER.warning("PushWard could not make a ThumbHash for a non-admin user: %s", detail)
+                detail = "could not fetch or decode the image"
         raise ServiceValidationError(
             translation_domain=DOMAIN,
             translation_key="thumbhash_failed",
-            translation_placeholders={"error": str(err)},
+            translation_placeholders={"error": detail},
         ) from err
     return {"thumbhash": thumbhash}
 

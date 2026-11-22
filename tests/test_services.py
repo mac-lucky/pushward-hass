@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntryState, ConfigSubentryData
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import issue_registry as ir
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -4035,6 +4035,32 @@ async def test_generate_thumbhash_reports_failures(hass: HomeAssistant) -> None:
         await hass.services.async_call(
             DOMAIN, "generate_thumbhash", {"image_url": IMAGE_URL}, blocking=True, return_response=True
         )
+
+
+async def test_generate_thumbhash_shows_why_to_admins_only(
+    hass: HomeAssistant, hass_admin_user, hass_read_only_user, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A non-admin still gets hashes (dashboard scripts), but not the fetch error detail."""
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    async def _error_for(context: Context) -> str:
+        with patch_image_fetch_failure(), pytest.raises(ServiceValidationError) as excinfo:
+            await hass.services.async_call(
+                DOMAIN,
+                "generate_thumbhash",
+                {"image_url": "http://192.168.1.50/snapshot.jpg"},
+                blocking=True,
+                return_response=True,
+                context=context,
+            )
+        return excinfo.value.translation_placeholders["error"]
+
+    assert "192.168.1.50" in await _error_for(Context(user_id=hass_admin_user.id))
+    assert "192.168.1.50" in await _error_for(Context())
+    caplog.clear()
+    assert await _error_for(Context(user_id=hass_read_only_user.id)) == "could not fetch or decode the image"
+    assert "192.168.1.50" in caplog.text
 
 
 async def test_generate_thumbhash_requires_exactly_one_source(hass: HomeAssistant) -> None:
