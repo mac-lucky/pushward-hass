@@ -17,10 +17,11 @@ from custom_components.pushward.const import (
     DEFAULT_SERVER_URL,
     DOMAIN,
     SUBENTRY_TYPE_ENTITY,
+    SUBENTRY_TYPE_WIDGET,
 )
 from custom_components.pushward.e2e import key_id
 
-from .conftest import make_entity_config, make_usage_payload
+from .conftest import make_entity_config, make_usage_payload, make_widget_config
 
 KEY_HEX = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
 KID = key_id(bytes.fromhex(KEY_HEX))
@@ -180,3 +181,28 @@ async def test_only_a_manager_whose_configs_changed_restarts(hass: HomeAssistant
     reload.assert_awaited_once()
     assert [cfg["entity_id"] for cfg in reload.await_args.args[0]] == [config["entity_id"]]
     widget_reload.assert_not_called()
+
+
+async def test_a_changed_widget_config_restarts_only_the_widget_manager(hass: HomeAssistant) -> None:
+    api = AsyncMock()
+    api.get_me = AsyncMock(return_value=make_usage_payload())
+    entry = _entry()
+    entry.add_to_hass(hass)
+    with patch("custom_components.pushward.PushWardApiClient", return_value=api):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    data = hass.data[DOMAIN][entry.entry_id]
+    widget = make_widget_config()
+    with (
+        patch.object(data["manager"], "async_reload") as reload,
+        patch.object(data["widget_manager"], "async_reload") as widget_reload,
+    ):
+        hass.config_entries.async_add_subentry(
+            entry,
+            ConfigSubentry(data=widget, subentry_type=SUBENTRY_TYPE_WIDGET, title="Users", unique_id="ha-users"),
+        )
+        await hass.async_block_till_done()
+    widget_reload.assert_awaited_once()
+    assert [cfg["slug"] for cfg in widget_reload.await_args.args[0]] == [widget["slug"]]
+    reload.assert_not_called()
