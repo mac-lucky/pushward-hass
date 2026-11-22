@@ -48,6 +48,8 @@ from custom_components.pushward.const import (
     CONF_PROGRESS_ATTRIBUTE,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
+    CONF_RUN_WHILE,
+    CONF_RUN_WHILE_STATES,
     CONF_SERIES_ENTITIES,
     CONF_SLUG,
     CONF_SOUND,
@@ -1930,6 +1932,33 @@ async def test_failed_shutdown_end_stays_saved(hass: HomeAssistant, hass_storage
     assert _saved_active(hass_storage, entry)["binary_sensor.washer"]["slug"] == "ha-washer"
 
 
+@pytest.mark.parametrize(
+    ("update_error", "delete_error", "stays_saved"),
+    [
+        (PushWardNotFoundError("gone", status_code=404), None, False),
+        (make_quota_error(), None, False),
+        (make_quota_error(), PushWardApiError("down", status_code=503), True),
+    ],
+    ids=["already-gone", "quota-delete", "quota-delete-failed"],
+)
+async def test_shutdown_end_saves_only_a_card_still_up(
+    hass: HomeAssistant, hass_storage, update_error: Exception, delete_error: Exception | None, stays_saved: bool
+) -> None:
+    """A card the server no longer has, or that the DELETE took down, is not ended again on the next start."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    hass.states.async_set("binary_sensor.washer", "on")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    api.update_activity = AsyncMock(side_effect=update_error)
+    api.delete_activity = AsyncMock(side_effect=delete_error)
+    await manager.async_stop()
+
+    assert ("binary_sensor.washer" in _saved_active(hass_storage, entry)) is stays_saved
+
+
 async def test_activity_left_up_ends_when_the_entity_finished_meanwhile(hass: HomeAssistant, hass_storage) -> None:
     """HA stopped mid-run and the cycle ended while it was down: the card ends on boot."""
     entry = make_mock_entry()
@@ -1942,19 +1971,117 @@ async def test_activity_left_up_ends_when_the_entity_finished_meanwhile(hass: Ho
     hass.states.async_set("binary_sensor.washer", "off")
     manager = ActivityManager(hass, api, [_entity_config()], entry)
 
-    with patch("custom_components.pushward.activity_manager.END_DELAY_SECONDS", 0):
-        await manager.async_start()
-        await manager._tracked["binary_sensor.washer"].end_task
-        await hass.async_block_till_done()
+    await manager.async_start()
+    await manager._tracked["binary_sensor.washer"].end_task
+    await hass.async_block_till_done()
 
     api.create_activity.assert_not_called()
-    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing", "ended"]
+    # One ENDED, no completion frame: an "ongoing" would start the card again if it
+    # already ended server-side while HA was down.
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ended"]
     completion = api.update_activity.call_args_list[0].args[2]
     assert completion["progress"] == 0.8
     assert completion["subtitle"] == "Rinse"
     assert not manager._tracked["binary_sensor.washer"].is_active
+    # Saved on its own: a crash before the next stop does not end it again.
+    assert manager._history_save_armed
     await manager.async_stop()
     assert _saved_active(hass_storage, entry) == {}
+
+
+async def test_activity_left_up_resumes_in_a_start_state(hass: HomeAssistant, hass_storage) -> None:
+    """Still running on boot: the run restarts through the normal start, once."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", "on")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    assert tracked.end_task is None
+    api.create_activity.assert_awaited_once()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing"]
+    await manager.async_stop()
+
+
+def _plug_config() -> dict:
+    """The washer, up only while its plug is on."""
+    return _entity_config(**{CONF_RUN_WHILE: [{CONF_ENTITY_ID: "switch.plug", CONF_RUN_WHILE_STATES: ["on"]}]})
+
+
+@pytest.mark.parametrize("washer", ["on", "drying"])
+@pytest.mark.parametrize("plug", [None, "unavailable"])
+async def test_activity_left_up_waits_for_a_run_while_row_still_loading(
+    hass: HomeAssistant, hass_storage, washer: str, plug: str | None
+) -> None:
+    """A row whose integration sets up after this one is load order, not a failed row."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", washer)
+    if plug is not None:
+        hass.states.async_set("switch.plug", plug)
+    manager = ActivityManager(hass, api, [_plug_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    assert tracked.end_task is None
+    api.create_activity.assert_not_called()
+    api.update_activity.assert_not_called()
+
+    # The row loads matching: the same run stays up, nothing restarts.
+    hass.states.async_set("switch.plug", "on")
+    await hass.async_block_till_done()
+    assert tracked.is_active
+    api.create_activity.assert_not_called()
+    api.update_activity.assert_not_called()
+
+    # A row that then stops matching ends it, as it does live.
+    with patch("custom_components.pushward.activity_manager.END_DELAY_SECONDS", 0):
+        hass.states.async_set("switch.plug", "off")
+        await hass.async_block_till_done()
+        await tracked.end_task
+    assert not tracked.is_active
+    assert activity_updates(api, "ended")
+    await manager.async_stop()
+
+
+async def test_activity_left_up_ends_when_a_loaded_run_while_row_fails(hass: HomeAssistant, hass_storage) -> None:
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", "on")
+    hass.states.async_set("switch.plug", "off")
+    manager = ActivityManager(hass, api, [_plug_config()], entry)
+    await manager.async_start()
+    await manager._tracked["binary_sensor.washer"].end_task
+    await hass.async_block_till_done()
+
+    api.create_activity.assert_not_called()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ended"]
+    assert not manager._tracked["binary_sensor.washer"].is_active
+    await manager.async_stop()
+    assert _saved_active(hass_storage, entry) == {}
+
+
+async def test_failed_startup_end_stays_saved(hass: HomeAssistant, hass_storage) -> None:
+    """A restored end that does not go through is retried on the next start."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    api.update_activity = AsyncMock(side_effect=PushWardApiError("down", status_code=503))
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", "off")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await manager._tracked["binary_sensor.washer"].end_task
+    await manager.async_stop()
+
+    assert _saved_active(hass_storage, entry)["binary_sensor.washer"]["slug"] == "ha-washer"
 
 
 async def test_activity_left_up_stays_up_in_an_in_between_state(hass: HomeAssistant, hass_storage) -> None:

@@ -441,14 +441,24 @@ class ActivityManager:
                     starts.append(task)
             elif tracked.is_active and current is not None and current.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
                 # A restored activity follows the live rules: a state-driven one ends only
-                # on an end state or a failed run_while row. Unavailable waits for events.
-                if (
-                    is_calendar_config(entity_cfg)
-                    or current.state in entity_cfg.get(CONF_END_STATES, [])
-                    or not self._conditions_hold(entity_cfg)
-                ):
-                    self._schedule_end(entity_id)
+                # on an end state or a failed run_while row. Unavailable waits for events,
+                # and so does a row whose integration has not set up yet.
+                if is_calendar_config(entity_cfg):
+                    ended = not self._in_start(tracked, current)
                 else:
+                    ended = current.state in entity_cfg.get(CONF_END_STATES, [])
+                rows = [
+                    (row, self._hass.states.get(row[CONF_ENTITY_ID]))
+                    for row in run_while_rows(entity_cfg.get(CONF_RUN_WHILE))
+                ]
+                loaded = [
+                    (row, state)
+                    for row, state in rows
+                    if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN)
+                ]
+                if ended or any(state.state not in row[CONF_RUN_WHILE_STATES] for row, state in loaded):
+                    tracked.end_task = self._hass.async_create_task(self._end_restored(entity_id))
+                elif len(loaded) == len(rows):
                     self._schedule_throttled_update(entity_id)
         if starts:
             await asyncio.wait(starts)
@@ -615,8 +625,8 @@ class ActivityManager:
 
         self._tracked.clear()
 
-    async def _end_on_stop(self, tracked: TrackedEntity) -> None:
-        """Send the shutdown ENDED for one active activity.
+    async def _end_on_stop(self, tracked: TrackedEntity, context: str = "shutdown") -> None:
+        """Send one ENDED with the completion content for an active activity.
 
         Only an end that went through clears is_active; a failed one stays in the
         flushed store, so the next start ends it.
@@ -628,16 +638,27 @@ class ActivityManager:
                 slug, ACTIVITY_STATE_ENDED, content, dismissal_ttl=0 if tracked.config.get(CONF_REMOVE_ON_END) else None
             )
         except PushWardNotFoundError:
-            _LOGGER.debug("Activity %s already gone server-side during shutdown", slug)
+            _LOGGER.debug("Activity %s already gone server-side during %s", slug, context)
         except PushWardQuotaExceededError:
             # Updates are metered, deletes are not: still take the card down.
-            if not await self._delete_quietly(slug, "shutdown"):
+            if not await self._delete_quietly(slug, context):
                 return
         except (PushWardApiError, aiohttp.ClientError):
-            _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
+            _LOGGER.warning("Failed to end activity %s during %s", slug, context, exc_info=True)
             return
         tracked.is_active = False
         tracked.last_content = None
+
+    async def _end_restored(self, entity_id: str) -> None:
+        """End an activity left up when HA stopped, with one ENDED and no completion window.
+
+        The live end opens with an ``ongoing`` frame, which starts the activity
+        again if it ended server-side while HA was down (its stale TTL, say).
+        """
+        tracked = self._tracked[entity_id]
+        await self._end_on_stop(tracked, "startup")
+        if not tracked.is_active:
+            self._schedule_history_save()
 
     async def _delete_quietly(self, slug: str, context: str) -> bool:
         """DELETE the activity as the un-metered stand-in for a quota-refused end.

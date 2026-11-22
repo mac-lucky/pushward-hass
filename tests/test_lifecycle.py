@@ -60,7 +60,7 @@ from .conftest import (
     make_quota_error,
 )
 from .server_contract import assert_valid_activity_content
-from .test_activity_manager import SLEEP_TARGET, _gated_sleep, _pump
+from .test_activity_manager import SLEEP_TARGET, _gated_sleep, _pump, _seed_active
 
 END_DELAY_TARGET = "custom_components.pushward.activity_manager.END_DELAY_SECONDS"
 
@@ -752,6 +752,40 @@ async def test_calendar_starts_on_startup_inside_the_window(hass: HomeAssistant,
     api.create_activity.assert_awaited_once()
     content = activity_updates(api, "ongoing")[-1]
     assert (content["start_date"], content["end_date"]) == (_ts(10), _ts(11))
+
+
+async def test_calendar_left_up_ends_when_the_event_ended_meanwhile(
+    hass: HomeAssistant, hass_storage, calendar, freezer
+) -> None:
+    start, api = calendar
+    _seed_active(hass_storage, make_mock_entry(), {CAL: {"slug": "ha-calendar", "last_content": None}})
+    freezer.move_to(_local(11, 30))
+    manager = await start(_event(), state="off")
+    await _end_window(manager, hass, CAL)
+
+    api.create_activity.assert_not_awaited()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ended"]
+    assert not manager._tracked[CAL].is_active
+
+
+@pytest.mark.parametrize(("me", "ends"), [(None, False), ("unavailable", False), ("not_home", True)])
+async def test_calendar_left_up_inside_the_window_follows_its_run_while_row(
+    hass: HomeAssistant, hass_storage, calendar, freezer, me: str | None, ends: bool
+) -> None:
+    """A row still loading at boot waits; a loaded row that fails ends the card."""
+    start, api = calendar
+    _seed_active(hass_storage, make_mock_entry(), {CAL: {"slug": "ha-calendar", "last_content": None}})
+    if me is not None:
+        await _set(hass, ME, me)
+    freezer.move_to(_local(10, 15))
+    manager = await start(
+        _event(), state="on", **{CONF_RUN_WHILE: [{CONF_ENTITY_ID: ME, CONF_RUN_WHILE_STATES: ["home"]}]}
+    )
+    await _end_window(manager, hass, CAL)
+
+    api.create_activity.assert_not_awaited()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == (["ended"] if ends else [])
+    assert manager._tracked[CAL].is_active is not ends
 
 
 async def test_calendar_ignores_start_and_end_states(hass: HomeAssistant, calendar, freezer) -> None:
