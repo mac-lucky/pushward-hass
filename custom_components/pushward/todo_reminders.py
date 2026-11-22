@@ -1081,6 +1081,19 @@ class TodoReminderManager:
                 rec["watch_until"] = None  # nothing to read, e.g. no answer was recorded
                 self._release(rec)
                 self._save()
+            except (PushWardAuthError, PushWardForbiddenError) as err:
+                # Every read fails the same way until the key or its permission changes.
+                # Parked until the next reminder is sent: a finished reauth reloads the
+                # entry, and a permission granted again in the app heals on that send.
+                _LOGGER.warning(
+                    "PushWard refused to read a to-do reminder's answer; watching again after the next reminder: %s",
+                    err,
+                )
+                if isinstance(err, PushWardAuthError):
+                    self._entry.async_start_reauth(self._hass)
+                self._watch_wakeup.clear()
+                await self._watch_wakeup.wait()
+                continue
             except PushWardApiError as err:
                 _LOGGER.debug("Watching a to-do reminder for its answer failed: %s", err)
                 pause = max(pause, TODO_WATCH_ERROR_BACKOFF_SECONDS)

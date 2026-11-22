@@ -1039,6 +1039,43 @@ async def test_a_reminder_the_stream_reads_gets_one_read_of_its_own_at_the_end(
     assert rec["final_read"] is True
 
 
+@pytest.mark.parametrize(
+    ("error", "reauth"),
+    [
+        (PushWardAuthError("Invalid integration key", status_code=401), True),
+        (PushWardForbiddenError("no notifications permission", status_code=403), False),
+    ],
+    ids=["401", "403"],
+)
+async def test_a_refused_read_parks_the_watch_until_the_next_reminder(setup, error, reauth) -> None:
+    """Re-reading with a revoked key or a lost permission only fails again; the next send wakes it."""
+    manager, api, _ = await setup(list(_CALL))
+    rec = _records(manager)["a"]
+    rec.update(status="sent", notification_id=55, watch_until=(NOW + timedelta(hours=24)).isoformat())
+
+    async def refused(*_args, **_kwargs):
+        await asyncio.sleep(0)
+        raise error
+
+    api.poll_notification_answer = AsyncMock(side_effect=refused)
+    module = "custom_components.pushward.todo_reminders"
+    # No pauses, so a loop that kept polling would show up as more reads below.
+    with (
+        patch.object(manager._entry, "async_start_reauth") as start_reauth,
+        patch(f"{module}.TODO_WATCH_ERROR_BACKOFF_SECONDS", 0),
+        patch(f"{module}.TODO_WATCH_IDLE_SECONDS", 0),
+        patch(f"{module}.ANSWER_MIN_POLL_INTERVAL", 0),
+    ):
+        manager._watch_wakeup.set()
+        for _ in range(20):
+            await asyncio.sleep(0)
+        assert api.poll_notification_answer.await_count == 1
+        assert start_reauth.called is reauth
+
+        manager._watch_wakeup.set()  # what the next sent reminder does
+        await _until(lambda: api.poll_notification_answer.await_count == 2, "the read after the next send")
+
+
 async def test_a_failed_completion_from_the_stream_is_retried_by_an_own_read(hass: HomeAssistant, setup) -> None:
     """The stream reads an answer once: when completing fails, the manager reads it again itself."""
     stream = _FakeStream()
