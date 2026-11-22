@@ -341,6 +341,34 @@ async def test_resume_on_start(hass: HomeAssistant) -> None:
     await manager.async_stop()
 
 
+async def test_resumed_activities_start_concurrently(hass: HomeAssistant) -> None:
+    """A slow start for one entity does not hold back the others at startup."""
+    api = _mock_api()
+    configs = [
+        _entity_config(),
+        _entity_config(**{CONF_ENTITY_ID: "binary_sensor.dryer", CONF_SLUG: "ha-dryer"}),
+    ]
+    manager = ActivityManager(hass, api, configs, _mock_entry())
+    hass.states.async_set("binary_sensor.washer", "on")
+    hass.states.async_set("binary_sensor.dryer", "on")
+    gate = asyncio.Event()
+
+    async def _slow_create(*_args, **_kwargs) -> None:
+        await gate.wait()
+
+    api.create_activity = AsyncMock(side_effect=_slow_create)
+    start = asyncio.create_task(manager.async_start())
+    await _pump()
+
+    assert sorted(c.args[0] for c in api.create_activity.call_args_list) == ["ha-dryer", "ha-washer"]
+    assert not start.done()
+
+    gate.set()
+    await start
+    assert all(t.is_active for t in manager._tracked.values())
+    await manager.async_stop()
+
+
 async def test_stop_ends_all_active(hass: HomeAssistant) -> None:
     """async_stop sends ENDED for all active activities."""
     api = _mock_api()

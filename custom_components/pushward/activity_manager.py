@@ -372,6 +372,8 @@ class ActivityManager:
                 self._hass, quota_released_signal(self._entry.entry_id), self._on_quota_released
             )
 
+        # Resumed starts run side by side; the client's request semaphore caps them.
+        starts: list[asyncio.Task] = []
         for entity_cfg in self._entities:
             entity_id = entity_cfg[CONF_ENTITY_ID]
             tracked = TrackedEntity(config=entity_cfg)
@@ -436,7 +438,7 @@ class ActivityManager:
             # Resume if entity is currently in a start state (HA restart)
             if self._should_run(tracked, current):
                 if task := self._spawn_start(entity_id):
-                    await asyncio.wait([task])
+                    starts.append(task)
             elif tracked.is_active and current is not None and current.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
                 # A restored activity follows the live rules: a state-driven one ends only
                 # on an end state or a failed run_while row. Unavailable waits for events.
@@ -448,6 +450,8 @@ class ActivityManager:
                     self._schedule_end(entity_id)
                 else:
                     self._schedule_throttled_update(entity_id)
+        if starts:
+            await asyncio.wait(starts)
 
         # Prune buffers persisted for entities whose subentry was removed;
         # otherwise they linger in .storage until an unrelated debounced save.
