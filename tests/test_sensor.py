@@ -205,6 +205,17 @@ async def test_coordinator_api_error_maps_to_update_failed(hass: HomeAssistant) 
         await coordinator._async_update_data()
 
 
+async def test_only_the_first_refresh_tries_once(hass: HomeAssistant) -> None:
+    """The first refresh runs inside setup; later polls keep the full retry budget."""
+    coordinator, _ = _coordinator(hass, None)
+    coordinator._api.get_me = AsyncMock(return_value=make_usage_payload())
+
+    await coordinator.async_refresh()
+    await coordinator.async_refresh()
+
+    assert [call.kwargs for call in coordinator._api.get_me.await_args_list] == [{"attempts": 1}, {}]
+
+
 # --- end-to-end: entities created and populated on setup ---
 
 

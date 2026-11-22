@@ -97,7 +97,8 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         next successful poll without tearing down the config entry.
         """
         try:
-            data = await self._api.get_me()
+            # The first refresh runs inside setup, which HA retries with its own backoff.
+            data = await self._api.get_me(attempts=1) if self.data is None else await self._api.get_me()
         except PushWardAuthError as err:
             raise ConfigEntryAuthFailed(str(err)) from err
         except PushWardApiError as err:

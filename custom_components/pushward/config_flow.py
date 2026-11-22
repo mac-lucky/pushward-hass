@@ -909,7 +909,8 @@ async def _validate_integration_key(
     session = async_get_clientsession(hass)
     client = PushWardApiClient(session, server_url, key)
     try:
-        me = await client.get_me()
+        # One try: a blip shows cannot_connect at once instead of a spinner for minutes.
+        me = await client.get_me(attempts=1)
     except PushWardAuthError:
         return {"base": "invalid_auth"}, {}
     except (PushWardApiError, aiohttp.ClientError, TimeoutError, OSError) as err:

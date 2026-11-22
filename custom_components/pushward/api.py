@@ -239,7 +239,7 @@ class PushWardApiClient:
         # Set by the same stream; told the id of every schedule this client canceled.
         self.on_schedule_canceled: Callable[[int], None] | None = None
 
-    async def get_me(self) -> dict[str, Any]:
+    async def get_me(self, *, attempts: int = MAX_RETRIES) -> dict[str, Any]:
         """Fetch the account profile + usage counters via GET /auth/me.
 
         Returns the parsed JSON body. The server returns the user's own quota
@@ -250,12 +250,15 @@ class PushWardApiClient:
         on any other failure, so callers can map auth failures to reauth. Goes
         through the same retry/backoff as the write paths so a transient 429 or
         5xx doesn't flip the usage sensors to unavailable for a whole poll cycle.
+        ``attempts`` caps that retry budget: setup and the key check pass 1 so an
+        unreachable API fails at once instead of blocking for minutes.
         """
         data = await self._request_with_retry(
             "GET",
             "/auth/me",
             forbidden_is_auth=True,
             return_json=True,
+            attempts=attempts,
         )
         if not isinstance(data, dict):
             raise PushWardApiError("Unexpected /auth/me response shape")
@@ -843,6 +846,7 @@ class PushWardApiClient:
         idempotency_key: str | None = None,
         content_type: str | None = None,
         raw: bool = False,
+        attempts: int = MAX_RETRIES,
     ) -> Any:
         """Execute an HTTP request with exponential backoff retry.
 
@@ -856,7 +860,7 @@ class PushWardApiClient:
         and POST /notifications/scheduled read it. ``content_type`` replaces the
         JSON body's Content-Type. ``raw`` returns (status, parsed body or None) for
         every answer except 401 and 429, which keep their errors; a 5xx only once
-        the retries are spent.
+        the retries are spent. ``attempts`` is how many tries the request gets.
         """
         gate = self._quota_gate if quota_kind is not None else None
         headers = self._headers if idempotency_key is None else {**self._headers, "Idempotency-Key": idempotency_key}
@@ -866,7 +870,7 @@ class PushWardApiClient:
             url = f"{self._base_url}{path}"
             last_error: Exception | None = None
 
-            for attempt in range(MAX_RETRIES):
+            for attempt in range(attempts):
                 # Checked per attempt, not once up front: a request that waited on
                 # the semaphore or slept through a rate-limit retry must not go out
                 # after another request has just learned the quota is gone.
@@ -878,7 +882,7 @@ class PushWardApiClient:
                         if (
                             raw
                             and resp.status not in _RAW_KEEPS_ERROR
-                            and (resp.status < 500 or attempt == MAX_RETRIES - 1)
+                            and (resp.status < 500 or attempt == attempts - 1)
                         ):
                             return resp.status, await self._body_or_none(resp)
                         if resp.ok:
@@ -943,7 +947,7 @@ class PushWardApiClient:
                                 f"{method} {path} rate limited (429)",
                                 status_code=resp.status,
                             )
-                            if attempt < MAX_RETRIES - 1:
+                            if attempt < attempts - 1:
                                 delay = self._parse_retry_after(resp.headers.get("Retry-After", ""))
                                 if delay <= 0:
                                     delay = self._backoff_delay(attempt)
@@ -970,7 +974,7 @@ class PushWardApiClient:
                 except (aiohttp.ClientError, TimeoutError) as err:
                     last_error = PushWardApiError(f"{method} {path} connection error: {self._truncate(str(err))}")
 
-                if attempt < MAX_RETRIES - 1:
+                if attempt < attempts - 1:
                     delay = self._backoff_delay(attempt)
                     _LOGGER.debug(
                         "Retrying %s %s in %.1fs (attempt %d/%d)",
@@ -978,12 +982,12 @@ class PushWardApiClient:
                         path,
                         delay,
                         attempt + 1,
-                        MAX_RETRIES,
+                        attempts,
                     )
                     await asyncio.sleep(delay)
 
             if last_error is None:
-                last_error = PushWardApiError(f"{method} {path} failed after {MAX_RETRIES} attempts")
+                last_error = PushWardApiError(f"{method} {path} failed after {attempts} attempts")
             raise last_error
 
     @staticmethod

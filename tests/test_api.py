@@ -105,6 +105,28 @@ async def test_get_me_429_exhaustion_is_typed(mock_sleep):
     assert excinfo.value.status_code == 429
 
 
+@pytest.mark.parametrize(
+    "failure",
+    [_mock_response(503), aiohttp.ClientConnectionError("unreachable"), TimeoutError()],
+    ids=["5xx", "connection", "timeout"],
+)
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_get_me_with_one_attempt_fails_at_once(mock_sleep, failure):
+    """Setup and the key check try once; HA's setup retry owns the backoff."""
+    if isinstance(failure, BaseException):
+        session = _make_session()
+        session.request.side_effect = [failure]
+    else:
+        session = _make_session(failure)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError):
+        await client.get_me(attempts=1)
+
+    assert session.request.call_count == 1
+    mock_sleep.assert_not_awaited()
+
+
 # --- create_activity ---
 
 

@@ -495,7 +495,8 @@ async def test_user_step_success(
         CONF_SERVER_URL: DEFAULT_SERVER_URL,
         CONF_INTEGRATION_KEY: MOCK_INTEGRATION_KEY,
     }
-    mock_api_client.get_me.assert_awaited_once()
+    # One try, so an unreachable API shows cannot_connect instead of a long spinner.
+    mock_api_client.get_me.assert_awaited_once_with(attempts=1)
 
 
 async def _submit_user_step(hass: HomeAssistant, key: str = MOCK_INTEGRATION_KEY) -> dict:
