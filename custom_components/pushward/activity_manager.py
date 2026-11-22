@@ -249,6 +249,8 @@ class TrackedEntity:
     # Left up when HA stopped and nothing sent for it since: every event re-runs the
     # boot decision (_resume_restored) until a start, a frame or the end goes out.
     restored: bool = False
+    # After a restored end that failed, no new attempt before end_retry_at (time.monotonic()).
+    end_retry_at: float = 0.0
     last_content: dict | None = None
     registry_icon: str | None = None
     unsub_state: Callable | None = None
@@ -634,8 +636,9 @@ class ActivityManager:
             if not await self._delete_quietly(slug, context):
                 return
         except (PushWardApiError, aiohttp.ClientError):
-            _LOGGER.warning("Failed to end activity %s during %s", slug, context, exc_info=True)
+            self._log_push_failure(slug, "Failed to end activity %s during %s", slug, context, exc_info=True)
             return
+        self._clear_forbidden_notification(slug)
         tracked.is_active = False
         tracked.restored = False
         tracked.last_content = None
@@ -662,7 +665,9 @@ class ActivityManager:
             ended = current.state in config.get(CONF_END_STATES, [])
         rows = [(row, self._hass.states.get(row[CONF_ENTITY_ID])) for row in run_while_rows(config.get(CONF_RUN_WHILE))]
         if ended or any(_loaded(state) and state.state not in row[CONF_RUN_WHILE_STATES] for row, state in rows):
-            tracked.end_task = self._hass.async_create_task(self._end_restored(entity_id))
+            # A failed end is tried again on the first event after its pause, else on the next start.
+            if time.monotonic() >= tracked.end_retry_at:
+                tracked.end_task = self._hass.async_create_task(self._end_restored(entity_id))
         elif all(_loaded(state) for _row, state in rows):
             self._schedule_throttled_update(entity_id)
 
@@ -676,6 +681,10 @@ class ActivityManager:
         await self._end_on_stop(tracked, "startup")
         if not tracked.is_active:
             self._schedule_history_save()
+        else:
+            # Paused like a failed start, so a companion ticking every few seconds does not resend it.
+            pause = max(tracked.config.get(CONF_UPDATE_INTERVAL, 5), _START_RETRY_MIN_S)
+            tracked.end_retry_at = time.monotonic() + pause
 
     async def _delete_quietly(self, slug: str, context: str) -> bool:
         """DELETE the activity as the un-metered stand-in for a quota-refused end.

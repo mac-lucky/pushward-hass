@@ -2093,6 +2093,36 @@ async def test_failed_startup_end_stays_saved(hass: HomeAssistant, hass_storage)
     assert _saved_active(hass_storage, entry)["binary_sensor.washer"]["slug"] == "ha-washer"
 
 
+async def test_failed_startup_end_waits_out_the_retry_pause(
+    hass: HomeAssistant, hass_storage, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A refused restored end is not resent on every companion tick, only once the pause has passed."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    api.update_activity = AsyncMock(side_effect=PushWardForbiddenError("requires activities", status_code=403))
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", "off")
+    manager = ActivityManager(hass, api, [_entity_config(**{CONF_PROGRESS_ENTITY: "sensor.power"})], entry)
+    await manager.async_start()
+    tracked = manager._tracked["binary_sensor.washer"]
+    await tracked.end_task
+    assert tracked.end_retry_at - time.monotonic() == pytest.approx(30, abs=2)
+
+    for watts in range(20):
+        hass.states.async_set("sensor.power", str(watts))
+        await hass.async_block_till_done()
+    assert api.update_activity.await_count == 1
+
+    tracked.end_retry_at = time.monotonic() - 1  # the pause has passed
+    hass.states.async_set("sensor.power", "21")
+    await hass.async_block_till_done()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ended", "ended"]
+    assert tracked.is_active
+    # One warning per failure streak, as for live pushes.
+    assert len([r for r in caplog.records if r.levelno == logging.WARNING and "ha-washer" in r.getMessage()]) == 1
+    await manager.async_stop()
+
+
 async def test_activity_left_up_stays_up_in_an_in_between_state(hass: HomeAssistant, hass_storage) -> None:
     """A state that is neither a start nor an end state keeps the run going, as it does live."""
     entry = make_mock_entry()
