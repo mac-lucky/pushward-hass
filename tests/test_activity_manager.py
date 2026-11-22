@@ -1746,7 +1746,7 @@ async def test_log_rehydration_collapses_persisted_duplicates(hass: HomeAssistan
         {"text": "On", "at": 10},
         {"text": "Off", "at": 5},
     ]
-    with patch.object(manager, "_async_load_history", AsyncMock(return_value=({}, {eid: persisted}))):
+    with patch.object(manager, "_async_load_history", AsyncMock(return_value=({}, {eid: persisted}, {}))):
         await manager.async_start()
 
     texts = [line["text"] for line in manager._tracked[eid].log_buffer]
@@ -1772,7 +1772,7 @@ async def test_stale_persisted_history_pruned_on_start(hass: HomeAssistant) -> N
     }
     save_mock = AsyncMock()
     with (
-        patch.object(manager, "_async_load_history", AsyncMock(return_value=({}, persisted_logs))),
+        patch.object(manager, "_async_load_history", AsyncMock(return_value=({}, persisted_logs, {}))),
         patch.object(manager._history_store, "async_save", save_mock),
     ):
         await manager.async_start()
@@ -1858,9 +1858,124 @@ async def test_persisted_history_labels_capped_on_load(hass: HomeAssistant) -> N
     raw = {"samples": {"sensor.t": [[100, {long_label: 21.5}]]}, "logs": {}}
 
     with patch.object(manager._history_store, "async_load", AsyncMock(return_value=raw)):
-        history, _logs = await manager._async_load_history()
+        history, _logs, _active = await manager._async_load_history()
 
     assert history == {"sensor.t": [(100, {long_label[:32]: 21.5})]}
+
+
+def _seed_active(hass_storage: dict, entry, active: dict) -> None:
+    """Store what a build that stopped without ending its activities left behind."""
+    key = history_storage_key(entry.entry_id)
+    hass_storage[key] = {"version": 1, "minor_version": 1, "key": key, "data": {"active": active}}
+
+
+def _saved_active(hass_storage: dict, entry) -> dict:
+    return hass_storage[history_storage_key(entry.entry_id)]["data"]["active"]
+
+
+async def test_clean_stop_saves_no_active_activity(hass: HomeAssistant, hass_storage) -> None:
+    """An activity ended on stop is not ended a second time on the next start."""
+    entry = make_mock_entry()
+    hass.states.async_set("binary_sensor.washer", "on")
+    manager = ActivityManager(hass, _mock_api(), [_entity_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+    # The start armed a save, so a crash from here on still knows the card is up.
+    assert manager._history_save_armed
+
+    await manager.async_stop()
+
+    assert _saved_active(hass_storage, entry) == {}
+
+
+async def test_failed_shutdown_end_stays_saved(hass: HomeAssistant, hass_storage) -> None:
+    entry = make_mock_entry()
+    api = _mock_api()
+    hass.states.async_set("binary_sensor.washer", "on")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    api.update_activity = AsyncMock(side_effect=PushWardApiError("down", status_code=503))
+    await manager.async_stop()
+
+    assert _saved_active(hass_storage, entry)["binary_sensor.washer"]["slug"] == "ha-washer"
+
+
+async def test_activity_left_up_ends_when_the_entity_finished_meanwhile(hass: HomeAssistant, hass_storage) -> None:
+    """HA stopped mid-run and the cycle ended while it was down: the card ends on boot."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(
+        hass_storage,
+        entry,
+        {"binary_sensor.washer": {"slug": "ha-washer", "last_content": {"progress": 0.8, "subtitle": "Rinse"}}},
+    )
+    hass.states.async_set("binary_sensor.washer", "off")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+
+    with patch("custom_components.pushward.activity_manager.END_DELAY_SECONDS", 0):
+        await manager.async_start()
+        await manager._tracked["binary_sensor.washer"].end_task
+        await hass.async_block_till_done()
+
+    api.create_activity.assert_not_called()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing", "ended"]
+    completion = api.update_activity.call_args_list[0].args[2]
+    assert completion["progress"] == 0.8
+    assert completion["subtitle"] == "Rinse"
+    assert not manager._tracked["binary_sensor.washer"].is_active
+    await manager.async_stop()
+    assert _saved_active(hass_storage, entry) == {}
+
+
+async def test_activity_left_up_stays_up_in_an_in_between_state(hass: HomeAssistant, hass_storage) -> None:
+    """A state that is neither a start nor an end state keeps the run going, as it does live."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", "drying")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert tracked.is_active
+    assert tracked.end_task is None
+    api.create_activity.assert_not_called()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing"]
+    await manager.async_stop()
+
+
+async def test_activity_left_up_waits_while_the_entity_is_unavailable(hass: HomeAssistant, hass_storage) -> None:
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", "unavailable")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+    assert manager._tracked["binary_sensor.washer"].is_active
+    api.update_activity.assert_not_called()
+
+    await end_activity_via_state(manager, hass, "binary_sensor.washer", "off", {})
+
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing", "ended"]
+    await manager.async_stop()
+
+
+async def test_activity_left_up_under_another_slug_is_not_restored(hass: HomeAssistant, hass_storage) -> None:
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-old-slug", "last_content": None}})
+    hass.states.async_set("binary_sensor.washer", "off")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    assert not manager._tracked["binary_sensor.washer"].is_active
+    api.update_activity.assert_not_called()
+    await manager.async_stop()
 
 
 def _log_columns_config(columns):

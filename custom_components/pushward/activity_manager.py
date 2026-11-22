@@ -106,6 +106,8 @@ _START_RETRY_MIN_S = 30
 # templates survive restarts (the server backlog is the durable source of truth,
 # but this avoids a visible gap before the first post-restart push).
 _LOG_SAMPLES_KEY = "logs"
+# Activities still up on the phone, so one HA stopped without ending is ended on boot.
+_ACTIVE_KEY = "active"
 
 # Config keys that may point a value at a SEPARATE companion entity. Changes to
 # these entities should refresh the activity even though they don't drive
@@ -363,7 +365,7 @@ class ActivityManager:
 
     async def async_start(self) -> None:
         """Subscribe to state changes and resume any active entities."""
-        persisted, persisted_logs = await self._async_load_history()
+        persisted, persisted_logs, persisted_active = await self._async_load_history()
 
         if self._unsub_quota is None:
             self._unsub_quota = async_dispatcher_connect(
@@ -413,6 +415,13 @@ class ActivityManager:
 
             self._tracked[entity_id] = tracked
 
+            # Ongoing when HA stopped without ending it (restart, crash, power cut).
+            saved = persisted_active.get(entity_id)
+            if saved is not None and saved["slug"] == entity_cfg[CONF_SLUG]:
+                tracked.is_active = True
+                tracked.last_content = saved["last_content"]
+                tracked.registry_icon = self._get_registry_icon(entity_id)
+
             current = self._hass.states.get(entity_id)
             # Seed the history / log buffers with the current value so the first
             # activity start has at least one point / line.
@@ -425,12 +434,24 @@ class ActivityManager:
             if is_calendar_config(entity_cfg):
                 self._arm_calendar_timer(entity_id, tracked)
             # Resume if entity is currently in a start state (HA restart)
-            if self._should_run(tracked, current) and (task := self._spawn_start(entity_id)):
-                await asyncio.wait([task])
+            if self._should_run(tracked, current):
+                if task := self._spawn_start(entity_id):
+                    await asyncio.wait([task])
+            elif tracked.is_active and current is not None and current.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+                # A restored activity follows the live rules: a state-driven one ends only
+                # on an end state or a failed run_while row. Unavailable waits for events.
+                if (
+                    is_calendar_config(entity_cfg)
+                    or current.state in entity_cfg.get(CONF_END_STATES, [])
+                    or not self._conditions_hold(entity_cfg)
+                ):
+                    self._schedule_end(entity_id)
+                else:
+                    self._schedule_throttled_update(entity_id)
 
         # Prune buffers persisted for entities whose subentry was removed;
         # otherwise they linger in .storage until an unrelated debounced save.
-        stale = (set(persisted) | set(persisted_logs)) - set(self._tracked)
+        stale = (set(persisted) | set(persisted_logs) | set(persisted_active)) - set(self._tracked)
         if stale:
             _LOGGER.debug("Pruning persisted history for removed entities: %s", sorted(stale))
             try:
@@ -440,19 +461,20 @@ class ActivityManager:
 
     async def _async_load_history(
         self,
-    ) -> tuple[dict[str, list[tuple[int, dict[str, float]]]], dict[str, list[dict]]]:
+    ) -> tuple[dict[str, list[tuple[int, dict[str, float]]]], dict[str, list[dict]], dict[str, dict]]:
         """Read the persisted ring buffers from .storage.
 
-        Returns ``(history, logs)``: history is per-entity timeline samples; logs
-        is per-entity newest-first log-line dicts.
+        Returns ``(history, logs, active)``: history is per-entity timeline samples;
+        logs is per-entity newest-first log-line dicts; active is per-entity
+        ``{slug, last_content}`` of the activities that were up when it was saved.
         """
         try:
             raw = await self._history_store.async_load()
         except Exception:
             _LOGGER.debug("Failed to load persisted history, starting fresh", exc_info=True)
-            return {}, {}
+            return {}, {}, {}
         if not raw:
-            return {}, {}
+            return {}, {}, {}
         result: dict[str, list[tuple[int, dict[str, float]]]] = {}
         for entity_id, samples in raw.get(_HISTORY_SAMPLES_KEY, {}).items():
             rehydrated: list[tuple[int, dict[str, float]]] = []
@@ -473,7 +495,17 @@ class ActivityManager:
             rehydrated_lines = [line for line in lines if isinstance(line, dict) and line.get("text")]
             if rehydrated_lines:
                 logs[entity_id] = rehydrated_lines[:LOG_MAX_LINES]
-        return result, logs
+
+        active: dict[str, dict] = {}
+        saved_active = raw.get(_ACTIVE_KEY)
+        for entity_id, saved in (saved_active if isinstance(saved_active, dict) else {}).items():
+            if isinstance(saved, dict) and isinstance(saved.get("slug"), str):
+                last_content = saved.get("last_content")
+                active[entity_id] = {
+                    "slug": saved["slug"],
+                    "last_content": last_content if isinstance(last_content, dict) else None,
+                }
+        return result, logs, active
 
     @callback
     def _schedule_history_save(self) -> None:
@@ -511,6 +543,11 @@ class ActivityManager:
                 entity_id: list(tracked.log_buffer)
                 for entity_id, tracked in self._tracked.items()
                 if tracked.log_buffer
+            },
+            _ACTIVE_KEY: {
+                entity_id: {"slug": tracked.config[CONF_SLUG], "last_content": tracked.last_content}
+                for entity_id, tracked in self._tracked.items()
+                if tracked.is_active
             },
         }
 
@@ -575,30 +612,43 @@ class ActivityManager:
         self._tracked.clear()
 
     async def _end_on_stop(self, tracked: TrackedEntity) -> None:
-        """Send the shutdown ENDED for one active activity."""
+        """Send the shutdown ENDED for one active activity.
+
+        Only an end that went through clears is_active; a failed one stays in the
+        flushed store, so the next start ends it.
+        """
         slug = tracked.config[CONF_SLUG]
         try:
             content = map_completion_content(tracked.config, tracked.last_content)
             await self._api.update_activity(
                 slug, ACTIVITY_STATE_ENDED, content, dismissal_ttl=0 if tracked.config.get(CONF_REMOVE_ON_END) else None
             )
+        except PushWardNotFoundError:
+            _LOGGER.debug("Activity %s already gone server-side during shutdown", slug)
         except PushWardQuotaExceededError:
             # Updates are metered, deletes are not: still take the card down.
-            await self._delete_quietly(slug, "shutdown")
+            if not await self._delete_quietly(slug, "shutdown"):
+                return
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.warning("Failed to end activity %s during shutdown", slug, exc_info=True)
+            return
+        tracked.is_active = False
+        tracked.last_content = None
 
-    async def _delete_quietly(self, slug: str, context: str) -> None:
+    async def _delete_quietly(self, slug: str, context: str) -> bool:
         """DELETE the activity as the un-metered stand-in for a quota-refused end.
 
         Harder than an ``ended`` update: the server drops the row and its history,
         so the activity disappears from the app's list instead of showing as ended.
         Still better than a card that stays "ongoing" until its TTL expires.
+        Returns whether the delete went through.
         """
         try:
             await self._api.delete_activity(slug)
         except (PushWardApiError, aiohttp.ClientError):
             _LOGGER.debug("Failed to delete activity %s during %s", slug, context, exc_info=True)
+            return False
+        return True
 
     @callback
     def _on_quota_released(self, kind: str) -> None:
@@ -986,6 +1036,7 @@ class ActivityManager:
             tracked.recreate_attempted = False
             tracked.start_retry_at = 0.0
             requested = False
+            self._schedule_history_save()
 
             # A run_while row, calendar window or end state reached while this start was
             # on the wire found nothing active to end. State-driven entities keep ending
@@ -1244,6 +1295,8 @@ class ActivityManager:
                 tracked.recreate_attempted = False
             self._clear_forbidden_notification(slug)
             tracked.last_content = content
+            # Keeps the frame a restart's completion card is built from current.
+            self._schedule_history_save()
 
     @callback
     def _flush_update(self, entity_id: str, _now: datetime | None = None) -> None:
@@ -1332,3 +1385,4 @@ class ActivityManager:
                 if tracked.flush_unsub:
                     tracked.flush_unsub()
                     tracked.flush_unsub = None
+                self._schedule_history_save()
