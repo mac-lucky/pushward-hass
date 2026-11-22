@@ -1328,6 +1328,39 @@ async def test_semaphore_caps_concurrency(mock_sleep):
     assert session.request.call_count == 10
 
 
+async def test_service_calls_do_not_wait_behind_stuck_pushes():
+    """Every background slot held by a hanging push still leaves notifications and emails room."""
+    gate = asyncio.Event()
+
+    class _ContextManager:
+        def __init__(self, url: str) -> None:
+            self.url = url
+
+        async def __aenter__(self):
+            if "/activities/" in self.url:
+                await gate.wait()
+            return _mock_response(201, json_body={"id": 1})
+
+        async def __aexit__(self, *exc):
+            return False
+
+    session = AsyncMock(spec=aiohttp.ClientSession)
+    session.request = MagicMock(side_effect=lambda _method, url, **_kw: _ContextManager(url))
+    client = _make_client(session)
+    pushes = [
+        asyncio.create_task(client.update_activity(f"slug-{i}", "ongoing", {"i": i}))
+        for i in range(MAX_CONCURRENT_REQUESTS + 1)
+    ]
+    await asyncio.sleep(0)
+
+    assert await asyncio.wait_for(client.create_notification("t", "b"), 1) == {"id": 1}
+    await asyncio.wait_for(client.send_email("a@example.com", "s", text_body="b"), 1)
+    assert await asyncio.wait_for(client.cancel_notification_receipts_by_tag("door"), 1) == 0
+
+    gate.set()
+    await asyncio.gather(*pushes)
+
+
 # --- 403 demux ---
 
 

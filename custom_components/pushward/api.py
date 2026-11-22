@@ -11,7 +11,7 @@ from collections.abc import Callable
 from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -220,6 +220,9 @@ class PushWardApiClient:
         self._base_url = base_url.rstrip("/")
         self._integration_key = integration_key
         self._request_semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
+        # Service calls (notifications, emails, retract/cancel) get a lane of their own,
+        # so activity and widget pushes stuck in their retries never hold them back.
+        self._service_semaphore = asyncio.Semaphore(MAX_CONCURRENT_REQUESTS)
         # Answer long-polls hold their connection for up to ANSWER_LONG_POLL_SECONDS,
         # so they stay out of the shared request semaphore (they would stall pushes)
         # and get their own, small enough to leave the account's other clients room
@@ -497,6 +500,7 @@ class PushWardApiClient:
                 quota_kind=QUOTA_KIND_NOTIFICATIONS,
                 return_json=True,
                 idempotency_key=idempotency_key,
+                lane="service",
             )
         except PushWardApiError as err:
             # Only a send going out now: a schedule refused this way would be stored
@@ -520,6 +524,7 @@ class PushWardApiClient:
             quota_kind=QUOTA_KIND_NOTIFICATIONS,
             return_json=True,
             idempotency_key=uuid4().hex,  # a different body, so not a retry of the first POST
+            lane="service",
         )
         self._report_answerable(created, window=answer_window)
         return {**(created or {}), "acknowledge_refused": reason}
@@ -553,7 +558,7 @@ class PushWardApiClient:
         Returns how many devices it was sent to. Not metered.
         """
         data = await self._request_with_retry(
-            "POST", "/notifications/retract", json={"collapse_id": collapse_id}, return_json=True
+            "POST", "/notifications/retract", json={"collapse_id": collapse_id}, return_json=True, lane="service"
         )
         devices = data.get("devices") if isinstance(data, dict) else None
         return devices if isinstance(devices, int) and not isinstance(devices, bool) else 0
@@ -737,7 +742,7 @@ class PushWardApiClient:
         path = f"/notifications/scheduled/{int(scheduled_id)}"
         if purge:
             path += "?purge=true"
-        await self._request_with_retry("DELETE", path, allow_404=True)
+        await self._request_with_retry("DELETE", path, allow_404=True, lane="service")
         if self.on_schedule_canceled is not None:
             try:
                 self.on_schedule_canceled(int(scheduled_id))
@@ -754,14 +759,14 @@ class PushWardApiClient:
         can see.
         """
         data = await self._request_with_retry(
-            "POST", f"/notifications/receipts/{int(notification_id)}/cancel", return_json=True
+            "POST", f"/notifications/receipts/{int(notification_id)}/cancel", return_json=True, lane="service"
         )
         return data if isinstance(data, dict) else {}
 
     async def cancel_notification_receipts_by_tag(self, tag: str) -> int:
         """POST /notifications/receipts/cancel for every active receipt with this tag; returns how many."""
         data = await self._request_with_retry(
-            "POST", "/notifications/receipts/cancel", json={"tag": tag}, return_json=True
+            "POST", "/notifications/receipts/cancel", json={"tag": tag}, return_json=True, lane="service"
         )
         canceled = (data or {}).get("canceled") if isinstance(data, dict) else None
         return canceled if isinstance(canceled, int) and not isinstance(canceled, bool) else 0
@@ -792,7 +797,7 @@ class PushWardApiClient:
             payload["text_body"] = text_body
         if html_body is not None:
             payload["html_body"] = html_body
-        await self._request_with_retry("POST", "/emails", json=payload, quota_kind=QUOTA_KIND_EMAILS)
+        await self._request_with_retry("POST", "/emails", json=payload, quota_kind=QUOTA_KIND_EMAILS, lane="service")
 
     @staticmethod
     def _truncate(message: str, max_len: int = 200) -> str:
@@ -847,6 +852,7 @@ class PushWardApiClient:
         content_type: str | None = None,
         raw: bool = False,
         attempts: int = MAX_RETRIES,
+        lane: Literal["background", "service"] = "background",
     ) -> Any:
         """Execute an HTTP request with exponential backoff retry.
 
@@ -861,12 +867,15 @@ class PushWardApiClient:
         JSON body's Content-Type. ``raw`` returns (status, parsed body or None) for
         every answer except 401 and 429, which keep their errors; a 5xx only once
         the retries are spent. ``attempts`` is how many tries the request gets.
+        ``lane`` picks the concurrency cap the request+retry loop holds a slot of:
+        "service" for user-triggered calls, "background" for activity/widget pushes.
         """
         gate = self._quota_gate if quota_kind is not None else None
         headers = self._headers if idempotency_key is None else {**self._headers, "Idempotency-Key": idempotency_key}
         if content_type is not None:
             headers = {**headers, "Content-Type": content_type}
-        async with self._request_semaphore:
+        semaphore = self._service_semaphore if lane == "service" else self._request_semaphore
+        async with semaphore:
             url = f"{self._base_url}{path}"
             last_error: Exception | None = None
 

@@ -963,7 +963,7 @@ def usage_limit_issue_id(entry_id: str, used_key: str) -> str:
 MAX_RETRIES = 7
 RETRY_BASE_DELAY = 1  # seconds
 RETRY_MAX_DELAY = 30  # seconds
-MAX_CONCURRENT_REQUESTS = 5  # max simultaneous API request+retry loops
+MAX_CONCURRENT_REQUESTS = 5  # max simultaneous API request+retry loops, per lane (background, service)
 
 # Quota gate pause after a `quota.exceeded` 429: until the server's reset_at,
 # floored (a reset_at in the past must still pause), with a fallback for a missing
