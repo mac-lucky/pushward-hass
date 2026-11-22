@@ -797,7 +797,11 @@ class PushWardApiClient:
             payload["text_body"] = text_body
         if html_body is not None:
             payload["html_body"] = html_body
-        await self._request_with_retry("POST", "/emails", json=payload, quota_kind=QUOTA_KIND_EMAILS, lane="service")
+        # POST /emails reads no Idempotency-Key, so a retry after the server may have
+        # sent would deliver a second copy: only retries of what surely never went out.
+        await self._request_with_retry(
+            "POST", "/emails", json=payload, quota_kind=QUOTA_KIND_EMAILS, lane="service", retry_unsent_only=True
+        )
 
     @staticmethod
     def _truncate(message: str, max_len: int = 200) -> str:
@@ -853,6 +857,7 @@ class PushWardApiClient:
         raw: bool = False,
         attempts: int = MAX_RETRIES,
         lane: Literal["background", "service"] = "background",
+        retry_unsent_only: bool = False,
     ) -> Any:
         """Execute an HTTP request with exponential backoff retry.
 
@@ -869,6 +874,9 @@ class PushWardApiClient:
         the retries are spent. ``attempts`` is how many tries the request gets.
         ``lane`` picks the concurrency cap the request+retry loop holds a slot of:
         "service" for user-triggered calls, "background" for activity/widget pushes.
+        ``retry_unsent_only`` (a POST the server cannot dedupe) retries only what the
+        server never acted on: a non-quota 429 and a failed connect. A timeout, a
+        dropped connection or a 5xx raises at once, since the server may have run it.
         """
         gate = self._quota_gate if quota_kind is not None else None
         headers = self._headers if idempotency_key is None else {**self._headers, "Idempotency-Key": idempotency_key}
@@ -980,8 +988,13 @@ class PushWardApiClient:
                             f"{method} {path} failed ({resp.status})",
                             status_code=resp.status,
                         )
+                        if retry_unsent_only:
+                            raise last_error
                 except (aiohttp.ClientError, TimeoutError) as err:
                     last_error = PushWardApiError(f"{method} {path} connection error: {self._truncate(str(err))}")
+                    # A failed connect (DNS, refused) never sent the request; anything later may have.
+                    if retry_unsent_only and not isinstance(err, aiohttp.ClientConnectorError):
+                        raise last_error from err
 
                 if attempt < attempts - 1:
                     delay = self._backoff_delay(attempt)

@@ -1088,6 +1088,51 @@ async def test_send_email_omits_none_bodies():
     assert set(body.keys()) == {"to", "subject", "html_body"}
 
 
+@pytest.mark.parametrize(
+    "failure",
+    [_mock_response(502), TimeoutError(), aiohttp.ServerDisconnectedError()],
+    ids=["5xx", "timeout", "disconnect"],
+)
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_send_email_is_not_resent_once_the_server_may_have_sent_it(mock_sleep, failure):
+    """POST /emails has no idempotency key: a retry here could deliver a second copy."""
+    ok = _mock_response(202)
+    if isinstance(failure, BaseException):
+        session = _make_session(ok)
+        session.request.side_effect = [failure, *session.request.side_effect]
+    else:
+        session = _make_session(failure, ok)
+    client = _make_client(session)
+
+    with pytest.raises(PushWardApiError):
+        await client.send_email("alerts@example.com", "Subj", text_body="hi")
+
+    assert session.request.call_count == 1
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        _mock_response(429, headers={"Retry-After": "1"}),
+        aiohttp.ClientConnectorError(MagicMock(), OSError(111, "Connection refused")),
+    ],
+    ids=["rate-limited", "connect-failed"],
+)
+@patch("custom_components.pushward.api.asyncio.sleep", new_callable=AsyncMock)
+async def test_send_email_retries_what_never_went_out(mock_sleep, failure):
+    ok = _mock_response(202)
+    if isinstance(failure, BaseException):
+        session = _make_session(ok)
+        session.request.side_effect = [failure, *session.request.side_effect]
+    else:
+        session = _make_session(failure, ok)
+    client = _make_client(session)
+
+    await client.send_email("alerts@example.com", "Subj", text_body="hi")
+
+    assert session.request.call_count == 2
+
+
 # --- retry ---
 
 
