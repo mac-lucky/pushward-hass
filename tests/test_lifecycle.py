@@ -787,6 +787,12 @@ async def test_calendar_left_up_inside_the_window_follows_its_run_while_row(
     assert [c.args[1] for c in api.update_activity.call_args_list] == (["ended"] if ends else [])
     assert manager._tracked[CAL].is_active is not ends
 
+    # The event ends before the row loads: one ENDED, no completion frame.
+    await _at(hass, freezer, _local(11))
+    await _end_window(manager, hass, CAL)
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ended"]
+    assert not manager._tracked[CAL].is_active
+
 
 async def test_calendar_ignores_start_and_end_states(hass: HomeAssistant, calendar, freezer) -> None:
     start, api = calendar

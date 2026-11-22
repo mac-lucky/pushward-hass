@@ -46,6 +46,7 @@ from custom_components.pushward.const import (
     CONF_MEDIA_FAVORITE_SCRIPT,
     CONF_MEDIA_TOKEN,
     CONF_PROGRESS_ATTRIBUTE,
+    CONF_PROGRESS_ENTITY,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_RUN_WHILE,
@@ -2034,12 +2035,20 @@ async def test_activity_left_up_waits_for_a_run_while_row_still_loading(
     api.create_activity.assert_not_called()
     api.update_activity.assert_not_called()
 
-    # The row loads matching: the same run stays up, nothing restarts.
+    # The washer ticks while the row still loads: nothing ends, nothing goes out.
+    hass.states.async_set("binary_sensor.washer", washer, {"remaining": 29})
+    await hass.async_block_till_done()
+    assert tracked.is_active
+    assert tracked.end_task is None
+    api.create_activity.assert_not_called()
+    api.update_activity.assert_not_called()
+
+    # The row loads matching: the run carries on as it would have at boot, once.
     hass.states.async_set("switch.plug", "on")
     await hass.async_block_till_done()
     assert tracked.is_active
-    api.create_activity.assert_not_called()
-    api.update_activity.assert_not_called()
+    assert api.create_activity.await_count == (1 if washer == "on" else 0)
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing"]
 
     # A row that then stops matching ends it, as it does live.
     with patch("custom_components.pushward.activity_manager.END_DELAY_SECONDS", 0):
@@ -2102,11 +2111,16 @@ async def test_activity_left_up_stays_up_in_an_in_between_state(hass: HomeAssist
     await manager.async_stop()
 
 
-async def test_activity_left_up_waits_while_the_entity_is_unavailable(hass: HomeAssistant, hass_storage) -> None:
+@pytest.mark.parametrize("washer", [None, "unavailable"])
+async def test_activity_left_up_waits_while_the_entity_is_unavailable(
+    hass: HomeAssistant, hass_storage, washer: str | None
+) -> None:
+    """An entity that loads in an end state ends the card with one ENDED, as on boot."""
     entry = make_mock_entry()
     api = _mock_api()
     _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
-    hass.states.async_set("binary_sensor.washer", "unavailable")
+    if washer is not None:
+        hass.states.async_set("binary_sensor.washer", washer)
     manager = ActivityManager(hass, api, [_entity_config()], entry)
     await manager.async_start()
     await hass.async_block_till_done()
@@ -2115,7 +2129,40 @@ async def test_activity_left_up_waits_while_the_entity_is_unavailable(hass: Home
 
     await end_activity_via_state(manager, hass, "binary_sensor.washer", "off", {})
 
-    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing", "ended"]
+    api.create_activity.assert_not_called()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ended"]
+    assert not manager._tracked["binary_sensor.washer"].is_active
+    await manager.async_stop()
+    assert _saved_active(hass_storage, entry) == {}
+
+
+async def test_activity_left_up_ignores_companions_until_the_entity_loads(hass: HomeAssistant, hass_storage) -> None:
+    """A companion that loads first does not push the tracked entity's 'unavailable' state."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(
+        hass_storage,
+        entry,
+        {"binary_sensor.washer": {"slug": "ha-washer", "last_content": {"progress": 0.5, "state": "Washing"}}},
+    )
+    hass.states.async_set("binary_sensor.washer", "unavailable")
+    config = _entity_config(**{CONF_PROGRESS_ENTITY: "sensor.washer_progress"})
+    manager = ActivityManager(hass, api, [config], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    hass.states.async_set("sensor.washer_progress", "60")
+    await hass.async_block_till_done()
+    async_dispatcher_send(hass, quota_released_signal(entry.entry_id), "live_activity_updates")
+    await hass.async_block_till_done()
+    api.update_activity.assert_not_called()
+
+    # The washer loads still running: the run resumes through the normal start.
+    hass.states.async_set("binary_sensor.washer", "on")
+    await hass.async_block_till_done()
+    api.create_activity.assert_awaited_once()
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing"]
+    assert activity_updates(api, "ongoing")[0]["progress"] == 0.6
     await manager.async_stop()
 
 

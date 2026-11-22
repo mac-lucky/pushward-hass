@@ -198,6 +198,11 @@ def run_while_rows(raw: object) -> list[dict]:
     return rows[:RUN_WHILE_MAX]
 
 
+def _loaded(state: State | None) -> bool:
+    """The entity has set up: it has a state, neither unavailable nor unknown."""
+    return state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN)
+
+
 def _same_log_line(head: dict | None, line: dict) -> bool:
     """Two log lines are "the same event" when text+level match (``at`` ignored).
 
@@ -241,6 +246,9 @@ class TrackedEntity:
 
     config: dict
     is_active: bool = False
+    # Left up when HA stopped and nothing sent for it since: every event re-runs the
+    # boot decision (_resume_restored) until a start, a frame or the end goes out.
+    restored: bool = False
     last_content: dict | None = None
     registry_icon: str | None = None
     unsub_state: Callable | None = None
@@ -421,6 +429,7 @@ class ActivityManager:
             saved = persisted_active.get(entity_id)
             if saved is not None and saved["slug"] == entity_cfg[CONF_SLUG]:
                 tracked.is_active = True
+                tracked.restored = True
                 tracked.last_content = saved["last_content"]
                 tracked.registry_icon = self._get_registry_icon(entity_id)
 
@@ -439,27 +448,8 @@ class ActivityManager:
             if self._should_run(tracked, current):
                 if task := self._spawn_start(entity_id):
                     starts.append(task)
-            elif tracked.is_active and current is not None and current.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
-                # A restored activity follows the live rules: a state-driven one ends only
-                # on an end state or a failed run_while row. Unavailable waits for events,
-                # and so does a row whose integration has not set up yet.
-                if is_calendar_config(entity_cfg):
-                    ended = not self._in_start(tracked, current)
-                else:
-                    ended = current.state in entity_cfg.get(CONF_END_STATES, [])
-                rows = [
-                    (row, self._hass.states.get(row[CONF_ENTITY_ID]))
-                    for row in run_while_rows(entity_cfg.get(CONF_RUN_WHILE))
-                ]
-                loaded = [
-                    (row, state)
-                    for row, state in rows
-                    if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN)
-                ]
-                if ended or any(state.state not in row[CONF_RUN_WHILE_STATES] for row, state in loaded):
-                    tracked.end_task = self._hass.async_create_task(self._end_restored(entity_id))
-                elif len(loaded) == len(rows):
-                    self._schedule_throttled_update(entity_id)
+            elif tracked.restored:
+                self._resume_restored(entity_id)
         if starts:
             await asyncio.wait(starts)
 
@@ -647,7 +637,34 @@ class ActivityManager:
             _LOGGER.warning("Failed to end activity %s during %s", slug, context, exc_info=True)
             return
         tracked.is_active = False
+        tracked.restored = False
         tracked.last_content = None
+
+    @callback
+    def _resume_restored(self, entity_id: str) -> None:
+        """Start, update or end an activity left up across a restart, by the live rules.
+
+        A state-driven one ends only on an end state or a failed run_while row. A
+        missing, unavailable or unknown tracked entity or row is still loading
+        (other integrations set up after this one), so nothing goes out for it yet.
+        """
+        tracked = self._tracked[entity_id]
+        config = tracked.config
+        current = self._hass.states.get(entity_id)
+        if self._should_run(tracked, current):
+            self._spawn_start(entity_id)
+            return
+        if self._is_ending(tracked) or not _loaded(current):
+            return
+        if is_calendar_config(config):
+            ended = not self._in_start(tracked, current)
+        else:
+            ended = current.state in config.get(CONF_END_STATES, [])
+        rows = [(row, self._hass.states.get(row[CONF_ENTITY_ID])) for row in run_while_rows(config.get(CONF_RUN_WHILE))]
+        if ended or any(_loaded(state) and state.state not in row[CONF_RUN_WHILE_STATES] for row, state in rows):
+            tracked.end_task = self._hass.async_create_task(self._end_restored(entity_id))
+        elif all(_loaded(state) for _row, state in rows):
+            self._schedule_throttled_update(entity_id)
 
     async def _end_restored(self, entity_id: str) -> None:
         """End an activity left up when HA stopped, with one ENDED and no completion window.
@@ -686,7 +703,7 @@ class ActivityManager:
         if kind != QUOTA_KIND_LIVE_ACTIVITY_UPDATES:
             return
         for entity_id, tracked in self._tracked.items():
-            if tracked.is_active:
+            if tracked.is_active and not tracked.restored:
                 if not self._is_ending(tracked):
                     self._schedule_throttled_update(entity_id)
                 continue
@@ -694,6 +711,8 @@ class ActivityManager:
                 # The quota is what refused it, and that just came back.
                 tracked.start_retry_at = 0.0
                 self._spawn_start(entity_id)
+            elif tracked.restored:
+                self._resume_restored(entity_id)
 
     async def async_reload(self, new_entities: list[dict]) -> None:
         """Reload with new entity configuration."""
@@ -723,11 +742,14 @@ class ActivityManager:
             if old_state is not None and old_state.attributes == new_state.attributes:
                 # Only on/off flipped: HA's alarm at the event start or end, the boundary
                 # the timer already handles. Deciding here too would start a second time.
-                if tracked.is_active:
+                if tracked.is_active and not tracked.restored:
                     self._schedule_throttled_update(entity_id)
                 return
             # A new event or edited times move the window; states play no part.
             self._calendar_evaluate(entity_id)
+            return
+        if tracked.restored:
+            self._resume_restored(entity_id)
             return
 
         end_states = config.get(CONF_END_STATES, [])
@@ -757,7 +779,9 @@ class ActivityManager:
         tracked = self._tracked.get(entity_id)
         if tracked is None:
             return
-        if not self._conditions_hold(tracked.config):
+        if tracked.restored:
+            self._resume_restored(entity_id)
+        elif not self._conditions_hold(tracked.config):
             if tracked.is_active:
                 self._schedule_end(entity_id)
         elif (not tracked.is_active or self._is_ending(tracked)) and self._in_start(
@@ -796,6 +820,9 @@ class ActivityManager:
         if tracked is None:
             return
         self._arm_calendar_timer(entity_id, tracked)
+        if tracked.restored:
+            self._resume_restored(entity_id)
+            return
         should_run = self._should_run(tracked, self._hass.states.get(entity_id))
         if should_run and (not tracked.is_active or self._is_ending(tracked)):
             self._spawn_start(entity_id)
@@ -846,6 +873,9 @@ class ActivityManager:
         new_state: State | None = event.data.get("new_state")
         tracked = self._tracked.get(entity_id)
         if tracked is None:
+            return
+        if tracked.restored:
+            self._resume_restored(entity_id)
             return
 
         template = tracked.config.get(CONF_TEMPLATE)
@@ -978,7 +1008,7 @@ class ActivityManager:
         if tracked is None:
             return
         tracked.retry_unsub = None
-        if not tracked.is_active and self._should_run(tracked, self._hass.states.get(entity_id)):
+        if (not tracked.is_active or tracked.restored) and self._should_run(tracked, self._hass.states.get(entity_id)):
             self._spawn_start(entity_id)
 
     async def _start_activity(self, entity_id: str) -> None:
@@ -1056,6 +1086,7 @@ class ActivityManager:
             self._clear_forbidden_notification(slug)
 
             tracked.is_active = True
+            tracked.restored = False
             tracked.last_content = content
             tracked.last_sent_at = time.monotonic()
             tracked.recreate_attempted = False
@@ -1320,6 +1351,7 @@ class ActivityManager:
                 tracked.recreate_attempted = False
             self._clear_forbidden_notification(slug)
             tracked.last_content = content
+            tracked.restored = False
             # Keeps the frame a restart's completion card is built from current.
             self._schedule_history_save()
 
