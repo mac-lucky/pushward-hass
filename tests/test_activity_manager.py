@@ -47,6 +47,7 @@ from custom_components.pushward.const import (
     CONF_MEDIA_TOKEN,
     CONF_PROGRESS_ATTRIBUTE,
     CONF_PROGRESS_ENTITY,
+    CONF_PROGRESS_MODE,
     CONF_REMAINING_TIME_ATTR,
     CONF_REMAINING_TIME_ENTITY,
     CONF_RUN_WHILE,
@@ -66,6 +67,7 @@ from custom_components.pushward.const import (
     HISTORY_PERIOD_MAX,
     HISTORY_SEED_MAX,
     LOG_MAX_LINES,
+    PROGRESS_MODE_REMAINING,
 )
 from custom_components.pushward.content_mapper import OPTIONAL_CONTENT_KEYS
 from custom_components.pushward.image_hash import clear_thumbhash_cache
@@ -2138,6 +2140,32 @@ async def test_activity_left_up_stays_up_in_an_in_between_state(hass: HomeAssist
     assert tracked.end_task is None
     api.create_activity.assert_not_called()
     assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing"]
+    await manager.async_stop()
+
+
+async def test_activity_left_up_keeps_its_remaining_progress(hass: HomeAssistant, hass_storage) -> None:
+    """Remaining-mode progress carries on from the run's saved peak instead of dropping to empty."""
+    entry = make_mock_entry()
+    api = _mock_api()
+    config = _entity_config(**{CONF_PROGRESS_ENTITY: "sensor.remaining", CONF_PROGRESS_MODE: PROGRESS_MODE_REMAINING})
+    hass.states.async_set("binary_sensor.washer", "on")
+    hass.states.async_set("sensor.remaining", "60")
+    manager = ActivityManager(hass, api, [config], entry)
+    await manager.async_start()
+    await bump_state(manager, hass, "binary_sensor.washer", "sensor.remaining", "12", {})
+    assert activity_updates(api, "ongoing")[-1]["progress"] == 0.8
+    # The end on stop does not go through, so the card is still up on the next start.
+    api.update_activity.side_effect = PushWardApiError("down", status_code=503)
+    await manager.async_stop()
+
+    hass.states.async_set("binary_sensor.washer", "drying")
+    hass.states.async_set("sensor.remaining", "6")
+    api = _mock_api()
+    manager = ActivityManager(hass, api, [config], entry)
+    await manager.async_start()
+    await hass.async_block_till_done()
+
+    assert [u["progress"] for u in activity_updates(api, "ongoing")] == [0.9]
     await manager.async_stop()
 
 

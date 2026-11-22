@@ -78,6 +78,7 @@ from .const import (
 )
 from .content_mapper import (
     _build_log_line,
+    _finite_number,
     _get_timeline_values,
     _timeline_recorder_sources,
     calendar_next_boundary,
@@ -433,6 +434,8 @@ class ActivityManager:
                 tracked.is_active = True
                 tracked.restored = True
                 tracked.last_content = saved["last_content"]
+                # Remaining-mode progress keeps measuring from the run's peak, not from the value at boot.
+                tracked.progress_max = saved["progress_max"]
                 tracked.registry_icon = self._get_registry_icon(entity_id)
 
             current = self._hass.states.get(entity_id)
@@ -472,7 +475,7 @@ class ActivityManager:
 
         Returns ``(history, logs, active)``: history is per-entity timeline samples;
         logs is per-entity newest-first log-line dicts; active is per-entity
-        ``{slug, last_content}`` of the activities that were up when it was saved.
+        ``{slug, last_content, progress_max}`` of the activities that were up when it was saved.
         """
         try:
             raw = await self._history_store.async_load()
@@ -510,6 +513,7 @@ class ActivityManager:
                 active[entity_id] = {
                     "slug": saved["slug"],
                     "last_content": last_content if isinstance(last_content, dict) else None,
+                    "progress_max": _finite_number(saved.get("progress_max")),
                 }
         return result, logs, active
 
@@ -551,7 +555,11 @@ class ActivityManager:
                 if tracked.log_buffer
             },
             _ACTIVE_KEY: {
-                entity_id: {"slug": tracked.config[CONF_SLUG], "last_content": tracked.last_content}
+                entity_id: {
+                    "slug": tracked.config[CONF_SLUG],
+                    "last_content": tracked.last_content,
+                    "progress_max": tracked.progress_max,
+                }
                 for entity_id, tracked in self._tracked.items()
                 if tracked.is_active
             },
