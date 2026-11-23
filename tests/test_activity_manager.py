@@ -2143,6 +2143,94 @@ async def test_activity_left_up_stays_up_in_an_in_between_state(hass: HomeAssist
     await manager.async_stop()
 
 
+async def test_activity_left_up_ends_over_a_boot_frame_still_retrying(hass: HomeAssistant, hass_storage) -> None:
+    """The end cancels a boot frame still in its backoff, as the live end does.
+
+    The server starts an ended activity again on an ``ongoing``, so that frame
+    landing after the ENDED would put the card back up with nothing left to end it.
+    """
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    landed: list[str] = []
+    backoff = asyncio.Event()
+
+    async def _update(_slug, state, *_args, **_kwargs) -> None:
+        if state == "ongoing":
+            await backoff.wait()
+        landed.append(state)
+
+    api.update_activity = AsyncMock(side_effect=_update)
+    hass.states.async_set("binary_sensor.washer", "drying")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    await manager.async_start()
+    await _pump()
+    tracked = manager._tracked["binary_sensor.washer"]
+    assert [c.args[1] for c in api.update_activity.call_args_list] == ["ongoing"]
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await _pump()
+    await tracked.end_task
+    backoff.set()  # the retry would go out now
+    await hass.async_block_till_done()
+
+    assert landed == ["ended"]
+    assert not tracked.is_active
+    await manager.async_stop()
+    assert _saved_active(hass_storage, entry) == {}
+
+
+async def test_activity_left_up_ends_after_its_boot_start_lands(hass: HomeAssistant, hass_storage) -> None:
+    """An end state while the boot start is on the wire sends no ENDED ahead of it.
+
+    The start's own check on landing (the end state it finds) runs the normal end.
+    """
+    entry = make_mock_entry()
+    api = _mock_api()
+    _seed_active(hass_storage, entry, {"binary_sensor.washer": {"slug": "ha-washer", "last_content": None}})
+    landed: list[str] = []
+    create_lands = asyncio.Event()
+
+    async def _create(*_args, **_kwargs) -> None:
+        await create_lands.wait()
+        landed.append("create")
+
+    async def _update(_slug, state, *_args, **_kwargs) -> None:
+        landed.append(state)
+
+    api.create_activity = AsyncMock(side_effect=_create)
+    api.update_activity = AsyncMock(side_effect=_update)
+    hass.states.async_set("binary_sensor.washer", "on")
+    manager = ActivityManager(hass, api, [_entity_config()], entry)
+    schedule_end = manager._schedule_end
+
+    def _spy_schedule_end(entity_id: str) -> None:
+        landed.append("end scheduled")
+        schedule_end(entity_id)
+
+    manager._schedule_end = _spy_schedule_end
+    start = asyncio.create_task(manager.async_start())
+    await _pump()
+    tracked = manager._tracked["binary_sensor.washer"]
+    api.create_activity.assert_called_once()
+
+    hass.states.async_set("binary_sensor.washer", "off")
+    await _pump()
+    api.update_activity.assert_not_called()
+
+    with patch("custom_components.pushward.activity_manager.END_DELAY_SECONDS", 0):
+        create_lands.set()
+        await start
+        await tracked.end_task
+        await hass.async_block_till_done()
+
+    # Start frame, then the end the start scheduled itself: completion frame, ENDED.
+    assert landed == ["create", "ongoing", "end scheduled", "ongoing", "ended"]
+    assert not tracked.is_active
+    await manager.async_stop()
+    assert _saved_active(hass_storage, entry) == {}
+
+
 async def test_activity_left_up_keeps_its_remaining_progress(hass: HomeAssistant, hass_storage) -> None:
     """Remaining-mode progress carries on from the run's saved peak instead of dropping to empty."""
     entry = make_mock_entry()

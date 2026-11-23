@@ -667,6 +667,8 @@ class ActivityManager:
             return
         if self._is_ending(tracked) or not _loaded(current):
             return
+        if tracked.start_task is not None and not tracked.start_task.done():
+            return  # The start ends it on landing if it finds an end state.
         if is_calendar_config(config):
             ended = not self._in_start(tracked, current)
         else:
@@ -675,6 +677,14 @@ class ActivityManager:
         if ended or any(_loaded(state) and state.state not in row[CONF_RUN_WHILE_STATES] for row, state in rows):
             # A failed end is tried again on the first event after its pause, else on the next start.
             if time.monotonic() >= tracked.end_retry_at:
+                # As in _schedule_end: a frame landing after the ENDED would start the card again.
+                if tracked.flush_unsub:
+                    tracked.flush_unsub()
+                    tracked.flush_unsub = None
+                if tracked.pending_task and not tracked.pending_task.done():
+                    tracked.pending_task.cancel()
+                    tracked.pending_task = None
+                tracked.update_pending = False
                 tracked.end_task = self._hass.async_create_task(self._end_restored(entity_id))
         elif all(_loaded(state) for _row, state in rows):
             self._schedule_throttled_update(entity_id)
