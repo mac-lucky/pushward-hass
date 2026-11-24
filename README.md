@@ -1148,6 +1148,7 @@ Send a push notification.
 | `source` / `source_display_name` | No | Grouping ID + label in the PushWard inbox |
 | `activity_slug` | No | Link the notification to an existing Live Activity |
 | `url` | No | Deep-link URL opened on tap. A path like `/lovelace/kitchen` opens on your external URL, see [Links into Home Assistant](#links-into-home-assistant) |
+| `open_url_on_tap` | No | `true` makes a tap open `url` instead of the notification, when the link opens without asking on that phone (a Trusted Site, or Confirm Before Opening Links off). Other links still open the notification first. Needs `url`; app versions without it open the notification |
 | `media` | No | Object `{ url, type }`, type is image, video, or audio. Android shows only images in the shade |
 | `icon_url` | No | Custom icon URL |
 | `metadata` | No | Arbitrary key-value pairs for custom app handling |

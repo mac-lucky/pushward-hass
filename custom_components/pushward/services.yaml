@@ -2380,6 +2380,11 @@ send_notification:
       example: "https://example.com"
       selector:
         text:
+    open_url_on_tap:
+      name: Open URL on tap
+      description: Tapping the notification opens the URL instead of the notification, if the link opens without asking on that device (a Trusted Site in the PushWard app, or Confirm Before Opening Links is off). Other links open the notification first. Requires URL. Older app versions open the notification as before.
+      selector:
+        boolean:
     media:
       name: Media
       description: Media attachment as an object with `url` (HTTPS) and `type` (image, video, or audio). Android shows only images in the notification shade.

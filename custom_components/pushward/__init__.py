@@ -968,6 +968,15 @@ def _validate_snooze(data: dict) -> dict:
     return data
 
 
+def _validate_open_url_on_tap(data: dict) -> dict:
+    """open_url_on_tap goes out only when true, and only with a url (sealed or not, it is in the call)."""
+    if not data.get("open_url_on_tap"):
+        data.pop("open_url_on_tap", None)  # false sends the body older servers know
+    elif not data.get("url"):
+        raise vol.Invalid("open_url_on_tap requires url")
+    return data
+
+
 SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
     {
         **_ENTRY_TARGET_FIELD,
@@ -982,6 +991,7 @@ SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
         vol.Optional("source_display_name"): str,
         vol.Optional("activity_slug"): validate_slug,
         vol.Optional("url"): _ha_path_or(validate_url),
+        vol.Optional("open_url_on_tap"): cv.boolean,
         vol.Optional("media"): SCHEMA_MEDIA,
         vol.Optional("icon_url"): validate_url,
         vol.Optional("metadata"): vol.Schema({str: str}),
@@ -1004,7 +1014,9 @@ SCHEMA_SEND_NOTIFICATION_FIELDS = vol.Schema(
         ),
     }
 )
-SCHEMA_SEND_NOTIFICATION = vol.All(SCHEMA_SEND_NOTIFICATION_FIELDS, _validate_acknowledge, _validate_snooze)
+SCHEMA_SEND_NOTIFICATION = vol.All(
+    SCHEMA_SEND_NOTIFICATION_FIELDS, _validate_acknowledge, _validate_snooze, _validate_open_url_on_tap
+)
 
 SCHEMA_CANCEL_SCHEDULED_NOTIFICATION = vol.Schema(
     {
@@ -1438,6 +1450,7 @@ _NOTIFICATION_FIELDS = [
     "source_display_name",
     "activity_slug",
     "url",
+    "open_url_on_tap",
     "media",
     "icon_url",
     "metadata",

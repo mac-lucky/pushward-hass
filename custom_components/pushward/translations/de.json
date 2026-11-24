@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL, die beim Tippen auf die Benachrichtigung geöffnet wird. Ein Pfad wie /lovelace/kitchen öffnet sich unter der externen URL von Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "URL beim Tippen öffnen",
+          "description": "Ein Tippen auf die Benachrichtigung öffnet die URL statt der Benachrichtigung, wenn sich der Link auf diesem Gerät ohne Nachfrage öffnet (eine vertrauenswürdige Website in der PushWard-App, oder „Vor dem Öffnen von Links bestätigen“ ist aus). Andere Links öffnen zuerst die Benachrichtigung. Erfordert eine URL. Ältere App-Versionen öffnen wie bisher die Benachrichtigung."
+        },
         "media": {
           "name": "Medien",
           "description": "Medienanhang als Objekt mit `url` (HTTPS) und `type` (image, video oder audio). Android zeigt in der Benachrichtigungsleiste nur Bilder."

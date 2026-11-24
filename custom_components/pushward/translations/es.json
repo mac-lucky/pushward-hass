@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL que se abre al pulsar la notificación. Una ruta como /lovelace/kitchen se abre en la URL externa de Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Abrir URL al pulsar",
+          "description": "Al pulsar la notificación se abre la URL en lugar de la notificación, si en ese dispositivo el enlace se abre sin preguntar (un sitio de confianza en la app PushWard, o con 'Confirmar antes de abrir enlaces' desactivado). Los demás enlaces abren primero la notificación. Requiere una URL. Las versiones anteriores de la app abren la notificación como siempre."
+        },
         "media": {
           "name": "Multimedia",
           "description": "Adjunto multimedia como objeto con `url` (HTTPS) y `type` (image, video o audio). Android solo muestra imágenes en el panel de notificaciones."

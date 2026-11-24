@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL da aprire quando si tocca la notifica. Un percorso come /lovelace/kitchen si apre sull'URL esterno di Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Apri l'URL al tocco",
+          "description": "Toccando la notifica si apre l'URL invece della notifica, se su quel dispositivo il link si apre senza chiedere conferma (un sito attendibile nell'app PushWard, oppure con 'Conferma prima di aprire i link' disattivato). Gli altri link aprono prima la notifica. Richiede un URL. Le versioni precedenti dell'app aprono la notifica come sempre."
+        },
         "media": {
           "name": "Media",
           "description": "Allegato multimediale come oggetto con `url` (HTTPS) e `type` (image, video o audio). Android mostra solo le immagini nell'area notifiche."

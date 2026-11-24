@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL deschis la atingerea notificării. O cale precum /lovelace/kitchen se deschide pe URL-ul extern al Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Deschide URL-ul la atingere",
+          "description": "Atingerea notificării deschide URL-ul în locul notificării, dacă linkul se deschide fără confirmare pe acel dispozitiv (un site de încredere în aplicația PushWard sau cu 'Confirmă înainte de a deschide linkuri' dezactivat). Celelalte linkuri deschid mai întâi notificarea. Necesită un URL. Versiunile mai vechi ale aplicației deschid notificarea ca înainte."
+        },
         "media": {
           "name": "Media",
           "description": "Atașament media sub formă de obiect cu `url` (HTTPS) și `type` (image, video sau audio). Android afișează în panoul de notificări doar imagini."

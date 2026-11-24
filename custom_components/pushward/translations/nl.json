@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL die wordt geopend wanneer op de melding wordt getikt. Een pad zoals /lovelace/kitchen opent op de externe URL van Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "URL openen bij tikken",
+          "description": "Tikken op de melding opent de URL in plaats van de melding, als de link op dat apparaat zonder bevestiging opent (een vertrouwde site in de PushWard-app, of 'Bevestigen voor het openen van links' staat uit). Andere links openen eerst de melding. Vereist een URL. Oudere app-versies openen de melding zoals voorheen."
+        },
         "media": {
           "name": "Media",
           "description": "Mediabijlage als object met `url` (HTTPS) en `type` (image, video of audio). Android toont in het meldingenpaneel alleen afbeeldingen."

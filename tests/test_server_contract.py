@@ -1008,6 +1008,9 @@ def valid_receipt(**overrides) -> dict:
         {"encrypted": ENVELOPE, "acknowledge": {}, "callback_url": "https://8.8.8.8/hook"},
         {"title": "t", "body": "b", "snooze": [15, 60]},
         {"title": "t", "body": "b", "snooze": [1, 720, 1440], "actions": [LINK] * 7},
+        {"title": "t", "body": "b", "url": "https://example.com", "open_url_on_tap": True},
+        {"encrypted": ENVELOPE, "open_url_on_tap": True},
+        {"title": "t", "body": "b", "open_url_on_tap": False},
     ],
 )
 def test_valid_notification_requests_pass(payload) -> None:
@@ -1057,6 +1060,8 @@ def test_valid_notification_requests_pass(payload) -> None:
         ({"title": "t", "body": "b", "snooze": ["15"]}, "distinct ints"),
         ({"title": "t", "body": "b", "snooze": [15], "acknowledge": {}}, "acknowledge"),
         ({"title": "t", "body": "b", "snooze": [5, 10], "actions": [LINK] * 9}, "exceed 10"),
+        ({"title": "t", "body": "b", "open_url_on_tap": True}, "requires url"),
+        ({"title": "t", "body": "b", "url": "https://example.com", "open_url_on_tap": "yes"}, "must be a boolean"),
     ],
 )
 def test_invalid_notification_requests_rejected(payload, rule) -> None:

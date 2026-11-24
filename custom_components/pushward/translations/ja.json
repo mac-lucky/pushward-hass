@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "通知をタップしたときに開く URL。/lovelace/kitchen のようなパスは Home Assistant の外部 URL で開きます。"
         },
+        "open_url_on_tap": {
+          "name": "タップで URL を開く",
+          "description": "通知をタップすると、通知ではなく URL を開きます。そのデバイスでリンクが確認なしで開く場合に限ります（PushWard アプリの信頼済みサイト、または「リンクを開く前に確認」がオフの場合）。それ以外のリンクはまず通知を開きます。URL が必要です。古いバージョンのアプリでは、これまでどおり通知が開きます。"
+        },
         "media": {
           "name": "メディア",
           "description": "`url`（HTTPS）と `type`（image、video、または audio）を持つオブジェクトとしてのメディア添付。Android では通知シェードに画像のみが表示されます。"

@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL à ouvrir lors d'un appui sur la notification. Un chemin comme /lovelace/kitchen s'ouvre sur l'URL externe de Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Ouvrir l'URL à l'appui",
+          "description": "Un appui sur la notification ouvre l'URL au lieu de la notification, si le lien s'ouvre sans confirmation sur cet appareil (un site de confiance dans l'app PushWard, ou « Confirmer avant d'ouvrir les liens » désactivé). Les autres liens ouvrent d'abord la notification. Nécessite une URL. Les versions plus anciennes de l'app ouvrent la notification comme avant."
+        },
         "media": {
           "name": "Média",
           "description": "Pièce jointe multimédia sous forme d'objet avec `url` (HTTPS) et `type` (image, video ou audio). Android n'affiche que les images dans le volet des notifications."

@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "点按通知时打开的 URL。像 /lovelace/kitchen 这样的路径会通过 Home Assistant 的外部 URL 打开。"
         },
+        "open_url_on_tap": {
+          "name": "点按时打开 URL",
+          "description": "点按通知时打开 URL 而不是通知，前提是该链接在这台设备上无需询问即可打开（PushWard 应用中的信任的网站，或已关闭“打开链接前确认”）。其他链接会先打开通知。需要 URL。旧版应用会像以前一样打开通知。"
+        },
         "media": {
           "name": "媒体",
           "description": "媒体附件，为一个包含 `url`（HTTPS）和 `type`（image、video 或 audio）的对象。Android 在通知栏中只显示图片。"

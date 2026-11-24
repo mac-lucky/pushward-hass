@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL yang dibuka saat notifikasi diketuk. Jalur seperti /lovelace/kitchen dibuka di URL eksternal Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Buka URL saat diketuk",
+          "description": "Mengetuk notifikasi membuka URL, bukan notifikasinya, jika tautan itu terbuka tanpa bertanya di perangkat tersebut (situs tepercaya di aplikasi PushWard, atau 'Konfirmasi Sebelum Membuka Tautan' nonaktif). Tautan lain membuka notifikasi terlebih dahulu. Memerlukan URL. Versi aplikasi yang lebih lama tetap membuka notifikasi seperti biasa."
+        },
         "media": {
           "name": "Media",
           "description": "Lampiran media sebagai objek dengan `url` (HTTPS) dan `type` (image, video, atau audio). Android hanya menampilkan gambar di panel notifikasi."

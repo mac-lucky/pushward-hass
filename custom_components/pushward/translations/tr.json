@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "Bildirime dokunulduğunda açılacak URL. /lovelace/kitchen gibi bir yol Home Assistant'ın harici URL'sinde açılır."
         },
+        "open_url_on_tap": {
+          "name": "Dokununca URL'yi aç",
+          "description": "Bağlantı o cihazda sormadan açılıyorsa (PushWard uygulamasındaki güvenilir bir site ya da 'Bağlantıları Açmadan Önce Onayla' kapalıysa), bildirime dokunmak bildirim yerine URL'yi açar. Diğer bağlantılar önce bildirimi açar. URL gerektirir. Eski uygulama sürümleri bildirimi eskisi gibi açar."
+        },
         "media": {
           "name": "Medya",
           "description": "`url` (HTTPS) ve `type` (image, video veya audio) içeren bir nesne olarak medya eki. Android bildirim panelinde yalnızca görselleri gösterir."

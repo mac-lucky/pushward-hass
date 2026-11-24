@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL mở khi chạm vào thông báo. Một đường dẫn như /lovelace/kitchen sẽ mở trên URL bên ngoài của Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Mở URL khi chạm",
+          "description": "Chạm vào thông báo sẽ mở URL thay vì thông báo, nếu liên kết đó mở mà không cần hỏi trên thiết bị (một trang web tin cậy trong ứng dụng PushWard, hoặc khi 'Xác nhận trước khi mở liên kết' đang tắt). Các liên kết khác sẽ mở thông báo trước. Cần có URL. Các phiên bản ứng dụng cũ hơn vẫn mở thông báo như trước."
+        },
         "media": {
           "name": "Phương tiện",
           "description": "Tệp đính kèm phương tiện dưới dạng đối tượng với `url` (HTTPS) và `type` (image, video hoặc audio). Android chỉ hiển thị hình ảnh trong ngăn thông báo."

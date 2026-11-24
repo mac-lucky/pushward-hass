@@ -1343,6 +1343,12 @@ def assert_valid_notification_request(payload: dict, *, where: str = "notificati
         _check_len(payload.get("subtitle"), SUBTITLE_MAX, "subtitle", where)
         _check_len(payload.get("body"), BODY_MAX, "body", where)
 
+    open_url_on_tap = payload.get("open_url_on_tap")
+    if open_url_on_tap is not None and not isinstance(open_url_on_tap, bool):
+        _fail(where, f"open_url_on_tap must be a boolean, got {open_url_on_tap!r}")
+    if open_url_on_tap and not payload.get("url") and encrypted is None:
+        _fail(where, "open_url_on_tap requires url, or encrypted (422 notification.open_url_on_tap_requires_url)")
+
     actions = payload.get("actions") or []
     if not isinstance(actions, list) or len(actions) > NOTIFICATION_ACTIONS_MAX:
         _fail(where, f"actions must be a list of at most {NOTIFICATION_ACTIONS_MAX}")

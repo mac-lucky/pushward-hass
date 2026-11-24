@@ -395,6 +395,7 @@ class PushWardApiClient:
         source_display_name: str | None = None,
         activity_slug: str | None = None,
         url: str | None = None,
+        open_url_on_tap: bool | None = None,
         media: dict | None = None,
         icon_url: str | None = None,
         metadata: dict[str, str] | None = None,
@@ -435,6 +436,10 @@ class PushWardApiClient:
         ``snooze`` (1-3 minute durations) adds snooze buttons; the device shows the
         notification again after the chosen time. It never goes with acknowledge.
 
+        ``open_url_on_tap`` asks that a plain tap open the url instead of the
+        notification, on a device that trusts the link. It needs url and stays
+        plaintext beside the envelope.
+
         A send the server records the answer to is reported to
         ``on_answerable_send`` (the created body, and whether it was scheduled),
         with ``answer_window``: how long after the send its answer is still of use
@@ -473,6 +478,7 @@ class PushWardApiClient:
             ("source_display_name", source_display_name),
             ("activity_slug", activity_slug),
             ("url", url),
+            ("open_url_on_tap", open_url_on_tap),
             ("media", media),
             ("icon_url", icon_url),
             ("metadata", metadata),

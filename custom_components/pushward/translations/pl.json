@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "Adres URL otwierany po dotknięciu powiadomienia. Ścieżka taka jak /lovelace/kitchen otwiera się pod zewnętrznym adresem URL Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Otwieraj URL po dotknięciu",
+          "description": "Dotknięcie powiadomienia otwiera adres URL zamiast powiadomienia, jeśli link otwiera się na tym urządzeniu bez pytania (zaufana witryna w aplikacji PushWard albo wyłączone „Potwierdzaj przed otwarciem linków”). Inne linki najpierw otwierają powiadomienie. Wymaga adresu URL. Starsze wersje aplikacji otwierają powiadomienie tak jak dotąd."
+        },
         "media": {
           "name": "Multimedia",
           "description": "Załącznik multimedialny jako obiekt z `url` (HTTPS) i `type` (image, video lub audio). Android pokazuje w obszarze powiadomień tylko obrazy."

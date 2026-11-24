@@ -1640,6 +1640,41 @@ async def test_create_notification_keeps_snooze_on_scheduled_and_recurring_sends
         assert session.request.call_args[1]["json"]["snooze"] == [30]
 
 
+async def test_create_notification_sends_open_url_on_tap_with_the_url():
+    session = _make_session(_mock_response(201, json_body={"id": 5}))
+    client = _make_client(session)
+
+    await client.create_notification("Door", "Opened", url="https://ha.example.com/lovelace/door", open_url_on_tap=True)
+
+    body = session.request.call_args[1]["json"]
+    assert body["url"] == "https://ha.example.com/lovelace/door"
+    assert body["open_url_on_tap"] is True
+    assert_valid_notification_request(body)
+
+
+async def test_create_notification_leaves_open_url_on_tap_out_by_default():
+    session = _make_session(_mock_response(201, json_body={"id": 5}))
+    client = _make_client(session)
+
+    await client.create_notification("Door", "Opened", url="https://ha.example.com/lovelace/door")
+
+    assert "open_url_on_tap" not in session.request.call_args[1]["json"]
+
+
+async def test_create_notification_keeps_open_url_on_tap_plain_beside_the_envelope():
+    session = _make_session(_mock_response(201, json_body={"id": 5}))
+    client = _make_client(session)
+    client.e2e_key = _E2E_KEY
+
+    await client.create_notification("Door", "Opened", url="https://ha.example.com/door", open_url_on_tap=True)
+
+    body = session.request.call_args[1]["json"]
+    assert body["open_url_on_tap"] is True
+    assert "url" not in body
+    assert open_envelope(_E2E_KEY, body["encrypted"])["url"] == "https://ha.example.com/door"
+    assert_valid_notification_request(body)
+
+
 async def test_retract_notifications_posts_the_collapse_id_and_returns_devices():
     session = _make_session(_mock_response(202, json_body={"devices": 3}))
     client = _make_client(session)

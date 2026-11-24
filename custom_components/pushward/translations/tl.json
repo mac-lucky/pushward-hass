@@ -1866,6 +1866,10 @@
           "name": "URL",
           "description": "URL na bubuksan kapag na-tap ang notification. Ang path tulad ng /lovelace/kitchen ay bubukas sa external URL ng Home Assistant."
         },
+        "open_url_on_tap": {
+          "name": "Buksan ang URL sa pag-tap",
+          "description": "Kapag na-tap ang notification, ang URL ang bubukas sa halip na ang notification, kung bumubukas ang link nang hindi nagtatanong sa device na iyon (isang Trusted Site sa PushWard app, o naka-off ang Confirm Before Opening Links). Ang ibang link ay binubuksan muna ang notification. Kailangan ng URL. Ang mas lumang bersyon ng app ay binubuksan pa rin ang notification gaya ng dati."
+        },
         "media": {
           "name": "Media",
           "description": "Media attachment bilang object na may `url` (HTTPS) at `type` (image, video, o audio). Mga larawan lang ang ipinapakita ng Android sa notification shade."

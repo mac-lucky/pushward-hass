@@ -846,6 +846,52 @@ async def test_service_send_notification_keeps_snooze_on_scheduled_sends(hass: H
     assert api.create_notification.call_args[1]["snooze"] == [60]
 
 
+# --- open_url_on_tap ---
+
+
+@pytest.mark.parametrize("value", [True, "on"])
+async def test_service_send_notification_passes_open_url_on_tap(hass: HomeAssistant, value) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Door", "body": "Opened", "url": "https://example.com/door", "open_url_on_tap": value},
+        blocking=True,
+    )
+
+    kwargs = api.create_notification.call_args[1]
+    assert kwargs["open_url_on_tap"] is True
+    assert kwargs["url"] == "https://example.com/door"
+
+
+@pytest.mark.parametrize("extra", [{}, {"open_url_on_tap": False}])
+async def test_service_send_notification_leaves_open_url_on_tap_out_unless_true(hass: HomeAssistant, extra) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    await hass.services.async_call(
+        DOMAIN,
+        "send_notification",
+        {"title": "Door", "body": "Opened", "url": "https://example.com/door", **extra},
+        blocking=True,
+    )
+
+    assert "open_url_on_tap" not in api.create_notification.call_args[1]
+
+
+async def test_service_send_notification_refuses_open_url_on_tap_without_url(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    await _setup_entry(hass, api)
+
+    with pytest.raises(vol.Invalid, match="open_url_on_tap requires url"):
+        await hass.services.async_call(
+            DOMAIN, "send_notification", {"title": "t", "body": "b", "open_url_on_tap": True}, blocking=True
+        )
+    api.create_notification.assert_not_awaited()
+
+
 # --- the answer stream's wiring ---
 
 
