@@ -2571,6 +2571,86 @@ clear_notification:
       selector:
         text:
 
+mute:
+  name: Mute
+  description: "Mute a notification source or activity, or * for everything except critical alerts, on every device of the account. Muted notifications still land in the PushWard app's list; no new Live Activity starts and running ones update without sound. Muting the same target and applies_to again replaces the earlier mute. The integration key needs Account set to Full management."
+  fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
+    target:
+      name: Target
+      description: "A notification source or activity slug, matched exactly, or * for everything except critical alerts. A mute on one source silences its critical alerts too."
+      required: true
+      example: "*"
+      selector:
+        text:
+    applies_to:
+      name: Applies To
+      description: What to mute. Defaults to both.
+      default: both
+      selector:
+        select:
+          options:
+            - both
+            - notifications
+            - activities
+    mode:
+      name: Mode
+      description: "silent (the default) delivers notifications without sound, banner or screen wake; off sends no push at all."
+      default: silent
+      selector:
+        select:
+          options:
+            - silent
+            - "off"
+    duration:
+      name: Duration
+      description: How long the mute lasts. Leave this and Until empty to mute until you unmute.
+      selector:
+        duration:
+    until:
+      name: Until
+      description: When the mute ends, instead of a duration.
+      selector:
+        datetime:
+    label:
+      name: Label
+      description: The name the PushWard app shows for the target, up to 100 characters.
+      example: "Washer"
+      selector:
+        text:
+
+unmute:
+  name: Unmute
+  description: "Remove the mutes of a target. Daily quiet-hours schedules set in the PushWard app stay. Nothing to remove is not an error. The integration key needs Account set to Full management."
+  fields:
+    config_entry_id:
+      name: Account
+      description: "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+      selector:
+        config_entry:
+          integration: pushward
+    target:
+      name: Target
+      description: The target that was muted, or * for everything.
+      required: true
+      example: "*"
+      selector:
+        text:
+    applies_to:
+      name: Applies To
+      description: Only remove the mute for this. Leave empty to remove them all.
+      selector:
+        select:
+          options:
+            - both
+            - notifications
+            - activities
+
 send_email:
   name: Send Email
   description: Send a transactional email via PushWard. Provide a text body, an HTML body, or both. The integration key needs the "emails" capability.

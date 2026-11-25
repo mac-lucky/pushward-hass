@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Notificação push"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Pausar notificações"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Entidade do HA vinculada ao widget. Resolvida para o widget correspondente pela configuração. É necessário informar slug ou entity_id."
         }
       }
+    },
+    "mute": {
+      "name": "Silenciar",
+      "description": "Silencia uma fonte de notificações ou uma atividade, ou * para tudo exceto alertas críticos, em todos os dispositivos da conta. Notificações silenciadas continuam chegando à lista do app PushWard; nenhuma Live Activity nova é iniciada e as em andamento são atualizadas sem som. Silenciar de novo o mesmo alvo com o mesmo applies_to substitui o silenciamento anterior. A chave de integração precisa de Conta em Gerenciamento completo.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Conta",
+          "description": "Conta PushWard a usar. Deixe vazio para usar todas as contas PushWard adicionadas ao Home Assistant."
+        },
+        "target": {
+          "name": "Alvo",
+          "description": "Uma fonte de notificações ou o slug de uma atividade, com correspondência exata, ou * para tudo exceto alertas críticos. Silenciar uma única fonte também silencia os alertas críticos dela."
+        },
+        "applies_to": {
+          "name": "Aplica-se a",
+          "description": "O que silenciar. O padrão é both."
+        },
+        "mode": {
+          "name": "Modo",
+          "description": "silent (padrão) entrega as notificações sem som, banner ou acender a tela; off não envia push nenhum."
+        },
+        "duration": {
+          "name": "Duração",
+          "description": "Quanto tempo o silenciamento dura. Deixe este campo e Até vazios para silenciar até você remover."
+        },
+        "until": {
+          "name": "Até",
+          "description": "Quando o silenciamento termina, em vez de uma duração."
+        },
+        "label": {
+          "name": "Rótulo",
+          "description": "O nome que o app PushWard mostra para o alvo, até 100 caracteres."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Remover silenciamento",
+      "description": "Remove os silenciamentos de um alvo. Os horários diários de silêncio definidos no app PushWard permanecem. Não haver nada para remover não é um erro. A chave de integração precisa de Conta em Gerenciamento completo.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Conta",
+          "description": "Conta PushWard a usar. Deixe vazio para usar todas as contas PushWard adicionadas ao Home Assistant."
+        },
+        "target": {
+          "name": "Alvo",
+          "description": "O alvo que foi silenciado, ou * para tudo."
+        },
+        "applies_to": {
+          "name": "Aplica-se a",
+          "description": "Remove só o silenciamento para isto. Deixe vazio para remover todos."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} é uma requisição silenciosa, que o celular só envia por https, e a URL externa do Home Assistant é http. Defina uma URL da Internet com https em Configurações > Sistema > Rede ou conecte o Home Assistant Cloud, ou envie uma URL https completa."
+    },
+    "account_permission_required": {
+      "message": "Esta chave de integração não pode alterar silenciamentos. No app PushWard, abra Ajustes > Chaves de Integração, escolha esta chave e defina Conta como Gerenciamento completo."
     }
   },
   "config": {

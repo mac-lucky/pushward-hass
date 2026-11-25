@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Powiadomienie push"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Wstrzymaj powiadomienia"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Encja HA powiązana z widżetem. Dopasowywana do odpowiedniego widżetu na podstawie konfiguracji. Należy podać slug lub entity_id."
         }
       }
+    },
+    "mute": {
+      "name": "Wycisz",
+      "description": "Wycisza źródło powiadomień lub aktywność albo * dla wszystkiego poza alertami krytycznymi na każdym urządzeniu konta. Wyciszone powiadomienia nadal trafiają na listę w aplikacji PushWard; nie startuje żadna nowa Live Activity, a trwające aktualizują się bez dźwięku. Ponowne wyciszenie tego samego celu z tym samym applies_to zastępuje wcześniejsze wyciszenie. Klucz integracji potrzebuje uprawnienia Konto ustawionego na Pełne zarządzanie.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Konto PushWard do użycia. Zostaw puste, aby użyć każdego konta PushWard dodanego do Home Assistant."
+        },
+        "target": {
+          "name": "Cel",
+          "description": "Źródło powiadomień lub slug aktywności, porównywany dokładnie, albo * dla wszystkiego poza alertami krytycznymi. Wyciszenie jednego źródła wycisza też jego alerty krytyczne."
+        },
+        "applies_to": {
+          "name": "Dotyczy",
+          "description": "Co wyciszyć. Domyślnie both."
+        },
+        "mode": {
+          "name": "Tryb",
+          "description": "silent (domyślnie) dostarcza powiadomienia bez dźwięku, banera i wybudzania ekranu; off nie wysyła żadnego pusha."
+        },
+        "duration": {
+          "name": "Czas trwania",
+          "description": "Jak długo trwa wyciszenie. Zostaw to pole i Do puste, aby wyciszyć do czasu wyłączenia wyciszenia."
+        },
+        "until": {
+          "name": "Do",
+          "description": "Kiedy kończy się wyciszenie, zamiast czasu trwania."
+        },
+        "label": {
+          "name": "Etykieta",
+          "description": "Nazwa, którą aplikacja PushWard pokazuje dla celu, do 100 znaków."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Wyłącz wyciszenie",
+      "description": "Usuwa wyciszenia celu. Codzienne godziny ciszy ustawione w aplikacji PushWard zostają. Brak czegokolwiek do usunięcia nie jest błędem. Klucz integracji potrzebuje uprawnienia Konto ustawionego na Pełne zarządzanie.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Konto PushWard do użycia. Zostaw puste, aby użyć każdego konta PushWard dodanego do Home Assistant."
+        },
+        "target": {
+          "name": "Cel",
+          "description": "Wyciszony cel albo * dla wszystkiego."
+        },
+        "applies_to": {
+          "name": "Dotyczy",
+          "description": "Usuń tylko wyciszenie dla tego. Zostaw puste, aby usunąć wszystkie."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} to ciche żądanie, które telefon wysyła tylko przez https, a zewnętrzny adres URL Home Assistant używa http. Ustaw adres URL Internet z https w Ustawienia > System > Sieć lub połącz Home Assistant Cloud albo zamiast tego wyślij pełny adres URL https."
+    },
+    "account_permission_required": {
+      "message": "Ten klucz integracji nie może zmieniać wyciszeń. W aplikacji PushWard otwórz Ustawienia > Klucze integracji, wybierz ten klucz i ustaw Konto na Pełne zarządzanie."
     }
   },
   "config": {

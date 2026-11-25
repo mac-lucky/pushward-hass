@@ -152,6 +152,10 @@ Home Assistant.
   `update_activity_countdown`), then `pushward.end_activity`.
 - `pushward.widget_refresh` pushes a widget now; `pushward.send_email` mails a verified
   address.
+- `pushward.mute` / `pushward.unmute` silence a notification source, an activity slug or `*`
+  (everything but critical alerts) on the user's phones, for a `duration`, until a time or until
+  unmuted; the account's Pause notifications switch is the same `*` mute. Both need the key's
+  Account permission at Full management.
 - With more than one PushWard account, pass `config_entry_id` to every action.
 
 Read `services.yaml` in the integration (or Developer Tools > Actions) for the full field list

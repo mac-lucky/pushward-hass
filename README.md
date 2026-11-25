@@ -33,7 +33,7 @@ In Home Assistant, the [PushWard panel](#pushward-panel) in the sidebar lists ev
 
 ## Contents
 
-[What it looks like](#what-it-looks-like) | [How it works](#how-it-works) | [Features](#features) | [Android](#android) | [Prerequisites](#prerequisites) | [Installation](#installation) | [Agent skill](#agent-skill) | [Configuration](#configuration) | [Account sensors](#account-sensors) | [Notify entity](#notify-entity) | [Services](#services) | [Domain Defaults](#domain-defaults) | [Contributing](#contributing) | [Support](#support) | [Translations](#translations) | [Development](#development) | [CI/CD & Releases](#cicd--releases) | [Server compatibility](#server-compatibility) | [Troubleshooting](#troubleshooting) | [Requirements & License](#requirements--license)
+[What it looks like](#what-it-looks-like) | [How it works](#how-it-works) | [Features](#features) | [Android](#android) | [Prerequisites](#prerequisites) | [Installation](#installation) | [Agent skill](#agent-skill) | [Configuration](#configuration) | [Account sensors](#account-sensors) | [Notify entity](#notify-entity) | [Pause switch](#pause-switch) | [Services](#services) | [Domain Defaults](#domain-defaults) | [Contributing](#contributing) | [Support](#support) | [Translations](#translations) | [Development](#development) | [CI/CD & Releases](#cicd--releases) | [Server compatibility](#server-compatibility) | [Troubleshooting](#troubleshooting) | [Requirements & License](#requirements--license)
 
 ## How it works
 
@@ -94,8 +94,9 @@ The surfaces are independent (separate config, managers, and caches) and share o
 - **6-level icon fallback**: attribute -> config -> entity -> registry -> device class -> domain default
 - **Color support**: RGB, HSV, XY, Kelvin, named colors
 - **TTL controls**: auto-delete after end, auto-end on stale activity, auto-dismiss from the Lock Screen
-- **Services** for the whole surface: create/update/end/delete activities (with a per-template update action), pause and resume timers, send notifications, send email, refresh/delete widgets, generate a ThumbHash
+- **Services** for the whole surface: create/update/end/delete activities (with a per-template update action), pause and resume timers, send notifications, send email, refresh/delete widgets, generate a ThumbHash, mute and unmute
 - **Notify entity** per account, for `notify.send_message` and notify groups
+- **Pause switch** per account: one toggle (or automation) that silences everything but critical alerts on every phone
 
 ## Android
 
@@ -119,6 +120,7 @@ pushward.app compares the two per template: <https://pushward.app/docs/live-acti
 - A **PushWard account** with an **integration key** (`hlk_` prefix), created in the PushWard app under **Settings > Integration Keys** (recommended scope `ha-*`)
   - The key needs the **`widgets`** permission to publish widgets
   - The key needs the **`emails`** capability *and* a verified recipient to use `send_email`
+  - The key needs **Account** set to **Full management** for the [pause switch](#pause-switch) and the `mute`/`unmute` actions
 - The **[PushWard app](https://pushward.app)** installed on the phone that will display the Live Activities / widgets
 
 ## Installation
@@ -677,9 +679,27 @@ It can also be a member of a notify group with other notify entities. The Compan
 
 The message goes out like a `pushward.send_notification` with only a title and body, so an [encryption key](#end-to-end-encryption) seals it (a message too long for the sealed envelope is shortened to fit) and a used-up notification quota refuses it. PushWard needs a title and `notify.send_message` doesn't always carry one; without it the title is your Home Assistant's name from **Settings > System > General** ("Home" unless you changed it), so the phone shows which home sent it. For levels, links, buttons or scheduling use `pushward.send_notification`.
 
+## Pause switch
+
+Each entry also gets a switch on the same device, `switch.pushward_pause_notifications` for an entry titled PushWard. On mutes everything except critical alerts on every device of the account, silently and until you turn it off: notifications still land in the app's list but make no sound, banner or screen wake, no new Live Activity starts and running ones update without sound. Off removes that mute again, also one set in the PushWard app or by `pushward.mute` with target `*`. A mute with an end time turns the switch off when it ends. The daily quiet hours you can set in the app are a separate schedule; they neither turn the switch on nor go away when you turn it off.
+
+The state is read from PushWard at setup, after each change and every 15 minutes, so a mute set in the app can take up to 15 minutes to show. The key needs **Account** set to **Full management** in the app (**Settings > Integration Keys**); without it the switch stays unavailable and the log says why, and everything else keeps working.
+
+```yaml
+- alias: Quiet while everyone is away
+  triggers:
+    - trigger: state
+      entity_id: zone.home
+      to: "0"
+  actions:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.pushward_pause_notifications
+```
+
 ## Services
 
-All services live in the `pushward` domain. There are 24 in total: the fourteen described below plus a per-template `update_activity_<template>` for each of the 10 activity templates (and the deprecated `update_activity` alias).
+All services live in the `pushward` domain. There are 27 in total: the sixteen described below plus a per-template `update_activity_<template>` for each of the 11 activity templates (and the deprecated `update_activity` alias).
 
 ### Choosing the account
 
@@ -690,7 +710,7 @@ Every action except `generate_thumbhash` takes an optional `config_entry_id` (**
 | `create_activity`, `update_activity_<template>`, `end_activity`, `delete_activity`, `widget_refresh`, `delete_widget` | every account |
 | `send_notification` | every account; name one to read the response |
 | `cancel_notifications` | a `tag` is canceled on every account; a `notification_id` needs one |
-| `clear_notification` | every account |
+| `clear_notification`, `mute`, `unmute` | every account |
 | `get_notification_answer`, `list_scheduled_notifications`, `cancel_scheduled_notification`, `send_email` | fails until you name one |
 
 Notification ids belong to the account that sent them, hence the single-account rows. `send_email` goes to the address you give it, so sending it from every account would only deliver copies. When one account fails (quota, missing permission) the others still get the call, and the action raises the first error once they are done.
@@ -1355,6 +1375,44 @@ The optional response is `{ devices: <count> }`, the number of devices the retra
         collapse_id: garage-door
 ```
 
+### `pushward.mute`
+
+Mute a notification source, an activity, or `*` for everything except critical alerts, on every device of the account. A muted notification still lands in the PushWard app's list. While an activity is muted no new Live Activity for it starts, and running ones update without sound. Muting the same `target` and `applies_to` again replaces the earlier mute instead of adding one. A mute on one source silences its critical alerts too; only `*` lets them through. Needs **Account** at **Full management** on the key.
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `target` | Yes | A notification `source` or activity slug, matched exactly, or `*` |
+| `applies_to` | No | `both` (default), `notifications` or `activities` |
+| `mode` | No | `silent` (default): no sound, banner or screen wake. `off`: no push at all. Quote it in YAML (`"off"`) |
+| `duration` | No | How long, e.g. `{ hours: 8 }` or `"08:00:00"`. Not together with `until` |
+| `until` | No | When it ends. A time without a UTC offset is read in Home Assistant's time zone |
+| `label` | No | The name the app shows for the target, up to 100 characters |
+
+Without `duration` or `until` the mute lasts until you unmute it. An account holds at most 100.
+
+```yaml
+- alias: Washer quiet at night
+  triggers:
+    - trigger: time
+      at: "22:00:00"
+  actions:
+    - action: pushward.mute
+      data:
+        target: ha-washer
+        label: Washer
+        duration:
+          hours: 9
+```
+
+### `pushward.unmute`
+
+Remove the mutes of a `target` (only the one for `applies_to` when given). Daily quiet-hours schedules set in the app stay, and nothing to remove is not an error. Needs **Account** at **Full management**.
+
+| Field | Required | Description |
+|-------|:--------:|-------------|
+| `target` | Yes | The muted target, or `*` |
+| `applies_to` | No | Only the mute for `notifications`, `activities` or `both` |
+
 ### `pushward.send_email`
 
 Send a transactional email. Requires the key's **`emails`** capability; the recipient must already be added and confirmed in the PushWard app (the integration cannot verify recipients itself).
@@ -1479,7 +1537,7 @@ Requires Python **3.13.2+**. CI also runs **HACS validation** and **hassfest** o
 
 ## Server compatibility
 
-This integration talks to the public PushWard REST API at **`https://api.pushward.app`**, authenticating with `Authorization: Bearer <integration_key>`. Endpoints used: `GET /auth/me`, `POST/PATCH/DELETE /activities`, `POST/PATCH/DELETE /widgets`, `POST /notifications`, `POST /emails`. The request/response contract, including the Live Activity `ContentState` shape and widget content caps, is owned by the PushWard server; this integration mirrors those caps in `const.py`. Widget endpoints require the key's `widgets` permission; `POST /emails` requires the `emails` capability plus a verified recipient. The client retries with exponential backoff (up to 7 attempts with roughly 30-60 seconds of backoff between them, max 5 concurrent) and honors `Retry-After` on a rate-limit 429. Notification POSTs send one `Idempotency-Key` per send, the same on every retry, so a retry after a lost response gets the first notification back instead of delivering it twice. A quota 429 (`code: quota.exceeded`, sent once a metered monthly allowance is used up) is not retried: the integration stops sending that kind of request until the server's `reset_at`, re-reads the account usage so the matching repair issue appears within seconds, and resumes on its own after the reset, re-sending whatever changed in the meantime. Downloaded diagnostics list the paused kinds under `quota_blocks`.
+This integration talks to the public PushWard REST API at **`https://api.pushward.app`**, authenticating with `Authorization: Bearer <integration_key>`. Endpoints used: `GET /auth/me`, `POST/PATCH/DELETE /activities`, `POST/PATCH/DELETE /widgets`, `POST /notifications`, `POST /emails`, `GET/POST/DELETE /app/mutes`. The request/response contract, including the Live Activity `ContentState` shape and widget content caps, is owned by the PushWard server; this integration mirrors those caps in `const.py`. Widget endpoints require the key's `widgets` permission; `POST /emails` requires the `emails` capability plus a verified recipient; `/app/mutes` the Account permission (read to list, Full management to change). The client retries with exponential backoff (up to 7 attempts with roughly 30-60 seconds of backoff between them, max 5 concurrent) and honors `Retry-After` on a rate-limit 429. Notification POSTs send one `Idempotency-Key` per send, the same on every retry, so a retry after a lost response gets the first notification back instead of delivering it twice. A quota 429 (`code: quota.exceeded`, sent once a metered monthly allowance is used up) is not retried: the integration stops sending that kind of request until the server's `reset_at`, re-reads the account usage so the matching repair issue appears within seconds, and resumes on its own after the reset, re-sending whatever changed in the meantime. Downloaded diagnostics list the paused kinds under `quota_blocks`.
 
 ## Troubleshooting
 
@@ -1509,6 +1567,7 @@ Narrow to one area with `custom_components.pushward.api` (HTTP calls) or `custom
 - **Service call rejected with a server reason**: fixable problems surface as a validation error (e.g. a missing `widgets`/`emails` capability, or an unverified email recipient). Read the `custom_components.pushward.api` debug lines for the HTTP status and body.
 - **`slug` doesn't match an existing activity**: create it first with `pushward.create_activity`.
 - **Wrong field for the chosen template**: see [which fields apply to which template](#pushwardupdate_activity_template).
+- **Pause switch unavailable**: the key cannot read mutes. Set **Account** to **Full management** for it in the app under **Settings > Integration Keys**, then reload the entry or wait up to 15 minutes.
 - **Widget never appears**: confirm the key has the `widgets` permission, and that the bound entity has a renderable value (value/progress/gauge widgets are skipped when the value isn't numeric).
 - **Trend widget stays empty**: it needs at least two points. Either wait for a second sample or set Trend History so it seeds from the recorder.
 - **Countdown widget never updates**: the end date has to parse. A `device_class: timestamp` sensor, a timer's `finishes_at` and a calendar's `end_time` all work out of the box; anything else needs the End Date Attribute pointed at an ISO-8601 or epoch value. Dates before 2000 or more than a year out are dropped rather than sent, so the widget keeps its last content.

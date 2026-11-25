@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Notifikasi push"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Jeda notifikasi"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Entitas HA yang terikat ke widget. Dipetakan ke widget yang cocok berdasarkan konfigurasi. Slug atau entity_id harus diberikan."
         }
       }
+    },
+    "mute": {
+      "name": "Bisukan",
+      "description": "Membisukan sumber notifikasi atau aktivitas, atau * untuk semuanya kecuali peringatan kritis, di setiap perangkat akun. Notifikasi yang dibisukan tetap masuk ke daftar di aplikasi PushWard; tidak ada Live Activity baru yang dimulai dan yang sedang berjalan diperbarui tanpa suara. Membisukan lagi target yang sama dengan applies_to yang sama menggantikan bisu sebelumnya. Kunci integrasi memerlukan Akun disetel ke Pengelolaan penuh.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
+        "target": {
+          "name": "Target",
+          "description": "Sumber notifikasi atau slug aktivitas, dicocokkan persis, atau * untuk semuanya kecuali peringatan kritis. Membisukan satu sumber juga membisukan peringatan kritisnya."
+        },
+        "applies_to": {
+          "name": "Berlaku untuk",
+          "description": "Apa yang dibisukan. Bawaan: both."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "silent (bawaan) mengirim notifikasi tanpa suara, banner, atau menyalakan layar; off tidak mengirim push sama sekali."
+        },
+        "duration": {
+          "name": "Durasi",
+          "description": "Berapa lama bisu berlangsung. Biarkan kolom ini dan Sampai kosong untuk membisukan sampai Anda membatalkannya."
+        },
+        "until": {
+          "name": "Sampai",
+          "description": "Kapan bisu berakhir, sebagai ganti durasi."
+        },
+        "label": {
+          "name": "Label",
+          "description": "Nama yang ditampilkan aplikasi PushWard untuk target, hingga 100 karakter."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Batalkan Bisu",
+      "description": "Menghapus bisu suatu target. Jadwal jam tenang harian yang diatur di aplikasi PushWard tetap ada. Tidak ada yang bisa dihapus bukanlah kesalahan. Kunci integrasi memerlukan Akun disetel ke Pengelolaan penuh.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Akun",
+          "description": "Akun PushWard yang digunakan. Biarkan kosong untuk menggunakan setiap akun PushWard yang ditambahkan ke Home Assistant."
+        },
+        "target": {
+          "name": "Target",
+          "description": "Target yang dibisukan, atau * untuk semuanya."
+        },
+        "applies_to": {
+          "name": "Berlaku untuk",
+          "description": "Hanya hapus bisu untuk ini. Biarkan kosong untuk menghapus semuanya."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} adalah permintaan senyap, yang hanya dikirim ponsel lewat https, dan URL eksternal Home Assistant adalah http. Atur URL Internet https di Pengaturan > Sistem > Jaringan atau hubungkan Home Assistant Cloud, atau kirim URL https lengkap sebagai gantinya."
+    },
+    "account_permission_required": {
+      "message": "Kunci integrasi ini tidak dapat mengubah bisu. Di aplikasi PushWard, buka Pengaturan > Kunci Integrasi, pilih kunci ini, lalu setel Akun ke Pengelolaan penuh."
     }
   },
   "config": {

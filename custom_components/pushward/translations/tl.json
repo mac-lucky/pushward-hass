@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Push notification"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "I-pause ang mga notification"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "HA entity na nakatali sa widget. Niri-resolve sa tumutugmang widget ayon sa config. Dapat ibigay ang alinman sa slug o entity_id."
         }
       }
+    },
+    "mute": {
+      "name": "I-mute",
+      "description": "I-mute ang isang notification source o activity, o * para sa lahat maliban sa mga critical alert, sa bawat device ng account. Napupunta pa rin ang mga na-mute na notification sa listahan ng PushWard app; walang bagong Live Activity na magsisimula at mag-a-update nang walang tunog ang mga tumatakbo. Ang muling pag-mute sa parehong target na may parehong applies_to ay papalit sa naunang mute. Kailangang naka-Full management ang Account ng integration key.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
+        "target": {
+          "name": "Target",
+          "description": "Isang notification source o activity slug, eksaktong itinutugma, o * para sa lahat maliban sa mga critical alert. Ang pag-mute sa isang source ay nagmu-mute din sa mga critical alert nito."
+        },
+        "applies_to": {
+          "name": "Saklaw",
+          "description": "Kung ano ang ime-mute. Default ang both."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "Ang silent (default) ay naghahatid ng notification nang walang tunog, banner, o paggising ng screen; ang off ay hindi nagpapadala ng push."
+        },
+        "duration": {
+          "name": "Tagal",
+          "description": "Gaano katagal ang mute. Iwanang blangko ito at ang Hanggang para mag-mute hanggang i-unmute mo."
+        },
+        "until": {
+          "name": "Hanggang",
+          "description": "Kailan matatapos ang mute, sa halip na tagal."
+        },
+        "label": {
+          "name": "Label",
+          "description": "Ang pangalang ipinapakita ng PushWard app para sa target, hanggang 100 character."
+        }
+      }
+    },
+    "unmute": {
+      "name": "I-unmute",
+      "description": "Alisin ang mga mute ng isang target. Nananatili ang mga araw-araw na quiet hours na itinakda sa PushWard app. Hindi error kung walang maaalis. Kailangang naka-Full management ang Account ng integration key.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Ang PushWard account na gagamitin. Iwanang blangko para gamitin ang bawat PushWard account na idinagdag sa Home Assistant."
+        },
+        "target": {
+          "name": "Target",
+          "description": "Ang target na na-mute, o * para sa lahat."
+        },
+        "applies_to": {
+          "name": "Saklaw",
+          "description": "Alisin lang ang mute para rito. Iwanang blangko para alisin lahat."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "Ang {path} ay isang silent request, na ipinapadala lang ng phone sa https, at http ang external URL ng Home Assistant. Magtakda ng https Internet URL sa Settings > System > Network o ikonekta ang Home Assistant Cloud, o magpadala na lang ng buong https URL."
+    },
+    "account_permission_required": {
+      "message": "Hindi mababago ng integration key na ito ang mga mute. Sa PushWard app, buksan ang Settings > Integration Keys, piliin ang key na ito at itakda ang Account sa Full management."
     }
   },
   "config": {

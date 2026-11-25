@@ -1,9 +1,10 @@
-"""Usage/quota polling coordinator for PushWard.
+"""Polling coordinators for PushWard.
 
-Polls ``GET /auth/me`` for the account's own usage counters and subscription
-tier so the sensor platform can surface them as Home Assistant entities. This is
-the integration's only polling component — activities and widgets are
-event-driven (see ``activity_manager`` / ``widget_manager``).
+``PushWardUsageCoordinator`` polls ``GET /auth/me`` for the account's own usage
+counters and subscription tier so the sensor platform can surface them as Home
+Assistant entities. ``PushWardMuteCoordinator`` reads ``GET /app/mutes`` at the
+same slow pace for the pause switch. Activities and widgets are event-driven
+(see ``activity_manager`` / ``widget_manager``).
 """
 
 from __future__ import annotations
@@ -18,9 +19,10 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import PushWardApiClient, PushWardApiError, PushWardAuthError
+from .api import PushWardAccountPermissionError, PushWardApiClient, PushWardApiError, PushWardAuthError
 from .const import (
     DOMAIN,
+    MAX_RETRIES,
     PRICING_URL,
     QUOTA_RESET_KEY,
     USAGE_LIMIT_RESOURCES,
@@ -148,3 +150,34 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 },
                 learn_more_url=PRICING_URL,
             )
+
+
+class PushWardMuteCoordinator(DataUpdateCoordinator[list[dict[str, Any]]]):
+    """The account's mutes from ``GET /app/mutes``, for the pause switch.
+
+    Polls only every USAGE_UPDATE_INTERVAL; the switch and the mute actions ask for a
+    refresh after each change they make. Any failure, a key without the Account
+    permission included, leaves just the switch unavailable.
+    """
+
+    def __init__(self, hass: HomeAssistant, api: PushWardApiClient, entry: ConfigEntry) -> None:
+        super().__init__(
+            hass,
+            _LOGGER,
+            config_entry=entry,
+            name=f"{DOMAIN}_mutes ({entry.title})",
+            update_interval=timedelta(seconds=USAGE_UPDATE_INTERVAL),
+        )
+        self._api = api
+
+    async def _async_update_data(self) -> list[dict[str, Any]]:
+        try:
+            # One try while the platform sets up, like the usage coordinator's first refresh.
+            return await self._api.list_mutes(attempts=1 if self.data is None else MAX_RETRIES)
+        except PushWardAccountPermissionError as err:
+            raise UpdateFailed(
+                "the integration key cannot read mutes. In the PushWard app, open Settings > Integration Keys, "
+                "pick this key and set Account to Full management to use the pause switch"
+            ) from err
+        except PushWardApiError as err:
+            raise UpdateFailed(str(err)) from err

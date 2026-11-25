@@ -149,6 +149,7 @@ async def _send_through_client(hass: HomeAssistant, options: dict, **data) -> di
     with (
         patch("custom_components.pushward.async_get_clientsession", return_value=session),
         patch.object(PushWardApiClient, "get_me", AsyncMock(return_value=make_usage_payload())),
+        patch.object(PushWardApiClient, "list_mutes", AsyncMock(return_value=[])),
     ):
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()

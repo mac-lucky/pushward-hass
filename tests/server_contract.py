@@ -1504,3 +1504,65 @@ def assert_valid_retract_response(body: object, *, where: str = "retract_respons
     """Assert the 202 body of POST /notifications/retract: ``{"devices": n}``."""
     if not isinstance(body, dict) or not _is_int(body.get("devices")) or body["devices"] < 0:
         _fail(where, f"expected {{'devices': <non-negative int>}}, got {body!r}")
+
+
+# --- Mutes (GET/POST /app/mutes, DELETE /app/mutes/{id}) -------------------------------------
+
+MUTE_APPLIES_TO = ("notifications", "activities", "both")
+MUTE_MODES = ("silent", "off")
+_MUTE_FIELDS = ("target", "label", "applies_to", "mode", "until", "schedule")
+
+
+def _check_mute_schedule(schedule: object, where: str) -> None:
+    if not isinstance(schedule, dict) or set(schedule) != {"start_minute", "end_minute", "time_zone"}:
+        _fail(where, f"schedule must be {{start_minute, end_minute, time_zone}}, got {schedule!r}")
+    for field in ("start_minute", "end_minute"):
+        if not _is_int(schedule[field]) or not 0 <= schedule[field] <= 1439:
+            _fail(where, f"schedule.{field} must be an int in [0, 1439]")
+    if schedule["start_minute"] == schedule["end_minute"]:
+        _fail(where, "schedule.end_minute must differ from start_minute")
+    if not isinstance(schedule["time_zone"], str) or not 1 <= len(schedule["time_zone"]) <= 64:
+        _fail(where, "schedule.time_zone must be a 1-64 character IANA name")
+
+
+def assert_valid_mute_request(body: object, *, where: str = "mute") -> None:
+    """Assert a POST /app/mutes body (CreateMuteBody) the server would accept."""
+    if not isinstance(body, dict):
+        _fail(where, f"body must be an object, got {type(body).__name__}")
+    if unknown := set(body) - set(_MUTE_FIELDS):
+        _fail(where, f"unknown fields {sorted(unknown)} (additionalProperties: false)")
+    target = body.get("target")
+    if not isinstance(target, str) or not 1 <= len(target) <= 128 or not target.strip():
+        _fail(where, f"target must be 1-128 characters, not blank, got {target!r}")
+    if body.get("applies_to") not in MUTE_APPLIES_TO:
+        _fail(where, f"applies_to {body.get('applies_to')!r} is not one of {MUTE_APPLIES_TO}")
+    if "mode" in body and body["mode"] not in MUTE_MODES:
+        _fail(where, f"mode {body['mode']!r} is not one of {MUTE_MODES}")
+    if "label" in body and (not isinstance(body["label"], str) or len(body["label"]) > 100):
+        _fail(where, "label must be a string of at most 100 characters")
+    if "until" in body:
+        _check_timestamp(body["until"], "until", where, required=True)
+        until = datetime.fromisoformat(body["until"].replace("Z", "+00:00"))
+        if until.tzinfo is None:
+            _fail(where, "until must carry a time zone offset")
+        if until.timestamp() <= _now():
+            _fail(where, "until must be in the future")
+    if "schedule" in body:
+        _check_mute_schedule(body["schedule"], where)
+
+
+def assert_valid_mute(mute: object, *, where: str = "mute") -> None:
+    """Assert ``mute`` has the Mute shape the server returns (201 body and GET list items)."""
+    if not isinstance(mute, dict):
+        _fail(where, f"mute must be an object, got {type(mute).__name__}")
+    for field in ("id", "target"):
+        if not isinstance(mute.get(field), str) or not mute[field]:
+            _fail(where, f"{field} must be a non-empty string")
+    if mute.get("applies_to") not in MUTE_APPLIES_TO:
+        _fail(where, f"applies_to {mute.get('applies_to')!r} is not one of {MUTE_APPLIES_TO}")
+    if mute.get("mode") not in MUTE_MODES:
+        _fail(where, f"mode {mute.get('mode')!r} is not one of {MUTE_MODES}")
+    _check_timestamp(mute.get("created_at"), "created_at", where, required=True)
+    _check_timestamp(mute.get("until"), "until", where)
+    if mute.get("schedule") is not None:
+        _check_mute_schedule(mute["schedule"], where)

@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "プッシュ通知"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "通知を一時停止"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "ウィジェットに紐付けられた HA エンティティ。設定に基づいて該当するウィジェットに解決されます。slug または entity_id のいずれかを指定する必要があります。"
         }
       }
+    },
+    "mute": {
+      "name": "ミュート",
+      "description": "通知ソースまたはアクティビティを、あるいは * で重大な通知以外のすべてを、アカウントのすべてのデバイスでミュートします。ミュートした通知も PushWard アプリの一覧には届きます。新しい Live Activity は開始されず、実行中のものは音なしで更新されます。同じターゲットを同じ applies_to で再度ミュートすると、以前のミュートが置き換えられます。統合キーの「アカウント」を「フル管理」に設定する必要があります。",
+      "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
+        "target": {
+          "name": "ターゲット",
+          "description": "完全一致で照合される通知ソースまたはアクティビティのスラッグ、あるいは重大な通知以外のすべてを表す *。1 つのソースをミュートすると、その重大な通知もミュートされます。"
+        },
+        "applies_to": {
+          "name": "対象",
+          "description": "ミュートする対象。既定値は both です。"
+        },
+        "mode": {
+          "name": "モード",
+          "description": "silent (既定) は通知を音、バナー、画面点灯なしで届けます。off はプッシュをまったく送信しません。"
+        },
+        "duration": {
+          "name": "期間",
+          "description": "ミュートを続ける長さ。解除するまでミュートするには、この欄と「終了日時」を空のままにします。"
+        },
+        "until": {
+          "name": "終了日時",
+          "description": "期間の代わりに、ミュートを終える日時。"
+        },
+        "label": {
+          "name": "ラベル",
+          "description": "PushWard アプリがターゲットに表示する名前。最大 100 文字。"
+        }
+      }
+    },
+    "unmute": {
+      "name": "ミュート解除",
+      "description": "ターゲットのミュートを解除します。PushWard アプリで設定した毎日の静かな時間帯のスケジュールは残ります。解除するものがなくてもエラーにはなりません。統合キーの「アカウント」を「フル管理」に設定する必要があります。",
+      "fields": {
+        "config_entry_id": {
+          "name": "アカウント",
+          "description": "使用する PushWard アカウント。空欄にすると、Home Assistant に追加したすべての PushWard アカウントを使用します。"
+        },
+        "target": {
+          "name": "ターゲット",
+          "description": "ミュートしたターゲット、またはすべてを表す *。"
+        },
+        "applies_to": {
+          "name": "対象",
+          "description": "これに対するミュートだけを解除します。空のままにするとすべて解除します。"
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} はサイレントリクエストで、スマートフォンは https でしか送信しませんが、Home Assistant の外部 URL は http です。設定 > システム > ネットワーク で https のインターネット URL を設定するか、Home Assistant Cloud に接続するか、代わりに完全な https URL を送信してください。"
+    },
+    "account_permission_required": {
+      "message": "この統合キーではミュートを変更できません。PushWard アプリで「設定」>「インテグレーションキー」を開き、このキーを選んで「アカウント」を「フル管理」に設定してください。"
     }
   },
   "config": {

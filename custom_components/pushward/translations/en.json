@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Push notification"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Pause notifications"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "HA entity bound to the widget. Resolved to the matching widget by config. Either slug or entity_id must be provided."
         }
       }
+    },
+    "mute": {
+      "name": "Mute",
+      "description": "Mute a notification source or activity, or * for everything except critical alerts, on every device of the account. Muted notifications still land in the PushWard app's list; no new Live Activity starts and running ones update without sound. Muting the same target and applies_to again replaces the earlier mute. The integration key needs Account set to Full management.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
+        "target": {
+          "name": "Target",
+          "description": "A notification source or activity slug, matched exactly, or * for everything except critical alerts. A mute on one source silences its critical alerts too."
+        },
+        "applies_to": {
+          "name": "Applies To",
+          "description": "What to mute. Defaults to both."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "silent (the default) delivers notifications without sound, banner or screen wake; off sends no push at all."
+        },
+        "duration": {
+          "name": "Duration",
+          "description": "How long the mute lasts. Leave this and Until empty to mute until you unmute."
+        },
+        "until": {
+          "name": "Until",
+          "description": "When the mute ends, instead of a duration."
+        },
+        "label": {
+          "name": "Label",
+          "description": "The name the PushWard app shows for the target, up to 100 characters."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Unmute",
+      "description": "Remove the mutes of a target. Daily quiet-hours schedules set in the PushWard app stay. Nothing to remove is not an error. The integration key needs Account set to Full management.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "PushWard account to use. Leave empty to use every PushWard account added to Home Assistant."
+        },
+        "target": {
+          "name": "Target",
+          "description": "The target that was muted, or * for everything."
+        },
+        "applies_to": {
+          "name": "Applies To",
+          "description": "Only remove the mute for this. Leave empty to remove them all."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} is a silent request, which the phone only sends over https, and Home Assistant's external URL is http. Set an https Internet URL under Settings > System > Network or connect Home Assistant Cloud, or send a full https URL instead."
+    },
+    "account_permission_required": {
+      "message": "This integration key cannot change mutes. In the PushWard app, open Settings > Integration Keys, pick this key and set Account to Full management."
     }
   },
   "config": {

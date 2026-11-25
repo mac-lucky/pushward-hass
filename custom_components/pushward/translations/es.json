@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Notificación push"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Pausar notificaciones"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Entidad de HA vinculada al widget. Se resuelve al widget correspondiente según la configuración. Debes indicar slug o entity_id."
         }
       }
+    },
+    "mute": {
+      "name": "Silenciar",
+      "description": "Silencia una fuente de notificaciones o una actividad, o * para todo salvo las alertas críticas, en todos los dispositivos de la cuenta. Las notificaciones silenciadas siguen llegando a la lista de la app PushWard; no se inicia ninguna Live Activity nueva y las que están en curso se actualizan sin sonido. Volver a silenciar el mismo destino con el mismo applies_to sustituye el silencio anterior. La clave de integración necesita Cuenta en Gestión completa.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cuenta",
+          "description": "Cuenta de PushWard que se usará. Déjalo vacío para usar todas las cuentas de PushWard añadidas a Home Assistant."
+        },
+        "target": {
+          "name": "Destino",
+          "description": "Una fuente de notificaciones o el slug de una actividad, con coincidencia exacta, o * para todo salvo las alertas críticas. Silenciar una sola fuente también silencia sus alertas críticas."
+        },
+        "applies_to": {
+          "name": "Se aplica a",
+          "description": "Qué silenciar. Por defecto, both."
+        },
+        "mode": {
+          "name": "Modo",
+          "description": "silent (por defecto) entrega las notificaciones sin sonido, banner ni encender la pantalla; off no envía ningún push."
+        },
+        "duration": {
+          "name": "Duración",
+          "description": "Cuánto dura el silencio. Deja este campo y Hasta vacíos para silenciar hasta que lo quites."
+        },
+        "until": {
+          "name": "Hasta",
+          "description": "Cuándo termina el silencio, en lugar de una duración."
+        },
+        "label": {
+          "name": "Etiqueta",
+          "description": "El nombre que la app PushWard muestra para el destino, hasta 100 caracteres."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Quitar silencio",
+      "description": "Quita los silencios de un destino. Los horarios diarios de silencio configurados en la app PushWard se mantienen. Que no haya nada que quitar no es un error. La clave de integración necesita Cuenta en Gestión completa.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cuenta",
+          "description": "Cuenta de PushWard que se usará. Déjalo vacío para usar todas las cuentas de PushWard añadidas a Home Assistant."
+        },
+        "target": {
+          "name": "Destino",
+          "description": "El destino que se silenció, o * para todo."
+        },
+        "applies_to": {
+          "name": "Se aplica a",
+          "description": "Quita solo el silencio para esto. Déjalo vacío para quitarlos todos."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} es una solicitud silenciosa, que el teléfono solo envía por https, y la URL externa de Home Assistant es http. Configura una URL de Internet https en Ajustes > Sistema > Red o conecta Home Assistant Cloud, o envía una URL https completa."
+    },
+    "account_permission_required": {
+      "message": "Esta clave de integración no puede cambiar silencios. En la app PushWard, abre Ajustes > Claves de integración, elige esta clave y pon Cuenta en Gestión completa."
     }
   },
   "config": {

@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Notificare push"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Pune notificările pe pauză"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Entitate HA asociată widget-ului. Rezolvată la widget-ul corespunzător pe baza configurației. Trebuie furnizat fie slug, fie entity_id."
         }
       }
+    },
+    "mute": {
+      "name": "Silențiază",
+      "description": "Silențiază o sursă de notificări sau o activitate, ori * pentru tot în afară de alertele critice, pe fiecare dispozitiv al contului. Notificările silențiate ajung în continuare în lista din aplicația PushWard; nu pornește nicio Live Activity nouă, iar cele în curs se actualizează fără sunet. Silențierea din nou a aceleiași ținte cu același applies_to înlocuiește silențierea anterioară. Cheia de integrare are nevoie de Cont setat pe Gestionare completă.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
+        "target": {
+          "name": "Țintă",
+          "description": "O sursă de notificări sau slug-ul unei activități, potrivit exact, ori * pentru tot în afară de alertele critice. Silențierea unei singure surse îi silențiază și alertele critice."
+        },
+        "applies_to": {
+          "name": "Se aplică la",
+          "description": "Ce se silențiază. Implicit both."
+        },
+        "mode": {
+          "name": "Mod",
+          "description": "silent (implicit) livrează notificările fără sunet, banner sau aprinderea ecranului; off nu trimite niciun push."
+        },
+        "duration": {
+          "name": "Durată",
+          "description": "Cât durează silențierea. Lăsați acest câmp și Până la goale pentru a silenția până când o anulați."
+        },
+        "until": {
+          "name": "Până la",
+          "description": "Când se termină silențierea, în locul unei durate."
+        },
+        "label": {
+          "name": "Etichetă",
+          "description": "Numele pe care aplicația PushWard îl afișează pentru țintă, până la 100 de caractere."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Anulează silențierea",
+      "description": "Elimină silențierile unei ținte. Intervalele zilnice de liniște setate în aplicația PushWard rămân. Dacă nu e nimic de eliminat, nu este o eroare. Cheia de integrare are nevoie de Cont setat pe Gestionare completă.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Cont",
+          "description": "Contul PushWard de folosit. Lăsați gol pentru a folosi fiecare cont PushWard adăugat în Home Assistant."
+        },
+        "target": {
+          "name": "Țintă",
+          "description": "Ținta silențiată, ori * pentru tot."
+        },
+        "applies_to": {
+          "name": "Se aplică la",
+          "description": "Eliminați doar silențierea pentru aceasta. Lăsați gol pentru a le elimina pe toate."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} este o cerere silențioasă, pe care telefonul o trimite doar prin https, iar URL-ul extern al Home Assistant este http. Setați un URL de Internet https în Setări > Sistem > Rețea sau conectați Home Assistant Cloud, ori trimiteți în schimb un URL https complet."
+    },
+    "account_permission_required": {
+      "message": "Această cheie de integrare nu poate modifica silențierile. În aplicația PushWard, deschideți Setări > Chei de integrare, alegeți această cheie și setați Cont pe Gestionare completă."
     }
   },
   "config": {

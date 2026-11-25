@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Anlık bildirim"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Bildirimleri duraklat"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Widget'a bağlı HA varlığı. Yapılandırmaya göre eşleşen widget'a çözümlenir. slug veya entity_id'den biri sağlanmalıdır."
         }
       }
+    },
+    "mute": {
+      "name": "Sessize Al",
+      "description": "Bir bildirim kaynağını veya etkinliği ya da kritik uyarılar dışındaki her şey için * değerini hesabın tüm cihazlarında sessize alır. Sessize alınan bildirimler yine de PushWard uygulamasının listesine düşer; yeni Live Activity başlamaz ve çalışanlar sessizce güncellenir. Aynı hedefi aynı applies_to ile yeniden sessize almak öncekinin yerini alır. Entegrasyon anahtarında Hesap, Tam yönetim olarak ayarlı olmalıdır.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
+        "target": {
+          "name": "Hedef",
+          "description": "Birebir eşleşen bir bildirim kaynağı veya etkinlik slug'ı ya da kritik uyarılar dışındaki her şey için *. Tek bir kaynağı sessize almak onun kritik uyarılarını da susturur."
+        },
+        "applies_to": {
+          "name": "Kapsam",
+          "description": "Neyin sessize alınacağı. Varsayılan both."
+        },
+        "mode": {
+          "name": "Mod",
+          "description": "silent (varsayılan) bildirimleri ses, banner veya ekran uyandırma olmadan teslim eder; off hiç push göndermez."
+        },
+        "duration": {
+          "name": "Süre",
+          "description": "Sessize almanın ne kadar süreceği. Kaldırana kadar sessize almak için bunu ve Bitiş alanını boş bırakın."
+        },
+        "until": {
+          "name": "Bitiş",
+          "description": "Süre yerine, sessize almanın biteceği zaman."
+        },
+        "label": {
+          "name": "Etiket",
+          "description": "PushWard uygulamasının hedef için gösterdiği ad, en fazla 100 karakter."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Sesi Aç",
+      "description": "Bir hedefin sessize almalarını kaldırır. PushWard uygulamasında ayarlanan günlük sessiz saatler kalır. Kaldırılacak bir şey olmaması hata değildir. Entegrasyon anahtarında Hesap, Tam yönetim olarak ayarlı olmalıdır.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hesap",
+          "description": "Kullanılacak PushWard hesabı. Home Assistant'a eklenen her PushWard hesabını kullanmak için boş bırakın."
+        },
+        "target": {
+          "name": "Hedef",
+          "description": "Sessize alınan hedef ya da her şey için *."
+        },
+        "applies_to": {
+          "name": "Kapsam",
+          "description": "Yalnızca bunun için sessize almayı kaldırın. Hepsini kaldırmak için boş bırakın."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} sessiz bir istektir; telefon bunu yalnızca https üzerinden gönderir ve Home Assistant'ın harici URL'si http'dir. Ayarlar > Sistem > Ağ altında https bir İnternet URL'si ayarlayın veya Home Assistant Cloud'u bağlayın ya da bunun yerine tam bir https URL'si gönderin."
+    },
+    "account_permission_required": {
+      "message": "Bu entegrasyon anahtarı sessize almaları değiştiremez. PushWard uygulamasında Ayarlar > Entegrasyon Anahtarları'nı açın, bu anahtarı seçin ve Hesap'ı Tam yönetim olarak ayarlayın."
     }
   },
   "config": {

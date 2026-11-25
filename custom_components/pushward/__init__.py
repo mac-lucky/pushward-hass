@@ -7,6 +7,7 @@ import copy
 import logging
 from collections.abc import Callable, Coroutine
 from contextlib import contextmanager
+from datetime import timedelta
 from functools import partial
 from typing import Any
 from urllib.parse import urlparse
@@ -29,6 +30,7 @@ from homeassistant.util import dt as dt_util
 from .activity_manager import ActivityManager, build_history_store
 from .answer_stream import AnswerStream, build_answer_store
 from .api import (
+    PushWardAccountPermissionError,
     PushWardApiClient,
     PushWardApiError,
     PushWardForbiddenError,
@@ -99,6 +101,11 @@ from .const import (
     MEDIA_DURATION_MAX,
     MEDIA_EXTRA_CONTROLS_MAX,
     MEDIA_TITLE_MAX,
+    MUTE_APPLIES_TO,
+    MUTE_LABEL_MAX,
+    MUTE_MODES,
+    MUTE_TARGET_ALL,
+    MUTE_TARGET_MAX,
     NOTIFICATION_ACTIONS_MAX,
     NOTIFICATION_LEVELS,
     NOTIFICATION_TAGS_MAX,
@@ -134,7 +141,7 @@ from .const import (
     validate_thumbhash,
     validate_url,
 )
-from .coordinator import PushWardUsageCoordinator
+from .coordinator import PushWardMuteCoordinator, PushWardUsageCoordinator
 from .e2e import E2EError, parse_key
 from .image_hash import (
     ThumbhashError,
@@ -155,7 +162,7 @@ _LOGGER = logging.getLogger(__name__)
 # Seconds async_remove_entry gives each of the panel's test-item cleanups.
 PANEL_CLEANUP_TIMEOUT = 10
 
-PLATFORMS = [Platform.NOTIFY, Platform.SENSOR]
+PLATFORMS = [Platform.NOTIFY, Platform.SENSOR, Platform.SWITCH]
 
 
 SERVICE_UPDATE_ACTIVITY = "update_activity"
@@ -177,6 +184,8 @@ SERVICE_LIST_SCHEDULED_NOTIFICATIONS = "list_scheduled_notifications"
 SERVICE_GET_NOTIFICATION_ANSWER = "get_notification_answer"
 SERVICE_CANCEL_NOTIFICATIONS = "cancel_notifications"
 SERVICE_CLEAR_NOTIFICATION = "clear_notification"
+SERVICE_MUTE = "mute"
+SERVICE_UNMUTE = "unmute"
 
 
 def _entry_ids(value: object) -> list[str] | None:
@@ -1061,6 +1070,29 @@ SCHEMA_LIST_SCHEDULED_NOTIFICATIONS = vol.Schema(
 )
 
 
+def _mute_mode(value: object) -> str:
+    """silent or off; YAML 1.1 reads an unquoted `mode: off` as false."""
+    return "off" if value is False else vol.In(MUTE_MODES)(value)
+
+
+_MUTE_TARGET_FIELDS = {
+    **_ENTRY_TARGET_FIELD,
+    vol.Required("target"): vol.All(cv.string, vol.Length(min=1, max=MUTE_TARGET_MAX)),
+}
+SCHEMA_MUTE = vol.Schema(
+    {
+        **_MUTE_TARGET_FIELDS,
+        vol.Optional("applies_to", default="both"): vol.In(MUTE_APPLIES_TO),
+        vol.Optional("mode", default="silent"): _mute_mode,
+        vol.Exclusive("duration", "mute_end"): vol.All(cv.time_period, vol.Range(min=timedelta(seconds=1))),
+        # Naive values (the UI datetime picker) are in Home Assistant's time zone.
+        vol.Exclusive("until", "mute_end"): vol.All(cv.datetime, dt_util.as_utc),
+        vol.Optional("label"): vol.All(cv.string, vol.Length(max=MUTE_LABEL_MAX)),
+    }
+)
+SCHEMA_UNMUTE = vol.Schema({**_MUTE_TARGET_FIELDS, vol.Optional("applies_to"): vol.In(MUTE_APPLIES_TO)})
+
+
 def _no_line_breaks(value: str) -> str:
     """Reject CR/LF — guards against email header injection via to/subject."""
     if "\r" in value or "\n" in value:
@@ -1177,6 +1209,8 @@ def _surface_api_errors():
     """
     try:
         yield
+    except PushWardAccountPermissionError as err:
+        raise ServiceValidationError(translation_domain=DOMAIN, translation_key="account_permission_required") from err
     except (PushWardForbiddenError, PushWardQuotaExceededError) as err:
         raise ServiceValidationError(str(err)) from err
     except PushWardApiError as err:
@@ -1560,6 +1594,42 @@ async def _async_handle_clear_notification(hass: HomeAssistant, call: ServiceCal
     return {"devices": sum(counts)} if call.return_response else None
 
 
+async def _write_mutes(
+    hass: HomeAssistant, call: ServiceCall, write: Callable[[PushWardApiClient], Coroutine[Any, Any, Any]]
+) -> None:
+    """Run a mute change on every targeted account; a change to "*" re-reads the pause switch's state."""
+
+    async def send(data: dict) -> None:
+        await write(data["api"])
+        if call.data["target"] == MUTE_TARGET_ALL:
+            await data["mute_coordinator"].async_request_refresh()
+
+    await _fan_out(_target_entries(hass, call), send)
+
+
+async def _async_handle_mute(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Mute a source, an activity or "*" (everything but critical alerts) on every device of the account."""
+    until = call.data.get("until")
+    if (duration := call.data.get("duration")) is not None:
+        until = dt_util.utcnow() + duration
+    await _write_mutes(
+        hass,
+        call,
+        lambda api: api.create_mute(
+            call.data["target"],
+            applies_to=call.data["applies_to"],
+            mode=call.data["mode"],
+            label=call.data.get("label"),
+            until=until,
+        ),
+    )
+
+
+async def _async_handle_unmute(hass: HomeAssistant, call: ServiceCall) -> None:
+    """Remove a target's mutes, daily schedules excepted. Nothing to remove is not an error."""
+    await _write_mutes(hass, call, lambda api: api.unmute(call.data["target"], call.data.get("applies_to")))
+
+
 async def _async_handle_list_scheduled_notifications(hass: HomeAssistant, call: ServiceCall) -> ServiceResponse:
     """Return scheduled notifications: pending soonest first, any other status latest first."""
     api = _single_api(hass, call)
@@ -1722,6 +1792,8 @@ def _register_services(hass: HomeAssistant) -> None:
         SCHEMA_CLEAR_NOTIFICATION,
         supports_response=SupportsResponse.OPTIONAL,
     )
+    hass.services.async_register(DOMAIN, SERVICE_MUTE, partial(_async_handle_mute, hass), SCHEMA_MUTE)
+    hass.services.async_register(DOMAIN, SERVICE_UNMUTE, partial(_async_handle_unmute, hass), SCHEMA_UNMUTE)
     hass.services.async_register(DOMAIN, SERVICE_SEND_EMAIL, partial(_async_handle_send_email, hass), SCHEMA_SEND_EMAIL)
     hass.services.async_register(
         DOMAIN, SERVICE_WIDGET_REFRESH, partial(_async_handle_widget_refresh, hass), SCHEMA_WIDGET_REFRESH
@@ -1849,6 +1921,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "widget_manager": widget_manager,
         "todo_manager": todo_manager,
         "coordinator": coordinator,
+        # Refreshed by the switch platform's setup, so a key that cannot read mutes fails nothing else.
+        "mute_coordinator": PushWardMuteCoordinator(hass, api, entry),
         "quota_gate": quota_gate,
         "answer_stream": answer_stream,
         "e2e_key": entry.options.get(CONF_E2E_KEY),

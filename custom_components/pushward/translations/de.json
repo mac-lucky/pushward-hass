@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Push-Benachrichtigung"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Benachrichtigungen pausieren"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "HA-Entität, die mit dem Widget verknüpft ist. Wird per Konfiguration dem passenden Widget zugeordnet. Es muss entweder slug oder entity_id angegeben werden."
         }
       }
+    },
+    "mute": {
+      "name": "Stummschalten",
+      "description": "Schaltet eine Benachrichtigungsquelle oder Aktivität stumm, oder mit * alles außer kritischen Warnungen, auf jedem Gerät des Kontos. Stummgeschaltete Benachrichtigungen landen trotzdem in der Liste der PushWard-App; keine neue Live Activity startet, laufende werden ohne Ton aktualisiert. Dasselbe Ziel mit demselben applies_to erneut stummzuschalten ersetzt die frühere Stummschaltung. Der Integrationsschlüssel benötigt für Konto die Stufe Vollständige Verwaltung.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Zu verwendendes PushWard-Konto. Leer lassen, um jedes in Home Assistant hinzugefügte PushWard-Konto zu verwenden."
+        },
+        "target": {
+          "name": "Ziel",
+          "description": "Eine Benachrichtigungsquelle oder ein Aktivitäts-Slug, exakt verglichen, oder * für alles außer kritischen Warnungen. Eine Stummschaltung einer einzelnen Quelle unterdrückt auch deren kritische Warnungen."
+        },
+        "applies_to": {
+          "name": "Gilt für",
+          "description": "Was stummgeschaltet wird. Standard ist both."
+        },
+        "mode": {
+          "name": "Modus",
+          "description": "silent (Standard) stellt Benachrichtigungen ohne Ton, Banner und Aufwecken des Bildschirms zu; off sendet gar keinen Push."
+        },
+        "duration": {
+          "name": "Dauer",
+          "description": "Wie lange die Stummschaltung gilt. Dieses Feld und Bis leer lassen, um bis zum Aufheben stummzuschalten."
+        },
+        "until": {
+          "name": "Bis",
+          "description": "Wann die Stummschaltung endet, statt einer Dauer."
+        },
+        "label": {
+          "name": "Bezeichnung",
+          "description": "Der Name, den die PushWard-App für das Ziel anzeigt, bis zu 100 Zeichen."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Stummschaltung aufheben",
+      "description": "Entfernt die Stummschaltungen eines Ziels. Tägliche Ruhezeiten, die in der PushWard-App eingerichtet sind, bleiben. Gibt es nichts zu entfernen, ist das kein Fehler. Der Integrationsschlüssel benötigt für Konto die Stufe Vollständige Verwaltung.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Konto",
+          "description": "Zu verwendendes PushWard-Konto. Leer lassen, um jedes in Home Assistant hinzugefügte PushWard-Konto zu verwenden."
+        },
+        "target": {
+          "name": "Ziel",
+          "description": "Das stummgeschaltete Ziel oder * für alles."
+        },
+        "applies_to": {
+          "name": "Gilt für",
+          "description": "Nur die Stummschaltung hierfür entfernen. Leer lassen, um alle zu entfernen."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} ist eine stille Anfrage, die das Telefon nur über https sendet, und die externe URL von Home Assistant ist http. Eine https-Internet-URL unter Einstellungen > System > Netzwerk festlegen oder Home Assistant Cloud verbinden, oder stattdessen eine vollständige https-URL senden."
+    },
+    "account_permission_required": {
+      "message": "Dieser Integrationsschlüssel kann keine Stummschaltungen ändern. In der PushWard-App unter Einstellungen > Integrationsschlüssel diesen Schlüssel wählen und Konto auf Vollständige Verwaltung setzen."
     }
   },
   "config": {

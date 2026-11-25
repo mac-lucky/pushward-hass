@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Pushmelding"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Meldingen pauzeren"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "HA-entiteit gekoppeld aan de widget. Wordt via de configuratie omgezet naar de bijbehorende widget. Geef óf slug óf entity_id op."
         }
       }
+    },
+    "mute": {
+      "name": "Dempen",
+      "description": "Dempt een meldingsbron of activiteit, of * voor alles behalve kritieke meldingen, op elk apparaat van het account. Gedempte meldingen komen nog steeds in de lijst van de PushWard-app; er start geen nieuwe Live Activity en lopende worden zonder geluid bijgewerkt. Hetzelfde doel met dezelfde applies_to opnieuw dempen vervangt de eerdere demping. De integratiesleutel heeft Account op Volledig beheer nodig.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
+        "target": {
+          "name": "Doel",
+          "description": "Een meldingsbron of activiteit-slug, exact vergeleken, of * voor alles behalve kritieke meldingen. Een demping van één bron dempt ook de kritieke meldingen ervan."
+        },
+        "applies_to": {
+          "name": "Geldt voor",
+          "description": "Wat gedempt wordt. Standaard both."
+        },
+        "mode": {
+          "name": "Modus",
+          "description": "silent (standaard) bezorgt meldingen zonder geluid, banner of wekken van het scherm; off verstuurt helemaal geen push."
+        },
+        "duration": {
+          "name": "Duur",
+          "description": "Hoe lang de demping duurt. Laat dit veld en Tot leeg om te dempen tot je het opheft."
+        },
+        "until": {
+          "name": "Tot",
+          "description": "Wanneer de demping eindigt, in plaats van een duur."
+        },
+        "label": {
+          "name": "Label",
+          "description": "De naam die de PushWard-app voor het doel toont, maximaal 100 tekens."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Demping opheffen",
+      "description": "Verwijdert de dempingen van een doel. Dagelijkse stille uren die in de PushWard-app zijn ingesteld blijven staan. Niets te verwijderen is geen fout. De integratiesleutel heeft Account op Volledig beheer nodig.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Account",
+          "description": "Te gebruiken PushWard-account. Laat leeg om elk PushWard-account te gebruiken dat aan Home Assistant is toegevoegd."
+        },
+        "target": {
+          "name": "Doel",
+          "description": "Het gedempte doel, of * voor alles."
+        },
+        "applies_to": {
+          "name": "Geldt voor",
+          "description": "Verwijder alleen de demping hiervoor. Laat leeg om ze allemaal te verwijderen."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} is een stil verzoek, dat de telefoon alleen via https verstuurt, en de externe URL van Home Assistant is http. Stel een https-internet-URL in onder Instellingen > Systeem > Netwerk of verbind Home Assistant Cloud, of stuur in plaats daarvan een volledige https-URL."
+    },
+    "account_permission_required": {
+      "message": "Deze integratiesleutel kan geen dempingen wijzigen. Open in de PushWard-app Instellingen > Integratiesleutels, kies deze sleutel en zet Account op Volledig beheer."
     }
   },
   "config": {

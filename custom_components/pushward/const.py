@@ -520,6 +520,14 @@ SNOOZE_MINUTES_MAX = 1440
 
 RETRACT_COLLAPSE_ID_MAX = 64
 
+# Mutes (/app/mutes). "*" mutes everything except critical alerts; any other target
+# is a notification source or activity slug, matched exactly.
+MUTE_TARGET_ALL = "*"
+MUTE_TARGET_MAX = 128
+MUTE_LABEL_MAX = 100
+MUTE_APPLIES_TO = ["notifications", "activities", "both"]
+MUTE_MODES = ["silent", "off"]
+
 # Tracked to-do lists (tracked_todo subentries): each open item with a due date
 # gets a PushWard scheduled notification. The entity is CONF_ENTITY_ID.
 CONF_TODO_OFFSET_MINUTES = "offset_minutes"

@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Thông báo đẩy"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Tạm dừng thông báo"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Thực thể HA gắn với widget. Được phân giải tới widget tương ứng theo cấu hình. Phải cung cấp slug hoặc entity_id."
         }
       }
+    },
+    "mute": {
+      "name": "Tắt tiếng",
+      "description": "Tắt tiếng một nguồn thông báo hoặc hoạt động, hoặc * cho mọi thứ trừ cảnh báo khẩn cấp, trên mọi thiết bị của tài khoản. Thông báo bị tắt tiếng vẫn vào danh sách của ứng dụng PushWard; không Live Activity mới nào bắt đầu và các hoạt động đang chạy cập nhật không có âm thanh. Tắt tiếng lại cùng mục tiêu với cùng applies_to sẽ thay thế lần tắt tiếng trước. Khóa tích hợp cần Tài khoản đặt ở Quản lý đầy đủ.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
+        "target": {
+          "name": "Mục tiêu",
+          "description": "Một nguồn thông báo hoặc slug hoạt động, khớp chính xác, hoặc * cho mọi thứ trừ cảnh báo khẩn cấp. Tắt tiếng một nguồn cũng tắt tiếng các cảnh báo khẩn cấp của nguồn đó."
+        },
+        "applies_to": {
+          "name": "Áp dụng cho",
+          "description": "Những gì cần tắt tiếng. Mặc định là both."
+        },
+        "mode": {
+          "name": "Chế độ",
+          "description": "silent (mặc định) gửi thông báo không có âm thanh, biểu ngữ hay đánh thức màn hình; off hoàn toàn không gửi push."
+        },
+        "duration": {
+          "name": "Thời lượng",
+          "description": "Thời gian tắt tiếng kéo dài. Để trống trường này và Đến khi để tắt tiếng cho đến khi bạn bật lại."
+        },
+        "until": {
+          "name": "Đến khi",
+          "description": "Thời điểm kết thúc tắt tiếng, thay cho thời lượng."
+        },
+        "label": {
+          "name": "Nhãn",
+          "description": "Tên ứng dụng PushWard hiển thị cho mục tiêu, tối đa 100 ký tự."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Bật tiếng",
+      "description": "Gỡ các lần tắt tiếng của một mục tiêu. Lịch giờ yên tĩnh hằng ngày đặt trong ứng dụng PushWard vẫn giữ nguyên. Không có gì để gỡ thì không phải lỗi. Khóa tích hợp cần Tài khoản đặt ở Quản lý đầy đủ.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Tài khoản",
+          "description": "Tài khoản PushWard cần dùng. Để trống để dùng mọi tài khoản PushWard đã thêm vào Home Assistant."
+        },
+        "target": {
+          "name": "Mục tiêu",
+          "description": "Mục tiêu đã tắt tiếng, hoặc * cho mọi thứ."
+        },
+        "applies_to": {
+          "name": "Áp dụng cho",
+          "description": "Chỉ gỡ tắt tiếng cho mục này. Để trống để gỡ tất cả."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} là một yêu cầu im lặng, điện thoại chỉ gửi nó qua https, còn URL bên ngoài của Home Assistant là http. Đặt một URL Internet https trong Cài đặt > Hệ thống > Mạng hoặc kết nối Home Assistant Cloud, hoặc gửi một URL https đầy đủ thay thế."
+    },
+    "account_permission_required": {
+      "message": "Khóa tích hợp này không thể thay đổi tắt tiếng. Trong ứng dụng PushWard, mở Cài đặt > Khóa tích hợp, chọn khóa này và đặt Tài khoản thành Quản lý đầy đủ."
     }
   },
   "config": {

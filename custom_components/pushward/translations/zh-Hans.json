@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "推送通知"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "暂停通知"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "绑定到小组件的 HA 实体。会根据配置解析为匹配的小组件。必须提供 slug 或 entity_id 之一。"
         }
       }
+    },
+    "mute": {
+      "name": "静音",
+      "description": "在账户的每台设备上静音某个通知来源或活动，或用 * 静音除紧急提醒以外的所有内容。被静音的通知仍会进入 PushWard 应用的列表；不会启动新的 Live Activity，正在进行的会无声更新。用相同的 applies_to 再次静音同一目标会替换之前的静音。集成密钥需要将“账户”设为“完整管理”。",
+      "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
+        "target": {
+          "name": "目标",
+          "description": "精确匹配的通知来源或活动 slug，或用 * 表示除紧急提醒以外的所有内容。静音单个来源也会静音它的紧急提醒。"
+        },
+        "applies_to": {
+          "name": "适用于",
+          "description": "要静音的内容。默认为 both。"
+        },
+        "mode": {
+          "name": "模式",
+          "description": "silent (默认) 投递通知时不发声、不显示横幅、不点亮屏幕；off 完全不发送推送。"
+        },
+        "duration": {
+          "name": "时长",
+          "description": "静音持续多久。将此项和“截止时间”留空即静音到取消为止。"
+        },
+        "until": {
+          "name": "截止时间",
+          "description": "静音结束的时间，代替时长。"
+        },
+        "label": {
+          "name": "标签",
+          "description": "PushWard 应用为目标显示的名称，最多 100 个字符。"
+        }
+      }
+    },
+    "unmute": {
+      "name": "取消静音",
+      "description": "移除某个目标的静音。在 PushWard 应用中设置的每日安静时段会保留。没有可移除的内容不算错误。集成密钥需要将“账户”设为“完整管理”。",
+      "fields": {
+        "config_entry_id": {
+          "name": "账户",
+          "description": "要使用的 PushWard 账户。留空则使用添加到 Home Assistant 的每个 PushWard 账户。"
+        },
+        "target": {
+          "name": "目标",
+          "description": "被静音的目标，或用 * 表示全部。"
+        },
+        "applies_to": {
+          "name": "适用于",
+          "description": "只移除针对此项的静音。留空则全部移除。"
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} 是静默请求，手机只会通过 https 发送，而 Home Assistant 的外部 URL 是 http。请在设置 > 系统 > 网络中设置 https 互联网 URL，或连接 Home Assistant Cloud，或者改为发送完整的 https URL。"
+    },
+    "account_permission_required": {
+      "message": "此集成密钥无法更改静音。请在 PushWard 应用中打开“设置”>“集成密钥”，选择此密钥并将“账户”设为“完整管理”。"
     }
   },
   "config": {

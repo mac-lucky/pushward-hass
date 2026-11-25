@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any, Literal
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 from uuid import uuid4
 
 import aiohttp
@@ -98,6 +98,15 @@ def _recurrence_payload(recurrence: dict) -> dict:
     return payload
 
 
+def unscheduled_mutes(mutes: list[dict], target: str, applies_to: str | None = None) -> list[dict]:
+    """The mutes of ``target`` without a daily schedule, only those for ``applies_to`` when given."""
+    return [
+        mute
+        for mute in mutes
+        if mute.get("target") == target and not mute.get("schedule") and applies_to in (None, mute.get("applies_to"))
+    ]
+
+
 def records_answer(actions: list[dict] | None, acknowledge: dict | None) -> bool:
     """Whether the server will record an answer: an action without url or foreground, or acknowledge.
 
@@ -166,6 +175,10 @@ class PushWardEmailPermissionError(PushWardForbiddenError):
     app. The server's `detail` distinguishes the two cases and is surfaced to
     the HA user.
     """
+
+
+class PushWardAccountPermissionError(PushWardForbiddenError):
+    """403 on /app/mutes: the key's Account permission is below read (list) or manage (change)."""
 
 
 class PushWardRateLimitedError(PushWardApiError):
@@ -809,6 +822,53 @@ class PushWardApiClient:
             "POST", "/emails", json=payload, quota_kind=QUOTA_KIND_EMAILS, lane="service", retry_unsent_only=True
         )
 
+    async def list_mutes(self, *, attempts: int = MAX_RETRIES) -> list[dict]:
+        """GET /app/mutes: the account's mutes, oldest first, without timed ones that have ended.
+
+        Needs the key's Account permission at read. Not metered.
+        """
+        data = await self._request_with_retry("GET", "/app/mutes", return_json=True, attempts=attempts, lane="service")
+        mutes = data.get("mutes") if isinstance(data, dict) else None
+        return [mute for mute in mutes or [] if isinstance(mute, dict)]
+
+    async def create_mute(
+        self,
+        target: str,
+        *,
+        applies_to: str,
+        mode: str,
+        label: str | None = None,
+        until: datetime | None = None,
+    ) -> dict:
+        """POST /app/mutes and return the mute. Without ``until`` it lasts until removed.
+
+        Muting the same target and applies_to again replaces the earlier mute, so a
+        retry after a lost response is harmless. Needs Account at manage.
+        """
+        body: dict = {"target": target, "applies_to": applies_to, "mode": mode}
+        if label:
+            body["label"] = label
+        if until is not None:
+            body["until"] = _aware_isoformat(until, "until")
+        created = await self._request_with_retry("POST", "/app/mutes", json=body, return_json=True, lane="service")
+        return created if isinstance(created, dict) else {}
+
+    async def delete_mute(self, mute_id: str) -> None:
+        """DELETE /app/mutes/{id}. A mute already gone (ended or removed elsewhere) is not an error."""
+        await self._request_with_retry(
+            "DELETE", f"/app/mutes/{quote(mute_id, safe='')}", allow_404=True, lane="service"
+        )
+
+    async def unmute(self, target: str, applies_to: str | None = None) -> int:
+        """Delete the mutes of ``target`` (only those for ``applies_to`` when given); returns how many.
+
+        Schedule mutes (daily quiet hours) stay: they are set up in the app, not toggled.
+        """
+        mutes = unscheduled_mutes(await self.list_mutes(), target, applies_to)
+        for mute in mutes:
+            await self.delete_mute(str(mute.get("id")))
+        return len(mutes)
+
     @staticmethod
     def _truncate(message: str, max_len: int = 200) -> str:
         return message[:max_len] + ("…" if len(message) > max_len else "")
@@ -952,6 +1012,8 @@ class PushWardApiClient:
                                     message,
                                     status_code=resp.status,
                                 )
+                            if path.startswith("/app/mutes"):
+                                raise PushWardAccountPermissionError(message, status_code=resp.status)
                             raise PushWardForbiddenError(
                                 message,
                                 status_code=resp.status,

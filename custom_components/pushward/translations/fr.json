@@ -25,6 +25,11 @@
       "push_notification": {
         "name": "Notification push"
       }
+    },
+    "switch": {
+      "pause_notifications": {
+        "name": "Suspendre les notifications"
+      }
     }
   },
   "services": {
@@ -2033,6 +2038,58 @@
           "description": "Entité HA liée au widget. Résolue vers le widget correspondant via la configuration. Vous devez fournir soit slug, soit entity_id."
         }
       }
+    },
+    "mute": {
+      "name": "Mettre en sourdine",
+      "description": "Met en sourdine une source de notifications ou une activité, ou * pour tout sauf les alertes critiques, sur chaque appareil du compte. Les notifications en sourdine arrivent quand même dans la liste de l'app PushWard ; aucune nouvelle Live Activity ne démarre et celles en cours se mettent à jour sans son. Remettre en sourdine la même cible avec le même applies_to remplace la sourdine précédente. La clé d'intégration doit avoir Compte réglé sur Gestion complète.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Compte",
+          "description": "Compte PushWard à utiliser. Laissez vide pour utiliser chaque compte PushWard ajouté à Home Assistant."
+        },
+        "target": {
+          "name": "Cible",
+          "description": "Une source de notifications ou le slug d'une activité, comparé exactement, ou * pour tout sauf les alertes critiques. Une sourdine sur une seule source coupe aussi ses alertes critiques."
+        },
+        "applies_to": {
+          "name": "S'applique à",
+          "description": "Ce qu'il faut mettre en sourdine. Par défaut : both."
+        },
+        "mode": {
+          "name": "Mode",
+          "description": "silent (par défaut) livre les notifications sans son, bannière ni réveil de l'écran ; off n'envoie aucun push."
+        },
+        "duration": {
+          "name": "Durée",
+          "description": "Durée de la sourdine. Laissez ce champ et Jusqu'à vides pour la garder jusqu'à ce que vous la retiriez."
+        },
+        "until": {
+          "name": "Jusqu'à",
+          "description": "Quand la sourdine prend fin, au lieu d'une durée."
+        },
+        "label": {
+          "name": "Libellé",
+          "description": "Le nom que l'app PushWard affiche pour la cible, jusqu'à 100 caractères."
+        }
+      }
+    },
+    "unmute": {
+      "name": "Réactiver le son",
+      "description": "Retire les sourdines d'une cible. Les plages quotidiennes de silence réglées dans l'app PushWard restent. Ne rien trouver à retirer n'est pas une erreur. La clé d'intégration doit avoir Compte réglé sur Gestion complète.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Compte",
+          "description": "Compte PushWard à utiliser. Laissez vide pour utiliser chaque compte PushWard ajouté à Home Assistant."
+        },
+        "target": {
+          "name": "Cible",
+          "description": "La cible mise en sourdine, ou * pour tout."
+        },
+        "applies_to": {
+          "name": "S'applique à",
+          "description": "Ne retirer que la sourdine pour ceci. Laissez vide pour toutes les retirer."
+        }
+      }
     }
   },
   "exceptions": {
@@ -2077,6 +2134,9 @@
     },
     "https_external_url_required": {
       "message": "{path} est une requête silencieuse, que le téléphone n'envoie qu'en https, et l'URL externe de Home Assistant est en http. Définissez une URL Internet en https sous Paramètres > Système > Réseau ou connectez Home Assistant Cloud, ou envoyez plutôt une URL https complète."
+    },
+    "account_permission_required": {
+      "message": "Cette clé d'intégration ne peut pas modifier les sourdines. Dans l'app PushWard, ouvrez Réglages > Clés d'intégration, choisissez cette clé et réglez Compte sur Gestion complète."
     }
   },
   "config": {
