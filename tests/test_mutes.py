@@ -468,6 +468,21 @@ async def test_switch_on_keeps_a_pause_set_elsewhere(hass: HomeAssistant, freeze
     assert hass.states.get(_switch_id(hass, entry)).state == STATE_ON
 
 
+@pytest.mark.parametrize("applies_to", ["activities", "notifications"])
+async def test_switch_on_adds_a_full_pause_beside_a_partial_one(hass: HomeAssistant, applies_to: str) -> None:
+    partial = _mute(applies_to=applies_to)
+    api = _mock_api(partial)
+    entry = await _setup(hass, api)
+    assert hass.states.get(_switch_id(hass, entry)).state == STATE_ON
+    api.list_mutes.return_value = [partial, _mute("m2")]
+
+    await hass.services.async_call("switch", "turn_on", {"entity_id": _switch_id(hass, entry)}, blocking=True)
+
+    api.create_mute.assert_awaited_once_with("*", applies_to="both", mode="silent")
+    api.unmute.assert_not_awaited()
+    assert hass.states.get(_switch_id(hass, entry)).state == STATE_ON
+
+
 async def test_switch_on_mutes_when_the_pause_it_showed_is_gone(hass: HomeAssistant) -> None:
     api = _mock_api()
     api.list_mutes.side_effect = [[_mute()], [], [_mute("m2")]]

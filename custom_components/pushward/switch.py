@@ -58,8 +58,12 @@ class PushWardPauseSwitch(CoordinatorEntity[PushWardMuteCoordinator], SwitchEnti
         self._attr_device_info = account_device_info(entry)
         self._unsub_expiry: CALLBACK_TYPE | None = None
 
-    def _pause_ends(self) -> list[datetime | None]:
-        return [_ends(mute) for mute in unscheduled_mutes(self.coordinator.data or [], MUTE_TARGET_ALL)]
+    def _pause_ends(self, applies_to: str | None = None) -> list[datetime | None]:
+        return [_ends(mute) for mute in unscheduled_mutes(self.coordinator.data or [], MUTE_TARGET_ALL, applies_to)]
+
+    def _paused(self, applies_to: str | None = None) -> bool:
+        now = dt_util.utcnow()
+        return any(end is None or end > now for end in self._pause_ends(applies_to))
 
     @property
     def available(self) -> bool:
@@ -67,15 +71,15 @@ class PushWardPauseSwitch(CoordinatorEntity[PushWardMuteCoordinator], SwitchEnti
 
     @property
     def is_on(self) -> bool:
-        now = dt_util.utcnow()
-        return any(end is None or end > now for end in self._pause_ends())
+        return self._paused()
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        if self.is_on:
-            # A pause set elsewhere (an end time, mode off) stays unless it is gone since the last read:
-            # muting "*" again would replace it with one that lasts until removed.
+        if self._paused("both"):
+            # A full pause set elsewhere (an end time, mode off) stays unless it is gone since the last read:
+            # muting "*" again would replace it with one that lasts until removed. A pause of only
+            # notifications or only activities is another row, so the full pause goes in beside it.
             await self.coordinator.async_refresh()
-            if self.is_on:
+            if self._paused("both"):
                 return
         with _surface_api_errors():
             await self._api.create_mute(MUTE_TARGET_ALL, applies_to="both", mode="silent")
