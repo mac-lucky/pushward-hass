@@ -33,11 +33,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up the account's pause switch."""
     data = hass.data[DOMAIN][entry.entry_id]
-    coordinator: PushWardMuteCoordinator = data["mute_coordinator"]
-    # Not the first-refresh variant: a failure (a key without the Account permission)
-    # leaves only this switch unavailable instead of failing the entry.
-    await coordinator.async_refresh()
-    async_add_entities([PushWardPauseSwitch(coordinator, entry, data["api"])])
+    async_add_entities([PushWardPauseSwitch(data["mute_coordinator"], entry, data["api"])])
 
 
 def _ends(mute: dict[str, Any]) -> datetime | None:
@@ -66,24 +62,37 @@ class PushWardPauseSwitch(CoordinatorEntity[PushWardMuteCoordinator], SwitchEnti
         return [_ends(mute) for mute in unscheduled_mutes(self.coordinator.data or [], MUTE_TARGET_ALL)]
 
     @property
+    def available(self) -> bool:
+        return super().available and self.coordinator.data is not None
+
+    @property
     def is_on(self) -> bool:
         now = dt_util.utcnow()
         return any(end is None or end > now for end in self._pause_ends())
 
     async def async_turn_on(self, **kwargs: Any) -> None:
+        if self.is_on:
+            # A pause set elsewhere (an end time, mode off) stays unless it is gone since the last read:
+            # muting "*" again would replace it with one that lasts until removed.
+            await self.coordinator.async_refresh()
+            if self.is_on:
+                return
         with _surface_api_errors():
             await self._api.create_mute(MUTE_TARGET_ALL, applies_to="both", mode="silent")
-        await self.coordinator.async_request_refresh()
+        # Not async_request_refresh: its cooldown would leave the state stale after a quick second toggle.
+        await self.coordinator.async_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         with _surface_api_errors():
             await self._api.unmute(MUTE_TARGET_ALL)
-        await self.coordinator.async_request_refresh()
+        await self.coordinator.async_refresh()
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
         self.async_on_remove(self._cancel_expiry)
-        self._schedule_expiry()
+        # Here, not in platform setup: a disabled switch is never added, so it reads nothing.
+        # The refresh reaches _handle_coordinator_update, which arms the expiry timer.
+        await self.coordinator.async_refresh()
 
     @callback
     def _handle_coordinator_update(self) -> None:

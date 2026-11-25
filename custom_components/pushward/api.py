@@ -822,12 +822,15 @@ class PushWardApiClient:
             "POST", "/emails", json=payload, quota_kind=QUOTA_KIND_EMAILS, lane="service", retry_unsent_only=True
         )
 
-    async def list_mutes(self, *, attempts: int = MAX_RETRIES) -> list[dict]:
+    async def list_mutes(
+        self, *, attempts: int = MAX_RETRIES, lane: Literal["background", "service"] = "service"
+    ) -> list[dict]:
         """GET /app/mutes: the account's mutes, oldest first, without timed ones that have ended.
 
-        Needs the key's Account permission at read. Not metered.
+        Needs the key's Account permission at read. Not metered. The pause switch's poll
+        passes ``lane="background"``, like the usage poll.
         """
-        data = await self._request_with_retry("GET", "/app/mutes", return_json=True, attempts=attempts, lane="service")
+        data = await self._request_with_retry("GET", "/app/mutes", return_json=True, attempts=attempts, lane=lane)
         mutes = data.get("mutes") if isinstance(data, dict) else None
         return [mute for mute in mutes or [] if isinstance(mute, dict)]
 

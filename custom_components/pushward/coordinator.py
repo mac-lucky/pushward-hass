@@ -152,15 +152,18 @@ class PushWardUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
 
 
-class PushWardMuteCoordinator(DataUpdateCoordinator[list[dict[str, Any]]]):
+class PushWardMuteCoordinator(DataUpdateCoordinator[list[dict[str, Any]] | None]):
     """The account's mutes from ``GET /app/mutes``, for the pause switch.
 
-    Polls only every USAGE_UPDATE_INTERVAL; the switch and the mute actions ask for a
-    refresh after each change they make. Any failure, a key without the Account
-    permission included, leaves just the switch unavailable.
+    The switch refreshes it once it is added and then it polls every
+    USAGE_UPDATE_INTERVAL, so a disabled switch sends nothing; the switch and the mute
+    actions re-read after each change they make. ``None`` means the key lacks the
+    Account permission: the switch is unavailable and nothing else is affected.
     """
 
-    def __init__(self, hass: HomeAssistant, api: PushWardApiClient, entry: ConfigEntry) -> None:
+    def __init__(
+        self, hass: HomeAssistant, api: PushWardApiClient, entry: ConfigEntry, usage: PushWardUsageCoordinator
+    ) -> None:
         super().__init__(
             hass,
             _LOGGER,
@@ -169,15 +172,33 @@ class PushWardMuteCoordinator(DataUpdateCoordinator[list[dict[str, Any]]]):
             update_interval=timedelta(seconds=USAGE_UPDATE_INTERVAL),
         )
         self._api = api
+        self._usage = usage
+        self._warned = False
 
-    async def _async_update_data(self) -> list[dict[str, Any]]:
-        try:
-            # One try while the platform sets up, like the usage coordinator's first refresh.
-            return await self._api.list_mutes(attempts=1 if self.data is None else MAX_RETRIES)
-        except PushWardAccountPermissionError as err:
-            raise UpdateFailed(
-                "the integration key cannot read mutes. In the PushWard app, open Settings > Integration Keys, "
-                "pick this key and set Account to Full management to use the pause switch"
-            ) from err
-        except PushWardApiError as err:
-            raise UpdateFailed(str(err)) from err
+    def _account_level(self) -> Any:
+        """The key's Account permission as the last ``/auth/me`` reported it, None when it did not."""
+        key = (self._usage.data or {}).get("integration_key")
+        permissions = key.get("permissions") if isinstance(key, dict) else None
+        return permissions.get("account") if isinstance(permissions, dict) else None
+
+    async def _async_update_data(self) -> list[dict[str, Any]] | None:
+        # /auth/me, polled anyway, tells when the read would only be refused: skip it then.
+        if self._account_level() != "none":
+            try:
+                # One try for the first read, which the switch's setup waits for.
+                mutes = await self._api.list_mutes(attempts=1 if self.data is None else MAX_RETRIES, lane="background")
+            except PushWardAccountPermissionError:
+                pass
+            except PushWardApiError as err:
+                raise UpdateFailed(str(err)) from err
+            else:
+                self._warned = False
+                return mutes
+        if not self._warned:
+            self._warned = True
+            _LOGGER.warning(
+                "%s: the integration key cannot read mutes, so the pause switch is unavailable. In the PushWard "
+                "app, open Settings > Integration Keys, pick this key and set Account to Full management",
+                self.config_entry.title,
+            )
+        return None

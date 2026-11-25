@@ -1602,7 +1602,7 @@ async def _write_mutes(
     async def send(data: dict) -> None:
         await write(data["api"])
         if call.data["target"] == MUTE_TARGET_ALL:
-            await data["mute_coordinator"].async_request_refresh()
+            await data["mute_coordinator"].async_refresh()
 
     await _fan_out(_target_entries(hass, call), send)
 
@@ -1921,8 +1921,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "widget_manager": widget_manager,
         "todo_manager": todo_manager,
         "coordinator": coordinator,
-        # Refreshed by the switch platform's setup, so a key that cannot read mutes fails nothing else.
-        "mute_coordinator": PushWardMuteCoordinator(hass, api, entry),
+        # Refreshed by the pause switch once added, so a key that cannot read mutes fails nothing else.
+        "mute_coordinator": PushWardMuteCoordinator(hass, api, entry, coordinator),
         "quota_gate": quota_gate,
         "answer_stream": answer_stream,
         "e2e_key": entry.options.get(CONF_E2E_KEY),

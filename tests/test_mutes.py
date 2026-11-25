@@ -27,6 +27,7 @@ from custom_components.pushward.const import (
     CONF_SERVER_URL,
     DEFAULT_SERVER_URL,
     DOMAIN,
+    MAX_RETRIES,
     USAGE_LIMIT_RESOURCES,
     USAGE_UPDATE_INTERVAL,
 )
@@ -207,16 +208,31 @@ def _mock_api(*mutes: dict, list_error: Exception | None = None) -> AsyncMock:
     return api
 
 
-async def _setup(hass: HomeAssistant, api: AsyncMock) -> MockConfigEntry:
-    entry = MockConfigEntry(
+def _entry() -> MockConfigEntry:
+    return MockConfigEntry(
         domain=DOMAIN,
         title="PushWard",
         data={CONF_SERVER_URL: DEFAULT_SERVER_URL, CONF_INTEGRATION_KEY: "test-key"},
         version=2,
         unique_id="user-123",
     )
+
+
+async def _setup(hass: HomeAssistant, api: AsyncMock) -> MockConfigEntry:
+    entry = _entry()
     await async_setup_with_api(hass, entry, api)
     return entry
+
+
+def _me(account: str) -> dict:
+    """An /auth/me body whose key has ``account`` as its Account permission."""
+    return make_usage_payload(integration_key={"id": "k1", "name": "HA", "permissions": {"account": account}})
+
+
+async def _tick(hass: HomeAssistant, freezer, seconds: int = USAGE_UPDATE_INTERVAL + 1) -> None:
+    freezer.tick(timedelta(seconds=seconds))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
 
 
 def _switch_id(hass: HomeAssistant, entry: MockConfigEntry) -> str:
@@ -421,6 +437,48 @@ async def test_switch_off_unmutes_everything_and_rereads(hass: HomeAssistant) ->
     assert hass.states.get(_switch_id(hass, entry)).state == STATE_OFF
 
 
+async def test_switch_shows_a_quick_second_toggle_at_once(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    entry = await _setup(hass, api)
+    switch = _switch_id(hass, entry)
+
+    api.list_mutes.return_value = [_mute()]
+    await hass.services.async_call("switch", "turn_on", {"entity_id": switch}, blocking=True)
+    assert hass.states.get(switch).state == STATE_ON
+
+    api.list_mutes.return_value = []
+    await hass.services.async_call("switch", "turn_off", {"entity_id": switch}, blocking=True)
+    assert hass.states.get(switch).state == STATE_OFF
+
+    api.list_mutes.return_value = [_mute()]
+    await hass.services.async_call(DOMAIN, "mute", {"target": "*"}, blocking=True)
+    assert hass.states.get(switch).state == STATE_ON
+    assert api.list_mutes.await_count == 4
+
+
+async def test_switch_on_keeps_a_pause_set_elsewhere(hass: HomeAssistant, freezer) -> None:
+    freezer.move_to(NOW)
+    api = _mock_api(_mute(mode="off", until="2026-11-26T07:00:00Z"))
+    entry = await _setup(hass, api)
+
+    await hass.services.async_call("switch", "turn_on", {"entity_id": _switch_id(hass, entry)}, blocking=True)
+
+    api.create_mute.assert_not_awaited()
+    assert api.list_mutes.await_count == 2
+    assert hass.states.get(_switch_id(hass, entry)).state == STATE_ON
+
+
+async def test_switch_on_mutes_when_the_pause_it_showed_is_gone(hass: HomeAssistant) -> None:
+    api = _mock_api()
+    api.list_mutes.side_effect = [[_mute()], [], [_mute("m2")]]
+    entry = await _setup(hass, api)
+
+    await hass.services.async_call("switch", "turn_on", {"entity_id": _switch_id(hass, entry)}, blocking=True)
+
+    api.create_mute.assert_awaited_once_with("*", applies_to="both", mode="silent")
+    assert hass.states.get(_switch_id(hass, entry)).state == STATE_ON
+
+
 async def test_switch_turns_off_when_the_timed_mute_ends(hass: HomeAssistant, freezer) -> None:
     freezer.move_to(NOW)
     ends = NOW + timedelta(minutes=5)
@@ -448,6 +506,8 @@ async def test_switch_polls_slowly(hass: HomeAssistant, freezer) -> None:
     api = _mock_api()
     await _setup(hass, api)
 
+    assert api.list_mutes.await_args.kwargs == {"attempts": 1, "lane": "background"}
+
     freezer.move_to(NOW + timedelta(seconds=USAGE_UPDATE_INTERVAL - 1))
     async_fire_time_changed(hass, NOW + timedelta(seconds=USAGE_UPDATE_INTERVAL - 1))
     await hass.async_block_till_done()
@@ -457,20 +517,66 @@ async def test_switch_polls_slowly(hass: HomeAssistant, freezer) -> None:
     async_fire_time_changed(hass, NOW + timedelta(seconds=USAGE_UPDATE_INTERVAL + 1))
     await hass.async_block_till_done()
     assert api.list_mutes.await_count == 2
+    assert api.list_mutes.await_args.kwargs == {"attempts": MAX_RETRIES, "lane": "background"}
 
 
 async def test_switch_without_the_account_permission_is_unavailable(
-    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+    hass: HomeAssistant, freezer, caplog: pytest.LogCaptureFixture
 ) -> None:
     api = _mock_api(list_error=FORBIDDEN)
-    with caplog.at_level(logging.ERROR):
+    with caplog.at_level(logging.WARNING):
         entry = await _setup(hass, api)
+        await _tick(hass, freezer)
 
     assert hass.states.get(_switch_id(hass, entry)).state == STATE_UNAVAILABLE
-    assert "set Account to Full management" in caplog.text
+    warnings = [r for r in caplog.records if "set Account to Full management" in r.getMessage()]
+    assert [r.levelno for r in warnings] == [logging.WARNING]
+    assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
     sensor = er.async_get(hass).async_get_entity_id("sensor", DOMAIN, f"{entry.entry_id}_notifications_used")
     assert hass.states.get(sensor).state == "137"
     assert hass.services.has_service(DOMAIN, "mute")
+
+
+async def test_switch_sends_nothing_while_auth_me_says_the_key_has_no_account_permission(
+    hass: HomeAssistant, freezer, caplog: pytest.LogCaptureFixture
+) -> None:
+    freezer.move_to(NOW)
+    api = _mock_api()
+    api.get_me.return_value = _me("none")
+    with caplog.at_level(logging.WARNING):
+        entry = await _setup(hass, api)
+        await _tick(hass, freezer)
+
+    api.list_mutes.assert_not_awaited()
+    assert hass.states.get(_switch_id(hass, entry)).state == STATE_UNAVAILABLE
+    assert caplog.text.count("set Account to Full management") == 1
+
+    # Granted in the app: the usage poll sees it, the next mute poll reads again.
+    api.get_me.return_value = _me("manage")
+    await _tick(hass, freezer)
+    await _tick(hass, freezer)
+
+    api.list_mutes.assert_awaited()
+    assert hass.states.get(_switch_id(hass, entry)).state == STATE_OFF
+
+
+async def test_a_disabled_switch_reads_nothing(hass: HomeAssistant, freezer) -> None:
+    freezer.move_to(NOW)
+    api = _mock_api()
+    entry = _entry()
+    entry.add_to_hass(hass)
+    er.async_get(hass).async_get_or_create(
+        "switch",
+        DOMAIN,
+        f"{entry.entry_id}_pause_notifications",
+        config_entry=entry,
+        disabled_by=er.RegistryEntryDisabler.USER,
+    )
+
+    await async_setup_with_api(hass, entry, api)
+    await _tick(hass, freezer)
+
+    api.list_mutes.assert_not_awaited()
 
 
 async def test_switch_explains_a_missing_manage_permission(hass: HomeAssistant) -> None:
